@@ -12,22 +12,27 @@ datasource db {
 
 // Modelo de Usuario
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  name          String?
-  image         String?
-  plan          String    @default("free") // free, premium, enterprise
-  apiKey        String?   // API key opcional para usuarios avanzados
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  email            String    @unique
+  emailVerified    DateTime?
+  name             String?
+  image            String?
+  plan             String    @default("free") // free, pro, enterprise
+  stripeCustomerId String?   @unique // Stripe customer ID
+  apiKey           String?   // API key opcional para usuarios avanzados
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  agents   Agent[]
-  worlds   World[]
-  accounts Account[]
-  sessions Session[]
+  agents        Agent[]
+  worlds        World[]
+  accounts      Account[]
+  sessions      Session[]
+  subscriptions Subscription[]
+  invoices      Invoice[]
+  payments      Payment[]
 
   @@index([email])
+  @@index([stripeCustomerId])
 }
 
 // NextAuth Models
@@ -175,4 +180,69 @@ model Log {
   @@index([userId])
   @@index([agentId])
   @@index([createdAt])
+}
+
+// Modelo de Suscripciones (Stripe)
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String
+  stripeSubscriptionId String    @unique
+  stripePriceId        String
+  stripeProductId      String
+  status               String    // active, canceled, past_due, trialing, incomplete
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean   @default(false)
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  canceledAt           DateTime?
+  metadata             Json?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSubscriptionId])
+  @@index([status])
+}
+
+// Modelo de Facturas (Stripe)
+model Invoice {
+  id              String   @id @default(cuid())
+  userId          String
+  stripeInvoiceId String   @unique
+  amount          Int      // Monto en centavos
+  currency        String   @default("usd")
+  status          String   // draft, open, paid, uncollectible, void
+  hostedUrl       String?  @db.Text
+  invoicePdf      String?  @db.Text
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  paidAt          DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeInvoiceId])
+  @@index([status])
+}
+
+// Modelo de Pagos (Stripe)
+model Payment {
+  id              String   @id @default(cuid())
+  userId          String
+  stripePaymentId String   @unique
+  amount          Int      // Monto en centavos
+  currency        String   @default("usd")
+  status          String   // succeeded, pending, failed
+  paymentMethod   String?  // card, bank_transfer, etc.
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripePaymentId])
+  @@index([status])
 }
