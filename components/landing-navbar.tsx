@@ -23,8 +23,11 @@ export function LandingNavbar() {
         </Link>
 
         <div className="flex items-center gap-4">
+          <Link href="/pricing">
+            <Button variant="ghost">Pricing</Button>
+          </Link>
           <ThemeToggle />
-          <Link href="/dashboard">
+          <Link href="/login">
             <Button variant="ghost">Iniciar sesión</Button>
           </Link>
           <Link href="/dashboard">
