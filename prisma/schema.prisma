@@ -19,7 +19,7 @@ model User {
   image            String?
   plan             String    @default("free") // free, pro, enterprise
   stripeCustomerId String?   @unique // Stripe customer ID
-  apiKey           String?   // API key opcional para usuarios avanzados
+  apiKey           String?   @unique // API key opcional para usuarios avanzados
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -30,9 +30,11 @@ model User {
   subscriptions Subscription[]
   invoices      Invoice[]
   payments      Payment[]
+  usage         Usage[]
 
   @@index([email])
   @@index([stripeCustomerId])
+  @@index([apiKey])
 }
 
 // NextAuth Models
@@ -245,4 +247,22 @@ model Payment {
   @@index([userId])
   @@index([stripePaymentId])
   @@index([status])
+}
+
+// Modelo de Uso (para tracking de recursos)
+model Usage {
+  id           String   @id @default(cuid())
+  userId       String
+  resourceType String   // message, agent, world, api_call, tokens
+  resourceId   String?  // ID del recurso usado (opcional)
+  quantity     Int      @default(1) // Cantidad usada (ej: tokens, mensajes)
+  metadata     Json?    // Datos adicionales (modelo usado, tiempo de respuesta, etc.)
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resourceType])
+  @@index([createdAt])
+  @@index([userId, resourceType, createdAt]) // Índice compuesto para queries de uso
 }

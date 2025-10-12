@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
 import { getVectorStore } from "@/lib/vector/store";
+import { checkRateLimit } from "@/lib/redis/ratelimit";
+import { canUseResource, trackUsage } from "@/lib/usage/tracker";
+import { auth } from "@/lib/auth";
 
 export async function POST(
   req: NextRequest,
@@ -10,8 +13,52 @@ export async function POST(
 ) {
   try {
     const { id: agentId } = await params;
+
+    // Get authenticated user
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const userPlan = session.user.plan || "free";
+
+    // Check rate limit
+    const rateLimitResult = await checkRateLimit(userId, userPlan);
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded. Please try again later.",
+          limit: rateLimitResult.limit,
+          reset: rateLimitResult.reset,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": rateLimitResult.limit?.toString() || "0",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": rateLimitResult.reset?.toString() || "0",
+          },
+        }
+      );
+    }
+
+    // Check message quota
+    const quotaCheck = await canUseResource(userId, "message");
+    if (!quotaCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: quotaCheck.reason,
+          current: quotaCheck.current,
+          limit: quotaCheck.limit,
+          upgrade: "/pricing",
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
-    const { content, userId = "default-user" } = body;
+    const { content } = body;
 
     if (!content) {
       return NextResponse.json(
@@ -20,7 +67,7 @@ export async function POST(
       );
     }
 
-    // Obtener agente
+    // Obtener agente y verificar ownership
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
     });
@@ -29,8 +76,12 @@ export async function POST(
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
+    if (agent.userId !== userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Guardar mensaje del usuario
-    const userMessage = await prisma.message.create({
+    await prisma.message.create({
       data: {
         agentId,
         userId,
@@ -44,6 +95,7 @@ export async function POST(
       where: {
         subjectId: agentId,
         targetId: userId,
+        targetType: "user",
       },
     });
 
@@ -52,6 +104,7 @@ export async function POST(
         data: {
           subjectId: agentId,
           targetId: userId,
+          targetType: "user",
           trust: 0.5,
           affinity: 0.5,
           respect: 0.5,
@@ -114,6 +167,9 @@ export async function POST(
       })),
     });
 
+    // Estimar tokens usados (aproximación simple)
+    const estimatedTokens = Math.ceil((content.length + response.length) / 4);
+
     // Guardar respuesta
     const assistantMessage = await prisma.message.create({
       data: {
@@ -123,15 +179,30 @@ export async function POST(
         metadata: {
           emotions: EmotionalEngine.getVisibleEmotions(newState),
           relationLevel: EmotionalEngine.getRelationshipLevel(newState),
+          tokensUsed: estimatedTokens,
         },
       },
     });
+
+    // Track usage
+    await Promise.all([
+      trackUsage(userId, "message", 1, agentId, {
+        agentName: agent.name,
+        contentLength: content.length,
+        responseLength: response.length,
+      }),
+      trackUsage(userId, "tokens", estimatedTokens, agentId, {
+        model: "gemini",
+        agentId,
+      }),
+    ]);
 
     // Guardar en memoria vectorial
     const vectorStore = getVectorStore();
     await vectorStore.addMemory(agentId, `User: ${content}\nAgent: ${response}`);
 
-    return NextResponse.json({
+    // Create response with rate limit headers
+    const responseData = {
       message: assistantMessage,
       emotions: EmotionalEngine.getVisibleEmotions(newState),
       relationLevel: EmotionalEngine.getRelationshipLevel(newState),
@@ -139,6 +210,17 @@ export async function POST(
         trust: newState.trust,
         affinity: newState.affinity,
         respect: newState.respect,
+      },
+      usage: {
+        messagesRemaining: quotaCheck.limit === -1 ? "unlimited" : (quotaCheck.limit! - quotaCheck.current! - 1),
+        tokensUsed: estimatedTokens,
+      },
+    };
+
+    return NextResponse.json(responseData, {
+      headers: {
+        "X-RateLimit-Limit": rateLimitResult.limit?.toString() || "0",
+        "X-RateLimit-Remaining": rateLimitResult.remaining?.toString() || "0",
       },
     });
   } catch (error) {
