@@ -20,6 +20,7 @@ model User {
   plan             String    @default("free") // free, pro, enterprise
   stripeCustomerId String?   @unique // Stripe customer ID
   apiKey           String?   @unique // API key opcional para usuarios avanzados
+  metadata         Json?     // Metadata adicional (push subscription, preferences, etc.)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
