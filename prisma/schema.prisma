@@ -17,9 +17,9 @@ model User {
   emailVerified    DateTime?
   name             String?
   image            String?
-  plan             String    @default("free") // free, pro, enterprise
-  stripeCustomerId String?   @unique // Stripe customer ID
-  apiKey           String?   @unique // API key opcional para usuarios avanzados
+  plan                   String    @default("free") // free, pro, enterprise
+  mercadopagoCustomerId  String?   @unique // Mercado Pago customer ID
+  apiKey                 String?   @unique // API key opcional para usuarios avanzados
   metadata         Json?     // Metadata adicional (push subscription, preferences, etc.)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
@@ -36,7 +36,7 @@ model User {
   teamMemberships TeamMember[]
 
   @@index([email])
-  @@index([stripeCustomerId])
+  @@index([mercadopagoCustomerId])
   @@index([apiKey])
 }
 
@@ -200,68 +200,67 @@ model Log {
   @@index([createdAt])
 }
 
-// Modelo de Suscripciones (Stripe)
+// Modelo de Suscripciones (Mercado Pago)
 model Subscription {
-  id                   String    @id @default(cuid())
-  userId               String
-  stripeSubscriptionId String    @unique
-  stripePriceId        String
-  stripeProductId      String
-  status               String    // active, canceled, past_due, trialing, incomplete
-  currentPeriodStart   DateTime
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean   @default(false)
-  trialStart           DateTime?
-  trialEnd             DateTime?
-  canceledAt           DateTime?
-  metadata             Json?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                         String    @id @default(cuid())
+  userId                     String
+  mercadopagoPreapprovalId   String    @unique
+  status                     String    // authorized, paused, cancelled, pending
+  currentPeriodStart         DateTime
+  currentPeriodEnd           DateTime
+  cancelAtPeriodEnd          Boolean   @default(false)
+  trialStart                 DateTime?
+  trialEnd                   DateTime?
+  canceledAt                 DateTime?
+  metadata                   Json?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([stripeSubscriptionId])
+  @@index([mercadopagoPreapprovalId])
   @@index([status])
 }
 
-// Modelo de Facturas (Stripe)
+// Modelo de Facturas (Mercado Pago)
 model Invoice {
-  id              String   @id @default(cuid())
-  userId          String
-  stripeInvoiceId String   @unique
-  amount          Int      // Monto en centavos
-  currency        String   @default("usd")
-  status          String   // draft, open, paid, uncollectible, void
-  hostedUrl       String?  @db.Text
-  invoicePdf      String?  @db.Text
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  paidAt          DateTime?
+  id                  String   @id @default(cuid())
+  userId              String
+  mercadopagoPaymentId String   @unique
+  amount              Int      // Monto en centavos
+  currency            String   @default("ARS")
+  status              String   // approved, pending, rejected, cancelled
+  statusDetail        String?  // Detalle del estado
+  paymentMethodId     String?  // Método de pago usado
+  metadata            Json?
+  createdAt           DateTime @default(now())
+  paidAt              DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([stripeInvoiceId])
+  @@index([mercadopagoPaymentId])
   @@index([status])
 }
 
-// Modelo de Pagos (Stripe)
+// Modelo de Pagos (Mercado Pago)
 model Payment {
-  id              String   @id @default(cuid())
-  userId          String
-  stripePaymentId String   @unique
-  amount          Int      // Monto en centavos
-  currency        String   @default("usd")
-  status          String   // succeeded, pending, failed
-  paymentMethod   String?  // card, bank_transfer, etc.
-  metadata        Json?
-  createdAt       DateTime @default(now())
+  id                  String   @id @default(cuid())
+  userId              String
+  mercadopagoPaymentId String   @unique
+  amount              Int      // Monto en centavos
+  currency            String   @default("ARS")
+  status              String   // approved, pending, rejected, cancelled
+  statusDetail        String?  // Detalle del estado
+  paymentMethod       String?  // credit_card, debit_card, ticket, bank_transfer, etc.
+  metadata            Json?
+  createdAt           DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([stripePaymentId])
+  @@index([mercadopagoPaymentId])
   @@index([status])
 }
 

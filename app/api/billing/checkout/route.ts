@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { createCheckoutSession } from "@/lib/stripe/subscription";
+import { createSubscriptionPreference } from "@/lib/mercadopago/subscription";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
-    const checkoutUrl = await createCheckoutSession(
+    // Crear preferencia de pago en Mercado Pago
+    const checkoutUrl = await createSubscriptionPreference(
       session.user.id,
       session.user.email!,
       planId,
@@ -26,9 +27,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: checkoutUrl });
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    console.error("Error creating Mercado Pago preference:", error);
     return NextResponse.json(
-      { error: "Failed to create checkout session" },
+      { error: "Failed to create payment preference" },
       { status: 500 }
     );
   }

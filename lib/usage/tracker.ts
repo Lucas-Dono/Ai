@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { PLANS, getPlanLimit } from "@/lib/stripe/config";
+import { PLANS, getPlanLimit } from "@/lib/mercadopago/config";
 import { Prisma } from "@prisma/client";
 
 export type ResourceType = "message" | "agent" | "world" | "api_call" | "tokens";

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Sparkles, Zap, Building2, ArrowRight } from "lucide-react";
-import { PLANS } from "@/lib/stripe/config";
+import { PLANS } from "@/lib/mercadopago/config";
 import { motion } from "framer-motion";
 
 export default function PricingPage() {
@@ -244,10 +244,11 @@ export default function PricingPage() {
               </p>
             </Card>
             <Card className="p-6">
-              <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
+              <h3 className="font-semibold mb-2">¿Qué métodos de pago aceptan?</h3>
               <p className="text-sm text-muted-foreground">
-                We accept all major credit cards (Visa, Mastercard, American
-                Express) and bank transfers for Enterprise plans.
+                Aceptamos todos los métodos de pago disponibles en Mercado Pago:
+                tarjetas de crédito y débito, transferencias bancarias, efectivo (Pago Fácil, Rapipago),
+                y dinero en cuenta de Mercado Pago.
               </p>
             </Card>
             <Card className="p-6">

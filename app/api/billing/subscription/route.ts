@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getUserSubscription } from "@/lib/stripe/subscription";
+import { getUserSubscription } from "@/lib/mercadopago/subscription";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       where: { id: session.user.id },
       select: {
         plan: true,
-        stripeCustomerId: true,
+        mercadopagoCustomerId: true,
       },
     });
 
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
             trialEnd: subscription.trialEnd,
           }
         : null,
-      hasStripeCustomer: !!user?.stripeCustomerId,
+      hasMercadoPagoCustomer: !!user?.mercadopagoCustomerId,
     });
   } catch (error) {
     console.error("Error fetching subscription:", error);

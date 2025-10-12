@@ -12,7 +12,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
-import { PLANS } from "@/lib/stripe/config";
+import { PLANS } from "@/lib/mercadopago/config";
 import { motion } from "framer-motion";
 
 interface Subscription {
@@ -26,7 +26,7 @@ interface Subscription {
 interface BillingData {
   plan: string;
   subscription: Subscription | null;
-  hasStripeCustomer: boolean;
+  hasMercadoPagoCustomer: boolean;
 }
 
 export default function BillingPage() {
