@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
+    "dev": "node server.js",
+    "dev:next": "next dev --turbopack",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js",
+    "start:next": "next start",
     "lint": "eslint",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -44,10 +46,13 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.65.0",
     "recharts": "^3.2.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "stripe": "^19.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-react": "^5.29.4",
     "tailwind-merge": "^3.3.1",
+    "web-push": "^3.6.7",
     "zod": "^4.1.12"
   },
   "devDependencies": {
