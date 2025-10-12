@@ -32,6 +32,8 @@ model User {
   invoices      Invoice[]
   payments      Payment[]
   usage         Usage[]
+  teamsOwned    Team[]         @relation("TeamOwner")
+  teamMemberships TeamMember[]
 
   @@index([email])
   @@index([stripeCustomerId])
@@ -78,6 +80,7 @@ model VerificationToken {
 model Agent {
   id           String   @id @default(cuid())
   userId       String
+  teamId       String?  // ID del equipo propietario (opcional)
   kind         String   // companion (emocional) o assistant (administrativo)
   name         String
   description  String?
@@ -87,7 +90,7 @@ model Agent {
   purpose      String?
   profile      Json     // JSON con toda la configuración del agente
   systemPrompt String   @db.Text
-  visibility   String   @default("private") // private, world, public
+  visibility   String   @default("private") // private, world, public, team
   avatar       String?  // URL o identificador de avatar
   tags         Json?    // Tags/categorías para el marketplace
   featured     Boolean  @default(false) // Destacado en el marketplace
@@ -97,7 +100,8 @@ model Agent {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
   worldAgents      WorldAgent[]
   messagesAsAgent  Message[]       @relation("AgentMessages")
@@ -106,6 +110,7 @@ model Agent {
   clones           AgentClone[]    @relation("OriginalAgent")
 
   @@index([userId])
+  @@index([teamId])
   @@index([kind])
   @@index([visibility])
   @@index([featured])
@@ -308,4 +313,60 @@ model AgentClone {
 
   @@index([originalAgentId])
   @@index([clonedByUserId])
+}
+
+// Modelo de Equipo (Teams)
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  plan        String   @default("free") // free, pro, enterprise
+  metadata    Json?    // Configuración adicional del equipo
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner   User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members TeamMember[]
+  invitations TeamInvitation[]
+  agents  Agent[]
+
+  @@index([ownerId])
+  @@index([plan])
+}
+
+// Modelo de Miembro de Equipo
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  role     String   // owner, admin, member, viewer
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId]) // Un usuario solo puede ser miembro una vez por equipo
+  @@index([teamId])
+  @@index([userId])
+  @@index([role])
+}
+
+// Modelo de Invitación a Equipo
+model TeamInvitation {
+  id        String    @id @default(cuid())
+  teamId    String
+  email     String
+  role      String    @default("member") // admin, member, viewer
+  token     String    @unique
+  expiresAt DateTime
+  acceptedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, email]) // Una invitación por email por equipo
+  @@index([teamId])
+  @@index([email])
+  @@index([token])
 }
