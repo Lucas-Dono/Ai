@@ -1,11 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
+import { auth } from "@/lib/auth";
+import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 
 export async function POST(req: NextRequest) {
   try {
+    // Get authenticated user
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    // Check agent creation quota
+    const quotaCheck = await canUseResource(userId, "agent");
+    if (!quotaCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: quotaCheck.reason,
+          current: quotaCheck.current,
+          limit: quotaCheck.limit,
+          upgrade: "/pricing",
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
-    const { name, kind, personality, purpose, tone, userId = "default-user" } = body;
+    const { name, kind, personality, purpose, tone } = body;
 
     // Validar datos
     if (!name || !kind) {
@@ -46,12 +70,19 @@ export async function POST(req: NextRequest) {
       data: {
         subjectId: agent.id,
         targetId: userId,
+        targetType: "user",
         trust: 0.5,
         affinity: 0.5,
         respect: 0.5,
         privateState: { love: 0, curiosity: 0 },
         visibleState: { trust: 0.5, affinity: 0.5, respect: 0.5 },
       },
+    });
+
+    // Track usage
+    await trackUsage(userId, "agent", 1, agent.id, {
+      name: agent.name,
+      kind: agent.kind,
     });
 
     return NextResponse.json(agent, { status: 201 });
