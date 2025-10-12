@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { OnboardingMenu } from "@/components/onboarding/OnboardingMenu";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
@@ -76,6 +77,11 @@ export function DashboardNav() {
           </Button>
         </Link>
 
+        <div className="flex gap-2">
+          <OnboardingMenu />
+          <ThemeToggle />
+        </div>
+
         <div className="flex items-center gap-3 px-3">
           <Avatar className="h-10 w-10">
             <AvatarFallback className="bg-gradient-to-br from-secondary/20 to-primary/20 text-primary font-semibold">
@@ -86,7 +92,6 @@ export function DashboardNav() {
             <div className="font-medium text-sm truncate">Usuario</div>
             <div className="text-xs text-muted-foreground">Plan Free</div>
           </div>
-          <ThemeToggle />
         </div>
       </div>
     </nav>

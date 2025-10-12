@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { WelcomeBanner } from "@/components/onboarding/WelcomeBanner";
 import { motion } from "framer-motion";
 import { Heart, Briefcase, MessageCircle, TrendingUp, Sparkles, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -49,6 +50,9 @@ export default function DashboardPage() {
           Gestiona tus inteligencias y mundos virtuales
         </p>
       </div>
+
+      {/* Welcome Banner */}
+      <WelcomeBanner />
 
       {/* Stats */}
       <div className="grid md:grid-cols-4 gap-6">

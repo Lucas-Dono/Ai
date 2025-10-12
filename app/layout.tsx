@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { OnboardingProvider } from "@/contexts/OnboardingContext";
 
 export const metadata: Metadata = {
   title: "Creador de Inteligencias - Crea, entrena y conecta tus propias IAs",
@@ -35,7 +36,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          {children}
+          <OnboardingProvider>
+            {children}
+          </OnboardingProvider>
         </ThemeProvider>
       </body>
     </html>
