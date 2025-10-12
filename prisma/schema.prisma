@@ -89,6 +89,11 @@ model Agent {
   systemPrompt String   @db.Text
   visibility   String   @default("private") // private, world, public
   avatar       String?  // URL o identificador de avatar
+  tags         Json?    // Tags/categorías para el marketplace
+  featured     Boolean  @default(false) // Destacado en el marketplace
+  rating       Float?   // Rating promedio (0-5)
+  cloneCount   Int      @default(0) // Número de veces clonado
+  originalId   String?  // ID del agente original si es un clon
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -97,9 +102,14 @@ model Agent {
   worldAgents      WorldAgent[]
   messagesAsAgent  Message[]       @relation("AgentMessages")
   relationsSubject Relation[]      @relation("SubjectRelations")
+  reviews          Review[]
+  clones           AgentClone[]    @relation("OriginalAgent")
 
   @@index([userId])
   @@index([kind])
+  @@index([visibility])
+  @@index([featured])
+  @@index([rating])
 }
 
 // Modelo de Mundo (entorno grupal)
@@ -266,4 +276,36 @@ model Usage {
   @@index([resourceType])
   @@index([createdAt])
   @@index([userId, resourceType, createdAt]) // Índice compuesto para queries de uso
+}
+
+// Modelo de Reviews (para el marketplace)
+model Review {
+  id        String   @id @default(cuid())
+  agentId   String
+  userId    String
+  rating    Int      // 1-5 estrellas
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, userId]) // Un usuario solo puede dar una review por agente
+  @@index([agentId])
+  @@index([userId])
+  @@index([rating])
+}
+
+// Modelo de Clones de Agentes (para tracking)
+model AgentClone {
+  id              String   @id @default(cuid())
+  originalAgentId String
+  clonedByUserId  String
+  clonedAgentId   String   @unique // ID del agente clonado
+  createdAt       DateTime @default(now())
+
+  originalAgent Agent @relation("OriginalAgent", fields: [originalAgentId], references: [id], onDelete: Cascade)
+
+  @@index([originalAgentId])
+  @@index([clonedByUserId])
 }

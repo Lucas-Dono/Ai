@@ -1,0 +1,57 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id: originalId } = await params;
+  const original = await prisma.agent.findFirst({
+    where: { id: originalId, visibility: "public" },
+  });
+
+  if (!original) {
+    return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+  }
+
+  const cloned = await prisma.agent.create({
+    data: {
+      userId: session.user.id,
+      name: `${original.name} (Clone)`,
+      kind: original.kind,
+      description: original.description,
+      gender: original.gender,
+      personality: original.personality,
+      tone: original.tone,
+      purpose: original.purpose,
+      profile: original.profile,
+      systemPrompt: original.systemPrompt,
+      visibility: "private",
+      avatar: original.avatar,
+      tags: original.tags,
+      originalId: original.id,
+    },
+  });
+
+  await Promise.all([
+    prisma.agent.update({
+      where: { id: originalId },
+      data: { cloneCount: { increment: 1 } },
+    }),
+    prisma.agentClone.create({
+      data: {
+        originalAgentId: originalId,
+        clonedByUserId: session.user.id,
+        clonedAgentId: cloned.id,
+      },
+    }),
+  ]);
+
+  return NextResponse.json({ agent: cloned, success: true });
+}

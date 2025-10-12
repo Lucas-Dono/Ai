@@ -15,6 +15,7 @@ import {
   Shield,
   Sparkles,
   CreditCard,
+  Store,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/dashboard?filter=companion", label: "Compañeros", icon: Heart },
   { href: "/dashboard?filter=assistant", label: "Asistentes", icon: Briefcase },
   { href: "/mundos", label: "Mundos", icon: Network },
+  { href: "/marketplace", label: "Marketplace", icon: Store },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/configuracion", label: "Configuración", icon: Settings },
   { href: "/administracion", label: "Admin", icon: Shield },
