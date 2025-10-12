@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
-import { getVectorStore } from "@/lib/vector/store";
+import { createMemoryManager } from "@/lib/memory/manager";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { auth } from "@/lib/auth";
@@ -144,6 +144,9 @@ export async function POST(
       },
     });
 
+    // Create memory manager for RAG
+    const memoryManager = createMemoryManager(agentId, userId);
+
     // Obtener mensajes recientes
     const recentMessages = await prisma.message.findMany({
       where: { agentId },
@@ -152,15 +155,21 @@ export async function POST(
     });
 
     // Ajustar system prompt con emoción
-    const adjustedPrompt = EmotionalEngine.adjustPromptForEmotion(
+    const emotionalPrompt = EmotionalEngine.adjustPromptForEmotion(
       agent.systemPrompt,
       newState
+    );
+
+    // Build enhanced prompt with RAG context
+    const enhancedPrompt = await memoryManager.buildEnhancedPrompt(
+      emotionalPrompt,
+      content
     );
 
     // Generar respuesta con LLM
     const llm = getLLMProvider();
     const response = await llm.generate({
-      systemPrompt: adjustedPrompt,
+      systemPrompt: enhancedPrompt,
       messages: recentMessages.reverse().map((m) => ({
         role: m.role as "user" | "assistant",
         content: m.content,
@@ -184,7 +193,7 @@ export async function POST(
       },
     });
 
-    // Track usage
+    // Track usage and store memories in parallel
     await Promise.all([
       trackUsage(userId, "message", 1, agentId, {
         agentName: agent.name,
@@ -195,11 +204,17 @@ export async function POST(
         model: "gemini",
         agentId,
       }),
+      // Store user message in memory
+      memoryManager.storeMessage(content, "user", {
+        messageId: assistantMessage.id,
+      }),
+      // Store assistant response in memory
+      memoryManager.storeMessage(response, "assistant", {
+        messageId: assistantMessage.id,
+        emotions: EmotionalEngine.getVisibleEmotions(newState),
+        relationLevel: EmotionalEngine.getRelationshipLevel(newState),
+      }),
     ]);
-
-    // Guardar en memoria vectorial
-    const vectorStore = getVectorStore();
-    await vectorStore.addMemory(agentId, `User: ${content}\nAgent: ${response}`);
 
     // Create response with rate limit headers
     const responseData = {

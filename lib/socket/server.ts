@@ -16,6 +16,7 @@ import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
+import { createMemoryManager } from "@/lib/memory/manager";
 
 type SocketServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 type AuthenticatedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -327,10 +328,19 @@ async function handleChatMessage(
     take: 10,
   });
 
+  // Create memory manager for RAG
+  const memoryManager = createMemoryManager(agentId, userId);
+
   // Adjust prompt based on emotional state
-  const adjustedPrompt = EmotionalEngine.adjustPromptForEmotion(
+  const emotionalPrompt = EmotionalEngine.adjustPromptForEmotion(
     agent.systemPrompt,
     newState
+  );
+
+  // Build enhanced prompt with RAG context
+  const adjustedPrompt = await memoryManager.buildEnhancedPrompt(
+    emotionalPrompt,
+    message
   );
 
   // Start typing indicator
@@ -420,7 +430,7 @@ async function handleChatMessage(
       },
     });
 
-    // Track usage
+    // Track usage and store memories
     await Promise.all([
       trackUsage(userId, "message", 1, agentId, {
         agentName: agent.name,
@@ -430,6 +440,16 @@ async function handleChatMessage(
       trackUsage(userId, "tokens", estimatedTokens, agentId, {
         model: "gemini",
         agentId,
+      }),
+      // Store user message in memory
+      memoryManager.storeMessage(message, "user", {
+        messageId: assistantMessage.id,
+      }),
+      // Store assistant response in memory
+      memoryManager.storeMessage(fullResponse, "assistant", {
+        messageId: assistantMessage.id,
+        emotions: EmotionalEngine.getVisibleEmotions(newState),
+        relationLevel: EmotionalEngine.getRelationshipLevel(newState),
       }),
     ]);
   } catch (error) {
