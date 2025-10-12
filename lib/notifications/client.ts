@@ -130,7 +130,7 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription> 
 
     // Get VAPID public key
     const vapidPublicKey = await getVAPIDPublicKey();
-    const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+    const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey) as BufferSource;
 
     // Subscribe to push
     const subscription = await registration.pushManager.subscribe({

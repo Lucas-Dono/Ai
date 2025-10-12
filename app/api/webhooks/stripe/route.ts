@@ -120,7 +120,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
   console.log("Invoice paid:", invoice.id);
 
-  const subscriptionId = invoice.subscription as string;
+  const subscriptionId = (invoice as any).subscription as string | undefined;
   if (!subscriptionId) return;
 
   // Buscar suscripción
@@ -153,10 +153,9 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   });
 
   // Crear registro de pago
-  if (invoice.payment_intent) {
-    const paymentIntent = await stripe.paymentIntents.retrieve(
-      invoice.payment_intent as string
-    );
+  const paymentIntentId = (invoice as any).payment_intent;
+  if (paymentIntentId && typeof paymentIntentId === 'string') {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     await prisma.payment.create({
       data: {
@@ -174,7 +173,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log("Invoice payment failed:", invoice.id);
 
-  const subscriptionId = invoice.subscription as string;
+  const subscriptionId = (invoice as any).subscription as string | undefined;
   if (!subscriptionId) return;
 
   const subscription = await prisma.subscription.findUnique({

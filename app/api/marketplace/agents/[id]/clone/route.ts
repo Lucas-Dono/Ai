@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function POST(
   req: NextRequest,
@@ -30,11 +31,11 @@ export async function POST(
       personality: original.personality,
       tone: original.tone,
       purpose: original.purpose,
-      profile: original.profile,
+      profile: original.profile as Prisma.InputJsonValue,
       systemPrompt: original.systemPrompt,
       visibility: "private",
       avatar: original.avatar,
-      tags: original.tags,
+      tags: original.tags as Prisma.InputJsonValue,
       originalId: original.id,
     },
   });

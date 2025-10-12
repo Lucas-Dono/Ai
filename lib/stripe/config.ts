@@ -2,7 +2,7 @@ import Stripe from "stripe";
 
 // Inicializar Stripe
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-09-30.clover",
   typescript: true,
 });
 
@@ -85,7 +85,7 @@ export type PlanId = keyof typeof PLANS;
 
 // Verificar si un plan tiene una feature
 export function hasPlanFeature(planId: PlanId, feature: string): boolean {
-  return PLANS[planId].features.includes(feature);
+  return (PLANS[planId].features as readonly string[]).includes(feature);
 }
 
 // Obtener límite de un recurso

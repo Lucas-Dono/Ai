@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLANS, getPlanLimit } from "@/lib/stripe/config";
+import { Prisma } from "@prisma/client";
 
 export type ResourceType = "message" | "agent" | "world" | "api_call" | "tokens";
 
@@ -17,7 +18,7 @@ export async function trackUsage(
       resourceType,
       resourceId,
       quantity,
-      metadata: metadata || undefined,
+      metadata: (metadata as Prisma.InputJsonValue) || undefined,
     },
   });
 }
@@ -230,7 +231,10 @@ export async function isNearLimit(
   const stats = await getUsageStats(userId);
   if (!stats) return false;
 
-  const resource = stats[resourceType];
+  // Map singular to plural
+  const pluralMap = { message: "messages", agent: "agents", world: "worlds" } as const;
+  const resourceKey = pluralMap[resourceType];
+  const resource = stats[resourceKey];
   if (resource.limit === -1) return false; // unlimited
 
   return resource.percentage >= 80;

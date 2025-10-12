@@ -59,7 +59,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     });
 
     // Extract the embedding array
-    const embedding = Array.from(output.data);
+    const embedding = Array.from(output.data) as number[];
 
     return embedding;
   } catch (error) {

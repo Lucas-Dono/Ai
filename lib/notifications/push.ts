@@ -5,6 +5,7 @@
 
 import webpush from "web-push";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 // VAPID keys for web push (should be in environment variables)
 const VAPID_PUBLIC_KEY =
@@ -55,7 +56,7 @@ export async function savePushSubscription(
       where: { id: userId },
       data: {
         metadata: {
-          pushSubscription: subscription,
+          pushSubscription: subscription as unknown as Prisma.InputJsonValue,
         },
       },
     });

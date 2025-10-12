@@ -9,19 +9,22 @@ export async function GET(req: NextRequest) {
   const sort = searchParams.get("sort") || "popular";
   const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
 
-  const where: any = { visibility: "public" };
-  if (query) {
-    where.OR = [
-      { name: { contains: query, mode: "insensitive" } },
-      { description: { contains: query, mode: "insensitive" } },
-    ];
-  }
-  if (kind) where.kind = kind;
-  if (featured) where.featured = true;
+  const where = {
+    visibility: "public" as const,
+    ...(query && {
+      OR: [
+        { name: { contains: query, mode: "insensitive" as const } },
+        { description: { contains: query, mode: "insensitive" as const } },
+      ],
+    }),
+    ...(kind && { kind }),
+    ...(featured && { featured: true }),
+  };
 
-  const orderBy: any = sort === "popular" ? { cloneCount: "desc" } :
-                       sort === "rating" ? { rating: "desc" } :
-                       { createdAt: "desc" };
+  const orderBy =
+    sort === "popular" ? { cloneCount: "desc" as const } :
+    sort === "rating" ? { rating: "desc" as const } :
+    { createdAt: "desc" as const };
 
   const agents = await prisma.agent.findMany({
     where,

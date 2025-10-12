@@ -122,9 +122,10 @@ export class MemoryManager {
       // Filter by similarity threshold and format results
       const relevantMessages = searchResults
         .filter((result) => result.similarity >= similarityThreshold)
+        .filter((result) => result.metadata.role === "user" || result.metadata.role === "assistant")
         .map((result) => ({
           content: result.metadata.content,
-          role: result.metadata.role,
+          role: result.metadata.role as "user" | "assistant",
           timestamp: new Date(result.metadata.timestamp),
           similarity: result.similarity,
           emotions: result.metadata.emotions,

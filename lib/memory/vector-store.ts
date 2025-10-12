@@ -102,7 +102,7 @@ export class VectorStore {
       this.index!.addPoint(embedding, label);
 
       // Store metadata
-      const fullMetadata: VectorMetadata = { id, ...metadata };
+      const fullMetadata = { id, ...metadata } as VectorMetadata;
       this.metadata.set(id, fullMetadata);
       this.idToLabel.set(id, label);
       this.labelToId.set(label, id);

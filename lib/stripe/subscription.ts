@@ -152,6 +152,7 @@ export async function syncSubscription(
   });
 
   // Crear o actualizar suscripción en DB
+  const sub = subscription as any;
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
     create: {
@@ -160,32 +161,32 @@ export async function syncSubscription(
       stripePriceId: subscription.items.data[0].price.id,
       stripeProductId: subscription.items.data[0].price.product as string,
       status: subscription.status,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      trialStart: subscription.trial_start
-        ? new Date(subscription.trial_start * 1000)
+      currentPeriodStart: new Date(sub.current_period_start * 1000),
+      currentPeriodEnd: new Date(sub.current_period_end * 1000),
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      trialStart: sub.trial_start
+        ? new Date(sub.trial_start * 1000)
         : null,
-      trialEnd: subscription.trial_end
-        ? new Date(subscription.trial_end * 1000)
+      trialEnd: sub.trial_end
+        ? new Date(sub.trial_end * 1000)
         : null,
-      canceledAt: subscription.canceled_at
-        ? new Date(subscription.canceled_at * 1000)
+      canceledAt: sub.canceled_at
+        ? new Date(sub.canceled_at * 1000)
         : null,
     },
     update: {
       status: subscription.status,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      trialStart: subscription.trial_start
-        ? new Date(subscription.trial_start * 1000)
+      currentPeriodStart: new Date(sub.current_period_start * 1000),
+      currentPeriodEnd: new Date(sub.current_period_end * 1000),
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      trialStart: sub.trial_start
+        ? new Date(sub.trial_start * 1000)
         : null,
-      trialEnd: subscription.trial_end
-        ? new Date(subscription.trial_end * 1000)
+      trialEnd: sub.trial_end
+        ? new Date(sub.trial_end * 1000)
         : null,
-      canceledAt: subscription.canceled_at
-        ? new Date(subscription.canceled_at * 1000)
+      canceledAt: sub.canceled_at
+        ? new Date(sub.canceled_at * 1000)
         : null,
     },
   });

@@ -72,6 +72,7 @@ export async function POST(
           data: {
             subjectId: agent.id,
             targetId: userId,
+            targetType: "user",
             trust: 0.5,
             affinity: 0.5,
             respect: 0.5,

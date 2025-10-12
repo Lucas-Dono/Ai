@@ -319,7 +319,6 @@ export async function getEmotionalStats(
       userId,
       role: "assistant",
       createdAt: { gte: start, lte: end },
-      metadata: { not: null },
     },
     select: { metadata: true },
   });
@@ -329,14 +328,16 @@ export async function getEmotionalStats(
 
   messages.forEach((msg) => {
     const metadata = msg.metadata as any;
-    if (metadata?.emotions) {
-      metadata.emotions.forEach((emotion: string) => {
-        emotionDistribution[emotion] = (emotionDistribution[emotion] || 0) + 1;
-      });
-    }
-    if (metadata?.relationLevel) {
-      const level = metadata.relationLevel;
-      relationshipLevels[level] = (relationshipLevels[level] || 0) + 1;
+    if (metadata && typeof metadata === 'object') {
+      if (metadata.emotions) {
+        metadata.emotions.forEach((emotion: string) => {
+          emotionDistribution[emotion] = (emotionDistribution[emotion] || 0) + 1;
+        });
+      }
+      if (metadata.relationLevel) {
+        const level = metadata.relationLevel;
+        relationshipLevels[level] = (relationshipLevels[level] || 0) + 1;
+      }
     }
   });
 
@@ -368,6 +369,7 @@ export async function getAgentStats(
           role: true,
           content: true,
           metadata: true,
+          userId: true,
         },
       },
       relationsSubject: {
