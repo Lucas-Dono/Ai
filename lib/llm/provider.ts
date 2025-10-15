@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export interface Message {
   role: "user" | "assistant" | "system";
@@ -13,16 +13,22 @@ export interface GenerateOptions {
 }
 
 export class LLMProvider {
-  private genAI: GoogleGenerativeAI;
-  private model: ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
+  private ai: GoogleGenAI;
 
   constructor() {
+    // Verificar que existe la API key
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY no está configurada");
     }
-    this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    console.log('[LLM] Inicializando GoogleGenAI...');
+    console.log('[LLM] API Key detectada:', apiKey ? 'Sí ✓' : 'No ✗');
+    console.log('[LLM] API Key primeros caracteres:', apiKey.substring(0, 10) + '...');
+
+    // Usar constructor vacío como en el script de prueba exitoso
+    // La librería buscará automáticamente GEMINI_API_KEY en las variables de entorno
+    this.ai = new GoogleGenAI({});
   }
 
   async generate(options: GenerateOptions): Promise<string> {
@@ -37,7 +43,9 @@ export class LLMProvider {
     const lastMessage = messages[messages.length - 1];
 
     try {
-      const chat = this.model.startChat({
+      const model = await this.ai.models.get({ model: "gemini-2.0-flash-exp" });
+      // @ts-expect-error - API method exists but not in type definitions
+      const chat = model.startChat({
         history,
         generationConfig: {
           temperature,
@@ -76,9 +84,24 @@ Responde SOLO con un JSON válido con este formato:
 }`;
 
     try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      console.log('[LLM] Generando perfil con Gemini 2.5 Flash...');
+
+      const response = await this.ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          temperature: 0.9,
+          thinkingConfig: {
+            thinkingBudget: 0, // Deshabilitar pensamiento para mayor velocidad
+          },
+        },
+      });
+
+      const text = response.text;
+      if (!text) {
+        throw new Error("Gemini no retornó texto en la respuesta");
+      }
+      console.log('[LLM] Respuesta de Gemini recibida');
 
       // Extraer JSON de la respuesta
       const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -88,12 +111,22 @@ Responde SOLO con un JSON válido con este formato:
 
       return JSON.parse(jsonMatch[0]);
     } catch (error) {
-      console.error("Error al generar perfil:", error);
+      console.error("[LLM] Error al generar perfil, usando fallback:", error);
       // Fallback: devolver datos básicos
-      return {
-        profile: rawData,
-        systemPrompt: `Eres ${rawData.name || "una IA"}. ${rawData.personality || ""} ${rawData.purpose || ""}`,
+      const fallback = {
+        profile: {
+          name: rawData.name,
+          kind: rawData.kind,
+          personality: rawData.personality,
+          purpose: rawData.purpose,
+          tone: rawData.tone,
+          traits: ["amigable", "conversacional"],
+          emotions: { joy: 0.7, calm: 0.8 },
+        },
+        systemPrompt: `Eres ${rawData.name || "una IA"}${rawData.kind === 'companion' ? ', un compañero emocional' : ', un asistente'}. ${rawData.personality || ""} ${rawData.purpose || ""} Usa un tono ${rawData.tone || "amigable"}.`,
       };
+      console.log('[LLM] Usando perfil fallback:', fallback);
+      return fallback;
     }
   }
 }

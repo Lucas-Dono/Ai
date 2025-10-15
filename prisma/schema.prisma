@@ -24,16 +24,18 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  agents        Agent[]
-  worlds        World[]
-  accounts      Account[]
-  sessions      Session[]
-  subscriptions Subscription[]
-  invoices      Invoice[]
-  payments      Payment[]
-  usage         Usage[]
-  teamsOwned    Team[]         @relation("TeamOwner")
-  teamMemberships TeamMember[]
+  agents             Agent[]
+  worlds             World[]
+  accounts           Account[]
+  sessions           Session[]
+  subscriptions      Subscription[]
+  invoices           Invoice[]
+  payments           Payment[]
+  usage              Usage[]
+  teamsOwned         Team[]              @relation("TeamOwner")
+  teamMemberships    TeamMember[]
+  fastsdInstallation FastSDInstallation?
+  reactions          Reaction[]
 
   @@index([email])
   @@index([mercadopagoCustomerId])
@@ -85,10 +87,10 @@ model Agent {
   name         String
   description  String?
   gender       String?
-  personality  String?
-  tone         String?
-  purpose      String?
-  profile      Json     // JSON con toda la configuración del agente
+  personality  String?  // DEPRECATED: usar personalityCore
+  tone         String?  // DEPRECATED: usar internalState
+  purpose      String?  // DEPRECATED: usar personalityCore.goals
+  profile      Json     // JSON con toda la configuración del agente (DEPRECATED)
   systemPrompt String   @db.Text
   visibility   String   @default("private") // private, world, public, team
   avatar       String?  // URL o identificador de avatar
@@ -109,12 +111,222 @@ model Agent {
   reviews          Review[]
   clones           AgentClone[]    @relation("OriginalAgent")
 
+  // Sistema emocional avanzado
+  personalityCore  PersonalityCore?
+  internalState    InternalState?
+  episodicMemories EpisodicMemory[]
+  semanticMemory   SemanticMemory?
+  proceduralMemory ProceduralMemory?
+  characterGrowth  CharacterGrowth?
+
+  // Sistema de voz multimodal
+  voiceConfig      VoiceConfig?
+
+  // Sistema de expresión visual
+  characterAppearance CharacterAppearance?
+  visualExpressions   VisualExpression[]
+
   @@index([userId])
   @@index([teamId])
   @@index([kind])
   @@index([visibility])
   @@index([featured])
   @@index([rating])
+}
+
+// ============================================
+// SISTEMA EMOCIONAL AVANZADO
+// ============================================
+
+// MÓDULO 1: PERSONALITY CORE (Núcleo de Personalidad)
+model PersonalityCore {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Big Five Personality Traits (0-100)
+  openness          Int @default(50)         // Curiosidad, creatividad
+  conscientiousness Int @default(50)         // Organización, autodisciplina
+  extraversion      Int @default(50)         // Energía social
+  agreeableness     Int @default(50)         // Cooperación, empatía
+  neuroticism       Int @default(50)         // Estabilidad emocional
+
+  // Core Values (JSON array)
+  // [{ "value": "autenticidad", "weight": 0.9, "description": "..." }]
+  coreValues Json
+
+  // Moral Schemas (JSON array)
+  // [{ "domain": "honestidad", "stance": "directa pero empática", "threshold": 0.7 }]
+  moralSchemas Json
+
+  // Backstory y contexto
+  backstory String? @db.Text
+
+  // Initial baseline emotions
+  baselineEmotions Json // { "joy": 0.4, "curiosity": 0.5, ... }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// MÓDULO 2: INTERNAL STATE (Estado Interno Dinámico)
+model InternalState {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Current Emotions (JSON con intensidades 0-1)
+  // { "joy": 0.4, "interest": 0.6, "anxiety": 0.2, "affection": 0.5, ... }
+  currentEmotions Json
+
+  // PAD Mood Model
+  moodValence   Float @default(0.0)  // -1 (negativo) a +1 (positivo)
+  moodArousal   Float @default(0.5)  // 0 (calmado) a 1 (activado)
+  moodDominance Float @default(0.5)  // 0 (sumiso) a 1 (dominante)
+
+  // Emotion decay parameters
+  emotionDecayRate Float @default(0.1)   // Tasa de decaimiento
+  emotionInertia   Float @default(0.3)   // Resistencia al cambio
+
+  // Psychological Needs (0-1)
+  needConnection Float @default(0.5)  // Necesidad de conexión emocional
+  needAutonomy   Float @default(0.5)  // Necesidad de autonomía
+  needCompetence Float @default(0.5)  // Necesidad de sentirse competente
+  needNovelty    Float @default(0.5)  // Necesidad de novedad/estimulación
+
+  // Active Goals (JSON array)
+  // [{ "goal": "Conocer mejor al usuario", "priority": 0.8, "progress": 0.4, "type": "social" }]
+  activeGoals Json
+
+  // Conversation context (últimos N mensajes)
+  conversationBuffer Json
+
+  lastUpdated DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([lastUpdated])
+}
+
+// MÓDULO 4: EPISODIC MEMORY (Memoria Episódica con embeddings)
+model EpisodicMemory {
+  id        String   @id @default(cuid())
+  agentId   String
+
+  // Contenido del evento
+  event String @db.Text
+
+  // Contexto emocional del evento
+  userEmotion      String?  // Emoción detectada del usuario
+  characterEmotion String?  // Emoción del personaje en ese momento
+  emotionalValence Float    // -1 a 1
+
+  // Importancia y decay
+  importance Float @default(0.5)  // 0 a 1
+  decayFactor Float @default(1.0) // Disminuye con el tiempo
+
+  // Embedding vectorial para búsqueda semántica (JSON temporal, migrar a pgvector después)
+  embedding Json? // Array de 1536 números, migrar a pgvector cuando esté disponible
+
+  // Conexiones con otras memorias
+  connectedMemoryIds Json? // Array de IDs de memorias relacionadas
+
+  // Metadata adicional
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([createdAt])
+  @@index([importance])
+  @@index([emotionalValence])
+}
+
+// MÓDULO 4B: SEMANTIC MEMORY (Memoria Semántica - Hechos)
+model SemanticMemory {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Hechos sobre el usuario (JSON)
+  // { "occupation": "ingeniero", "interests": ["gaming"], "pet_names": ["Luna"] }
+  userFacts Json
+
+  // Preferencias aprendidas del usuario
+  // { "communication_style": "directo", "support_type": "escucha activa" }
+  userPreferences Json
+
+  // Etapa de la relación
+  relationshipStage String @default("first_meeting") // first_meeting, acquaintance, friend, close_friend, etc.
+
+  // Conocimiento del mundo (opcional, puede ir creciendo)
+  worldKnowledge Json?
+
+  lastUpdated DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// MÓDULO 4C: PROCEDURAL MEMORY (Patrones de Comportamiento)
+model ProceduralMemory {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Patrones de comportamiento aprendidos (JSON)
+  // { "when_user_stressed": "ofrecer espacio antes de consejo", ... }
+  behavioralPatterns Json
+
+  // User triggers aprendidos
+  // { "gets_defensive_when": ["trabajo mencionado bruscamente"], ... }
+  userTriggers Json
+
+  // Estrategias que funcionan con este usuario
+  // { "humor_style": "sutil", "timing_for_advice": "después de validar" }
+  effectiveStrategies Json
+
+  lastUpdated DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// MÓDULO 7: CHARACTER GROWTH (Crecimiento del Personaje)
+model CharacterGrowth {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Relationship Dynamics
+  trustLevel    Float @default(0.4)    // 0 a 1
+  intimacyLevel Float @default(0.3)    // 0 a 1
+
+  // Historia de eventos positivos/negativos
+  positiveEventsCount Int @default(0)
+  negativeEventsCount Int @default(0)
+  conflictHistory Json // Array de conflictos pasados
+
+  // Personality Drift (cambios sutiles en personalidad)
+  // { "openness": { "current": 65, "initial": 60, "influenced_by": [...] } }
+  personalityDrift Json?
+
+  // Learned Patterns sobre el usuario
+  learnedUserPatterns Json?
+
+  // Métricas de evolución
+  conversationCount Int @default(0)
+  lastSignificantEvent DateTime?
+
+  lastUpdated DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
 }
 
 // Modelo de Mundo (entorno grupal)
@@ -175,15 +387,32 @@ model Message {
   userId    String?  // Usuario que envió el mensaje
   role      String   // user, assistant, system
   content   String   @db.Text
-  metadata  Json?    // Datos adicionales (emociones, contexto, etc.)
+  metadata  Json?    // Datos adicionales (emociones, contexto, tipo de mensaje: text/audio/image, etc.)
   createdAt DateTime @default(now())
 
-  world World? @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  agent Agent? @relation("AgentMessages", fields: [agentId], references: [id], onDelete: Cascade)
+  world     World?     @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  agent     Agent?     @relation("AgentMessages", fields: [agentId], references: [id], onDelete: Cascade)
+  reactions Reaction[] // Reacciones de usuarios al mensaje
 
   @@index([worldId])
   @@index([agentId])
   @@index([createdAt])
+}
+
+// Modelo de Reacciones a Mensajes (WhatsApp-like)
+model Reaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String   // Emoji de la reacción (👍, ❤️, 😂, etc.)
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, emoji, userId]) // Un usuario puede dar una reacción específica solo una vez
+  @@index([messageId])
+  @@index([userId])
 }
 
 // Modelo de Logs (para panel administrativo)
@@ -368,4 +597,192 @@ model TeamInvitation {
   @@index([teamId])
   @@index([email])
   @@index([token])
+}
+
+// ============================================
+// SISTEMA DE VOZ MULTIMODAL
+// ============================================
+
+// CONFIGURACIÓN DE VOZ POR AGENTE
+model VoiceConfig {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Voz seleccionada de ElevenLabs
+  voiceId   String   // ID de la voz en ElevenLabs
+  voiceName String   // Nombre de la voz (para referencia)
+
+  // Características de la voz (para búsqueda/matching)
+  gender    String   @default("neutral") // male, female, neutral
+  age       String   @default("middle_aged") // young, middle_aged, old
+  accent    String?  // "es-MX", "es-AR", "es-ES", "en-US", etc.
+
+  // Descripción del personaje (usada para seleccionar voz)
+  characterDescription String? @db.Text
+
+  // Confidence score del matching automático
+  selectionConfidence Float @default(0.5)
+
+  // Si fue seleccionada manualmente o automáticamente
+  manualSelection Boolean @default(false)
+
+  // Parámetros de modulación por defecto
+  defaultStability      Float @default(0.5)  // 0-1
+  defaultSimilarityBoost Float @default(0.75) // 0-1
+  defaultStyle          Float @default(0.0)  // 0-1
+
+  // Configuración de entrada
+  enableVoiceInput      Boolean @default(true)
+  whisperModel          String  @default("standard") // standard o mini
+  detectEmotionalTone   Boolean @default(true)
+
+  // Configuración de salida
+  enableVoiceOutput     Boolean @default(true)
+  autoPlayVoice         Boolean @default(false)
+  voiceSpeed            Float   @default(1.0) // 0.5 - 2.0
+
+  // Estadísticas de uso
+  totalVoiceGenerations Int     @default(0)
+  totalTranscriptions   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([voiceId])
+}
+
+// ============================================
+// SISTEMA DE EXPRESIÓN VISUAL
+// ============================================
+
+// APARIENCIA BASE DEL PERSONAJE
+model CharacterAppearance {
+  id        String   @id @default(cuid())
+  agentId   String   @unique
+
+  // Descripción base para generación
+  basePrompt      String   @db.Text  // Prompt completo de SD/Gemini
+  style           String   @default("realistic") // "realistic", "anime", "semi-realistic"
+
+  // Características físicas
+  gender          String   // "male", "female", "non-binary"
+  ethnicity       String?  // "asian", "caucasian", "hispanic", "african", "middle-eastern", etc.
+  age             String   @default("25-30")
+  hairColor       String?
+  hairStyle       String?
+  eyeColor        String?
+  clothing        String?  // Descripción de ropa/outfit
+
+  // URLs de referencias
+  referencePhotoUrl String? // Foto de referencia subida por usuario
+  basePhotoUrl      String? // Primera foto generada (base neutra)
+
+  // Config de generación
+  negativePrompt  String?  @db.Text
+  seed            Int?     // Para consistencia en generaciones
+
+  // Provider preferences
+  preferredProvider String @default("gemini") // "gemini", "huggingface"
+
+  // Stats
+  totalGenerations Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// EXPRESIONES VISUALES CACHEADAS
+model VisualExpression {
+  id        String   @id @default(cuid())
+  agentId   String
+
+  // Identificador de expresión
+  emotionType     String   // "joy", "distress", "neutral", "anger", etc.
+  intensity       String   // "low", "medium", "high"
+  context         String?  // "celebration", "comfort", "greeting", etc.
+
+  // Media
+  type            String   // "photo" o "video"
+  url             String   // CDN URL o data URL
+  thumbnailUrl    String?  // Thumbnail para videos
+
+  // Metadata de generación
+  generationParams Json    // { provider, seed, prompt, etc. }
+  width           Int
+  height          Int
+  durationMs      Int?     // Para videos (milisegundos)
+
+  // Provider usado
+  provider        String   // "gemini" o "huggingface"
+
+  // Stats de uso
+  timesUsed       Int      @default(0)
+  lastUsed        DateTime?
+
+  createdAt       DateTime @default(now())
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, emotionType, intensity])
+  @@index([agentId, timesUsed])
+  @@index([provider])
+}
+
+// ============================================
+// SISTEMA DE GENERACIÓN LOCAL (FastSD CPU)
+// ============================================
+
+// ESTADO DE INSTALACIÓN DE FASTSD POR USUARIO
+model FastSDInstallation {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+
+  // Estado de instalación
+  installed           Boolean  @default(false)
+  installPath         String?  // Ruta de instalación
+  version             String?  // Versión instalada
+
+  // Estado del servidor
+  serverRunning       Boolean  @default(false)
+  serverUrl           String   @default("http://localhost:8000")
+  lastHealthCheck     DateTime?
+
+  // Modelos instalados
+  installedModels     Json?    // Array de modelos disponibles
+  activeModel         String?  // Modelo actualmente activo
+
+  // Configuración
+  device              String   @default("CPU") // "CPU", "GPU", "NPU"
+  useOpenVINO         Boolean  @default(true)
+  useTinyAutoencoder  Boolean  @default(true)
+
+  // Aprobaciones y consentimientos
+  userApprovedInstallation Boolean  @default(false)
+  installationRequestedAt  DateTime?
+  installationCompletedAt  DateTime?
+  installationError        String?  @db.Text
+
+  // Estadísticas de uso
+  totalGenerations    Int      @default(0)
+  totalGenerationTime Float    @default(0.0) // Segundos totales
+  avgGenerationTime   Float?   // Promedio de tiempo por imagen
+
+  // Metadata
+  metadata            Json?    // Configuración adicional
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([installed])
+  @@index([serverRunning])
 }

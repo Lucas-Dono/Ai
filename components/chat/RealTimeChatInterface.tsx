@@ -15,6 +15,7 @@ import { Send, Loader2 } from "lucide-react";
 import { generateGradient, getInitials } from "@/lib/utils";
 import { useChatSocket } from "@/hooks/useSocket";
 import { useTyping, useRemoteTyping } from "@/hooks/useTyping";
+import { EmotionalSystemPanel } from "./EmotionalSystemPanel";
 import type {
   ChatMessageEvent,
   StreamChunkEvent,
@@ -364,6 +365,16 @@ export function RealTimeChatInterface({
           </div>
         </div>
       </div>
+
+      {/* Emotional System Panel (toggleable) */}
+      <EmotionalSystemPanel
+        agentName={agentName}
+        emotionalState={{
+          emotions,
+          relationLevel: parseInt(relationLevel) || 50,
+          relationState,
+        }}
+      />
     </div>
   );
 }

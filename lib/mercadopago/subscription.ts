@@ -60,6 +60,7 @@ export async function createSubscriptionPreference(
         end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 año
       },
       external_reference: userId,
+      // @ts-expect-error - notification_url exists but not in type definition
       notification_url: MERCADOPAGO_URLS.notification,
       status: "pending",
     },

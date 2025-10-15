@@ -11,6 +11,7 @@ import {
   getRoomName,
   TYPING_TIMEOUT,
 } from "./events";
+import { registerChatEvents, registerReactionEvents } from "./chat-events";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
@@ -95,6 +96,15 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
       connected: true,
       timestamp: Date.now(),
     });
+
+    // Socket server is guaranteed to be initialized at this point
+    const socketServer = io!;
+
+    // Register multimodal chat events
+    registerChatEvents(socketServer, socket);
+
+    // Register reaction events
+    registerReactionEvents(socketServer, socket);
 
     // Handle presence online
     handlePresenceOnline(socket, userId);

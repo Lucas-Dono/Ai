@@ -1,0 +1,227 @@
+/**
+ * API Route: Multimodal Agent Message
+ *
+ * Endpoint que procesa mensajes del usuario y genera respuestas multimodales:
+ * - Analiza la emoción del mensaje
+ * - Genera respuesta de texto
+ * - Genera audio (voz del personaje)
+ * - Genera imagen (expresión facial)
+ * - Decide autónomamente qué combinación enviar
+ *
+ * POST /api/agents/[id]/message-multimodal
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { getLLMProvider } from "@/lib/llm/provider";
+import { getEmotionalSystemOrchestrator } from "@/lib/emotional-system/orchestrator";
+import { getVisualGenerationService } from "@/lib/visual-system/visual-generation-service";
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { message } = await request.json();
+
+    if (!message || typeof message !== "string") {
+      return NextResponse.json(
+        { error: "Message is required" },
+        { status: 400 }
+      );
+    }
+
+    const agentId = params.id;
+
+    // 1. Verificar que el agente existe y el usuario tiene acceso
+    const agent = await prisma.agent.findUnique({
+      where: { id: agentId },
+      include: {
+        emotionalState: true,
+        characterAppearance: true,
+      },
+    });
+
+    if (!agent) {
+      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+    }
+
+    if (agent.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    console.log(`[MultimodalAPI] Processing message for agent: ${agent.name}`);
+
+    // 2. Analizar emoción del mensaje del usuario
+    const analyzer = getEmotionalAnalyzer();
+    const userEmotion = await analyzer.analyzeMessage(message);
+
+    console.log(`[MultimodalAPI] User emotion:`, userEmotion);
+
+    // 3. Generar respuesta completa del agente (con emoción y personalidad)
+    const orchestrator = getEmotionalOrchestrator();
+    const agentResponse = await orchestrator.generateResponse({
+      agentId,
+      userMessage: message,
+      userEmotion,
+      includeMetadata: true,
+    });
+
+    console.log(`[MultimodalAPI] Agent response generated`);
+    console.log(`[MultimodalAPI] Agent emotion:`, agentResponse.emotion);
+
+    // 4. Decidir qué modalidades incluir
+    const modalityDecision = decideModalities({
+      messageLength: agentResponse.text.length,
+      emotion: agentResponse.emotion,
+      userTier: "free", // TODO: Obtener tier real del usuario
+      hasImage: !!agent.characterAppearance,
+    });
+
+    console.log(`[MultimodalAPI] Modalities:`, modalityDecision);
+
+    // 5. Generar contenido según modalidades
+    const responseContent: {
+      text: string;
+      audioUrl?: string;
+      imageUrl?: string;
+      emotion: {
+        type: string;
+        intensity: "low" | "medium" | "high";
+      };
+    } = {
+      text: agentResponse.text,
+      emotion: {
+        type: agentResponse.emotion.dominantEmotion,
+        intensity: agentResponse.emotion.intensity,
+      },
+    };
+
+    // 5.1 Generar imagen (expresión facial)
+    if (modalityDecision.includeImage && agent.characterAppearance) {
+      try {
+        const visualService = getVisualGenerationService();
+        const imageResult = await visualService.getOrGenerateExpression({
+          agentId,
+          emotionType: agentResponse.emotion.dominantEmotion,
+          intensity: agentResponse.emotion.intensity,
+          contentType: "sfw",
+          userTier: "free",
+        });
+
+        responseContent.imageUrl = imageResult.imageUrl;
+        console.log(`[MultimodalAPI] Image generated: ${imageResult.cached ? "cached" : "new"}`);
+      } catch (error) {
+        console.error(`[MultimodalAPI] Error generating image:`, error);
+        // Continuar sin imagen si falla
+      }
+    }
+
+    // 5.2 Generar audio (voz del personaje)
+    if (modalityDecision.includeAudio) {
+      try {
+        const voiceService = getVoiceService();
+        const audioResult = await voiceService.generateSpeech({
+          text: agentResponse.text,
+          agentId,
+          emotion: agentResponse.emotion.dominantEmotion,
+          intensity: agentResponse.emotion.intensity,
+        });
+
+        responseContent.audioUrl = audioResult.audioUrl;
+        console.log(`[MultimodalAPI] Audio generated: ${audioResult.cached ? "cached" : "new"}`);
+      } catch (error) {
+        console.error(`[MultimodalAPI] Error generating audio:`, error);
+        // Continuar sin audio si falla
+      }
+    }
+
+    // 6. Guardar mensaje en la base de datos
+    const conversation = await prisma.conversation.findFirst({
+      where: {
+        agentId,
+        userId: session.user.id,
+      },
+    });
+
+    if (conversation) {
+      await prisma.message.create({
+        data: {
+          conversationId: conversation.id,
+          role: "assistant",
+          content: agentResponse.text,
+          metadata: {
+            audioUrl: responseContent.audioUrl,
+            imageUrl: responseContent.imageUrl,
+            emotion: responseContent.emotion,
+            modalities: modalityDecision,
+          },
+        },
+      });
+    }
+
+    // 7. Retornar respuesta multimodal
+    return NextResponse.json({
+      success: true,
+      response: responseContent,
+      messageId: Date.now().toString(),
+    });
+  } catch (error) {
+    console.error("[MultimodalAPI] Error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * Decide qué modalidades incluir en la respuesta
+ * La IA decide autónomamente basándose en contexto
+ */
+function decideModalities(params: {
+  messageLength: number;
+  emotion: {
+    dominantEmotion: string;
+    intensity: "low" | "medium" | "high";
+  };
+  userTier: string;
+  hasImage: boolean;
+}): {
+  includeText: boolean;
+  includeAudio: boolean;
+  includeImage: boolean;
+} {
+  const { messageLength, emotion, userTier, hasImage } = params;
+
+  // Siempre incluir texto
+  const includeText = true;
+
+  // Incluir audio si:
+  // - Mensaje corto-medio (más natural escuchar)
+  // - O emoción intensa (más expresivo)
+  const includeAudio =
+    messageLength < 200 || emotion.intensity === "high";
+
+  // Incluir imagen si:
+  // - Hay imagen de personaje disponible
+  // - Y emoción es significativa (no neutral/low)
+  // - Y no es mensaje muy corto (evitar sobrecarga)
+  const includeImage =
+    hasImage &&
+    emotion.dominantEmotion !== "neutral" &&
+    (emotion.intensity === "medium" || emotion.intensity === "high") &&
+    messageLength > 20;
+
+  return {
+    includeText,
+    includeAudio,
+    includeImage,
+  };
+}

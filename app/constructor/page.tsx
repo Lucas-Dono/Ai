@@ -40,16 +40,18 @@ export default function ConstructorPage() {
   const [newAgentId, setNewAgentId] = useState<string | null>(null);
 
   const steps = [
-    { field: "name", prompt: "¡Perfecto! ¿Quieres crear un Compañero (IA emocional) o un Asistente (IA administrativa)?" },
-    { field: "kind", prompt: (draft: AgentDraft) => `Excelente elección. Ahora, ¿cómo describirías la personalidad de ${draft.name}?` },
-    { field: "personality", prompt: (draft: AgentDraft) => `Interesante. ¿Cuál será el propósito principal de ${draft.name}?` },
-    { field: "purpose", prompt: (draft: AgentDraft) => `Perfecto. Por último, ¿qué tono de comunicación prefieres que use ${draft.name}? (formal, casual, amigable, profesional, etc.)` },
-    { field: "tone", prompt: () => "¡Listo! Voy a compilar tu inteligencia..." },
+    { field: "name", prompt: "¿qué nombre te gustaría darle a tu nueva IA?" },
+    { field: "kind", prompt: "¿Quieres crear un Compañero (IA emocional) o un Asistente (IA administrativa)?" },
+    { field: "personality", prompt: (draft: AgentDraft) => `¿Cómo describirías la personalidad de ${draft.name}?` },
+    { field: "purpose", prompt: (draft: AgentDraft) => `¿Cuál será el propósito principal de ${draft.name}?` },
+    { field: "tone", prompt: (draft: AgentDraft) => `Por último, ¿qué tono de comunicación prefieres que use ${draft.name}? (formal, casual, amigable, profesional, etc.)` },
   ];
 
   const createAgent = async (finalDraft: AgentDraft) => {
+    console.log('[Constructor] Iniciando creación de agente con draft:', finalDraft);
     setCreating(true);
     try {
+      console.log('[Constructor] Enviando POST a /api/agents...');
       const res = await fetch("/api/agents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -62,9 +64,16 @@ export default function ConstructorPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create agent");
+      console.log('[Constructor] Respuesta recibida:', res.status, res.statusText);
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('[Constructor] Error del servidor:', errorData);
+        throw new Error(errorData.error || "Failed to create agent");
+      }
 
       const data = await res.json();
+      console.log('[Constructor] Agente creado exitosamente:', data);
       setNewAgentId(data.id);
 
       setMessages((prev) => [
@@ -75,7 +84,7 @@ export default function ConstructorPage() {
         },
       ]);
     } catch (error) {
-      console.error(error);
+      console.error('[Constructor] Error en createAgent:', error);
       setMessages((prev) => [
         ...prev,
         {
@@ -84,6 +93,7 @@ export default function ConstructorPage() {
         },
       ]);
     } finally {
+      console.log('[Constructor] Finalizando creación, setting creating=false');
       setCreating(false);
     }
   };
@@ -91,54 +101,81 @@ export default function ConstructorPage() {
   const handleSend = () => {
     if (!input.trim()) return;
 
+    console.log('[Constructor] handleSend ejecutado. Step actual:', step, 'Steps total:', steps.length);
+
     const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
 
-    // Actualizar draft según el paso
+    // Actualizar draft basándose en el field del step ACTUAL
     const currentStep = steps[step];
     const newDraft = { ...draft };
 
-    if (step === 0) {
-      newDraft.name = input;
-    } else if (step === 1) {
-      const lower = input.toLowerCase();
-      if (lower.includes("compañero") || lower.includes("emocional")) {
-        newDraft.kind = "companion";
-      } else if (lower.includes("asistente") || lower.includes("admin")) {
-        newDraft.kind = "assistant";
-      } else {
-        newDraft.kind = "companion";
-      }
-    } else if (step === 2) {
-      newDraft.personality = input;
-    } else if (step === 3) {
-      newDraft.purpose = input;
-    } else if (step === 4) {
-      newDraft.tone = input;
+    // Guardar en el campo correspondiente al step actual
+    switch (currentStep.field) {
+      case "name":
+        newDraft.name = input;
+        console.log('[Constructor] Guardando nombre:', input);
+        break;
+      case "kind":
+        const lower = input.toLowerCase();
+        if (lower.includes("compañero") || lower.includes("emocional") || lower.includes("companion")) {
+          newDraft.kind = "companion";
+        } else if (lower.includes("asistente") || lower.includes("admin") || lower.includes("assistant")) {
+          newDraft.kind = "assistant";
+        } else {
+          // Por defecto, companion
+          newDraft.kind = "companion";
+        }
+        console.log('[Constructor] Guardando kind:', newDraft.kind);
+        break;
+      case "personality":
+        newDraft.personality = input;
+        console.log('[Constructor] Guardando personality:', input);
+        break;
+      case "purpose":
+        newDraft.purpose = input;
+        console.log('[Constructor] Guardando purpose:', input);
+        break;
+      case "tone":
+        newDraft.tone = input;
+        console.log('[Constructor] Guardando tone:', input);
+        break;
     }
 
     setDraft(newDraft);
+    console.log('[Constructor] Draft actualizado:', newDraft);
+
+    setInput("");
 
     // Respuesta del arquitecto
     setTimeout(() => {
-      if (step < steps.length - 1) {
-        const nextStep = steps[step + 1];
+      // Avanzar al siguiente step
+      const nextStepIndex = step + 1;
+      console.log('[Constructor] Avanzando a step:', nextStepIndex, 'de', steps.length);
+
+      if (nextStepIndex < steps.length) {
+        // Hay más preguntas
+        const nextStep = steps[nextStepIndex];
         const promptText = typeof nextStep.prompt === "function"
           ? nextStep.prompt(newDraft)
           : nextStep.prompt;
 
+        console.log('[Constructor] Mostrando pregunta:', promptText);
         setMessages((prev) => [
           ...prev,
           { role: "architect", content: promptText },
         ]);
-        setStep(step + 1);
+        setStep(nextStepIndex);
       } else {
-        // Último paso - crear el agente
+        // Ya se respondieron todas las preguntas - crear el agente
+        console.log('[Constructor] ¡Todas las preguntas respondidas! Creando agente con:', newDraft);
+        setMessages((prev) => [
+          ...prev,
+          { role: "architect", content: "¡Listo! Voy a compilar tu inteligencia..." },
+        ]);
         createAgent(newDraft);
       }
     }, 800);
-
-    setInput("");
   };
 
   const isComplete = step >= steps.length && newAgentId;

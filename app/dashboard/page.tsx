@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { WelcomeBanner } from "@/components/onboarding/WelcomeBanner";
 import { motion } from "framer-motion";
-import { Heart, Briefcase, MessageCircle, TrendingUp, Sparkles, Loader2 } from "lucide-react";
+import { Heart, Briefcase, MessageCircle, TrendingUp, Sparkles, Loader2, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
 
@@ -21,24 +21,51 @@ interface Agent {
 export default function DashboardPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const fetchAgents = async () => {
+    try {
+      const res = await fetch("/api/agents");
+      if (res.ok) {
+        const data = await res.json();
+        setAgents(data);
+      }
+    } catch (error) {
+      console.error("Error fetching agents:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const res = await fetch("/api/agents");
-        if (res.ok) {
-          const data = await res.json();
-          setAgents(data);
-        }
-      } catch (error) {
-        console.error("Error fetching agents:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAgents();
   }, []);
+
+  const handleDelete = async (agentId: string, agentName: string) => {
+    if (!confirm(`¿Estás seguro de que quieres eliminar a "${agentName}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    setDeleting(agentId);
+    try {
+      const res = await fetch(`/api/agents/${agentId}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        // Actualizar la lista eliminando el agente
+        setAgents(agents.filter(a => a.id !== agentId));
+      } else {
+        const error = await res.json();
+        alert(error.error || "Error al eliminar la IA");
+      }
+    } catch (error) {
+      console.error("Error deleting agent:", error);
+      alert("Error al eliminar la IA");
+    } finally {
+      setDeleting(null);
+    }
+  };
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -186,12 +213,35 @@ export default function DashboardPage() {
                         <Badge variant="outline" className="text-xs">Activo</Badge>
                       </div>
 
-                      <Link href={`/agentes/${agent.id}`}>
-                        <Button className="w-full mt-4" variant="outline">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          Abrir chat
+                      <div className="flex gap-2 mt-4">
+                        <Link href={`/agentes/${agent.id}`} className="flex-1">
+                          <Button className="w-full" variant="outline">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Abrir chat
+                          </Button>
+                        </Link>
+                        <Link href={`/agentes/${agent.id}/edit`}>
+                          <Button variant="outline" size="icon" title="Editar">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete(agent.id, agent.name);
+                          }}
+                          disabled={deleting === agent.id}
+                          title="Eliminar"
+                        >
+                          {deleting === agent.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          )}
                         </Button>
-                      </Link>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>

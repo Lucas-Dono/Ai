@@ -10,6 +10,28 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    ignores: [
+      ".next/**",
+      "out/**",
+      "dist/**",
+      "build/**",
+      "node_modules/**",
+      "local-ai-server/**",
+      "test-output/**",
+      "coverage/**",
+      "*.log",
+      ".DS_Store",
+      "prisma/generated/**",
+      // Utility scripts (CommonJS)
+      "create-superuser.js",
+      "create-superuser-with-password.js",
+      "reset-db.js",
+      "server.js",
+      "**/test-*.js",
+      "**/*.config.js",
+    ],
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
