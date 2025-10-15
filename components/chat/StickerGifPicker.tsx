@@ -5,14 +5,16 @@
  *
  * Permite al usuario enviar stickers y GIFs:
  * - Stickers predefinidos por categorías
- * - Búsqueda de GIFs usando Giphy API
+ * - Búsqueda de GIFs usando Giphy API con cache
+ * - Lazy loading de GIFs para mejor rendimiento
  * - Preview antes de enviar
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X, Loader2 } from "lucide-react";
+import { Grid } from "react-window";
 import { cn } from "@/lib/utils";
 
 interface StickerGifPickerProps {
@@ -61,6 +63,72 @@ interface GiphyGif {
   title: string;
 }
 
+// Cache en memoria para búsquedas de GIFs
+const gifCache = new Map<string, { gifs: GiphyGif[]; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
+// Función para limpiar cache expirado
+const cleanExpiredCache = () => {
+  const now = Date.now();
+  for (const [key, value] of gifCache.entries()) {
+    if (now - value.timestamp > CACHE_DURATION) {
+      gifCache.delete(key);
+    }
+  }
+};
+
+// Componente de Grid virtualizado para GIFs
+const GifGrid = ({ gifs, onSelect }: { gifs: GiphyGif[]; onSelect: (gif: GiphyGif) => void }) => {
+  const columnCount = 2;
+  const columnWidth = 180;
+  const rowHeight = 180;
+  const gapSize = 8;
+
+  const rowCount = Math.ceil(gifs.length / columnCount);
+
+  const Cell = ({ columnIndex, rowIndex, style, gifs, onSelect }: any) => {
+    const index = rowIndex * columnCount + columnIndex;
+    if (index >= gifs.length) return null;
+
+    const gif = gifs[index];
+
+    return (
+      <div style={style}>
+        <button
+          onClick={() => onSelect(gif)}
+          className="w-full h-full bg-[#2a2a2a] rounded-lg overflow-hidden hover:ring-2 hover:ring-green-500 transition-all"
+          style={{
+            margin: gapSize / 2,
+            width: columnWidth - gapSize,
+            height: rowHeight - gapSize,
+          }}
+        >
+          <img
+            src={gif.preview}
+            alt={gif.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <Grid
+      columnCount={columnCount}
+      columnWidth={columnWidth}
+      defaultHeight={320}
+      defaultWidth={columnCount * columnWidth}
+      rowCount={rowCount}
+      rowHeight={rowHeight}
+      className="mx-auto"
+      cellComponent={Cell}
+      cellProps={{ gifs, onSelect }}
+    />
+  );
+};
+
 export function StickerGifPicker({
   onSend,
   onClose,
@@ -70,12 +138,25 @@ export function StickerGifPicker({
   const [gifs, setGifs] = useState<GiphyGif[]>([]);
   const [isLoadingGifs, setIsLoadingGifs] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Buscar GIFs en Giphy
-  const searchGifs = async (query: string) => {
+  // Buscar GIFs en Giphy con cache
+  const searchGifs = useCallback(async (query: string) => {
     if (!query.trim()) {
       // Mostrar trending GIFs si no hay búsqueda
       loadTrendingGifs();
+      return;
+    }
+
+    // Limpiar cache expirado periódicamente
+    cleanExpiredCache();
+
+    // Verificar si tenemos resultado en cache
+    const cacheKey = `search:${query.toLowerCase()}`;
+    const cached = gifCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setGifs(cached.gifs);
       return;
     }
 
@@ -86,7 +167,7 @@ export function StickerGifPicker({
       // y las llamadas deben hacerse desde el backend
       const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY || "demo";
       const response = await fetch(
-        `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&rating=g`
+        `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=30&rating=g`
       );
 
       if (!response.ok) {
@@ -102,6 +183,8 @@ export function StickerGifPicker({
         title: gif.title,
       }));
 
+      // Guardar en cache
+      gifCache.set(cacheKey, { gifs, timestamp: Date.now() });
       setGifs(gifs);
     } catch (error) {
       console.error("Error fetching GIFs:", error);
@@ -109,16 +192,25 @@ export function StickerGifPicker({
     } finally {
       setIsLoadingGifs(false);
     }
-  };
+  }, []);
 
-  // Cargar GIFs trending
-  const loadTrendingGifs = async () => {
+  // Cargar GIFs trending con cache
+  const loadTrendingGifs = useCallback(async () => {
+    // Verificar si tenemos trending en cache
+    const cacheKey = "trending";
+    const cached = gifCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setGifs(cached.gifs);
+      return;
+    }
+
     setIsLoadingGifs(true);
 
     try {
       const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY || "demo";
       const response = await fetch(
-        `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=20&rating=g`
+        `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=30&rating=g`
       );
 
       if (!response.ok) {
@@ -134,6 +226,8 @@ export function StickerGifPicker({
         title: gif.title,
       }));
 
+      // Guardar en cache
+      gifCache.set(cacheKey, { gifs, timestamp: Date.now() });
       setGifs(gifs);
     } catch (error) {
       console.error("Error fetching trending GIFs:", error);
@@ -141,7 +235,7 @@ export function StickerGifPicker({
     } finally {
       setIsLoadingGifs(false);
     }
-  };
+  }, []);
 
   // Efecto para búsqueda con debounce
   useEffect(() => {
@@ -256,31 +350,14 @@ export function StickerGifPicker({
             </div>
           </div>
 
-          {/* Grid de GIFs */}
-          <div className="max-h-[320px] overflow-y-auto">
+          {/* Grid de GIFs con lazy loading */}
+          <div ref={containerRef} className="max-h-[320px]">
             {isLoadingGifs ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
               </div>
             ) : gifs.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2">
-                {gifs.map((gif) => (
-                  <button
-                    key={gif.id}
-                    onClick={() => {
-                      onSend(gif.url, "gif");
-                      onClose();
-                    }}
-                    className="aspect-square bg-[#2a2a2a] rounded-lg overflow-hidden hover:ring-2 hover:ring-green-500 transition-all"
-                  >
-                    <img
-                      src={gif.preview}
-                      alt={gif.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+              <GifGrid gifs={gifs} onSelect={(gif) => { onSend(gif.url, "gif"); onClose(); }} />
             ) : (
               <div className="text-center py-8 text-gray-500 text-sm">
                 {gifSearchQuery
