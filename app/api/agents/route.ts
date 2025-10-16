@@ -79,68 +79,7 @@ export async function POST(req: NextRequest) {
     });
     console.log('[API] Agente creado:', agent.id);
 
-    // MULTIMEDIA CONSISTENCY: Generar imagen de referencia y asignar voz
-    console.log('[API] Configurando referencias multimedia...');
-    try {
-      let finalReferenceImageUrl: string | undefined;
-      let finalVoiceId: string | undefined;
-
-      // Si el usuario proporcionó una imagen, usarla directamente
-      if (referenceImage) {
-        console.log('[API] Usando imagen de referencia proporcionada por el usuario');
-        finalReferenceImageUrl = referenceImage;
-      }
-
-      // Generar/asignar referencias faltantes
-      const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
-
-      // Si no hay imagen del usuario, generar una automáticamente
-      // Si hay imagen pero falta voz, solo asignar voz
-      if (!referenceImage || !finalVoiceId) {
-        const references = await generateAgentReferences(
-          agent.name,
-          agent.personality || agent.description || "",
-          undefined, // gender - se infiere de la personalidad
-          userId,
-          agent.id
-        );
-
-        // Solo sobrescribir si no existen
-        if (!finalReferenceImageUrl && references.referenceImageUrl) {
-          finalReferenceImageUrl = references.referenceImageUrl;
-        }
-        if (!finalVoiceId && references.voiceId) {
-          finalVoiceId = references.voiceId;
-        }
-
-        if (references.errors.length > 0) {
-          console.warn('[API] Errores durante generación de referencias:', references.errors);
-        }
-      } else {
-        // Solo asignar voz sin generar imagen
-        const { selectVoiceForAgent } = await import("@/lib/multimedia/reference-generator");
-        finalVoiceId = selectVoiceForAgent(agent.personality || agent.description || "", undefined);
-      }
-
-      // Actualizar agente con las referencias
-      if (finalReferenceImageUrl || finalVoiceId) {
-        await prisma.agent.update({
-          where: { id: agent.id },
-          data: {
-            referenceImageUrl: finalReferenceImageUrl,
-            voiceId: finalVoiceId,
-          },
-        });
-        console.log('[API] Referencias multimedia configuradas exitosamente');
-        console.log('[API] - Imagen de referencia:', finalReferenceImageUrl ? '✅' : '❌');
-        console.log('[API] - Voz asignada:', finalVoiceId ? '✅' : '❌');
-      }
-    } catch (error) {
-      console.error('[API] Error configurando referencias multimedia:', error);
-      // No fallar la creación del agente si esto falla
-    }
-
-    // Crear relación inicial con el usuario
+    // Crear relación inicial con el usuario (necesario antes de behaviors y stage prompts)
     console.log('[API] Creando relación inicial...');
     await prisma.relation.create({
       data: {
@@ -233,44 +172,140 @@ export async function POST(req: NextRequest) {
       // Por ahora, el sistema ya lo permite si se crean behaviors dinámicamente
     }
 
-    // GENERAR PROMPTS DE ETAPAS DE RELACIÓN
-    console.log('[API] Generando stage prompts...');
-    try {
-      const { generateStagePrompts } = await import("@/lib/relationship/prompt-generator");
+    // ========================================
+    // OPERACIONES EN PARALELO (OPTIMIZACIÓN)
+    // ========================================
+    // Ejecutar generación de imagen y stage prompts simultáneamente
+    // para reducir el tiempo total de creación
+    console.log('[API] 🚀 Iniciando operaciones en paralelo (imagen + prompts)...');
+    const parallelStartTime = Date.now();
 
-      // Obtener behaviors activos para incluir en la generación
-      const behaviorProfiles = await prisma.behaviorProfile.findMany({
-        where: { agentId: agent.id },
-        select: { behaviorType: true },
-      });
+    const [multimediaResult, stagePromptsResult] = await Promise.allSettled([
+      // OPERACIÓN 1: Generación de imagen de referencia y asignación de voz
+      (async () => {
+        console.log('[API] [PARALLEL] Configurando referencias multimedia...');
+        try {
+          let finalReferenceImageUrl: string | undefined;
+          let finalVoiceId: string | undefined;
 
-      const behaviorTypes = behaviorProfiles.map(b => b.behaviorType);
+          // Si el usuario proporcionó una imagen, usarla directamente
+          if (referenceImage) {
+            console.log('[API] [PARALLEL] Usando imagen de referencia proporcionada por el usuario');
+            finalReferenceImageUrl = referenceImage;
+          }
 
-      const stagePrompts = await generateStagePrompts(
-        systemPrompt,
-        agent.name,
-        agent.personality || agent.description || "",
-        behaviorTypes
-      );
+          // Generar/asignar referencias faltantes
+          const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
 
-      // Crear InternalState con los stage prompts
-      await prisma.internalState.create({
-        data: {
-          agentId: agent.id,
-          currentStage: "stranger",
-          totalInteractions: 0,
-          trust: 0.5,
-          affinity: 0.5,
-          respect: 0.5,
-          stagePrompts: stagePrompts as any,
-          lastUpdated: new Date(),
-        },
-      });
+          // Si no hay imagen del usuario, generar una automáticamente
+          // Si hay imagen pero falta voz, solo asignar voz
+          if (!referenceImage || !finalVoiceId) {
+            const references = await generateAgentReferences(
+              agent.name,
+              agent.personality || agent.description || "",
+              undefined, // gender - se infiere de la personalidad
+              userId,
+              agent.id
+            );
 
-      console.log('[API] Stage prompts generados y guardados exitosamente');
-    } catch (error) {
-      console.error('[API] Error generando stage prompts:', error);
-      // No fallar la creación del agente si esto falla, pero loguearlo
+            // Solo sobrescribir si no existen
+            if (!finalReferenceImageUrl && references.referenceImageUrl) {
+              finalReferenceImageUrl = references.referenceImageUrl;
+            }
+            if (!finalVoiceId && references.voiceId) {
+              finalVoiceId = references.voiceId;
+            }
+
+            if (references.errors.length > 0) {
+              console.warn('[API] [PARALLEL] Errores durante generación de referencias:', references.errors);
+            }
+          } else {
+            // Solo asignar voz sin generar imagen
+            const { selectVoiceForAgent } = await import("@/lib/multimedia/reference-generator");
+            finalVoiceId = selectVoiceForAgent(agent.personality || agent.description || "", undefined);
+          }
+
+          // Actualizar agente con las referencias
+          if (finalReferenceImageUrl || finalVoiceId) {
+            await prisma.agent.update({
+              where: { id: agent.id },
+              data: {
+                referenceImageUrl: finalReferenceImageUrl,
+                voiceId: finalVoiceId,
+              },
+            });
+            console.log('[API] [PARALLEL] Referencias multimedia configuradas exitosamente');
+            console.log('[API] [PARALLEL] - Imagen de referencia:', finalReferenceImageUrl ? '✅' : '❌');
+            console.log('[API] [PARALLEL] - Voz asignada:', finalVoiceId ? '✅' : '❌');
+          }
+
+          return { success: true };
+        } catch (error) {
+          console.error('[API] [PARALLEL] Error configurando referencias multimedia:', error);
+          return { success: false, error };
+        }
+      })(),
+
+      // OPERACIÓN 2: Generación de stage prompts
+      (async () => {
+        console.log('[API] [PARALLEL] Generando stage prompts...');
+        try {
+          const { generateStagePrompts } = await import("@/lib/relationship/prompt-generator");
+
+          // Obtener behaviors activos para incluir en la generación
+          const behaviorProfiles = await prisma.behaviorProfile.findMany({
+            where: { agentId: agent.id },
+            select: { behaviorType: true },
+          });
+
+          const behaviorTypes = behaviorProfiles.map(b => b.behaviorType);
+
+          const stagePrompts = await generateStagePrompts(
+            systemPrompt,
+            agent.name,
+            agent.personality || agent.description || "",
+            behaviorTypes
+          );
+
+          // Crear InternalState con los stage prompts
+          await prisma.internalState.create({
+            data: {
+              agentId: agent.id,
+              currentStage: "stranger",
+              totalInteractions: 0,
+              trust: 0.5,
+              affinity: 0.5,
+              respect: 0.5,
+              stagePrompts: stagePrompts as any,
+              lastUpdated: new Date(),
+            },
+          });
+
+          console.log('[API] [PARALLEL] Stage prompts generados y guardados exitosamente');
+          return { success: true };
+        } catch (error) {
+          console.error('[API] [PARALLEL] Error generando stage prompts:', error);
+          return { success: false, error };
+        }
+      })(),
+    ]);
+
+    const parallelEndTime = Date.now();
+    const parallelDuration = ((parallelEndTime - parallelStartTime) / 1000).toFixed(2);
+    console.log(`[API] ✅ Operaciones paralelas completadas en ${parallelDuration}s`);
+
+    // Reportar resultados de operaciones paralelas
+    if (multimediaResult.status === 'rejected') {
+      console.error('[API] ⚠️  Multimedia generation failed:', multimediaResult.reason);
+    } else if (!multimediaResult.value.success) {
+      console.warn('[API] ⚠️  Multimedia generation completed with errors');
+    }
+
+    if (stagePromptsResult.status === 'rejected') {
+      console.error('[API] ⚠️  Stage prompts generation failed:', stagePromptsResult.reason);
+      console.warn('[API] El agente se creó pero sin stage prompts. Se generarán en la primera interacción.');
+    } else if (!stagePromptsResult.value.success) {
+      console.warn('[API] ⚠️  Stage prompts generation completed with errors');
       console.warn('[API] El agente se creó pero sin stage prompts. Se generarán en la primera interacción.');
     }
 
