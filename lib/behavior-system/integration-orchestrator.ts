@@ -196,7 +196,7 @@ export class BehaviorIntegrationOrchestrator {
   }
 
   /**
-   * Obtiene behavior profiles del agente
+   * Obtiene behavior profiles del agente (solo los activos)
    */
   private async getBehaviorProfiles(agentId: string): Promise<BehaviorProfile[]> {
     return prisma.behaviorProfile.findMany({

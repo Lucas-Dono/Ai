@@ -617,6 +617,7 @@ model BehaviorProfile {
 
   // Tipo de comportamiento
   behaviorType BehaviorType
+  enabled      Boolean      @default(true) // Activar/desactivar sin eliminar
 
   // Configuración de intensidad
   baseIntensity    Float @default(0.3) // 0-1, nivel base
