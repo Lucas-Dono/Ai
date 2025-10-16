@@ -2,13 +2,10 @@
  * Embedding Generation Service
  * Generates vector embeddings for text using Xenova Transformers
  * Runs locally without requiring external API keys
+ *
+ * IMPORTANT: This module uses dynamic imports to avoid bundling native binaries
+ * in the client-side code. It should only be used in server-side contexts.
  */
-
-import { pipeline, env } from "@xenova/transformers";
-
-// Configure Xenova to use local cache
-env.cacheDir = "./.cache/transformers";
-env.allowLocalModels = false;
 
 // Model configuration
 const EMBEDDING_MODEL = "Xenova/all-MiniLM-L6-v2"; // 384 dimensions
@@ -19,9 +16,14 @@ let embeddingPipeline: any = null;
 let initializationPromise: Promise<any> | null = null;
 
 /**
- * Initialize the embedding pipeline (lazy loading)
+ * Initialize the embedding pipeline (lazy loading with dynamic import)
  */
 async function getEmbeddingPipeline() {
+  // Verificar que estamos en el servidor
+  if (typeof window !== "undefined") {
+    throw new Error("Embeddings can only be generated on the server side");
+  }
+
   if (embeddingPipeline) {
     return embeddingPipeline;
   }
@@ -32,6 +34,14 @@ async function getEmbeddingPipeline() {
 
   initializationPromise = (async () => {
     console.log("[Embeddings] Initializing embedding model...");
+
+    // Importación dinámica para evitar que Webpack lo incluya en el bundle del cliente
+    const { pipeline, env } = await import("@xenova/transformers");
+
+    // Configure Xenova to use local cache
+    env.cacheDir = "./.cache/transformers";
+    env.allowLocalModels = false;
+
     const pipe = await pipeline("feature-extraction", EMBEDDING_MODEL);
     embeddingPipeline = pipe;
     console.log("[Embeddings] Model ready");
