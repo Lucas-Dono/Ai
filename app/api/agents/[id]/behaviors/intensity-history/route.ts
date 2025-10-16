@@ -10,10 +10,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: agentId } = params;
+    const { id: agentId } = await params;
 
     // Verificar que el agente existe
     const agent = await prisma.agent.findUnique({

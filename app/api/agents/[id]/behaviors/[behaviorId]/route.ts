@@ -13,10 +13,10 @@ import { prisma } from "@/lib/prisma";
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; behaviorId: string } }
+  { params }: { params: Promise<{ id: string; behaviorId: string }> }
 ) {
   try {
-    const { id: agentId, behaviorId } = params;
+    const { id: agentId, behaviorId } = await params;
 
     // Verificar que el behavior existe y pertenece al agente
     const behavior = await prisma.behaviorProfile.findFirst({
@@ -58,10 +58,10 @@ export async function DELETE(
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string; behaviorId: string } }
+  { params }: { params: Promise<{ id: string; behaviorId: string }> }
 ) {
   try {
-    const { id: agentId, behaviorId } = params;
+    const { id: agentId, behaviorId } = await params;
     const body = await req.json();
 
     // Validar que el behavior existe y pertenece al agente

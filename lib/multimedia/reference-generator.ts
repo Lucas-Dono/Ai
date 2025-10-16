@@ -101,7 +101,7 @@ function buildReferenceImagePrompt(
   }
 
   // Extraer keywords de apariencia
-  let appearanceKeywords: string[] = [];
+  const appearanceKeywords: string[] = [];
 
   if (personalityLower.includes("atlético") || personalityLower.includes("deportista")) {
     appearanceKeywords.push("athletic build, fit");
