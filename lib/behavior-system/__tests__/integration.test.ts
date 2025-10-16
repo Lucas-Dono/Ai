@@ -17,16 +17,20 @@ describe("Behavior System Integration", () => {
   });
 
   // Mock BehaviorProfile para tests de integración
-  const mockProfile: BehaviorProfile = {
+  const mockProfile = {
     id: "profile-1",
     agentId: "test-agent",
     behaviorType: BehaviorType.YANDERE_OBSESSIVE,
     baseIntensity: 0.5,
     escalationRate: 0.1,
     deEscalationRate: 0.05,
+    volatility: 0.5,
     currentPhase: 3,
-    lastPhaseTransition: new Date(),
-    phaseHistory: {},
+    phaseStartedAt: new Date(),
+    phaseHistory: [],
+    triggers: {},
+    thresholdForDisplay: 0.3,
+    behaviorSpecificState: null,
     interactionsSincePhaseStart: 45,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -99,13 +103,12 @@ describe("Behavior System Integration", () => {
     test("debería responder a delayed response con contexto temporal", async () => {
       const oldMessage = {
         id: "1",
+        worldId: null,
         content: "¿Estás ahí?",
         agentId: "test-agent",
         userId: "user-1",
         role: "user" as const,
         createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrás
-        updatedAt: new Date(),
-        conversationId: "conv-1",
         metadata: {},
       };
 
@@ -210,7 +213,9 @@ describe("Behavior System Integration", () => {
       const highEscalationProfile = {
         ...mockProfile,
         baseIntensity: 0.3,
-        escalationRate: 0.2
+        escalationRate: 0.2,
+        volatility: 0.5,
+        thresholdForDisplay: 0.3,
       };
 
       const triggers = await detector.detectTriggers(
@@ -233,6 +238,8 @@ describe("Behavior System Integration", () => {
         behaviorType: BehaviorType.ANXIOUS_ATTACHMENT,
         baseIntensity: 0.8,
         deEscalationRate: 0.1,
+        volatility: 0.5,
+        thresholdForDisplay: 0.3,
       };
 
       const triggers = await detector.detectTriggers(

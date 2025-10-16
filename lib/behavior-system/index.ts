@@ -61,7 +61,7 @@ export const FEATURES = {
 // Phase 2: Trigger Detection System
 export { TriggerDetector } from "./trigger-detector";
 export {
-  TRIGGER_PATTERNS,
+  ALL_TRIGGER_PATTERNS,
   TRIGGER_WEIGHTS,
   TRIGGER_BEHAVIOR_MAPPING,
   DELAYED_RESPONSE_THRESHOLDS,
@@ -75,15 +75,4 @@ export {
 // Phase 3: Behavior Phase Manager
 export { BehaviorPhaseManager } from "./phase-manager";
 export { PhaseEvaluator } from "./phase-evaluator";
-export {
-  calculateFinalIntensity,
-  calculatePhaseMultiplier,
-  calculateTriggerAmplification,
-  calculateDecay,
-  calculateInertia,
-  calculateMinimumIntensityForPhase,
-  shouldRegressPhase,
-  calculateDynamicEscalationRate,
-  projectFutureIntensity,
-  calculateVolatility,
-} from "./intensity-calculator";
+export { IntensityCalculator } from "./intensity-calculator";
