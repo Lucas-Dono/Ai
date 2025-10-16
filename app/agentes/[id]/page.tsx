@@ -4,23 +4,21 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, ArrowLeft, Heart, Briefcase, Loader2 } from "lucide-react";
+import { ArrowLeft, Heart, Briefcase, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
 import { ExportConversationButton } from "@/components/export-conversation-button";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { MessageBubble } from "@/components/chat/MessageBubble";
 
 interface Message {
   id: string;
   role: string;
   content: string;
-  metadata?: {
-    emotions?: string[];
-    relationLevel?: string;
-  };
+  metadata?: any;
 }
 
 interface Agent {
@@ -36,12 +34,12 @@ export default function AgentChatPage() {
   const router = useRouter();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [emotions, setEmotions] = useState<string[]>([]);
+  const [emotions, setEmotions] = useState<any>(null);
   const [relationLevel, setRelationLevel] = useState("Relación neutral");
   const [relationState, setRelationState] = useState({ trust: 0.5, affinity: 0.5, respect: 0.5 });
+  const [relationshipStage, setRelationshipStage] = useState<string>("stranger");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -71,38 +69,73 @@ export default function AgentChatPage() {
     fetchAgent();
   }, [params.id, router]);
 
-  const handleSend = async () => {
-    if (!input.trim() || sending) return;
+  const handleSendMessage = async (
+    content: string,
+    type: "text" | "audio" | "gif" | "sticker" = "text",
+    metadata?: any
+  ) => {
+    if (!content.trim() || sending) return;
 
-    const userMessage = {
+    // Mensaje temporal para el usuario
+    const tempMessage = {
       id: `temp-${Date.now()}`,
       role: "user",
-      content: input,
+      content,
+      metadata: {
+        messageType: type,
+        ...metadata,
+      },
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setMessages((prev) => [...prev, tempMessage]);
     setSending(true);
 
     try {
       const res = await fetch(`/api/agents/${params.id}/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: input }),
+        body: JSON.stringify({
+          content,
+          messageType: type,
+          metadata,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to send message");
 
       const data = await res.json();
-      setMessages((prev) => [...prev, data.message]);
-      setEmotions(data.emotions || []);
+
+      // Reemplazar mensaje temporal con el real
+      setMessages((prev) => {
+        const filtered = prev.filter((m) => m.id !== tempMessage.id);
+        return [...filtered, data.message];
+      });
+
+      // Actualizar estados emocionales
+      setEmotions(data.emotions || null);
       setRelationLevel(data.relationLevel || "Relación neutral");
       setRelationState(data.state || { trust: 0.5, affinity: 0.5, respect: 0.5 });
+
+      // Actualizar stage de relación si existe
+      if (data.relationship) {
+        setRelationshipStage(data.relationship.stage);
+      }
     } catch (error) {
       console.error(error);
+      // Remover mensaje temporal en caso de error
+      setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
     } finally {
       setSending(false);
     }
+  };
+
+  const handleSendAudio = async (audioBlob: Blob) => {
+    // TODO: Implementar transcripción con Whisper
+    console.log("Audio blob:", audioBlob);
+    // Por ahora, placeholder
+    handleSendMessage("[Mensaje de voz - transcripción pendiente]", "audio", {
+      duration: 0,
+    });
   };
 
   if (loading) {
@@ -152,13 +185,14 @@ export default function AgentChatPage() {
         </div>
 
         <div className="space-y-4">
+          {/* Estado Emocional Mejorado */}
           <Card className="p-4">
             <div className="text-sm font-semibold text-muted-foreground mb-2">
               Estado Emocional
             </div>
             <div className="flex flex-wrap gap-2">
-              {emotions.length > 0 ? (
-                emotions.map((emotion, idx) => (
+              {emotions?.dominant ? (
+                emotions.dominant.map((emotion: string, idx: number) => (
                   <Badge key={idx} variant="outline">
                     {emotion}
                   </Badge>
@@ -167,13 +201,35 @@ export default function AgentChatPage() {
                 <Badge variant="outline">Neutral</Badge>
               )}
             </div>
+            {emotions?.mood && (
+              <div className="mt-2 text-xs text-muted-foreground">
+                Mood: {emotions.mood}
+              </div>
+            )}
           </Card>
 
+          {/* Nivel de Relación */}
           <Card className="p-4">
             <div className="text-sm font-semibold text-muted-foreground mb-3">
               Nivel de Relación
             </div>
             <div className="text-sm mb-2">{relationLevel}</div>
+
+            {/* Stage de relación */}
+            <div className="mb-3">
+              <Badge variant="secondary" className="text-xs">
+                {relationshipStage === "stranger"
+                  ? "🆕 Desconocido"
+                  : relationshipStage === "acquaintance"
+                  ? "👋 Conocido"
+                  : relationshipStage === "friend"
+                  ? "🤝 Amigo"
+                  : relationshipStage === "close"
+                  ? "💕 Cercano"
+                  : "❤️ Íntimo"}
+              </Badge>
+            </div>
+
             <div className="space-y-2">
               <div>
                 <div className="flex justify-between text-xs mb-1">
@@ -226,73 +282,23 @@ export default function AgentChatPage() {
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
           <AnimatePresence>
             {messages.map((message, idx) => (
-              <motion.div
+              <MessageBubble
                 key={message.id || idx}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`flex gap-4 ${message.role === "user" ? "flex-row-reverse" : ""}`}
-              >
-                <Avatar className={message.role === "assistant" ? "border-2 border-primary" : ""}>
-                  <AvatarFallback
-                    className={
-                      message.role === "assistant"
-                        ? "bg-gradient-to-br from-primary to-secondary text-white"
-                        : "bg-muted"
-                    }
-                    style={
-                      message.role === "assistant"
-                        ? { background: generateGradient(agent.name) }
-                        : undefined
-                    }
-                  >
-                    {message.role === "assistant" ? getInitials(agent.name) : "U"}
-                  </AvatarFallback>
-                </Avatar>
-
-                <div className={`flex-1 max-w-2xl ${message.role === "user" ? "text-right" : ""}`}>
-                  <div
-                    className={`inline-block rounded-2xl px-6 py-3 ${
-                      message.role === "assistant"
-                        ? "bg-card border border-border"
-                        : "bg-primary text-primary-foreground"
-                    }`}
-                  >
-                    {message.content}
-                  </div>
-                  {message.metadata?.emotions && message.metadata.emotions.length > 0 && (
-                    <div className="mt-2 flex gap-1 flex-wrap">
-                      {message.metadata.emotions.map((emotion: string, i: number) => (
-                        <Badge key={i} variant="outline" className="text-xs">
-                          {emotion}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </motion.div>
+                message={message as any}
+                agentName={agent.name}
+              />
             ))}
           </AnimatePresence>
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex gap-3">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                placeholder="Escribe tu mensaje..."
-                className="flex-1"
-                disabled={sending}
-              />
-              <Button onClick={handleSend} size="icon" disabled={sending}>
-                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Chat Input Mejorado */}
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          onSendAudio={handleSendAudio}
+          disabled={sending}
+          placeholder="Escribe tu mensaje..."
+        />
       </div>
     </div>
   );

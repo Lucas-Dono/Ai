@@ -70,13 +70,39 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { content } = body;
+    const { content, messageType, metadata } = body;
 
     if (!content) {
       return NextResponse.json(
         { error: "Content is required" },
         { status: 400 }
       );
+    }
+
+    // Determinar el contenido real que procesa la IA
+    let contentForAI = content;
+    let contentForUser = content;
+    let messageMetadata: any = metadata || {};
+
+    // Si es un GIF, traducir a texto para la IA
+    if (messageType === "gif" && metadata?.description) {
+      contentForAI = `[El usuario envió un GIF de: ${metadata.description}]`;
+      contentForUser = content; // URL del GIF para mostrar al usuario
+      messageMetadata = {
+        ...metadata,
+        messageType: "gif",
+        gifDescription: metadata.description,
+      };
+    }
+
+    // Si es audio, indicar que es un mensaje de voz
+    if (messageType === "audio") {
+      contentForAI = content; // Ya debería venir transcrito
+      messageMetadata = {
+        ...metadata,
+        messageType: "audio",
+        audioDuration: metadata?.duration,
+      };
     }
 
     // Obtener agente y verificar ownership
@@ -92,13 +118,14 @@ export async function POST(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Guardar mensaje del usuario
+    // Guardar mensaje del usuario (con URL/contenido visual)
     const userMessage = await prisma.message.create({
       data: {
         agentId,
         userId,
         role: "user",
-        content,
+        content: contentForUser, // URL del GIF o contenido original
+        metadata: messageMetadata,
       },
     });
 
@@ -161,7 +188,8 @@ export async function POST(
     }
 
     // Analizar el mensaje del usuario y calcular deltas emocionales
-    const emotionDeltas = analyzeMessageEmotions(content);
+    // Usar contentForAI para que analice la descripción del GIF, no la URL
+    const emotionDeltas = analyzeMessageEmotions(contentForAI);
 
     // Aplicar deltas con decay e inercia
     const newEmotionState = applyEmotionDeltas(
@@ -254,9 +282,10 @@ Refleja estas emociones de manera sutil en tu tono y respuestas.
     }
 
     // Build enhanced prompt with RAG context
+    // Usar contentForAI para que el sistema RAG busque por descripción, no por URL
     const finalPrompt = await memoryManager.buildEnhancedPrompt(
       enhancedPrompt,
-      content
+      contentForAI
     );
 
     // Generar respuesta con LLM
