@@ -3,14 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // Excluir paquetes con binarios nativos del bundle del cliente
-  experimental: {
-    serverComponentsExternalPackages: [
-      "sharp",
-      "onnxruntime-node",
-      "@xenova/transformers",
-    ],
-  },
+  // Excluir paquetes con binarios nativos del bundle del servidor
+  serverExternalPackages: [
+    "sharp",
+    "onnxruntime-node",
+    "@xenova/transformers",
+  ],
 
   // Configuración de Webpack para ignorar módulos nativos en el cliente
   webpack: (config, { isServer }) => {
