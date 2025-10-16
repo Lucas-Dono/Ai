@@ -244,11 +244,11 @@ export async function POST(
       agent,
       userMessage,
       recentMessages,
-      dominantEmotion: undefined, // TODO: inferir de newState o EmotionalEngine
+      dominantEmotion: emotionalSummary.dominant[0] || "neutral",
       emotionalState: {
-        valence: newState.valence,
-        arousal: newState.arousal,
-        dominance: newState.dominance,
+        valence: emotionalSummary.pad.valence,
+        arousal: emotionalSummary.pad.arousal,
+        dominance: emotionalSummary.pad.dominance,
       },
     });
 

@@ -79,6 +79,39 @@ export async function POST(req: NextRequest) {
     });
     console.log('[API] Agente creado:', agent.id);
 
+    // MULTIMEDIA CONSISTENCY: Generar imagen de referencia y asignar voz
+    console.log('[API] Generando imagen de referencia y asignando voz...');
+    try {
+      const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
+      const references = await generateAgentReferences(
+        agent.name,
+        agent.personality || agent.description || "",
+        undefined, // gender - se infiere de la personalidad
+        userId,
+        agent.id
+      );
+
+      if (references.referenceImageUrl || references.voiceId) {
+        await prisma.agent.update({
+          where: { id: agent.id },
+          data: {
+            referenceImageUrl: references.referenceImageUrl,
+            voiceId: references.voiceId,
+          },
+        });
+        console.log('[API] Referencias multimedia generadas exitosamente');
+        console.log('[API] - Imagen de referencia:', references.referenceImageUrl ? '✅' : '❌');
+        console.log('[API] - Voz asignada:', references.voiceId ? '✅' : '❌');
+      }
+
+      if (references.errors.length > 0) {
+        console.warn('[API] Errores durante generación de referencias:', references.errors);
+      }
+    } catch (error) {
+      console.error('[API] Error generando referencias multimedia:', error);
+      // No fallar la creación del agente si esto falla
+    }
+
     // Crear relación inicial con el usuario
     console.log('[API] Creando relación inicial...');
     await prisma.relation.create({
