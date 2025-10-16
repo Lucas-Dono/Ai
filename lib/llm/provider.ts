@@ -13,7 +13,7 @@ export interface GenerateOptions {
 export class LLMProvider {
   private apiKey: string;
   private baseURL: string = "https://openrouter.ai/api/v1";
-  private model: string = "anthropic/claude-3.5-sonnet"; // Default model
+  private model: string = "cognitivecomputations/dolphin-mistral-24b-venice-edition:free"; // Modelo GRATIS para generación de prompts
 
   constructor() {
     // Verificar que existe la API key de OpenRouter
@@ -23,7 +23,7 @@ export class LLMProvider {
     }
 
     this.apiKey = apiKey;
-    console.log('[LLM] Inicializando OpenRouter...');
+    console.log('[LLM] Inicializando OpenRouter con modelo GRATIS...');
     console.log('[LLM] API Key detectada:', apiKey ? 'Sí ✓' : 'No ✗');
     console.log('[LLM] Modelo:', this.model);
   }
