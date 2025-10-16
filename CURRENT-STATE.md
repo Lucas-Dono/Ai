@@ -310,25 +310,64 @@ psql -d creador_inteligencias -c "\d \"BehaviorProfile\""
 
 ---
 
-## 🎯 PRÓXIMOS PASOS (Sprint 2-3)
+## 🎨 SPRINT 2: PÁGINA DE DETALLES - ✅ COMPLETADO
 
-### Sprint 2: Página de Detalles de Behaviors
 **Ruta:** `/agentes/[id]/behaviors`
-**Contenido:**
-- Timeline visual de progresión de phases
-- Historial completo de triggers
-- Gráficas de intensidad a lo largo del tiempo
-- Configuración: activar/desactivar behaviors específicos
-- Reset de behaviors
-- Analytics detallados
 
-### Sprint 3: Dashboard de Analytics
-**Ubicación:** Integrar en dashboard principal
-**Contenido:**
+### API Endpoint Implementado:
+
+**GET /api/agents/[id]/behaviors** ✅
+- Obtiene BehaviorProfiles activos
+- Historial de triggers (últimos 100) con join a mensajes
+- BehaviorProgressionState con cache
+- Estadísticas calculadas: total triggers, triggers por tipo/behavior, peso promedio
+
+### Página Principal:
+
+**Layout:** ✅
+- Header con nombre del agente y badge NSFW
+- 4 cards de estadísticas principales
+- Tabs navegables: Timeline | Historial | Configuración
+- Responsive design completo
+- Estados de loading/error/empty
+
+**Tab 1: Timeline** ✅
+- Lista de behaviors activos con fase, intensidad, interacciones
+- Historial de fases previas expandible
+- Fechas formateadas en español
+
+**Tab 2: Historial de Triggers** ✅
+- Lista cronológica con tipo, peso (colores semafóricos), behavior asociado
+- Muestra texto detectado y mensaje relacionado
+- Timestamps localizados
+
+**Tab 3: Configuración** 🔜
+- Placeholder para reset y ajustes avanzados
+
+### Mejoras Integradas:
+
+- ✅ BehaviorPanel incluye botón "Ver Detalles Completos"
+- ✅ Navegación fluida desde chat a página de detalles
+
+---
+
+## 🎯 PRÓXIMOS PASOS (Sprint 3+)
+
+### Sprint 3: Gráficas de Intensidad
+- Gráfica temporal de evolución (Chart.js/Recharts)
+- Visualización de triggers importantes
+- Integrar en tab Timeline
+
+### Sprint 4: Configuración Avanzada
+- Reset de behaviors con confirmación
+- Activar/desactivar behaviors
+- Ajustar thresholds
+- Exportar datos históricos
+
+### Sprint 5: Dashboard Global Analytics
 - Comparación entre agentes
-- Estadísticas de safety levels alcanzados
-- Triggers más comunes
-- Evolución de intensidades globales
+- Estadísticas de safety levels
+- Triggers más comunes globalmente
 
 ---
 
