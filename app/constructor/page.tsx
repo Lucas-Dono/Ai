@@ -25,6 +25,7 @@ interface AgentDraft {
   personality?: string;
   purpose?: string;
   tone?: string;
+  physicalAppearance?: string; // Descripción física para generación de imágenes
   referenceImage?: string; // URL o data URL de la imagen de referencia
   // Behavior system configuration
   nsfwMode?: boolean;
@@ -93,6 +94,55 @@ export default function ConstructorPage() {
         { value: "casual", label: "😊 Casual", description: "Relajado y natural" },
         { value: "amigable", label: "🤗 Amigable", description: "Cálido y cercano" },
         { value: "profesional", label: "💼 Profesional", description: "Eficiente y directo" },
+      ]
+    },
+
+    // PHYSICAL APPEARANCE STEP (for better image generation)
+    {
+      field: "physicalAppearance",
+      prompt: (draft: AgentDraft) => `👤 **APARIENCIA FÍSICA**\n\n¿Cómo te imaginas físicamente a ${draft.name}?\n\nEsto ayudará a generar imágenes más precisas y consistentes.\n\n**Puedes elegir una opción o describirlo con tus propias palabras.**`,
+      hasOptions: true,
+      options: [
+        {
+          value: "random",
+          label: "🎲 Aleatorio",
+          description: "Déjame sorprenderte con una apariencia única"
+        },
+        {
+          value: "asian_woman",
+          label: "👩 Mujer Asiática",
+          description: "Cabello negro liso, piel clara, ojos oscuros, 1.65m, estilo moderno elegante"
+        },
+        {
+          value: "latina_woman",
+          label: "👩🏽 Mujer Latina",
+          description: "Cabello castaño ondulado, piel morena, ojos cafés, 1.68m, estilo casual sofisticado"
+        },
+        {
+          value: "caucasian_woman",
+          label: "👩🏼 Mujer Caucásica",
+          description: "Cabello rubio, piel clara, ojos claros, 1.70m, estilo profesional"
+        },
+        {
+          value: "asian_man",
+          label: "👨 Hombre Asiático",
+          description: "Cabello negro corto, piel clara, ojos oscuros, 1.75m, estilo urbano moderno"
+        },
+        {
+          value: "latino_man",
+          label: "👨🏽 Hombre Latino",
+          description: "Cabello negro/castaño, piel morena, ojos oscuros, 1.78m, estilo casual deportivo"
+        },
+        {
+          value: "caucasian_man",
+          label: "👨🏼 Hombre Caucásico",
+          description: "Cabello castaño/rubio, piel clara, ojos claros, 1.80m, estilo formal ejecutivo"
+        },
+        {
+          value: "custom",
+          label: "✍️ Descripción personalizada",
+          description: "Escribiré mi propia descripción detallada"
+        },
       ]
     },
 
@@ -235,6 +285,28 @@ export default function ConstructorPage() {
       case "tone":
         newDraft.tone = input;
         console.log('[Constructor] Guardando tone:', input);
+        break;
+
+      case "physicalAppearance":
+        // Si seleccionó "custom", necesitará escribir la descripción
+        if (input === "custom") {
+          // El siguiente mensaje pedirá la descripción personalizada
+          newDraft.physicalAppearance = ""; // Temporal, se actualizará en el siguiente paso
+        } else if (input === "random") {
+          newDraft.physicalAppearance = "random";
+        } else {
+          // Es una de las opciones predefinidas, expandir a descripción completa
+          const appearanceMap: Record<string, string> = {
+            asian_woman: "Mujer asiática, cabello negro liso largo, piel clara, ojos oscuros almendrados, complexión delgada, 1.65m de altura, estilo moderno elegante, rostro delicado",
+            latina_woman: "Mujer latina, cabello castaño ondulado, piel morena clara, ojos cafés expresivos, complexión curvilínea, 1.68m de altura, estilo casual sofisticado, rasgos definidos",
+            caucasian_woman: "Mujer caucásica, cabello rubio, piel clara, ojos azules/verdes, complexión atlética, 1.70m de altura, estilo profesional, rasgos equilibrados",
+            asian_man: "Hombre asiático, cabello negro corto moderno, piel clara, ojos oscuros, complexión delgada atlética, 1.75m de altura, estilo urbano contemporáneo, mandíbula definida",
+            latino_man: "Hombre latino, cabello negro o castaño corto, piel morena, ojos oscuros, complexión musculosa, 1.78m de altura, estilo casual deportivo, rasgos masculinos marcados",
+            caucasian_man: "Hombre caucásico, cabello castaño o rubio corto, piel clara, ojos claros, complexión atlética, 1.80m de altura, estilo formal ejecutivo, rasgos angulosos"
+          };
+          newDraft.physicalAppearance = appearanceMap[input] || input;
+        }
+        console.log('[Constructor] Guardando physicalAppearance:', newDraft.physicalAppearance);
         break;
 
       // BEHAVIOR SYSTEM CONFIGURATION
@@ -569,6 +641,7 @@ export default function ConstructorPage() {
                 <ReferenceImageSelector
                   agentName={draft.name || "tu IA"}
                   personality={draft.personality || ""}
+                  physicalAppearance={draft.physicalAppearance}
                   onImageSelected={handleImageSelected}
                   onSkip={handleImageSkipped}
                 />

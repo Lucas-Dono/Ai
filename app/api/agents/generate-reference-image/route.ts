@@ -9,6 +9,7 @@ import { getAIHordeClient } from "@/lib/visual-system/ai-horde-client";
  * Body: {
  *   name: string;
  *   personality: string;
+ *   physicalAppearance?: string; // Nueva descripción física detallada
  *   gender?: string;
  * }
  */
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
     console.log("[API] Generando imagen de referencia...");
 
     const body = await req.json();
-    const { name, personality, gender } = body;
+    const { name, personality, physicalAppearance, gender } = body;
 
     if (!name || !personality) {
       return NextResponse.json(
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Construir prompt para imagen de referencia
-    const prompt = buildReferenceImagePrompt(name, personality, gender);
+    const prompt = buildReferenceImagePrompt(name, personality, physicalAppearance, gender);
 
     console.log("[API] Prompt generado:", prompt);
 
@@ -73,8 +74,37 @@ export async function POST(req: NextRequest) {
 function buildReferenceImagePrompt(
   name: string,
   personality: string,
+  physicalAppearance?: string,
   gender?: string
 ): string {
+  // Si hay physicalAppearance, usarlo directamente (prioridad)
+  if (physicalAppearance && physicalAppearance !== "random") {
+    // Descripción física detallada proporcionada por el usuario
+    const prompt = `Professional reference portrait photograph of ${name}.
+Physical description: ${physicalAppearance}.
+Full body portrait, standing position, neutral white background.
+Natural lighting, high quality, photorealistic, detailed facial features,
+consistent appearance for character reference, professional photography.
+Clear, sharp focus, 4K quality.
+Character personality: ${personality.substring(0, 100)}.`;
+
+    return prompt;
+  }
+
+  // Si physicalAppearance es "random", generar aspecto aleatorio
+  if (physicalAppearance === "random") {
+    const prompt = `Professional reference portrait photograph of ${name}.
+Unique and creative character design, randomized appearance features.
+Full body portrait, standing position, neutral white background.
+Natural lighting, high quality, photorealistic, detailed facial features,
+consistent appearance for character reference, professional photography.
+Clear, sharp focus, 4K quality.
+Character personality: ${personality.substring(0, 100)}.`;
+
+    return prompt;
+  }
+
+  // FALLBACK: Usar el método anterior (inferir de personalidad)
   const personalityLower = personality.toLowerCase();
 
   // Determinar género

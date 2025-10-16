@@ -81,7 +81,18 @@
       "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"Si, resetea la base de datos\" npx prisma migrate reset:*)",
       "Bash(PGPASSWORD=b02483e2d89f4a60a7c85310126d61da psql:*)",
       "Bash(sudo -u postgres psql:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(git reset:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Read(//tmp/**)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(/bashes)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npm view:*)",
+      "Bash(timeout 10 npx tsc:*)"
     ],
     "deny": [],
     "ask": []

@@ -18,6 +18,7 @@ import Image from "next/image";
 interface ReferenceImageSelectorProps {
   agentName: string;
   personality: string;
+  physicalAppearance?: string; // Nueva prop para descripción física
   onImageSelected: (imageUrl: string) => void;
   onSkip: () => void;
 }
@@ -25,6 +26,7 @@ interface ReferenceImageSelectorProps {
 export function ReferenceImageSelector({
   agentName,
   personality,
+  physicalAppearance,
   onImageSelected,
   onSkip,
 }: ReferenceImageSelectorProps) {
@@ -49,6 +51,7 @@ export function ReferenceImageSelector({
         body: JSON.stringify({
           name: agentName,
           personality,
+          physicalAppearance, // Incluir descripción física
         }),
       });
 
