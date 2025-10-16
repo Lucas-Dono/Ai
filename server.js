@@ -33,7 +33,7 @@ app.prepare().then(() => {
   // Initialize Socket.IO only after Next.js is ready
   // We import dynamically to ensure the module is transpiled
   if (process.env.ENABLE_WEBSOCKETS !== "false") {
-    import("./lib/socket/server.js").then((module) => {
+    import("./lib/socket/server.mjs").then((module) => {
       const { initSocketServer } = module;
       initSocketServer(server);
       console.log("[Server] WebSocket support enabled");
