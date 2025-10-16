@@ -1,5 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
-
 export interface Message {
   role: "user" | "assistant" | "system";
   content: string;
@@ -13,52 +11,60 @@ export interface GenerateOptions {
 }
 
 export class LLMProvider {
-  private ai: GoogleGenAI;
+  private apiKey: string;
+  private baseURL: string = "https://openrouter.ai/api/v1";
+  private model: string = "anthropic/claude-3.5-sonnet"; // Default model
 
   constructor() {
-    // Verificar que existe la API key
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Verificar que existe la API key de OpenRouter
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY no está configurada");
+      throw new Error("OPENROUTER_API_KEY no está configurada");
     }
 
-    console.log('[LLM] Inicializando GoogleGenAI...');
+    this.apiKey = apiKey;
+    console.log('[LLM] Inicializando OpenRouter...');
     console.log('[LLM] API Key detectada:', apiKey ? 'Sí ✓' : 'No ✗');
-    console.log('[LLM] API Key primeros caracteres:', apiKey.substring(0, 10) + '...');
-
-    // Usar constructor vacío como en el script de prueba exitoso
-    // La librería buscará automáticamente GEMINI_API_KEY en las variables de entorno
-    this.ai = new GoogleGenAI({});
+    console.log('[LLM] Modelo:', this.model);
   }
 
   async generate(options: GenerateOptions): Promise<string> {
     const { systemPrompt, messages, temperature = 0.9, maxTokens = 1000 } = options;
 
-    // Construir el historial de chat para Gemini
-    const history = messages.slice(0, -1).map((msg) => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
-    }));
-
-    const lastMessage = messages[messages.length - 1];
-
     try {
-      const model = await this.ai.models.get({ model: "gemini-2.0-flash-exp" });
-      // @ts-expect-error - API method exists but not in type definitions
-      const chat = model.startChat({
-        history,
-        generationConfig: {
-          temperature,
-          maxOutputTokens: maxTokens,
+      // Construir mensajes en formato OpenAI
+      const formattedMessages = [
+        { role: "system" as const, content: systemPrompt },
+        ...messages.map(msg => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content
+        }))
+      ];
+
+      const response = await fetch(`${this.baseURL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://creador-inteligencias.com",
+          "X-Title": "Creador de Inteligencias"
         },
+        body: JSON.stringify({
+          model: this.model,
+          messages: formattedMessages,
+          temperature,
+          max_tokens: maxTokens
+        })
       });
 
-      // Combinar system prompt con el último mensaje del usuario
-      const prompt = `${systemPrompt}\n\nUsuario: ${lastMessage.content}`;
+      if (!response.ok) {
+        const error = await response.text();
+        console.error("OpenRouter API error:", error);
+        throw new Error(`OpenRouter API error: ${response.status}`);
+      }
 
-      const result = await chat.sendMessage(prompt);
-      const response = await result.response;
-      return response.text();
+      const data = await response.json();
+      return data.choices[0]?.message?.content || "";
     } catch (error) {
       console.error("Error al generar respuesta:", error);
       throw new Error("No se pudo generar una respuesta de la IA");
@@ -84,24 +90,33 @@ Responde SOLO con un JSON válido con este formato:
 }`;
 
     try {
-      console.log('[LLM] Generando perfil con Gemini 2.5 Flash...');
+      console.log('[LLM] Generando perfil con OpenRouter...');
 
-      const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          temperature: 0.9,
-          thinkingConfig: {
-            thinkingBudget: 0, // Deshabilitar pensamiento para mayor velocidad
-          },
+      const response = await fetch(`${this.baseURL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          model: this.model,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.9,
+          max_tokens: 2000
+        })
       });
 
-      const text = response.text;
-      if (!text) {
-        throw new Error("Gemini no retornó texto en la respuesta");
+      if (!response.ok) {
+        throw new Error(`OpenRouter error: ${response.status}`);
       }
-      console.log('[LLM] Respuesta de Gemini recibida');
+
+      const data = await response.json();
+      const text = data.choices[0]?.message?.content;
+
+      if (!text) {
+        throw new Error("OpenRouter no retornó texto en la respuesta");
+      }
+      console.log('[LLM] Respuesta de OpenRouter recibida');
 
       // Extraer JSON de la respuesta
       const jsonMatch = text.match(/\{[\s\S]*\}/);
