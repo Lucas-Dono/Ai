@@ -667,6 +667,77 @@ psql -d creador_inteligencias -c "\d \"BehaviorProfile\""
 
 ---
 
+## 🚀 OPTIMIZATION: PARALLEL EXECUTION - COMPLETADO
+
+**Fecha:** 2025-10-16
+**Commit:** 7764cfa
+
+### Agent Creation Parallelization:
+
+**Problema:** Las operaciones de creación de agente se ejecutaban secuencialmente:
+1. Generación de imagen de referencia: ~85 segundos
+2. Generación de stage prompts: ~60 segundos
+3. **Tiempo total:** ~145 segundos
+
+**Solución:** Ejecutar ambas operaciones en paralelo usando `Promise.allSettled()`
+
+**Implementation:**
+
+**Cambios en `app/api/agents/route.ts`:**
+- Movida creación de Relation y BehaviorProfile antes de operaciones lentas
+- Wrapping de ambas operaciones en async IIFE functions
+- `Promise.allSettled()` para ejecución paralela (no `Promise.all` - tolerante a fallos)
+- Logging detallado con prefijo `[PARALLEL]`
+- Medición de tiempo total con timestamps
+- Error handling individual por operación
+- Graceful fallback si alguna falla
+
+**Estructura del Promise.allSettled:**
+```typescript
+const [multimediaResult, stagePromptsResult] = await Promise.allSettled([
+  // OPERACIÓN 1: Generación imagen + voz
+  (async () => {
+    // generateAgentReferences() + prisma.agent.update()
+    return { success: true };
+  })(),
+
+  // OPERACIÓN 2: Generación stage prompts
+  (async () => {
+    // generateStagePrompts() + prisma.internalState.create()
+    return { success: true };
+  })(),
+]);
+```
+
+**Benefits:**
+- ⚡ **Reducción de ~40% en tiempo total:** De ~145s a ~85s (el máximo entre ambas operaciones)
+- 🔄 **Sin bloqueo:** Ambas operaciones LLM se ejecutan simultáneamente
+- ✅ **Fault-tolerant:** Si una falla, la otra continúa
+- 📊 **Métricas precisas:** Logging con duración total de operaciones paralelas
+- 🎯 **UX mejorado:** El usuario espera menos tiempo en el constructor
+
+**Performance Metrics:**
+- Before: 85s (imagen) + 60s (prompts) = 145s total
+- After: max(85s, 60s) = 85s total
+- **Improvement: 60 segundos ahorrados (41% faster)**
+
+**Log Output Example:**
+```
+[API] 🚀 Iniciando operaciones en paralelo (imagen + prompts)...
+[API] [PARALLEL] Configurando referencias multimedia...
+[API] [PARALLEL] Generando stage prompts...
+[AI Horde] Status: 0/1 (Queue: 0, Wait: 86s)
+[LLM] Modelo: cognitivecomputations/dolphin-mistral-24b-venice-edition:free
+...
+[API] [PARALLEL] Referencias multimedia configuradas exitosamente
+[API] [PARALLEL] Stage prompts generados y guardados exitosamente
+[API] ✅ Operaciones paralelas completadas en 85.76s
+```
+
+**Consideration:** Si ambas operaciones tardan similar tiempo (~85s), el beneficio es máximo. Si en el futuro los stage prompts se hacen más rápidos (~30s), el beneficio sigue siendo significativo (~30s ahorrados).
+
+---
+
 ## 📞 CONTACTO CON USUARIO
 
 **Zona horaria:** GMT-3 (Argentina)
@@ -679,4 +750,4 @@ psql -d creador_inteligencias -c "\d \"BehaviorProfile\""
 ---
 
 **FIN DEL ESTADO ACTUAL**
-**Siguiente paso:** Implementar `lib/behavior-system/trigger-detector.ts`
+**Siguiente paso:** Testing completo del flujo de creación con parallelización + verificación de modelo FREE
