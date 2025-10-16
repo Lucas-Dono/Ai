@@ -14,6 +14,7 @@ export function EmojiPickerComponent({ onEmojiSelect }: EmojiPickerComponentProp
   return (
     <EmojiPicker
       onEmojiClick={(emojiObject) => onEmojiSelect(emojiObject.emoji)}
+      theme="dark"
       width={350}
       height={400}
       searchPlaceHolder="Buscar emoji..."

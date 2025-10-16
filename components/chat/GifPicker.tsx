@@ -26,15 +26,25 @@ export function GifPicker({ onSelect }: GifPickerProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const TENOR_API_KEY = process.env.NEXT_PUBLIC_TENOR_API_KEY || "AIzaSyAr7Y_OGMPfJXS7W3Uk7kIkW-2uFOKxqr4"; // Key p�blica de demo
+  const TENOR_API_KEY = process.env.NEXT_PUBLIC_TENOR_API_KEY;
   const TENOR_CLIENT_KEY = "creador-inteligencias";
 
   useEffect(() => {
+    // Debug: verificar si la API key está cargada
+    if (!TENOR_API_KEY) {
+      console.error("⚠️ NEXT_PUBLIC_TENOR_API_KEY no está definida en .env");
+      setError("Falta configurar TENOR_API_KEY en .env");
+      return;
+    }
+    console.log("✅ Tenor API Key cargada:", TENOR_API_KEY.substring(0, 10) + "...");
+
     // Cargar GIFs trending al inicio
     fetchTrendingGifs();
   }, []);
 
   useEffect(() => {
+    if (!TENOR_API_KEY) return;
+
     if (search.trim()) {
       const timer = setTimeout(() => {
         searchGifs(search);
@@ -46,13 +56,19 @@ export function GifPicker({ onSelect }: GifPickerProps) {
   }, [search]);
 
   const fetchTrendingGifs = async () => {
+    if (!TENOR_API_KEY) return;
+
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(
         `https://tenor.googleapis.com/v2/featured?key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`
       );
-      if (!response.ok) throw new Error("Failed to fetch trending GIFs");
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Tenor API Error:", response.status, errorData);
+        throw new Error(`Failed to fetch trending GIFs: ${response.status}`);
+      }
       const data = await response.json();
       setGifs(data.results || []);
     } catch (err) {
@@ -64,6 +80,8 @@ export function GifPicker({ onSelect }: GifPickerProps) {
   };
 
   const searchGifs = async (query: string) => {
+    if (!TENOR_API_KEY) return;
+
     setLoading(true);
     setError(null);
     try {
@@ -72,7 +90,11 @@ export function GifPicker({ onSelect }: GifPickerProps) {
           query
         )}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`
       );
-      if (!response.ok) throw new Error("Failed to search GIFs");
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Tenor API Error:", response.status, errorData);
+        throw new Error(`Failed to search GIFs: ${response.status}`);
+      }
       const data = await response.json();
       setGifs(data.results || []);
     } catch (err) {
