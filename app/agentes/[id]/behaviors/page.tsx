@@ -16,6 +16,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, History, Settings, AlertTriangle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IntensityChart } from "@/components/behaviors/IntensityChart";
+import { BehaviorSettings } from "@/components/behaviors/BehaviorSettings";
 
 interface BehaviorProfile {
   id: string;
@@ -221,12 +223,16 @@ export default function BehaviorsDetailPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="timeline">
+        <TabsContent value="timeline" className="space-y-6">
+          {/* Intensity Chart */}
+          <IntensityChart agentId={agentId} />
+
+          {/* Phase Progression Details */}
           <Card>
             <CardHeader>
               <CardTitle>Progresión de Fases</CardTitle>
               <CardDescription>
-                Visualización temporal de la evolución de comportamientos
+                Detalle de la evolución de cada comportamiento
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -377,21 +383,11 @@ export default function BehaviorsDetailPage() {
         </TabsContent>
 
         <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración de Behaviors</CardTitle>
-              <CardDescription>
-                Gestiona los comportamientos activos del agente
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Configuración avanzada</p>
-                <p className="text-sm mt-2">Próximamente: Reset, activar/desactivar behaviors</p>
-              </div>
-            </CardContent>
-          </Card>
+          <BehaviorSettings
+            agentId={agentId}
+            agentName={data.agent.name}
+            behaviors={data.behaviorProfiles}
+          />
         </TabsContent>
       </Tabs>
     </div>

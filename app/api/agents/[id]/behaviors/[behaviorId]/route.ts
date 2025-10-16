@@ -1,0 +1,143 @@
+/**
+ * API Endpoints para gestión individual de behaviors
+ *
+ * DELETE /api/agents/[id]/behaviors/[behaviorId] - Elimina un behavior específico
+ * PATCH /api/agents/[id]/behaviors/[behaviorId] - Actualiza configuración de un behavior
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+/**
+ * DELETE - Eliminar behavior específico
+ */
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string; behaviorId: string } }
+) {
+  try {
+    const { id: agentId, behaviorId } = params;
+
+    // Verificar que el behavior existe y pertenece al agente
+    const behavior = await prisma.behaviorProfile.findFirst({
+      where: {
+        id: behaviorId,
+        agentId,
+      },
+    });
+
+    if (!behavior) {
+      return NextResponse.json(
+        { error: "Behavior not found" },
+        { status: 404 }
+      );
+    }
+
+    // Eliminar el behavior (triggers se eliminan por CASCADE)
+    await prisma.behaviorProfile.delete({
+      where: { id: behaviorId },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Behavior ${behavior.behaviorType} eliminado`,
+      behaviorId,
+      behaviorType: behavior.behaviorType,
+    });
+  } catch (error) {
+    console.error("[API] Error deleting behavior:", error);
+    return NextResponse.json(
+      { error: "Failed to delete behavior" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PATCH - Actualizar configuración del behavior
+ */
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string; behaviorId: string } }
+) {
+  try {
+    const { id: agentId, behaviorId } = params;
+    const body = await req.json();
+
+    // Validar que el behavior existe y pertenece al agente
+    const behavior = await prisma.behaviorProfile.findFirst({
+      where: {
+        id: behaviorId,
+        agentId,
+      },
+    });
+
+    if (!behavior) {
+      return NextResponse.json(
+        { error: "Behavior not found" },
+        { status: 404 }
+      );
+    }
+
+    // Campos permitidos para actualizar
+    const allowedFields = [
+      "baseIntensity",
+      "volatility",
+      "escalationRate",
+      "deEscalationRate",
+      "thresholdForDisplay",
+    ];
+
+    const updateData: any = {};
+
+    // Filtrar solo campos permitidos y validar valores
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        const value = body[field];
+
+        // Validar que sea un número entre 0 y 1
+        if (typeof value !== "number" || value < 0 || value > 1) {
+          return NextResponse.json(
+            { error: `${field} must be a number between 0 and 1` },
+            { status: 400 }
+          );
+        }
+
+        updateData[field] = value;
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: "No valid fields to update" },
+        { status: 400 }
+      );
+    }
+
+    // Actualizar el behavior
+    const updated = await prisma.behaviorProfile.update({
+      where: { id: behaviorId },
+      data: updateData,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Behavior actualizado",
+      behavior: {
+        id: updated.id,
+        behaviorType: updated.behaviorType,
+        baseIntensity: updated.baseIntensity,
+        volatility: updated.volatility,
+        escalationRate: updated.escalationRate,
+        deEscalationRate: updated.deEscalationRate,
+        thresholdForDisplay: updated.thresholdForDisplay,
+      },
+    });
+  } catch (error) {
+    console.error("[API] Error updating behavior:", error);
+    return NextResponse.json(
+      { error: "Failed to update behavior" },
+      { status: 500 }
+    );
+  }
+}
