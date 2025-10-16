@@ -138,7 +138,7 @@ Character personality traits: ${personality.substring(0, 100)}.`;
 /**
  * Selecciona una voz apropiada de ElevenLabs basada en personalidad y género
  */
-function selectVoiceForAgent(personality: string, gender?: string): string {
+export function selectVoiceForAgent(personality: string, gender?: string): string {
   const personalityLower = personality.toLowerCase();
 
   // Determinar género

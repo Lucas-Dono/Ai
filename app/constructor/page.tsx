@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Sparkles, Heart, Briefcase, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
+import { ReferenceImageSelector } from "@/components/constructor/ReferenceImageSelector";
 
 interface Message {
   role: "architect" | "user";
@@ -23,6 +24,7 @@ interface AgentDraft {
   personality?: string;
   purpose?: string;
   tone?: string;
+  referenceImage?: string; // URL o data URL de la imagen de referencia
   // Behavior system configuration
   nsfwMode?: boolean;
   allowDevelopTraumas?: boolean;
@@ -49,6 +51,13 @@ export default function ConstructorPage() {
     { field: "personality", prompt: (draft: AgentDraft) => `¿Cómo describirías la personalidad de ${draft.name}?` },
     { field: "purpose", prompt: (draft: AgentDraft) => `¿Cuál será el propósito principal de ${draft.name}?` },
     { field: "tone", prompt: (draft: AgentDraft) => `¿Qué tono de comunicación prefieres que use ${draft.name}? (formal, casual, amigable, profesional, etc.)` },
+
+    // REFERENCE IMAGE STEP (interactive visual step)
+    {
+      field: "referenceImage",
+      prompt: (draft: AgentDraft) => `🖼️ **IMAGEN DE REFERENCIA**\n\n¿Te gustaría crear o subir una imagen de referencia para ${draft.name}?\n\nEsta imagen se usará para mantener consistencia visual en todas las imágenes futuras que genere.`,
+      isVisualStep: true // Marcador especial para renderizar componente visual
+    },
 
     // BEHAVIOR SYSTEM CONFIGURATION
     {
@@ -79,6 +88,7 @@ export default function ConstructorPage() {
           personality: finalDraft.personality,
           purpose: finalDraft.purpose,
           tone: finalDraft.tone,
+          referenceImage: finalDraft.referenceImage, // Imagen de referencia opcional
           // Behavior system configuration
           nsfwMode: finalDraft.nsfwMode || false,
           allowDevelopTraumas: finalDraft.allowDevelopTraumas || false,
@@ -234,6 +244,75 @@ export default function ConstructorPage() {
         createAgent(newDraft);
       }
     }, 800);
+  };
+
+  /**
+   * Manejador para cuando se selecciona una imagen de referencia
+   */
+  const handleImageSelected = (imageUrl: string) => {
+    const newDraft = { ...draft, referenceImage: imageUrl };
+    setDraft(newDraft);
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: "✅ Imagen de referencia seleccionada" },
+    ]);
+
+    // Avanzar al siguiente step
+    const nextStepIndex = step + 1;
+    setTimeout(() => {
+      if (nextStepIndex < steps.length) {
+        const nextStep = steps[nextStepIndex];
+        const promptText = typeof nextStep.prompt === "function"
+          ? nextStep.prompt(newDraft)
+          : nextStep.prompt;
+
+        setMessages((prev) => [
+          ...prev,
+          { role: "architect", content: promptText },
+        ]);
+        setStep(nextStepIndex);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "architect", content: "¡Listo! Voy a compilar tu inteligencia..." },
+        ]);
+        createAgent(newDraft);
+      }
+    }, 500);
+  };
+
+  /**
+   * Manejador para cuando se omite la imagen de referencia
+   */
+  const handleImageSkipped = () => {
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: "⏭️ Imagen de referencia omitida (se generará automáticamente)" },
+    ]);
+
+    // Avanzar al siguiente step sin imagen
+    const nextStepIndex = step + 1;
+    setTimeout(() => {
+      if (nextStepIndex < steps.length) {
+        const nextStep = steps[nextStepIndex];
+        const promptText = typeof nextStep.prompt === "function"
+          ? nextStep.prompt(draft)
+          : nextStep.prompt;
+
+        setMessages((prev) => [
+          ...prev,
+          { role: "architect", content: promptText },
+        ]);
+        setStep(nextStepIndex);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "architect", content: "¡Listo! Voy a compilar tu inteligencia..." },
+        ]);
+        createAgent(draft);
+      }
+    }, 500);
   };
 
   const isComplete = step >= steps.length && newAgentId;
@@ -403,19 +482,30 @@ export default function ConstructorPage() {
         {!isComplete && (
           <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6">
             <div className="max-w-4xl mx-auto">
-              <div className="flex gap-3">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && !creating && handleSend()}
-                  placeholder="Escribe tu respuesta..."
-                  className="flex-1"
-                  disabled={creating}
+              {/* Si estamos en el paso de imagen de referencia, mostrar el selector visual */}
+              {step < steps.length && (steps[step] as any).isVisualStep ? (
+                <ReferenceImageSelector
+                  agentName={draft.name || "tu IA"}
+                  personality={draft.personality || ""}
+                  onImageSelected={handleImageSelected}
+                  onSkip={handleImageSkipped}
                 />
-                <Button onClick={handleSend} size="icon" className="shrink-0" disabled={creating}>
-                  {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                </Button>
-              </div>
+              ) : (
+                /* Input de texto normal para otros pasos */
+                <div className="flex gap-3">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && !creating && handleSend()}
+                    placeholder="Escribe tu respuesta..."
+                    className="flex-1"
+                    disabled={creating}
+                  />
+                  <Button onClick={handleSend} size="icon" className="shrink-0" disabled={creating}>
+                    {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

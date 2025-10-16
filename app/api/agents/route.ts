@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, kind, personality, purpose, tone, nsfwMode, allowDevelopTraumas, initialBehavior } = body;
-    console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone, nsfwMode, allowDevelopTraumas, initialBehavior });
+    const { name, kind, personality, purpose, tone, referenceImage, nsfwMode, allowDevelopTraumas, initialBehavior } = body;
+    console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone, referenceImage: referenceImage ? 'provided' : 'none', nsfwMode, allowDevelopTraumas, initialBehavior });
 
     // Validar datos
     if (!name || !kind) {
@@ -80,35 +80,63 @@ export async function POST(req: NextRequest) {
     console.log('[API] Agente creado:', agent.id);
 
     // MULTIMEDIA CONSISTENCY: Generar imagen de referencia y asignar voz
-    console.log('[API] Generando imagen de referencia y asignando voz...');
+    console.log('[API] Configurando referencias multimedia...');
     try {
-      const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
-      const references = await generateAgentReferences(
-        agent.name,
-        agent.personality || agent.description || "",
-        undefined, // gender - se infiere de la personalidad
-        userId,
-        agent.id
-      );
+      let finalReferenceImageUrl: string | undefined;
+      let finalVoiceId: string | undefined;
 
-      if (references.referenceImageUrl || references.voiceId) {
+      // Si el usuario proporcionó una imagen, usarla directamente
+      if (referenceImage) {
+        console.log('[API] Usando imagen de referencia proporcionada por el usuario');
+        finalReferenceImageUrl = referenceImage;
+      }
+
+      // Generar/asignar referencias faltantes
+      const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
+
+      // Si no hay imagen del usuario, generar una automáticamente
+      // Si hay imagen pero falta voz, solo asignar voz
+      if (!referenceImage || !finalVoiceId) {
+        const references = await generateAgentReferences(
+          agent.name,
+          agent.personality || agent.description || "",
+          undefined, // gender - se infiere de la personalidad
+          userId,
+          agent.id
+        );
+
+        // Solo sobrescribir si no existen
+        if (!finalReferenceImageUrl && references.referenceImageUrl) {
+          finalReferenceImageUrl = references.referenceImageUrl;
+        }
+        if (!finalVoiceId && references.voiceId) {
+          finalVoiceId = references.voiceId;
+        }
+
+        if (references.errors.length > 0) {
+          console.warn('[API] Errores durante generación de referencias:', references.errors);
+        }
+      } else {
+        // Solo asignar voz sin generar imagen
+        const { selectVoiceForAgent } = await import("@/lib/multimedia/reference-generator");
+        finalVoiceId = selectVoiceForAgent(agent.personality || agent.description || "", undefined);
+      }
+
+      // Actualizar agente con las referencias
+      if (finalReferenceImageUrl || finalVoiceId) {
         await prisma.agent.update({
           where: { id: agent.id },
           data: {
-            referenceImageUrl: references.referenceImageUrl,
-            voiceId: references.voiceId,
+            referenceImageUrl: finalReferenceImageUrl,
+            voiceId: finalVoiceId,
           },
         });
-        console.log('[API] Referencias multimedia generadas exitosamente');
-        console.log('[API] - Imagen de referencia:', references.referenceImageUrl ? '✅' : '❌');
-        console.log('[API] - Voz asignada:', references.voiceId ? '✅' : '❌');
-      }
-
-      if (references.errors.length > 0) {
-        console.warn('[API] Errores durante generación de referencias:', references.errors);
+        console.log('[API] Referencias multimedia configuradas exitosamente');
+        console.log('[API] - Imagen de referencia:', finalReferenceImageUrl ? '✅' : '❌');
+        console.log('[API] - Voz asignada:', finalVoiceId ? '✅' : '❌');
       }
     } catch (error) {
-      console.error('[API] Error generando referencias multimedia:', error);
+      console.error('[API] Error configurando referencias multimedia:', error);
       // No fallar la creación del agente si esto falla
     }
 
