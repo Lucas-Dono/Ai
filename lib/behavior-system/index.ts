@@ -76,3 +76,10 @@ export {
 export { BehaviorPhaseManager } from "./phase-manager";
 export { PhaseEvaluator } from "./phase-evaluator";
 export { IntensityCalculator } from "./intensity-calculator";
+
+// Phase 4: Emotional Integration
+export {
+  EmotionalIntegrationCalculator,
+  getBehaviorEmotionMapping,
+  getEmotionBehaviorMapping,
+} from "./emotional-integration";

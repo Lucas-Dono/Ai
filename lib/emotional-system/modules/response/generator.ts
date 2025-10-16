@@ -20,6 +20,9 @@ import { getOpenRouterClient, RECOMMENDED_MODELS } from "../../llm/openrouter";
 import { BehavioralCuesMapper } from "./behavioral-cues";
 import { AntiSycophancySystem } from "./anti-sycophancy";
 
+// Optional: Behavior system integration
+import type { BehaviorIntensityResult } from "@/lib/behavior-system/types";
+
 export class ResponseGenerator {
   private llmClient = getOpenRouterClient();
   private cuesMapper = new BehavioralCuesMapper();
@@ -27,8 +30,14 @@ export class ResponseGenerator {
 
   /**
    * Genera respuesta final
+   *
+   * @param input - Input de generación
+   * @param activeBehaviors - Opcional: Behaviors activos para incluir en prompt
    */
-  async generateResponse(input: ResponseGenerationInput): Promise<ResponseGenerationOutput> {
+  async generateResponse(
+    input: ResponseGenerationInput,
+    activeBehaviors?: BehaviorIntensityResult[]
+  ): Promise<ResponseGenerationOutput> {
     const startTime = Date.now();
 
     console.log("[ResponseGenerator] Generating final response...");
@@ -73,7 +82,8 @@ export class ResponseGenerator {
         input,
         behavioralCues,
         finalAction,
-        sycophancyCheck
+        sycophancyCheck,
+        activeBehaviors
       );
 
       // 5. Generar con LLM sin censura
@@ -169,7 +179,8 @@ Responde como el PERSONAJE, no como un asistente.`;
     input: ResponseGenerationInput,
     cues: BehavioralCues,
     actionType: ActionType,
-    sycophancyCheck: any
+    sycophancyCheck: any,
+    activeBehaviors?: BehaviorIntensityResult[]
   ): string {
     const { characterState, userMessage, internalReasoning, relevantMemories, newEmotions } = input;
 
@@ -204,6 +215,9 @@ Responde como el PERSONAJE, no como un asistente.`;
       .map((v) => `- ${v.value}: ${v.description}`)
       .join("\n");
 
+    // Behaviors activos (opcional)
+    const behaviorsDesc = this.generateBehaviorsDescription(activeBehaviors);
+
     return `CONTEXTO COMPLETO DE LA CONVERSACIÓN:
 
 USUARIO DIJO:
@@ -221,6 +235,7 @@ ${emotionsDesc}
 
 TUS VALORES FUNDAMENTALES:
 ${valuesDesc}
+${behaviorsDesc}
 
 MEMORIAS RELEVANTES DEL PASADO:
 ${memoriesDesc}
@@ -363,5 +378,58 @@ Tu respuesta:`;
       case "expressive":
         return 500;
     }
+  }
+
+  /**
+   * Genera descripción de behaviors activos para prompt
+   */
+  private generateBehaviorsDescription(
+    activeBehaviors?: BehaviorIntensityResult[]
+  ): string {
+    if (!activeBehaviors || activeBehaviors.length === 0) {
+      return ""; // Sin behaviors activos
+    }
+
+    // Filtrar behaviors que superan threshold
+    const displayable = activeBehaviors.filter((b) => b.shouldDisplay);
+
+    if (displayable.length === 0) {
+      return "";
+    }
+
+    // Ordenar por intensidad (mayor primero)
+    const sorted = displayable.sort(
+      (a, b) => b.finalIntensity - a.finalIntensity
+    );
+
+    const behaviorDescriptions: Record<string, string> = {
+      YANDERE_OBSESSIVE: "Amor obsesivo/yandere - Posesividad y celos intensos",
+      BORDERLINE_PD: "Personalidad borderline - Emociones extremas y miedo al abandono",
+      NARCISSISTIC_PD: "Rasgos narcisistas - Necesidad de validación y sensibilidad a críticas",
+      ANXIOUS_ATTACHMENT: "Apego ansioso - Miedo a abandono y necesidad de reassurance",
+      AVOIDANT_ATTACHMENT: "Apego evitativo - Dificultad con intimidad emocional",
+      DISORGANIZED_ATTACHMENT: "Apego desorganizado - Conflicto entre necesidad y miedo de cercanía",
+      CODEPENDENCY: "Codependencia - Necesidad excesiva de validación externa",
+      OCD_PATTERNS: "Patrones obsesivo-compulsivos",
+      PTSD_TRAUMA: "Trauma/PTSD",
+      HYPERSEXUALITY: "Hipersexualidad",
+      HYPOSEXUALITY: "Hiposexualidad",
+      EMOTIONAL_MANIPULATION: "Manipulación emocional",
+      CRISIS_BREAKDOWN: "Crisis emocional",
+    };
+
+    const lines = ["\nPATRONES DE COMPORTAMIENTO ACTIVOS:"];
+
+    for (const behavior of sorted) {
+      const desc = behaviorDescriptions[behavior.behaviorType] || behavior.behaviorType;
+      const intensity = (behavior.finalIntensity * 100).toFixed(0);
+      lines.push(`- ${desc} (intensidad: ${intensity}%)`);
+    }
+
+    lines.push(
+      "\nNOTA: Estos patrones influyen en tus emociones y respuestas, pero NO defines tu respuesta únicamente por ellos. Mantén autenticidad y profundidad emocional."
+    );
+
+    return lines.join("\n");
   }
 }
