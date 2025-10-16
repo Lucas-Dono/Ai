@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,7 @@ interface AgentDraft {
 
 export default function ConstructorPage() {
   const router = useRouter();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "architect",
@@ -45,6 +46,11 @@ export default function ConstructorPage() {
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
   const [newAgentId, setNewAgentId] = useState<string | null>(null);
+
+  // Auto-scroll cuando llegan nuevos mensajes (como WhatsApp)
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const steps = [
     {
@@ -389,9 +395,9 @@ export default function ConstructorPage() {
   const isComplete = step >= steps.length && newAgentId;
 
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar - Preview */}
-      <div className="w-96 border-r border-border bg-card/30 p-6 space-y-6">
+    <div className="h-screen flex overflow-hidden">
+      {/* Sidebar - Preview - FIXED, NO SCROLL */}
+      <div className="w-96 border-r border-border bg-card/30 p-6 space-y-6 overflow-y-auto">
         <div className="flex items-center gap-2 mb-8">
           <Link href="/dashboard">
             <Button variant="ghost" size="icon" disabled={creating}>
@@ -490,9 +496,10 @@ export default function ConstructorPage() {
         )}
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        <div className="border-b border-border bg-card/50 backdrop-blur-sm px-8 py-4">
+      {/* Chat Area - LAYOUT TIPO WHATSAPP */}
+      <div className="flex-1 flex flex-col h-screen">
+        {/* Header - FIXED */}
+        <div className="border-b border-border bg-card/50 backdrop-blur-sm px-8 py-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <Sparkles className="h-6 w-6 text-white" />
@@ -506,7 +513,8 @@ export default function ConstructorPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+        {/* Messages Area - SCROLLABLE */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-6" id="messages-container">
           <AnimatePresence>
             {messages.map((message, idx) => (
               <motion.div
@@ -548,10 +556,13 @@ export default function ConstructorPage() {
               </motion.div>
             ))}
           </AnimatePresence>
+          {/* Invisible div para auto-scroll */}
+          <div ref={messagesEndRef} />
         </div>
 
+        {/* Input Area - FIXED AT BOTTOM */}
         {!isComplete && (
-          <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6">
+          <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6 shrink-0">
             <div className="max-w-4xl mx-auto">
               {/* Si estamos en el paso de imagen de referencia, mostrar el selector visual */}
               {step < steps.length && (steps[step] as any).isVisualStep ? (
