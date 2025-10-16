@@ -104,6 +104,10 @@ model Agent {
   // Sistema de progresión de relación
   stagePrompts Json? // Prompts específicos por etapa de relación: { stranger, acquaintance, friend, close, intimate }
 
+  // Sistema de consistencia multimedia
+  referenceImageUrl String? // URL de la imagen de referencia del personaje (para img2img)
+  voiceId           String? // ID de voz de ElevenLabs asignado al personaje
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
