@@ -3,6 +3,10 @@
  * This server wraps Next.js with Socket.IO for real-time features
  */
 
+// Load environment variables from .env file
+// Use override: true to prioritize .env over system environment variables
+require("dotenv").config({ override: true });
+
 const { createServer } = require("http");
 const { parse } = require("url");
 const next = require("next");
