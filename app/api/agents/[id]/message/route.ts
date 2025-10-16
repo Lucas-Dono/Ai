@@ -201,10 +201,19 @@ export async function POST(
     // Moderar respuesta si hay behaviors activos
     if (behaviorOrchestration.activeBehaviors.length > 0) {
       const primaryBehavior = behaviorOrchestration.activeBehaviors[0];
+
+      // Obtener el BehaviorProfile para acceder a currentPhase
+      const behaviorProfile = await prisma.behaviorProfile.findFirst({
+        where: {
+          agentId,
+          behaviorType: primaryBehavior.behaviorType,
+        },
+      });
+
       const moderation = behaviorOrchestration.moderator.moderateResponse(
         response,
         primaryBehavior.behaviorType,
-        primaryBehavior.currentPhase,
+        behaviorProfile?.currentPhase || 1,
         agent.nsfwMode || false
       );
 

@@ -140,7 +140,6 @@ export async function POST(req: NextRequest) {
           behaviorType: behaviorType as any,
           baseIntensity: 0.3, // Intensidad inicial moderada
           currentPhase: 1,
-          enabled: true,
           volatility: 0.5, // Volatilidad media
           thresholdForDisplay: 0.4,
           triggers: [],
@@ -151,14 +150,15 @@ export async function POST(req: NextRequest) {
 
       console.log(`[API] BehaviorProfile creado: ${behaviorType}`);
 
-      // Crear BehaviorProgressionState
+      // Crear BehaviorProgressionState inicial
       await prisma.behaviorProgressionState.create({
         data: {
           agentId: agent.id,
-          globalIntensity: 0.3,
-          dominantBehavior: behaviorType as any,
-          recentTriggers: [],
-          lastTriggerAt: new Date(),
+          totalInteractions: 0,
+          positiveInteractions: 0,
+          negativeInteractions: 0,
+          currentIntensities: { [behaviorType]: 0.3 },
+          lastCalculatedAt: new Date(),
         },
       });
 

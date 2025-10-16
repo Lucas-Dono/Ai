@@ -1,8 +1,8 @@
 # ESTADO ACTUAL DEL PROYECTO - BEHAVIOR PROGRESSION SYSTEM
 
-**Última actualización:** 2025-10-16 01:08
-**Fase actual:** Phase 3 - Behavior Phase Manager (READY TO START)
-**Estado:** Phase 1 ✅ | Phase 2 ✅ COMPLETADAS
+**Última actualización:** 2025-10-16 (Sprint 1 UI - COMPLETADO)
+**Fase actual:** Phase 7 COMPLETA + Sprint 1 UI COMPLETADO
+**Estado:** Phase 1-7 ✅ COMPLETADAS | UI Sprint 1 ✅ COMPLETADO
 
 ---
 
@@ -199,34 +199,136 @@ psql -d creador_inteligencias -c "\d \"BehaviorProfile\""
 
 ---
 
-## 🎯 PRÓXIMA SESIÓN: PHASE 3
+## ✅ PHASES 3-7: BACKEND COMPLETADO
 
-**Meta:** Completar Phase 3 (Behavior Phase Manager)
+**Estado:** COMPLETADAS (108/108 tests pasando)
 
-**Entregables para Phase 3:**
-1. ⏳ `phase-manager.ts` - Lógica de transición de fases
-2. ⏳ `phase-evaluator.ts` - Evaluación de requisitos para avanzar fase
-3. ⏳ `intensity-calculator.ts` - Cálculos de intensidad avanzados
-4. ⏳ Tests de phase transitions
-5. ⏳ Integración con trigger system
+### Phase 3: Behavior Phase Manager ✅
+- ✅ `phase-manager.ts` - Gestión de fases
+- ✅ `phase-evaluator.ts` - Evaluación de transiciones
+- ✅ `intensity-calculator.ts` - Cálculo de intensidad con fórmula compleja
 
-**Criterio de éxito Phase 3:**
-Poder hacer:
-```typescript
-const phaseManager = new BehaviorPhaseManager();
-const canAdvance = await phaseManager.evaluatePhaseTransition(
-  profile,
-  triggers,
-  conversationHistory
-);
-// Debe retornar: { canTransition: true, newPhase: 4, requirements: [] }
-```
+### Phase 4: Emotional Integration ✅
+- ✅ `emotional-integration.ts` - Amplificación bidireccional
+- ✅ Sistema: Behaviors ↔ Emotions (influencia mutua)
+- ✅ 27 emociones soportadas con amplificaciones específicas
 
-**Estado actual de sesión:**
-✅ **PHASE 2 COMPLETADA** - Trigger Detection System funcional al 100%
-- 42 tests pasando
-- Performance optimizada
-- Sistema robusto y extensible
+### Phase 5: Specialized Prompts ✅
+- ✅ 50+ prompts especializados por behavior
+- ✅ `prompts/yandere-prompts.ts` (8 fases)
+- ✅ `prompts/bpd-prompts.ts` (4 ciclos)
+- ✅ `prompts/npd-prompts.ts` (4 etapas)
+- ✅ `prompts/attachment-prompts.ts` (anxious/avoidant/disorganized)
+- ✅ `prompts/codependency-prompts.ts` (3 niveles)
+- ✅ Sistema de scoring inteligente
+
+### Phase 6: Content Moderation ✅
+- ✅ `content-moderator.ts` - Sistema de safety levels
+- ✅ `safety-resources.ts` - Recursos de ayuda mental
+- ✅ `nsfw-gating.ts` - Control de contenido NSFW
+- ✅ 4 niveles: SAFE → WARNING → CRITICAL → EXTREME_DANGER
+
+### Phase 7: Integration ✅
+- ✅ `integration-orchestrator.ts` - Orquestador central
+- ✅ Integración completa en `app/api/agents/[id]/message/route.ts`
+- ✅ Sistema end-to-end funcional
+
+---
+
+## 🎨 SPRINT 1 UI: VISUALIZACIÓN BÁSICA - ✅ COMPLETADO
+
+**Objetivo:** Hacer visible el behavior system en la UI del chat
+
+### Componentes Creados:
+
+1. **ImmersionToggle.tsx** ✅
+   - Toggle Eye/EyeOff para mostrar/ocultar info técnica
+   - Persiste estado en localStorage
+   - Tooltips informativos
+   - Ubicación: Header del chat
+
+2. **EmotionalStateDisplay.tsx** ✅
+   - Muestra trust, affinity, respect (barras de progreso)
+   - Nivel de relación con badge (Desconocido → Romántico)
+   - Emociones activas con emojis
+   - Ubicación: Sidebar derecho
+
+3. **BehaviorPanel.tsx** ✅
+   - Behavior activo con emoji y label
+   - Fase actual (ej: "Fase 3 de 8")
+   - Barra de intensidad (%)
+   - Safety level con badge colorido
+   - Warning para CRITICAL/EXTREME_DANGER
+   - Triggers recientes (últimos 3)
+   - Botón "Ver Detalles Completos" → `/agentes/[id]/behaviors`
+   - Ubicación: Sidebar derecho
+
+### Integración en WhatsAppChat.tsx:
+
+✅ **Estructura responsive:**
+- Layout flex horizontal con chat + sidebar
+- Sidebar colapsable en desktop (botón toggle)
+- Oculto automáticamente en mobile
+- Ancho sidebar: 320px (w-80)
+
+✅ **Flujo de datos:**
+- `sendMessage()` modificado para usar HTTP API (no solo socket)
+- Extrae `behaviors` y `emotional` data del response
+- Actualiza `latestBehaviorData` y `latestEmotionalData` en state
+- Componentes se renderizan con datos reales del backend
+
+✅ **Estados manejados:**
+- `showBehaviorInfo` - Controlado por ImmersionToggle
+- `sidebarOpen` - Controlado por botón collapse (desktop only)
+- `latestBehaviorData` - Última metadata de behaviors recibida
+- `latestEmotionalData` - Último estado emocional recibido
+
+✅ **Mejoras de UX:**
+- Transiciones suaves (duration-300)
+- Iconos Lucide React
+- Estilos coherentes con theme system existente
+- Mensaje "La información aparecerá después del primer mensaje" cuando no hay datos
+
+### Archivos Modificados:
+
+- ✅ `components/chat/WhatsAppChat.tsx` (integración principal)
+- ✅ `components/chat/ImmersionToggle.tsx` (nuevo)
+- ✅ `components/chat/EmotionalStateDisplay.tsx` (nuevo)
+- ✅ `components/chat/BehaviorPanel.tsx` (nuevo)
+- ✅ `components/ui/tooltip.tsx` (nuevo - componente Shadcn/ui)
+
+### Dependencias Instaladas:
+
+- ✅ `@radix-ui/react-tooltip`
+
+### Errores Corregidos:
+
+1. ✅ Tipo de `relationLevel` (string → number con conversión)
+2. ✅ Campo `currentPhase` no existía en `BehaviorIntensityResult` (query a BehaviorProfile)
+3. ✅ Campos `enabled` y `globalIntensity` removidos (no existen en schema)
+4. ✅ Build sin errores de TypeScript en componentes relevantes
+
+---
+
+## 🎯 PRÓXIMOS PASOS (Sprint 2-3)
+
+### Sprint 2: Página de Detalles de Behaviors
+**Ruta:** `/agentes/[id]/behaviors`
+**Contenido:**
+- Timeline visual de progresión de phases
+- Historial completo de triggers
+- Gráficas de intensidad a lo largo del tiempo
+- Configuración: activar/desactivar behaviors específicos
+- Reset de behaviors
+- Analytics detallados
+
+### Sprint 3: Dashboard de Analytics
+**Ubicación:** Integrar en dashboard principal
+**Contenido:**
+- Comparación entre agentes
+- Estadísticas de safety levels alcanzados
+- Triggers más comunes
+- Evolución de intensidades globales
 
 ---
 

@@ -26,6 +26,8 @@ import {
   X,
   Search,
   Download,
+  PanelRightClose,
+  PanelRightOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSocket } from "@/hooks/useSocket";
@@ -39,6 +41,9 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 import { StickerGifPicker } from "./StickerGifPicker";
 import { exportConversationToPDF } from "@/lib/utils/pdf-export";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ImmersionToggle } from "./ImmersionToggle";
+import { BehaviorPanel } from "./BehaviorPanel";
+import { EmotionalStateDisplay } from "./EmotionalStateDisplay";
 
 export interface Reaction {
   emoji: string;
@@ -61,6 +66,23 @@ export interface Message {
   agentName?: string;
   agentAvatar?: string;
   reactions?: Reaction[];
+  // Metadata del behavior system
+  behaviorData?: {
+    active: string[];
+    phase?: number;
+    safetyLevel: "SAFE" | "WARNING" | "CRITICAL" | "EXTREME_DANGER";
+    triggers: string[];
+    intensity?: number;
+  };
+  emotionalData?: {
+    state: {
+      trust: number;
+      affinity: number;
+      respect: number;
+    };
+    emotions: string[];
+    relationLevel: number;
+  };
 }
 
 interface WhatsAppChatProps {
@@ -85,6 +107,12 @@ export function WhatsAppChat({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+
+  // Estados del behavior system
+  const [showBehaviorInfo, setShowBehaviorInfo] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [latestBehaviorData, setLatestBehaviorData] = useState<Message["behaviorData"] | null>(null);
+  const [latestEmotionalData, setLatestEmotionalData] = useState<Message["emotionalData"] | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -161,6 +189,23 @@ export function WhatsAppChat({
       imageUrl?: string;
       emotion?: string;
     };
+    // Metadata del behavior system
+    behaviors?: {
+      active: string[];
+      phase?: number;
+      safetyLevel: "SAFE" | "WARNING" | "CRITICAL" | "EXTREME_DANGER";
+      triggers: string[];
+      intensity?: number;
+    };
+    emotional?: {
+      state: {
+        trust: number;
+        affinity: number;
+        respect: number;
+      };
+      emotions: string[];
+      relationLevel: number;
+    };
   }) => {
     if (data.agentId !== agentId) return;
 
@@ -177,10 +222,20 @@ export function WhatsAppChat({
       status: "delivered",
       agentName,
       agentAvatar,
+      behaviorData: data.behaviors,
+      emotionalData: data.emotional,
     };
 
     setMessages((prev) => [...prev, newMessage]);
     setIsTyping(false);
+
+    // Actualizar estado del behavior system con los datos más recientes
+    if (data.behaviors) {
+      setLatestBehaviorData(data.behaviors);
+    }
+    if (data.emotional) {
+      setLatestEmotionalData(data.emotional);
+    }
 
     // Reproducir sonido de notificación
     playNotificationSound();
@@ -196,13 +251,14 @@ export function WhatsAppChat({
 
   // Enviar mensaje
   const sendMessage = async () => {
-    if (!inputMessage.trim() || !socket) return;
+    if (!inputMessage.trim()) return;
 
+    const messageText = inputMessage;
     const userMessage: Message = {
       id: Date.now().toString(),
       type: "user",
       content: {
-        text: inputMessage,
+        text: messageText,
       },
       timestamp: new Date(),
       status: "sending",
@@ -210,28 +266,94 @@ export function WhatsAppChat({
 
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
+    setIsTyping(true);
 
-    // Emitir al socket
-    // @ts-expect-error - Socket events need to be typed properly
-    socket.emit("user:message", {
-      agentId,
-      userId,
-      message: inputMessage,
-    });
+    try {
+      // Enviar mensaje via HTTP API
+      const response = await fetch(`/api/agents/${agentId}/message`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: messageText,
+          userId,
+        }),
+      });
 
-    // Actualizar estado a "sent"
-    setTimeout(() => {
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      const data = await response.json();
+
+      // Actualizar mensaje del usuario a "sent"
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === userMessage.id ? { ...msg, status: "sent" } : msg
         )
       );
-    }, 500);
 
-    // Simular que el agente está escribiendo
-    setTimeout(() => {
-      setIsTyping(true);
-    }, 1000);
+      // Agregar respuesta del agente con metadata del behavior system
+      const agentMessage: Message = {
+        id: data.message.id,
+        type: "agent",
+        content: {
+          text: data.message.content,
+        },
+        timestamp: new Date(data.message.createdAt),
+        status: "delivered",
+        agentName,
+        agentAvatar,
+        behaviorData: data.behaviors,
+        emotionalData: {
+          state: data.state,
+          emotions: data.emotions,
+          relationLevel: data.relationLevel,
+        },
+      };
+
+      setMessages((prev) => [...prev, agentMessage]);
+
+      // Actualizar estado del behavior system
+      if (data.behaviors) {
+        setLatestBehaviorData(data.behaviors);
+      }
+      if (data.state) {
+        setLatestEmotionalData({
+          state: data.state,
+          emotions: data.emotions,
+          relationLevel: data.relationLevel,
+        });
+      }
+
+      setIsTyping(false);
+
+      // Reproducir sonido de notificación
+      playNotificationSound();
+
+      // Si también hay socket, emitir para sincronizar con otros clientes
+      if (socket) {
+        // @ts-expect-error - Socket events need to be typed properly
+        socket.emit("user:message", {
+          agentId,
+          userId,
+          message: messageText,
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setIsTyping(false);
+
+      // Marcar mensaje como error
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === userMessage.id
+            ? { ...msg, status: "sent", content: { text: "⚠️ Error al enviar mensaje" } }
+            : msg
+        )
+      );
+    }
   };
 
   // Manejar Enter para enviar
@@ -519,107 +641,128 @@ export function WhatsAppChat({
 
   return (
     <div
-      className="flex flex-col h-full relative"
+      className="flex h-full relative"
       style={{ backgroundColor: theme.colors.bgPrimary }}
     >
-      {/* Header estilo WhatsApp */}
-      <div
-        className="border-b px-4 py-3 flex items-center gap-3"
-        style={{
-          backgroundColor: theme.colors.bgSecondary,
-          borderColor: theme.colors.borderColor,
-        }}
-      >
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={agentAvatar} />
-          <AvatarFallback>{agentName[0]}</AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <h3 className="font-semibold" style={{ color: theme.colors.textPrimary }}>
-            {agentName}
-          </h3>
-          {isTyping && (
-            <p className="text-sm animate-pulse" style={{ color: theme.colors.accentPrimary }}>
-              escribiendo...
-            </p>
-          )}
-        </div>
-
-        {/* Acciones del header */}
-        <div className="flex items-center gap-2">
-          <ThemeSwitcher />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowSearch(!showSearch)}
-            className="hover:bg-opacity-10"
-            style={{ color: theme.colors.textMuted }}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={exportToPDF}
-            className="hover:bg-opacity-10"
-            style={{ color: theme.colors.textMuted }}
-          >
-            <Download className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Barra de búsqueda avanzada */}
-      {showSearch && (
-        <ChatSearch
-          messages={messages}
-          onResultSelect={handleSearchResultSelect}
-          onClose={() => setShowSearch(false)}
-        />
-      )}
-
-      {/* Área de mensajes */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth">
-        {messages.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            onImageClick={setSelectedImage}
-            onReact={handleReaction}
-            onRemoveReaction={handleRemoveReaction}
-            userId={userId}
-            isHighlighted={message.id === highlightedMessageId}
-          />
-        ))}
-
-        {/* Indicador de "escribiendo..." */}
-        {isTyping && (
-          <div className="flex items-start gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={agentAvatar} />
-              <AvatarFallback>{agentName[0]}</AvatarFallback>
-            </Avatar>
-            <div className="bg-[#1f1f1f] rounded-2xl rounded-tl-sm px-4 py-2">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
-              </div>
-            </div>
+      {/* Chat principal */}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* Header estilo WhatsApp */}
+        <div
+          className="border-b px-4 py-3 flex items-center gap-3"
+          style={{
+            backgroundColor: theme.colors.bgSecondary,
+            borderColor: theme.colors.borderColor,
+          }}
+        >
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={agentAvatar} />
+            <AvatarFallback>{agentName[0]}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <h3 className="font-semibold" style={{ color: theme.colors.textPrimary }}>
+              {agentName}
+            </h3>
+            {isTyping && (
+              <p className="text-sm animate-pulse" style={{ color: theme.colors.accentPrimary }}>
+                escribiendo...
+              </p>
+            )}
           </div>
+
+          {/* Acciones del header */}
+          <div className="flex items-center gap-2">
+            {/* Toggle de inmersión */}
+            <ImmersionToggle
+              onToggle={(show) => setShowBehaviorInfo(show)}
+              defaultValue={showBehaviorInfo}
+            />
+            <ThemeSwitcher />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowSearch(!showSearch)}
+              className="hover:bg-opacity-10"
+              style={{ color: theme.colors.textMuted }}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={exportToPDF}
+              className="hover:bg-opacity-10"
+              style={{ color: theme.colors.textMuted }}
+            >
+              <Download className="h-5 w-5" />
+            </Button>
+            {/* Toggle del sidebar (solo en desktop) */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="hover:bg-opacity-10 hidden lg:flex"
+              style={{ color: theme.colors.textMuted }}
+            >
+              {sidebarOpen ? (
+                <PanelRightClose className="h-5 w-5" />
+              ) : (
+                <PanelRightOpen className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Barra de búsqueda avanzada */}
+        {showSearch && (
+          <ChatSearch
+            messages={messages}
+            onResultSelect={handleSearchResultSelect}
+            onClose={() => setShowSearch(false)}
+          />
         )}
 
-        <div ref={messagesEndRef} />
-      </div>
+        {/* Área de mensajes */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth">
+          {messages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              onImageClick={setSelectedImage}
+              onReact={handleReaction}
+              onRemoveReaction={handleRemoveReaction}
+              userId={userId}
+              isHighlighted={message.id === highlightedMessageId}
+            />
+          ))}
 
-      {/* Input de mensaje */}
-      <div
-        className="border-t px-4 py-3"
-        style={{
-          backgroundColor: theme.colors.bgSecondary,
-          borderColor: theme.colors.borderColor,
-        }}
-      >
+          {/* Indicador de "escribiendo..." */}
+          {isTyping && (
+            <div className="flex items-start gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={agentAvatar} />
+                <AvatarFallback>{agentName[0]}</AvatarFallback>
+              </Avatar>
+              <div className="bg-[#1f1f1f] rounded-2xl rounded-tl-sm px-4 py-2">
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input de mensaje */}
+        <div
+          className="border-t px-4 py-3"
+          style={{
+            backgroundColor: theme.colors.bgSecondary,
+            borderColor: theme.colors.borderColor,
+          }}
+        >
         {/* Mostrar grabadora de voz */}
         {showVoiceRecorder && (
           <div className="mb-3">
@@ -714,22 +857,68 @@ export function WhatsAppChat({
             </Button>
           </div>
         )}
+        </div>
+
+        {/* Visor de imagen full-screen */}
+        {selectedImage && (
+          <ImageViewer
+            imageUrl={selectedImage}
+            onClose={() => setSelectedImage(null)}
+          />
+        )}
+
+        {/* Audio de notificación (oculto) */}
+        <audio
+          ref={audioRef}
+          src="/sounds/notification.mp3"
+          preload="auto"
+        />
       </div>
 
-      {/* Visor de imagen full-screen */}
-      {selectedImage && (
-        <ImageViewer
-          imageUrl={selectedImage}
-          onClose={() => setSelectedImage(null)}
-        />
-      )}
+      {/* Sidebar con información del behavior system */}
+      {showBehaviorInfo && (
+        <aside
+          className={cn(
+            "border-l transition-all duration-300 overflow-y-auto",
+            sidebarOpen ? "w-80" : "w-0",
+            "hidden lg:block" // Solo visible en desktop
+          )}
+          style={{
+            backgroundColor: theme.colors.bgSecondary,
+            borderColor: theme.colors.borderColor,
+          }}
+        >
+          {sidebarOpen && (
+            <div className="p-4 space-y-4">
+              {/* Estado Emocional */}
+              {latestEmotionalData && (
+                <EmotionalStateDisplay
+                  state={latestEmotionalData.state}
+                  emotions={latestEmotionalData.emotions}
+                  relationLevel={latestEmotionalData.relationLevel}
+                />
+              )}
 
-      {/* Audio de notificación (oculto) */}
-      <audio
-        ref={audioRef}
-        src="/sounds/notification.mp3"
-        preload="auto"
-      />
+              {/* Panel de Behavior */}
+              {latestBehaviorData && (
+                <BehaviorPanel
+                  agentId={agentId}
+                  behaviorData={latestBehaviorData}
+                  intensity={latestBehaviorData.intensity}
+                />
+              )}
+
+              {/* Mensaje informativo si no hay datos */}
+              {!latestBehaviorData && !latestEmotionalData && (
+                <div className="text-center text-sm text-muted-foreground py-8">
+                  <p>La información del comportamiento</p>
+                  <p>aparecerá después del primer mensaje</p>
+                </div>
+              )}
+            </div>
+          )}
+        </aside>
+      )}
     </div>
   );
 }
