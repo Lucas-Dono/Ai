@@ -25,6 +25,10 @@ export interface AIHordeGenerationParams {
   nsfw?: boolean; // Permitir contenido NSFW
   karras?: boolean; // Usar sigmas de Karras (mejor calidad)
   clipSkip?: number; // CLIP skip (1-12)
+
+  // IMG2IMG Parameters
+  sourceImage?: string; // Base64 image string (sin el prefijo data:image/...)
+  denoisingStrength?: number; // 0.0-1.0, cuánto transformar la imagen (default: 0.75)
 }
 
 export interface AIHordeGenerationResult {
@@ -105,7 +109,7 @@ export class AIHordeClient {
   private async submitGenerationRequest(
     params: AIHordeGenerationParams
   ): Promise<string> {
-    const requestBody = {
+    const requestBody: any = {
       prompt: params.prompt,
       params: {
         n: 1, // Número de imágenes
@@ -135,11 +139,21 @@ export class AIHordeClient {
 
     // Añadir negative prompt si existe
     if (params.negativePrompt) {
-      requestBody.params = {
-        ...requestBody.params,
-        // @ts-expect-error - negative_prompt not in type definition but supported by API
-        negative_prompt: params.negativePrompt,
-      };
+      requestBody.params.negative_prompt = params.negativePrompt;
+    }
+
+    // IMG2IMG: Añadir source image y denoising strength
+    if (params.sourceImage) {
+      console.log("[AI Horde] Using img2img mode with denoising strength:", params.denoisingStrength || 0.6);
+
+      requestBody.source_image = params.sourceImage;
+      requestBody.source_processing = "img2img";
+
+      // Denoising strength: 0.0-1.0
+      // 0.0 = imagen idéntica a la original
+      // 1.0 = completamente nueva (ignora la referencia)
+      // 0.6 = buen balance (60% transformación, 40% mantiene referencia)
+      requestBody.params.denoising_strength = params.denoisingStrength ?? 0.6;
     }
 
     const response = await fetch(`${AI_HORDE_API_BASE}/generate/async`, {

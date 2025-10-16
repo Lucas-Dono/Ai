@@ -34,8 +34,7 @@ export class MultimediaGenerator {
   }
 
   /**
-   * Genera imágenes usando AI Horde
-   * TODO: Implementar img2img para usar referenceImageUrl y mantener consistencia
+   * Genera imágenes usando AI Horde con img2img para consistencia
    */
   async generateImage(
     description: string,
@@ -50,18 +49,33 @@ export class MultimediaGenerator {
       );
 
       const aiHordeClient = getAIHordeClient();
-      const result = await aiHordeClient.generateImage({
+      const genParams: any = {
         prompt: enhancedPrompt,
         negativePrompt:
-          "low quality, blurry, distorted, anime, cartoon, 3d render, deformed",
+          "low quality, blurry, distorted, different person, different face, different body, anime, cartoon, 3d render, deformed, ugly",
         width: 512,
         height: 512,
-        steps: 25,
+        steps: 30, // Más steps para img2img
         cfgScale: 7.5,
         sampler: "k_euler_a",
         seed: -1,
         nsfw: false,
-      });
+      };
+
+      // IMG2IMG: Si hay imagen de referencia, convertirla a base64 y usar img2img
+      if (options.referenceImageUrl) {
+        console.log("[MultimediaGenerator] Using img2img with reference image");
+        const sourceImageBase64 = await this.imageUrlToBase64(options.referenceImageUrl);
+
+        if (sourceImageBase64) {
+          genParams.sourceImage = sourceImageBase64;
+          genParams.denoisingStrength = 0.6; // 60% transformación, 40% mantiene referencia
+        } else {
+          console.warn("[MultimediaGenerator] Failed to convert reference image to base64, using text2img");
+        }
+      }
+
+      const result = await aiHordeClient.generateImage(genParams);
 
       if (result && result.imageUrl) {
         return {
@@ -71,7 +85,8 @@ export class MultimediaGenerator {
           metadata: {
             prompt: enhancedPrompt,
             model: result.model,
-            usedReference: false, // TODO: Implementar img2img
+            usedReference: !!options.referenceImageUrl && !!genParams.sourceImage,
+            denoisingStrength: genParams.denoisingStrength,
           },
         };
       }
@@ -203,5 +218,39 @@ as reference image. Only pose, expression, clothing, and background may vary.`;
 
     // Default: voz neutral
     return "pNInz6obpgDQGcFmaJgB"; // Adam (neutral)
+  }
+
+  /**
+   * Convierte una URL de imagen a base64 (sin el prefijo data:image/...)
+   * Soporta URLs HTTP/HTTPS y data URLs
+   */
+  private async imageUrlToBase64(imageUrl: string): Promise<string | null> {
+    try {
+      // Si ya es data URL (data:image/png;base64,...), extraer solo el base64
+      if (imageUrl.startsWith("data:")) {
+        const base64Match = imageUrl.match(/base64,(.+)/);
+        return base64Match ? base64Match[1] : null;
+      }
+
+      // Si es URL HTTP/HTTPS, descargar y convertir a base64
+      if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+        const response = await fetch(imageUrl);
+        if (!response.ok) {
+          console.error("[MultimediaGenerator] Failed to fetch image:", response.status);
+          return null;
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        return buffer.toString("base64");
+      }
+
+      // URL relativa o formato no soportado
+      console.error("[MultimediaGenerator] Unsupported image URL format:", imageUrl);
+      return null;
+    } catch (error) {
+      console.error("[MultimediaGenerator] Error converting image to base64:", error);
+      return null;
+    }
   }
 }
