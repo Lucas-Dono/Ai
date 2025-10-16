@@ -12,18 +12,18 @@ export interface GenerateOptions {
 
 export class LLMProvider {
   private apiKey: string;
-  private baseURL: string = "https://openrouter.ai/api/v1";
-  private model: string = "cognitivecomputations/dolphin-mistral-24b-venice-edition:free"; // Modelo GRATIS para generación de prompts
+  private baseURL: string = "https://generativelanguage.googleapis.com/v1beta";
+  private model: string = "gemini-1.5-flash"; // Modelo GRATIS de Google
 
   constructor() {
-    // Verificar que existe la API key de OpenRouter
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    // Verificar que existe la API key de Google AI
+    const apiKey = process.env.GOOGLE_AI_API_KEY;
     if (!apiKey) {
-      throw new Error("OPENROUTER_API_KEY no está configurada");
+      throw new Error("GOOGLE_AI_API_KEY no está configurada");
     }
 
     this.apiKey = apiKey;
-    console.log('[LLM] Inicializando OpenRouter con modelo GRATIS...');
+    console.log('[LLM] Inicializando Google AI (Gemini) con modelo GRATIS...');
     console.log('[LLM] API Key detectada:', apiKey ? 'Sí ✓' : 'No ✗');
     console.log('[LLM] Modelo:', this.model);
   }
@@ -32,39 +32,55 @@ export class LLMProvider {
     const { systemPrompt, messages, temperature = 0.9, maxTokens = 1000 } = options;
 
     try {
-      // Construir mensajes en formato OpenAI
-      const formattedMessages = [
-        { role: "system" as const, content: systemPrompt },
-        ...messages.map(msg => ({
-          role: msg.role as "user" | "assistant",
-          content: msg.content
-        }))
-      ];
+      // Gemini usa un formato diferente: combina system prompt con el primer user message
+      // y convierte roles (user/model en vez de user/assistant)
+      const contents = [];
 
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://creador-inteligencias.com",
-          "X-Title": "Creador de Inteligencias"
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: formattedMessages,
-          temperature,
-          max_tokens: maxTokens
-        })
-      });
+      // Agregar system prompt como primer user message
+      let firstUserContent = systemPrompt + "\n\n";
+
+      // Combinar mensajes en formato Gemini
+      for (const msg of messages) {
+        if (msg.role === "user") {
+          firstUserContent += msg.content;
+          contents.push({
+            role: "user",
+            parts: [{ text: firstUserContent }]
+          });
+          firstUserContent = ""; // Reset
+        } else if (msg.role === "assistant") {
+          contents.push({
+            role: "model",
+            parts: [{ text: msg.content }]
+          });
+        }
+      }
+
+      const response = await fetch(
+        `${this.baseURL}/models/${this.model}:generateContent?key=${this.apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents,
+            generationConfig: {
+              temperature,
+              maxOutputTokens: maxTokens,
+            }
+          })
+        }
+      );
 
       if (!response.ok) {
         const error = await response.text();
-        console.error("OpenRouter API error:", error);
-        throw new Error(`OpenRouter API error: ${response.status}`);
+        console.error("Gemini API error:", error);
+        throw new Error(`Gemini API error: ${response.status}`);
       }
 
       const data = await response.json();
-      return data.choices[0]?.message?.content || "";
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     } catch (error) {
       console.error("Error al generar respuesta:", error);
       throw new Error("No se pudo generar una respuesta de la IA");
@@ -90,35 +106,41 @@ Responde SOLO con un JSON válido con este formato:
 }`;
 
     try {
-      console.log('[LLM] Generando perfil con OpenRouter...');
+      console.log('[LLM] Generando perfil con Gemini...');
 
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: [{ role: "user", content: prompt }],
-          temperature: 0.9,
-          max_tokens: 2000
-        })
-      });
+      const response = await fetch(
+        `${this.baseURL}/models/${this.model}:generateContent?key=${this.apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+              temperature: 0.9,
+              maxOutputTokens: 2000,
+            }
+          })
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`OpenRouter error: ${response.status}`);
+        throw new Error(`Gemini error: ${response.status}`);
       }
 
       const data = await response.json();
-      const text = data.choices[0]?.message?.content;
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!text) {
-        throw new Error("OpenRouter no retornó texto en la respuesta");
+        throw new Error("Gemini no retornó texto en la respuesta");
       }
-      console.log('[LLM] Respuesta de OpenRouter recibida');
+      console.log('[LLM] Respuesta de Gemini recibida');
 
-      // Extraer JSON de la respuesta
+      // Extraer JSON de la respuesta (Gemini a veces incluye markdown)
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error("No se pudo extraer JSON de la respuesta");
@@ -138,7 +160,7 @@ Responde SOLO con un JSON válido con este formato:
           traits: ["amigable", "conversacional"],
           emotions: { joy: 0.7, calm: 0.8 },
         },
-        systemPrompt: `Eres ${rawData.name || "una IA"}${rawData.kind === 'companion' ? ', un compañero emocional' : ', un asistente'}. ${rawData.personality || ""} ${rawData.purpose || ""} Usa un tono ${rawData.tone || "amigable"}.`,
+        systemPrompt: `Eres una IA con el nombre de ${rawData.name || "una IA"}, diseñada como ${rawData.kind === 'companion' ? 'una compañera' : 'un asistente'} para el usuario. Tu personalidad es ${rawData.personality || "amigable y conversacional"}, lo cual se refleja en tu tono ${rawData.tone || "amigable"}. Tu principal propósito es ${rawData.purpose || "ayudar al usuario"}. Mantén una actitud positiva y acessible mientras interactúas con el usuario.`,
       };
       console.log('[LLM] Usando perfil fallback:', fallback);
       return fallback;

@@ -277,6 +277,7 @@ export async function POST(req: NextRequest) {
               affinity: 0.5,
               respect: 0.5,
               stagePrompts: stagePrompts as any,
+              currentEmotions: {}, // Emociones iniciales vacías
               lastUpdated: new Date(),
             },
           });
