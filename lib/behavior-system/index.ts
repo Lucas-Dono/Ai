@@ -54,7 +54,7 @@ export const FEATURES = {
   PHASE_MANAGER: true, // Phase 3 ✅
   EMOTIONAL_INTEGRATION: true, // Phase 4 ✅
   SPECIALIZED_PROMPTS: true, // Phase 5 ✅
-  CONTENT_MODERATION: false, // Phase 6
+  CONTENT_MODERATION: true, // Phase 6 ✅
   ANALYTICS_DASHBOARD: false, // Phase 8
 } as const;
 
@@ -100,3 +100,17 @@ export {
   determineNPDContext,
   determineCodependencyContext,
 } from "./prompts/npd-codependency-prompts";
+
+// Phase 6: Content Moderation
+export { ContentModerator } from "./content-moderator";
+export {
+  SAFETY_RESOURCES,
+  CRISIS_HELPLINES,
+  getMentalHealthResource,
+  getCrisisHelplines,
+  generateSafetyMessage,
+  generateNSFWDisclaimer,
+  generateEducationalNote,
+} from "./safety-resources";
+export { NSFWGatingManager, nsfwGatingManager, NSFW_REQUIREMENTS } from "./nsfw-gating";
+export type { NSFWVerificationResult, NSFWRequirement } from "./nsfw-gating";

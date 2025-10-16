@@ -87,6 +87,11 @@ export class PromptSelector {
       input.nsfwMode
     );
 
+    // Si no hay prompt principal, usar fallback
+    if (!primaryPrompt) {
+      return this.getDefaultPrompt();
+    }
+
     // Seleccionar prompts para behaviors secundarios (si existen)
     const secondaryPrompts: SelectedPrompt[] = [];
     for (let i = 1; i < Math.min(sortedBehaviors.length, 3); i++) {
