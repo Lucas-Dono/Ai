@@ -107,15 +107,16 @@ const agent = await prisma.agent.create({
     progressionState = await prisma.behaviorProgressionState.create({
       data: {
         agentId: testAgent.id,
-        globalIntensity: 0.3,
-        dominantBehavior: "YANDERE_OBSESSIVE",
-        recentTriggers: [],
-        lastTriggerAt: new Date()
+        totalInteractions: 0,
+        positiveInteractions: 0,
+        negativeInteractions: 0,
+        currentIntensities: { "YANDERE_OBSESSIVE": 0.3 },
+        lastCalculatedAt: new Date()
       }
     });
     console.log("   ✅ BehaviorProgressionState creado");
   } else {
-    console.log(`   ✅ BehaviorProgressionState existe (Dominant: ${progressionState.dominantBehavior})`);
+    console.log(`   ✅ BehaviorProgressionState existe (Interacciones: ${progressionState.totalInteractions})`);
   }
 
   console.log("");
