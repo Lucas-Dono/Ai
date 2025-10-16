@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
@@ -76,26 +76,17 @@ const safetyColors = {
 };
 
 export default function AnalyticsDashboardPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/analytics/behaviors");
-        if (!response.ok) throw new Error("Failed to fetch analytics data");
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        console.error("Error fetching analytics:", err);
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // Usar SWR para data fetching con cache automático
+  const {
+    data,
+    error,
+    isLoading: loading,
+  } = useSWR<AnalyticsData>("/api/analytics/behaviors", {
+    // Revalidar cada 5 minutos si la tab está activa
+    refreshInterval: 5 * 60 * 1000,
+    // Mostrar data anterior mientras revalida
+    keepPreviousData: true,
+  });
 
   if (loading) {
     return (
@@ -110,7 +101,7 @@ export default function AnalyticsDashboardPage() {
     );
   }
 
-  if (error || !data) {
+  if (error || (!loading && !data)) {
     return (
       <div className="container mx-auto py-8">
         <Card className="border-destructive">
@@ -119,11 +110,18 @@ export default function AnalyticsDashboardPage() {
               <AlertTriangle className="h-5 w-5" />
               Error al cargar analytics
             </CardTitle>
-            <CardDescription>{error || "No se pudieron cargar los datos"}</CardDescription>
+            <CardDescription>
+              {error?.message || "No se pudieron cargar los datos"}
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
     );
+  }
+
+  // Safety check for data availability
+  if (!data) {
+    return null;
   }
 
   const behaviorDistributionData = Object.entries(data.behaviorDistribution).map(([key, value]) => ({

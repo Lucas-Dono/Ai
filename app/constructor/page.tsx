@@ -667,7 +667,7 @@ export default function ConstructorPage() {
                     className="flex-1"
                     disabled={creating}
                   />
-                  <Button onClick={handleSend} size="icon" className="shrink-0" disabled={creating}>
+                  <Button onClick={() => handleSend()} size="icon" className="shrink-0" disabled={creating}>
                     {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </div>
