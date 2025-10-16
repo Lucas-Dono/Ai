@@ -1,8 +1,8 @@
 # ESTADO ACTUAL DEL PROYECTO - BEHAVIOR PROGRESSION SYSTEM
 
-**Última actualización:** 2025-10-16 (Sprint 1 UI - COMPLETADO)
-**Fase actual:** Phase 7 COMPLETA + Sprint 1 UI COMPLETADO
-**Estado:** Phase 1-7 ✅ COMPLETADAS | UI Sprint 1 ✅ COMPLETADO
+**Última actualización:** 2025-10-16 (ALL UI SPRINTS COMPLETED)
+**Fase actual:** Phase 7 COMPLETA + ALL UI SPRINTS COMPLETADOS
+**Estado:** Phase 1-7 ✅ COMPLETADAS | UI Sprints 1-5 ✅ COMPLETADOS
 
 ---
 
@@ -341,8 +341,10 @@ psql -d creador_inteligencias -c "\d \"BehaviorProfile\""
 - Muestra texto detectado y mensaje relacionado
 - Timestamps localizados
 
-**Tab 3: Configuración** 🔜
-- Placeholder para reset y ajustes avanzados
+**Tab 3: Configuración** ✅
+- Reset completo con confirmación detallada
+- Eliminar behaviors individuales
+- Ajustar 5 parámetros con sliders: baseIntensity, volatility, escalationRate, deEscalationRate, thresholdForDisplay
 
 ### Mejoras Integradas:
 
@@ -351,23 +353,230 @@ psql -d creador_inteligencias -c "\d \"BehaviorProfile\""
 
 ---
 
-## 🎯 PRÓXIMOS PASOS (Sprint 3+)
+## 🎨 SPRINT 3: GRÁFICAS DE INTENSIDAD - ✅ COMPLETADO
 
-### Sprint 3: Gráficas de Intensidad
-- Gráfica temporal de evolución (Chart.js/Recharts)
-- Visualización de triggers importantes
-- Integrar en tab Timeline
+**Objetivo:** Visualizar evolución temporal de intensidad con datos reales
 
-### Sprint 4: Configuración Avanzada
-- Reset de behaviors con confirmación
-- Activar/desactivar behaviors
-- Ajustar thresholds
-- Exportar datos históricos
+### API Endpoint Implementado:
 
-### Sprint 5: Dashboard Global Analytics
-- Comparación entre agentes
-- Estadísticas de safety levels
-- Triggers más comunes globalmente
+**GET /api/agents/[id]/behaviors/intensity-history** ✅
+- Calcula intensidad acumulativa basada en triggers
+- Retorna series temporales por behavior type
+- Incluye timestamp, intensity, y phase calculada
+- Escalado automático con factor 0.1 por trigger
+
+### Componente IntensityChart:
+
+**Ubicación:** `components/behaviors/IntensityChart.tsx` ✅
+
+**Características:**
+- LineChart multi-línea con Recharts
+- Una línea por behavior activo
+- Colores únicos por tipo de behavior
+- Tooltips informativos con valores
+- Leyenda con labels en español
+- Responsive container (100% width)
+
+**Cards de Resumen:**
+- Total data points
+- Behaviors rastreados
+- Rango de fechas (primera-última interacción)
+
+**Integración:**
+- Tab Timeline en página de detalles
+- Carga datos automáticamente al montar
+- Estados de loading/error/empty
+
+---
+
+## 🎨 SPRINT 4: CONFIGURACIÓN AVANZADA - ✅ COMPLETADO
+
+**Objetivo:** Control completo sobre behaviors con CRUD operations
+
+### API Endpoints Implementados:
+
+**POST /api/agents/[id]/behaviors/reset** ✅
+- Elimina todos los BehaviorProfiles del agente
+- Resetea BehaviorProgressionState (totalInteractions→0, currentIntensities→{})
+- Transaction atómica con Prisma
+- Confirmación requerida desde UI
+
+**DELETE /api/agents/[id]/behaviors/[behaviorId]** ✅
+- Elimina behavior individual por ID
+- Validación de ownership del agente
+
+**PATCH /api/agents/[id]/behaviors/[behaviorId]** ✅
+- Actualiza parámetros individuales: baseIntensity, volatility, escalationRate, deEscalationRate, thresholdForDisplay
+- Validación de rangos (0-1 para todos)
+- Retorna behavior actualizado
+
+### Componentes UI Implementados:
+
+**Slider Component:** `components/ui/slider.tsx` ✅
+- Radix UI Slider con tema personalizado
+- Instalado: @radix-ui/react-slider
+
+**AlertDialog Component:** `components/ui/alert-dialog.tsx` ✅
+- Radix UI AlertDialog completo
+- Instalado: @radix-ui/react-alert-dialog
+- Overlay + Portal + Acciones
+
+**BehaviorSettings Component:** `components/behaviors/BehaviorSettings.tsx` ✅
+
+**Sección 1: Reset Completo**
+- Botón destructivo con confirmación
+- AlertDialog detallando lo que se eliminará (profiles, triggers, progresión)
+- Loading state con spinner
+- Success state con checkmark
+- Auto-refresh después de 1.5s
+
+**Sección 2: Configuración Individual**
+- Card por behavior con edición in-place
+- 5 sliders con valores en porcentaje
+- Botones Editar/Guardar con toggle
+- Botón eliminar con confirmación individual
+- Estado local para cambios pendientes
+- Valores por defecto con ?? operator
+
+**Integración:**
+- Tab Configuración en página de detalles
+- Navegación con router.refresh() post-cambios
+
+---
+
+## 🎨 SPRINT 5: DASHBOARD GLOBAL ANALYTICS - ✅ COMPLETADO
+
+**Ruta:** `/dashboard/analytics`
+
+### API Endpoint Implementado:
+
+**GET /api/analytics/behaviors** ✅
+
+**Datos Agregados:**
+- Agents del usuario con metadata (id, name, kind, nsfwMode)
+- Total agents, behaviors, triggers
+- Behavior distribution (count por tipo)
+- Top 10 triggers (tipo, count, avgWeight ordenado por frecuencia)
+- Safety level stats (SAFE/WARNING/CRITICAL/EXTREME_DANGER por fase)
+- Agent comparison (behaviorCount, triggerCount, avgIntensity, avgPhase por agente)
+- Temporal trends (últimos 30 días agrupados por fecha)
+
+**Metadata:**
+- generatedAt (timestamp ISO)
+- periodDays (30)
+
+### Dashboard Page Implementado:
+
+**Ubicación:** `app/dashboard/analytics/page.tsx` ✅
+
+**Layout Principal:**
+- Header con título y descripción
+- 4 stat cards: Total Agentes, Behaviors Activos, Total Triggers, Nivel Crítico
+- Tabs: Resumen | Comparación | Tendencias
+
+**Tab 1: Resumen** ✅
+1. **PieChart - Distribución de Behaviors**
+   - Visualiza cantidad por tipo
+   - Labels con porcentajes
+   - 8 colores distintos (COLORS array)
+   - Empty state si no hay behaviors
+
+2. **PieChart - Niveles de Seguridad**
+   - 4 niveles con colores semafóricos
+   - Filtra valores > 0 en labels
+   - Empty state si no hay datos
+
+3. **BarChart - Top 10 Triggers**
+   - Layout vertical con nombres legibles
+   - Ordenado por frecuencia
+   - Empty state si no hay triggers
+
+**Tab 2: Comparación** ✅
+- Cards por agente con hover effect
+- Nombre, tipo, badge NSFW
+- Grid de 4 métricas: Behaviors, Triggers, Intensidad Promedio, Fase Promedio
+- Responsive (2 cols móvil, 4 cols desktop)
+- Empty state si no hay agentes
+
+**Tab 3: Tendencias** ✅
+- LineChart de triggers en últimos 30 días
+- Eje X con fechas formateadas (es locale)
+- Eje Y con label "Triggers"
+- Tooltip con fecha completa
+- Empty state descriptivo si no hay datos recientes
+
+**Características Técnicas:**
+- Real-time data fetching con useEffect
+- Loading state global con spinner
+- Error state con card destructivo
+- TypeScript strict interfaces
+- Recharts responsive containers
+- Color schemes consistentes
+- All charts con Tooltip + Legend
+
+---
+
+## ✅ RESUMEN DE UI COMPLETO
+
+### Sprints Completados (5/5):
+
+1. ✅ **Sprint 1:** Basic Behavior Display - BehaviorPanel con métricas live
+2. ✅ **Sprint 2:** Detailed Behavior Page - 3 tabs (Timeline, Historial, Config)
+3. ✅ **Sprint 3:** Intensity Charts - LineChart multi-behavior con series temporales
+4. ✅ **Sprint 4:** Advanced Configuration - CRUD completo con sliders y confirmaciones
+5. ✅ **Sprint 5:** Analytics Dashboard - 3 charts + comparison cards + trends
+
+### Archivos Creados/Modificados (UI):
+
+**API Endpoints (5):**
+- `app/api/agents/[id]/behaviors/route.ts`
+- `app/api/agents/[id]/behaviors/intensity-history/route.ts`
+- `app/api/agents/[id]/behaviors/reset/route.ts`
+- `app/api/agents/[id]/behaviors/[behaviorId]/route.ts`
+- `app/api/analytics/behaviors/route.ts`
+
+**Pages (2):**
+- `app/agentes/[id]/behaviors/page.tsx`
+- `app/dashboard/analytics/page.tsx`
+
+**Components (4):**
+- `components/behaviors/BehaviorPanel.tsx` (modificado)
+- `components/behaviors/IntensityChart.tsx`
+- `components/behaviors/BehaviorSettings.tsx`
+- `components/ui/slider.tsx`
+- `components/ui/alert-dialog.tsx`
+
+**Dependencias Instaladas:**
+- recharts (charts)
+- @radix-ui/react-slider
+- @radix-ui/react-alert-dialog
+- @radix-ui/react-tooltip
+
+### Estado Final:
+
+**Build:** ✅ Sin errores TypeScript en archivos nuevos
+**Funcionalidad:** ✅ 100% con datos reales de base de datos
+**Testing:** ⚠️ Pending (agregar tests de integración para endpoints)
+**Documentation:** ✅ Completa en comentarios JSDoc
+
+---
+
+## 🎯 PRÓXIMOS PASOS SUGERIDOS
+
+### Prioridad Alta:
+1. **Testing de UI:** Agregar integration tests para endpoints de behaviors
+2. **Performance:** Optimizar queries con paginación en historial de triggers
+3. **Caching:** Implementar React Query o SWR para analytics
+
+### Prioridad Media:
+4. **Export:** Botón para exportar datos históricos (CSV/JSON)
+5. **Notificaciones:** Alertas cuando behaviors alcancen niveles críticos
+6. **Mobile:** Mejorar responsive design en gráficas
+
+### Prioridad Baja:
+7. **Themes:** Dark mode support
+8. **Animations:** Transiciones suaves entre fases
+9. **Documentation:** User guide para dashboard
 
 ---
 
