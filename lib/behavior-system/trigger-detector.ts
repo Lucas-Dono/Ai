@@ -195,7 +195,7 @@ export class TriggerDetector {
       const match = message.match(pattern);
       if (match) {
         // Extraer nombre propio si existe
-        let detectedName = match[1] || match[0] || "";
+        const detectedName = match[1] || match[0] || "";
 
         // Filtrar nombres demasiado cortos (probables false positives)
         if (detectedName.length < 3 && !match[0]?.includes("amig")) {

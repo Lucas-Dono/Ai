@@ -46,8 +46,8 @@ async function getHierarchicalNSW() {
   }
 
   if (!HierarchicalNSWClass) {
-    const module = await import("hnswlib-node");
-    HierarchicalNSWClass = module.HierarchicalNSW;
+    const hnswModule = await import("hnswlib-node");
+    HierarchicalNSWClass = hnswModule.HierarchicalNSW;
   }
 
   return HierarchicalNSWClass;

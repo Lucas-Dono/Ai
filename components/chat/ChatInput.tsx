@@ -17,10 +17,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import data from "@emoji-mart/data";
-import { Picker } from "@emoji-mart/react";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { GifPicker } from "./GifPicker";
+import { EmojiPickerComponent } from "./EmojiPickerComponent";
 
 interface ChatInputProps {
   onSendMessage: (content: string, type?: "text" | "audio" | "gif" | "sticker", metadata?: any) => void;
@@ -55,8 +54,8 @@ export function ChatInput({
     }
   };
 
-  const handleEmojiSelect = (emoji: any) => {
-    setInput((prev) => prev + emoji.native);
+  const handleEmojiSelect = (emoji: string) => {
+    setInput((prev) => prev + emoji);
     setEmojiPickerOpen(false);
     inputRef.current?.focus();
   };
@@ -114,15 +113,9 @@ export function ChatInput({
               <PopoverContent
                 side="top"
                 align="start"
-                className="w-full p-0 border-0"
+                className="p-0 border-0 w-auto"
               >
-                <Picker
-                  data={data}
-                  onEmojiSelect={handleEmojiSelect}
-                  theme="dark"
-                  previewPosition="none"
-                  skinTonePosition="search"
-                />
+                <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
               </PopoverContent>
             </Popover>
 
