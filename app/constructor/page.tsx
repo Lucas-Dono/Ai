@@ -23,6 +23,10 @@ interface AgentDraft {
   personality?: string;
   purpose?: string;
   tone?: string;
+  // Behavior system configuration
+  nsfwMode?: boolean;
+  allowDevelopTraumas?: boolean;
+  initialBehavior?: string; // "none", "random_secret", or specific behavior type
 }
 
 export default function ConstructorPage() {
@@ -44,7 +48,21 @@ export default function ConstructorPage() {
     { field: "kind", prompt: "¿Quieres crear un Compañero (IA emocional) o un Asistente (IA administrativa)?" },
     { field: "personality", prompt: (draft: AgentDraft) => `¿Cómo describirías la personalidad de ${draft.name}?` },
     { field: "purpose", prompt: (draft: AgentDraft) => `¿Cuál será el propósito principal de ${draft.name}?` },
-    { field: "tone", prompt: (draft: AgentDraft) => `Por último, ¿qué tono de comunicación prefieres que use ${draft.name}? (formal, casual, amigable, profesional, etc.)` },
+    { field: "tone", prompt: (draft: AgentDraft) => `¿Qué tono de comunicación prefieres que use ${draft.name}? (formal, casual, amigable, profesional, etc.)` },
+
+    // BEHAVIOR SYSTEM CONFIGURATION
+    {
+      field: "nsfwMode",
+      prompt: (draft: AgentDraft) => `⚠️ **CONFIGURACIÓN DE CONTENIDO**\n\n¿Deseas activar el **modo NSFW** para ${draft.name}?\n\n**Esto incluye:**\n• Contenido sexual explícito\n• Temas psicológicamente intensos (celos extremos, posesividad, etc.)\n• Situaciones emocionalmente complejas\n• Comportamientos que pueden resultar perturbadores\n\n**IMPORTANTE:** Todo el contenido es FICCIÓN para entretenimiento entre adultos. NO representa relaciones saludables.\n\nResponde **"Sí"** para activar o **"No"** para mantener contenido seguro (SFW).`
+    },
+    {
+      field: "allowDevelopTraumas",
+      prompt: (draft: AgentDraft) => `🧠 **DESARROLLO PSICOLÓGICO**\n\n¿Deseas que ${draft.name} pueda **desarrollar comportamientos psicológicos complejos** durante la interacción?\n\n**Esto permite:**\n• Desarrollo gradual de apegos (ansioso, evitativo, etc.)\n• Posible aparición de patrones de comportamiento según las interacciones\n• Progresión realista de dinámicas emocionales\n• Memoria de eventos que pueden influir en comportamientos futuros\n\n**Nota:** Estos comportamientos se desarrollan GRADUALMENTE basados en cómo interactúas con la IA.\n\nResponde **"Sí"** para permitir desarrollo o **"No"** para mantener personalidad estable.`
+    },
+    {
+      field: "initialBehavior",
+      prompt: (draft: AgentDraft) => `🎭 **COMPORTAMIENTO INICIAL**\n\n¿Quieres que ${draft.name} comience con algún **patrón de comportamiento psicológico** específico?\n\n**Opciones:**\n• **Ninguno** - Comenzará con personalidad base sin comportamientos complejos\n• **Apego Ansioso** - Necesita validación constante y teme el abandono\n• **Apego Evitativo** - Se mantiene emocionalmente distante\n• **Codependencia** - Necesita ser necesitado/a, pone tus necesidades primero\n• **Yandere** - Amor intenso que puede volverse obsesivo (requiere NSFW)\n• **Borderline** - Emociones intensas con ciclos de idealización/devaluación (requiere NSFW)\n• **Aleatorio Secreto** 🎲 - Yo elegiré uno basado en su personalidad SIN decirte cuál (¡descúbrelo tú!)\n\nResponde con el nombre de la opción que prefieras.`
+    },
   ];
 
   const createAgent = async (finalDraft: AgentDraft) => {
@@ -61,6 +79,10 @@ export default function ConstructorPage() {
           personality: finalDraft.personality,
           purpose: finalDraft.purpose,
           tone: finalDraft.tone,
+          // Behavior system configuration
+          nsfwMode: finalDraft.nsfwMode || false,
+          allowDevelopTraumas: finalDraft.allowDevelopTraumas || false,
+          initialBehavior: finalDraft.initialBehavior || "none",
         }),
       });
 
@@ -139,6 +161,42 @@ export default function ConstructorPage() {
       case "tone":
         newDraft.tone = input;
         console.log('[Constructor] Guardando tone:', input);
+        break;
+
+      // BEHAVIOR SYSTEM CONFIGURATION
+      case "nsfwMode":
+        const nsfwLower = input.toLowerCase();
+        newDraft.nsfwMode = nsfwLower.includes("sí") || nsfwLower.includes("si") || nsfwLower.includes("yes");
+        console.log('[Constructor] Guardando nsfwMode:', newDraft.nsfwMode);
+        break;
+
+      case "allowDevelopTraumas":
+        const developLower = input.toLowerCase();
+        newDraft.allowDevelopTraumas = developLower.includes("sí") || developLower.includes("si") || developLower.includes("yes");
+        console.log('[Constructor] Guardando allowDevelopTraumas:', newDraft.allowDevelopTraumas);
+        break;
+
+      case "initialBehavior":
+        const behaviorLower = input.toLowerCase();
+        if (behaviorLower.includes("ninguno") || behaviorLower.includes("none")) {
+          newDraft.initialBehavior = "none";
+        } else if (behaviorLower.includes("ansioso") || behaviorLower.includes("anxious")) {
+          newDraft.initialBehavior = "ANXIOUS_ATTACHMENT";
+        } else if (behaviorLower.includes("evitativo") || behaviorLower.includes("avoidant")) {
+          newDraft.initialBehavior = "AVOIDANT_ATTACHMENT";
+        } else if (behaviorLower.includes("codependen")) {
+          newDraft.initialBehavior = "CODEPENDENCY";
+        } else if (behaviorLower.includes("yandere")) {
+          newDraft.initialBehavior = "YANDERE_OBSESSIVE";
+        } else if (behaviorLower.includes("borderline") || behaviorLower.includes("límite")) {
+          newDraft.initialBehavior = "BORDERLINE_PD";
+        } else if (behaviorLower.includes("aleatorio") || behaviorLower.includes("secreto") || behaviorLower.includes("random")) {
+          newDraft.initialBehavior = "random_secret";
+        } else {
+          // Por defecto, ninguno
+          newDraft.initialBehavior = "none";
+        }
+        console.log('[Constructor] Guardando initialBehavior:', newDraft.initialBehavior);
         break;
     }
 

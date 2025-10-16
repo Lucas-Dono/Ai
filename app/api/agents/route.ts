@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, kind, personality, purpose, tone } = body;
-    console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone });
+    const { name, kind, personality, purpose, tone, nsfwMode, allowDevelopTraumas, initialBehavior } = body;
+    console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone, nsfwMode, allowDevelopTraumas, initialBehavior });
 
     // Validar datos
     if (!name || !kind) {
@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
         profile: profile as Record<string, string | number | boolean | null>,
         systemPrompt,
         visibility: "private",
+        nsfwMode: nsfwMode || false,
       },
     });
     console.log('[API] Agente creado:', agent.id);
@@ -93,6 +94,83 @@ export async function POST(req: NextRequest) {
       },
     });
     console.log('[API] Relación creada');
+
+    // BEHAVIOR SYSTEM: Crear BehaviorProfile si se configuró
+    if (initialBehavior && initialBehavior !== "none") {
+      console.log('[API] Configurando behavior system...');
+
+      let behaviorType: string;
+
+      // Si es "random_secret", elegir uno basado en personalidad
+      if (initialBehavior === "random_secret") {
+        console.log('[API] Seleccionando behavior aleatorio secreto...');
+        const behaviorsPool = [
+          "ANXIOUS_ATTACHMENT",
+          "AVOIDANT_ATTACHMENT",
+          "CODEPENDENCY",
+          "BORDERLINE_PD",
+          "NARCISSISTIC_PD",
+          "YANDERE_OBSESSIVE",
+        ];
+
+        // Usar personalidad para "seed" la selección (más inteligente que random puro)
+        const personalityLower = (personality || "").toLowerCase();
+        if (personalityLower.includes("dependiente") || personalityLower.includes("necesit")) {
+          behaviorType = Math.random() > 0.5 ? "ANXIOUS_ATTACHMENT" : "CODEPENDENCY";
+        } else if (personalityLower.includes("distante") || personalityLower.includes("frío") || personalityLower.includes("independiente")) {
+          behaviorType = "AVOIDANT_ATTACHMENT";
+        } else if (personalityLower.includes("intenso") || personalityLower.includes("extremo") || personalityLower.includes("obsesiv")) {
+          behaviorType = Math.random() > 0.5 ? "BORDERLINE_PD" : "YANDERE_OBSESSIVE";
+        } else if (personalityLower.includes("orgullos") || personalityLower.includes("superior") || personalityLower.includes("perfeccion")) {
+          behaviorType = "NARCISSISTIC_PD";
+        } else {
+          // Random real si no hay pistas en personalidad
+          behaviorType = behaviorsPool[Math.floor(Math.random() * behaviorsPool.length)];
+        }
+
+        console.log(`[API] Behavior secreto seleccionado: ${behaviorType} (basado en: "${personality}")`);
+      } else {
+        behaviorType = initialBehavior;
+      }
+
+      // Crear BehaviorProfile
+      await prisma.behaviorProfile.create({
+        data: {
+          agentId: agent.id,
+          behaviorType: behaviorType as any,
+          baseIntensity: 0.3, // Intensidad inicial moderada
+          currentPhase: 1,
+          enabled: true,
+          volatility: 0.5, // Volatilidad media
+          thresholdForDisplay: 0.4,
+          triggers: [],
+          phaseStartedAt: new Date(),
+          phaseHistory: [],
+        },
+      });
+
+      console.log(`[API] BehaviorProfile creado: ${behaviorType}`);
+
+      // Crear BehaviorProgressionState
+      await prisma.behaviorProgressionState.create({
+        data: {
+          agentId: agent.id,
+          globalIntensity: 0.3,
+          dominantBehavior: behaviorType as any,
+          recentTriggers: [],
+          lastTriggerAt: new Date(),
+        },
+      });
+
+      console.log('[API] BehaviorProgressionState creado');
+    }
+
+    // Si allowDevelopTraumas está activado, loguear para futura implementación
+    if (allowDevelopTraumas) {
+      console.log('[API] allowDevelopTraumas activado - el agente podrá desarrollar behaviors durante interacción');
+      // TODO: Implementar lógica de desarrollo gradual de behaviors
+      // Por ahora, el sistema ya lo permite si se crean behaviors dinámicamente
+    }
 
     // Track usage
     console.log('[API] Registrando uso...');
