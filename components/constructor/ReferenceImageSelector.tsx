@@ -138,12 +138,12 @@ export function ReferenceImageSelector({
       {imageUrl ? (
         <Card className="p-4">
           <div className="relative">
-            <div className="relative w-full h-96 rounded-lg overflow-hidden bg-muted">
+            <div className="relative w-full h-[600px] rounded-lg overflow-hidden bg-muted flex items-center justify-center">
               <Image
                 src={imageUrl}
                 alt={`Imagen de referencia de ${agentName}`}
                 fill
-                className="object-cover"
+                className="object-contain"
                 unoptimized
               />
             </div>
