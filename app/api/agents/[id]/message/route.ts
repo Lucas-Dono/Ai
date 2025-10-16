@@ -326,16 +326,51 @@ Refleja estas emociones de manera sutil en tu tono y respuestas.
       }
     }
 
+    // ===== MULTIMEDIA PROCESSING =====
+    // Parsear y generar contenido multimedia si la IA usó tags [IMAGE:...] o [AUDIO:...]
+    const { parseMultimediaTags, validateMultimediaUsage } = await import("@/lib/multimedia/parser");
+    const { MultimediaGenerator } = await import("@/lib/multimedia/generator");
+
+    const parsedResponse = parseMultimediaTags(response);
+    const multimediaValidation = validateMultimediaUsage(parsedResponse);
+
+    let generatedMultimedia: any[] = [];
+    let finalResponse = response;
+
+    if (parsedResponse.hasMultimedia && multimediaValidation.valid) {
+      console.log(`[Multimedia] Detected ${parsedResponse.multimediaTags.length} multimedia tags`);
+
+      const generator = new MultimediaGenerator();
+      generatedMultimedia = await generator.generateMultimediaContent(
+        parsedResponse.multimediaTags,
+        {
+          agentId,
+          agentName: agent.name,
+          agentPersonality: agent.personality || agent.description || "",
+          referenceImageUrl: agent.referenceImageUrl || undefined,
+          voiceId: agent.voiceId || undefined,
+          userId,
+        }
+      );
+
+      // Usar el texto sin tags como respuesta final
+      finalResponse = parsedResponse.textContent;
+
+      console.log(`[Multimedia] Generated ${generatedMultimedia.length} multimedia items`);
+    }
+
     // Estimar tokens usados (aproximación simple)
-    const estimatedTokens = Math.ceil((content.length + response.length) / 4);
+    const estimatedTokens = Math.ceil((content.length + finalResponse.length) / 4);
 
     // Guardar respuesta
     const assistantMessage = await prisma.message.create({
       data: {
         agentId,
         role: "assistant",
-        content: response,
+        content: finalResponse,
         metadata: {
+          // Multimedia generado
+          multimedia: generatedMultimedia.length > 0 ? generatedMultimedia : undefined,
           // Sistema emocional completo (Plutchik)
           emotions: {
             dominant: emotionalSummary.dominant,

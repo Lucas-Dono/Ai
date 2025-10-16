@@ -8,6 +8,13 @@ import Image from "next/image";
 import { Play, Pause } from "lucide-react";
 import { useState, useRef } from "react";
 
+interface GeneratedMultimedia {
+  type: "image" | "audio";
+  url: string;
+  description: string;
+  metadata?: Record<string, any>;
+}
+
 interface MessageMetadata {
   emotions?: {
     dominant?: string[];
@@ -18,6 +25,7 @@ interface MessageMetadata {
   messageType?: "text" | "gif" | "audio";
   gifDescription?: string;
   audioDuration?: number;
+  multimedia?: GeneratedMultimedia[];
 }
 
 interface Message {
@@ -105,8 +113,49 @@ export function MessageBubble({ message, agentName, isUser }: MessageBubbleProps
         >
           {/* TEXT MESSAGE */}
           {messageType === "text" && (
-            <div className="px-6 py-3 whitespace-pre-wrap">
-              {message.content}
+            <div className="px-6 py-3">
+              <div className="whitespace-pre-wrap">{message.content}</div>
+
+              {/* GENERATED MULTIMEDIA (imágenes y audios generados por IA) */}
+              {message.metadata?.multimedia &&
+                message.metadata.multimedia.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {message.metadata.multimedia.map((media, idx) => (
+                      <div key={idx}>
+                        {media.type === "image" && (
+                          <div className="relative rounded-lg overflow-hidden border border-border">
+                            <Image
+                              src={media.url}
+                              alt={media.description}
+                              width={400}
+                              height={400}
+                              className="object-cover"
+                              unoptimized
+                            />
+                            {/* Descripción opcional */}
+                            <div className="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs px-2 py-1">
+                              {media.description}
+                            </div>
+                          </div>
+                        )}
+
+                        {media.type === "audio" && (
+                          <div className="bg-muted/50 rounded-lg p-3 flex items-center gap-3">
+                            <audio
+                              src={media.url}
+                              controls
+                              className="flex-1"
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              🎤 {media.description.substring(0, 30)}
+                              {media.description.length > 30 ? "..." : ""}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           )}
 
