@@ -18,6 +18,14 @@ export async function GET(
   try {
     const { id: agentId } = await params;
 
+    // Parse query parameters for pagination
+    const { searchParams } = new URL(req.url);
+    const cursor = searchParams.get("cursor"); // ID del último trigger cargado
+    const limit = parseInt(searchParams.get("limit") || "50", 10); // Límite por página (default: 50)
+
+    // Validar límite (máx 100 por request)
+    const validatedLimit = Math.min(Math.max(limit, 10), 100);
+
     // Verificar que el agente existe
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
@@ -47,7 +55,7 @@ export async function GET(
       where: { agentId },
     });
 
-    // Obtener historial de triggers (últimos 100)
+    // Obtener historial de triggers con cursor-based pagination
     const triggerHistory = await prisma.behaviorTriggerLog.findMany({
       where: {
         message: {
@@ -55,7 +63,8 @@ export async function GET(
         },
       },
       orderBy: { createdAt: "desc" },
-      take: 100,
+      take: validatedLimit + 1, // +1 para saber si hay más páginas
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }), // Si hay cursor, empezar desde ahí
       include: {
         message: {
           select: {
@@ -68,9 +77,21 @@ export async function GET(
       },
     });
 
-    // Calcular estadísticas
+    // Determinar si hay más páginas
+    const hasMore = triggerHistory.length > validatedLimit;
+    const paginatedTriggers = hasMore
+      ? triggerHistory.slice(0, -1)
+      : triggerHistory;
+
+    // Cursor para la siguiente página (ID del último elemento)
+    const nextCursor =
+      hasMore && paginatedTriggers.length > 0
+        ? paginatedTriggers[paginatedTriggers.length - 1].id
+        : null;
+
+    // Calcular estadísticas (solo sobre triggers de la página actual)
     const stats = {
-      totalTriggers: triggerHistory.length,
+      totalTriggers: paginatedTriggers.length,
       triggersByType: {} as Record<string, number>,
       triggersByBehavior: {} as Record<string, number>,
       averageWeight: 0,
@@ -78,7 +99,7 @@ export async function GET(
 
     let totalWeight = 0;
 
-    triggerHistory.forEach((trigger) => {
+    paginatedTriggers.forEach((trigger) => {
       // Count by type
       stats.triggersByType[trigger.triggerType] =
         (stats.triggersByType[trigger.triggerType] || 0) + 1;
@@ -91,9 +112,18 @@ export async function GET(
       totalWeight += trigger.weight;
     });
 
-    if (triggerHistory.length > 0) {
-      stats.averageWeight = totalWeight / triggerHistory.length;
+    if (paginatedTriggers.length > 0) {
+      stats.averageWeight = totalWeight / paginatedTriggers.length;
     }
+
+    // Obtener count total de triggers (sin limit) para metadata
+    const totalTriggersCount = await prisma.behaviorTriggerLog.count({
+      where: {
+        message: {
+          agentId,
+        },
+      },
+    });
 
     // Formatear phase history de cada profile
     const profilesWithHistory = behaviorProfiles.map((profile) => {
@@ -119,7 +149,7 @@ export async function GET(
       },
       behaviorProfiles: profilesWithHistory,
       progressionState,
-      triggerHistory: triggerHistory.map((trigger) => ({
+      triggerHistory: paginatedTriggers.map((trigger) => ({
         id: trigger.id,
         triggerType: trigger.triggerType,
         behaviorType: trigger.behaviorType,
@@ -134,6 +164,13 @@ export async function GET(
         },
       })),
       stats,
+      pagination: {
+        total: totalTriggersCount,
+        count: paginatedTriggers.length,
+        hasMore,
+        nextCursor,
+        limit: validatedLimit,
+      },
     });
   } catch (error) {
     console.error("[API] Error fetching behavior details:", error);

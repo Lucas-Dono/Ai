@@ -65,6 +65,13 @@ interface BehaviorData {
     triggersByBehavior: Record<string, number>;
     averageWeight: number;
   };
+  pagination: {
+    total: number;
+    count: number;
+    hasMore: boolean;
+    nextCursor: string | null;
+    limit: number;
+  };
 }
 
 export default function BehaviorsDetailPage() {
@@ -74,29 +81,57 @@ export default function BehaviorsDetailPage() {
 
   const [data, setData] = useState<BehaviorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/agents/${agentId}/behaviors`);
+  const fetchData = async (cursor?: string) => {
+    try {
+      const url = cursor
+        ? `/api/agents/${agentId}/behaviors?cursor=${cursor}&limit=50`
+        : `/api/agents/${agentId}/behaviors?limit=50`;
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch behavior data");
-        }
+      const response = await fetch(url);
 
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        console.error("Error fetching behavior data:", err);
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch behavior data");
       }
+
+      const result = await response.json();
+
+      if (cursor && data) {
+        // Append triggers to existing data (Load More)
+        setData({
+          ...result,
+          triggerHistory: [...data.triggerHistory, ...result.triggerHistory],
+        });
+      } else {
+        // Initial load
+        setData(result);
+      }
+    } catch (err) {
+      console.error("Error fetching behavior data:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
+    }
+  };
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoading(true);
+      await fetchData();
+      setLoading(false);
     };
 
-    fetchData();
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agentId]);
+
+  const handleLoadMore = async () => {
+    if (!data?.pagination.hasMore || loadingMore) return;
+
+    setLoadingMore(true);
+    await fetchData(data.pagination.nextCursor || undefined);
+    setLoadingMore(false);
+  };
 
   if (loading) {
     return (
@@ -175,7 +210,10 @@ export default function BehaviorsDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{data.stats.totalTriggers}</div>
+            <div className="text-3xl font-bold">{data.pagination.total}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Mostrando {data.triggerHistory.length}
+            </p>
           </CardContent>
         </Card>
 
@@ -324,7 +362,7 @@ export default function BehaviorsDetailPage() {
             <CardHeader>
               <CardTitle>Historial de Triggers</CardTitle>
               <CardDescription>
-                Registro de todos los triggers detectados (últimos 100)
+                Registro de todos los triggers detectados ({data.pagination.total} total)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -336,47 +374,72 @@ export default function BehaviorsDetailPage() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {data.triggerHistory.map((trigger) => (
-                    <div
-                      key={trigger.id}
-                      className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-sm">
-                              {trigger.triggerType.replace(/_/g, " ")}
-                            </span>
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded ${
-                                trigger.weight > 0.7
-                                  ? "bg-red-500/10 text-red-500"
-                                  : trigger.weight > 0.4
-                                  ? "bg-yellow-500/10 text-yellow-500"
-                                  : "bg-green-500/10 text-green-500"
-                              }`}
-                            >
-                              Peso: {trigger.weight.toFixed(2)}
-                            </span>
+                <>
+                  <div className="space-y-3">
+                    {data.triggerHistory.map((trigger) => (
+                      <div
+                        key={trigger.id}
+                        className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-sm">
+                                {trigger.triggerType.replace(/_/g, " ")}
+                              </span>
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded ${
+                                  trigger.weight > 0.7
+                                    ? "bg-red-500/10 text-red-500"
+                                    : trigger.weight > 0.4
+                                    ? "bg-yellow-500/10 text-yellow-500"
+                                    : "bg-green-500/10 text-green-500"
+                                }`}
+                              >
+                                Peso: {trigger.weight.toFixed(2)}
+                              </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground italic">
+                              "{trigger.detectedText || trigger.message.content}"
+                            </p>
                           </div>
-                          <p className="text-sm text-muted-foreground italic">
-                            "{trigger.detectedText || trigger.message.content}"
-                          </p>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
+                            {new Date(trigger.detectedAt).toLocaleString("es")}
+                          </span>
                         </div>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
-                          {new Date(trigger.detectedAt).toLocaleString("es")}
-                        </span>
-                      </div>
 
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded">
-                          {trigger.behaviorType.replace(/_/g, " ")}
-                        </span>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded">
+                            {trigger.behaviorType.replace(/_/g, " ")}
+                          </span>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Load More Button */}
+                  {data.pagination.hasMore && (
+                    <div className="mt-6 flex justify-center">
+                      <Button
+                        onClick={handleLoadMore}
+                        disabled={loadingMore}
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                      >
+                        {loadingMore ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                            Cargando más...
+                          </>
+                        ) : (
+                          <>
+                            Cargar más triggers ({data.pagination.total - data.triggerHistory.length} restantes)
+                          </>
+                        )}
+                      </Button>
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
