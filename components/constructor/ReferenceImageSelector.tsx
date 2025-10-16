@@ -245,12 +245,22 @@ export function ReferenceImageSelector({
       )}
 
       {/* Información */}
-      <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
-        <p className="font-medium mb-1">💡 ¿Para qué sirve esto?</p>
-        <p>
-          La imagen de referencia se usa para mantener consistencia visual en todas las imágenes que {agentName} genere en el futuro.
-          Siempre mantendrá la misma apariencia (cara, cabello, cuerpo), solo cambiarán poses y expresiones.
-        </p>
+      <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md space-y-2">
+        <div>
+          <p className="font-medium mb-1">💡 ¿Para qué sirve esto?</p>
+          <p>
+            La imagen de referencia se usa para mantener consistencia visual en todas las imágenes que {agentName} genere en el futuro.
+            Siempre mantendrá la misma apariencia (cara, cabello, cuerpo), solo cambiarán poses y expresiones.
+          </p>
+        </div>
+
+        <div className="pt-2 border-t border-border/50">
+          <p className="font-medium mb-1">✨ Tip: Para mejores resultados</p>
+          <p>
+            Si quieres una imagen personalizada, genera el prompt con <span className="font-semibold">ChatGPT</span> o <span className="font-semibold">Gemini</span> y súbela aquí.
+            O escríbelo tú mismo si te sientes creativo. Nosotros la generamos por ti.
+          </p>
+        </div>
       </div>
     </div>
   );
