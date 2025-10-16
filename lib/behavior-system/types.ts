@@ -32,6 +32,38 @@ export interface TriggerRequirement {
   minOccurrences: number; // Cuántas veces debe ocurrir
 }
 
+/**
+ * Resultado de evaluación de transición de fase
+ */
+export interface PhaseTransitionResult {
+  canTransition: boolean;
+  currentPhase: number;
+  nextPhase: number;
+  missingRequirements: string[];
+  safetyFlags: string[];
+  requiresUserConsent: boolean;
+  phaseDefinition?: YanderePhaseDefinition | BPDCyclePhaseDefinition;
+}
+
+/**
+ * Requisitos para transición de fase
+ */
+export interface PhaseTransitionRequirements {
+  minInteractions: number;
+  minIntensity?: number;
+  requiredTriggers: TriggerRequirement[];
+}
+
+/**
+ * Resultado de evaluación específica de fase
+ */
+export interface PhaseEvaluationResult {
+  canProceed: boolean;
+  issues: string[];
+  warnings: string[];
+  recommendations: string[];
+}
+
 // ============================================
 // YANDERE/OBSESSIVE LOVE PHASES
 // ============================================

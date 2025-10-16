@@ -12,17 +12,17 @@ datasource db {
 
 // Modelo de Usuario
 model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
-  emailVerified    DateTime?
-  name             String?
-  image            String?
-  plan                   String    @default("free") // free, pro, enterprise
-  mercadopagoCustomerId  String?   @unique // Mercado Pago customer ID
-  apiKey                 String?   @unique // API key opcional para usuarios avanzados
-  metadata         Json?     // Metadata adicional (push subscription, preferences, etc.)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  emailVerified         DateTime?
+  name                  String?
+  image                 String?
+  plan                  String    @default("free") // free, pro, enterprise
+  mercadopagoCustomerId String?   @unique // Mercado Pago customer ID
+  apiKey                String?   @unique // API key opcional para usuarios avanzados
+  metadata              Json? // Metadata adicional (push subscription, preferences, etc.)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   agents             Agent[]
   worlds             World[]
@@ -82,23 +82,23 @@ model VerificationToken {
 model Agent {
   id           String   @id @default(cuid())
   userId       String
-  teamId       String?  // ID del equipo propietario (opcional)
-  kind         String   // companion (emocional) o assistant (administrativo)
+  teamId       String? // ID del equipo propietario (opcional)
+  kind         String // companion (emocional) o assistant (administrativo)
   name         String
   description  String?
   gender       String?
-  personality  String?  // DEPRECATED: usar personalityCore
-  tone         String?  // DEPRECATED: usar internalState
-  purpose      String?  // DEPRECATED: usar personalityCore.goals
-  profile      Json     // JSON con toda la configuración del agente (DEPRECATED)
+  personality  String? // DEPRECATED: usar personalityCore
+  tone         String? // DEPRECATED: usar internalState
+  purpose      String? // DEPRECATED: usar personalityCore.goals
+  profile      Json // JSON con toda la configuración del agente (DEPRECATED)
   systemPrompt String   @db.Text
   visibility   String   @default("private") // private, world, public, team
-  avatar       String?  // URL o identificador de avatar
-  tags         Json?    // Tags/categorías para el marketplace
+  avatar       String? // URL o identificador de avatar
+  tags         Json? // Tags/categorías para el marketplace
   featured     Boolean  @default(false) // Destacado en el marketplace
-  rating       Float?   // Rating promedio (0-5)
+  rating       Float? // Rating promedio (0-5)
   cloneCount   Int      @default(0) // Número de veces clonado
-  originalId   String?  // ID del agente original si es un clon
+  originalId   String? // ID del agente original si es un clon
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -106,10 +106,10 @@ model Agent {
   team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
   worldAgents      WorldAgent[]
-  messagesAsAgent  Message[]       @relation("AgentMessages")
-  relationsSubject Relation[]      @relation("SubjectRelations")
+  messagesAsAgent  Message[]    @relation("AgentMessages")
+  relationsSubject Relation[]   @relation("SubjectRelations")
   reviews          Review[]
-  clones           AgentClone[]    @relation("OriginalAgent")
+  clones           AgentClone[] @relation("OriginalAgent")
 
   // Sistema emocional avanzado
   personalityCore  PersonalityCore?
@@ -120,11 +120,15 @@ model Agent {
   characterGrowth  CharacterGrowth?
 
   // Sistema de voz multimodal
-  voiceConfig      VoiceConfig?
+  voiceConfig VoiceConfig?
 
   // Sistema de expresión visual
   characterAppearance CharacterAppearance?
   visualExpressions   VisualExpression[]
+
+  // Sistema de comportamientos psicológicos
+  behaviorProfiles         BehaviorProfile[]
+  behaviorProgressionState BehaviorProgressionState?
 
   @@index([userId])
   @@index([teamId])
@@ -140,15 +144,15 @@ model Agent {
 
 // MÓDULO 1: PERSONALITY CORE (Núcleo de Personalidad)
 model PersonalityCore {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Big Five Personality Traits (0-100)
-  openness          Int @default(50)         // Curiosidad, creatividad
-  conscientiousness Int @default(50)         // Organización, autodisciplina
-  extraversion      Int @default(50)         // Energía social
-  agreeableness     Int @default(50)         // Cooperación, empatía
-  neuroticism       Int @default(50)         // Estabilidad emocional
+  openness          Int @default(50) // Curiosidad, creatividad
+  conscientiousness Int @default(50) // Organización, autodisciplina
+  extraversion      Int @default(50) // Energía social
+  agreeableness     Int @default(50) // Cooperación, empatía
+  neuroticism       Int @default(50) // Estabilidad emocional
 
   // Core Values (JSON array)
   // [{ "value": "autenticidad", "weight": 0.9, "description": "..." }]
@@ -174,27 +178,27 @@ model PersonalityCore {
 
 // MÓDULO 2: INTERNAL STATE (Estado Interno Dinámico)
 model InternalState {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Current Emotions (JSON con intensidades 0-1)
   // { "joy": 0.4, "interest": 0.6, "anxiety": 0.2, "affection": 0.5, ... }
   currentEmotions Json
 
   // PAD Mood Model
-  moodValence   Float @default(0.0)  // -1 (negativo) a +1 (positivo)
-  moodArousal   Float @default(0.5)  // 0 (calmado) a 1 (activado)
-  moodDominance Float @default(0.5)  // 0 (sumiso) a 1 (dominante)
+  moodValence   Float @default(0.0) // -1 (negativo) a +1 (positivo)
+  moodArousal   Float @default(0.5) // 0 (calmado) a 1 (activado)
+  moodDominance Float @default(0.5) // 0 (sumiso) a 1 (dominante)
 
   // Emotion decay parameters
-  emotionDecayRate Float @default(0.1)   // Tasa de decaimiento
-  emotionInertia   Float @default(0.3)   // Resistencia al cambio
+  emotionDecayRate Float @default(0.1) // Tasa de decaimiento
+  emotionInertia   Float @default(0.3) // Resistencia al cambio
 
   // Psychological Needs (0-1)
-  needConnection Float @default(0.5)  // Necesidad de conexión emocional
-  needAutonomy   Float @default(0.5)  // Necesidad de autonomía
-  needCompetence Float @default(0.5)  // Necesidad de sentirse competente
-  needNovelty    Float @default(0.5)  // Necesidad de novedad/estimulación
+  needConnection Float @default(0.5) // Necesidad de conexión emocional
+  needAutonomy   Float @default(0.5) // Necesidad de autonomía
+  needCompetence Float @default(0.5) // Necesidad de sentirse competente
+  needNovelty    Float @default(0.5) // Necesidad de novedad/estimulación
 
   // Active Goals (JSON array)
   // [{ "goal": "Conocer mejor al usuario", "priority": 0.8, "progress": 0.4, "type": "social" }]
@@ -213,19 +217,19 @@ model InternalState {
 
 // MÓDULO 4: EPISODIC MEMORY (Memoria Episódica con embeddings)
 model EpisodicMemory {
-  id        String   @id @default(cuid())
-  agentId   String
+  id      String @id @default(cuid())
+  agentId String
 
   // Contenido del evento
   event String @db.Text
 
   // Contexto emocional del evento
-  userEmotion      String?  // Emoción detectada del usuario
-  characterEmotion String?  // Emoción del personaje en ese momento
-  emotionalValence Float    // -1 a 1
+  userEmotion      String? // Emoción detectada del usuario
+  characterEmotion String? // Emoción del personaje en ese momento
+  emotionalValence Float // -1 a 1
 
   // Importancia y decay
-  importance Float @default(0.5)  // 0 a 1
+  importance  Float @default(0.5) // 0 a 1
   decayFactor Float @default(1.0) // Disminuye con el tiempo
 
   // Embedding vectorial para búsqueda semántica (JSON temporal, migrar a pgvector después)
@@ -249,8 +253,8 @@ model EpisodicMemory {
 
 // MÓDULO 4B: SEMANTIC MEMORY (Memoria Semántica - Hechos)
 model SemanticMemory {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Hechos sobre el usuario (JSON)
   // { "occupation": "ingeniero", "interests": ["gaming"], "pet_names": ["Luna"] }
@@ -275,8 +279,8 @@ model SemanticMemory {
 
 // MÓDULO 4C: PROCEDURAL MEMORY (Patrones de Comportamiento)
 model ProceduralMemory {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Patrones de comportamiento aprendidos (JSON)
   // { "when_user_stressed": "ofrecer espacio antes de consejo", ... }
@@ -299,17 +303,17 @@ model ProceduralMemory {
 
 // MÓDULO 7: CHARACTER GROWTH (Crecimiento del Personaje)
 model CharacterGrowth {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Relationship Dynamics
-  trustLevel    Float @default(0.4)    // 0 a 1
-  intimacyLevel Float @default(0.3)    // 0 a 1
+  trustLevel    Float @default(0.4) // 0 a 1
+  intimacyLevel Float @default(0.3) // 0 a 1
 
   // Historia de eventos positivos/negativos
-  positiveEventsCount Int @default(0)
-  negativeEventsCount Int @default(0)
-  conflictHistory Json // Array de conflictos pasados
+  positiveEventsCount Int  @default(0)
+  negativeEventsCount Int  @default(0)
+  conflictHistory     Json // Array de conflictos pasados
 
   // Personality Drift (cambios sutiles en personalidad)
   // { "openness": { "current": 65, "initial": 60, "influenced_by": [...] } }
@@ -319,7 +323,7 @@ model CharacterGrowth {
   learnedUserPatterns Json?
 
   // Métricas de evolución
-  conversationCount Int @default(0)
+  conversationCount    Int       @default(0)
   lastSignificantEvent DateTime?
 
   lastUpdated DateTime @default(now())
@@ -360,16 +364,16 @@ model WorldAgent {
 
 // Modelo de Relaciones (emocionales entre agentes o usuario-agente)
 model Relation {
-  id            String   @id @default(cuid())
-  subjectId     String   // ID del agente que siente la relación
-  targetId      String   // ID del agente o usuario objetivo
-  targetType    String   // "agent" o "user" - indica el tipo de objetivo
-  trust         Float    @default(0.5) // Confianza (0-1)
-  affinity      Float    @default(0.5) // Afinidad (0-1)
-  respect       Float    @default(0.5) // Respeto (0-1)
-  privateState  Json     // Estados ocultos: love, curiosity, etc.
-  visibleState  Json     // Estados visibles para el usuario
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  subjectId    String // ID del agente que siente la relación
+  targetId     String // ID del agente o usuario objetivo
+  targetType   String // "agent" o "user" - indica el tipo de objetivo
+  trust        Float    @default(0.5) // Confianza (0-1)
+  affinity     Float    @default(0.5) // Afinidad (0-1)
+  respect      Float    @default(0.5) // Respeto (0-1)
+  privateState Json // Estados ocultos: love, curiosity, etc.
+  visibleState Json // Estados visibles para el usuario
+  updatedAt    DateTime @updatedAt
 
   subjectAgent Agent @relation("SubjectRelations", fields: [subjectId], references: [id], onDelete: Cascade)
 
@@ -382,17 +386,18 @@ model Relation {
 // Modelo de Mensajes
 model Message {
   id        String   @id @default(cuid())
-  worldId   String?  // Si es en un mundo grupal
-  agentId   String?  // Si es chat individual
-  userId    String?  // Usuario que envió el mensaje
-  role      String   // user, assistant, system
+  worldId   String? // Si es en un mundo grupal
+  agentId   String? // Si es chat individual
+  userId    String? // Usuario que envió el mensaje
+  role      String // user, assistant, system
   content   String   @db.Text
-  metadata  Json?    // Datos adicionales (emociones, contexto, tipo de mensaje: text/audio/image, etc.)
+  metadata  Json? // Datos adicionales (emociones, contexto, tipo de mensaje: text/audio/image, etc.)
   createdAt DateTime @default(now())
 
-  world     World?     @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  agent     Agent?     @relation("AgentMessages", fields: [agentId], references: [id], onDelete: Cascade)
-  reactions Reaction[] // Reacciones de usuarios al mensaje
+  world            World?               @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  agent            Agent?               @relation("AgentMessages", fields: [agentId], references: [id], onDelete: Cascade)
+  reactions        Reaction[] // Reacciones de usuarios al mensaje
+  behaviorTriggers BehaviorTriggerLog[] // Triggers detectados en este mensaje
 
   @@index([worldId])
   @@index([agentId])
@@ -404,7 +409,7 @@ model Reaction {
   id        String   @id @default(cuid())
   messageId String
   userId    String
-  emoji     String   // Emoji de la reacción (👍, ❤️, 😂, etc.)
+  emoji     String // Emoji de la reacción (👍, ❤️, 😂, etc.)
   createdAt DateTime @default(now())
 
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
@@ -417,12 +422,12 @@ model Reaction {
 
 // Modelo de Logs (para panel administrativo)
 model Log {
-  id          String   @id @default(cuid())
-  userId      String?
-  agentId     String?
-  action      String   // message_sent, agent_created, world_created, etc.
-  metadata    Json?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String?
+  agentId   String?
+  action    String // message_sent, agent_created, world_created, etc.
+  metadata  Json?
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([agentId])
@@ -431,19 +436,19 @@ model Log {
 
 // Modelo de Suscripciones (Mercado Pago)
 model Subscription {
-  id                         String    @id @default(cuid())
-  userId                     String
-  mercadopagoPreapprovalId   String    @unique
-  status                     String    // authorized, paused, cancelled, pending
-  currentPeriodStart         DateTime
-  currentPeriodEnd           DateTime
-  cancelAtPeriodEnd          Boolean   @default(false)
-  trialStart                 DateTime?
-  trialEnd                   DateTime?
-  canceledAt                 DateTime?
-  metadata                   Json?
-  createdAt                  DateTime  @default(now())
-  updatedAt                  DateTime  @updatedAt
+  id                       String    @id @default(cuid())
+  userId                   String
+  mercadopagoPreapprovalId String    @unique
+  status                   String // authorized, paused, cancelled, pending
+  currentPeriodStart       DateTime
+  currentPeriodEnd         DateTime
+  cancelAtPeriodEnd        Boolean   @default(false)
+  trialStart               DateTime?
+  trialEnd                 DateTime?
+  canceledAt               DateTime?
+  metadata                 Json?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -454,17 +459,17 @@ model Subscription {
 
 // Modelo de Facturas (Mercado Pago)
 model Invoice {
-  id                  String   @id @default(cuid())
-  userId              String
-  mercadopagoPaymentId String   @unique
-  amount              Int      // Monto en centavos
-  currency            String   @default("ARS")
-  status              String   // approved, pending, rejected, cancelled
-  statusDetail        String?  // Detalle del estado
-  paymentMethodId     String?  // Método de pago usado
-  metadata            Json?
-  createdAt           DateTime @default(now())
-  paidAt              DateTime?
+  id                   String    @id @default(cuid())
+  userId               String
+  mercadopagoPaymentId String    @unique
+  amount               Int // Monto en centavos
+  currency             String    @default("ARS")
+  status               String // approved, pending, rejected, cancelled
+  statusDetail         String? // Detalle del estado
+  paymentMethodId      String? // Método de pago usado
+  metadata             Json?
+  createdAt            DateTime  @default(now())
+  paidAt               DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -475,16 +480,16 @@ model Invoice {
 
 // Modelo de Pagos (Mercado Pago)
 model Payment {
-  id                  String   @id @default(cuid())
-  userId              String
+  id                   String   @id @default(cuid())
+  userId               String
   mercadopagoPaymentId String   @unique
-  amount              Int      // Monto en centavos
-  currency            String   @default("ARS")
-  status              String   // approved, pending, rejected, cancelled
-  statusDetail        String?  // Detalle del estado
-  paymentMethod       String?  // credit_card, debit_card, ticket, bank_transfer, etc.
-  metadata            Json?
-  createdAt           DateTime @default(now())
+  amount               Int // Monto en centavos
+  currency             String   @default("ARS")
+  status               String // approved, pending, rejected, cancelled
+  statusDetail         String? // Detalle del estado
+  paymentMethod        String? // credit_card, debit_card, ticket, bank_transfer, etc.
+  metadata             Json?
+  createdAt            DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -497,10 +502,10 @@ model Payment {
 model Usage {
   id           String   @id @default(cuid())
   userId       String
-  resourceType String   // message, agent, world, api_call, tokens
-  resourceId   String?  // ID del recurso usado (opcional)
+  resourceType String // message, agent, world, api_call, tokens
+  resourceId   String? // ID del recurso usado (opcional)
   quantity     Int      @default(1) // Cantidad usada (ej: tokens, mensajes)
-  metadata     Json?    // Datos adicionales (modelo usado, tiempo de respuesta, etc.)
+  metadata     Json? // Datos adicionales (modelo usado, tiempo de respuesta, etc.)
   createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -516,7 +521,7 @@ model Review {
   id        String   @id @default(cuid())
   agentId   String
   userId    String
-  rating    Int      // 1-5 estrellas
+  rating    Int // 1-5 estrellas
   comment   String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -550,14 +555,14 @@ model Team {
   description String?
   ownerId     String
   plan        String   @default("free") // free, pro, enterprise
-  metadata    Json?    // Configuración adicional del equipo
+  metadata    Json? // Configuración adicional del equipo
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner   User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members TeamMember[]
+  owner       User             @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
   invitations TeamInvitation[]
-  agents  Agent[]
+  agents      Agent[]
 
   @@index([ownerId])
   @@index([plan])
@@ -568,7 +573,7 @@ model TeamMember {
   id       String   @id @default(cuid())
   teamId   String
   userId   String
-  role     String   // owner, admin, member, viewer
+  role     String // owner, admin, member, viewer
   joinedAt DateTime @default(now())
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -582,14 +587,14 @@ model TeamMember {
 
 // Modelo de Invitación a Equipo
 model TeamInvitation {
-  id        String    @id @default(cuid())
-  teamId    String
-  email     String
-  role      String    @default("member") // admin, member, viewer
-  token     String    @unique
-  expiresAt DateTime
+  id         String    @id @default(cuid())
+  teamId     String
+  email      String
+  role       String    @default("member") // admin, member, viewer
+  token      String    @unique
+  expiresAt  DateTime
   acceptedAt DateTime?
-  createdAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -600,22 +605,138 @@ model TeamInvitation {
 }
 
 // ============================================
+// SISTEMA DE COMPORTAMIENTOS PSICOLÓGICOS
+// ============================================
+
+// PERFIL DE COMPORTAMIENTO (configuración y estado de cada comportamiento)
+model BehaviorProfile {
+  id      String @id @default(cuid())
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  // Tipo de comportamiento
+  behaviorType BehaviorType
+
+  // Configuración de intensidad
+  baseIntensity    Float @default(0.3) // 0-1, nivel base
+  volatility       Float @default(0.5) // 0-1, qué tan rápido oscila
+  escalationRate   Float @default(0.1) // velocidad de aumento por trigger
+  deEscalationRate Float @default(0.05) // velocidad de reducción
+
+  // Fase actual
+  currentPhase                Int      @default(1) // Etapa actual (1-8 para Yandere, etc)
+  phaseStartedAt              DateTime @default(now())
+  interactionsSincePhaseStart Int      @default(0)
+
+  // Umbrales
+  thresholdForDisplay Float @default(0.3) // Intensidad mínima para manifestarse
+
+  // Triggers específicos para este comportamiento
+  triggers Json // Array de trigger definitions con pesos
+
+  // Historial de progresión (para analytics)
+  phaseHistory Json @default("[]") // [{phase: 1, enteredAt: Date, exitedAt: Date, triggerCount: N}]
+
+  // Estado específico por tipo de comportamiento
+  // Para BPD: { currentCyclePhase: "idealization" | "devaluation" | "panic" | "emptiness" }
+  // Para NPD: { currentEgoState: "inflated" | "stable" | "wounded" }
+  behaviorSpecificState Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agentId, behaviorType])
+  @@index([agentId])
+  @@index([behaviorType])
+  @@index([currentPhase])
+}
+
+// ENUM: Tipos de comportamiento
+enum BehaviorType {
+  // Attachment Theory
+  ANXIOUS_ATTACHMENT
+  AVOIDANT_ATTACHMENT
+  DISORGANIZED_ATTACHMENT
+
+  // Yandere/Obsessive
+  YANDERE_OBSESSIVE
+
+  // Personality Disorders
+  BORDERLINE_PD
+  NARCISSISTIC_PD
+
+  // Codependency
+  CODEPENDENCY
+
+  // Future additions (pending research)
+  OCD_PATTERNS
+  PTSD_TRAUMA
+  HYPERSEXUALITY
+  HYPOSEXUALITY
+  EMOTIONAL_MANIPULATION
+  CRISIS_BREAKDOWN
+}
+
+// REGISTRO DE TRIGGERS (detectados en cada interacción)
+model BehaviorTriggerLog {
+  id        String  @id @default(cuid())
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  behaviorType BehaviorType
+  triggerType  String // "abandonment_signal", "criticism", "jealousy_cue", etc
+  weight       Float // 0-1, qué tan fuerte es el trigger
+  detectedText String? // Fragmento que lo detonó (para debugging)
+
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
+  @@index([behaviorType])
+  @@index([triggerType])
+  @@index([createdAt])
+}
+
+// ESTADO DE PROGRESIÓN DE COMPORTAMIENTO (cache global del agente)
+model BehaviorProgressionState {
+  id      String @id @default(cuid())
+  agentId String @unique
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  // Contadores globales
+  totalInteractions    Int @default(0)
+  positiveInteractions Int @default(0) // Para tracking de mejora
+  negativeInteractions Int @default(0) // Para tracking de empeoramiento
+
+  // Intensidades actuales calculadas (cache)
+  currentIntensities Json @default("{}") // {YANDERE_OBSESSIVE: 0.45, ANXIOUS_ATTACHMENT: 0.6, ...}
+
+  // Última actualización
+  lastCalculatedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([lastCalculatedAt])
+}
+
+// ============================================
 // SISTEMA DE VOZ MULTIMODAL
 // ============================================
 
 // CONFIGURACIÓN DE VOZ POR AGENTE
 model VoiceConfig {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Voz seleccionada de ElevenLabs
-  voiceId   String   // ID de la voz en ElevenLabs
-  voiceName String   // Nombre de la voz (para referencia)
+  voiceId   String // ID de la voz en ElevenLabs
+  voiceName String // Nombre de la voz (para referencia)
 
   // Características de la voz (para búsqueda/matching)
-  gender    String   @default("neutral") // male, female, neutral
-  age       String   @default("middle_aged") // young, middle_aged, old
-  accent    String?  // "es-MX", "es-AR", "es-ES", "en-US", etc.
+  gender String  @default("neutral") // male, female, neutral
+  age    String  @default("middle_aged") // young, middle_aged, old
+  accent String? // "es-MX", "es-AR", "es-ES", "en-US", etc.
 
   // Descripción del personaje (usada para seleccionar voz)
   characterDescription String? @db.Text
@@ -627,23 +748,23 @@ model VoiceConfig {
   manualSelection Boolean @default(false)
 
   // Parámetros de modulación por defecto
-  defaultStability      Float @default(0.5)  // 0-1
+  defaultStability       Float @default(0.5) // 0-1
   defaultSimilarityBoost Float @default(0.75) // 0-1
-  defaultStyle          Float @default(0.0)  // 0-1
+  defaultStyle           Float @default(0.0) // 0-1
 
   // Configuración de entrada
-  enableVoiceInput      Boolean @default(true)
-  whisperModel          String  @default("standard") // standard o mini
-  detectEmotionalTone   Boolean @default(true)
+  enableVoiceInput    Boolean @default(true)
+  whisperModel        String  @default("standard") // standard o mini
+  detectEmotionalTone Boolean @default(true)
 
   // Configuración de salida
-  enableVoiceOutput     Boolean @default(true)
-  autoPlayVoice         Boolean @default(false)
-  voiceSpeed            Float   @default(1.0) // 0.5 - 2.0
+  enableVoiceOutput Boolean @default(true)
+  autoPlayVoice     Boolean @default(false)
+  voiceSpeed        Float   @default(1.0) // 0.5 - 2.0
 
   // Estadísticas de uso
-  totalVoiceGenerations Int     @default(0)
-  totalTranscriptions   Int     @default(0)
+  totalVoiceGenerations Int @default(0)
+  totalTranscriptions   Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -660,35 +781,35 @@ model VoiceConfig {
 
 // APARIENCIA BASE DEL PERSONAJE
 model CharacterAppearance {
-  id        String   @id @default(cuid())
-  agentId   String   @unique
+  id      String @id @default(cuid())
+  agentId String @unique
 
   // Descripción base para generación
-  basePrompt      String   @db.Text  // Prompt completo de SD/Gemini
-  style           String   @default("realistic") // "realistic", "anime", "semi-realistic"
+  basePrompt String @db.Text // Prompt completo de SD/Gemini
+  style      String @default("realistic") // "realistic", "anime", "semi-realistic"
 
   // Características físicas
-  gender          String   // "male", "female", "non-binary"
-  ethnicity       String?  // "asian", "caucasian", "hispanic", "african", "middle-eastern", etc.
-  age             String   @default("25-30")
-  hairColor       String?
-  hairStyle       String?
-  eyeColor        String?
-  clothing        String?  // Descripción de ropa/outfit
+  gender    String // "male", "female", "non-binary"
+  ethnicity String? // "asian", "caucasian", "hispanic", "african", "middle-eastern", etc.
+  age       String  @default("25-30")
+  hairColor String?
+  hairStyle String?
+  eyeColor  String?
+  clothing  String? // Descripción de ropa/outfit
 
   // URLs de referencias
   referencePhotoUrl String? // Foto de referencia subida por usuario
   basePhotoUrl      String? // Primera foto generada (base neutra)
 
   // Config de generación
-  negativePrompt  String?  @db.Text
-  seed            Int?     // Para consistencia en generaciones
+  negativePrompt String? @db.Text
+  seed           Int? // Para consistencia en generaciones
 
   // Provider preferences
   preferredProvider String @default("gemini") // "gemini", "huggingface"
 
   // Stats
-  totalGenerations Int     @default(0)
+  totalGenerations Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -700,33 +821,33 @@ model CharacterAppearance {
 
 // EXPRESIONES VISUALES CACHEADAS
 model VisualExpression {
-  id        String   @id @default(cuid())
-  agentId   String
+  id      String @id @default(cuid())
+  agentId String
 
   // Identificador de expresión
-  emotionType     String   // "joy", "distress", "neutral", "anger", etc.
-  intensity       String   // "low", "medium", "high"
-  context         String?  // "celebration", "comfort", "greeting", etc.
+  emotionType String // "joy", "distress", "neutral", "anger", etc.
+  intensity   String // "low", "medium", "high"
+  context     String? // "celebration", "comfort", "greeting", etc.
 
   // Media
-  type            String   // "photo" o "video"
-  url             String   // CDN URL o data URL
-  thumbnailUrl    String?  // Thumbnail para videos
+  type         String // "photo" o "video"
+  url          String // CDN URL o data URL
+  thumbnailUrl String? // Thumbnail para videos
 
   // Metadata de generación
-  generationParams Json    // { provider, seed, prompt, etc. }
-  width           Int
-  height          Int
-  durationMs      Int?     // Para videos (milisegundos)
+  generationParams Json // { provider, seed, prompt, etc. }
+  width            Int
+  height           Int
+  durationMs       Int? // Para videos (milisegundos)
 
   // Provider usado
-  provider        String   // "gemini" o "huggingface"
+  provider String // "gemini" o "huggingface"
 
   // Stats de uso
-  timesUsed       Int      @default(0)
-  lastUsed        DateTime?
+  timesUsed Int       @default(0)
+  lastUsed  DateTime?
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
@@ -741,41 +862,41 @@ model VisualExpression {
 
 // ESTADO DE INSTALACIÓN DE FASTSD POR USUARIO
 model FastSDInstallation {
-  id        String   @id @default(cuid())
-  userId    String   @unique
+  id     String @id @default(cuid())
+  userId String @unique
 
   // Estado de instalación
-  installed           Boolean  @default(false)
-  installPath         String?  // Ruta de instalación
-  version             String?  // Versión instalada
+  installed   Boolean @default(false)
+  installPath String? // Ruta de instalación
+  version     String? // Versión instalada
 
   // Estado del servidor
-  serverRunning       Boolean  @default(false)
-  serverUrl           String   @default("http://localhost:8000")
-  lastHealthCheck     DateTime?
+  serverRunning   Boolean   @default(false)
+  serverUrl       String    @default("http://localhost:8000")
+  lastHealthCheck DateTime?
 
   // Modelos instalados
-  installedModels     Json?    // Array de modelos disponibles
-  activeModel         String?  // Modelo actualmente activo
+  installedModels Json? // Array de modelos disponibles
+  activeModel     String? // Modelo actualmente activo
 
   // Configuración
-  device              String   @default("CPU") // "CPU", "GPU", "NPU"
-  useOpenVINO         Boolean  @default(true)
-  useTinyAutoencoder  Boolean  @default(true)
+  device             String  @default("CPU") // "CPU", "GPU", "NPU"
+  useOpenVINO        Boolean @default(true)
+  useTinyAutoencoder Boolean @default(true)
 
   // Aprobaciones y consentimientos
-  userApprovedInstallation Boolean  @default(false)
+  userApprovedInstallation Boolean   @default(false)
   installationRequestedAt  DateTime?
   installationCompletedAt  DateTime?
-  installationError        String?  @db.Text
+  installationError        String?   @db.Text
 
   // Estadísticas de uso
-  totalGenerations    Int      @default(0)
-  totalGenerationTime Float    @default(0.0) // Segundos totales
-  avgGenerationTime   Float?   // Promedio de tiempo por imagen
+  totalGenerations    Int    @default(0)
+  totalGenerationTime Float  @default(0.0) // Segundos totales
+  avgGenerationTime   Float? // Promedio de tiempo por imagen
 
   // Metadata
-  metadata            Json?    // Configuración adicional
+  metadata Json? // Configuración adicional
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

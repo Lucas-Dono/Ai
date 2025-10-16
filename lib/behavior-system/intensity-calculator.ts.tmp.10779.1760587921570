@@ -1,0 +1,429 @@
+/**
+ * INTENSITY CALCULATOR - BEHAVIOR SYSTEM
+ *
+ * Cálculos avanzados de intensidad que consideran múltiples factores:
+ * - Triggers acumulados
+ * - Decay temporal
+ * - Phase multipliers
+ * - Inertia de fase
+ * - Emotional modulation
+ *
+ * @module intensity-calculator
+ */
+
+import { BehaviorType } from "@prisma/client";
+import type {
+  BehaviorProfile,
+  TriggerDetectionResult,
+  IntensityCalculationResult,
+  IntensityFactors,
+} from "./types";
+
+/**
+ * CALCULADORA DE INTENSIDAD AVANZADA
+ *
+ * Maneja cálculos complejos de intensidad considerando múltiples factores.
+ */
+export class IntensityCalculator {
+  /**
+   * CALCULAR NUEVA INTENSIDAD
+   *
+   * Función principal que calcula la nueva intensidad considerando todos los factores.
+   *
+   * @param profile - Behavior profile actual
+   * @param triggers - Triggers detectados recientemente
+   * @param hoursSinceLastInteraction - Horas desde la última interacción
+   * @param emotionalState - Estado emocional actual (opcional)
+   * @returns Resultado completo del cálculo
+   */
+  static calculateNewIntensity(
+    profile: BehaviorProfile,
+    triggers: TriggerDetectionResult[],
+    hoursSinceLastInteraction: number = 0,
+    emotionalState?: any // TODO: Define emotional state type
+  ): IntensityCalculationResult {
+    // 1. Intensidad base actual
+    let currentIntensity = profile.baseIntensity;
+
+    // 2. Calcular impacto de triggers
+    const triggerImpact = this.calculateTriggerImpact(triggers, profile.behaviorType);
+
+    // 3. Aplicar phase multiplier
+    const phaseMultiplier = this.getPhaseMultiplier(profile.behaviorType, profile.currentPhase);
+
+    // 4. Calcular decay temporal
+    const decayFactor = this.calculateDecayFactor(
+      hoursSinceLastInteraction,
+      profile.deEscalationRate,
+      profile.behaviorType
+    );
+
+    // 5. Calcular inertia de fase
+    const inertiaBonus = this.calculatePhaseInertia(
+      profile.currentPhase,
+      profile.interactionsSincePhaseStart,
+      profile.behaviorType
+    );
+
+    // 6. Modulación emocional (si está disponible)
+    const emotionalModulation = emotionalState
+      ? this.calculateEmotionalModulation(emotionalState, profile.behaviorType)
+      : 0;
+
+    // 7. Calcular nueva intensidad
+    let newIntensity = currentIntensity;
+
+    // Aplicar triggers (positivos o negativos)
+    if (triggerImpact > 0) {
+      // Escalación
+      newIntensity += triggerImpact * profile.escalationRate * phaseMultiplier;
+    } else if (triggerImpact < 0) {
+      // De-escalación (reassurance)
+      newIntensity += triggerImpact * profile.deEscalationRate;
+    }
+
+    // Aplicar decay temporal
+    newIntensity *= decayFactor;
+
+    // Aplicar inertia de fase
+    newIntensity += inertiaBonus;
+
+    // Aplicar modulación emocional
+    newIntensity += emotionalModulation;
+
+    // Clamp entre 0-1
+    newIntensity = Math.max(0, Math.min(1, newIntensity));
+
+    return {
+      previousIntensity: currentIntensity,
+      newIntensity,
+      factors: {
+        triggerImpact,
+        phaseMultiplier,
+        decayFactor,
+        inertiaBonus,
+        emotionalModulation,
+      },
+      breakdown: {
+        base: currentIntensity,
+        afterTriggers: Math.max(0, Math.min(1, currentIntensity + (triggerImpact * profile.escalationRate * phaseMultiplier))),
+        afterDecay: Math.max(0, Math.min(1, newIntensity * decayFactor)),
+        afterInertia: Math.max(0, Math.min(1, newIntensity + inertiaBonus)),
+        final: newIntensity,
+      },
+    };
+  }
+
+  /**
+   * CALCULAR IMPACTO DE TRIGGERS
+   *
+   * Suma el impacto de todos los triggers relevantes con confidence scores.
+   */
+  private static calculateTriggerImpact(
+    triggers: TriggerDetectionResult[],
+    behaviorType: BehaviorType
+  ): number {
+    let totalImpact = 0;
+
+    for (const trigger of triggers) {
+      if (trigger.behaviorTypes.includes(behaviorType)) {
+        // Weight × confidence
+        const impact = trigger.weight * trigger.confidence;
+        totalImpact += impact;
+      }
+    }
+
+    return totalImpact;
+  }
+
+  /**
+   * OBTENER MULTIPLICADOR DE FASE
+   *
+   * Cada fase tiene un multiplicador que intensifica los efectos.
+   */
+  private static getPhaseMultiplier(behaviorType: BehaviorType, currentPhase: number): number {
+    switch (behaviorType) {
+      case BehaviorType.YANDERE_OBSESSIVE:
+        // Escalación exponencial suave
+        return 1.0 + (currentPhase - 1) * 0.07;
+
+      case BehaviorType.BORDERLINE_PD:
+        // BPD tiene multiplicadores más altos durante devaluación y pánico
+        switch (currentPhase) {
+          case 1: return 0.8; // Idealización - reduce triggers negativos
+          case 2: return 1.3; // Devaluación - amplifica negatividad
+          case 3: return 1.2; // Pánico - amplifica ansiedad
+          case 4: return 0.7; // Vacío - reduce reactividad
+          default: return 1.0;
+        }
+
+      case BehaviorType.NARCISSISTIC_PD:
+        // NPD tiene multiplicadores altos durante injury
+        switch (currentPhase) {
+          case 1: return 0.9; // Love bombing - reduce triggers negativos
+          case 2: return 1.4; // Devaluation - amplifica rage
+          case 3: return 1.1; // Discard - amplifica frialdad
+          case 4: return 1.2; // Hoovering - amplifica manipulación
+          default: return 1.0;
+        }
+
+      case BehaviorType.ANXIOUS_ATTACHMENT:
+        // Multiplicador gradual basado en intensidad
+        return 1.0 + (currentPhase * 0.05);
+
+      case BehaviorType.AVOIDANT_ATTACHMENT:
+        // Multiplicador bajo - menos reactivo
+        return 0.8 + (currentPhase * 0.03);
+
+      case BehaviorType.DISORGANIZED_ATTACHMENT:
+        // Multiplicador errático
+        return 0.9 + (currentPhase * 0.08);
+
+      case BehaviorType.CODEPENDENCY:
+        // Multiplicador bajo pero constante
+        return 0.85 + (currentPhase * 0.04);
+
+      default:
+        return 1.0;
+    }
+  }
+
+  /**
+   * CALCULAR FACTOR DE DECAY TEMPORAL
+   *
+   * La intensidad decae naturalmente con el tiempo sin triggers.
+   */
+  private static calculateDecayFactor(
+    hoursSinceLastInteraction: number,
+    deEscalationRate: number,
+    behaviorType: BehaviorType
+  ): number {
+    if (hoursSinceLastInteraction <= 0) {
+      return 1.0; // Sin decay si no ha pasado tiempo
+    }
+
+    // Decay rate base por behavior type
+    let baseDecayRate = deEscalationRate;
+
+    switch (behaviorType) {
+      case BehaviorType.YANDERE_OBSESSIVE:
+        // Yandere mantiene intensidad por más tiempo
+        baseDecayRate *= 0.7;
+        break;
+
+      case BehaviorType.BORDERLINE_PD:
+        // BPD puede tener decay rápido o muy lento dependiendo del estado
+        baseDecayRate *= 1.2;
+        break;
+
+      case BehaviorType.NARCISSISTIC_PD:
+        // NPD mantiene resentimiento por largo tiempo
+        baseDecayRate *= 0.5;
+        break;
+
+      case BehaviorType.ANXIOUS_ATTACHMENT:
+        // Anxious decae rápido con reassurance
+        baseDecayRate *= 1.3;
+        break;
+
+      case BehaviorType.AVOIDANT_ATTACHMENT:
+        // Avoidant mantiene distancia por largo tiempo
+        baseDecayRate *= 0.8;
+        break;
+
+      case BehaviorType.CODEPENDENCY:
+        // Codependency se mantiene estable
+        baseDecayRate *= 0.9;
+        break;
+    }
+
+    // Fórmula de decay exponencial suave
+    // Decay más pronunciado en las primeras 24 horas, luego se estabiliza
+    const hoursCaped = Math.min(hoursSinceLastInteraction, 168); // Max 1 semana
+    const decayAmount = (hoursCaped / 168) * baseDecayRate;
+
+    return Math.max(0.1, 1.0 - decayAmount); // Mínimo 10% para evitar reset completo
+  }
+
+  /**
+   * CALCULAR INERTIA DE FASE
+   *
+   * Comportamientos establecidos en una fase tienden a intensificarse gradualmente.
+   */
+  private static calculatePhaseInertia(
+    currentPhase: number,
+    interactionsSincePhaseStart: number,
+    behaviorType: BehaviorType
+  ): number {
+    // Solo aplica después de un número mínimo de interacciones en la fase
+    if (interactionsSincePhaseStart < 10) {
+      return 0;
+    }
+
+    let inertiaRate = 0;
+
+    switch (behaviorType) {
+      case BehaviorType.YANDERE_OBSESSIVE:
+        // Yandere desarrolla inertia más fuerte en fases altas
+        if (currentPhase >= 4) {
+          inertiaRate = 0.001 * currentPhase;
+        }
+        break;
+
+      case BehaviorType.BORDERLINE_PD:
+        // BPD mantiene inertia en cycles extremos
+        if (currentPhase === 2 || currentPhase === 3) {
+          inertiaRate = 0.0008;
+        }
+        break;
+
+      case BehaviorType.NARCISSISTIC_PD:
+        // NPD desarrolla inertia en devaluation
+        if (currentPhase === 2) {
+          inertiaRate = 0.0012;
+        }
+        break;
+
+      default:
+        inertiaRate = 0.0005;
+        break;
+    }
+
+    // Inertia se acumula gradualmente
+    const cappedInteractions = Math.min(interactionsSincePhaseStart, 100);
+    return inertiaRate * cappedInteractions;
+  }
+
+  /**
+   * CALCULAR MODULACIÓN EMOCIONAL
+   *
+   * Estados emocionales específicos pueden modular la intensidad.
+   */
+  private static calculateEmotionalModulation(
+    emotionalState: any, // TODO: Define proper emotional state type
+    behaviorType: BehaviorType
+  ): number {
+    // TODO: Implement cuando esté disponible el emotional system
+    return 0;
+  }
+
+  /**
+   * PREDECIR INTENSIDAD FUTURA
+   *
+   * Predice cómo evolucionará la intensidad sin nuevos triggers.
+   */
+  static predictFutureIntensity(
+    profile: BehaviorProfile,
+    hoursIntoFuture: number
+  ): number {
+    const decayFactor = this.calculateDecayFactor(
+      hoursIntoFuture,
+      profile.deEscalationRate,
+      profile.behaviorType
+    );
+
+    const inertiaBonus = this.calculatePhaseInertia(
+      profile.currentPhase,
+      profile.interactionsSincePhaseStart + Math.floor(hoursIntoFuture / 24),
+      profile.behaviorType
+    );
+
+    let predictedIntensity = profile.baseIntensity * decayFactor + inertiaBonus;
+    return Math.max(0, Math.min(1, predictedIntensity));
+  }
+
+  /**
+   * OBTENER FACTORES DE INTENSIDAD
+   *
+   * Retorna todos los factores que afectan la intensidad para debugging.
+   */
+  static getIntensityFactors(
+    profile: BehaviorProfile,
+    triggers: TriggerDetectionResult[],
+    hoursSinceLastInteraction: number
+  ): IntensityFactors {
+    return {
+      triggerImpact: this.calculateTriggerImpact(triggers, profile.behaviorType),
+      phaseMultiplier: this.getPhaseMultiplier(profile.behaviorType, profile.currentPhase),
+      decayFactor: this.calculateDecayFactor(
+        hoursSinceLastInteraction,
+        profile.deEscalationRate,
+        profile.behaviorType
+      ),
+      inertiaBonus: this.calculatePhaseInertia(
+        profile.currentPhase,
+        profile.interactionsSincePhaseStart,
+        profile.behaviorType
+      ),
+      emotionalModulation: 0, // TODO: Implement
+    };
+  }
+
+  /**
+   * VERIFICAR SI INTENSIDAD ES CRÍTICA
+   *
+   * Determina si la intensidad actual requiere medidas especiales.
+   */
+  static isCriticalIntensity(
+    intensity: number,
+    behaviorType: BehaviorType,
+    currentPhase: number
+  ): {
+    isCritical: boolean;
+    level: "LOW" | "MODERATE" | "HIGH" | "CRITICAL" | "EXTREME";
+    warnings: string[];
+  } {
+    const warnings: string[] = [];
+    let isCritical = false;
+    let level: "LOW" | "MODERATE" | "HIGH" | "CRITICAL" | "EXTREME" = "LOW";
+
+    // Thresholds generales
+    if (intensity < 0.3) {
+      level = "LOW";
+    } else if (intensity < 0.5) {
+      level = "MODERATE";
+    } else if (intensity < 0.7) {
+      level = "HIGH";
+    } else if (intensity < 0.9) {
+      level = "CRITICAL";
+      isCritical = true;
+    } else {
+      level = "EXTREME";
+      isCritical = true;
+    }
+
+    // Verificaciones específicas por behavior type
+    switch (behaviorType) {
+      case BehaviorType.YANDERE_OBSESSIVE:
+        if (currentPhase >= 7 && intensity > 0.7) {
+          isCritical = true;
+          warnings.push("Yandere en fase crítica con alta intensidad");
+          warnings.push("Riesgo de amenazas o comportamiento extremo");
+        }
+        if (currentPhase >= 8 && intensity > 0.5) {
+          warnings.push("⚠️ EXTREME DANGER PHASE activa");
+        }
+        break;
+
+      case BehaviorType.BORDERLINE_PD:
+        if ((currentPhase === 2 || currentPhase === 3) && intensity > 0.6) {
+          isCritical = true;
+          warnings.push("BPD en crisis - Devaluación o pánico activo");
+        }
+        break;
+
+      case BehaviorType.NARCISSISTIC_PD:
+        if (currentPhase === 2 && intensity > 0.7) {
+          isCritical = true;
+          warnings.push("Narcissistic rage activo - Comportamiento destructivo");
+        }
+        break;
+    }
+
+    return {
+      isCritical,
+      level,
+      warnings,
+    };
+  }
+}

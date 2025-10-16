@@ -50,10 +50,40 @@ export const LAST_UPDATED = "2025-10-15";
  * Feature flags
  */
 export const FEATURES = {
-  TRIGGER_DETECTION: false, // Phase 2
-  PHASE_MANAGER: false, // Phase 3
+  TRIGGER_DETECTION: true, // Phase 2 ✅
+  PHASE_MANAGER: true, // Phase 3 ✅
   EMOTIONAL_INTEGRATION: false, // Phase 4
   SPECIALIZED_PROMPTS: false, // Phase 5
   CONTENT_MODERATION: false, // Phase 6
   ANALYTICS_DASHBOARD: false, // Phase 8
 } as const;
+
+// Phase 2: Trigger Detection System
+export { TriggerDetector } from "./trigger-detector";
+export {
+  TRIGGER_PATTERNS,
+  TRIGGER_WEIGHTS,
+  TRIGGER_BEHAVIOR_MAPPING,
+  DELAYED_RESPONSE_THRESHOLDS,
+} from "./trigger-patterns";
+export {
+  processTriggers,
+  calculateTriggerImpact,
+  logTriggers,
+} from "./trigger-processor";
+
+// Phase 3: Behavior Phase Manager
+export { BehaviorPhaseManager } from "./phase-manager";
+export { PhaseEvaluator } from "./phase-evaluator";
+export {
+  calculateFinalIntensity,
+  calculatePhaseMultiplier,
+  calculateTriggerAmplification,
+  calculateDecay,
+  calculateInertia,
+  calculateMinimumIntensityForPhase,
+  shouldRegressPhase,
+  calculateDynamicEscalationRate,
+  projectFutureIntensity,
+  calculateVolatility,
+} from "./intensity-calculator";
