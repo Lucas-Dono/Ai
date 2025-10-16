@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     "sharp",
     "onnxruntime-node",
     "@xenova/transformers",
+    "hnswlib-node",
   ],
 
   // Configuración de Webpack para ignorar módulos nativos en el cliente
@@ -18,6 +19,7 @@ const nextConfig: NextConfig = {
         ...config.resolve.alias,
         sharp: false,
         "onnxruntime-node": false,
+        "hnswlib-node": false,
       };
 
       // Ignorar archivos .node en el cliente
@@ -33,6 +35,7 @@ const nextConfig: NextConfig = {
       config.externals.push({
         "sharp": "commonjs sharp",
         "onnxruntime-node": "commonjs onnxruntime-node",
+        "hnswlib-node": "commonjs hnswlib-node",
       });
     }
 
