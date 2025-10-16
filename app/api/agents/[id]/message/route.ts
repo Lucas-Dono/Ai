@@ -7,6 +7,17 @@ import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { auth } from "@/lib/auth";
 import { behaviorOrchestrator } from "@/lib/behavior-system";
+import { getRelationshipStage, shouldAdvanceStage } from "@/lib/relationship/stages";
+import { getPromptForStage } from "@/lib/relationship/prompt-generator";
+import type { StagePrompts } from "@/lib/relationship/prompt-generator";
+import type { RelationshipStage } from "@/lib/relationship/stages";
+import {
+  analyzeMessageEmotions,
+  applyEmotionDeltas,
+  getEmotionalSummary,
+  updateInternalState,
+  type PlutchikEmotionState,
+} from "@/lib/emotions";
 
 export async function POST(
   req: NextRequest,
@@ -111,37 +122,81 @@ export async function POST(
           respect: 0.5,
           privateState: { love: 0, curiosity: 0 },
           visibleState: { trust: 0.5, affinity: 0.5, respect: 0.5 },
+          stage: "stranger",
+          totalInteractions: 0,
         },
       });
     }
 
-    // Analizar emoción del mensaje
-    const currentState = {
-      valence: 0.5,
-      arousal: 0.5,
-      dominance: 0.5,
-      trust: relation.trust,
-      affinity: relation.affinity,
-      respect: relation.respect,
-      love: (relation.privateState as { love?: number }).love || 0,
-      curiosity: (relation.privateState as { curiosity?: number }).curiosity || 0,
-    };
+    // Actualizar contador de interacciones y etapa de relación
+    const newTotalInteractions = relation.totalInteractions + 1;
+    const newStage = getRelationshipStage(newTotalInteractions);
+    const stageChanged = shouldAdvanceStage(newTotalInteractions, relation.stage as RelationshipStage);
 
-    const newState = EmotionalEngine.analyzeMessage(content, currentState);
+    // ===== SISTEMA EMOCIONAL COMPLETO (Plutchik) =====
+    // Obtener o crear InternalState del agente
+    let internalState = await prisma.internalState.findUnique({
+      where: { agentId },
+    });
 
-    // Actualizar relación
+    let currentEmotions: PlutchikEmotionState;
+    if (!internalState) {
+      // Crear estado inicial neutro
+      const { createNeutralState } = await import("@/lib/emotions");
+      currentEmotions = createNeutralState();
+
+      internalState = await prisma.internalState.create({
+        data: {
+          agentId,
+          currentEmotions,
+          moodValence: 0.0,
+          moodArousal: 0.5,
+          moodDominance: 0.5,
+          activeGoals: [],
+          conversationBuffer: [],
+        },
+      });
+    } else {
+      currentEmotions = internalState.currentEmotions as PlutchikEmotionState;
+    }
+
+    // Analizar el mensaje del usuario y calcular deltas emocionales
+    const emotionDeltas = analyzeMessageEmotions(content);
+
+    // Aplicar deltas con decay e inercia
+    const newEmotionState = applyEmotionDeltas(
+      currentEmotions,
+      emotionDeltas,
+      internalState.emotionDecayRate,
+      internalState.emotionInertia
+    );
+
+    // Obtener resumen emocional
+    const emotionalSummary = getEmotionalSummary(newEmotionState);
+
+    // Actualizar InternalState en DB
+    await updateInternalState(agentId, newEmotionState, prisma);
+
+    // Actualizar relación (mantener compatibilidad con sistema legacy)
+    // Mapear emociones Plutchik a métricas legacy
+    const trust = newEmotionState.trust;
+    const affinity = (newEmotionState.joy + newEmotionState.trust) / 2;
+    const respect = (newEmotionState.trust + newEmotionState.anticipation) / 2;
+
     await prisma.relation.update({
       where: { id: relation.id },
       data: {
-        trust: newState.trust,
-        affinity: newState.affinity,
-        respect: newState.respect,
-        privateState: { love: newState.love, curiosity: newState.curiosity },
-        visibleState: {
-          trust: newState.trust,
-          affinity: newState.affinity,
-          respect: newState.respect,
+        trust,
+        affinity,
+        respect,
+        privateState: {
+          love: (newEmotionState.joy + newEmotionState.trust) / 2,
+          curiosity: (newEmotionState.surprise + newEmotionState.anticipation) / 2,
         },
+        visibleState: { trust, affinity, respect },
+        totalInteractions: newTotalInteractions,
+        stage: newStage,
+        lastInteractionAt: new Date(),
       },
     });
 
@@ -169,11 +224,28 @@ export async function POST(
       },
     });
 
-    // Ajustar system prompt con emoción
-    const emotionalPrompt = EmotionalEngine.adjustPromptForEmotion(
-      agent.systemPrompt,
-      newState
+    // ===== RELATIONSHIP STAGE PROMPT SELECTION =====
+    // Obtener el prompt apropiado para la etapa actual de relación
+    const stagePrompts = agent.stagePrompts as StagePrompts | null;
+    const basePrompt = getPromptForStage(
+      stagePrompts,
+      newStage,
+      agent.systemPrompt
     );
+
+    // Ajustar system prompt con emoción usando el nuevo sistema
+    const emotionalContext = `
+Estado emocional actual:
+- Emociones dominantes: ${emotionalSummary.dominant.join(", ")}
+${emotionalSummary.secondary.length > 0 ? `- Emociones secundarias: ${emotionalSummary.secondary.join(", ")}` : ""}
+- Mood general: ${emotionalSummary.mood}
+- Valence (placer): ${(emotionalSummary.pad.valence * 100).toFixed(0)}%
+- Arousal (activación): ${(emotionalSummary.pad.arousal * 100).toFixed(0)}%
+
+Refleja estas emociones de manera sutil en tu tono y respuestas.
+`;
+
+    const emotionalPrompt = `${basePrompt}\n\n${emotionalContext}`;
 
     // Combinar prompt emocional con behavior prompt
     let enhancedPrompt = emotionalPrompt;
@@ -235,8 +307,16 @@ export async function POST(
         role: "assistant",
         content: response,
         metadata: {
-          emotions: EmotionalEngine.getVisibleEmotions(newState),
-          relationLevel: EmotionalEngine.getRelationshipLevel(newState),
+          // Sistema emocional completo (Plutchik)
+          emotions: {
+            dominant: emotionalSummary.dominant,
+            secondary: emotionalSummary.secondary,
+            mood: emotionalSummary.mood,
+            pad: emotionalSummary.pad,
+            // Mantener compatibilidad legacy
+            visible: emotionalSummary.dominant,
+          },
+          relationLevel: emotionalSummary.mood,
           tokensUsed: estimatedTokens,
           // Behavior System Metadata
           behaviors: {
@@ -267,20 +347,43 @@ export async function POST(
       // Store assistant response in memory
       memoryManager.storeMessage(response, "assistant", {
         messageId: assistantMessage.id,
-        emotions: EmotionalEngine.getVisibleEmotions(newState),
-        relationLevel: EmotionalEngine.getRelationshipLevel(newState),
+        emotions: emotionalSummary.dominant,
+        relationLevel: emotionalSummary.mood,
       }),
     ]);
 
     // Create response with rate limit headers
     const responseData = {
       message: assistantMessage,
-      emotions: EmotionalEngine.getVisibleEmotions(newState),
-      relationLevel: EmotionalEngine.getRelationshipLevel(newState),
+      // Sistema emocional completo
+      emotions: {
+        dominant: emotionalSummary.dominant,
+        secondary: emotionalSummary.secondary,
+        mood: emotionalSummary.mood,
+        pad: emotionalSummary.pad,
+        // Estado emocional detallado
+        detailed: {
+          joy: Math.round(newEmotionState.joy * 100),
+          trust: Math.round(newEmotionState.trust * 100),
+          fear: Math.round(newEmotionState.fear * 100),
+          surprise: Math.round(newEmotionState.surprise * 100),
+          sadness: Math.round(newEmotionState.sadness * 100),
+          disgust: Math.round(newEmotionState.disgust * 100),
+          anger: Math.round(newEmotionState.anger * 100),
+          anticipation: Math.round(newEmotionState.anticipation * 100),
+        },
+      },
+      relationLevel: emotionalSummary.mood,
       state: {
-        trust: newState.trust,
-        affinity: newState.affinity,
-        respect: newState.respect,
+        trust,
+        affinity,
+        respect,
+      },
+      // Relationship Progression Data
+      relationship: {
+        stage: newStage,
+        totalInteractions: newTotalInteractions,
+        stageChanged,
       },
       // Behavior System Data
       behaviors: {

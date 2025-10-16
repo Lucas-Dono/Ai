@@ -100,6 +100,10 @@ model Agent {
   rating       Float? // Rating promedio (0-5)
   cloneCount   Int      @default(0) // Número de veces clonado
   originalId   String? // ID del agente original si es un clon
+
+  // Sistema de progresión de relación
+  stagePrompts Json? // Prompts específicos por etapa de relación: { stranger, acquaintance, friend, close, intimate }
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -374,6 +378,12 @@ model Relation {
   respect      Float    @default(0.5) // Respeto (0-1)
   privateState Json // Estados ocultos: love, curiosity, etc.
   visibleState Json // Estados visibles para el usuario
+
+  // Sistema de progresión de relación
+  stage              String @default("stranger") // stranger | acquaintance | friend | close | intimate
+  totalInteractions  Int    @default(0) // Total de interacciones para calcular stage
+  lastInteractionAt  DateTime?
+
   updatedAt    DateTime @updatedAt
 
   subjectAgent Agent @relation("SubjectRelations", fields: [subjectId], references: [id], onDelete: Cascade)
@@ -382,6 +392,7 @@ model Relation {
   @@index([subjectId])
   @@index([targetId])
   @@index([targetType])
+  @@index([stage])
 }
 
 // Modelo de Mensajes
