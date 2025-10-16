@@ -52,8 +52,8 @@ export const LAST_UPDATED = "2025-10-15";
 export const FEATURES = {
   TRIGGER_DETECTION: true, // Phase 2 ✅
   PHASE_MANAGER: true, // Phase 3 ✅
-  EMOTIONAL_INTEGRATION: false, // Phase 4
-  SPECIALIZED_PROMPTS: false, // Phase 5
+  EMOTIONAL_INTEGRATION: true, // Phase 4 ✅
+  SPECIALIZED_PROMPTS: true, // Phase 5 ✅
   CONTENT_MODERATION: false, // Phase 6
   ANALYTICS_DASHBOARD: false, // Phase 8
 } as const;
@@ -83,3 +83,20 @@ export {
   getBehaviorEmotionMapping,
   getEmotionBehaviorMapping,
 } from "./emotional-integration";
+
+// Phase 5: Specialized Prompts
+export { PromptSelector } from "./prompt-selector";
+export type {
+  PromptSelectionInput,
+  SelectedPrompt,
+  PromptSelectionResult,
+} from "./prompt-selector";
+export { getYanderePrompt } from "./prompts/yandere-prompts";
+export { getBPDPrompt, determineBPDContext } from "./prompts/bpd-prompts";
+export { getAttachmentPrompt, determineAttachmentContext } from "./prompts/attachment-prompts";
+export {
+  getNPDPrompt,
+  getCodependencyPrompt,
+  determineNPDContext,
+  determineCodependencyContext,
+} from "./prompts/npd-codependency-prompts";
