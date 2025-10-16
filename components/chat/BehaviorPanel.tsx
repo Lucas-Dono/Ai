@@ -212,8 +212,21 @@ export function BehaviorPanel({ agentId, behaviorData, intensity = 0 }: Behavior
         </Card>
       )}
 
+      {/* View Details Button */}
+      <div className="px-4">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            window.location.href = `/agentes/${agentId}/behaviors`;
+          }}
+        >
+          Ver Detalles Completos
+        </Button>
+      </div>
+
       {/* Info Note */}
-      <div className="text-xs text-muted-foreground text-center px-4">
+      <div className="text-xs text-muted-foreground text-center px-4 mt-3">
         Los comportamientos evolucionan basándose en tus interacciones
       </div>
     </div>
