@@ -468,7 +468,8 @@ export default function ConstructorPage() {
     }, 500);
   };
 
-  const isComplete = step >= steps.length && newAgentId;
+  // El proceso está completo cuando el agente fue creado exitosamente
+  const isComplete = !!newAgentId;
 
   return (
     <div className="h-screen flex overflow-hidden">
@@ -637,7 +638,7 @@ export default function ConstructorPage() {
         </div>
 
         {/* Input Area - FIXED AT BOTTOM */}
-        {!isComplete && (
+        {!isComplete ? (
           <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6 shrink-0">
             <div className="max-w-4xl mx-auto">
               {/* Si estamos en el paso de imagen de referencia, mostrar el selector visual */}
@@ -672,6 +673,20 @@ export default function ConstructorPage() {
                   </Button>
                 </div>
               )}
+            </div>
+          </div>
+        ) : (
+          /* Mensaje de finalización cuando el agente fue creado */
+          <div className="border-t border-border bg-gradient-to-r from-primary/10 to-purple-500/10 backdrop-blur-sm p-6 shrink-0">
+            <div className="max-w-4xl mx-auto text-center space-y-3">
+              <div className="flex items-center justify-center gap-2 text-primary">
+                <Sparkles className="h-5 w-5" />
+                <p className="font-semibold">¡Proceso completado!</p>
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Tu inteligencia ha sido creada exitosamente. Usa los botones de arriba para comenzar a interactuar.
+              </p>
             </div>
           </div>
         )}
