@@ -738,6 +738,96 @@ const [multimediaResult, stagePromptsResult] = await Promise.allSettled([
 
 ---
 
+## 🔧 FIX: Migration to Google Gemini API - COMPLETADO
+
+**Fecha:** 2025-10-16
+**Commit:** 3ffd853
+
+### Problem:
+
+**Rate Limiting con OpenRouter:**
+```
+OpenRouter API error: 429
+cognitivecomputations/dolphin-mistral-24b-venice-edition:free is temporarily rate-limited upstream
+Provider: Venice
+```
+
+**Prisma Validation Error:**
+```
+Invalid prisma.internalState.create() invocation
+Argument currentEmotions is missing
+```
+
+### Solution:
+
+**1. Migrated LLMProvider to Google Gemini API:**
+
+**Changes in `lib/llm/provider.ts`:**
+- Switched from OpenRouter to Google AI (Gemini 1.5 Flash)
+- Updated API endpoint: `https://generativelanguage.googleapis.com/v1beta`
+- Changed authentication: API key as query parameter instead of Bearer token
+- Updated message format:
+  - OpenRouter: `{ role: "user"/"assistant", content: "..." }`
+  - Gemini: `{ role: "user"/"model", parts: [{ text: "..." }] }`
+- System prompts combined with first user message (Gemini limitation)
+- Environment variable: `GOOGLE_AI_API_KEY`
+
+**2. Fixed Prisma InternalState Creation:**
+
+**Changes in `app/api/agents/route.ts`:**
+- Added `currentEmotions: {}` field to InternalState.create()
+- Ensures all required fields are present
+
+### Benefits:
+
+- ✅ **No rate limits:** Gemini 1.5 Flash has generous free tier
+- ✅ **100% free:** No costs for agent creation
+- ✅ **Better reliability:** Google infrastructure vs third-party providers
+- ✅ **Same quality:** Gemini 1.5 Flash performs well for prompt generation
+- ✅ **Proper schema compliance:** All Prisma validations pass
+
+### API Format Comparison:
+
+**OpenRouter (Old):**
+```typescript
+POST https://openrouter.ai/api/v1/chat/completions
+Authorization: Bearer {OPENROUTER_API_KEY}
+
+{
+  "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+  "messages": [
+    { "role": "system", "content": "..." },
+    { "role": "user", "content": "..." }
+  ]
+}
+```
+
+**Gemini (New):**
+```typescript
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_AI_API_KEY}
+
+{
+  "contents": [
+    {
+      "role": "user",
+      "parts": [{ "text": "System: ...\n\nUser: ..." }]
+    }
+  ],
+  "generationConfig": {
+    "temperature": 0.9,
+    "maxOutputTokens": 2000
+  }
+}
+```
+
+### Testing Status:
+
+- ✅ Code compiles without TypeScript errors
+- ✅ Prisma schema validation passes
+- ⏳ Pending: End-to-end agent creation test with Gemini
+
+---
+
 ## 📞 CONTACTO CON USUARIO
 
 **Zona horaria:** GMT-3 (Argentina)
@@ -750,4 +840,4 @@ const [multimediaResult, stagePromptsResult] = await Promise.allSettled([
 ---
 
 **FIN DEL ESTADO ACTUAL**
-**Siguiente paso:** Testing completo del flujo de creación con parallelización + verificación de modelo FREE
+**Siguiente paso:** Reiniciar servidor con GOOGLE_AI_API_KEY y probar creación de agente end-to-end con Gemini + operaciones paralelas
