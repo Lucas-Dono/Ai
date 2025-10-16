@@ -233,6 +233,47 @@ export async function POST(req: NextRequest) {
       // Por ahora, el sistema ya lo permite si se crean behaviors dinámicamente
     }
 
+    // GENERAR PROMPTS DE ETAPAS DE RELACIÓN
+    console.log('[API] Generando stage prompts...');
+    try {
+      const { generateStagePrompts } = await import("@/lib/relationship/prompt-generator");
+
+      // Obtener behaviors activos para incluir en la generación
+      const behaviorProfiles = await prisma.behaviorProfile.findMany({
+        where: { agentId: agent.id },
+        select: { behaviorType: true },
+      });
+
+      const behaviorTypes = behaviorProfiles.map(b => b.behaviorType);
+
+      const stagePrompts = await generateStagePrompts(
+        systemPrompt,
+        agent.name,
+        agent.personality || agent.description || "",
+        behaviorTypes
+      );
+
+      // Crear InternalState con los stage prompts
+      await prisma.internalState.create({
+        data: {
+          agentId: agent.id,
+          currentStage: "stranger",
+          totalInteractions: 0,
+          trust: 0.5,
+          affinity: 0.5,
+          respect: 0.5,
+          stagePrompts: stagePrompts as any,
+          lastUpdated: new Date(),
+        },
+      });
+
+      console.log('[API] Stage prompts generados y guardados exitosamente');
+    } catch (error) {
+      console.error('[API] Error generando stage prompts:', error);
+      // No fallar la creación del agente si esto falla, pero loguearlo
+      console.warn('[API] El agente se creó pero sin stage prompts. Se generarán en la primera interacción.');
+    }
+
     // Track usage
     console.log('[API] Registrando uso...');
     await trackUsage(userId, "agent", 1, agent.id, {
