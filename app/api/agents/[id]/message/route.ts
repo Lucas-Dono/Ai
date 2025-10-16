@@ -6,6 +6,7 @@ import { createMemoryManager } from "@/lib/memory/manager";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { auth } from "@/lib/auth";
+import { behaviorOrchestrator } from "@/lib/behavior-system";
 
 export async function POST(
   req: NextRequest,
@@ -81,7 +82,7 @@ export async function POST(
     }
 
     // Guardar mensaje del usuario
-    await prisma.message.create({
+    const userMessage = await prisma.message.create({
       data: {
         agentId,
         userId,
@@ -154,27 +155,66 @@ export async function POST(
       take: 10,
     });
 
+    // ===== BEHAVIOR SYSTEM INTEGRATION =====
+    // Procesar mensaje a través del behavior system
+    const behaviorOrchestration = await behaviorOrchestrator.processIncomingMessage({
+      agent,
+      userMessage,
+      recentMessages,
+      dominantEmotion: undefined, // TODO: inferir de newState o EmotionalEngine
+      emotionalState: {
+        valence: newState.valence,
+        arousal: newState.arousal,
+        dominance: newState.dominance,
+      },
+    });
+
     // Ajustar system prompt con emoción
     const emotionalPrompt = EmotionalEngine.adjustPromptForEmotion(
       agent.systemPrompt,
       newState
     );
 
+    // Combinar prompt emocional con behavior prompt
+    let enhancedPrompt = emotionalPrompt;
+    if (behaviorOrchestration.enhancedSystemPrompt) {
+      enhancedPrompt += "\n\n" + behaviorOrchestration.enhancedSystemPrompt;
+    }
+
     // Build enhanced prompt with RAG context
-    const enhancedPrompt = await memoryManager.buildEnhancedPrompt(
-      emotionalPrompt,
+    const finalPrompt = await memoryManager.buildEnhancedPrompt(
+      enhancedPrompt,
       content
     );
 
     // Generar respuesta con LLM
     const llm = getLLMProvider();
-    const response = await llm.generate({
-      systemPrompt: enhancedPrompt,
+    let response = await llm.generate({
+      systemPrompt: finalPrompt,
       messages: recentMessages.reverse().map((m) => ({
         role: m.role as "user" | "assistant",
         content: m.content,
       })),
     });
+
+    // ===== CONTENT MODERATION =====
+    // Moderar respuesta si hay behaviors activos
+    if (behaviorOrchestration.activeBehaviors.length > 0) {
+      const primaryBehavior = behaviorOrchestration.activeBehaviors[0];
+      const moderation = behaviorOrchestration.moderator.moderateResponse(
+        response,
+        primaryBehavior.behaviorType,
+        primaryBehavior.currentPhase,
+        agent.nsfwMode || false
+      );
+
+      // Si la respuesta fue modificada o bloqueada, usar la versión moderada
+      if (!moderation.allowed) {
+        response = moderation.warning || "Lo siento, no puedo continuar con este tipo de contenido.";
+      } else if (moderation.modifiedResponse) {
+        response = moderation.modifiedResponse;
+      }
+    }
 
     // Estimar tokens usados (aproximación simple)
     const estimatedTokens = Math.ceil((content.length + response.length) / 4);
@@ -189,6 +229,13 @@ export async function POST(
           emotions: EmotionalEngine.getVisibleEmotions(newState),
           relationLevel: EmotionalEngine.getRelationshipLevel(newState),
           tokensUsed: estimatedTokens,
+          // Behavior System Metadata
+          behaviors: {
+            active: behaviorOrchestration.metadata.behaviorsActive,
+            phase: behaviorOrchestration.metadata.phase,
+            safetyLevel: behaviorOrchestration.metadata.safetyLevel,
+            triggers: behaviorOrchestration.metadata.triggers,
+          },
         },
       },
     });
@@ -225,6 +272,13 @@ export async function POST(
         trust: newState.trust,
         affinity: newState.affinity,
         respect: newState.respect,
+      },
+      // Behavior System Data
+      behaviors: {
+        active: behaviorOrchestration.metadata.behaviorsActive,
+        phase: behaviorOrchestration.metadata.phase,
+        safetyLevel: behaviorOrchestration.metadata.safetyLevel,
+        triggers: behaviorOrchestration.metadata.triggers,
       },
       usage: {
         messagesRemaining: quotaCheck.limit === -1 ? "unlimited" : (quotaCheck.limit! - quotaCheck.current! - 1),

@@ -93,6 +93,7 @@ model Agent {
   profile      Json // JSON con toda la configuración del agente (DEPRECATED)
   systemPrompt String   @db.Text
   visibility   String   @default("private") // private, world, public, team
+  nsfwMode     Boolean  @default(false) // Permitir contenido NSFW/adulto
   avatar       String? // URL o identificador de avatar
   tags         Json? // Tags/categorías para el marketplace
   featured     Boolean  @default(false) // Destacado en el marketplace

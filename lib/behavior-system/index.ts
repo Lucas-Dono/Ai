@@ -114,3 +114,10 @@ export {
 } from "./safety-resources";
 export { NSFWGatingManager, nsfwGatingManager, NSFW_REQUIREMENTS } from "./nsfw-gating";
 export type { NSFWVerificationResult, NSFWRequirement } from "./nsfw-gating";
+
+// Phase 7: Integration Orchestrator
+export { BehaviorIntegrationOrchestrator, behaviorOrchestrator } from "./integration-orchestrator";
+export type {
+  BehaviorOrchestrationInput,
+  BehaviorOrchestrationOutput,
+} from "./integration-orchestrator";
