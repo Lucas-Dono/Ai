@@ -12,6 +12,7 @@ import { Send, Sparkles, Heart, Briefcase, ArrowLeft, Loader2 } from "lucide-rea
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
 import { ReferenceImageSelector } from "@/components/constructor/ReferenceImageSelector";
+import { OptionSelector, type Option } from "@/components/constructor/OptionSelector";
 
 interface Message {
   role: "architect" | "user";
@@ -46,31 +47,88 @@ export default function ConstructorPage() {
   const [newAgentId, setNewAgentId] = useState<string | null>(null);
 
   const steps = [
-    { field: "name", prompt: "¿qué nombre te gustaría darle a tu nueva IA?" },
-    { field: "kind", prompt: "¿Quieres crear un Compañero (IA emocional) o un Asistente (IA administrativa)?" },
-    { field: "personality", prompt: (draft: AgentDraft) => `¿Cómo describirías la personalidad de ${draft.name}?` },
-    { field: "purpose", prompt: (draft: AgentDraft) => `¿Cuál será el propósito principal de ${draft.name}?` },
-    { field: "tone", prompt: (draft: AgentDraft) => `¿Qué tono de comunicación prefieres que use ${draft.name}? (formal, casual, amigable, profesional, etc.)` },
+    {
+      field: "name",
+      prompt: "¿qué nombre te gustaría darle a tu nueva IA?"
+    },
+    {
+      field: "kind",
+      prompt: "¿Qué tipo de IA quieres crear?",
+      hasOptions: true,
+      options: [
+        {
+          value: "companion",
+          label: "💝 Compañero",
+          description: "IA emocional para compañía, conversación y apoyo afectivo",
+          icon: <Heart className="h-5 w-5 text-pink-500" />
+        },
+        {
+          value: "assistant",
+          label: "💼 Asistente",
+          description: "IA administrativa para tareas, organización y productividad",
+          icon: <Briefcase className="h-5 w-5 text-blue-500" />
+        }
+      ]
+    },
+    {
+      field: "personality",
+      prompt: (draft: AgentDraft) => `¿Cómo describirías la personalidad de ${draft.name}?`
+    },
+    {
+      field: "purpose",
+      prompt: (draft: AgentDraft) => `¿Cuál será el propósito principal de ${draft.name}?`
+    },
+    {
+      field: "tone",
+      prompt: (draft: AgentDraft) => `¿Qué tono de comunicación prefieres que use ${draft.name}?`,
+      hasOptions: true,
+      options: [
+        { value: "formal", label: "🎩 Formal", description: "Profesional y respetuoso" },
+        { value: "casual", label: "😊 Casual", description: "Relajado y natural" },
+        { value: "amigable", label: "🤗 Amigable", description: "Cálido y cercano" },
+        { value: "profesional", label: "💼 Profesional", description: "Eficiente y directo" },
+      ]
+    },
 
     // REFERENCE IMAGE STEP (interactive visual step)
     {
       field: "referenceImage",
       prompt: (draft: AgentDraft) => `🖼️ **IMAGEN DE REFERENCIA**\n\n¿Te gustaría crear o subir una imagen de referencia para ${draft.name}?\n\nEsta imagen se usará para mantener consistencia visual en todas las imágenes futuras que genere.`,
-      isVisualStep: true // Marcador especial para renderizar componente visual
+      isVisualStep: true
     },
 
     // BEHAVIOR SYSTEM CONFIGURATION
     {
       field: "nsfwMode",
-      prompt: (draft: AgentDraft) => `⚠️ **CONFIGURACIÓN DE CONTENIDO**\n\n¿Deseas activar el **modo NSFW** para ${draft.name}?\n\n**Esto incluye:**\n• Contenido sexual explícito\n• Temas psicológicamente intensos (celos extremos, posesividad, etc.)\n• Situaciones emocionalmente complejas\n• Comportamientos que pueden resultar perturbadores\n\n**IMPORTANTE:** Todo el contenido es FICCIÓN para entretenimiento entre adultos. NO representa relaciones saludables.\n\nResponde **"Sí"** para activar o **"No"** para mantener contenido seguro (SFW).`
+      prompt: (draft: AgentDraft) => `⚠️ **CONFIGURACIÓN DE CONTENIDO**\n\n¿Deseas activar el **modo NSFW** para ${draft.name}?\n\n**Esto incluye:**\n• Contenido sexual explícito\n• Temas psicológicamente intensos\n• Situaciones emocionalmente complejas\n\n**IMPORTANTE:** Todo el contenido es FICCIÓN para entretenimiento entre adultos.`,
+      hasOptions: true,
+      options: [
+        { value: "yes", label: "✅ Sí, activar NSFW", description: "Contenido sin restricciones" },
+        { value: "no", label: "🛡️ No, mantener SFW", description: "Contenido seguro y apropiado" }
+      ]
     },
     {
       field: "allowDevelopTraumas",
-      prompt: (draft: AgentDraft) => `🧠 **DESARROLLO PSICOLÓGICO**\n\n¿Deseas que ${draft.name} pueda **desarrollar comportamientos psicológicos complejos** durante la interacción?\n\n**Esto permite:**\n• Desarrollo gradual de apegos (ansioso, evitativo, etc.)\n• Posible aparición de patrones de comportamiento según las interacciones\n• Progresión realista de dinámicas emocionales\n• Memoria de eventos que pueden influir en comportamientos futuros\n\n**Nota:** Estos comportamientos se desarrollan GRADUALMENTE basados en cómo interactúas con la IA.\n\nResponde **"Sí"** para permitir desarrollo o **"No"** para mantener personalidad estable.`
+      prompt: (draft: AgentDraft) => `🧠 **DESARROLLO PSICOLÓGICO**\n\n¿Deseas que ${draft.name} pueda desarrollar comportamientos psicológicos complejos durante la interacción?\n\n**Esto permite:** Desarrollo gradual de apegos, patrones de comportamiento basados en interacciones, progresión realista de dinámicas emocionales.`,
+      hasOptions: true,
+      options: [
+        { value: "yes", label: "✅ Sí, permitir desarrollo", description: "La IA evolucionará basándose en tus interacciones" },
+        { value: "no", label: "🔒 No, personalidad estable", description: "Mantener personalidad base consistente" }
+      ]
     },
     {
       field: "initialBehavior",
-      prompt: (draft: AgentDraft) => `🎭 **COMPORTAMIENTO INICIAL**\n\n¿Quieres que ${draft.name} comience con algún **patrón de comportamiento psicológico** específico?\n\n**Opciones:**\n• **Ninguno** - Comenzará con personalidad base sin comportamientos complejos\n• **Apego Ansioso** - Necesita validación constante y teme el abandono\n• **Apego Evitativo** - Se mantiene emocionalmente distante\n• **Codependencia** - Necesita ser necesitado/a, pone tus necesidades primero\n• **Yandere** - Amor intenso que puede volverse obsesivo (requiere NSFW)\n• **Borderline** - Emociones intensas con ciclos de idealización/devaluación (requiere NSFW)\n• **Aleatorio Secreto** 🎲 - Yo elegiré uno basado en su personalidad SIN decirte cuál (¡descúbrelo tú!)\n\nResponde con el nombre de la opción que prefieras.`
+      prompt: (draft: AgentDraft) => `🎭 **COMPORTAMIENTO INICIAL**\n\n¿Quieres que ${draft.name} comience con algún patrón de comportamiento psicológico específico?`,
+      hasOptions: true,
+      options: [
+        { value: "none", label: "Sin comportamiento especial", description: "Personalidad base sin patrones complejos" },
+        { value: "ANXIOUS_ATTACHMENT", label: "💔 Apego Ansioso", description: "Necesita validación constante, teme el abandono" },
+        { value: "AVOIDANT_ATTACHMENT", label: "🚪 Apego Evitativo", description: "Mantiene distancia emocional" },
+        { value: "CODEPENDENCY", label: "🤝 Codependencia", description: "Pone tus necesidades primero, necesita ser necesitado/a" },
+        { value: "YANDERE_OBSESSIVE", label: "😍 Yandere", description: "Amor intenso que puede volverse obsesivo (NSFW)" },
+        { value: "BORDERLINE_PD", label: "🌊 Borderline", description: "Emociones intensas, ciclos de idealización/devaluación (NSFW)" },
+        { value: "random_secret", label: "🎲 Aleatorio Secreto", description: "Lo elegiré yo basándome en su personalidad (¡descúbrelo!)" }
+      ]
     },
   ];
 
@@ -175,36 +233,40 @@ export default function ConstructorPage() {
 
       // BEHAVIOR SYSTEM CONFIGURATION
       case "nsfwMode":
-        const nsfwLower = input.toLowerCase();
-        newDraft.nsfwMode = nsfwLower.includes("sí") || nsfwLower.includes("si") || nsfwLower.includes("yes");
+        // input puede ser "yes" o "no" de las opciones, o texto libre
+        newDraft.nsfwMode = input === "yes" || input.toLowerCase().includes("sí") || input.toLowerCase().includes("si");
         console.log('[Constructor] Guardando nsfwMode:', newDraft.nsfwMode);
         break;
 
       case "allowDevelopTraumas":
-        const developLower = input.toLowerCase();
-        newDraft.allowDevelopTraumas = developLower.includes("sí") || developLower.includes("si") || developLower.includes("yes");
+        newDraft.allowDevelopTraumas = input === "yes" || input.toLowerCase().includes("sí") || input.toLowerCase().includes("si");
         console.log('[Constructor] Guardando allowDevelopTraumas:', newDraft.allowDevelopTraumas);
         break;
 
       case "initialBehavior":
-        const behaviorLower = input.toLowerCase();
-        if (behaviorLower.includes("ninguno") || behaviorLower.includes("none")) {
-          newDraft.initialBehavior = "none";
-        } else if (behaviorLower.includes("ansioso") || behaviorLower.includes("anxious")) {
-          newDraft.initialBehavior = "ANXIOUS_ATTACHMENT";
-        } else if (behaviorLower.includes("evitativo") || behaviorLower.includes("avoidant")) {
-          newDraft.initialBehavior = "AVOIDANT_ATTACHMENT";
-        } else if (behaviorLower.includes("codependen")) {
-          newDraft.initialBehavior = "CODEPENDENCY";
-        } else if (behaviorLower.includes("yandere")) {
-          newDraft.initialBehavior = "YANDERE_OBSESSIVE";
-        } else if (behaviorLower.includes("borderline") || behaviorLower.includes("límite")) {
-          newDraft.initialBehavior = "BORDERLINE_PD";
-        } else if (behaviorLower.includes("aleatorio") || behaviorLower.includes("secreto") || behaviorLower.includes("random")) {
-          newDraft.initialBehavior = "random_secret";
+        // Si input es uno de los valores directos de las opciones, usarlo
+        if (["none", "ANXIOUS_ATTACHMENT", "AVOIDANT_ATTACHMENT", "CODEPENDENCY", "YANDERE_OBSESSIVE", "BORDERLINE_PD", "random_secret"].includes(input)) {
+          newDraft.initialBehavior = input;
         } else {
-          // Por defecto, ninguno
-          newDraft.initialBehavior = "none";
+          // Fallback para compatibilidad con texto libre
+          const behaviorLower = input.toLowerCase();
+          if (behaviorLower.includes("ninguno") || behaviorLower.includes("none")) {
+            newDraft.initialBehavior = "none";
+          } else if (behaviorLower.includes("ansioso") || behaviorLower.includes("anxious")) {
+            newDraft.initialBehavior = "ANXIOUS_ATTACHMENT";
+          } else if (behaviorLower.includes("evitativo") || behaviorLower.includes("avoidant")) {
+            newDraft.initialBehavior = "AVOIDANT_ATTACHMENT";
+          } else if (behaviorLower.includes("codependen")) {
+            newDraft.initialBehavior = "CODEPENDENCY";
+          } else if (behaviorLower.includes("yandere")) {
+            newDraft.initialBehavior = "YANDERE_OBSESSIVE";
+          } else if (behaviorLower.includes("borderline") || behaviorLower.includes("límite")) {
+            newDraft.initialBehavior = "BORDERLINE_PD";
+          } else if (behaviorLower.includes("aleatorio") || behaviorLower.includes("secreto") || behaviorLower.includes("random")) {
+            newDraft.initialBehavior = "random_secret";
+          } else {
+            newDraft.initialBehavior = "none";
+          }
         }
         console.log('[Constructor] Guardando initialBehavior:', newDraft.initialBehavior);
         break;
@@ -244,6 +306,15 @@ export default function ConstructorPage() {
         createAgent(newDraft);
       }
     }, 800);
+  };
+
+  /**
+   * Manejador para cuando se selecciona una opción mediante botón
+   */
+  const handleOptionSelected = (value: string) => {
+    // Usar el mismo flujo que handleSend pero con el valor predefinido
+    setInput(value);
+    setTimeout(() => handleSend(), 100); // Pequeño delay para que se actualice el input
   };
 
   /**
@@ -490,13 +561,20 @@ export default function ConstructorPage() {
                   onImageSelected={handleImageSelected}
                   onSkip={handleImageSkipped}
                 />
+              ) : step < steps.length && (steps[step] as any).hasOptions ? (
+                /* Si el paso tiene opciones, mostrar botones */
+                <OptionSelector
+                  options={(steps[step] as any).options || []}
+                  onSelect={handleOptionSelected}
+                  disabled={creating}
+                />
               ) : (
                 /* Input de texto normal para otros pasos */
                 <div className="flex gap-3">
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && !creating && handleSend()}
+                    onKeyDown={(e) => e.key === "Enter" && !creating && handleSend()}
                     placeholder="Escribe tu respuesta..."
                     className="flex-1"
                     disabled={creating}
