@@ -244,12 +244,15 @@ export default function ConstructorPage() {
     }
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = (valueOverride?: string) => {
+    // Usar valueOverride si se proporciona, sino el input del state
+    const valueToUse = valueOverride !== undefined ? valueOverride : input;
+
+    if (!valueToUse.trim()) return;
 
     console.log('[Constructor] handleSend ejecutado. Step actual:', step, 'Steps total:', steps.length);
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { role: "user", content: valueToUse };
     setMessages((prev) => [...prev, userMessage]);
 
     // Actualizar draft basándose en el field del step ACTUAL
@@ -259,11 +262,11 @@ export default function ConstructorPage() {
     // Guardar en el campo correspondiente al step actual
     switch (currentStep.field) {
       case "name":
-        newDraft.name = input;
-        console.log('[Constructor] Guardando nombre:', input);
+        newDraft.name = valueToUse;
+        console.log('[Constructor] Guardando nombre:', valueToUse);
         break;
       case "kind":
-        const lower = input.toLowerCase();
+        const lower = valueToUse.toLowerCase();
         if (lower.includes("compañero") || lower.includes("emocional") || lower.includes("companion")) {
           newDraft.kind = "companion";
         } else if (lower.includes("asistente") || lower.includes("admin") || lower.includes("assistant")) {
@@ -275,24 +278,24 @@ export default function ConstructorPage() {
         console.log('[Constructor] Guardando kind:', newDraft.kind);
         break;
       case "personality":
-        newDraft.personality = input;
-        console.log('[Constructor] Guardando personality:', input);
+        newDraft.personality = valueToUse;
+        console.log('[Constructor] Guardando personality:', valueToUse);
         break;
       case "purpose":
-        newDraft.purpose = input;
-        console.log('[Constructor] Guardando purpose:', input);
+        newDraft.purpose = valueToUse;
+        console.log('[Constructor] Guardando purpose:', valueToUse);
         break;
       case "tone":
-        newDraft.tone = input;
-        console.log('[Constructor] Guardando tone:', input);
+        newDraft.tone = valueToUse;
+        console.log('[Constructor] Guardando tone:', valueToUse);
         break;
 
       case "physicalAppearance":
         // Si seleccionó "custom", necesitará escribir la descripción
-        if (input === "custom") {
+        if (valueToUse === "custom") {
           // El siguiente mensaje pedirá la descripción personalizada
           newDraft.physicalAppearance = ""; // Temporal, se actualizará en el siguiente paso
-        } else if (input === "random") {
+        } else if (valueToUse === "random") {
           newDraft.physicalAppearance = "random";
         } else {
           // Es una de las opciones predefinidas, expandir a descripción completa
@@ -304,30 +307,30 @@ export default function ConstructorPage() {
             latino_man: "Hombre latino, cabello negro o castaño corto, piel morena, ojos oscuros, complexión musculosa, 1.78m de altura, estilo casual deportivo, rasgos masculinos marcados",
             caucasian_man: "Hombre caucásico, cabello castaño o rubio corto, piel clara, ojos claros, complexión atlética, 1.80m de altura, estilo formal ejecutivo, rasgos angulosos"
           };
-          newDraft.physicalAppearance = appearanceMap[input] || input;
+          newDraft.physicalAppearance = appearanceMap[valueToUse] || valueToUse;
         }
         console.log('[Constructor] Guardando physicalAppearance:', newDraft.physicalAppearance);
         break;
 
       // BEHAVIOR SYSTEM CONFIGURATION
       case "nsfwMode":
-        // input puede ser "yes" o "no" de las opciones, o texto libre
-        newDraft.nsfwMode = input === "yes" || input.toLowerCase().includes("sí") || input.toLowerCase().includes("si");
+        // valueToUse puede ser "yes" o "no" de las opciones, o texto libre
+        newDraft.nsfwMode = valueToUse === "yes" || valueToUse.toLowerCase().includes("sí") || valueToUse.toLowerCase().includes("si");
         console.log('[Constructor] Guardando nsfwMode:', newDraft.nsfwMode);
         break;
 
       case "allowDevelopTraumas":
-        newDraft.allowDevelopTraumas = input === "yes" || input.toLowerCase().includes("sí") || input.toLowerCase().includes("si");
+        newDraft.allowDevelopTraumas = valueToUse === "yes" || valueToUse.toLowerCase().includes("sí") || valueToUse.toLowerCase().includes("si");
         console.log('[Constructor] Guardando allowDevelopTraumas:', newDraft.allowDevelopTraumas);
         break;
 
       case "initialBehavior":
-        // Si input es uno de los valores directos de las opciones, usarlo
-        if (["none", "ANXIOUS_ATTACHMENT", "AVOIDANT_ATTACHMENT", "CODEPENDENCY", "YANDERE_OBSESSIVE", "BORDERLINE_PD", "random_secret"].includes(input)) {
-          newDraft.initialBehavior = input;
+        // Si valueToUse es uno de los valores directos de las opciones, usarlo
+        if (["none", "ANXIOUS_ATTACHMENT", "AVOIDANT_ATTACHMENT", "CODEPENDENCY", "YANDERE_OBSESSIVE", "BORDERLINE_PD", "random_secret"].includes(valueToUse)) {
+          newDraft.initialBehavior = valueToUse;
         } else {
           // Fallback para compatibilidad con texto libre
-          const behaviorLower = input.toLowerCase();
+          const behaviorLower = valueToUse.toLowerCase();
           if (behaviorLower.includes("ninguno") || behaviorLower.includes("none")) {
             newDraft.initialBehavior = "none";
           } else if (behaviorLower.includes("ansioso") || behaviorLower.includes("anxious")) {
@@ -390,9 +393,10 @@ export default function ConstructorPage() {
    * Manejador para cuando se selecciona una opción mediante botón
    */
   const handleOptionSelected = (value: string) => {
-    // Usar el mismo flujo que handleSend pero con el valor predefinido
-    setInput(value);
-    setTimeout(() => handleSend(), 100); // Pequeño delay para que se actualice el input
+    // Pasar el valor directamente a handleSend sin esperar async state update
+    handleSend(value);
+    // Limpiar input para evitar confusión visual
+    setInput("");
   };
 
   /**
