@@ -80,7 +80,7 @@ const BEHAVIOR_EMOTION_AMPLIFIERS: Record<
     anxiety: 1.8,
     fear: 1.7,
     affection: 0.7,
-    confusion: 1.9,
+    // confusion no existe en EmotionType, usar anxiety en su lugar
   },
 
   // Codependency amplifica neediness

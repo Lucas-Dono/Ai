@@ -86,7 +86,7 @@ export function ChatInput({
               className="mb-3"
             >
               <VoiceRecorder
-                onRecordingComplete={handleAudioRecorded}
+                onSend={handleAudioRecorded}
                 onCancel={() => setIsRecording(false)}
               />
             </motion.div>

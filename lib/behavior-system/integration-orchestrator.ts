@@ -119,12 +119,12 @@ export class BehaviorIntegrationOrchestrator {
 
     // 3. PROCESS TRIGGERS (actualiza baseIntensity y loguea)
     if (triggers.length > 0) {
-      await processTriggers(triggers, behaviorProfiles, userMessage.id);
+      await processTriggers(triggers, behaviorProfiles, userMessage.id, agent.id);
     }
 
     // 4. PHASE MANAGEMENT (evaluar transiciones para cada behavior)
     for (const profile of behaviorProfiles) {
-      await this.phaseManager.evaluatePhaseTransition(profile.id, agent.id);
+      await this.phaseManager.evaluatePhaseTransition(profile, agent.id);
     }
 
     // 5. Recargar profiles actualizados

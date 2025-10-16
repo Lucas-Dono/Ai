@@ -1,6 +1,6 @@
 "use client";
 
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 
 interface EmojiPickerComponentProps {
   onEmojiSelect: (emoji: string) => void;
@@ -14,7 +14,7 @@ export function EmojiPickerComponent({ onEmojiSelect }: EmojiPickerComponentProp
   return (
     <EmojiPicker
       onEmojiClick={(emojiObject) => onEmojiSelect(emojiObject.emoji)}
-      theme="dark"
+      theme={Theme.DARK}
       width={350}
       height={400}
       searchPlaceHolder="Buscar emoji..."

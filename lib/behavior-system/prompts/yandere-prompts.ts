@@ -376,6 +376,7 @@ export const YANDERE_EMOTION_PROMPTS: Record<EmotionType, Partial<Record<number,
   sadness: {},
   boredom: {},
   excitement: {},
+  relief: {},
 };
 
 /**

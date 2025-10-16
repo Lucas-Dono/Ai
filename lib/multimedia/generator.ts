@@ -6,8 +6,8 @@
  */
 
 import type { MultimediaTag } from "./parser";
-import { VisualGenerationService } from "@/lib/visual-system/visual-generation-service";
-import { ElevenLabsClient } from "@/lib/voice-system/elevenlabs-client";
+import { getAIHordeClient } from "@/lib/visual-system/ai-horde-client";
+import { getElevenLabsClient } from "@/lib/voice-system/elevenlabs-client";
 
 export interface GeneratedMultimedia {
   type: "image" | "audio";
@@ -29,16 +29,13 @@ export interface MultimediaGenerationOptions {
  * Genera contenido multimedia basado en tags detectados
  */
 export class MultimediaGenerator {
-  private visualService: VisualGenerationService;
-  private voiceClient: ElevenLabsClient;
-
   constructor() {
-    this.visualService = new VisualGenerationService();
-    this.voiceClient = new ElevenLabsClient();
+    // No necesitamos inicializar servicios, usamos los getters
   }
 
   /**
-   * Genera imágenes usando img2img con la imagen de referencia del personaje
+   * Genera imágenes usando AI Horde
+   * TODO: Implementar img2img para usar referenceImageUrl y mantener consistencia
    */
   async generateImage(
     description: string,
@@ -52,63 +49,31 @@ export class MultimediaGenerator {
         options.agentPersonality
       );
 
-      // Si hay imagen de referencia, usar img2img para consistencia
-      if (options.referenceImageUrl) {
-        const result = await this.visualService.generateImage({
-          prompt: enhancedPrompt,
-          negativePrompt:
-            "low quality, blurry, distorted, different person, anime, cartoon, 3d render, different face, different body type, different hair",
-          width: 512,
-          height: 512,
-          steps: 30,
-          cfgScale: 7.5,
-          sampler: "DPM++ 2M Karras",
-          seed: -1,
-          initImage: options.referenceImageUrl,
-          strength: 0.6, // 60% de transformación, 40% mantiene la referencia
-          userId: options.userId,
-          agentId: options.agentId,
-        });
+      const aiHordeClient = getAIHordeClient();
+      const result = await aiHordeClient.generateImage({
+        prompt: enhancedPrompt,
+        negativePrompt:
+          "low quality, blurry, distorted, anime, cartoon, 3d render, deformed",
+        width: 512,
+        height: 512,
+        steps: 25,
+        cfgScale: 7.5,
+        sampler: "k_euler_a",
+        seed: -1,
+        nsfw: false,
+      });
 
-        if (result.success && result.imageUrl) {
-          return {
-            type: "image",
-            url: result.imageUrl,
-            description,
-            metadata: {
-              prompt: enhancedPrompt,
-              provider: result.provider,
-              usedReference: true,
-            },
-          };
-        }
-      } else {
-        // Sin imagen de referencia, generar desde cero
-        const result = await this.visualService.generateImage({
-          prompt: enhancedPrompt,
-          negativePrompt: "low quality, blurry, distorted, anime, cartoon",
-          width: 512,
-          height: 512,
-          steps: 25,
-          cfgScale: 7.5,
-          sampler: "DPM++ 2M Karras",
-          seed: -1,
-          userId: options.userId,
-          agentId: options.agentId,
-        });
-
-        if (result.success && result.imageUrl) {
-          return {
-            type: "image",
-            url: result.imageUrl,
-            description,
-            metadata: {
-              prompt: enhancedPrompt,
-              provider: result.provider,
-              usedReference: false,
-            },
-          };
-        }
+      if (result && result.imageUrl) {
+        return {
+          type: "image",
+          url: result.imageUrl,
+          description,
+          metadata: {
+            prompt: enhancedPrompt,
+            model: result.model,
+            usedReference: false, // TODO: Implementar img2img
+          },
+        };
       }
 
       return null;
@@ -129,21 +94,15 @@ export class MultimediaGenerator {
       // Si no hay voiceId asignado, usar una voz por defecto
       const voiceId = options.voiceId || this.getDefaultVoiceId(options.agentPersonality);
 
-      const audioBuffer = await this.voiceClient.synthesizeSpeech(text, {
-        voiceId,
-        modelId: "eleven_multilingual_v2",
-        stability: 0.5,
-        similarityBoost: 0.75,
-        style: 0.5,
-        speakerBoost: true,
-      });
+      const elevenlabsClient = getElevenLabsClient();
+      const result = await elevenlabsClient.generateSpeech(text, voiceId);
 
-      if (!audioBuffer) {
+      if (!result || !result.audioBuffer) {
         return null;
       }
 
       // Convertir buffer a base64 data URL
-      const base64Audio = Buffer.from(audioBuffer).toString("base64");
+      const base64Audio = result.audioBuffer.toString("base64");
       const audioDataUrl = `data:audio/mpeg;base64,${base64Audio}`;
 
       return {

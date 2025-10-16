@@ -6,13 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
+interface LogEntry {
+  timestamp: string;
+  type: string;
+  data: any;
+}
+
 export default function AgentMessageTestPage() {
   const [agentId, setAgentId] = useState("");
   const [message, setMessage] = useState("Hola");
   const [loading, setLoading] = useState(false);
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
-  const addLog = (type, data) => {
+  const addLog = (type: string, data: any) => {
     setLogs(prev => [...prev, { timestamp: new Date().toISOString(), type, data }]);
   };
 
@@ -35,7 +41,7 @@ export default function AgentMessageTestPage() {
         addLog("success", { duration: duration + "ms", reply: data.reply });
       }
     } catch (error) {
-      addLog("error", { type: "network_error", message: error.message });
+      addLog("error", { type: "network_error", message: error instanceof Error ? error.message : "Unknown error" });
     } finally {
       setLoading(false);
     }

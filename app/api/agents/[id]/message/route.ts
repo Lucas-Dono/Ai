@@ -175,7 +175,7 @@ export async function POST(
       internalState = await prisma.internalState.create({
         data: {
           agentId,
-          currentEmotions,
+          currentEmotions: currentEmotions as any,
           moodValence: 0.0,
           moodArousal: 0.5,
           moodDominance: 0.5,
@@ -184,7 +184,7 @@ export async function POST(
         },
       });
     } else {
-      currentEmotions = internalState.currentEmotions as PlutchikEmotionState;
+      currentEmotions = internalState.currentEmotions as unknown as PlutchikEmotionState;
     }
 
     // Analizar el mensaje del usuario y calcular deltas emocionales
@@ -244,7 +244,7 @@ export async function POST(
       agent,
       userMessage,
       recentMessages,
-      dominantEmotion: emotionalSummary.dominant[0] || "neutral",
+      dominantEmotion: (emotionalSummary.dominant[0] as any) || "joy",
       emotionalState: {
         valence: emotionalSummary.pad.valence,
         arousal: emotionalSummary.pad.arousal,

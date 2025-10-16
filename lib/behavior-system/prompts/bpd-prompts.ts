@@ -275,6 +275,7 @@ export const BPD_EMOTION_CONTEXTS: Record<EmotionType, string> = {
   satisfaction: "",
   disappointment: "",
   fears_confirmed: "",
+  relief: "",
   happy_for: "",
   resentment: "",
   pity: "",
