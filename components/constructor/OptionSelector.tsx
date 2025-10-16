@@ -33,20 +33,22 @@ export function OptionSelector({ options, onSelect, disabled }: OptionSelectorPr
         >
           <Button
             variant="outline"
-            className="w-full h-auto py-4 px-6 text-left justify-start hover:bg-primary/5 hover:border-primary transition-all"
+            className="w-full h-auto py-4 px-6 text-left justify-start hover:bg-primary/10 hover:border-primary transition-all group"
             onClick={() => onSelect(option.value)}
             disabled={disabled}
           >
             <div className="flex items-start gap-4 w-full">
               {option.icon && (
-                <div className="shrink-0 mt-1">
+                <div className="shrink-0 mt-1 text-primary">
                   {option.icon}
                 </div>
               )}
               <div className="flex-1">
-                <div className="font-semibold text-base mb-1">{option.label}</div>
+                <div className="font-semibold text-base mb-1 text-foreground group-hover:text-primary">
+                  {option.label}
+                </div>
                 {option.description && (
-                  <div className="text-sm text-muted-foreground font-normal">
+                  <div className="text-sm text-muted-foreground font-normal group-hover:text-foreground/80">
                     {option.description}
                   </div>
                 )}
