@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import data from "@emoji-mart/data";
-import Picker from "@emoji-mart/react";
+import { Picker } from "@emoji-mart/react";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { GifPicker } from "./GifPicker";
 
