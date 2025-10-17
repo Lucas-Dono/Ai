@@ -934,10 +934,54 @@ With 4 Gemini API keys:
 
 **Next Steps:**
 
-1. Apply same rotation system to OpenRouter for chat interactions
+1. ✅ Apply same rotation system to OpenRouter for chat interactions (COMPLETADO)
 2. Add usage tracking/metrics per key
 3. Implement key health monitoring
 4. Add exponential backoff before rotation (optional)
+
+### Update: OpenRouter API Key Rotation (Commit PENDING)
+
+**Implementation:** Applied same rotation system to OpenRouter client for chat interactions
+
+**Changes in `lib/emotional-system/llm/openrouter.ts`:**
+
+1. **Multiple API Key Support:**
+   - Updated `OpenRouterConfig` interface to support `apiKeys?: string[]`
+   - Backward compatible with single `apiKey?: string` (deprecated)
+   - Loads keys from `OPENROUTER_API_KEY` or `OPENROUTER_API_KEY_1`, `_2`, etc.
+
+2. **Rotation Implementation:**
+   - Added `getCurrentApiKey()` and `rotateApiKey()` methods
+   - Applied retry logic to `generate()` method
+   - Applied retry logic to `generateWithSystemPrompt()` method
+   - Detects quota errors: 429, 403, "quota", "rate limit", "rate-limited"
+
+3. **Updated Singleton:**
+   - `getOpenRouterClient()` now loads multiple keys automatically
+   - Detailed logging for debugging
+
+**Usage Example:**
+
+```bash
+# .env.local
+OPENROUTER_API_KEY_1=sk-or-v1-XXXXXXXX...
+OPENROUTER_API_KEY_2=sk-or-v1-YYYYYYYY...
+OPENROUTER_API_KEY_3=sk-or-v1-ZZZZZZZZ...
+```
+
+**Benefits:**
+
+- ✅ **Maximize chat capacity:** Multiple keys for uncensored models
+- ✅ **Same rotation pattern** as Gemini (consistent codebase)
+- ✅ **Automatic failover** for chat interactions
+- ✅ **Production ready** for high-volume chat usage
+
+**Combined Free Tier Capacity:**
+
+With 3-4 API keys for each provider:
+- **Gemini:** 50-70 agent creations (profile + prompts)
+- **OpenRouter:** Hundreds of chat interactions per day
+- **Total:** Extensive free tier testing before costs
 
 ---
 

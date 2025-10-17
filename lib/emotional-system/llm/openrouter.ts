@@ -8,7 +8,8 @@
 import { LLMRequest, LLMResponse } from "../types";
 
 export interface OpenRouterConfig {
-  apiKey: string;
+  apiKey?: string; // Single key (deprecated, use apiKeys)
+  apiKeys?: string[]; // Multiple keys for rotation
   baseURL?: string;
   defaultModel?: string;
 }
@@ -29,80 +30,147 @@ export interface OpenRouterRequestBody {
 }
 
 export class OpenRouterClient {
-  private apiKey: string;
+  private apiKeys: string[];
+  private currentKeyIndex: number = 0;
   private baseURL: string;
   private defaultModel: string;
 
   constructor(config: OpenRouterConfig) {
-    this.apiKey = config.apiKey;
+    // Support both single key (deprecated) and multiple keys
+    if (config.apiKeys && config.apiKeys.length > 0) {
+      this.apiKeys = config.apiKeys;
+    } else if (config.apiKey) {
+      this.apiKeys = [config.apiKey];
+    } else {
+      throw new Error("OpenRouterClient requires apiKey or apiKeys");
+    }
+
     this.baseURL = config.baseURL || "https://openrouter.ai/api/v1";
     this.defaultModel = config.defaultModel || "cognitivecomputations/dolphin-mistral-24b-venice-edition:free";
+
+    console.log('[OpenRouter] Inicializando cliente...');
+    console.log('[OpenRouter] API Keys disponibles:', this.apiKeys.length);
+    console.log('[OpenRouter] API Key activa: #1');
+    console.log('[OpenRouter] Modelo por defecto:', this.defaultModel);
   }
 
   /**
-   * Genera respuesta del LLM
+   * Obtiene la API key activa actual
+   */
+  private getCurrentApiKey(): string {
+    return this.apiKeys[this.currentKeyIndex];
+  }
+
+  /**
+   * Rota a la siguiente API key disponible
+   * Retorna true si hay más keys, false si ya se probaron todas
+   */
+  private rotateApiKey(): boolean {
+    this.currentKeyIndex = (this.currentKeyIndex + 1) % this.apiKeys.length;
+
+    // Si volvimos al inicio, significa que probamos todas las keys
+    if (this.currentKeyIndex === 0) {
+      console.error('[OpenRouter] ⚠️  Todas las API keys han sido intentadas');
+      return false;
+    }
+
+    console.log(`[OpenRouter] 🔄 Rotando a API key #${this.currentKeyIndex + 1}`);
+    return true;
+  }
+
+  /**
+   * Genera respuesta del LLM con rotación automática de API keys
    */
   async generate(request: LLMRequest): Promise<LLMResponse> {
     const startTime = Date.now();
+    let lastError: Error | null = null;
+    const maxRetries = this.apiKeys.length;
 
-    try {
-      const messages: OpenRouterMessage[] = [
-        {
-          role: "user",
-          content: request.prompt,
-        },
-      ];
+    // Intentar con cada API key disponible
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const messages: OpenRouterMessage[] = [
+          {
+            role: "user",
+            content: request.prompt,
+          },
+        ];
 
-      const body: OpenRouterRequestBody = {
-        model: request.model || this.defaultModel,
-        messages,
-        temperature: request.temperature ?? 0.8,
-        max_tokens: request.maxTokens ?? 1000,
-        top_p: 0.9,
-        stop: request.stopSequences,
-      };
+        const body: OpenRouterRequestBody = {
+          model: request.model || this.defaultModel,
+          messages,
+          temperature: request.temperature ?? 0.8,
+          max_tokens: request.maxTokens ?? 1000,
+          top_p: 0.9,
+          stop: request.stopSequences,
+        };
 
-      console.log(`[OpenRouter] Sending request to ${body.model}...`);
+        const currentKey = this.getCurrentApiKey();
+        console.log(`[OpenRouter] Sending request to ${body.model} with API key #${this.currentKeyIndex + 1}...`);
 
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-          "HTTP-Referer": "http://localhost:3000", // Para analytics
-          "X-Title": "Creador de Inteligencias", // Para analytics
-        },
-        body: JSON.stringify(body),
-      });
+        const response = await fetch(`${this.baseURL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${currentKey}`,
+            "HTTP-Referer": "http://localhost:3000", // Para analytics
+            "X-Title": "Creador de Inteligencias", // Para analytics
+          },
+          body: JSON.stringify(body),
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[OpenRouter] Error ${response.status}:`, errorText);
-        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[OpenRouter] Error ${response.status}:`, errorText);
+
+          // Detectar errores de cuota (429, 403, o mensajes de quota/rate limit)
+          const isQuotaError = response.status === 429 ||
+                               response.status === 403 ||
+                               errorText.toLowerCase().includes('quota') ||
+                               errorText.toLowerCase().includes('rate limit') ||
+                               errorText.toLowerCase().includes('rate-limited');
+
+          if (isQuotaError && this.rotateApiKey()) {
+            console.log('[OpenRouter] Error de cuota detectado, intentando con siguiente API key...');
+            lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
+            continue; // Reintentar con siguiente key
+          }
+
+          throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        const elapsedMs = Date.now() - startTime;
+        console.log(`[OpenRouter] Response received in ${elapsedMs}ms`);
+
+        return {
+          text: data.choices[0]?.message?.content || "",
+          model: data.model,
+          usage: {
+            promptTokens: data.usage?.prompt_tokens || 0,
+            completionTokens: data.usage?.completion_tokens || 0,
+            totalTokens: data.usage?.total_tokens || 0,
+          },
+        };
+      } catch (error) {
+        lastError = error as Error;
+
+        // Si no es error de cuota, lanzar inmediatamente
+        if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
+          console.error("[OpenRouter] Generation error:", error);
+          throw error;
+        }
       }
-
-      const data = await response.json();
-
-      const elapsedMs = Date.now() - startTime;
-      console.log(`[OpenRouter] Response received in ${elapsedMs}ms`);
-
-      return {
-        text: data.choices[0]?.message?.content || "",
-        model: data.model,
-        usage: {
-          promptTokens: data.usage?.prompt_tokens || 0,
-          completionTokens: data.usage?.completion_tokens || 0,
-          totalTokens: data.usage?.total_tokens || 0,
-        },
-      };
-    } catch (error) {
-      console.error("[OpenRouter] Generation error:", error);
-      throw error;
     }
+
+    // Si llegamos aquí, todas las keys fallaron
+    console.error('[OpenRouter] ❌ Todas las API keys agotaron su cuota');
+    throw new Error("Todas las API keys de OpenRouter han agotado su cuota. Por favor, agregue más keys o espere a que se renueven.");
   }
 
   /**
-   * Genera respuesta con system prompt + user message
+   * Genera respuesta con system prompt + user message con rotación automática de API keys
    */
   async generateWithSystemPrompt(
     systemPrompt: string,
@@ -113,59 +181,90 @@ export class OpenRouterClient {
       maxTokens?: number;
     }
   ): Promise<LLMResponse> {
-    try {
-      const messages: OpenRouterMessage[] = [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        {
-          role: "user",
-          content: userMessage,
-        },
-      ];
+    let lastError: Error | null = null;
+    const maxRetries = this.apiKeys.length;
 
-      const body: OpenRouterRequestBody = {
-        model: options?.model || this.defaultModel,
-        messages,
-        temperature: options?.temperature ?? 0.8,
-        max_tokens: options?.maxTokens ?? 1000,
-        top_p: 0.9,
-      };
+    // Intentar con cada API key disponible
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const messages: OpenRouterMessage[] = [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
+            role: "user",
+            content: userMessage,
+          },
+        ];
 
-      console.log(`[OpenRouter] Generating with system prompt...`);
+        const body: OpenRouterRequestBody = {
+          model: options?.model || this.defaultModel,
+          messages,
+          temperature: options?.temperature ?? 0.8,
+          max_tokens: options?.maxTokens ?? 1000,
+          top_p: 0.9,
+        };
 
-      const response = await fetch(`${this.baseURL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-          "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "Creador de Inteligencias",
-        },
-        body: JSON.stringify(body),
-      });
+        const currentKey = this.getCurrentApiKey();
+        console.log(`[OpenRouter] Generating with system prompt using API key #${this.currentKeyIndex + 1}...`);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+        const response = await fetch(`${this.baseURL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${currentKey}`,
+            "HTTP-Referer": "http://localhost:3000",
+            "X-Title": "Creador de Inteligencias",
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[OpenRouter] Error ${response.status}:`, errorText);
+
+          // Detectar errores de cuota
+          const isQuotaError = response.status === 429 ||
+                               response.status === 403 ||
+                               errorText.toLowerCase().includes('quota') ||
+                               errorText.toLowerCase().includes('rate limit') ||
+                               errorText.toLowerCase().includes('rate-limited');
+
+          if (isQuotaError && this.rotateApiKey()) {
+            console.log('[OpenRouter] Error de cuota detectado en generateWithSystemPrompt, intentando con siguiente API key...');
+            lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
+            continue; // Reintentar con siguiente key
+          }
+
+          throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        return {
+          text: data.choices[0]?.message?.content || "",
+          model: data.model,
+          usage: {
+            promptTokens: data.usage?.prompt_tokens || 0,
+            completionTokens: data.usage?.completion_tokens || 0,
+            totalTokens: data.usage?.total_tokens || 0,
+          },
+        };
+      } catch (error) {
+        lastError = error as Error;
+
+        // Si no es error de cuota, lanzar inmediatamente
+        if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
+          console.error("[OpenRouter] Generation error:", error);
+          throw error;
+        }
       }
-
-      const data = await response.json();
-
-      return {
-        text: data.choices[0]?.message?.content || "",
-        model: data.model,
-        usage: {
-          promptTokens: data.usage?.prompt_tokens || 0,
-          completionTokens: data.usage?.completion_tokens || 0,
-          totalTokens: data.usage?.total_tokens || 0,
-        },
-      };
-    } catch (error) {
-      console.error("[OpenRouter] Generation error:", error);
-      throw error;
     }
+
+    // Si llegamos aquí, todas las keys fallaron
+    console.error('[OpenRouter] ❌ Todas las API keys agotaron su cuota en generateWithSystemPrompt');
+    throw new Error("Todas las API keys de OpenRouter han agotado su cuota. Por favor, agregue más keys o espere a que se renueven.");
   }
 
   /**
@@ -209,19 +308,44 @@ export class OpenRouterClient {
 }
 
 /**
+ * Carga múltiples API keys desde variables de entorno
+ * Soporta OPENROUTER_API_KEY o OPENROUTER_API_KEY_1, OPENROUTER_API_KEY_2, etc.
+ */
+function loadOpenRouterApiKeys(): string[] {
+  const keys: string[] = [];
+
+  // Intentar cargar OPENROUTER_API_KEY (single key)
+  const singleKey = process.env.OPENROUTER_API_KEY;
+  if (singleKey) {
+    keys.push(singleKey);
+  }
+
+  // Intentar cargar OPENROUTER_API_KEY_1, OPENROUTER_API_KEY_2, etc.
+  for (let i = 1; i <= 10; i++) {
+    const key = process.env[`OPENROUTER_API_KEY_${i}`];
+    if (key) {
+      keys.push(key);
+    }
+  }
+
+  return keys;
+}
+
+/**
  * Cliente singleton de OpenRouter
  */
 let openRouterClient: OpenRouterClient | null = null;
 
 export function getOpenRouterClient(): OpenRouterClient {
   if (!openRouterClient) {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      throw new Error("OPENROUTER_API_KEY not found in environment variables");
+    const apiKeys = loadOpenRouterApiKeys();
+
+    if (apiKeys.length === 0) {
+      throw new Error("No se encontraron API keys de OpenRouter. Configure OPENROUTER_API_KEY o OPENROUTER_API_KEY_1, OPENROUTER_API_KEY_2, etc.");
     }
 
     openRouterClient = new OpenRouterClient({
-      apiKey,
+      apiKeys,
       defaultModel: process.env.MODEL_UNCENSORED || "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     });
 
