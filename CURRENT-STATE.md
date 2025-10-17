@@ -826,6 +826,44 @@ POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:ge
 - ✅ Prisma schema validation passes
 - ⏳ Pending: End-to-end agent creation test with Gemini
 
+### Update: Gemini 2.5 Models (Commit a1229b3)
+
+**Problem:** Gemini 1.5 Flash deprecado (404 error)
+
+**Solution:** Migrated to Gemini 2.5 family with intelligent model selection:
+
+**Dual-Model Strategy:**
+
+1. **Gemini 2.5 Flash-Lite** (`gemini-2.5-flash-lite`)
+   - **Costo:** $0.10 input / $0.40 output per 1M tokens
+   - **Velocidad:** 887 tokens/sec (40% más rápido que 2.0 Flash-Lite)
+   - **Uso:** Stage prompt generation (tareas repetitivas, alta frecuencia)
+   - **Ventajas:** 50% menos tokens en reasoning mode, respuestas más concisas
+
+2. **Gemini 2.5 Flash** (`gemini-2.5-flash`)
+   - **Costo:** $0.30 input / $2.50 output per 1M tokens
+   - **Uso:** Profile generation inicial (1 vez por agente)
+   - **Ventajas:** Mejor razonamiento complejo, mejor tool use, structured outputs
+
+**Cost Analysis:**
+
+Por agente creado:
+- Profile generation (1x): ~500 tokens × $2.50/M = $0.00125
+- Stage prompts (5 prompts × 2000 tokens): ~10,000 tokens × $0.40/M = $0.004
+- **Total por agente:** ~$0.00525 (menos de 1 centavo)
+
+**Comparación con alternativas:**
+- OpenRouter free models: Rate limited, unreliable
+- Gemini 1.5 Flash: Deprecado (404 error)
+- Claude 3.5 Sonnet: ~$3.00 por agente (570x más caro)
+
+**Benefits:**
+- ✅ Optimal cost/performance balance
+- ✅ No rate limits
+- ✅ Latest model improvements (Sep 2025)
+- ✅ 50% token reduction with Flash-Lite
+- ✅ Better instruction following
+
 ---
 
 ## 📞 CONTACTO CON USUARIO
@@ -840,4 +878,9 @@ POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:ge
 ---
 
 **FIN DEL ESTADO ACTUAL**
-**Siguiente paso:** Reiniciar servidor con GOOGLE_AI_API_KEY y probar creación de agente end-to-end con Gemini + operaciones paralelas
+**Siguiente paso:**
+1. Verificar que GOOGLE_AI_API_KEY esté configurada en .env.local
+2. Reiniciar servidor de desarrollo
+3. Probar creación de agente end-to-end con Gemini 2.5
+4. Verificar logs muestren modelos correctos (Flash-Lite para prompts, Flash para profile)
+5. Confirmar operaciones paralelas funcionan correctamente
