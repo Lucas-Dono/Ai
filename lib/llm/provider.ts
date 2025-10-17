@@ -13,7 +13,12 @@ export interface GenerateOptions {
 export class LLMProvider {
   private apiKey: string;
   private baseURL: string = "https://generativelanguage.googleapis.com/v1beta";
-  private model: string = "gemini-1.5-flash"; // Modelo GRATIS de Google
+
+  // Gemini 2.5 Flash-Lite: $0.40/M tokens - Para tareas de alta frecuencia (stage prompts)
+  private modelLite: string = "gemini-2.5-flash-lite";
+
+  // Gemini 2.5 Flash: $2.50/M tokens - Para tareas complejas (profile generation)
+  private modelFull: string = "gemini-2.5-flash";
 
   constructor() {
     // Verificar que existe la API key de Google AI
@@ -23,11 +28,16 @@ export class LLMProvider {
     }
 
     this.apiKey = apiKey;
-    console.log('[LLM] Inicializando Google AI (Gemini) con modelo GRATIS...');
+    console.log('[LLM] Inicializando Google AI (Gemini 2.5)...');
     console.log('[LLM] API Key detectada:', apiKey ? 'Sí ✓' : 'No ✗');
-    console.log('[LLM] Modelo:', this.model);
+    console.log('[LLM] Modelo para prompts:', this.modelLite, '($0.40/M tokens)');
+    console.log('[LLM] Modelo para profiles:', this.modelFull, '($2.50/M tokens)');
   }
 
+  /**
+   * Genera texto usando Gemini 2.5 Flash-Lite (optimizado para stage prompts).
+   * Usa el modelo más económico ($0.40/M tokens) para tareas de alta frecuencia.
+   */
   async generate(options: GenerateOptions): Promise<string> {
     const { systemPrompt, messages, temperature = 0.9, maxTokens = 1000 } = options;
 
@@ -56,8 +66,10 @@ export class LLMProvider {
         }
       }
 
+      console.log('[LLM] Usando modelo:', this.modelLite, 'para generación de prompts');
+
       const response = await fetch(
-        `${this.baseURL}/models/${this.model}:generateContent?key=${this.apiKey}`,
+        `${this.baseURL}/models/${this.modelLite}:generateContent?key=${this.apiKey}`,
         {
           method: "POST",
           headers: {
@@ -87,6 +99,11 @@ export class LLMProvider {
     }
   }
 
+  /**
+   * Genera un perfil completo usando Gemini 2.5 Flash (modelo completo).
+   * Usa el modelo más potente ($2.50/M tokens) para razonamiento complejo.
+   * Se ejecuta solo 1 vez por agente, por lo que el costo es mínimo.
+   */
   async generateProfile(rawData: Record<string, unknown>): Promise<{
     profile: Record<string, unknown>;
     systemPrompt: string;
@@ -106,10 +123,10 @@ Responde SOLO con un JSON válido con este formato:
 }`;
 
     try {
-      console.log('[LLM] Generando perfil con Gemini...');
+      console.log('[LLM] Generando perfil con Gemini 2.5 Flash (modelo completo)...');
 
       const response = await fetch(
-        `${this.baseURL}/models/${this.model}:generateContent?key=${this.apiKey}`,
+        `${this.baseURL}/models/${this.modelFull}:generateContent?key=${this.apiKey}`,
         {
           method: "POST",
           headers: {
@@ -129,6 +146,8 @@ Responde SOLO con un JSON válido con este formato:
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[LLM] Gemini Flash error:', errorText);
         throw new Error(`Gemini error: ${response.status}`);
       }
 
