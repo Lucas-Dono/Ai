@@ -939,7 +939,7 @@ With 4 Gemini API keys:
 3. Implement key health monitoring
 4. Add exponential backoff before rotation (optional)
 
-### Update: OpenRouter API Key Rotation (Commit PENDING)
+### Update: OpenRouter API Key Rotation (Commit c04078b)
 
 **Implementation:** Applied same rotation system to OpenRouter client for chat interactions
 
@@ -982,6 +982,46 @@ With 3-4 API keys for each provider:
 - **Gemini:** 50-70 agent creations (profile + prompts)
 - **OpenRouter:** Hundreds of chat interactions per day
 - **Total:** Extensive free tier testing before costs
+
+### Update: Integration Tests for API Key Rotation (Commit 3762ea1)
+
+**Objective:** Comprehensive test coverage for rotation logic
+
+**Test Files Created:**
+
+1. **`lib/llm/__tests__/provider.test.ts`** - 14 tests for Gemini
+2. **`lib/emotional-system/llm/__tests__/openrouter.test.ts`** - 22 tests for OpenRouter
+
+**Test Coverage:**
+
+**Gemini Tests (14 tests):**
+- ✅ API key loading (single, multiple, combined)
+- ✅ Rotation on quota errors (429, 403, "rate limit")
+- ✅ No rotation on non-quota errors (500, etc.)
+- ✅ generateProfile() fallback behavior
+- ✅ Gemini message format conversion (user/model roles)
+
+**OpenRouter Tests (22 tests):**
+- ✅ Initialization with backward compatibility
+- ✅ Rotation across all error types
+- ✅ generate() method with retries
+- ✅ generateWithSystemPrompt() method with retries
+- ✅ generateJSON() parsing and markdown extraction
+- ✅ Singleton loading behavior
+
+**Test Results:**
+```
+✓ Test Files: 2 passed (2)
+✓ Tests: 36 passed | 1 skipped (37)
+✓ Duration: 1.71s
+```
+
+**Benefits:**
+
+- ✅ **Prevents regressions** in critical rotation logic
+- ✅ **Documents expected behavior** for future maintainers
+- ✅ **Edge case coverage** (multiple keys exhausted, non-quota errors, etc.)
+- ✅ **CI/CD ready** for automated testing
 
 ---
 
