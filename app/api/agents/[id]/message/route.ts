@@ -174,7 +174,9 @@ export async function POST(
 
       internalState = await prisma.internalState.create({
         data: {
-          agentId,
+          agent: {
+            connect: { id: agentId }
+          },
           currentEmotions: currentEmotions as any,
           moodValence: 0.0,
           moodArousal: 0.5,
@@ -184,7 +186,19 @@ export async function POST(
         },
       });
     } else {
-      currentEmotions = internalState.currentEmotions as unknown as PlutchikEmotionState;
+      // Parsear emociones desde DB con valores por defecto para evitar NaN
+      const emotionsFromDB = internalState.currentEmotions as any;
+      currentEmotions = {
+        joy: typeof emotionsFromDB?.joy === 'number' ? emotionsFromDB.joy : 0.5,
+        trust: typeof emotionsFromDB?.trust === 'number' ? emotionsFromDB.trust : 0.5,
+        fear: typeof emotionsFromDB?.fear === 'number' ? emotionsFromDB.fear : 0.2,
+        surprise: typeof emotionsFromDB?.surprise === 'number' ? emotionsFromDB.surprise : 0.1,
+        sadness: typeof emotionsFromDB?.sadness === 'number' ? emotionsFromDB.sadness : 0.2,
+        disgust: typeof emotionsFromDB?.disgust === 'number' ? emotionsFromDB.disgust : 0.1,
+        anger: typeof emotionsFromDB?.anger === 'number' ? emotionsFromDB.anger : 0.1,
+        anticipation: typeof emotionsFromDB?.anticipation === 'number' ? emotionsFromDB.anticipation : 0.4,
+        lastUpdated: new Date(),
+      };
     }
 
     // Analizar el mensaje del usuario y calcular deltas emocionales

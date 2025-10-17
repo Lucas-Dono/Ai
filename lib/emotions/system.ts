@@ -339,7 +339,9 @@ export async function initializeInternalState(
   await prisma.internalState.upsert({
     where: { agentId },
     create: {
-      agentId,
+      agent: {
+        connect: { id: agentId }
+      },
       currentEmotions: neutralState,
       moodValence: 0.0,
       moodArousal: 0.5,
@@ -366,7 +368,9 @@ export async function updateInternalState(
   await prisma.internalState.upsert({
     where: { agentId },
     create: {
-      agentId,
+      agent: {
+        connect: { id: agentId }
+      },
       currentEmotions: newState,
       moodValence: pad.valence,
       moodArousal: pad.arousal,
