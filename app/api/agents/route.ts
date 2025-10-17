@@ -263,20 +263,21 @@ export async function POST(req: NextRequest) {
             behaviorTypes
           );
 
-          // Crear InternalState con los stage prompts
+          // Guardar stage prompts en el Agent
+          await prisma.agent.update({
+            where: { id: agent.id },
+            data: {
+              stagePrompts: stagePrompts as any,
+            },
+          });
+
+          // Crear InternalState con campos correctos
           await prisma.internalState.create({
             data: {
               agentId: agent.id,
-              currentStage: "stranger",
-              totalInteractions: 0,
-              trust: 0.5,
-              affinity: 0.5,
-              respect: 0.5,
-              stagePrompts: stagePrompts as any,
               currentEmotions: {}, // Emociones iniciales vacías
               activeGoals: [], // Goals iniciales vacíos
               conversationBuffer: [], // Buffer de conversación vacío
-              lastUpdated: new Date(),
             },
           });
 
