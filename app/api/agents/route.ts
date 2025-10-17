@@ -197,32 +197,28 @@ export async function POST(req: NextRequest) {
           // Generar/asignar referencias faltantes
           const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
 
-          // Si no hay imagen del usuario, generar una automáticamente
-          // Si hay imagen pero falta voz, solo asignar voz
-          if (!referenceImage || !finalVoiceId) {
-            const references = await generateAgentReferences(
-              agent.name,
-              agent.personality || agent.description || "",
-              undefined, // gender - se infiere de la personalidad
-              userId,
-              agent.id
-            );
+          // Llamar a generateAgentReferences con skipImageGeneration=true si el usuario ya proporcionó imagen
+          const references = await generateAgentReferences(
+            agent.name,
+            agent.personality || agent.description || "",
+            undefined, // gender - se infiere de la personalidad
+            userId,
+            agent.id,
+            !!referenceImage // skipImageGeneration: true si el usuario proporcionó imagen
+          );
 
-            // Solo sobrescribir si no existen
-            if (!finalReferenceImageUrl && references.referenceImageUrl) {
-              finalReferenceImageUrl = references.referenceImageUrl;
-            }
-            if (!finalVoiceId && references.voiceId) {
-              finalVoiceId = references.voiceId;
-            }
+          // Usar la imagen del usuario si existe, sino la generada
+          if (!finalReferenceImageUrl && references.referenceImageUrl) {
+            finalReferenceImageUrl = references.referenceImageUrl;
+          }
 
-            if (references.errors.length > 0) {
-              console.warn('[API] [PARALLEL] Errores durante generación de referencias:', references.errors);
-            }
-          } else {
-            // Solo asignar voz sin generar imagen
-            const { selectVoiceForAgent } = await import("@/lib/multimedia/reference-generator");
-            finalVoiceId = selectVoiceForAgent(agent.personality || agent.description || "", undefined);
+          // Siempre usar la voz asignada
+          if (references.voiceId) {
+            finalVoiceId = references.voiceId;
+          }
+
+          if (references.errors.length > 0) {
+            console.warn('[API] [PARALLEL] Errores durante generación de referencias:', references.errors);
           }
 
           // Actualizar agente con las referencias

@@ -15,48 +15,54 @@ export interface ReferenceGenerationResult {
 
 /**
  * Genera imagen de referencia y asigna voz para un nuevo agente
+ *
+ * @param skipImageGeneration - Si true, no genera imagen (usuario ya proporcionó una)
  */
 export async function generateAgentReferences(
   agentName: string,
   personality: string,
   gender?: string,
   userId?: string,
-  agentId?: string
+  agentId?: string,
+  skipImageGeneration?: boolean
 ): Promise<ReferenceGenerationResult> {
   const result: ReferenceGenerationResult = {
     errors: [],
   };
 
-  // 1. Generar imagen de referencia
-  // TODO: Implementar generación de imagen de referencia con AI Horde
-  // Por ahora, dejamos esto como funcionalidad futura
-  try {
-    const prompt = buildReferenceImagePrompt(agentName, personality, gender);
+  // 1. Generar imagen de referencia (solo si el usuario NO proporcionó una)
+  if (!skipImageGeneration) {
+    try {
+      console.log('[ReferenceGenerator] Generando imagen con AI Horde...');
+      const prompt = buildReferenceImagePrompt(agentName, personality, gender);
 
-    const aiHordeClient = getAIHordeClient();
-    const imageResult = await aiHordeClient.generateImage({
-      prompt,
-      negativePrompt:
-        "low quality, blurry, distorted, deformed, anime, cartoon, multiple people, text, watermark, signature, low resolution, bad anatomy",
-      width: 512,
-      height: 768, // Vertical para capturar cuerpo completo
-      steps: 40, // Más steps para mejor calidad en referencia
-      cfgScale: 7.5,
-      sampler: "k_euler_a",
-      seed: -1,
-      nsfw: false,
-    });
+      const aiHordeClient = getAIHordeClient();
+      const imageResult = await aiHordeClient.generateImage({
+        prompt,
+        negativePrompt:
+          "low quality, blurry, distorted, deformed, anime, cartoon, multiple people, text, watermark, signature, low resolution, bad anatomy",
+        width: 512,
+        height: 768, // Vertical para capturar cuerpo completo
+        steps: 40, // Más steps para mejor calidad en referencia
+        cfgScale: 7.5,
+        sampler: "k_euler_a",
+        seed: -1,
+        nsfw: false,
+      });
 
-    if (imageResult && imageResult.imageUrl) {
-      result.referenceImageUrl = imageResult.imageUrl;
-      console.log(`[ReferenceGenerator] Reference image generated for ${agentName}`);
-    } else {
-      result.errors.push("Failed to generate reference image");
-      console.error(`[ReferenceGenerator] Image generation failed`);
+      if (imageResult && imageResult.imageUrl) {
+        result.referenceImageUrl = imageResult.imageUrl;
+        console.log(`[ReferenceGenerator] Reference image generated for ${agentName}`);
+      } else {
+        result.errors.push("Failed to generate reference image");
+        console.error(`[ReferenceGenerator] Image generation failed`);
+      }
+    } catch (error) {
+      result.errors.push(`Image generation error: ${error}`);
+      console.error("[ReferenceGenerator] Error generating reference image:", error);
     }
-  } catch (error) {
-    result.errors.push(`Image generation error: ${error}`);
-    console.error("[ReferenceGenerator] Error generating reference image:", error);
+  } else {
+    console.log('[ReferenceGenerator] Saltando generación de imagen (usuario proporcionó una)');
   }
 
   // 2. Asignar voz de ElevenLabs
