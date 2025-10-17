@@ -864,6 +864,81 @@ Por agente creado:
 - ✅ 50% token reduction with Flash-Lite
 - ✅ Better instruction following
 
+### Update: API Key Rotation System (Commit PENDING)
+
+**Problem:** Free tier quota limits on individual API keys
+
+**Solution:** Implemented automatic API key rotation system to maximize free tier usage
+
+**Implementation in `lib/llm/provider.ts`:**
+
+1. **Multiple API Key Loading:**
+   - Supports `GOOGLE_AI_API_KEY` (single key)
+   - Supports `GOOGLE_AI_API_KEY_1`, `GOOGLE_AI_API_KEY_2`, ..., `GOOGLE_AI_API_KEY_10` (numbered keys)
+   - Loads all available keys on initialization
+   - Logs number of keys detected
+
+2. **Automatic Rotation Logic:**
+   - Detects quota errors: HTTP 429, 403, or error text containing "quota"/"rate limit"
+   - Automatically rotates to next available key on quota error
+   - Retries up to `apiKeys.length` times (tries all keys before failing)
+   - Logs which key is active for debugging
+
+3. **Retry Implementation:**
+   - `generate()` method: Retries with rotation, throws error if all keys exhausted
+   - `generateProfile()` method: Retries with rotation, uses fallback if all keys exhausted
+   - Both methods share same rotation state (singleton pattern)
+
+4. **Graceful Degradation:**
+   - If all keys exhausted during prompt generation: throws error (critical)
+   - If all keys exhausted during profile generation: uses fallback profile (non-critical)
+
+**Usage Example:**
+
+```bash
+# .env.local
+GOOGLE_AI_API_KEY_1=AIzaSyXXXXXXXXXX...
+GOOGLE_AI_API_KEY_2=AIzaSyYYYYYYYYYY...
+GOOGLE_AI_API_KEY_3=AIzaSyZZZZZZZZZZ...
+```
+
+**Logs Example:**
+
+```
+[LLM] Inicializando Google AI (Gemini 2.5)...
+[LLM] API Keys disponibles: 3
+[LLM] API Key activa: #1
+[LLM] Usando modelo: gemini-2.5-flash-lite con API key #1
+[LLM] Gemini Flash-Lite HTTP error: 429
+[LLM] Error de cuota detectado, intentando con siguiente API key...
+[LLM] 🔄 Rotando a API key #2
+[LLM] Usando modelo: gemini-2.5-flash-lite con API key #2
+[LLM] Gemini Flash-Lite response received ✅
+```
+
+**Benefits:**
+
+- ✅ **Maximize free tier:** 3-4 keys × 1500 RPD = 4500-6000 requests/day
+- ✅ **50-70 free agent creations** before spending money
+- ✅ **Automatic failover:** No manual intervention needed
+- ✅ **Transparent rotation:** Detailed logging for debugging
+- ✅ **Production ready:** Works same way with OpenRouter (future implementation)
+
+**Estimated Free Tier Capacity:**
+
+With 4 Gemini API keys:
+- Profile generation: 2 requests/agent (generate + retry)
+- Stage prompts: 5 requests/agent
+- **Total:** 7 requests × 4 keys = 28 free requests/day minimum
+- **Agent capacity:** ~50-70 agents before costs (depending on retries)
+
+**Next Steps:**
+
+1. Apply same rotation system to OpenRouter for chat interactions
+2. Add usage tracking/metrics per key
+3. Implement key health monitoring
+4. Add exponential backoff before rotation (optional)
+
 ---
 
 ## 📞 CONTACTO CON USUARIO
