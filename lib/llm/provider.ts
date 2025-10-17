@@ -200,19 +200,23 @@ export class LLMProvider {
     profile: Record<string, unknown>;
     systemPrompt: string;
   }> {
-    const prompt = `Eres un diseñador de inteligencias artificiales. Tu tarea es crear un perfil detallado y un system prompt para una IA basándote en los siguientes datos:
+    const prompt = `Crea un perfil JSON CONCISO para esta IA:
 
 ${JSON.stringify(rawData, null, 2)}
 
-Genera:
-1. Un objeto JSON "profile" con campos estructurados (nombre, tipo, personalidad, emociones dominantes, propósito, etc.)
-2. Un "systemPrompt" que defina el comportamiento de esta IA de forma clara y precisa.
-
-Responde SOLO con un JSON válido con este formato:
+Responde SOLO con este JSON (SIN explicaciones, SIN markdown):
 {
-  "profile": { ... },
-  "systemPrompt": "..."
-}`;
+  "profile": {
+    "name": "${rawData.name}",
+    "kind": "${rawData.kind}",
+    "personality": "descripción corta",
+    "traits": ["trait1", "trait2", "trait3"],
+    "emotions": {"joy": 0.7, "calm": 0.8}
+  },
+  "systemPrompt": "System prompt CONCISO (máximo 2 oraciones) que describe el comportamiento de la IA"
+}
+
+IMPORTANTE: Responde SOLO el JSON, sin texto adicional.`;
 
     let lastError: Error | null = null;
     const maxRetries = this.apiKeys.length;
@@ -236,8 +240,8 @@ Responde SOLO con un JSON válido con este formato:
                 parts: [{ text: prompt }]
               }],
               generationConfig: {
-                temperature: 0.9,
-                maxOutputTokens: 2000,
+                temperature: 0.7, // Reducido para respuestas más consistentes
+                maxOutputTokens: 4000, // Aumentado para JSON completo
               }
             })
           }
@@ -273,7 +277,7 @@ Responde SOLO con un JSON válido con este formato:
           throw new Error("Gemini no retornó texto en la respuesta");
         }
 
-        console.log('[LLM] Raw response text:', text.substring(0, 500)); // Log primeros 500 chars
+        console.log('[LLM] Raw response text (first 1000 chars):', text.substring(0, 1000));
 
         // Estrategia 1: Intentar parsear directamente (si ya es JSON puro)
         try {
