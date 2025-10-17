@@ -86,15 +86,25 @@ export class LLMProvider {
       );
 
       if (!response.ok) {
-        const error = await response.text();
-        console.error("Gemini API error:", error);
-        throw new Error(`Gemini API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('[LLM] Gemini Flash-Lite HTTP error:', response.status);
+        console.error('[LLM] Gemini Flash-Lite error response:', errorText);
+        throw new Error(`Gemini HTTP error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      console.log('[LLM] Gemini Flash-Lite response:', JSON.stringify(data, null, 2));
+
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+      if (!text) {
+        console.error('[LLM] Gemini Flash-Lite response sin texto:', JSON.stringify(data, null, 2));
+        throw new Error("Gemini no retornó texto en la respuesta");
+      }
+
+      return text;
     } catch (error) {
-      console.error("Error al generar respuesta:", error);
+      console.error("[LLM] Error al generar respuesta:", error);
       throw new Error("No se pudo generar una respuesta de la IA");
     }
   }
@@ -147,14 +157,18 @@ Responde SOLO con un JSON válido con este formato:
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('[LLM] Gemini Flash error:', errorText);
-        throw new Error(`Gemini error: ${response.status}`);
+        console.error('[LLM] Gemini Flash HTTP error:', response.status);
+        console.error('[LLM] Gemini Flash error response:', errorText);
+        throw new Error(`Gemini HTTP error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('[LLM] Gemini Flash raw response:', JSON.stringify(data, null, 2));
+
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!text) {
+        console.error('[LLM] Gemini Flash response sin texto:', JSON.stringify(data, null, 2));
         throw new Error("Gemini no retornó texto en la respuesta");
       }
       console.log('[LLM] Respuesta de Gemini recibida');

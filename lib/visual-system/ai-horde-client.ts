@@ -449,7 +449,14 @@ export function getAIHordeClient(config?: {
   clientAgent?: string;
 }): AIHordeClient {
   if (!aiHordeClient || config) {
-    aiHordeClient = new AIHordeClient(config);
+    // Leer API key desde variable de entorno si no se proporciona
+    const apiKey = config?.apiKey || process.env.AI_HORDE_API_KEY || "0000000000";
+    const clientAgent = config?.clientAgent || "CreadorInteligencias:1.0:contact@example.com";
+
+    console.log('[AI Horde] Inicializando cliente...');
+    console.log('[AI Horde] API Key detectada:', apiKey !== "0000000000" ? 'Sí ✓' : 'No (modo anónimo)');
+
+    aiHordeClient = new AIHordeClient({ apiKey, clientAgent });
   }
   return aiHordeClient;
 }
