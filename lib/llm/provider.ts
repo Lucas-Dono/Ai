@@ -273,13 +273,59 @@ Responde SOLO con un JSON válido con este formato:
           throw new Error("Gemini no retornó texto en la respuesta");
         }
 
-        // Extraer JSON de la respuesta (Gemini a veces incluye markdown)
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
+        console.log('[LLM] Raw response text:', text.substring(0, 500)); // Log primeros 500 chars
+
+        // Estrategia 1: Intentar parsear directamente (si ya es JSON puro)
+        try {
+          const parsed = JSON.parse(text);
+          console.log('[LLM] JSON parseado directamente');
+          return parsed;
+        } catch (e) {
+          // No es JSON puro, continuar con extracción
+        }
+
+        // Estrategia 2: Extraer JSON de markdown code blocks
+        let jsonText = text;
+
+        // Remover markdown code blocks si existen
+        if (text.includes('```')) {
+          const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+          if (codeBlockMatch) {
+            jsonText = codeBlockMatch[1];
+            console.log('[LLM] JSON extraído de code block');
+          }
+        }
+
+        // Estrategia 3: Buscar el primer { y el último } balanceado
+        const firstBrace = jsonText.indexOf('{');
+        if (firstBrace === -1) {
+          console.error('[LLM] No se encontró { en la respuesta');
           throw new Error("No se pudo extraer JSON de la respuesta");
         }
 
-        return JSON.parse(jsonMatch[0]);
+        // Encontrar el último } que cierra el JSON
+        let braceCount = 0;
+        let lastBrace = -1;
+        for (let i = firstBrace; i < jsonText.length; i++) {
+          if (jsonText[i] === '{') braceCount++;
+          if (jsonText[i] === '}') {
+            braceCount--;
+            if (braceCount === 0) {
+              lastBrace = i;
+              break;
+            }
+          }
+        }
+
+        if (lastBrace === -1) {
+          console.error('[LLM] No se encontró } balanceado en la respuesta');
+          throw new Error("No se pudo extraer JSON de la respuesta");
+        }
+
+        const extractedJson = jsonText.substring(firstBrace, lastBrace + 1);
+        console.log('[LLM] JSON extraído con búsqueda de llaves balanceadas');
+
+        return JSON.parse(extractedJson);
       } catch (error) {
         lastError = error as Error;
 
