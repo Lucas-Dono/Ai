@@ -21,6 +21,12 @@ model User {
   mercadopagoCustomerId String?   @unique // Mercado Pago customer ID
   apiKey                String?   @unique // API key opcional para usuarios avanzados
   metadata              Json? // Metadata adicional (push subscription, preferences, etc.)
+
+  // Image upload limits
+  imageUploadsThisMonth Int       @default(0) // Contador mensual de imágenes subidas
+  imageUploadLimit      Int       @default(10) // Límite mensual (10 free, 100 premium, ilimitado pro)
+  imageUploadResetDate  DateTime  @default(now()) // Fecha del último reset del contador
+
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 

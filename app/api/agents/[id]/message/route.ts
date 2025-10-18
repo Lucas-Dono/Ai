@@ -24,8 +24,44 @@ import { messageInputSchema, formatZodError } from "@/lib/validation/schemas";
 import { createLogger, logError } from "@/lib/logger";
 import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
+import { HuggingFaceVisionClient } from "@/lib/vision/huggingface-vision";
+import { prisma } from "@/lib/prisma";
 
 const log = createLogger('API/Message');
+
+// Helper para resetear contador mensual de imágenes
+async function checkAndResetImageCount(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      imageUploadResetDate: true,
+      imageUploadsThisMonth: true,
+      imageUploadLimit: true,
+    },
+  });
+
+  if (!user) return null;
+
+  const now = new Date();
+  const lastReset = new Date(user.imageUploadResetDate);
+
+  // Si pasó un mes desde el último reset, resetear contador
+  const monthsElapsed = (now.getFullYear() - lastReset.getFullYear()) * 12 +
+                        (now.getMonth() - lastReset.getMonth());
+
+  if (monthsElapsed >= 1) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        imageUploadsThisMonth: 0,
+        imageUploadResetDate: now,
+      },
+    });
+    return { ...user, imageUploadsThisMonth: 0 };
+  }
+
+  return user;
+}
 
 export async function POST(
   req: NextRequest,
@@ -89,9 +125,109 @@ export async function POST(
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // INPUT PARSING (Support both JSON and FormData for images)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const contentType = req.headers.get('content-type') || '';
+    let body: any;
+    let imageFile: File | null = null;
+    let imageCaption: string | null = null;
+
+    if (contentType.includes('multipart/form-data')) {
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // IMAGE UPLOAD HANDLING
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const formData = await req.formData();
+      imageFile = formData.get('image') as File | null;
+
+      if (!imageFile) {
+        return NextResponse.json(
+          { error: "No image file provided" },
+          { status: 400 }
+        );
+      }
+
+      log.info({ userId, imageSize: imageFile.size }, 'Image upload detected');
+
+      // Verificar límite de imágenes del usuario
+      const userImageLimits = await checkAndResetImageCount(userId);
+
+      if (!userImageLimits) {
+        return NextResponse.json(
+          { error: "User not found" },
+          { status: 404 }
+        );
+      }
+
+      if (userImageLimits.imageUploadsThisMonth >= userImageLimits.imageUploadLimit) {
+        log.warn({ userId, current: userImageLimits.imageUploadsThisMonth, limit: userImageLimits.imageUploadLimit }, 'Image upload limit exceeded');
+        return NextResponse.json(
+          {
+            error: "Límite mensual de imágenes alcanzado",
+            current: userImageLimits.imageUploadsThisMonth,
+            limit: userImageLimits.imageUploadLimit,
+            resetDate: userImageLimits.imageUploadResetDate,
+            upgrade: "/pricing",
+          },
+          { status: 429 }
+        );
+      }
+
+      // Generar caption de la imagen con HuggingFace Vision
+      try {
+        const visionClient = new HuggingFaceVisionClient({});
+
+        // Convertir File a base64
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        const mimeType = imageFile.type || 'image/jpeg';
+        const imageBase64 = `data:${mimeType};base64,${base64}`;
+
+        log.info({ userId }, 'Generating image caption with HuggingFace Vision...');
+        const result = await visionClient.generateCaption({ imageBase64 });
+        imageCaption = result.caption;
+
+        log.info({ userId, caption: imageCaption.substring(0, 100) }, 'Image caption generated successfully');
+
+        // Incrementar contador de imágenes
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            imageUploadsThisMonth: {
+              increment: 1,
+            },
+          },
+        });
+
+      } catch (error) {
+        log.error({ error }, 'Error generating image caption');
+        return NextResponse.json(
+          {
+            error: "Error al procesar la imagen. Por favor, intenta de nuevo.",
+            details: error instanceof Error ? error.message : "Unknown error",
+          },
+          { status: 500 }
+        );
+      }
+
+      // Construir body desde FormData
+      body = {
+        content: formData.get('content') || imageCaption || "He enviado una imagen",
+        messageType: 'image',
+        metadata: {
+          imageCaption,
+          originalFileName: imageFile.name,
+          imageSize: imageFile.size,
+          imageMimeType: imageFile.type,
+        },
+      };
+    } else {
+      // JSON request (text message)
+      body = await req.json();
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // INPUT VALIDATION
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const body = await req.json();
     const validation = messageInputSchema.safeParse(body);
 
     if (!validation.success) {
@@ -102,7 +238,13 @@ export async function POST(
       );
     }
 
-    const { content, messageType, metadata } = validation.data;
+    let { content, messageType, metadata } = validation.data;
+
+    // Si hay un caption de imagen, enriquecer el contenido
+    if (imageCaption) {
+      content = `[Imagen: ${imageCaption}]\n\n${content}`;
+      log.info({ enrichedContent: content.substring(0, 150) }, 'Content enriched with image caption');
+    }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // MESSAGE PROCESSING (Service Layer)
