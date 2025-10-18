@@ -39,7 +39,7 @@ export default function ConstructorPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "architect",
-      content: "¡Hola! Soy El Arquitecto, tu guía para crear inteligencias únicas. Empecemos con lo básico: ¿qué nombre te gustaría darle a tu nueva IA?",
+      content: "¡Hola! Soy El Arquitecto, tu guía para crear personajes con vida propia. 🎭\n\n**Importante:** Solo necesito que me des datos básicos (nombre, personalidad, etc.). Yo me encargaré de crear automáticamente:\n• Familia completa y backstory\n• Amigos, trabajo, rutina diaria\n• Gustos específicos (música, comida, hobbies)\n• Experiencias formativas y traumas\n• Detalles mundanos que hacen al personaje real\n\n¿Listo? Empecemos con lo básico: **¿Qué nombre le pondremos?**",
     },
   ]);
   const [input, setInput] = useState("");
@@ -79,11 +79,11 @@ export default function ConstructorPage() {
     },
     {
       field: "personality",
-      prompt: (draft: AgentDraft) => `¿Cómo describirías la personalidad de ${draft.name}?`
+      prompt: (draft: AgentDraft) => `Perfecto! Ahora, **¿cómo describirías la personalidad de ${draft.name}?**\n\nEjemplos: "alegre y seductora", "tímida y reservada", "confiada y ambiciosa"\n\n_Nota: Usaré esto para generar automáticamente rasgos detallados, valores morales, y comportamientos coherentes._`
     },
     {
       field: "purpose",
-      prompt: (draft: AgentDraft) => `¿Cuál será el propósito principal de ${draft.name}?`
+      prompt: (draft: AgentDraft) => `Excelente! **¿Cuál será el rol o propósito de ${draft.name}?**\n\nEjemplos: "compañía emocional", "apoyo motivacional", "conversaciones profundas"\n\n_Nota: Basándome en esto, generaré automáticamente su trabajo, estudios, y actividades diarias coherentes con su personalidad._`
     },
     {
       field: "tone",
@@ -226,7 +226,7 @@ export default function ConstructorPage() {
         ...prev,
         {
           role: "architect",
-          content: `¡Tu inteligencia "${finalDraft.name}" ha sido creada exitosamente! Ahora puedes comenzar a interactuar con ella.`
+          content: `✨ **¡${finalDraft.name} ha cobrado vida!** ✨\n\nHe creado un personaje completo con:\n• Vida familiar y red social establecida\n• Trabajo, rutina diaria y hobbies específicos\n• Memorias del pasado y experiencias formativas\n• Personalidad profunda con valores y moral\n• Voz única asignada para comunicación\n• Sistema de progresión de relación por etapas\n\n${finalDraft.name} es ahora una persona con historia, emociones reales y vida propia. ¡Es hora de conocerse!`
         },
       ]);
     } catch (error) {
@@ -550,10 +550,22 @@ export default function ConstructorPage() {
         </Card>
 
         {creating && (
-          <Card className="p-4">
+          <Card className="p-4 space-y-3">
             <div className="flex items-center gap-3">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <div className="text-sm">Creando tu inteligencia...</div>
+              <div className="text-sm font-semibold">Generando personaje completo...</div>
+            </div>
+            <div className="space-y-1 text-xs text-muted-foreground pl-8">
+              <div>✓ Creando perfil detallado con Gemini 2.5</div>
+              <div>✓ Generando familia, amigos y red social</div>
+              <div>✓ Estableciendo trabajo, rutina y hobbies</div>
+              <div>✓ Creando memorias episódicas del pasado</div>
+              <div>✓ Inicializando personalidad profunda (Big Five)</div>
+              <div>✓ Asignando voz con ElevenLabs</div>
+              <div>✓ Configurando system prompts por etapa de relación</div>
+            </div>
+            <div className="text-xs text-muted-foreground italic pt-2">
+              Esto puede tomar 10-15 segundos. ¡Vale la pena la espera!
             </div>
           </Card>
         )}

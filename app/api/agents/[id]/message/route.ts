@@ -11,13 +11,10 @@ import { getRelationshipStage, shouldAdvanceStage } from "@/lib/relationship/sta
 import { getPromptForStage } from "@/lib/relationship/prompt-generator";
 import type { StagePrompts } from "@/lib/relationship/prompt-generator";
 import type { RelationshipStage } from "@/lib/relationship/stages";
-import {
-  analyzeMessageEmotions,
-  applyEmotionDeltas,
-  getEmotionalSummary,
-  updateInternalState,
-  type PlutchikEmotionState,
-} from "@/lib/emotions";
+import { interceptKnowledgeCommand, buildExpandedPrompt, logCommandUsage } from "@/lib/profile/knowledge-interceptor";
+import { type PlutchikEmotionState } from "@/lib/emotions/plutchik";
+import { hybridEmotionalOrchestrator } from "@/lib/emotional-system/hybrid-orchestrator";
+import { dyadCalculator } from "@/lib/emotional-system/modules/emotion/dyad-calculator";
 
 export async function POST(
   req: NextRequest,
@@ -160,64 +157,34 @@ export async function POST(
     const newStage = getRelationshipStage(newTotalInteractions);
     const stageChanged = shouldAdvanceStage(newTotalInteractions, relation.stage as RelationshipStage);
 
-    // ===== SISTEMA EMOCIONAL COMPLETO (Plutchik) =====
-    // Obtener o crear InternalState del agente
-    let internalState = await prisma.internalState.findUnique({
-      where: { agentId },
+    // ===== SISTEMA EMOCIONAL HÍBRIDO (Plutchik + OCC) =====
+    // Procesar con routing inteligente: Fast Path (simple) o Deep Path (complejo)
+    console.log("[Message] 🧠 Processing emotions with Hybrid System...");
+    const hybridResult = await hybridEmotionalOrchestrator.processMessage({
+      agentId,
+      userMessage: contentForAI, // Usar descripción de GIF si aplica
+      userId,
+      generateResponse: false, // Solo procesar emociones aquí, response después
     });
 
-    let currentEmotions: PlutchikEmotionState;
-    if (!internalState) {
-      // Crear estado inicial neutro
-      const { createNeutralState } = await import("@/lib/emotions");
-      currentEmotions = createNeutralState();
+    // Obtener estado emocional y dyads
+    const newEmotionState = hybridResult.emotionState;
+    const activeDyads = hybridResult.activeDyads;
 
-      internalState = await prisma.internalState.create({
-        data: {
-          agent: {
-            connect: { id: agentId }
-          },
-          currentEmotions: currentEmotions as any,
-          moodValence: 0.0,
-          moodArousal: 0.5,
-          moodDominance: 0.5,
-          activeGoals: [],
-          conversationBuffer: [],
-        },
-      });
-    } else {
-      // Parsear emociones desde DB con valores por defecto para evitar NaN
-      const emotionsFromDB = internalState.currentEmotions as any;
-      currentEmotions = {
-        joy: typeof emotionsFromDB?.joy === 'number' ? emotionsFromDB.joy : 0.5,
-        trust: typeof emotionsFromDB?.trust === 'number' ? emotionsFromDB.trust : 0.5,
-        fear: typeof emotionsFromDB?.fear === 'number' ? emotionsFromDB.fear : 0.2,
-        surprise: typeof emotionsFromDB?.surprise === 'number' ? emotionsFromDB.surprise : 0.1,
-        sadness: typeof emotionsFromDB?.sadness === 'number' ? emotionsFromDB.sadness : 0.2,
-        disgust: typeof emotionsFromDB?.disgust === 'number' ? emotionsFromDB.disgust : 0.1,
-        anger: typeof emotionsFromDB?.anger === 'number' ? emotionsFromDB.anger : 0.1,
-        anticipation: typeof emotionsFromDB?.anticipation === 'number' ? emotionsFromDB.anticipation : 0.4,
-        lastUpdated: new Date(),
-      };
+    console.log(`[Message] ✅ Emotional processing complete`);
+    console.log(`[Message] Path: ${hybridResult.metadata.path} | Time: ${hybridResult.metadata.processingTimeMs}ms | Cost: $${hybridResult.metadata.costEstimate.toFixed(4)}`);
+    console.log(`[Message] Primary emotion: ${hybridResult.metadata.primaryEmotion} | Dyads: ${activeDyads.length} active`);
+
+    if (activeDyads.length > 0) {
+      console.log(`[Message] Top dyads: ${activeDyads.slice(0, 3).map(d => d.label).join(", ")}`);
     }
 
-    // Analizar el mensaje del usuario y calcular deltas emocionales
-    // Usar contentForAI para que analice la descripción del GIF, no la URL
-    const emotionDeltas = analyzeMessageEmotions(contentForAI);
-
-    // Aplicar deltas con decay e inercia
-    const newEmotionState = applyEmotionDeltas(
-      currentEmotions,
-      emotionDeltas,
-      internalState.emotionDecayRate,
-      internalState.emotionInertia
-    );
-
-    // Obtener resumen emocional
+    // Obtener resumen emocional para compatibilidad con código existente
+    const { getEmotionalSummary } = await import("@/lib/emotions/system");
     const emotionalSummary = getEmotionalSummary(newEmotionState);
 
-    // Actualizar InternalState en DB
-    await updateInternalState(agentId, newEmotionState, prisma);
+    // Agregar dyads al summary para uso en prompts
+    emotionalSummary.secondary = activeDyads.slice(0, 3).map(d => d.label);
 
     // Actualizar relación (mantener compatibilidad con sistema legacy)
     // Mapear emociones Plutchik a métricas legacy
@@ -275,14 +242,25 @@ export async function POST(
       agent.systemPrompt
     );
 
-    // Ajustar system prompt con emoción usando el nuevo sistema
-    const emotionalContext = `
+    // Incluir dyads en emotional context para respuestas más ricas
+    let emotionalContext = `
 Estado emocional actual:
-- Emociones dominantes: ${emotionalSummary.dominant.join(", ")}
-${emotionalSummary.secondary.length > 0 ? `- Emociones secundarias: ${emotionalSummary.secondary.join(", ")}` : ""}
-- Mood general: ${emotionalSummary.mood}
+- Emociones primarias: ${emotionalSummary.dominant.join(", ")}
+`;
+
+    if (activeDyads.length > 0) {
+      const dyadDescriptions = activeDyads.slice(0, 3).map(dyad => {
+        const intensity = (dyad.intensity * 100).toFixed(0);
+        return `${dyad.label} (${intensity}% - ${dyad.components[0]}+${dyad.components[2]})`;
+      }).join(", ");
+
+      emotionalContext += `- Emociones secundarias (dyads): ${dyadDescriptions}\n`;
+    }
+
+    emotionalContext += `- Mood general: ${emotionalSummary.mood}
 - Valence (placer): ${(emotionalSummary.pad.valence * 100).toFixed(0)}%
 - Arousal (activación): ${(emotionalSummary.pad.arousal * 100).toFixed(0)}%
+- Estabilidad emocional: ${(hybridResult.metadata.emotionalStability * 100).toFixed(0)}%
 
 Refleja estas emociones de manera sutil en tu tono y respuestas.
 `;
@@ -311,6 +289,40 @@ Refleja estas emociones de manera sutil en tu tono y respuestas.
         content: m.content,
       })),
     });
+
+    // ===== KNOWLEDGE COMMAND INTERCEPTION =====
+    // Detectar si la IA solicitó información específica mediante comandos
+    const interceptResult = await interceptKnowledgeCommand(agentId, response);
+
+    if (interceptResult.shouldIntercept && interceptResult.knowledgeContext) {
+      console.log(`[Message] Knowledge command detected: ${interceptResult.command}`);
+      console.log(`[Message] Expanding prompt with ${interceptResult.knowledgeContext.length} chars of context`);
+
+      // Log para analytics
+      await logCommandUsage(
+        agentId,
+        interceptResult.command!,
+        interceptResult.knowledgeContext.length
+      );
+
+      // Construir prompt expandido con el knowledge context
+      const expandedPrompt = buildExpandedPrompt(
+        finalPrompt,
+        interceptResult.knowledgeContext,
+        interceptResult.command!
+      );
+
+      // Re-request con contexto expandido
+      response = await llm.generate({
+        systemPrompt: expandedPrompt,
+        messages: recentMessages.reverse().map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        })),
+      });
+
+      console.log(`[Message] Knowledge-enhanced response generated (${response.length} chars)`);
+    }
 
     // ===== CONTENT MODERATION =====
     // Moderar respuesta si hay behaviors activos
@@ -432,6 +444,7 @@ Refleja estas emociones de manera sutil en tu tono y respuestas.
 
     // Create response with rate limit headers
     const responseData = {
+      userMessage, // Agregar mensaje del usuario para actualizar el ID en el frontend
       message: assistantMessage,
       // Sistema emocional completo
       emotions: {

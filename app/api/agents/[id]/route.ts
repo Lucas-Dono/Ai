@@ -14,7 +14,7 @@ export async function GET(
       where: { id },
       include: {
         messagesAsAgent: {
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: "asc" }, // ASC = orden cronológico (más antiguos primero)
           take: 50,
         },
       },

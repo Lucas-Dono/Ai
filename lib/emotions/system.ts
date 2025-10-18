@@ -1,8 +1,19 @@
 /**
- * Sistema Emocional Completo
+ * ⚠️ NOTA: Este sistema ahora es componente del HybridEmotionalOrchestrator
+ *
+ * NO USAR DIRECTAMENTE EN ROUTES - Usar en su lugar:
+ * import { hybridEmotionalOrchestrator } from "@/lib/emotional-system/hybrid-orchestrator";
+ *
+ * Este sistema (Plutchik rule-based) ahora se usa solo para el FAST PATH
+ * cuando el mensaje es simple. El sistema híbrido decide automáticamente.
+ *
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Sistema Emocional Completo (Plutchik-based)
  *
  * Analiza mensajes y actualiza el estado emocional del agente
  * basándose en Plutchik's Wheel of Emotions + PAD Model.
+ *
+ * USADO POR: HybridEmotionalOrchestrator (Fast Path)
  */
 
 import {

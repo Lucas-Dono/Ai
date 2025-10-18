@@ -54,9 +54,9 @@ async function main() {
   console.log();
 
   // 2. PROMPTS POR ETAPA DE RELACIÓN
-  if (agent.internalState?.stagePrompts) {
-    const stagePrompts = agent.internalState.stagePrompts as any;
-    const currentStage = agent.internalState.currentStage;
+  if (agent.stagePrompts) {
+    const stagePrompts = agent.stagePrompts as any;
+    const currentStage = "stranger"; // Default stage
 
     console.log("━".repeat(80));
     console.log("2️⃣  PROMPTS POR ETAPA DE RELACIÓN");
@@ -143,19 +143,20 @@ async function main() {
   console.log();
 
   // 5. ESTADÍSTICAS DE INTERACCIÓN
-  if (agent.internalState) {
-    const state = agent.internalState;
-    console.log("━".repeat(80));
-    console.log("5️⃣  ESTADÍSTICAS DE RELACIÓN");
-    console.log("━".repeat(80));
-    console.log();
-    console.log(`Total interacciones: ${state.totalInteractions}`);
-    console.log(`Etapa actual: ${state.currentStage}`);
-    console.log(`Trust: ${(state.trust * 100).toFixed(1)}%`);
-    console.log(`Affinity: ${(state.affinity * 100).toFixed(1)}%`);
-    console.log(`Respect: ${(state.respect * 100).toFixed(1)}%`);
-    console.log();
-  }
+  // Comentado temporalmente - estos datos están en Relation o BehaviorProgressionState, no en InternalState
+  // if (agent.internalState) {
+  //   const state = agent.internalState;
+  //   console.log("━".repeat(80));
+  //   console.log("5️⃣  ESTADÍSTICAS DE RELACIÓN");
+  //   console.log("━".repeat(80));
+  //   console.log();
+  //   console.log(`Total interacciones: ${state.totalInteractions}`);
+  //   console.log(`Etapa actual: ${state.currentStage}`);
+  //   console.log(`Trust: ${(state.trust * 100).toFixed(1)}%`);
+  //   console.log(`Affinity: ${(state.affinity * 100).toFixed(1)}%`);
+  //   console.log(`Respect: ${(state.respect * 100).toFixed(1)}%`);
+  //   console.log();
+  // }
 
   console.log("=".repeat(80));
   console.log("FIN DEL REPORTE DE PROMPTS");

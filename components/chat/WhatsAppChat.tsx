@@ -28,6 +28,8 @@ import {
   Download,
   PanelRightClose,
   PanelRightOpen,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSocket } from "@/hooks/useSocket";
@@ -98,6 +100,9 @@ export function WhatsAppChat({
   agentAvatar,
   userId,
 }: WhatsAppChatProps) {
+  // ✅ Clave única para sessionStorage
+  const sessionKey = `chat-messages-${agentId}-${userId}`;
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -107,6 +112,8 @@ export function WhatsAppChat({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Estados del behavior system
   const [showBehaviorInfo, setShowBehaviorInfo] = useState(true);
@@ -129,6 +136,107 @@ export function WhatsAppChat({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // ✅ Persistir mensajes en sessionStorage como backup contra Fast Refresh
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        // Guardar solo los datos esenciales para reducir tamaño
+        const messagesToSave = messages.map(msg => ({
+          id: msg.id,
+          type: msg.type,
+          content: msg.content,
+          timestamp: msg.timestamp.toISOString(),
+          status: msg.status,
+          agentName: msg.agentName,
+          agentAvatar: msg.agentAvatar,
+        }));
+        sessionStorage.setItem(sessionKey, JSON.stringify(messagesToSave));
+        console.log(`[WhatsAppChat] Guardados ${messages.length} mensajes en sessionStorage`);
+      } catch (error) {
+        console.error('[WhatsAppChat] Error guardando en sessionStorage:', error);
+      }
+    }
+  }, [messages, sessionKey]);
+
+  // ✅ Intentar restaurar mensajes desde sessionStorage al montar
+  useEffect(() => {
+    if (messages.length === 0) {
+      try {
+        const savedMessages = sessionStorage.getItem(sessionKey);
+        if (savedMessages) {
+          const parsed = JSON.parse(savedMessages);
+          const restored: Message[] = parsed.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          }));
+          setMessages(restored);
+          console.log(`[WhatsAppChat] Restaurados ${restored.length} mensajes desde sessionStorage`);
+        }
+      } catch (error) {
+        console.error('[WhatsAppChat] Error restaurando desde sessionStorage:', error);
+      }
+    }
+  }, [sessionKey]);
+
+  // Cargar mensajes históricos SOLO UNA VEZ al montar el componente
+  const hasLoadedMessages = useRef(false);
+
+  useEffect(() => {
+    // ✅ Prevenir re-cargas que sobrescribirían mensajes nuevos
+    if (hasLoadedMessages.current) return;
+
+    // ✅ Si ya hay mensajes en estado (restaurados desde sessionStorage), no cargar desde DB
+    if (messages.length > 0) {
+      console.log('[WhatsAppChat] Mensajes ya restaurados desde sessionStorage, saltando carga desde DB');
+      hasLoadedMessages.current = true;
+      return;
+    }
+
+    const loadMessages = async () => {
+      try {
+        const response = await fetch(`/api/agents/${agentId}`);
+        if (response.ok) {
+          const data = await response.json();
+
+          // Convertir mensajes de DB al formato del componente
+          const historicalMessages: Message[] = (data.messagesAsAgent || []).map((msg: any) => ({
+            id: msg.id,
+            type: msg.role === "user" ? "user" : "agent",
+            content: {
+              text: msg.content,
+              // Extraer multimedia del metadata si existe
+              audio: msg.metadata?.multimedia?.[0]?.type === "audio" ? msg.metadata.multimedia[0].url : undefined,
+              image: msg.metadata?.multimedia?.[0]?.type === "image" ? msg.metadata.multimedia[0].url : undefined,
+            },
+            timestamp: new Date(msg.createdAt),
+            status: msg.role === "user" ? "sent" : "delivered",
+            agentName: msg.role === "assistant" ? agentName : undefined,
+            agentAvatar: msg.role === "assistant" ? agentAvatar : undefined,
+            behaviorData: msg.metadata?.behaviors,
+            emotionalData: msg.metadata?.emotions ? {
+              state: {
+                trust: 0.5,
+                affinity: 0.5,
+                respect: 0.5,
+              },
+              emotions: msg.metadata.emotions.dominant || [],
+              relationLevel: msg.metadata.relationLevel || 0,
+            } : undefined,
+          }));
+
+          console.log(`[WhatsAppChat] Cargados ${historicalMessages.length} mensajes desde DB`);
+          setMessages(historicalMessages);
+          hasLoadedMessages.current = true;
+        }
+      } catch (error) {
+        console.error("Error loading messages:", error);
+      }
+    };
+
+    loadMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length]); // Depender de messages.length para verificar si ya hay mensajes
 
   // Escuchar mensajes del socket
   useEffect(() => {
@@ -179,6 +287,9 @@ export function WhatsAppChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, agentId]);
 
+  // Ref para trackear mensajes enviados por este cliente
+  const pendingMessageIds = useRef<Set<string>>(new Set());
+
   // Manejar mensaje del agente
   const handleAgentMessage = (data: {
     messageId: string;
@@ -208,6 +319,15 @@ export function WhatsAppChat({
     };
   }) => {
     if (data.agentId !== agentId) return;
+
+    // ✅ Verificar si este mensaje ya fue manejado via HTTP
+    if (pendingMessageIds.current.has(data.messageId)) {
+      console.log('[WhatsAppChat] Ignorando mensaje duplicado del socket:', data.messageId);
+      pendingMessageIds.current.delete(data.messageId);
+      return;
+    }
+
+    console.log('[WhatsAppChat] Recibido mensaje del socket:', data.messageId);
 
     const newMessage: Message = {
       id: data.messageId,
@@ -254,8 +374,9 @@ export function WhatsAppChat({
     if (!inputMessage.trim()) return;
 
     const messageText = inputMessage;
+    const tempId = `temp-${Date.now()}`;
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: tempId,
       type: "user",
       content: {
         text: messageText,
@@ -264,7 +385,19 @@ export function WhatsAppChat({
       status: "sending",
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    console.log('[WhatsAppChat] Agregando mensaje temporal del usuario:', {
+      tempId,
+      text: messageText.substring(0, 50),
+    });
+
+    setMessages((prev) => {
+      const newState = [...prev, userMessage];
+      console.log('[WhatsAppChat] Estado después de agregar mensaje temporal:', {
+        messageCount: newState.length,
+        tempMessageAdded: newState.some(m => m.id === tempId),
+      });
+      return newState;
+    });
     setInputMessage("");
     setIsTyping(true);
 
@@ -287,14 +420,20 @@ export function WhatsAppChat({
 
       const data = await response.json();
 
-      // Actualizar mensaje del usuario a "sent"
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === userMessage.id ? { ...msg, status: "sent" } : msg
-        )
-      );
+      console.log('[WhatsAppChat] Mensaje enviado exitosamente:', {
+        tempId: userMessage.id,
+        realId: data.userMessage.id,
+        agentMessageId: data.message.id,
+      });
 
-      // Agregar respuesta del agente con metadata del behavior system
+      // ✅ Marcar este mensaje como manejado via HTTP para evitar duplicados del socket
+      pendingMessageIds.current.add(data.message.id);
+      // Limpiar después de 5 segundos por si el socket nunca llega
+      setTimeout(() => {
+        pendingMessageIds.current.delete(data.message.id);
+      }, 5000);
+
+      // Crear mensaje del agente
       const agentMessage: Message = {
         id: data.message.id,
         type: "agent",
@@ -313,7 +452,50 @@ export function WhatsAppChat({
         },
       };
 
-      setMessages((prev) => [...prev, agentMessage]);
+      // ✅ ACTUALIZACIÓN ATÓMICA Y DEFENSIVA: Actualizar el mensaje del usuario Y agregar el del agente
+      setMessages((prev) => {
+        console.log('[WhatsAppChat] Estado previo:', {
+          messageCount: prev.length,
+          tempMessageExists: prev.some(m => m.id === userMessage.id),
+          tempId: userMessage.id,
+        });
+
+        // Buscar y actualizar el mensaje temporal del usuario
+        const updatedMessages = prev.map((msg) => {
+          if (msg.id === userMessage.id) {
+            console.log('[WhatsAppChat] Actualizando mensaje temporal con ID real');
+            return {
+              ...msg,
+              id: data.userMessage.id, // Usar ID real de la DB
+              status: "sent" as const,
+            };
+          }
+          return msg;
+        });
+
+        // Verificar que el mensaje se encontró y actualizó
+        const messageWasFound = updatedMessages.some(m => m.id === data.userMessage.id);
+        if (!messageWasFound) {
+          console.error('[WhatsAppChat] ⚠️ Mensaje temporal no encontrado, agregando desde cero');
+          // Si el mensaje temporal no se encontró, agregarlo con el ID real
+          updatedMessages.push({
+            ...userMessage,
+            id: data.userMessage.id,
+            status: "sent" as const,
+          });
+        }
+
+        // Agregar mensaje del agente
+        const finalMessages = [...updatedMessages, agentMessage];
+
+        console.log('[WhatsAppChat] Estado nuevo:', {
+          messageCount: finalMessages.length,
+          lastUserMessage: finalMessages.filter(m => m.type === 'user').slice(-1)[0]?.id,
+          lastAgentMessage: finalMessages.filter(m => m.type === 'agent').slice(-1)[0]?.id,
+        });
+
+        return finalMessages;
+      });
 
       // Actualizar estado del behavior system
       if (data.behaviors) {
@@ -332,15 +514,8 @@ export function WhatsAppChat({
       // Reproducir sonido de notificación
       playNotificationSound();
 
-      // Si también hay socket, emitir para sincronizar con otros clientes
-      if (socket) {
-        // @ts-expect-error - Socket events need to be typed properly
-        socket.emit("user:message", {
-          agentId,
-          userId,
-          message: messageText,
-        });
-      }
+      // ✅ NO emitir al socket aquí - la respuesta ya se manejó via HTTP
+      // Emitir al socket solo causaría duplicados y conflictos de estado
     } catch (error) {
       console.error("Error sending message:", error);
       setIsTyping(false);
@@ -639,6 +814,45 @@ export function WhatsAppChat({
     }
   };
 
+  // Resetear conversación completa
+  const resetConversation = async () => {
+    if (isResetting) return;
+
+    setIsResetting(true);
+    try {
+      console.log('[Reset] Borrando conversación...');
+
+      const response = await fetch(`/api/agents/${agentId}/conversation/reset`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reset conversation");
+      }
+
+      const data = await response.json();
+      console.log('[Reset] Conversación borrada:', data);
+
+      // Limpiar estado local
+      setMessages([]);
+
+      // Limpiar sessionStorage
+      sessionStorage.removeItem(sessionKey);
+
+      // Cerrar modal
+      setShowResetConfirm(false);
+
+      // Recargar la página para empezar completamente de cero
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Error resetting conversation:", error);
+      alert("Error al resetear la conversación. Intenta de nuevo.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div
       className="flex h-full relative"
@@ -683,6 +897,7 @@ export function WhatsAppChat({
               onClick={() => setShowSearch(!showSearch)}
               className="hover:bg-opacity-10"
               style={{ color: theme.colors.textMuted }}
+              title="Buscar en conversación"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -692,8 +907,19 @@ export function WhatsAppChat({
               onClick={exportToPDF}
               className="hover:bg-opacity-10"
               style={{ color: theme.colors.textMuted }}
+              title="Exportar a PDF"
             >
               <Download className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowResetConfirm(true)}
+              className="hover:bg-opacity-10 hover:text-red-500"
+              style={{ color: theme.colors.textMuted }}
+              title="Resetear conversación"
+            >
+              <Trash2 className="h-5 w-5" />
             </Button>
             {/* Toggle del sidebar (solo en desktop) */}
             <Button
@@ -865,6 +1091,72 @@ export function WhatsAppChat({
             imageUrl={selectedImage}
             onClose={() => setSelectedImage(null)}
           />
+        )}
+
+        {/* Modal de confirmación de reset */}
+        {showResetConfirm && (
+          <div
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+            onClick={() => !isResetting && setShowResetConfirm(false)}
+          >
+            <div
+              className="bg-[#1f1f1f] rounded-lg p-6 max-w-md w-full animate-in zoom-in-95 duration-200"
+              style={{
+                backgroundColor: theme.colors.bgSecondary,
+                borderColor: theme.colors.borderColor,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-red-500" />
+                </div>
+                <div className="flex-1">
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: theme.colors.textPrimary }}
+                  >
+                    ¿Resetear conversación?
+                  </h3>
+                  <p
+                    className="text-sm mb-4"
+                    style={{ color: theme.colors.textMuted }}
+                  >
+                    Esto borrará <strong>todos los mensajes</strong>, resetará la relación y el estado emocional.
+                    Esta acción <strong>no se puede deshacer</strong>.
+                  </p>
+                  <div className="flex gap-3 justify-end">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowResetConfirm(false)}
+                      disabled={isResetting}
+                      className="hover:bg-white/10"
+                      style={{ color: theme.colors.textMuted }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={resetConversation}
+                      disabled={isResetting}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {isResetting ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Reseteando...
+                        </div>
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Sí, resetear
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Audio de notificación (oculto) */}

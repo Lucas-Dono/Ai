@@ -281,6 +281,19 @@ export async function POST(req: NextRequest) {
             },
           });
 
+          // 🆕 INICIALIZAR TODAS LAS MEMORIAS DEL PERSONAJE
+          console.log('[API] [PARALLEL] Inicializando memorias completas del personaje...');
+          const { initializeAllMemories } = await import("@/lib/profile/memory-initialization");
+
+          try {
+            await initializeAllMemories(agent.id, profile as any, systemPrompt);
+            console.log('[API] [PARALLEL] ✅ Memorias del personaje inicializadas exitosamente');
+          } catch (memoryError) {
+            console.error('[API] [PARALLEL] ⚠️  Error inicializando memorias:', memoryError);
+            // No fallar toda la creación si falla la inicialización de memorias
+            // Las memorias se pueden regenerar después
+          }
+
           console.log('[API] [PARALLEL] Stage prompts generados y guardados exitosamente');
           return { success: true };
         } catch (error) {

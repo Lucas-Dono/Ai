@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Heart, Briefcase, Loader2 } from "lucide-react";
+import { ArrowLeft, Heart, Briefcase, Loader2, Trash2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
 import { ExportConversationButton } from "@/components/export-conversation-button";
@@ -40,6 +40,8 @@ export default function AgentChatPage() {
   const [relationLevel, setRelationLevel] = useState("Relación neutral");
   const [relationState, setRelationState] = useState({ trust: 0.5, affinity: 0.5, respect: 0.5 });
   const [relationshipStage, setRelationshipStage] = useState<string>("stranger");
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -105,10 +107,11 @@ export default function AgentChatPage() {
 
       const data = await res.json();
 
-      // Reemplazar mensaje temporal con el real
+      // Reemplazar mensaje temporal con el real Y agregar respuesta del agente
       setMessages((prev) => {
         const filtered = prev.filter((m) => m.id !== tempMessage.id);
-        return [...filtered, data.message];
+        // Agregar AMBOS: mensaje del usuario con ID real + mensaje del agente
+        return [...filtered, data.userMessage, data.message];
       });
 
       // Actualizar estados emocionales
@@ -136,6 +139,45 @@ export default function AgentChatPage() {
     handleSendMessage("[Mensaje de voz - transcripción pendiente]", "audio", {
       duration: 0,
     });
+  };
+
+  const resetConversation = async () => {
+    if (isResetting) return;
+
+    setIsResetting(true);
+    try {
+      console.log('[Reset] Borrando conversación...');
+
+      const response = await fetch(`/api/agents/${params.id}/conversation/reset`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reset conversation");
+      }
+
+      const data = await response.json();
+      console.log('[Reset] Conversación borrada:', data);
+
+      // Limpiar estado local
+      setMessages([]);
+      setEmotions(null);
+      setRelationLevel("Relación neutral");
+      setRelationState({ trust: 0.5, affinity: 0.5, respect: 0.5 });
+      setRelationshipStage("stranger");
+
+      // Cerrar modal
+      setShowResetConfirm(false);
+
+      // Recargar la página para empezar completamente de cero
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Error resetting conversation:", error);
+      alert("Error al resetear la conversación. Intenta de nuevo.");
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   if (loading) {
@@ -276,7 +318,18 @@ export default function AgentChatPage() {
       <div className="flex-1 flex flex-col">
         <div className="border-b border-border bg-card/50 backdrop-blur-sm px-8 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold">Chat con {agent.name}</h1>
-          <ExportConversationButton messages={messages} agentName={agent.name} />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowResetConfirm(true)}
+              className="hover:text-red-500"
+              title="Resetear conversación"
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+            <ExportConversationButton messages={messages} agentName={agent.name} />
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
@@ -300,6 +353,60 @@ export default function AgentChatPage() {
           placeholder="Escribe tu mensaje..."
         />
       </div>
+
+      {/* Modal de confirmación de reset */}
+      {showResetConfirm && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => !isResetting && setShowResetConfirm(false)}
+        >
+          <div
+            className="bg-card rounded-lg p-6 max-w-md w-full animate-in zoom-in-95 duration-200 border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-red-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold mb-2">
+                  ¿Resetear conversación?
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Esto borrará <strong>todos los mensajes</strong>, resetará la relación y el estado emocional.
+                  Esta acción <strong>no se puede deshacer</strong>.
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowResetConfirm(false)}
+                    disabled={isResetting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={resetConversation}
+                    disabled={isResetting}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {isResetting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Reseteando...
+                      </div>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Sí, resetear
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

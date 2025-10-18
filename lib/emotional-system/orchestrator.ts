@@ -1,5 +1,15 @@
 /**
- * EMOTIONAL SYSTEM ORCHESTRATOR
+ * ⚠️ NOTA: Este orquestador ahora es usado internamente por HybridEmotionalOrchestrator
+ *
+ * NO USAR DIRECTAMENTE - Usar en su lugar:
+ * import { hybridEmotionalOrchestrator } from "@/lib/emotional-system/hybrid-orchestrator";
+ *
+ * Este orchestrator (OCC puro) ahora se usa solo para el DEEP PATH
+ * cuando el mensaje es complejo. El sistema híbrido decide automáticamente
+ * cuándo usar este vs el Fast Path (Plutchik rule-based).
+ *
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * EMOTIONAL SYSTEM ORCHESTRATOR (OCC-based)
  *
  * Orquesta todo el flujo del sistema emocional:
  * 1. Appraisal → 2. Emotion → 3. Memory → 4. Reasoning →

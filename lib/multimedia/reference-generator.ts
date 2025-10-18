@@ -6,6 +6,8 @@
  */
 
 import { getAIHordeClient } from "@/lib/visual-system/ai-horde-client";
+import { getElevenLabsClient, type VoiceCharacteristics } from "@/lib/voice-system/elevenlabs-client";
+import { getLLMProvider } from "@/lib/llm/provider";
 
 export interface ReferenceGenerationResult {
   referenceImageUrl?: string;
@@ -65,11 +67,14 @@ export async function generateAgentReferences(
     console.log('[ReferenceGenerator] Saltando generación de imagen (usuario proporcionó una)');
   }
 
-  // 2. Asignar voz de ElevenLabs
+  // 2. Asignar voz de ElevenLabs usando IA para buscar la mejor match
   try {
-    const voiceId = selectVoiceForAgent(personality, gender);
-    result.voiceId = voiceId;
-    console.log(`[ReferenceGenerator] Voice ${voiceId} assigned to ${agentName}`);
+    console.log('[ReferenceGenerator] Seleccionando voz automáticamente con IA...');
+
+    const voiceResult = await selectVoiceForAgentWithAI(agentName, personality, gender);
+    result.voiceId = voiceResult.voiceId;
+
+    console.log(`[ReferenceGenerator] Voice "${voiceResult.voiceName}" (${voiceResult.voiceId}) assigned to ${agentName} with confidence ${(voiceResult.confidence * 100).toFixed(0)}%`);
   } catch (error) {
     result.errors.push(`Voice assignment error: ${error}`);
     console.error("[ReferenceGenerator] Error assigning voice:", error);
@@ -142,9 +147,82 @@ Character personality traits: ${personality.substring(0, 100)}.`;
 }
 
 /**
- * Selecciona una voz apropiada de ElevenLabs basada en personalidad y género
+ * Usa Gemini para analizar el personaje y ElevenLabs para seleccionar la mejor voz
  */
-export function selectVoiceForAgent(personality: string, gender?: string): string {
+async function selectVoiceForAgentWithAI(
+  agentName: string,
+  personality: string,
+  gender?: string
+): Promise<{ voiceId: string; voiceName: string; confidence: number }> {
+  try {
+    // 1. Usar Gemini para extraer características de búsqueda
+    const llm = getLLMProvider();
+
+    const analysisPrompt = `Analiza este personaje y extrae características para buscar su voz perfecta en ElevenLabs.
+
+PERSONAJE:
+Nombre: ${agentName}
+Personalidad: ${personality}
+${gender ? `Género especificado: ${gender}` : ''}
+
+TAREA:
+Extrae las siguientes características en formato JSON:
+- gender: "male" | "female" | "neutral"
+- age: "young" | "middle_aged" | "old"
+- accent: código de acento (ej: "es-AR" para argentino, "es-MX" para mexicano, "en-US", etc.)
+- description: 2-3 palabras clave en inglés que describan el tono de voz ideal (ej: "cheerful energetic", "calm mature", "seductive confident")
+
+IMPORTANTE:
+- Para nombres femeninos como "Anya", "María", "Sofia" → gender: "female"
+- Para nombres masculinos como "Carlos", "Josh", "Mario" → gender: "male"
+- Si la personalidad menciona "alegre", "enérgico" → incluir en description
+- Si menciona "tranquilo", "sereno" → incluir "calm" en description
+- Si menciona nacionalidad/región, inferir el acento apropiado
+
+Responde SOLO con el JSON, sin markdown ni explicaciones:`;
+
+    const response = await llm.generate({
+      systemPrompt: "Eres un asistente que genera JSON estructurado. Responde SOLO con JSON válido.",
+      messages: [{ role: "user", content: analysisPrompt }],
+      temperature: 0.3,
+    });
+
+    // Parsear respuesta
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith("```json")) {
+      cleanedResponse = cleanedResponse.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+    } else if (cleanedResponse.startsWith("```")) {
+      cleanedResponse = cleanedResponse.replace(/^```\s*/, "").replace(/\s*```$/, "");
+    }
+
+    const characteristics: VoiceCharacteristics = JSON.parse(cleanedResponse);
+
+    console.log('[ReferenceGenerator] Características extraídas por Gemini:', characteristics);
+
+    // 2. Usar ElevenLabs para buscar la mejor voz
+    const elevenlabsClient = getElevenLabsClient();
+    const voiceResult = await elevenlabsClient.selectVoiceForCharacter(characteristics);
+
+    return voiceResult;
+  } catch (error) {
+    console.error('[ReferenceGenerator] Error en selección inteligente de voz:', error);
+    console.log('[ReferenceGenerator] Fallback a método legacy...');
+
+    // Fallback al método antiguo si falla
+    const voiceId = selectVoiceForAgentLegacy(personality, gender);
+    return {
+      voiceId,
+      voiceName: "Fallback Voice",
+      confidence: 0.3,
+    };
+  }
+}
+
+/**
+ * Método legacy de selección de voz (fallback)
+ * @deprecated Usar selectVoiceForAgentWithAI en su lugar
+ */
+function selectVoiceForAgentLegacy(personality: string, gender?: string): string {
   const personalityLower = personality.toLowerCase();
 
   // Determinar género

@@ -72,3 +72,6 @@ temp/
 .temp/
 
 /lib/generated/prisma
+
+# vector store (to avoid Next.js watching these files)
+.vector-store/

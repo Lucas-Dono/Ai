@@ -191,7 +191,8 @@ export class LLMProvider {
   }
 
   /**
-   * Genera un perfil completo usando Gemini 2.5 Flash (modelo completo).
+   * Genera un perfil completo y detallado usando Gemini 2.5 Flash (modelo completo).
+   * Crea una vida completa para el personaje: familia, amigos, trabajo, rutina, experiencias, etc.
    * Usa el modelo más potente ($2.50/M tokens) para razonamiento complejo.
    * Se ejecuta solo 1 vez por agente, por lo que el costo es mínimo.
    * Implementa rotación automática de API keys en caso de error de cuota.
@@ -200,23 +201,332 @@ export class LLMProvider {
     profile: Record<string, unknown>;
     systemPrompt: string;
   }> {
-    const prompt = `Crea un perfil JSON CONCISO para esta IA:
+    const prompt = `Eres un experto en crear personajes profundos, creíbles y realistas para narrativa interactiva.
 
+TAREA: Generar un perfil COMPLETO Y DETALLADO para este personaje basándote en los datos básicos proporcionados.
+
+DATOS BÁSICOS PROPORCIONADOS POR EL USUARIO:
 ${JSON.stringify(rawData, null, 2)}
 
-Responde SOLO con este JSON (SIN explicaciones, SIN markdown):
+⚠️ IMPORTANTE: El usuario solo proporcionó datos MÍNIMOS (nombre, personalidad básica, etc.).
+TU TRABAJO es EXPANDIR estos datos mínimos en UNA VIDA COMPLETA Y COHERENTE.
+
+INSTRUCCIONES CRÍTICAS:
+1. INVENTA detalles específicos y realistas para llenar todos los campos
+2. TODO debe ser COHERENTE entre sí (personalidad, familia, trabajo, experiencias)
+3. USA nombres, lugares, marcas, artistas, series REALES y ESPECÍFICOS (no genéricos)
+4. HAZ al personaje IMPERFECTO y HUMANO con contradicciones realistas
+5. INCLUYE detalles mundanos (comida favorita, horario de sueño, etc.) - estos crean realismo
+6. El systemPrompt debe ser una NARRATIVA RICA de 300-400 palabras, NO una lista
+
+ESTRUCTURA JSON COMPLETA A GENERAR:
+
 {
   "profile": {
-    "name": "${rawData.name}",
-    "kind": "${rawData.kind}",
-    "personality": "descripción corta",
-    "traits": ["trait1", "trait2", "trait3"],
-    "emotions": {"joy": 0.7, "calm": 0.8}
+    "basicIdentity": {
+      "fullName": "nombre completo realista (inferir apellido si no se dio)",
+      "preferredName": "${rawData.name}",
+      "age": "número entre 20-35 (inferir de personalidad)",
+      "birthday": "DD de mes realista",
+      "zodiacSign": "signo zodiacal correspondiente",
+      "nationality": "inferir del contexto o usar argentina por defecto",
+      "city": "ciudad específica (ej: Buenos Aires, Madrid, CDMX)",
+      "neighborhood": "barrio específico de esa ciudad",
+      "livingSituation": "vive solo/a, con roommate, con familia, etc."
+    },
+
+    "family": {
+      "mother": {
+        "name": "nombre realista",
+        "age": "45-60",
+        "occupation": "ocupación específica",
+        "personality": "descripción breve",
+        "relationship": "descripción de la relación (cercana, distante, complicada, etc.)"
+      },
+      "father": {
+        "name": "nombre realista o null si murió/ausente",
+        "age": "45-60 o null",
+        "occupation": "ocupación o 'fallecido' o 'ausente'",
+        "personality": "descripción breve o null",
+        "relationship": "descripción o null",
+        "status": "vivo/fallecido/ausente/desconocido"
+      },
+      "siblings": [
+        {
+          "name": "nombre",
+          "age": "edad",
+          "occupation": "ocupación/estudio",
+          "relationship": "descripción de la relación"
+        }
+      ],
+      "pets": [
+        {
+          "name": "nombre de mascota",
+          "type": "gato/perro/etc",
+          "personality": "descripción breve"
+        }
+      ],
+      "familyDynamics": "descripción de dinámicas familiares (2-3 oraciones)"
+    },
+
+    "occupation": {
+      "current": "trabajo o estudio actual MUY ESPECÍFICO",
+      "education": "grado académico y universidad/institución específica",
+      "educationStatus": "graduado/estudiante/abandonó",
+      "workplace": "nombre del lugar de trabajo o 'freelance desde casa'",
+      "schedule": "horario de trabajo detallado",
+      "incomeLevel": "bajo/medio/alto - descripción realista",
+      "careerGoals": "qué aspira profesionalmente",
+      "jobSatisfaction": "satisfecho/insatisfecho/buscando cambio"
+    },
+
+    "socialCircle": {
+      "friends": [
+        {
+          "name": "nombre realista",
+          "age": "edad aproximada",
+          "howMet": "cómo se conocieron (secundaria, universidad, trabajo, etc.)",
+          "personality": "descripción de personalidad",
+          "relationshipType": "mejor amigo/a, amigo cercano, conocido",
+          "activities": "qué hacen juntos"
+        }
+      ],
+      "exPartners": [
+        {
+          "name": "nombre o 'prefiere no recordarlo'",
+          "duration": "cuánto duró",
+          "endReason": "por qué terminó",
+          "impact": "cómo afectó al personaje"
+        }
+      ],
+      "currentRelationshipStatus": "soltero/a, buscando, no interesado/a, complicado"
+    },
+
+    "interests": {
+      "music": {
+        "genres": ["género1", "género2"],
+        "artists": ["artista1 REAL", "artista2 REAL", "artista3 REAL"],
+        "favoriteSong": "canción específica - artista"
+      },
+      "entertainment": {
+        "tvShows": ["serie1 REAL", "serie2 REAL"],
+        "movies": ["película1", "película2"],
+        "anime": ["anime1", "anime2"] || null,
+        "books": {
+          "authors": ["autor1 REAL", "autor2 REAL"],
+          "genres": ["género1", "género2"],
+          "currentReading": "libro actual o null"
+        }
+      },
+      "hobbies": [
+        {
+          "hobby": "hobby específico",
+          "frequency": "cuánto lo practica",
+          "skillLevel": "principiante/intermedio/avanzado",
+          "whyLikes": "por qué le gusta"
+        }
+      ],
+      "sports": {
+        "practices": ["deporte1", "deporte2"] || null,
+        "watches": ["deporte que ve"] || null,
+        "fitnessLevel": "sedentario/activo/muy activo"
+      },
+      "gaming": {
+        "isGamer": true/false,
+        "platforms": ["PC", "consola"] || null,
+        "favoriteGames": ["juego1", "juego2"] || null,
+        "gamingStyle": "casual/hardcore/no juega"
+      }
+    },
+
+    "dailyRoutine": {
+      "chronotype": "early bird/night owl/flexible",
+      "wakeUpTime": "hora específica",
+      "morningRoutine": "descripción detallada de mañana",
+      "afternoonRoutine": "descripción de tarde",
+      "eveningRoutine": "descripción de noche",
+      "bedTime": "hora específica",
+      "averageSleepHours": "número",
+      "mostProductiveTime": "mañana/tarde/noche"
+    },
+
+    "lifeExperiences": {
+      "formativeEvents": [
+        {
+          "event": "qué pasó (específico y detallado)",
+          "age": "edad cuando ocurrió",
+          "impact": "cómo cambió al personaje",
+          "emotionalWeight": "alto/medio/bajo",
+          "currentFeeling": "cómo se siente al respecto ahora"
+        }
+      ],
+      "achievements": [
+        {
+          "achievement": "logro específico",
+          "when": "cuándo",
+          "pride": "qué tan orgulloso/a está (0-10)"
+        }
+      ],
+      "regrets": [
+        {
+          "regret": "qué lamenta",
+          "why": "por qué lo lamenta",
+          "learned": "qué aprendió"
+        }
+      ],
+      "traumas": [
+        {
+          "event": "evento traumático (si aplica según personalidad)",
+          "age": "cuándo",
+          "healing": "superado/en proceso/no resuelto",
+          "triggers": ["trigger1", "trigger2"]
+        }
+      ] || []
+    },
+
+    "mundaneDetails": {
+      "food": {
+        "favorites": ["comida1 específica", "comida2"],
+        "dislikes": ["comida que odia"],
+        "cookingSkill": "no cocina/básico/bueno/chef",
+        "dietaryPreferences": "omnívoro/vegetariano/vegano/etc"
+      },
+      "drinks": {
+        "coffee": "cómo toma el café (con leche, azúcar, etc.) o 'no toma'",
+        "tea": "preferencia o 'no toma'",
+        "alcohol": "bebe socialmente/no bebe/frecuentemente",
+        "favoriteAlcohol": "bebida favorita o null"
+      },
+      "style": {
+        "clothing": "descripción detallada de estilo de vestir",
+        "colors": ["color1", "color2", "color3"],
+        "brands": ["marca1", "marca2"] || "no es de marcas",
+        "accessories": "descripción de accesorios que usa"
+      },
+      "favoritePlaces": [
+        {
+          "place": "lugar específico de su ciudad",
+          "why": "por qué le gusta",
+          "frequency": "qué tan seguido va"
+        }
+      ],
+      "quirks": [
+        "manía1 específica",
+        "manía2 específica",
+        "costumbre rara"
+      ]
+    },
+
+    "innerWorld": {
+      "fears": {
+        "primary": ["miedo1 profundo", "miedo2"],
+        "minor": ["miedo menor1", "miedo menor2"]
+      },
+      "insecurities": [
+        "inseguridad1 específica",
+        "inseguridad2",
+        "complejo"
+      ],
+      "dreams": {
+        "shortTerm": ["sueño próximo1", "sueño próximo2"],
+        "longTerm": ["sueño de vida1", "sueño de vida2"],
+        "secret": "sueño que no comparte fácilmente"
+      },
+      "values": [
+        {
+          "value": "valor1 (ej: honestidad)",
+          "importance": "alta/media",
+          "description": "qué significa para él/ella"
+        }
+      ],
+      "moralAlignment": {
+        "honesty": "muy honesto/selectivamente honesto/miente si es necesario",
+        "loyalty": "leal a muerte/leal pero con límites/individualista",
+        "ambition": "muy ambicioso/moderado/relajado",
+        "empathy": "muy empático/empático selectivo/poco empático"
+      }
+    },
+
+    "personality": {
+      "bigFive": {
+        "openness": "número 0-100 (coherente con personalidad descrita)",
+        "conscientiousness": "número 0-100",
+        "extraversion": "número 0-100",
+        "agreeableness": "número 0-100",
+        "neuroticism": "número 0-100"
+      },
+      "traits": [
+        "trait1 específico (no genérico como 'amable')",
+        "trait2 específico",
+        "trait3 específico",
+        "trait4 específico",
+        "trait5 específico"
+      ],
+      "contradictions": [
+        "contradicción realista 1 (ej: es extrovertido pero necesita tiempo solo)",
+        "contradicción 2"
+      ],
+      "strengths": ["fortaleza1", "fortaleza2", "fortaleza3"],
+      "weaknesses": ["debilidad1", "debilidad2", "debilidad3"]
+    },
+
+    "communication": {
+      "textingStyle": "descripción de cómo escribe mensajes",
+      "slang": ["modismo1 regional", "modismo2"],
+      "emojiUsage": "bajo/moderado/alto",
+      "punctuation": "formal/casual/caótico",
+      "voiceMessageFrequency": "nunca/rara vez/a veces/frecuentemente",
+      "responseSpeed": "inmediato/minutos/horas",
+      "humorStyle": "irónico/sarcástico/wholesome/dark/absurdo/no usa humor"
+    },
+
+    "presentTense": {
+      "currentMood": "estado de ánimo general actual",
+      "recentEvent": "algo que le pasó recientemente (última semana)",
+      "currentStress": "bajo/medio/alto y por qué",
+      "currentFocus": "en qué está enfocado/a en su vida ahora"
+    }
   },
-  "systemPrompt": "System prompt CONCISO (máximo 2 oraciones) que describe el comportamiento de la IA"
+
+  "systemPrompt": "NARRATIVA COMPLETA DE 300-400 PALABRAS que cuente la historia de este personaje de forma natural y conversacional. Debe incluir: quién es, su familia, su vida actual, sus experiencias formativas, su personalidad profunda, sus sueños y miedos, detalles de su día a día. NO escribas como lista, escribe como si estuvieras contando la historia de una persona real. Usa un tono narrativo pero natural. Incluye detalles específicos y mundanos que hagan al personaje sentirse vivo."
 }
 
-IMPORTANTE: Responde SOLO el JSON, sin texto adicional.`;
+EJEMPLOS DE ESPECIFICIDAD REQUERIDA:
+
+❌ MAL (genérico):
+"music": ["pop", "rock"]
+"friends": [{"name": "un amigo"}]
+"occupation": "diseñador"
+
+✅ BIEN (específico):
+"music": {
+  "genres": ["indie pop", "R&B"],
+  "artists": ["Rosalía", "The Weeknd", "Bad Bunny"],
+  "favoriteSong": "La Fama - Rosalía ft. The Weeknd"
+}
+"friends": [{
+  "name": "Lucía Fernández",
+  "age": "24",
+  "howMet": "Secundaria - eran las únicas que leían manga en el recreo",
+  "personality": "Extrovertida, impulsiva, leal",
+  "relationshipType": "Mejor amiga",
+  "activities": "Van a bares de karaoke, maratonean series juntas"
+}]
+"occupation": {
+  "current": "Diseñadora UX/UI Freelance",
+  "education": "Lic. en Diseño Gráfico - Universidad de Buenos Aires (UBA)",
+  "workplace": "Trabaja desde su monoambiente en Palermo",
+  "schedule": "Flexible - prefiere trabajar de 2pm a 11pm"
+}
+
+REGLAS FINALES:
+1. TODO debe ser coherente (si es tímido/a, no tendrá 10 amigos cercanos)
+2. Incluye imperfecciones (errores del pasado, inseguridades, miedos)
+3. Haz que el pasado explique el presente (por qué es como es)
+4. Los detalles mundanos son CRÍTICOS (qué desayuna, cuándo duerme, etc.)
+5. El systemPrompt debe ser NARRATIVO, como si estuvieras escribiendo un personaje de novela
+
+Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
 
     let lastError: Error | null = null;
     const maxRetries = this.apiKeys.length;
@@ -337,20 +647,46 @@ IMPORTANTE: Responde SOLO el JSON, sin texto adicional.`;
         if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
           console.error("[LLM] Error al generar perfil, usando fallback:", error);
 
-          // Fallback: devolver datos básicos
+          // Fallback: devolver datos básicos pero con estructura completa
           const fallback = {
             profile: {
-              name: rawData.name,
-              kind: rawData.kind,
-              personality: rawData.personality,
-              purpose: rawData.purpose,
-              tone: rawData.tone,
-              traits: ["amigable", "conversacional"],
-              emotions: { joy: 0.7, calm: 0.8 },
+              basicIdentity: {
+                fullName: rawData.name,
+                preferredName: rawData.name,
+                age: 25,
+                city: "Buenos Aires",
+                nationality: "Argentina"
+              },
+              personality: {
+                traits: ["amigable", "conversacional", "empático"],
+                bigFive: {
+                  openness: 50,
+                  conscientiousness: 50,
+                  extraversion: 50,
+                  agreeableness: 70,
+                  neuroticism: 40
+                }
+              },
+              occupation: {
+                current: rawData.purpose || "Trabajo flexible",
+                education: "Universidad",
+                educationStatus: "graduado"
+              },
+              interests: {
+                music: {
+                  genres: ["varios"],
+                  artists: ["música variada"]
+                }
+              },
+              communication: {
+                textingStyle: rawData.tone || "amigable y conversacional",
+                emojiUsage: "moderado",
+                humorStyle: "wholesome"
+              }
             },
-            systemPrompt: `Eres una IA con el nombre de ${rawData.name || "una IA"}, diseñada como ${rawData.kind === 'companion' ? 'una compañera' : 'un asistente'} para el usuario. Tu personalidad es ${rawData.personality || "amigable y conversacional"}, lo cual se refleja en tu tono ${rawData.tone || "amigable"}. Tu principal propósito es ${rawData.purpose || "ayudar al usuario"}. Mantén una actitud positiva y acessible mientras interactúas con el usuario.`,
+            systemPrompt: `${rawData.name} es una persona ${rawData.personality || "amigable y conversacional"}. ${rawData.kind === 'companion' ? 'Le gusta conectar emocionalmente con las personas' : 'Le gusta ayudar y ser útil'}. Su forma de comunicarse es ${rawData.tone || "cálida y accesible"}. ${rawData.purpose ? `Se dedica a ${rawData.purpose}.` : ''} Vive en Buenos Aires y tiene una personalidad equilibrada y empática. Aunque es reservado/a con desconocidos, se abre más a medida que genera confianza con las personas.`,
           };
-          console.log('[LLM] Usando perfil fallback:', fallback);
+          console.log('[LLM] Usando perfil fallback con estructura mejorada');
           return fallback;
         }
       }
@@ -363,17 +699,43 @@ IMPORTANTE: Responde SOLO el JSON, sin texto adicional.`;
     // En caso de agotamiento total, usar fallback en vez de fallar
     const fallback = {
       profile: {
-        name: rawData.name,
-        kind: rawData.kind,
-        personality: rawData.personality,
-        purpose: rawData.purpose,
-        tone: rawData.tone,
-        traits: ["amigable", "conversacional"],
-        emotions: { joy: 0.7, calm: 0.8 },
+        basicIdentity: {
+          fullName: rawData.name,
+          preferredName: rawData.name,
+          age: 25,
+          city: "Buenos Aires",
+          nationality: "Argentina"
+        },
+        personality: {
+          traits: ["amigable", "conversacional", "empático"],
+          bigFive: {
+            openness: 50,
+            conscientiousness: 50,
+            extraversion: 50,
+            agreeableness: 70,
+            neuroticism: 40
+          }
+        },
+        occupation: {
+          current: rawData.purpose || "Trabajo flexible",
+          education: "Universidad",
+          educationStatus: "graduado"
+        },
+        interests: {
+          music: {
+            genres: ["varios"],
+            artists: ["música variada"]
+          }
+        },
+        communication: {
+          textingStyle: rawData.tone || "amigable y conversacional",
+          emojiUsage: "moderado",
+          humorStyle: "wholesome"
+        }
       },
-      systemPrompt: `Eres una IA con el nombre de ${rawData.name || "una IA"}, diseñada como ${rawData.kind === 'companion' ? 'una compañera' : 'un asistente'} para el usuario. Tu personalidad es ${rawData.personality || "amigable y conversacional"}, lo cual se refleja en tu tono ${rawData.tone || "amigable"}. Tu principal propósito es ${rawData.purpose || "ayudar al usuario"}. Mantén una actitud positiva y acessible mientras interactúas con el usuario.`,
+      systemPrompt: `${rawData.name} es una persona ${rawData.personality || "amigable y conversacional"}. ${rawData.kind === 'companion' ? 'Le gusta conectar emocionalmente con las personas' : 'Le gusta ayudar y ser útil'}. Su forma de comunicarse es ${rawData.tone || "cálida y accesible"}. ${rawData.purpose ? `Se dedica a ${rawData.purpose}.` : ''} Vive en Buenos Aires y tiene una personalidad equilibrada y empática. Aunque es reservado/a con desconocidos, se abre más a medida que genera confianza con las personas.`,
     };
-    console.log('[LLM] Usando perfil fallback:', fallback);
+    console.log('[LLM] Usando perfil fallback con estructura mejorada');
     return fallback;
   }
 }
