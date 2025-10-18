@@ -14,7 +14,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Send, Mic, ImageIcon, Smile, X } from "lucide-react";
+import { Send, Mic, ImageIcon, Smile } from "lucide-react";
 
 interface ChatInputProps {
   value: string;
@@ -40,7 +40,6 @@ export function ChatInput({
   maxLength = 10000,
 }: ChatInputProps) {
   const [isFocused, setIsFocused] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
@@ -98,71 +97,29 @@ export function ChatInput({
         </AnimatePresence>
 
         <div className="relative z-10 flex items-end gap-2 p-2">
-          {/* Action Buttons - Left Side */}
+          {/* Action Buttons - Left Side - Always Visible */}
           <div className="flex items-center gap-1 pb-2">
-            <AnimatePresence mode="wait">
-              {isExpanded ? (
-                <motion.div
-                  key="expanded"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center gap-1"
-                >
-                  {onEmoji && (
-                    <ActionButton
-                      icon={<Smile className="w-4 h-4" />}
-                      onClick={onEmoji}
-                      label="Emoji"
-                    />
-                  )}
-                  {onImage && (
-                    <ActionButton
-                      icon={<ImageIcon className="w-4 h-4" />}
-                      onClick={onImage}
-                      label="Imagen"
-                    />
-                  )}
-                  {onVoice && (
-                    <ActionButton
-                      icon={<Mic className="w-4 h-4" />}
-                      onClick={onVoice}
-                      label="Voz"
-                    />
-                  )}
-                  <ActionButton
-                    icon={<X className="w-4 h-4" />}
-                    onClick={() => setIsExpanded(false)}
-                    label="Cerrar"
-                  />
-                </motion.div>
-              ) : (
-                <motion.button
-                  key="collapsed"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsExpanded(true)}
-                  className={cn(
-                    "p-2 rounded-full",
-                    "bg-gradient-to-br from-gray-100 to-gray-50",
-                    "dark:from-gray-700 dark:to-gray-800",
-                    "text-gray-600 dark:text-gray-300",
-                    "transition-all duration-200",
-                    "hover:shadow-md"
-                  )}
-                >
-                  <motion.div
-                    animate={{ rotate: [0, 90, 0] }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Smile className="w-5 h-5" />
-                  </motion.div>
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {onEmoji && (
+              <ActionButton
+                icon={<Smile className="w-4 h-4" />}
+                onClick={onEmoji}
+                label="Stickers/GIF"
+              />
+            )}
+            {onImage && (
+              <ActionButton
+                icon={<ImageIcon className="w-4 h-4" />}
+                onClick={onImage}
+                label="Imagen"
+              />
+            )}
+            {onVoice && (
+              <ActionButton
+                icon={<Mic className="w-4 h-4" />}
+                onClick={onVoice}
+                label="Voz"
+              />
+            )}
           </div>
 
           {/* Textarea */}

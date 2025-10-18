@@ -10,7 +10,8 @@
 
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   Search,
@@ -46,6 +47,8 @@ export function ChatHeader({
   onExport,
   onReset,
 }: ChatHeaderProps) {
+  const [showMenu, setShowMenu] = useState(false);
+
   return (
     <motion.header
       initial={{ y: -100, opacity: 0 }}
@@ -137,31 +140,7 @@ export function ChatHeader({
         transition={{ delay: 0.3 }}
         className="relative z-10 flex items-center gap-2"
       >
-        {onSearch && (
-          <ActionButton
-            icon={<Search className="w-4 h-4" />}
-            onClick={onSearch}
-            label="Buscar"
-          />
-        )}
-
-        {onExport && (
-          <ActionButton
-            icon={<Download className="w-4 h-4" />}
-            onClick={onExport}
-            label="Exportar"
-          />
-        )}
-
-        {onReset && (
-          <ActionButton
-            icon={<Trash2 className="w-4 h-4" />}
-            onClick={onReset}
-            label="Resetear"
-            variant="danger"
-          />
-        )}
-
+        {/* Toggle Sidebar Button (always visible on desktop) */}
         {onToggleSidebar && (
           <ActionButton
             icon={
@@ -176,11 +155,73 @@ export function ChatHeader({
           />
         )}
 
-        <ActionButton
-          icon={<MoreVertical className="w-4 h-4" />}
-          onClick={() => {}}
-          label="Más opciones"
-        />
+        {/* More Options Menu */}
+        <div className="relative">
+          <ActionButton
+            icon={<MoreVertical className="w-4 h-4" />}
+            onClick={() => setShowMenu(!showMenu)}
+            label="Más opciones"
+          />
+
+          {/* Dropdown Menu */}
+          <AnimatePresence>
+            {showMenu && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setShowMenu(false)}
+                />
+
+                {/* Menu */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-56 z-40 rounded-xl overflow-hidden shadow-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/50"
+                >
+                  {onSearch && (
+                    <MenuItem
+                      icon={<Search className="w-4 h-4" />}
+                      label="Buscar en conversación"
+                      onClick={() => {
+                        onSearch();
+                        setShowMenu(false);
+                      }}
+                    />
+                  )}
+
+                  {onExport && (
+                    <MenuItem
+                      icon={<Download className="w-4 h-4" />}
+                      label="Exportar a PDF"
+                      onClick={() => {
+                        onExport();
+                        setShowMenu(false);
+                      }}
+                    />
+                  )}
+
+                  {onReset && (
+                    <>
+                      <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+                      <MenuItem
+                        icon={<Trash2 className="w-4 h-4" />}
+                        label="Resetear conversación"
+                        onClick={() => {
+                          onReset();
+                          setShowMenu(false);
+                        }}
+                        variant="danger"
+                      />
+                    </>
+                  )}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
     </motion.header>
   );
@@ -226,6 +267,43 @@ function ActionButton({
       )}
     >
       {icon}
+    </motion.button>
+  );
+}
+
+// Menu Item Component
+function MenuItem({
+  icon,
+  label,
+  onClick,
+  variant = "default",
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  variant?: "default" | "danger";
+}) {
+  return (
+    <motion.button
+      whileHover={{ x: 4 }}
+      onClick={onClick}
+      className={cn(
+        "w-full flex items-center gap-3 px-4 py-3",
+        "text-left text-sm font-medium",
+        "transition-colors duration-150",
+        variant === "danger"
+          ? [
+              "text-red-600 dark:text-red-400",
+              "hover:bg-red-500/10",
+            ]
+          : [
+              "text-gray-700 dark:text-gray-300",
+              "hover:bg-gray-100 dark:hover:bg-gray-800",
+            ]
+      )}
+    >
+      {icon}
+      <span>{label}</span>
     </motion.button>
   );
 }
