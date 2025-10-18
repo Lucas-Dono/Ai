@@ -6,6 +6,7 @@
  * - Smooth animations
  * - Better component structure
  * - Improved UX
+ * - Full feature parity with original WhatsAppChat
  */
 
 "use client";
@@ -14,10 +15,19 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useSocket } from "@/hooks/useSocket";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
 import type { Message } from "@/components/chat/WhatsAppChat";
+import { VoiceRecorder } from "@/components/chat/VoiceRecorder";
+import { ImageUploader } from "@/components/chat/ImageUploader";
+import { StickerGifPicker } from "@/components/chat/StickerGifPicker";
+import { BehaviorPanel } from "@/components/chat/BehaviorPanel";
+import { EmotionalStateDisplay } from "@/components/chat/EmotionalStateDisplay";
+import { ChatSearch } from "@/components/chat/ChatSearch";
+import { exportConversationToPDF } from "@/lib/utils/pdf-export";
 
 interface ModernChatProps {
   agentId: string;
@@ -38,6 +48,21 @@ export function ModernChat({
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Multimodal input states
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [showImageUploader, setShowImageUploader] = useState(false);
+  const [showStickerGifPicker, setShowStickerGifPicker] = useState(false);
+
+  // Search and utility states
+  const [showSearch, setShowSearch] = useState(false);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  // Behavioral and emotional tracking
+  const [latestBehaviorData, setLatestBehaviorData] = useState<Message["behaviorData"] | null>(null);
+  const [latestEmotionalData, setLatestEmotionalData] = useState<Message["emotionalData"] | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socket = useSocket();
@@ -82,6 +107,22 @@ export function ModernChat({
       }
     }
   }, [messages, sessionKey]);
+
+  // Update latest behavioral and emotional data when new messages arrive
+  useEffect(() => {
+    const lastAgentMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.type === "agent");
+
+    if (lastAgentMessage) {
+      if (lastAgentMessage.behaviorData) {
+        setLatestBehaviorData(lastAgentMessage.behaviorData);
+      }
+      if (lastAgentMessage.emotionalData) {
+        setLatestEmotionalData(lastAgentMessage.emotionalData);
+      }
+    }
+  }, [messages]);
 
   // Socket connection
   useEffect(() => {
@@ -206,6 +247,216 @@ export function ModernChat({
     }
   };
 
+  // Send voice message
+  const sendVoiceMessage = async (audioBlob: Blob, duration: number) => {
+    const tempId = `temp-voice-${Date.now()}`;
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "voice-message.webm");
+    formData.append("userId", userId);
+    formData.append("duration", duration.toString());
+
+    const userMessage: Message = {
+      id: tempId,
+      type: "user",
+      content: { text: `🎤 Mensaje de voz (${Math.round(duration)}s)` },
+      timestamp: new Date(),
+      status: "sending",
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setShowVoiceRecorder(false);
+    setIsTyping(true);
+
+    try {
+      const response = await fetch(`/api/agents/${agentId}/message`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Failed to send voice message");
+      const data = await response.json();
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === tempId ? { ...msg, id: data.userMessage.id, status: "sent" as const } : msg
+        )
+      );
+
+      const agentMessage: Message = {
+        id: data.message.id,
+        type: "agent",
+        content: { text: data.message.content },
+        timestamp: new Date(data.message.createdAt),
+        status: "delivered",
+        agentName,
+        agentAvatar,
+        behaviorData: data.behaviors,
+        emotionalData: { state: data.state, emotions: data.emotions, relationLevel: data.relationLevel },
+      };
+
+      setMessages((prev) => [...prev, agentMessage]);
+      setIsTyping(false);
+    } catch (error) {
+      console.error("Error sending voice message:", error);
+      setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, status: "sent" as const } : msg)));
+      setIsTyping(false);
+    }
+  };
+
+  // Send image message
+  const sendImageMessage = async (imageFile: File, caption?: string) => {
+    const tempId = `temp-image-${Date.now()}`;
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("userId", userId);
+    if (caption) formData.append("content", caption);
+
+    const userMessage: Message = {
+      id: tempId,
+      type: "user",
+      content: { text: caption || "📷 Imagen" },
+      timestamp: new Date(),
+      status: "sending",
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setShowImageUploader(false);
+    setIsTyping(true);
+
+    try {
+      const response = await fetch(`/api/agents/${agentId}/message`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Failed to send image");
+      const data = await response.json();
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === tempId ? { ...msg, id: data.userMessage.id, status: "sent" as const } : msg
+        )
+      );
+
+      const agentMessage: Message = {
+        id: data.message.id,
+        type: "agent",
+        content: { text: data.message.content },
+        timestamp: new Date(data.message.createdAt),
+        status: "delivered",
+        agentName,
+        agentAvatar,
+        behaviorData: data.behaviors,
+        emotionalData: { state: data.state, emotions: data.emotions, relationLevel: data.relationLevel },
+      };
+
+      setMessages((prev) => [...prev, agentMessage]);
+      setIsTyping(false);
+    } catch (error) {
+      console.error("Error sending image:", error);
+      setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, status: "sent" as const } : msg)));
+      setIsTyping(false);
+    }
+  };
+
+  // Send sticker or GIF
+  const sendStickerOrGif = async (url: string, type: "sticker" | "gif") => {
+    const tempId = `temp-${type}-${Date.now()}`;
+
+    const userMessage: Message = {
+      id: tempId,
+      type: "user",
+      content: { text: type === "sticker" ? "🎭 Sticker" : "🎬 GIF" },
+      timestamp: new Date(),
+      status: "sending",
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setShowStickerGifPicker(false);
+    setIsTyping(true);
+
+    try {
+      const response = await fetch(`/api/agents/${agentId}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: url, userId, messageType: type }),
+      });
+
+      if (!response.ok) throw new Error(`Failed to send ${type}`);
+      const data = await response.json();
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === tempId ? { ...msg, id: data.userMessage.id, status: "sent" as const } : msg
+        )
+      );
+
+      const agentMessage: Message = {
+        id: data.message.id,
+        type: "agent",
+        content: { text: data.message.content },
+        timestamp: new Date(data.message.createdAt),
+        status: "delivered",
+        agentName,
+        agentAvatar,
+        behaviorData: data.behaviors,
+        emotionalData: { state: data.state, emotions: data.emotions, relationLevel: data.relationLevel },
+      };
+
+      setMessages((prev) => [...prev, agentMessage]);
+      setIsTyping(false);
+    } catch (error) {
+      console.error(`Error sending ${type}:`, error);
+      setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, status: "sent" as const } : msg)));
+      setIsTyping(false);
+    }
+  };
+
+  // Search result handler
+  const handleSearchResultSelect = (messageId: string) => {
+    setHighlightedMessageId(messageId);
+    setTimeout(() => setHighlightedMessageId(null), 3000);
+  };
+
+  // Export to PDF
+  const exportToPDF = async () => {
+    try {
+      await exportConversationToPDF(messages, {
+        agentName,
+        userName: "Usuario",
+        includeImages: true,
+        includeTimestamps: true,
+      });
+    } catch (error) {
+      console.error("Error exportando a PDF:", error);
+      alert("Error al exportar la conversación. Intenta de nuevo.");
+    }
+  };
+
+  // Reset conversation
+  const resetConversation = async () => {
+    if (isResetting) return;
+
+    setIsResetting(true);
+    try {
+      const response = await fetch(`/api/agents/${agentId}/conversation/reset`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to reset conversation");
+
+      setMessages([]);
+      sessionStorage.removeItem(sessionKey);
+      setShowResetConfirm(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error resetting conversation:", error);
+      alert("Error al resetear la conversación. Intenta de nuevo.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="flex h-full relative overflow-hidden">
       {/* Animated Background */}
@@ -228,10 +479,19 @@ export function ModernChat({
           isOnline={true}
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          onSearch={() => {}}
-          onExport={() => {}}
-          onReset={() => {}}
+          onSearch={() => setShowSearch(!showSearch)}
+          onExport={exportToPDF}
+          onReset={() => setShowResetConfirm(true)}
         />
+
+        {/* Search Bar */}
+        {showSearch && (
+          <ChatSearch
+            messages={messages}
+            onResultSelect={handleSearchResultSelect}
+            onClose={() => setShowSearch(false)}
+          />
+        )}
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-2">
@@ -288,16 +548,138 @@ export function ModernChat({
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Voice Recorder */}
+        {showVoiceRecorder && (
+          <div className="px-6 pb-4">
+            <VoiceRecorder
+              onSend={sendVoiceMessage}
+              onCancel={() => setShowVoiceRecorder(false)}
+            />
+          </div>
+        )}
+
+        {/* Image Uploader */}
+        {showImageUploader && (
+          <div className="px-6 pb-4">
+            <ImageUploader
+              onSend={sendImageMessage}
+              onCancel={() => setShowImageUploader(false)}
+            />
+          </div>
+        )}
+
+        {/* Sticker/GIF Picker */}
+        {showStickerGifPicker && (
+          <div className="px-6 pb-4 flex justify-center">
+            <StickerGifPicker
+              onSend={sendStickerOrGif}
+              onClose={() => setShowStickerGifPicker(false)}
+            />
+          </div>
+        )}
+
         {/* Input Area */}
-        <ChatInput
-          value={inputMessage}
-          onChange={setInputMessage}
-          onSend={sendMessage}
-          onVoice={() => {}}
-          onImage={() => {}}
-          onEmoji={() => {}}
-        />
+        {!showVoiceRecorder && !showImageUploader && !showStickerGifPicker && (
+          <ChatInput
+            value={inputMessage}
+            onChange={setInputMessage}
+            onSend={sendMessage}
+            onVoice={() => setShowVoiceRecorder(true)}
+            onImage={() => setShowImageUploader(true)}
+            onEmoji={() => setShowStickerGifPicker(true)}
+          />
+        )}
       </div>
+
+      {/* Sidebar with Behavioral & Emotional Data */}
+      <aside
+        className={cn(
+          "relative z-10 border-l transition-all duration-300 overflow-y-auto",
+          sidebarOpen ? "w-80" : "w-0",
+          "hidden lg:block",
+          "bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl",
+          "border-white/30 dark:border-gray-700/50"
+        )}
+      >
+        {sidebarOpen && (
+          <div className="p-4 space-y-4">
+            {/* Emotional State */}
+            {latestEmotionalData && (
+              <EmotionalStateDisplay
+                state={latestEmotionalData.state}
+                emotions={latestEmotionalData.emotions}
+                relationLevel={latestEmotionalData.relationLevel}
+              />
+            )}
+
+            {/* Behavior Panel */}
+            {latestBehaviorData && (
+              <BehaviorPanel
+                agentId={agentId}
+                behaviorData={latestBehaviorData}
+                intensity={latestBehaviorData.intensity}
+              />
+            )}
+          </div>
+        )}
+      </aside>
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => !isResetting && setShowResetConfirm(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 max-w-md w-full border border-white/30 dark:border-gray-700/50 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-red-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                  ¿Resetear conversación?
+                </h3>
+                <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">
+                  Esto borrará <strong>todos los mensajes</strong>, resetará la relación y el estado emocional.
+                  Esta acción <strong>no se puede deshacer</strong>.
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowResetConfirm(false)}
+                    disabled={isResetting}
+                    className="hover:bg-gray-200 dark:hover:bg-gray-800"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={resetConversation}
+                    disabled={isResetting}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {isResetting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Reseteando...
+                      </div>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Sí, resetear
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
