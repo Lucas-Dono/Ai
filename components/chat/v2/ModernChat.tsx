@@ -620,6 +620,21 @@ export function ModernChat({
                 intensity={latestBehaviorData.intensity}
               />
             )}
+
+            {/* Empty State */}
+            {!latestEmotionalData && !latestBehaviorData && (
+              <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
+                  <span className="text-3xl">💭</span>
+                </div>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Estado Emocional
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Envía un mensaje para ver el estado emocional y comportamiento del agente
+                </p>
+              </div>
+            )}
           </div>
         )}
       </aside>
