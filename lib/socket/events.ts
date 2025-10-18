@@ -15,6 +15,32 @@ export interface ClientToServerEvents {
   "chat:join": (data: { agentId: string; userId: string }) => void;
   "chat:leave": (data: { agentId: string; userId: string }) => void;
 
+  // Room management (WhatsAppChat)
+  "join:agent:room": (data: { agentId: string }) => void;
+  "leave:agent:room": (data: { agentId: string }) => void;
+
+  // User message with metadata
+  "user:message": (data: {
+    agentId: string;
+    userId: string;
+    message: string;
+    metadata?: {
+      type?: 'text' | 'audio' | 'gif' | 'image';
+      emotion?: string;
+      intensity?: number;
+      tone?: string;
+      duration?: number;
+      [key: string]: unknown;
+    };
+  }) => void;
+
+  // Message reactions
+  "message:react": (data: {
+    messageId: string;
+    emoji: string;
+    userId: string;
+  }) => void;
+
   // Presence events
   "presence:online": (data: { userId: string }) => void;
   "presence:offline": (data: { userId: string }) => void;
@@ -32,6 +58,16 @@ export interface ServerToClientEvents {
   "chat:message:complete": (data: MessageCompleteEvent) => void;
   "chat:typing": (data: TypingEvent) => void;
   "chat:error": (data: ErrorEvent) => void;
+
+  // Agent messages (WhatsAppChat)
+  "agent:message": (data: AgentMessageEvent) => void;
+  "agent:typing": (data: { agentId: string; isTyping: boolean }) => void;
+
+  // Message reactions (WhatsAppChat)
+  "message:reactions:updated": (data: {
+    messageId: string;
+    reactions: Reaction[];
+  }) => void;
 
   // Presence events
   "presence:update": (data: PresenceUpdateEvent) => void;
@@ -144,6 +180,42 @@ export interface RelationUpdateEvent {
   relationLevel: string;
   emotions: string[];
   timestamp: number;
+}
+
+export interface AgentMessageEvent {
+  messageId: string;
+  agentId: string;
+  content: {
+    text?: string;
+    audioUrl?: string;
+    imageUrl?: string;
+    emotion?: string;
+  };
+  // Behavior system metadata
+  behaviors?: {
+    active: string[];
+    phase?: number;
+    safetyLevel: 'SAFE' | 'WARNING' | 'CRITICAL' | 'EXTREME_DANGER';
+    triggers: string[];
+    intensity?: number;
+  };
+  // Emotional state
+  emotional?: {
+    state: {
+      trust: number;
+      affinity: number;
+      respect: number;
+    };
+    emotions: string[];
+    relationLevel: number;
+  };
+}
+
+export interface Reaction {
+  emoji: string;
+  count: number;
+  users: string[];
+  reacted: boolean;
 }
 
 // Room naming conventions
