@@ -10,7 +10,7 @@
  * - Añadir caption opcional
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Send, Image as ImageIcon } from "lucide-react";
@@ -59,14 +59,14 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
     }
   };
 
-  // Auto-trigger file input
-  useState(() => {
+  // Auto-trigger file input when component mounts
+  useEffect(() => {
     fileInputRef.current?.click();
-  });
+  }, []);
 
   if (!selectedImage || !previewUrl) {
     return (
-      <div className="bg-[#1f1f1f] rounded-2xl p-8 text-center">
+      <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-8 text-center border border-white/30 dark:border-gray-700/50 shadow-2xl">
         <input
           ref={fileInputRef}
           type="file"
@@ -74,12 +74,14 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
           onChange={handleFileSelect}
           className="hidden"
         />
-        <ImageIcon className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-        <p className="text-gray-400 mb-4">Seleccionando imagen...</p>
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+          <ImageIcon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+        </div>
+        <p className="text-gray-700 dark:text-gray-300 mb-4 font-medium">Seleccionando imagen...</p>
         <Button
           variant="outline"
           onClick={onCancel}
-          className="text-gray-400"
+          className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-md border-white/30 hover:bg-white/70 dark:hover:bg-gray-700/70"
         >
           Cancelar
         </Button>
@@ -88,13 +90,13 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
   }
 
   return (
-    <div className="bg-[#1f1f1f] rounded-2xl p-4 space-y-3 max-w-2xl">
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl p-4 space-y-3 max-w-2xl border border-white/30 dark:border-gray-700/50 shadow-2xl">
       {/* Preview */}
-      <div className="relative rounded-lg overflow-hidden">
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-900 dark:to-gray-800">
         <img
           src={previewUrl}
           alt="Preview"
-          className="w-full h-auto max-h-[400px] object-contain bg-black"
+          className="w-full h-auto max-h-[400px] object-contain"
         />
 
         {/* Close button */}
@@ -102,7 +104,7 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
           variant="ghost"
           size="icon"
           onClick={onCancel}
-          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full"
+          className="absolute top-3 right-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md hover:bg-white/90 dark:hover:bg-gray-900/90 text-gray-700 dark:text-gray-300 rounded-full shadow-lg border border-white/30"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -113,13 +115,13 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
         placeholder="Añade un mensaje (opcional)..."
-        className="bg-[#2a2a2a] border-none text-white placeholder:text-gray-500 resize-none"
+        className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-md border-white/30 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none rounded-xl"
         rows={2}
       />
 
       {/* Actions */}
       <div className="flex items-center justify-between gap-2">
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
           {selectedImage.name} ({(selectedImage.size / 1024).toFixed(0)}KB)
         </div>
 
@@ -127,14 +129,13 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
           <Button
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
-            className="text-gray-400"
+            className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-md border-white/30 hover:bg-white/70 dark:hover:bg-gray-700/70"
           >
             Cambiar
           </Button>
           <Button
-            variant="default"
             onClick={handleSend}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
           >
             <Send className="h-4 w-4 mr-2" />
             Enviar
