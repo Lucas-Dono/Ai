@@ -231,14 +231,15 @@ export async function POST(
     const validation = messageInputSchema.safeParse(body);
 
     if (!validation.success) {
-      log.warn({ errors: validation.error.errors }, 'Invalid input data');
+      log.warn({ errors: validation.error.issues }, 'Invalid input data');
       return NextResponse.json(
         formatZodError(validation.error),
         { status: 400 }
       );
     }
 
-    let { content, messageType, metadata } = validation.data;
+    let { content } = validation.data;
+    const { messageType, metadata } = validation.data;
 
     // Si hay un caption de imagen, enriquecer el contenido
     if (imageCaption) {
@@ -312,7 +313,7 @@ export async function POST(
 
     // Handle validation errors
     if (error instanceof ZodError) {
-      log.warn({ errors: error.errors }, 'Validation error');
+      log.warn({ errors: error.issues }, 'Validation error');
       return NextResponse.json(
         formatZodError(error),
         { status: 400 }

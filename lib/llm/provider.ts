@@ -105,6 +105,7 @@ export class LLMProvider {
 
         // Agregar system prompt como primer user message
         let firstUserContent = systemPrompt + "\n\n";
+        let systemPromptAdded = false;
 
         // Combinar mensajes en formato Gemini
         for (const msg of messages) {
@@ -115,12 +116,21 @@ export class LLMProvider {
               parts: [{ text: firstUserContent }]
             });
             firstUserContent = ""; // Reset
+            systemPromptAdded = true;
           } else if (msg.role === "assistant") {
             contents.push({
               role: "model",
               parts: [{ text: msg.content }]
             });
           }
+        }
+
+        // Si el systemPrompt no se agregó (no hay mensajes user), agregarlo ahora
+        if (!systemPromptAdded && firstUserContent) {
+          contents.push({
+            role: "user",
+            parts: [{ text: firstUserContent }]
+          });
         }
 
         const currentKey = this.getCurrentApiKey();

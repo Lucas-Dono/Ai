@@ -128,7 +128,7 @@ export function ModernChat({
   useEffect(() => {
     if (!socket) return;
 
-    // @ts-ignore - Using typed socket events
+    // @ts-expect-error - Using typed socket events
     socket.on("agent:message", (data: any) => {
       if (data.agentId !== agentId) return;
 
@@ -153,22 +153,22 @@ export function ModernChat({
       setIsTyping(false);
     });
 
-    // @ts-ignore
+    // @ts-expect-error - Socket.io types don't include custom events
     socket.on("agent:typing", (data: { agentId: string; isTyping: boolean }) => {
       if (data.agentId === agentId) {
         setIsTyping(data.isTyping);
       }
     });
 
-    // @ts-ignore
+    // @ts-expect-error - Socket.io types don't include custom events
     socket.emit("join:agent:room", { agentId });
 
     return () => {
-      // @ts-ignore
+      // @ts-expect-error - Socket.io types don't include custom events
       socket.emit("leave:agent:room", { agentId });
-      // @ts-ignore
+      // @ts-expect-error - Socket.io types don't include custom events
       socket.off("agent:message");
-      // @ts-ignore
+      // @ts-expect-error - Socket.io types don't include custom events
       socket.off("agent:typing");
     };
   }, [socket, agentId, agentName, agentAvatar]);

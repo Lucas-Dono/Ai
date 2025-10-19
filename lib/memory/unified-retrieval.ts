@@ -373,7 +373,7 @@ export class UnifiedMemoryRetrieval {
       return "";
     }
 
-    let promptParts: string[] = [];
+    const promptParts: string[] = [];
     let currentTokens = 0;
 
     // Estimar ~4 caracteres por token

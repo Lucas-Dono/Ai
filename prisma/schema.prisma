@@ -20,6 +20,7 @@ model User {
   plan                  String    @default("free") // free, pro, enterprise
   mercadopagoCustomerId String?   @unique // Mercado Pago customer ID
   apiKey                String?   @unique // API key opcional para usuarios avanzados
+  location              String? // Ciudad del usuario para contexto de clima (ej: "Buenos Aires")
   metadata              Json? // Metadata adicional (push subscription, preferences, etc.)
 
   // Image upload limits
@@ -144,6 +145,13 @@ model Agent {
   // Sistema de comportamientos psicológicos
   behaviorProfiles         BehaviorProfile[]
   behaviorProgressionState BehaviorProgressionState?
+
+  // Sistema de eventos importantes y personas
+  importantEvents ImportantEvent[]
+  importantPeople ImportantPerson[]
+
+  // Sistema de mensajes proactivos
+  proactiveConfig ProactiveConfig?
 
   @@index([userId])
   @@index([teamId])
@@ -929,4 +937,149 @@ model FastSDInstallation {
   @@index([userId])
   @@index([installed])
   @@index([serverRunning])
+}
+
+// IMPORTANT EVENTS - Eventos importantes que la IA debe recordar
+// La IA decide qué guardar usando comandos [REMEMBER:...]
+model ImportantEvent {
+  id      String @id @default(cuid())
+  agentId String
+  userId  String
+
+  // Información del evento
+  eventDate   DateTime // Fecha del evento
+  type        String // birthday, medical, exam, special, anniversary, other
+  description String   @db.Text // "Cirugía de Max (perro)", "Cumpleaños del usuario"
+  priority    String   @default("medium") // low, medium, high, critical
+
+  // Estado del evento
+  mentioned        Boolean  @default(false) // Ya la IA preguntó sobre esto?
+  reminderSentAt   DateTime? // Cuándo se mencionó por última vez
+  eventHappened    Boolean  @default(false) // El evento ya pasó?
+  userFeedback     String? // "Fue bien", "Se canceló", etc.
+  isRecurring      Boolean  @default(false) // Se repite cada año? (cumpleaños, aniversarios)
+  recurringDay     Int? // Día del mes (1-31) para eventos recurrentes
+  recurringMonth   Int? // Mes (1-12) para eventos recurrentes
+
+  // Metadata
+  relationship String? // user, family, pet, friend (a quién afecta)
+  emotionalTone String? // joyful, anxious, neutral, sad
+  metadata     Json? // Info adicional flexible
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([eventDate])
+  @@index([mentioned])
+  @@index([type])
+}
+
+// IMPORTANT PEOPLE - Personas importantes que la IA debe recordar
+// La IA detecta personas mediante comandos [PERSON:...]
+model ImportantPerson {
+  id      String @id @default(cuid())
+  agentId String
+  userId  String
+
+  // Información básica
+  name         String // "Ana", "Max", "Mamá"
+  relationship String // "hermana", "pareja", "amigo", "madre", "mascota", "compañero de trabajo"
+  age          Int? // Edad aproximada
+  gender       String? // "male", "female", "other", "unknown"
+
+  // Contexto
+  description String? @db.Text // "Vive en Córdoba, estudia medicina"
+  interests   String? @db.Text // "Le gusta el anime, el gaming"
+  healthInfo  String? @db.Text // "Tiene diabetes", "Se recupera de cirugía"
+
+  // Metadata
+  birthday     DateTime? // Cumpleaños de la persona
+  lastMentioned DateTime? // Última vez que el usuario habló de esta persona
+  mentionCount  Int @default(0) // Cuántas veces se mencionó
+  importance    String @default("medium") // low, medium, high (basado en frecuencia de mención)
+
+  metadata Json? // Info adicional flexible
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([name])
+  @@index([relationship])
+  @@index([lastMentioned])
+}
+
+// PROACTIVE MESSAGING - Sistema de iniciativa conversacional
+// Permite que el agente envíe mensajes espontáneos al usuario
+
+model ProactiveConfig {
+  id      String @id @default(cuid())
+  agentId String @unique
+  userId  String
+
+  // Configuración general
+  enabled              Boolean @default(true) // Usuario permite mensajes proactivos?
+  maxMessagesPerDay    Int     @default(2) // Límite diario de mensajes proactivos
+  maxMessagesPerWeek   Int     @default(7) // Límite semanal
+  quietHoursStart      Int?    @default(22) // Hora de inicio de horario silencioso (22 = 10 PM)
+  quietHoursEnd        Int?    @default(8) // Hora de fin de horario silencioso (8 = 8 AM)
+
+  // Triggers habilitados
+  inactivityEnabled    Boolean @default(true) // Enviar mensaje si usuario inactivo?
+  inactivityDays       Int     @default(3) // Días de inactividad antes de enviar
+  eventRemindersEnabled Boolean @default(true) // Recordar eventos próximos?
+  eventReminderHours   Int     @default(24) // Horas antes del evento para recordar
+  emotionalCheckInEnabled Boolean @default(true) // Check-in emocional si última conversación fue difícil?
+
+  // Metadata
+  lastProactiveMessage DateTime? // Última vez que se envió mensaje proactivo
+  timezone             String    @default("America/Argentina/Buenos_Aires")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([enabled])
+}
+
+model ProactiveMessage {
+  id      String @id @default(cuid())
+  agentId String
+  userId  String
+
+  // Información del mensaje
+  triggerType String // "inactivity", "event_reminder", "emotional_checkin", "conversation_followup"
+  content     String @db.Text // Contenido del mensaje generado
+  context     Json? // Contexto usado para generar el mensaje (evento, última conversación, etc.)
+
+  // Estado
+  status        String   @default("pending") // pending, sent, delivered, read, failed
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  readAt        DateTime?
+  responseAt    DateTime? // Cuándo respondió el usuario?
+  userResponded Boolean  @default(false)
+
+  // Relación con mensaje real (si se envió)
+  messageId String? @unique // ID del mensaje en la tabla Message
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([status])
+  @@index([triggerType])
+  @@index([sentAt])
+  @@index([createdAt])
 }

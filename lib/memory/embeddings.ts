@@ -42,6 +42,11 @@ async function getEmbeddingPipeline() {
     env.cacheDir = "./.cache/transformers";
     env.allowLocalModels = false;
 
+    // Deshabilitar Sharp - no es necesario para embeddings de texto
+    // Esto permite que el código funcione en Windows y Linux sin problemas de binarios
+    env.backends.onnx.wasm.proxy = false;
+    env.useBrowserCache = false;
+
     const pipe = await pipeline("feature-extraction", EMBEDDING_MODEL);
     embeddingPipeline = pipe;
     console.log("[Embeddings] Model ready");

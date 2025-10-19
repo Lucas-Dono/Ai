@@ -16,15 +16,15 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 export const logger = pino({
   level: isDevelopment ? 'debug' : 'info',
 
-  // Pretty print in development for readability
-  transport: isDevelopment ? {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'HH:MM:ss',
-      ignore: 'pid,hostname',
-    }
-  } : undefined,
+  // Pretty print disabled to avoid worker thread issues in Next.js
+  // transport: isDevelopment ? {
+  //   target: 'pino-pretty',
+  //   options: {
+  //     colorize: true,
+  //     translateTime: 'HH:MM:ss',
+  //     ignore: 'pid,hostname',
+  //   }
+  // } : undefined,
 
   // Redact sensitive information
   redact: {

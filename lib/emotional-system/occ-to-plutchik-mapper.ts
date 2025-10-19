@@ -311,6 +311,12 @@ export class OCCToPlutchikMapper {
    * Mapea estado emocional OCC a estado Plutchik
    */
   mapOCCToPlutchik(occEmotions: EmotionState): PlutchikEmotionState {
+    // Validar input
+    if (!occEmotions || typeof occEmotions !== 'object') {
+      console.warn('[OCCMapper] Invalid occEmotions, returning neutral state');
+      return createNeutralState();
+    }
+
     // Empezar con estado neutral
     const plutchikState = createNeutralState();
 
@@ -429,6 +435,12 @@ export class OCCToPlutchikMapper {
     lines.push("OCC TO PLUTCHIK MAPPING REPORT");
     lines.push("=".repeat(60));
     lines.push("");
+
+    // Validar input
+    if (!occEmotions || typeof occEmotions !== 'object') {
+      lines.push("ERROR: Invalid occEmotions input");
+      return lines.join("\n");
+    }
 
     lines.push("OCC EMOTIONS INPUT:");
     for (const [emotion, intensity] of Object.entries(occEmotions)) {

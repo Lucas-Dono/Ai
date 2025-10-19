@@ -143,3 +143,482 @@ body {
   animation: gradient-x 15s ease infinite;
   background-size: 200% 200%;
 }
+
+/* ============================================
+   BUSINESS ENTERPRISE THEME
+   Sistema de diseño para dashboard empresarial
+   ============================================ */
+
+/* Business Theme Variables - Light Mode */
+:root {
+  /* Business Brand Colors */
+  --business-primary: 30 64 175;        /* Blue-700 - Profesional */
+  --business-primary-hover: 30 58 138;  /* Blue-800 */
+  --business-primary-light: 59 130 246; /* Blue-500 */
+
+  --business-secondary: 15 23 42;       /* Slate-900 */
+  --business-secondary-light: 30 41 59; /* Slate-800 */
+
+  --business-accent: 6 182 212;         /* Cyan-500 - Info accent */
+  --business-accent-light: 34 211 238;  /* Cyan-400 */
+
+  --business-success: 16 185 129;       /* Emerald-500 */
+  --business-warning: 245 158 11;       /* Amber-500 */
+  --business-error: 239 68 68;          /* Red-500 */
+  --business-info: 59 130 246;          /* Blue-500 */
+
+  /* Business Backgrounds - Light */
+  --business-bg-primary: 255 255 255;   /* White */
+  --business-bg-secondary: 248 250 252; /* Slate-50 */
+  --business-bg-tertiary: 241 245 249;  /* Slate-100 */
+  --business-bg-hover: 241 245 249;     /* Slate-100 */
+
+  /* Business Text Colors - Light */
+  --business-text-primary: 15 23 42;    /* Slate-900 */
+  --business-text-secondary: 71 85 105; /* Slate-600 */
+  --business-text-muted: 100 116 139;   /* Slate-500 */
+
+  /* Business Borders - Light */
+  --business-border-default: 226 232 240; /* Slate-200 */
+  --business-border-light: 241 245 249;   /* Slate-100 */
+  --business-border-strong: 203 213 225;  /* Slate-300 */
+}
+
+/* Business Theme Variables - Dark Mode */
+.dark {
+  /* Business Backgrounds - Dark */
+  --business-bg-primary: 15 23 42;      /* Slate-900 */
+  --business-bg-secondary: 30 41 59;    /* Slate-800 */
+  --business-bg-tertiary: 51 65 85;     /* Slate-700 */
+  --business-bg-hover: 51 65 85;        /* Slate-700 */
+
+  /* Business Text Colors - Dark */
+  --business-text-primary: 241 245 249; /* Slate-100 */
+  --business-text-secondary: 148 163 184; /* Slate-400 */
+  --business-text-muted: 100 116 139;   /* Slate-500 */
+
+  /* Business Borders - Dark */
+  --business-border-default: 51 65 85;  /* Slate-700 */
+  --business-border-light: 71 85 105;   /* Slate-600 */
+  --business-border-strong: 71 85 105;  /* Slate-600 */
+}
+
+/* Business Layout Constants */
+:root {
+  --business-sidebar-width: 280px;
+  --business-header-height: 64px;
+  --business-card-radius: 12px;
+  --business-button-radius: 8px;
+  --business-input-radius: 6px;
+
+  /* Spacing Scale */
+  --business-spacing-xs: 0.25rem;   /* 4px */
+  --business-spacing-sm: 0.5rem;    /* 8px */
+  --business-spacing-md: 1rem;      /* 16px */
+  --business-spacing-lg: 1.5rem;    /* 24px */
+  --business-spacing-xl: 2rem;      /* 32px */
+  --business-spacing-2xl: 3rem;     /* 48px */
+  --business-spacing-3xl: 4rem;     /* 64px */
+
+  /* Typography Scale */
+  --business-text-xs: 0.75rem;      /* 12px */
+  --business-text-sm: 0.875rem;     /* 14px */
+  --business-text-base: 1rem;       /* 16px */
+  --business-text-lg: 1.125rem;     /* 18px */
+  --business-text-xl: 1.25rem;      /* 20px */
+  --business-text-2xl: 1.5rem;      /* 24px */
+  --business-text-3xl: 1.875rem;    /* 30px */
+  --business-text-4xl: 2.25rem;     /* 36px */
+
+  /* Shadows */
+  --business-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --business-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --business-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --business-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Business Utility Classes */
+@layer utilities {
+  /* Background utilities */
+  .bg-business-primary {
+    background-color: rgb(var(--business-bg-primary));
+  }
+
+  .bg-business-secondary {
+    background-color: rgb(var(--business-bg-secondary));
+  }
+
+  .bg-business-tertiary {
+    background-color: rgb(var(--business-bg-tertiary));
+  }
+
+  .bg-business-hover:hover {
+    background-color: rgb(var(--business-bg-hover));
+  }
+
+  /* Text utilities */
+  .text-business-primary {
+    color: rgb(var(--business-text-primary));
+  }
+
+  .text-business-secondary {
+    color: rgb(var(--business-text-secondary));
+  }
+
+  .text-business-muted {
+    color: rgb(var(--business-text-muted));
+  }
+
+  /* Border utilities */
+  .border-business {
+    border-color: rgb(var(--business-border-default));
+  }
+
+  .border-business-light {
+    border-color: rgb(var(--business-border-light));
+  }
+
+  .border-business-strong {
+    border-color: rgb(var(--business-border-strong));
+  }
+
+  /* Brand color utilities */
+  .bg-business-brand {
+    background-color: rgb(var(--business-primary));
+  }
+
+  .text-business-brand {
+    color: rgb(var(--business-primary));
+  }
+
+  .bg-business-accent {
+    background-color: rgb(var(--business-accent));
+  }
+
+  .text-business-accent {
+    color: rgb(var(--business-accent));
+  }
+
+  /* Status utilities */
+  .bg-business-success {
+    background-color: rgb(var(--business-success));
+  }
+
+  .text-business-success {
+    color: rgb(var(--business-success));
+  }
+
+  .bg-business-warning {
+    background-color: rgb(var(--business-warning));
+  }
+
+  .text-business-warning {
+    color: rgb(var(--business-warning));
+  }
+
+  .bg-business-error {
+    background-color: rgb(var(--business-error));
+  }
+
+  .text-business-error {
+    color: rgb(var(--business-error));
+  }
+
+  /* Layout utilities */
+  .business-sidebar-width {
+    width: var(--business-sidebar-width);
+  }
+
+  .business-header-height {
+    height: var(--business-header-height);
+  }
+
+  /* Shadow utilities */
+  .shadow-business-sm {
+    box-shadow: var(--business-shadow-sm);
+  }
+
+  .shadow-business-md {
+    box-shadow: var(--business-shadow-md);
+  }
+
+  .shadow-business-lg {
+    box-shadow: var(--business-shadow-lg);
+  }
+
+  .shadow-business-xl {
+    box-shadow: var(--business-shadow-xl);
+  }
+}
+
+/* Business Component Styles */
+.business-card {
+  background-color: rgb(var(--business-bg-secondary));
+  border: 1px solid rgb(var(--business-border-default));
+  border-radius: var(--business-card-radius);
+  padding: var(--business-spacing-lg);
+  transition: all 0.2s ease;
+}
+
+.business-card:hover {
+  box-shadow: var(--business-shadow-lg);
+  border-color: rgb(var(--business-border-strong));
+}
+
+.business-stat-card {
+  background: linear-gradient(135deg, rgb(var(--business-bg-secondary)) 0%, rgb(var(--business-bg-tertiary)) 100%);
+  border: 1px solid rgb(var(--business-border-default));
+  border-radius: var(--business-card-radius);
+  padding: var(--business-spacing-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.business-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgb(var(--business-primary)), rgb(var(--business-accent)));
+}
+
+.business-button-primary {
+  background-color: rgb(var(--business-primary));
+  color: white;
+  padding: var(--business-spacing-sm) var(--business-spacing-lg);
+  border-radius: var(--business-button-radius);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.business-button-primary:hover {
+  background-color: rgb(var(--business-primary-hover));
+  box-shadow: var(--business-shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Business Animations */
+@keyframes business-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes business-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes business-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes business-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes business-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.business-animate-fade-in {
+  animation: business-fade-in 0.3s ease-out;
+}
+
+.business-animate-slide-in {
+  animation: business-slide-in 0.4s ease-out;
+}
+
+.business-animate-scale-in {
+  animation: business-scale-in 0.3s ease-out;
+}
+
+.business-animate-pulse {
+  animation: business-pulse 2s ease-in-out infinite;
+}
+
+.business-shimmer {
+  background: linear-gradient(
+    to right,
+    rgb(var(--business-bg-secondary)) 0%,
+    rgb(var(--business-bg-tertiary)) 50%,
+    rgb(var(--business-bg-secondary)) 100%
+  );
+  background-size: 1000px 100%;
+  animation: business-shimmer 2s infinite;
+}
+
+/* Business Scrollbar Styles */
+.business-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.business-scrollbar::-webkit-scrollbar-track {
+  background: rgb(var(--business-bg-secondary));
+  border-radius: 4px;
+}
+
+.business-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(var(--business-border-strong));
+  border-radius: 4px;
+}
+
+.business-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--business-text-muted));
+}
+
+/* Business Status Indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-active::before {
+  background-color: rgb(var(--business-success));
+  box-shadow: 0 0 8px rgb(var(--business-success) / 0.4);
+  animation: business-pulse 2s ease-in-out infinite;
+}
+
+.status-idle::before {
+  background-color: rgb(var(--business-warning));
+}
+
+.status-error::before {
+  background-color: rgb(var(--business-error));
+  animation: business-pulse 1s ease-in-out infinite;
+}
+
+.status-offline::before {
+  background-color: rgb(var(--business-text-muted));
+}
+
+/* Business Chart Styles */
+.business-chart-tooltip {
+  background-color: rgb(var(--business-bg-primary));
+  border: 1px solid rgb(var(--business-border-default));
+  border-radius: var(--business-input-radius);
+  padding: var(--business-spacing-sm) var(--business-spacing-md);
+  box-shadow: var(--business-shadow-lg);
+}
+
+/* Business Table Styles */
+.business-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.business-table thead tr {
+  background-color: rgb(var(--business-bg-tertiary));
+  border-bottom: 1px solid rgb(var(--business-border-default));
+}
+
+.business-table th {
+  padding: var(--business-spacing-md);
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--business-text-sm);
+  color: rgb(var(--business-text-secondary));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.business-table tbody tr {
+  border-bottom: 1px solid rgb(var(--business-border-default));
+  transition: background-color 0.15s ease;
+}
+
+.business-table tbody tr:hover {
+  background-color: rgb(var(--business-bg-hover));
+}
+
+.business-table td {
+  padding: var(--business-spacing-md);
+  color: rgb(var(--business-text-primary));
+}
+
+/* Business Badge Styles */
+.business-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: var(--business-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.business-badge-primary {
+  background-color: rgb(var(--business-primary) / 0.1);
+  color: rgb(var(--business-primary));
+}
+
+.business-badge-success {
+  background-color: rgb(var(--business-success) / 0.1);
+  color: rgb(var(--business-success));
+}
+
+.business-badge-warning {
+  background-color: rgb(var(--business-warning) / 0.1);
+  color: rgb(var(--business-warning));
+}
+
+.business-badge-error {
+  background-color: rgb(var(--business-error) / 0.1);
+  color: rgb(var(--business-error));
+}
+
+/* Business Loading States */
+.business-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--business-bg-secondary)) 0%,
+    rgb(var(--business-bg-tertiary)) 50%,
+    rgb(var(--business-bg-secondary)) 100%
+  );
+  background-size: 200% 100%;
+  animation: business-shimmer 1.5s infinite;
+  border-radius: var(--business-input-radius);
+}

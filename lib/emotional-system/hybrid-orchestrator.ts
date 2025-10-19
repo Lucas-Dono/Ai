@@ -233,7 +233,11 @@ export class HybridEmotionalOrchestrator {
 
     // 2. Mapear emociones OCC a Plutchik
     console.log("[Hybrid] 🗺️  Mapping OCC emotions to Plutchik...");
-    const plutchikState = this.occMapper.mapOCCToPlutchik(orchestratorResult.newEmotions);
+
+    // Las emociones están en updatedState.currentEmotions (que es JsonValue)
+    // Necesitamos convertirlo a EmotionState
+    const currentEmotions = (orchestratorResult.updatedState.currentEmotions as any) || {};
+    const plutchikState = this.occMapper.mapOCCToPlutchik(currentEmotions);
 
     // 3. Calcular dyads desde Plutchik state
     console.log("[Hybrid] 🔗 Calculating dyads...");

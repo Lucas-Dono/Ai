@@ -11,10 +11,10 @@
  */
 
 import { AppraisalScores, CompleteCharacterState, Goal, CoreValue } from "../../types";
-import { getOpenRouterClient, RECOMMENDED_MODELS } from "../../llm/openrouter";
+import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 
 export class AppraisalEngine {
-  private llmClient = getOpenRouterClient();
+  private llmClient = getHybridLLMProvider();
 
   /**
    * Evalúa un mensaje del usuario según el estado del personaje
@@ -28,12 +28,12 @@ export class AppraisalEngine {
     const prompt = this.buildAppraisalPrompt(userMessage, characterState);
 
     try {
-      // Usar modelo rápido y barato para appraisal
+      // Usar Gemini (gratis) para appraisal técnico
       const appraisalData = await this.llmClient.generateJSON<AppraisalScores>(
+        'appraisal', // Fase: usa Gemini automáticamente
         this.getSystemPrompt(),
         prompt,
         {
-          model: RECOMMENDED_MODELS.APPRAISAL,
           temperature: 0.3, // Bajo para evaluación consistente
         }
       );

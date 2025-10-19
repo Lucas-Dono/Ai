@@ -16,7 +16,7 @@ import {
   CoreValue,
   BigFiveTraits,
 } from "../../types";
-import { getOpenRouterClient, RECOMMENDED_MODELS } from "../../llm/openrouter";
+import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 import { BehavioralCuesMapper } from "./behavioral-cues";
 import { AntiSycophancySystem } from "./anti-sycophancy";
 
@@ -24,7 +24,7 @@ import { AntiSycophancySystem } from "./anti-sycophancy";
 import type { BehaviorIntensityResult } from "@/lib/behavior-system/types";
 
 export class ResponseGenerator {
-  private llmClient = getOpenRouterClient();
+  private llmClient = getHybridLLMProvider();
   private cuesMapper = new BehavioralCuesMapper();
   private antiSycophancy = new AntiSycophancySystem();
 
@@ -86,12 +86,12 @@ export class ResponseGenerator {
         activeBehaviors
       );
 
-      // 5. Generar con LLM sin censura
+      // 5. Generar con Venice (CRÍTICO: texto visible al usuario, sin censura)
       const response = await this.llmClient.generateWithSystemPrompt(
+        'response', // Fase: usa Venice sin censura
         this.getSystemPrompt(input.characterState.personalityCore.bigFive),
         prompt,
         {
-          model: RECOMMENDED_MODELS.RESPONSE,
           temperature: 0.8, // Alta para expresividad
           maxTokens: this.getMaxTokens(behavioralCues.verbosity),
         }

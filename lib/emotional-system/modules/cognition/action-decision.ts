@@ -17,10 +17,10 @@ import {
   AppraisalScores,
   Goal,
 } from "../../types";
-import { getOpenRouterClient, RECOMMENDED_MODELS } from "../../llm/openrouter";
+import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 
 export class ActionDecisionEngine {
-  private llmClient = getOpenRouterClient();
+  private llmClient = getHybridLLMProvider();
 
   /**
    * Decide qué acción tomar
@@ -45,12 +45,12 @@ export class ActionDecisionEngine {
     );
 
     try {
-      // Usar modelo rápido para decisión
+      // Usar Gemini (gratis) para decisión de acción JSON
       const decisionData = await this.llmClient.generateJSON<ActionDecision>(
+        'action', // Fase: usa Gemini automáticamente
         this.getSystemPrompt(),
         prompt,
         {
-          model: RECOMMENDED_MODELS.ACTION,
           temperature: 0.4,
         }
       );

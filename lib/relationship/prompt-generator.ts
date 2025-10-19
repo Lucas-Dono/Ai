@@ -9,6 +9,8 @@ import { LLMProvider } from "@/lib/llm/provider";
 import type { RelationshipStage } from "./stages";
 import type { BehaviorType } from "@prisma/client";
 import { KNOWLEDGE_COMMANDS_INSTRUCTION } from "@/lib/profile/knowledge-retrieval";
+import { REMEMBER_INSTRUCTIONS } from "@/lib/events/remember-instructions";
+import { PERSON_INSTRUCTIONS } from "@/lib/people/person-instructions";
 
 export interface StagePrompts {
   stranger: string;
@@ -384,6 +386,9 @@ ${MULTIMEDIA_CAPABILITIES}
 5. KNOWLEDGE_COMMANDS (Sistema de memoria externa):
 ${KNOWLEDGE_COMMANDS_INSTRUCTION}
 
+6. REMEMBER COMMANDS (Sistema de recordatorios):
+${REMEMBER_INSTRUCTIONS}
+
 GUIDELINES POR ETAPA:
 
 === STRANGER ===
@@ -473,6 +478,10 @@ ${MULTIMEDIA_CAPABILITIES}
 
 ${KNOWLEDGE_COMMANDS_INSTRUCTION}
 
+${REMEMBER_INSTRUCTIONS}
+
+${PERSON_INSTRUCTIONS}
+
 ${STAGE_GUIDELINES[stage]}`;
 
   return {
@@ -515,6 +524,10 @@ ${ANTI_GENERIC_RULES}
 ${MULTIMEDIA_CAPABILITIES}
 
 ${KNOWLEDGE_COMMANDS_INSTRUCTION}
+
+${REMEMBER_INSTRUCTIONS}
+
+${PERSON_INSTRUCTIONS}
 
 ${STAGE_GUIDELINES[currentStage]}`;
   }

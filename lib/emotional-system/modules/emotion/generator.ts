@@ -12,7 +12,7 @@ import {
   PADMood,
   BigFiveTraits,
 } from "../../types";
-import { getOpenRouterClient, RECOMMENDED_MODELS } from "../../llm/openrouter";
+import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 
 export interface EmotionGenerationResult {
   emotions: EmotionState;
@@ -22,7 +22,7 @@ export interface EmotionGenerationResult {
 }
 
 export class EmotionGenerator {
-  private llmClient = getOpenRouterClient();
+  private llmClient = getHybridLLMProvider();
 
   /**
    * Genera emociones desde appraisal
@@ -37,11 +37,12 @@ export class EmotionGenerator {
     const prompt = this.buildEmotionPrompt(appraisal, previousEmotions, personality);
 
     try {
+      // Usar Gemini (gratis) para generación de emociones JSON
       const emotionData = await this.llmClient.generateJSON<EmotionGenerationResult>(
+        'emotion', // Fase: usa Gemini automáticamente
         this.getSystemPrompt(),
         prompt,
         {
-          model: RECOMMENDED_MODELS.EMOTION,
           temperature: 0.4, // Moderado para variedad emocional
         }
       );

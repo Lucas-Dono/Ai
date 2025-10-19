@@ -12,10 +12,10 @@ import {
   EmotionState,
   EpisodicMemory,
 } from "../../types";
-import { getOpenRouterClient, RECOMMENDED_MODELS } from "../../llm/openrouter";
+import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 
 export class InternalReasoningEngine {
-  private llmClient = getOpenRouterClient();
+  private llmClient = getHybridLLMProvider();
 
   /**
    * Genera razonamiento interno del personaje
@@ -40,12 +40,12 @@ export class InternalReasoningEngine {
     );
 
     try {
-      // Usar modelo sin censura para pensamiento interno libre
+      // Usar Venice para pensamiento interno auténtico (sin censura)
       const response = await this.llmClient.generateWithSystemPrompt(
+        'reasoning', // Fase: usa Venice para autenticidad
         this.getSystemPrompt(characterState.personalityCore.coreValues),
         prompt,
         {
-          model: RECOMMENDED_MODELS.REASONING,
           temperature: 0.7,
           maxTokens: 800,
         }

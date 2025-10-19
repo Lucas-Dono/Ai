@@ -14,6 +14,11 @@ import { getRelationshipStage, shouldAdvanceStage } from '@/lib/relationship/sta
 import { getPromptForStage } from '@/lib/relationship/prompt-generator';
 import { getEmotionalSummary } from '@/lib/emotions/system';
 import { interceptKnowledgeCommand, buildExpandedPrompt, logCommandUsage } from '@/lib/profile/knowledge-interceptor';
+import { buildTemporalPrompt } from '@/lib/context/temporal';
+import { interceptRememberCommands, buildReminderContext } from '@/lib/events/remember-interceptor';
+import { interceptPersonCommands, buildPeopleContext } from '@/lib/people/person-interceptor';
+import { getUserWeather, buildWeatherPrompt } from '@/lib/context/weather';
+import { markProactiveMessageResponded } from '@/lib/proactive/proactive-service';
 import type { StagePrompts } from '@/lib/relationship/prompt-generator';
 import type { RelationshipStage } from '@/lib/relationship/stages';
 import type { PlutchikEmotionState } from '@/lib/emotions/plutchik';
@@ -96,6 +101,11 @@ export class MessageService {
             semanticMemory: true,
             characterGrowth: true,
             behaviorProfiles: true,
+            user: {
+              select: {
+                location: true,
+              },
+            },
           },
         }),
         prisma.message.findMany({
@@ -124,7 +134,7 @@ export class MessageService {
       // OPTIMIZATION 2: Determine AI-facing content
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       let contentForAI = content;
-      let contentForUser = content;
+      const contentForUser = content;
       let messageMetadata: Record<string, unknown> = { ...metadata };
 
       if (messageType === 'gif' && metadata.description) {
@@ -157,6 +167,27 @@ export class MessageService {
         }),
         this.getOrCreateRelation(agentId, userId),
       ]);
+
+      // Check if this is a response to a proactive message
+      const lastAssistantMessage = await prisma.message.findFirst({
+        where: {
+          agentId,
+          role: 'assistant',
+          createdAt: {
+            lt: userMessage.createdAt,
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      if (lastAssistantMessage) {
+        // Mark proactive message as responded if applicable
+        markProactiveMessageResponded(lastAssistantMessage.id).catch(err =>
+          log.warn({ error: err, messageId: lastAssistantMessage.id }, 'Failed to mark proactive message as responded')
+        );
+      }
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // RELATIONSHIP PROGRESSION
@@ -220,13 +251,39 @@ export class MessageService {
       const basePrompt = getPromptForStage(stagePrompts, newStage, agent.systemPrompt);
 
       // Emotional context with dyads
-      let emotionalContext = this.buildEmotionalContext(
+      const emotionalContext = this.buildEmotionalContext(
         emotionalSummary,
         activeDyads,
         hybridResult.metadata
       );
 
-      let enhancedPrompt = basePrompt + '\n\n' + emotionalContext;
+      // Weather context (if user has location configured)
+      let weatherContext: string | undefined;
+      if (agent.user?.location) {
+        const weather = await getUserWeather(agent.user.location);
+        if (weather) {
+          weatherContext = buildWeatherPrompt(weather);
+        }
+      }
+
+      // Temporal context (date, time, special events, weather)
+      const temporalContext = buildTemporalPrompt(newStage, undefined, weatherContext);
+
+      // Reminder context (important events to remember)
+      const reminderContext = await buildReminderContext(agentId, userId, newStage);
+
+      // People context (important people in user's life)
+      const peopleContext = await buildPeopleContext(agentId, userId, newStage);
+
+      let enhancedPrompt = basePrompt + '\n\n' + emotionalContext + '\n\n' + temporalContext;
+
+      if (reminderContext) {
+        enhancedPrompt += reminderContext;
+      }
+
+      if (peopleContext) {
+        enhancedPrompt += peopleContext;
+      }
 
       // Add behavior system prompt
       if (behaviorOrchestration.enhancedSystemPrompt) {
@@ -244,12 +301,22 @@ export class MessageService {
       // LLM GENERATION
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       const llm = getLLMProvider();
-      let response = await llm.generate({
-        systemPrompt: finalPrompt,
-        messages: recentMessages.reverse().map(m => ({
+
+      // Construir array de mensajes: mensajes recientes + mensaje actual del usuario
+      const conversationMessages = [
+        ...recentMessages.reverse().map(m => ({
           role: m.role as 'user' | 'assistant',
           content: m.content,
         })),
+        {
+          role: 'user' as const,
+          content: contentForAI,
+        }
+      ];
+
+      let response = await llm.generate({
+        systemPrompt: finalPrompt,
+        messages: conversationMessages,
       });
 
       // Knowledge command interception
@@ -272,11 +339,32 @@ export class MessageService {
 
         response = await llm.generate({
           systemPrompt: expandedPrompt,
-          messages: recentMessages.reverse().map(m => ({
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-          })),
+          messages: conversationMessages,
         });
+      }
+
+      // REMEMBER command interception
+      const rememberResult = await interceptRememberCommands(agentId, userId, response);
+
+      if (rememberResult.shouldIntercept) {
+        log.debug(
+          { count: rememberResult.commands.length },
+          'REMEMBER commands detected and saved'
+        );
+        // Use clean response (with [REMEMBER:...] removed)
+        response = rememberResult.cleanResponse;
+      }
+
+      // PERSON command interception
+      const personResult = await interceptPersonCommands(agentId, userId, response);
+
+      if (personResult.shouldIntercept) {
+        log.debug(
+          { count: personResult.commands.length },
+          'PERSON commands detected and saved'
+        );
+        // Use clean response (with [PERSON:...] removed)
+        response = personResult.cleanResponse;
       }
 
       // Content moderation for behaviors
@@ -369,14 +457,20 @@ export class MessageService {
             lastUpdated: new Date(),
           },
         }),
-        // Store memories
-        memoryManager.storeMessage(content, 'user', { messageId: userMessage.id }),
-        memoryManager.storeMessage(finalResponse, 'assistant', {
-          messageId: assistantMessage?.id,
-          emotions: emotionalSummary.dominant,
-          relationLevel: emotionalSummary.mood,
-        }),
       ]);
+
+      // Store memories in vector store (non-blocking, after assistantMessage is created)
+      memoryManager.storeMessage(content, 'user', { messageId: userMessage.id }).catch(err =>
+        log.warn({ error: err.message }, 'Failed to store user message in vector store')
+      );
+
+      memoryManager.storeMessage(finalResponse, 'assistant', {
+        messageId: assistantMessage.id,
+        emotions: emotionalSummary.dominant,
+        relationLevel: emotionalSummary.mood,
+      }).catch(err =>
+        log.warn({ error: err.message }, 'Failed to store assistant message in vector store')
+      );
 
       log.info({ duration: timer(), agentId, userId }, 'Message processed successfully');
 
