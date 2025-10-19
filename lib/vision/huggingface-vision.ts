@@ -32,12 +32,12 @@ export class HuggingFaceVisionClient {
   private baseURL: string = "https://api-inference.huggingface.co/models";
   private defaultModel: string;
 
-  // Modelos disponibles (ordenados por calidad)
+  // Modelos disponibles (ordenados por calidad - 2025)
   private static readonly MODELS = {
-    BLIP2: "Salesforce/blip2-opt-2.7b", // Rápido, buena calidad
-    BLIP_LARGE: "Salesforce/blip-image-captioning-large", // Más detallado
-    FLORENCE2: "microsoft/Florence-2-large", // Muy bueno para detalles
-    MOONDREAM: "vikhyatk/moondream2", // Rápido, ligero
+    BLIP2: "Salesforce/blip2-opt-2.7b", // ⭐ RECOMENDADO - Estado del arte, rápido y preciso
+    BLIP_LARGE: "Salesforce/blip-image-captioning-large", // BLIP v1 (legacy)
+    FLORENCE2: "microsoft/Florence-2-large", // Excelente para detalles pero más lento
+    MOONDREAM: "vikhyatk/moondream2", // Muy rápido, ligero, bueno para edge cases
   };
 
   constructor(config: HuggingFaceVisionConfig) {
@@ -55,7 +55,8 @@ export class HuggingFaceVisionClient {
       this.apiKeys = envKeys;
     }
 
-    this.defaultModel = config.defaultModel || HuggingFaceVisionClient.MODELS.BLIP_LARGE;
+    // BLIP-2 es el modelo recomendado por defecto (estado del arte 2025)
+    this.defaultModel = config.defaultModel || HuggingFaceVisionClient.MODELS.BLIP2;
 
     console.log('[HuggingFace Vision] Inicializando cliente...');
     console.log('[HuggingFace Vision] API Keys disponibles:', this.apiKeys.length);
