@@ -101,7 +101,7 @@ describe("Behavior CRUD operations", () => {
         { method: "DELETE" }
       );
       const response = await DELETE(req, {
-        params: { id: testAgentId, behaviorId: behavior.id },
+        params: Promise.resolve({ id: testAgentId, behaviorId: behavior.id }),
       });
       const data = await response.json();
 
@@ -123,7 +123,7 @@ describe("Behavior CRUD operations", () => {
         { method: "DELETE" }
       );
       const response = await DELETE(req, {
-        params: { id: testAgentId, behaviorId: "fake-id" },
+        params: Promise.resolve({ id: testAgentId, behaviorId: "fake-id" }),
       });
       const data = await response.json();
 
@@ -165,7 +165,7 @@ describe("Behavior CRUD operations", () => {
         { method: "DELETE" }
       );
       const response = await DELETE(req, {
-        params: { id: testAgentId, behaviorId: otherBehavior.id },
+        params: Promise.resolve({ id: testAgentId, behaviorId: otherBehavior.id }),
       });
       const data = await response.json();
 
@@ -212,7 +212,7 @@ describe("Behavior CRUD operations", () => {
         }
       );
       const response = await PATCH(req, {
-        params: { id: testAgentId, behaviorId: testBehaviorId },
+        params: Promise.resolve({ id: testAgentId, behaviorId: testBehaviorId }),
       });
       const data = await response.json();
 
@@ -239,7 +239,7 @@ describe("Behavior CRUD operations", () => {
         }
       );
       const response = await PATCH(req, {
-        params: { id: testAgentId, behaviorId: testBehaviorId },
+        params: Promise.resolve({ id: testAgentId, behaviorId: testBehaviorId }),
       });
       const data = await response.json();
 
@@ -256,7 +256,7 @@ describe("Behavior CRUD operations", () => {
         }
       );
       const response = await PATCH(req, {
-        params: { id: testAgentId, behaviorId: testBehaviorId },
+        params: Promise.resolve({ id: testAgentId, behaviorId: testBehaviorId }),
       });
       const data = await response.json();
 
@@ -273,7 +273,7 @@ describe("Behavior CRUD operations", () => {
         }
       );
       const response = await PATCH(req, {
-        params: { id: testAgentId, behaviorId: testBehaviorId },
+        params: Promise.resolve({ id: testAgentId, behaviorId: testBehaviorId }),
       });
       const data = await response.json();
 
@@ -290,7 +290,7 @@ describe("Behavior CRUD operations", () => {
         }
       );
       const response = await PATCH(req, {
-        params: { id: testAgentId, behaviorId: "fake-id" },
+        params: Promise.resolve({ id: testAgentId, behaviorId: "fake-id" }),
       });
       const data = await response.json();
 

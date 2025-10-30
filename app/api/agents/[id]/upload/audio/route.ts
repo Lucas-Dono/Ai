@@ -32,8 +32,8 @@ export async function POST(
     const { id: agentId } = await params;
     const formData = await request.formData();
 
-    const audioFile = formData.get("audio") as Blob | null;
-    const duration = formData.get("duration") as string | null;
+    const audioFile = (formData as any).get("audio") as Blob | null;
+    const duration = (formData as any).get("duration") as string | null;
 
     if (!audioFile) {
       return NextResponse.json(

@@ -86,7 +86,8 @@ export function detectKnowledgeCommand(response: string): string | null {
   const trimmed = response.trim();
 
   // Verificar si la respuesta es SOLO un comando (o comandos múltiples)
-  const commandPattern = /^\[([A-Z]+)\]$/;
+  // Mejorado para detectar múltiples comandos concatenados: [INTERESTS][WORK][DAILY]
+  const commandPattern = /^\[([A-Z]+)\](?:\[([A-Z]+)\])*$/;
   const match = trimmed.match(commandPattern);
 
   if (match) {
@@ -99,6 +100,21 @@ export function detectKnowledgeCommand(response: string): string | null {
   }
 
   return null;
+}
+
+/**
+ * Limpia todos los comandos de knowledge de una respuesta
+ * Elimina [FAMILY], [FRIENDS], [WORK], [INTERESTS], etc.
+ */
+export function cleanKnowledgeCommands(response: string): string {
+  let cleaned = response;
+
+  // Remover todos los comandos válidos
+  Object.values(KNOWLEDGE_COMMANDS).forEach(command => {
+    cleaned = cleaned.replace(new RegExp(`\\${command}`, 'g'), '');
+  });
+
+  return cleaned.trim();
 }
 
 /**

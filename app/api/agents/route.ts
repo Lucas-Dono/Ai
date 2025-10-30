@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 
 export async function POST(req: NextRequest) {
@@ -35,8 +36,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, kind, personality, purpose, tone, referenceImage, nsfwMode, allowDevelopTraumas, initialBehavior } = body;
-    console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone, referenceImage: referenceImage ? 'provided' : 'none', nsfwMode, allowDevelopTraumas, initialBehavior });
+    const { name, kind, personality, purpose, tone, avatar, referenceImage, nsfwMode, allowDevelopTraumas, initialBehavior } = body;
+    console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone, avatar: avatar ? 'provided' : 'none', referenceImage: referenceImage ? 'provided' : 'none', nsfwMode, allowDevelopTraumas, initialBehavior });
 
     // Validar datos
     if (!name || !kind) {
@@ -71,6 +72,8 @@ export async function POST(req: NextRequest) {
         personality,
         purpose,
         tone,
+        avatar: avatar || null, // Guardar foto de cara (cuadrada 1:1)
+        referenceImageUrl: referenceImage || null, // Guardar imagen de cuerpo completo
         profile: profile as Record<string, string | number | boolean | null>,
         systemPrompt,
         visibility: "private",
@@ -185,10 +188,17 @@ export async function POST(req: NextRequest) {
       (async () => {
         console.log('[API] [PARALLEL] Configurando referencias multimedia...');
         try {
+          let finalAvatarUrl: string | undefined;
           let finalReferenceImageUrl: string | undefined;
           let finalVoiceId: string | undefined;
 
-          // Si el usuario proporcionó una imagen, usarla directamente
+          // Si el usuario proporcionó un avatar, usarlo directamente
+          if (avatar) {
+            console.log('[API] [PARALLEL] Usando avatar proporcionado por el usuario');
+            finalAvatarUrl = avatar;
+          }
+
+          // Si el usuario proporcionó una imagen de referencia, usarla directamente
           if (referenceImage) {
             console.log('[API] [PARALLEL] Usando imagen de referencia proporcionada por el usuario');
             finalReferenceImageUrl = referenceImage;
@@ -197,17 +207,24 @@ export async function POST(req: NextRequest) {
           // Generar/asignar referencias faltantes
           const { generateAgentReferences } = await import("@/lib/multimedia/reference-generator");
 
-          // Llamar a generateAgentReferences con skipImageGeneration=true si el usuario ya proporcionó imagen
+          // Llamar a generateAgentReferences solo si falta avatar o imagen de referencia
+          const skipImageGeneration = !!(avatar && referenceImage);
+
           const references = await generateAgentReferences(
             agent.name,
             agent.personality || agent.description || "",
             undefined, // gender - se infiere de la personalidad
             userId,
             agent.id,
-            !!referenceImage // skipImageGeneration: true si el usuario proporcionó imagen
+            skipImageGeneration
           );
 
-          // Usar la imagen del usuario si existe, sino la generada
+          // Usar avatar del usuario si existe, sino la generada
+          if (!finalAvatarUrl && references.referenceImageUrl) {
+            finalAvatarUrl = references.referenceImageUrl;
+          }
+
+          // Usar imagen de referencia del usuario si existe, sino la generada
           if (!finalReferenceImageUrl && references.referenceImageUrl) {
             finalReferenceImageUrl = references.referenceImageUrl;
           }
@@ -222,15 +239,17 @@ export async function POST(req: NextRequest) {
           }
 
           // Actualizar agente con las referencias
-          if (finalReferenceImageUrl || finalVoiceId) {
+          if (finalAvatarUrl || finalReferenceImageUrl || finalVoiceId) {
             await prisma.agent.update({
               where: { id: agent.id },
               data: {
-                referenceImageUrl: finalReferenceImageUrl,
+                avatar: finalAvatarUrl, // Foto de cara para previews
+                referenceImageUrl: finalReferenceImageUrl, // Imagen de cuerpo completo para generación
                 voiceId: finalVoiceId,
               },
             });
             console.log('[API] [PARALLEL] Referencias multimedia configuradas exitosamente');
+            console.log('[API] [PARALLEL] - Avatar:', finalAvatarUrl ? '✅' : '❌');
             console.log('[API] [PARALLEL] - Imagen de referencia:', finalReferenceImageUrl ? '✅' : '❌');
             console.log('[API] [PARALLEL] - Voz asignada:', finalVoiceId ? '✅' : '❌');
           }
@@ -344,25 +363,57 @@ export async function GET(req: NextRequest) {
   try {
     console.log('[API GET] Obteniendo agentes...');
 
-    // Obtener userId de la sesión si no se pasa como parámetro
-    const session = await auth();
-    const userIdParam = req.nextUrl.searchParams.get("userId");
-    const userId = userIdParam || session?.user?.id || "default-user";
+    // Obtener usuario autenticado (NextAuth o JWT)
+    const user = await getAuthenticatedUser(req);
+    const userId = user?.id || "default-user";
 
-    console.log('[API GET] userId:', userId, 'de sesión:', session?.user?.id);
+    console.log('[API GET] userId:', userId, 'autenticado:', !!user);
 
     const kind = req.nextUrl.searchParams.get("kind");
 
-    const where = kind ? { userId, kind } : { userId };
+    // Construir where clause para incluir:
+    // 1. Agentes del usuario (userId = userId)
+    // 2. Agentes públicos del sistema (userId = null AND visibility = public)
+    const where = {
+      OR: [
+        // Agentes del usuario
+        kind ? { userId, kind } : { userId },
+        // Agentes públicos del sistema
+        {
+          userId: null,
+          visibility: "public",
+          ...(kind && { kind }) // Incluir filtro de kind si existe
+        }
+      ]
+    };
 
     const agents = await prisma.agent.findMany({
       where,
       orderBy: { createdAt: "desc" },
+      include: {
+        _count: {
+          select: {
+            reviews: true,
+          },
+        },
+      },
     });
 
     console.log('[API GET] Agentes encontrados:', agents.length);
+    console.log('[API GET] Agentes del usuario:', agents.filter(a => a.userId === userId).length);
+    console.log('[API GET] Agentes públicos:', agents.filter(a => a.userId === null).length);
 
-    return NextResponse.json(agents);
+    // Mapear agents para incluir isPublic y reviewCount
+    const mappedAgents = agents.map(agent => {
+      const { _count, ...agentData } = agent;
+      return {
+        ...agentData,
+        isPublic: agent.visibility === 'public',
+        reviewCount: _count?.reviews || 0,
+      };
+    });
+
+    return NextResponse.json(mappedAgents);
   } catch (error) {
     console.error("[API GET] Error fetching agents:", error);
     return NextResponse.json(

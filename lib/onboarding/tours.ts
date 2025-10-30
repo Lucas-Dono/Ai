@@ -195,7 +195,7 @@ export const onboardingTours: OnboardingTour[] = [
         id: "advanced-billing",
         title: "Plans and Billing",
         description:
-          "Upgrade to Pro or Enterprise for more agents, higher limits, and premium features. Manage your subscription anytime.",
+          "Upgrade to Plus or Ultra for more agents, higher limits, and premium features. Manage your subscription anytime.",
         target: 'a[href="/dashboard/billing"]',
         position: "right",
       },

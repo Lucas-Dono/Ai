@@ -14,7 +14,7 @@ import { getFastSDLocalClient } from "./fastsd-local-client";
 import { getAIHordeClient } from "./ai-horde-client";
 
 export type ContentType = "sfw" | "suggestive" | "nsfw";
-export type UserTier = "free" | "basic" | "premium";
+export type UserTier = "free" | "plus" | "ultra";
 export type VisualProvider = "aihorde" | "fastsd" | "gemini" | "huggingface";
 
 export interface VisualGenerationRequest {

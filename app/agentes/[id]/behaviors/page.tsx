@@ -1,38 +1,47 @@
 /**
- * Página de Detalles de Behaviors
+ * Psychology Dashboard
  *
- * Visualización completa de:
- * - Timeline de progresión de fases
- * - Historial de triggers
- * - Gráficas de intensidad
- * - Configuración de behaviors
+ * Panel de análisis psicológico completo del agente:
+ * - Rueda de Plutchik (visualización de emociones)
+ * - Perfil psicológico con análisis clínico
+ * - Estado emocional PAD
+ * - Triggers críticos recientes
+ * - Métricas clave
  */
 
 "use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUp, History, Settings, AlertTriangle } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IntensityChart } from "@/components/behaviors/IntensityChart";
-import { BehaviorSettings } from "@/components/behaviors/BehaviorSettings";
+import { ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
+import {
+  PlutchikWheel,
+  PsychologicalProfile,
+  EmotionalStatePAD,
+  CriticalTriggers,
+} from "@/components/psychology";
 
-interface BehaviorProfile {
-  id: string;
-  behaviorType: string;
-  baseIntensity: number;
-  currentPhase: number;
-  phaseStartedAt: string;
-  interactionsSincePhaseStart: number;
-  phaseHistory: Array<{
-    phase: number;
-    startedAt: string;
-    endedAt: string | null;
-    interactions: number;
-    triggers: string[];
-  }>;
+interface EmotionalData {
+  state: {
+    trust: number;
+    affinity: number;
+    respect: number;
+    valence: number;
+    arousal: number;
+    dominance: number;
+  };
+  emotions: Record<string, number>;
+  relationLevel: string;
+}
+
+interface BehaviorData {
+  active: string[];
+  phase?: number;
+  safetyLevel: "SAFE" | "WARNING" | "CRITICAL" | "EXTREME_DANGER";
+  triggers: string[];
+  intensity?: number;
 }
 
 interface TriggerLog {
@@ -50,96 +59,87 @@ interface TriggerLog {
   };
 }
 
-interface BehaviorData {
+interface ProgressionState {
+  totalInteractions: number;
+  currentIntensities: Record<string, number>;
+}
+
+interface DashboardData {
   agent: {
     id: string;
     name: string;
     nsfwMode: boolean;
   };
-  behaviorProfiles: BehaviorProfile[];
-  progressionState: any;
+  emotional: EmotionalData | null;
+  behavior: BehaviorData | null;
+  relationship: {
+    stage: string;
+    trust: number;
+    affinity: number;
+    respect: number;
+    totalInteractions: number;
+  };
   triggerHistory: TriggerLog[];
+  progressionState: ProgressionState | null;
   stats: {
     totalTriggers: number;
-    triggersByType: Record<string, number>;
-    triggersByBehavior: Record<string, number>;
     averageWeight: number;
-  };
-  pagination: {
-    total: number;
-    count: number;
-    hasMore: boolean;
-    nextCursor: string | null;
-    limit: number;
   };
 }
 
-export default function BehaviorsDetailPage() {
+export default function PsychologyDashboard() {
   const params = useParams();
   const router = useRouter();
   const agentId = params.id as string;
 
-  const [data, setData] = useState<BehaviorData | null>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async (cursor?: string) => {
-    try {
-      const url = cursor
-        ? `/api/agents/${agentId}/behaviors?cursor=${cursor}&limit=50`
-        : `/api/agents/${agentId}/behaviors?limit=50`;
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch behavior data");
-      }
-
-      const result = await response.json();
-
-      if (cursor && data) {
-        // Append triggers to existing data (Load More)
-        setData({
-          ...result,
-          triggerHistory: [...data.triggerHistory, ...result.triggerHistory],
-        });
-      } else {
-        // Initial load
-        setData(result);
-      }
-    } catch (err) {
-      console.error("Error fetching behavior data:", err);
-      setError(err instanceof Error ? err.message : "Unknown error");
-    }
-  };
-
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadData = async () => {
       setLoading(true);
-      await fetchData();
-      setLoading(false);
+      try {
+        // Load agent state
+        const [stateRes, behaviorsRes] = await Promise.all([
+          fetch(`/api/agents/${agentId}/state`),
+          fetch(`/api/agents/${agentId}/behaviors?limit=20`),
+        ]);
+
+        if (!stateRes.ok || !behaviorsRes.ok) {
+          throw new Error("Failed to load dashboard data");
+        }
+
+        const stateData = await stateRes.json();
+        const behaviorsData = await behaviorsRes.json();
+
+        setData({
+          agent: behaviorsData.agent,
+          emotional: stateData.emotional,
+          behavior: stateData.behavior,
+          relationship: stateData.relationship,
+          triggerHistory: behaviorsData.triggerHistory,
+          progressionState: behaviorsData.progressionState,
+          stats: behaviorsData.stats,
+        });
+      } catch (err) {
+        console.error("Error loading dashboard:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    loadInitialData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadData();
   }, [agentId]);
-
-  const handleLoadMore = async () => {
-    if (!data?.pagination.hasMore || loadingMore) return;
-
-    setLoadingMore(true);
-    await fetchData(data.pagination.nextCursor || undefined);
-    setLoadingMore(false);
-  };
 
   if (loading) {
     return (
       <div className="container mx-auto py-8">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Cargando datos de comportamiento...</p>
+            <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Cargando análisis psicológico...</p>
           </div>
         </div>
       </div>
@@ -155,9 +155,9 @@ export default function BehaviorsDetailPage() {
               <AlertTriangle className="h-5 w-5" />
               Error al cargar datos
             </CardTitle>
-            <CardDescription>{error || "No se pudieron cargar los datos"}</CardDescription>
           </CardHeader>
           <CardContent>
+            <p className="text-muted-foreground mb-4">{error || "No se pudieron cargar los datos"}</p>
             <Button onClick={() => router.back()}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver
@@ -168,291 +168,178 @@ export default function BehaviorsDetailPage() {
     );
   }
 
+  // Preparar datos para los componentes
+  const emotions = data.emotional?.emotions || {};
+
+  // Encontrar emociones dominante y secundaria
+  const emotionEntries = Object.entries(emotions as Record<string, number>)
+    .sort((a, b) => b[1] - a[1]);
+  const dominantEmotion = emotionEntries[0]?.[0];
+  const dominantIntensity = emotionEntries[0]?.[1];
+  const secondaryEmotion = emotionEntries[1]?.[0];
+  const secondaryIntensity = emotionEntries[1]?.[1];
+
+  // Preparar datos de behaviors para el perfil psicológico
+  const behaviorDataForProfile = data.behavior?.active
+    ? data.behavior.active.map((behaviorType, index) => ({
+        type: behaviorType,
+        intensity: data.progressionState?.currentIntensities[behaviorType] || 0,
+        phase: data.behavior?.phase,
+        trend: undefined, // TODO: Calcular tendencia desde histórico
+      }))
+    : [];
+
+  // Contar triggers críticos (weight > 0.7)
+  const criticalTriggerCount = data.triggerHistory.filter((t) => t.weight > 0.7).length;
+
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{data.agent.name}</h1>
-            <p className="text-muted-foreground">Análisis de Comportamientos</p>
+    <div className="min-h-screen bg-surface">
+      <div className="container mx-auto py-8 space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between md-card-elevated p-6">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="hover:bg-muted rounded-xl"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-4xl font-extrabold text-foreground tracking-tight">{data.agent.name}</h1>
+              <p className="text-muted-foreground font-medium mt-1">Análisis Psicológico Completo</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
           {data.agent.nsfwMode && (
-            <span className="px-3 py-1 bg-purple-500/10 text-purple-500 text-sm rounded-full">
+            <span className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold rounded-xl md-elevation-2">
               Modo NSFW Activo
             </span>
           )}
         </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Behaviors Activos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{data.behaviorProfiles.length}</div>
-          </CardContent>
-        </Card>
+        {/* Key Metrics Row */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <Card className="bg-blue-500/10 border-2 border-blue-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold text-blue-400 flex items-center gap-2">
+                <span className="text-lg">💬</span> Interacciones Totales
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold text-blue-300">
+                {data.progressionState?.totalInteractions || 0}
+              </div>
+              <p className="text-xs text-blue-400/80 mt-2 font-semibold">
+                Etapa: {data.relationship.stage}
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Triggers
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{data.pagination.total}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Mostrando {data.triggerHistory.length}
-            </p>
-          </CardContent>
-        </Card>
+          <Card className="bg-purple-500/10 border-2 border-purple-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold text-purple-400 flex items-center gap-2">
+                <span className="text-lg">🎭</span> Behaviors Activos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold text-purple-300">
+                {data.behavior?.active.length || 0}
+              </div>
+              <p className="text-xs text-purple-400/80 mt-2 font-semibold">
+                Safety: {data.behavior?.safetyLevel || "N/A"}
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Peso Promedio
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {data.stats.averageWeight.toFixed(2)}
+          <Card className="bg-orange-500/10 border-2 border-orange-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold text-orange-400 flex items-center gap-2">
+                <span className="text-lg">⚡</span> Triggers Detectados
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold text-orange-300">{data.stats.totalTriggers}</div>
+              <p className="text-xs text-orange-400/80 mt-2 font-semibold">
+                {criticalTriggerCount} críticos
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-green-500/10 border-2 border-green-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold text-green-400 flex items-center gap-2">
+                <span className="text-lg">📊</span> Peso Promedio
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold text-green-300">
+                {data.stats.averageWeight.toFixed(2)}
+              </div>
+              <p className="text-xs text-green-400/80 mt-2 font-semibold">
+                {data.stats.averageWeight > 0.7
+                  ? "Alto impacto"
+                  : data.stats.averageWeight > 0.4
+                  ? "Moderado"
+                  : "Bajo impacto"}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="space-y-8">
+            {/* Plutchik Wheel */}
+            <PlutchikWheel emotions={emotions as Record<string, number>} size={450} />
+
+            {/* Critical Triggers */}
+            <CriticalTriggers triggers={data.triggerHistory} maxDisplay={5} />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-8">
+            {/* Emotional State PAD */}
+            {data.emotional && (
+              <EmotionalStatePAD
+                valence={data.emotional.state.valence}
+                arousal={data.emotional.state.arousal}
+                dominance={data.emotional.state.dominance}
+                dominantEmotion={dominantEmotion}
+                dominantIntensity={dominantIntensity}
+                secondaryEmotion={secondaryEmotion}
+                secondaryIntensity={secondaryIntensity}
+              />
+            )}
+
+            {/* Psychological Profile */}
+            <PsychologicalProfile
+              behaviors={behaviorDataForProfile}
+              safetyLevel={data.behavior?.safetyLevel || "SAFE"}
+              criticalTriggerCount={criticalTriggerCount}
+            />
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <Card className="bg-gradient-to-br from-blue-500/5 via-indigo-500/5 to-purple-500/5 border-2 border-indigo-500/20 md-elevation-2">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-4">
+              <div className="text-4xl mb-3">💡</div>
+              <h3 className="text-2xl font-extrabold text-foreground">
+                Sobre este Panel de Análisis
+              </h3>
+              <p className="text-base text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium">
+                Este dashboard utiliza el <strong className="text-blue-400">Modelo de Plutchik</strong> para visualizar emociones
+                y el <strong className="text-indigo-400">Modelo PAD</strong> (Pleasure-Arousal-Dominance) para análisis dimensional.
+                Los comportamientos se evalúan usando frameworks de psicología clínica moderna.
+                Todos los análisis se generan automáticamente basándose en las interacciones reales.
+              </p>
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Interacciones
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {data.progressionState?.totalInteractions || 0}
-            </div>
-          </CardContent>
-        </Card>
       </div>
-
-      {/* Main Content */}
-      <Tabs defaultValue="timeline" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="timeline" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Timeline
-          </TabsTrigger>
-          <TabsTrigger value="triggers" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
-            Historial
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Configuración
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="timeline" className="space-y-6">
-          {/* Intensity Chart */}
-          <IntensityChart agentId={agentId} />
-
-          {/* Phase Progression Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Progresión de Fases</CardTitle>
-              <CardDescription>
-                Detalle de la evolución de cada comportamiento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {data.behaviorProfiles.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <p>No hay behaviors activos para este agente</p>
-                  <p className="text-sm mt-2">
-                    Los behaviors se activan durante la configuración inicial o se desarrollan
-                    durante las interacciones
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {data.behaviorProfiles.map((profile) => (
-                    <div key={profile.id} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-semibold text-lg">
-                          {profile.behaviorType.replace(/_/g, " ")}
-                        </h3>
-                        <span className="text-sm text-muted-foreground">
-                          Fase {profile.currentPhase}
-                        </span>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Intensidad Base:</span>
-                          <span className="font-medium">
-                            {(profile.baseIntensity * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            Interacciones en esta fase:
-                          </span>
-                          <span className="font-medium">
-                            {profile.interactionsSincePhaseStart}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Fase iniciada:</span>
-                          <span className="font-medium">
-                            {new Date(profile.phaseStartedAt).toLocaleDateString("es", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Phase History */}
-                      {profile.phaseHistory.length > 0 && (
-                        <div className="mt-4 pt-4 border-t">
-                          <h4 className="text-sm font-medium mb-3">Historial de Fases:</h4>
-                          <div className="space-y-2">
-                            {profile.phaseHistory
-                              .slice()
-                              .reverse()
-                              .map((phase, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-center justify-between text-xs bg-muted p-2 rounded"
-                                >
-                                  <span className="font-medium">Fase {phase.phase}</span>
-                                  <span className="text-muted-foreground">
-                                    {phase.interactions} interacciones
-                                  </span>
-                                  <span className="text-muted-foreground">
-                                    {new Date(phase.startedAt).toLocaleDateString("es")}
-                                    {phase.endedAt &&
-                                      ` - ${new Date(phase.endedAt).toLocaleDateString("es")}`}
-                                  </span>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="triggers">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historial de Triggers</CardTitle>
-              <CardDescription>
-                Registro de todos los triggers detectados ({data.pagination.total} total)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {data.triggerHistory.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <p>No se han detectado triggers aún</p>
-                  <p className="text-sm mt-2">
-                    Los triggers se detectan automáticamente durante las conversaciones
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-3">
-                    {data.triggerHistory.map((trigger) => (
-                      <div
-                        key={trigger.id}
-                        className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-sm">
-                                {trigger.triggerType.replace(/_/g, " ")}
-                              </span>
-                              <span
-                                className={`text-xs px-2 py-0.5 rounded ${
-                                  trigger.weight > 0.7
-                                    ? "bg-red-500/10 text-red-500"
-                                    : trigger.weight > 0.4
-                                    ? "bg-yellow-500/10 text-yellow-500"
-                                    : "bg-green-500/10 text-green-500"
-                                }`}
-                              >
-                                Peso: {trigger.weight.toFixed(2)}
-                              </span>
-                            </div>
-                            <p className="text-sm text-muted-foreground italic">
-                              "{trigger.detectedText || trigger.message.content}"
-                            </p>
-                          </div>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
-                            {new Date(trigger.detectedAt).toLocaleString("es")}
-                          </span>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded">
-                            {trigger.behaviorType.replace(/_/g, " ")}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Load More Button */}
-                  {data.pagination.hasMore && (
-                    <div className="mt-6 flex justify-center">
-                      <Button
-                        onClick={handleLoadMore}
-                        disabled={loadingMore}
-                        variant="outline"
-                        className="w-full sm:w-auto"
-                      >
-                        {loadingMore ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                            Cargando más...
-                          </>
-                        ) : (
-                          <>
-                            Cargar más triggers ({data.pagination.total - data.triggerHistory.length} restantes)
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="settings">
-          <BehaviorSettings
-            agentId={agentId}
-            agentName={data.agent.name}
-            behaviors={data.behaviorProfiles}
-          />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }

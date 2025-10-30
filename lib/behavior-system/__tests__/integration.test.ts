@@ -21,6 +21,7 @@ describe("Behavior System Integration", () => {
     id: "profile-1",
     agentId: "test-agent",
     behaviorType: BehaviorType.YANDERE_OBSESSIVE,
+    enabled: true,
     baseIntensity: 0.5,
     escalationRate: 0.1,
     deEscalationRate: 0.05,

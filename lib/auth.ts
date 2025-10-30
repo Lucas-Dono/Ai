@@ -60,7 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // Fetch plan from database
+        // Fetch plan from database solo en login
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
           select: { plan: true },

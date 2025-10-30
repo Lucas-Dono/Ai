@@ -1,0 +1,455 @@
+/**
+ * Marketplace Prompt Service - Marketplace de prompts
+ */
+
+import { prisma } from '@/lib/prisma';
+
+export interface CreatePromptData {
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  promptText: string;
+  variables?: any;
+  examples?: any;
+  price?: number;
+}
+
+export interface UpdatePromptData {
+  title?: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
+  promptText?: string;
+  variables?: any;
+  examples?: any;
+  price?: number;
+}
+
+export const MarketplacePromptService = {
+  /**
+   * Crear prompt
+   */
+  async createPrompt(authorId: string, data: CreatePromptData) {
+    const prompt = await prisma.marketplacePrompt.create({
+      data: {
+        authorId,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        tags: data.tags,
+        promptText: data.promptText,
+        variables: data.variables || {},
+        examples: data.examples || {},
+        price: data.price || 0,
+        status: 'pending',
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return prompt;
+  },
+
+  /**
+   * Actualizar prompt
+   */
+  async updatePrompt(promptId: string, userId: string, data: UpdatePromptData) {
+    const prompt = await prisma.marketplacePrompt.findUnique({
+      where: { id: promptId },
+    });
+
+    if (!prompt) {
+      throw new Error('Prompt no encontrado');
+    }
+
+    if (prompt.authorId !== userId) {
+      throw new Error('No tienes permisos para editar este prompt');
+    }
+
+    const updated = await prisma.marketplacePrompt.update({
+      where: { id: promptId },
+      data,
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return updated;
+  },
+
+  /**
+   * Obtener prompt
+   */
+  async getPrompt(promptId: string, userId?: string) {
+    const prompt = await prisma.marketplacePrompt.findUnique({
+      where: { id: promptId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        ratings: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+      },
+    });
+
+    if (!prompt) {
+      throw new Error('Prompt no encontrado');
+    }
+
+    // Solo mostrar el texto completo si es aprobado o es el autor
+    if (prompt.status !== 'approved' && prompt.authorId !== userId) {
+      return {
+        ...prompt,
+        promptText: '[Preview no disponible - Prompt en revisión]',
+      };
+    }
+
+    return prompt;
+  },
+
+  /**
+   * Listar prompts
+   */
+  async listPrompts(filters: {
+    category?: string;
+    tags?: string[];
+    authorId?: string;
+    status?: string;
+    search?: string;
+    minRating?: number;
+  } = {}, page = 1, limit = 25, sort: 'popular' | 'recent' | 'top_rated' | 'most_downloaded' = 'popular') {
+    const where: any = {
+      status: 'approved',
+    };
+
+    if (filters.category) {
+      where.category = filters.category;
+    }
+
+    if (filters.tags && filters.tags.length > 0) {
+      where.tags = {
+        hasSome: filters.tags,
+      };
+    }
+
+    if (filters.authorId) {
+      where.authorId = filters.authorId;
+    }
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    if (filters.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (filters.minRating) {
+      where.averageRating = { gte: filters.minRating };
+    }
+
+    let orderBy: any = { createdAt: 'desc' };
+
+    if (sort === 'popular') {
+      orderBy = [
+        { downloadCount: 'desc' },
+        { averageRating: 'desc' },
+      ];
+    } else if (sort === 'top_rated') {
+      orderBy = [
+        { averageRating: 'desc' },
+        { ratingCount: 'desc' },
+      ];
+    } else if (sort === 'most_downloaded') {
+      orderBy = { downloadCount: 'desc' };
+    }
+
+    const [prompts, total] = await Promise.all([
+      prisma.marketplacePrompt.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      }),
+      prisma.marketplacePrompt.count({ where }),
+    ]);
+
+    return {
+      prompts,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  },
+
+  /**
+   * Descargar prompt
+   */
+  async downloadPrompt(promptId: string, userId: string) {
+    const prompt = await prisma.marketplacePrompt.findUnique({
+      where: { id: promptId },
+    });
+
+    if (!prompt) {
+      throw new Error('Prompt no encontrado');
+    }
+
+    if (prompt.status !== 'approved') {
+      throw new Error('Este prompt no está disponible para descarga');
+    }
+
+    // Verificar si ya descargó
+    const existing = await prisma.promptDownload.findUnique({
+      where: {
+        promptId_userId: {
+          promptId,
+          userId,
+        },
+      },
+    });
+
+    if (!existing) {
+      // Registrar descarga
+      await prisma.promptDownload.create({
+        data: {
+          promptId,
+          userId,
+        },
+      });
+
+      // Incrementar contador
+      await prisma.marketplacePrompt.update({
+        where: { id: promptId },
+        data: {
+          downloadCount: { increment: 1 },
+        },
+      });
+    }
+
+    // Retornar el prompt completo
+    return prisma.marketplacePrompt.findUnique({
+      where: { id: promptId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+  },
+
+  /**
+   * Calificar prompt
+   */
+  async ratePrompt(promptId: string, userId: string, rating: number, review?: string) {
+    if (rating < 1 || rating > 5) {
+      throw new Error('La calificación debe estar entre 1 y 5');
+    }
+
+    // Verificar que haya descargado el prompt
+    const download = await prisma.promptDownload.findUnique({
+      where: {
+        promptId_userId: {
+          promptId,
+          userId,
+        },
+      },
+    });
+
+    if (!download) {
+      throw new Error('Debes descargar el prompt antes de calificarlo');
+    }
+
+    // Crear o actualizar calificación
+    const promptRating = await prisma.promptRating.upsert({
+      where: {
+        promptId_userId: {
+          promptId,
+          userId,
+        },
+      },
+      create: {
+        promptId,
+        userId,
+        rating,
+        review,
+      },
+      update: {
+        rating,
+        review,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    // Recalcular promedio
+    const ratings = await prisma.promptRating.aggregate({
+      where: { promptId },
+      _avg: { rating: true },
+      _count: true,
+    });
+
+    await prisma.marketplacePrompt.update({
+      where: { id: promptId },
+      data: {
+        averageRating: ratings._avg.rating || 0,
+        ratingCount: ratings._count,
+      },
+    });
+
+    return promptRating;
+  },
+
+  /**
+   * Eliminar prompt
+   */
+  async deletePrompt(promptId: string, userId: string) {
+    const prompt = await prisma.marketplacePrompt.findUnique({
+      where: { id: promptId },
+    });
+
+    if (!prompt) {
+      throw new Error('Prompt no encontrado');
+    }
+
+    if (prompt.authorId !== userId) {
+      throw new Error('No tienes permisos para eliminar este prompt');
+    }
+
+    await prisma.marketplacePrompt.delete({
+      where: { id: promptId },
+    });
+
+    return { success: true };
+  },
+
+  /**
+   * Aprobar prompt (admin)
+   */
+  async approvePrompt(promptId: string, adminId: string) {
+    // TODO: Verificar que adminId es admin
+
+    const prompt = await prisma.marketplacePrompt.update({
+      where: { id: promptId },
+      data: {
+        status: 'approved',
+        reviewedAt: new Date(),
+      },
+    });
+
+    return prompt;
+  },
+
+  /**
+   * Rechazar prompt (admin)
+   */
+  async rejectPrompt(promptId: string, adminId: string, reason: string) {
+    // TODO: Verificar que adminId es admin
+
+    const prompt = await prisma.marketplacePrompt.update({
+      where: { id: promptId },
+      data: {
+        status: 'rejected',
+        reviewedAt: new Date(),
+        rejectionReason: reason,
+      },
+    });
+
+    return prompt;
+  },
+
+  /**
+   * Obtener categorías populares
+   */
+  async getPopularCategories(limit = 10) {
+    const categories = await prisma.marketplacePrompt.groupBy({
+      by: ['category'],
+      where: { status: 'approved' },
+      _count: true,
+      orderBy: {
+        _count: {
+          category: 'desc',
+        },
+      },
+      take: limit,
+    });
+
+    return categories;
+  },
+
+  /**
+   * Obtener tags populares
+   */
+  async getPopularTags(limit = 20) {
+    const prompts = await prisma.marketplacePrompt.findMany({
+      where: { status: 'approved' },
+      select: { tags: true },
+    });
+
+    const tagCounts: Record<string, number> = {};
+
+    prompts.forEach(prompt => {
+      (prompt.tags as string[]).forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+
+    const sortedTags = Object.entries(tagCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, limit)
+      .map(([tag, count]) => ({ tag, count }));
+
+    return sortedTags;
+  },
+};

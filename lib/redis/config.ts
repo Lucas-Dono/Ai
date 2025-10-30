@@ -17,20 +17,20 @@ export const rateLimiters = {
     prefix: "@ratelimit/free",
   }),
 
-  // Pro plan: 100 requests por minuto
-  pro: new Ratelimit({
+  // Plus plan: 100 requests por minuto
+  plus: new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(100, "1 m"),
     analytics: true,
-    prefix: "@ratelimit/pro",
+    prefix: "@ratelimit/plus",
   }),
 
-  // Enterprise plan: 1000 requests por minuto
-  enterprise: new Ratelimit({
+  // Ultra plan: 500 requests por minuto
+  ultra: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(1000, "1 m"),
+    limiter: Ratelimit.slidingWindow(500, "1 m"),
     analytics: true,
-    prefix: "@ratelimit/enterprise",
+    prefix: "@ratelimit/ultra",
   }),
 
   // API rate limit: Por API key
@@ -65,10 +65,10 @@ export function isRedisConfigured(): boolean {
 // Get rate limiter by plan
 export function getRateLimiter(plan: string): Ratelimit {
   switch (plan) {
-    case "pro":
-      return rateLimiters.pro;
-    case "enterprise":
-      return rateLimiters.enterprise;
+    case "plus":
+      return rateLimiters.plus;
+    case "ultra":
+      return rateLimiters.ultra;
     default:
       return rateLimiters.free;
   }

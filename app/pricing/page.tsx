@@ -16,7 +16,7 @@ export default function PricingPage() {
     "month"
   );
 
-  const handleSubscribe = async (planId: "pro" | "enterprise") => {
+  const handleSubscribe = async (planId: "plus" | "ultra") => {
     setLoading(planId);
     try {
       const response = await fetch("/api/billing/checkout", {
@@ -44,14 +44,14 @@ export default function PricingPage() {
       popular: false,
     },
     {
-      ...PLANS.pro,
-      icon: Zap,
+      ...PLANS.plus,
+      icon: Sparkles,
       color: "from-blue-600 to-purple-600",
       popular: true,
     },
     {
-      ...PLANS.enterprise,
-      icon: Building2,
+      ...PLANS.ultra,
+      icon: Zap,
       color: "from-purple-600 to-pink-600",
       popular: false,
     },
@@ -183,7 +183,7 @@ export default function PricingPage() {
                     ) : (
                       <Button
                         onClick={() =>
-                          handleSubscribe(plan.id as "pro" | "enterprise")
+                          handleSubscribe(plan.id as "plus" | "ultra")
                         }
                         disabled={loading !== null}
                         className={`w-full ${
@@ -194,7 +194,7 @@ export default function PricingPage() {
                       >
                         {loading === plan.id
                           ? "Loading..."
-                          : `Start ${plan.id === "pro" ? "Pro" : "Enterprise"} Trial`}
+                          : `Start ${plan.id === "plus" ? "Plus" : "Ultra"} Trial`}
                         {loading !== plan.id && (
                           <ArrowRight className="ml-2 h-4 w-4" />
                         )}
@@ -254,7 +254,7 @@ export default function PricingPage() {
             <Card className="p-6">
               <h3 className="font-semibold mb-2">Is there a free trial?</h3>
               <p className="text-sm text-muted-foreground">
-                Yes! Pro and Enterprise plans include a 14-day free trial. No
+                Yes! Plus and Ultra plans include a 14-day free trial. No
                 credit card required to start.
               </p>
             </Card>

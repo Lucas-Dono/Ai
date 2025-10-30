@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     "onnxruntime-node",
     "@xenova/transformers",
     "hnswlib-node",
+    "node-llama-cpp",
   ],
 
   // Configuración de Webpack para ignorar módulos nativos en el cliente
@@ -20,6 +21,7 @@ const nextConfig: NextConfig = {
         sharp: false,
         "onnxruntime-node": false,
         "hnswlib-node": false,
+        "node-llama-cpp": false,
       };
 
       // Ignorar archivos .node en el cliente
@@ -31,11 +33,20 @@ const nextConfig: NextConfig = {
 
     // Marcar paquetes con binarios nativos como externos en el servidor
     if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        "sharp": "commonjs sharp",
-        "onnxruntime-node": "commonjs onnxruntime-node",
-        "hnswlib-node": "commonjs hnswlib-node",
+      // Ignorar módulos específicos de node-llama-cpp que causan problemas
+      config.externals = [
+        ...config.externals,
+        "node-llama-cpp",
+        "@reflink/reflink",
+        "@reflink/reflink-linux-x64-gnu",
+        "ipull",
+        "llamaindex",
+      ];
+
+      // Ignorar archivos .node en el servidor también
+      config.module.rules.push({
+        test: /\.node$/,
+        loader: "node-loader",
       });
     }
 

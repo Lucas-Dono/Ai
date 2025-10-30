@@ -288,7 +288,7 @@ export default function BillingPage() {
               <h4 className="font-semibold mb-1">Need help?</h4>
               <p className="text-sm text-muted-foreground">
                 If you have questions about billing or need to discuss
-                Enterprise plans, please contact our support team at{" "}
+                custom plans, please contact our support team at{" "}
                 <a
                   href="mailto:billing@creador-ia.com"
                   className="text-primary hover:underline"

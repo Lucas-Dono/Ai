@@ -89,33 +89,6 @@ export async function GET(
         ? paginatedTriggers[paginatedTriggers.length - 1].id
         : null;
 
-    // Calcular estadísticas (solo sobre triggers de la página actual)
-    const stats = {
-      totalTriggers: paginatedTriggers.length,
-      triggersByType: {} as Record<string, number>,
-      triggersByBehavior: {} as Record<string, number>,
-      averageWeight: 0,
-    };
-
-    let totalWeight = 0;
-
-    paginatedTriggers.forEach((trigger) => {
-      // Count by type
-      stats.triggersByType[trigger.triggerType] =
-        (stats.triggersByType[trigger.triggerType] || 0) + 1;
-
-      // Count by behavior (solo un behavior por trigger en schema actual)
-      const behavior = trigger.behaviorType;
-      stats.triggersByBehavior[behavior] =
-        (stats.triggersByBehavior[behavior] || 0) + 1;
-
-      totalWeight += trigger.weight;
-    });
-
-    if (paginatedTriggers.length > 0) {
-      stats.averageWeight = totalWeight / paginatedTriggers.length;
-    }
-
     // Obtener count total de triggers (sin limit) para metadata
     const totalTriggersCount = await prisma.behaviorTriggerLog.count({
       where: {
@@ -124,6 +97,48 @@ export async function GET(
         },
       },
     });
+
+    // Calcular estadísticas GLOBALES (todos los triggers, no solo la página)
+    // Esto es más costoso pero necesario para mostrar stats correctas
+    const allTriggers = totalTriggersCount > 0
+      ? await prisma.behaviorTriggerLog.findMany({
+          where: {
+            message: {
+              agentId,
+            },
+          },
+          select: {
+            triggerType: true,
+            behaviorType: true,
+            weight: true,
+          },
+        })
+      : [];
+
+    const stats = {
+      totalTriggers: totalTriggersCount,
+      triggersByType: {} as Record<string, number>,
+      triggersByBehavior: {} as Record<string, number>,
+      averageWeight: 0,
+    };
+
+    let totalWeight = 0;
+
+    allTriggers.forEach((trigger) => {
+      // Count by type
+      stats.triggersByType[trigger.triggerType] =
+        (stats.triggersByType[trigger.triggerType] || 0) + 1;
+
+      // Count by behavior
+      stats.triggersByBehavior[trigger.behaviorType] =
+        (stats.triggersByBehavior[trigger.behaviorType] || 0) + 1;
+
+      totalWeight += trigger.weight;
+    });
+
+    if (allTriggers.length > 0) {
+      stats.averageWeight = totalWeight / allTriggers.length;
+    }
 
     // Formatear phase history de cada profile
     const profilesWithHistory = behaviorProfiles.map((profile) => {

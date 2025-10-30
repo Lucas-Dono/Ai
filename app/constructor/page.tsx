@@ -8,11 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, Heart, Briefcase, ArrowLeft, Loader2 } from "lucide-react";
+import { Send, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
 import { ReferenceImageSelector } from "@/components/constructor/ReferenceImageSelector";
+import { AvatarImageSelector } from "@/components/constructor/AvatarImageSelector";
 import { OptionSelector, type Option } from "@/components/constructor/OptionSelector";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role: "architect" | "user";
@@ -26,7 +28,8 @@ interface AgentDraft {
   purpose?: string;
   tone?: string;
   physicalAppearance?: string; // Descripción física para generación de imágenes
-  referenceImage?: string; // URL o data URL de la imagen de referencia
+  avatar?: string; // Foto de cara cuadrada para previews y UI
+  referenceImage?: string; // Imagen de cuerpo completo para generación img2img
   // Behavior system configuration
   nsfwMode?: boolean;
   allowDevelopTraumas?: boolean;
@@ -47,6 +50,7 @@ export default function ConstructorPage() {
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
   const [newAgentId, setNewAgentId] = useState<string | null>(null);
+  const [waitingForCustomDescription, setWaitingForCustomDescription] = useState(false);
 
   // Auto-scroll cuando llegan nuevos mensajes (como WhatsApp)
   useEffect(() => {
@@ -59,31 +63,12 @@ export default function ConstructorPage() {
       prompt: "¿qué nombre te gustaría darle a tu nueva IA?"
     },
     {
-      field: "kind",
-      prompt: "¿Qué tipo de IA quieres crear?",
-      hasOptions: true,
-      options: [
-        {
-          value: "companion",
-          label: "💝 Compañero",
-          description: "IA emocional para compañía, conversación y apoyo afectivo",
-          icon: <Heart className="h-5 w-5 text-pink-500" />
-        },
-        {
-          value: "assistant",
-          label: "💼 Asistente",
-          description: "IA administrativa para tareas, organización y productividad",
-          icon: <Briefcase className="h-5 w-5 text-blue-500" />
-        }
-      ]
-    },
-    {
       field: "personality",
-      prompt: (draft: AgentDraft) => `Perfecto! Ahora, **¿cómo describirías la personalidad de ${draft.name}?**\n\nEjemplos: "alegre y seductora", "tímida y reservada", "confiada y ambiciosa"\n\n_Nota: Usaré esto para generar automáticamente rasgos detallados, valores morales, y comportamientos coherentes._`
+      prompt: (draft: AgentDraft) => `Perfecto! Ahora, **¿cómo describirías la personalidad de ${draft.name}?**\n\nEjemplos:\n• "Aventurero y entusiasta" (masculino)\n• "Formal y analítica" (femenino)\n• "Sensible y empático" (masculino)\n\n_Nota: Usaré esto para generar automáticamente rasgos detallados, valores morales, y comportamientos coherentes._`
     },
     {
       field: "purpose",
-      prompt: (draft: AgentDraft) => `Excelente! **¿Cuál será el rol o propósito de ${draft.name}?**\n\nEjemplos: "compañía emocional", "apoyo motivacional", "conversaciones profundas"\n\n_Nota: Basándome en esto, generaré automáticamente su trabajo, estudios, y actividades diarias coherentes con su personalidad._`
+      prompt: (draft: AgentDraft) => `Excelente! **¿Cuál será el rol o propósito de ${draft.name}?**\n\nEjemplos:\n• "Mentor profesional" (femenino)\n• "Compañero aventurero" (masculino)\n• "Apoyo emocional" (femenino)\n\n_Nota: Basándome en esto, generaré automáticamente su trabajo, estudios, y actividades diarias coherentes con su personalidad._`
     },
     {
       field: "tone",
@@ -146,10 +131,17 @@ export default function ConstructorPage() {
       ]
     },
 
-    // REFERENCE IMAGE STEP (interactive visual step)
+    // AVATAR IMAGE STEP (foto de cara para previews)
+    {
+      field: "avatar",
+      prompt: (draft: AgentDraft) => `📸 **FOTO DE CARA (AVATAR)**\n\n¿Te gustaría crear o subir una foto de cara para ${draft.name}?\n\nEsta foto se usará en:\n• Previews y tarjetas del personaje\n• Interfaz del chat\n• Perfil del personaje\n\n**Recomendación:** Foto cuadrada centrada en la cara.`,
+      isVisualStep: true
+    },
+
+    // REFERENCE IMAGE STEP (imagen de cuerpo completo para generación)
     {
       field: "referenceImage",
-      prompt: (draft: AgentDraft) => `🖼️ **IMAGEN DE REFERENCIA**\n\n¿Te gustaría crear o subir una imagen de referencia para ${draft.name}?\n\nEsta imagen se usará para mantener consistencia visual en todas las imágenes futuras que genere.`,
+      prompt: (draft: AgentDraft) => `🖼️ **IMAGEN DE CUERPO COMPLETO (Opcional)**\n\n¿Te gustaría agregar una imagen de cuerpo completo de ${draft.name}?\n\nEsta imagen se usará para:\n• Generar imágenes consistentes en conversaciones\n• Mantener la misma apariencia en todas las imágenes generadas\n• Img2img con tu referencia visual\n\n**Puedes omitir este paso** si solo quieres usar la foto de cara.`,
       isVisualStep: true
     },
 
@@ -198,11 +190,12 @@ export default function ConstructorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: finalDraft.name,
-          kind: finalDraft.kind,
+          kind: "companion", // Siempre companion (sentimental)
           personality: finalDraft.personality,
           purpose: finalDraft.purpose,
           tone: finalDraft.tone,
-          referenceImage: finalDraft.referenceImage, // Imagen de referencia opcional
+          avatar: finalDraft.avatar, // Foto de cara para previews
+          referenceImage: finalDraft.referenceImage, // Imagen de cuerpo completo para generación
           // Behavior system configuration
           nsfwMode: finalDraft.nsfwMode || false,
           allowDevelopTraumas: finalDraft.allowDevelopTraumas || false,
@@ -291,12 +284,19 @@ export default function ConstructorPage() {
         break;
 
       case "physicalAppearance":
-        // Si seleccionó "custom", necesitará escribir la descripción
-        if (valueToUse === "custom") {
-          // El siguiente mensaje pedirá la descripción personalizada
-          newDraft.physicalAppearance = ""; // Temporal, se actualizará en el siguiente paso
+        // Si estábamos esperando descripción personalizada y ahora la recibimos
+        if (waitingForCustomDescription) {
+          newDraft.physicalAppearance = valueToUse;
+          console.log('[Constructor] Guardando physicalAppearance personalizada:', valueToUse);
+        }
+        // Si seleccionó "custom", marcar que esperamos la descripción en el siguiente paso
+        else if (valueToUse === "custom") {
+          console.log('[Constructor] Modo custom activado, esperando descripción del usuario');
+          // No guardar nada todavía, esperamos el siguiente mensaje
+          // No incrementar step aquí, se hará en el setTimeout de abajo
         } else if (valueToUse === "random") {
           newDraft.physicalAppearance = "random";
+          console.log('[Constructor] Guardando physicalAppearance: random');
         } else {
           // Es una de las opciones predefinidas, expandir a descripción completa
           const appearanceMap: Record<string, string> = {
@@ -308,8 +308,8 @@ export default function ConstructorPage() {
             caucasian_man: "Hombre caucásico, cabello castaño o rubio corto, piel clara, ojos claros, complexión atlética, 1.80m de altura, estilo formal ejecutivo, rasgos angulosos"
           };
           newDraft.physicalAppearance = appearanceMap[valueToUse] || valueToUse;
+          console.log('[Constructor] Guardando physicalAppearance:', newDraft.physicalAppearance);
         }
-        console.log('[Constructor] Guardando physicalAppearance:', newDraft.physicalAppearance);
         break;
 
       // BEHAVIOR SYSTEM CONFIGURATION
@@ -360,6 +360,25 @@ export default function ConstructorPage() {
 
     // Respuesta del arquitecto
     setTimeout(() => {
+      // Si seleccionaron "custom" para physicalAppearance, pedir descripción
+      if (currentStep.field === "physicalAppearance" && valueToUse === "custom") {
+        setWaitingForCustomDescription(true);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "architect",
+            content: `✍️ **Perfecto!** Ahora escribe tu propia descripción física detallada de ${newDraft.name}.\n\n**Incluye:**\n• Género\n• Tipo de cabello (color, largo, estilo)\n• Color de piel\n• Color de ojos\n• Altura aproximada\n• Complexión (delgada, atlética, curvilínea, etc.)\n• Estilo de vestimenta\n\n**Ejemplo:** "Mujer asiática, cabello negro liso largo, piel clara, ojos oscuros almendrados, complexión delgada, 1.65m de altura, estilo moderno elegante, rostro delicado"`
+          }
+        ]);
+        // NO avanzar el step, quedarse esperando la descripción del usuario
+        return;
+      }
+
+      // Si acabamos de recibir la descripción personalizada, desactivar el flag y continuar
+      if (waitingForCustomDescription && currentStep.field === "physicalAppearance") {
+        setWaitingForCustomDescription(false);
+      }
+
       // Avanzar al siguiente step
       const nextStepIndex = step + 1;
       console.log('[Constructor] Avanzando a step:', nextStepIndex, 'de', steps.length);
@@ -400,15 +419,22 @@ export default function ConstructorPage() {
   };
 
   /**
-   * Manejador para cuando se selecciona una imagen de referencia
+   * Manejador para cuando se selecciona una imagen (avatar o referencia)
    */
   const handleImageSelected = (imageUrl: string) => {
-    const newDraft = { ...draft, referenceImage: imageUrl };
+    const currentStep = steps[step];
+    const field = currentStep.field as 'avatar' | 'referenceImage';
+
+    const newDraft = { ...draft, [field]: imageUrl };
     setDraft(newDraft);
+
+    const message = field === 'avatar'
+      ? "✅ Foto de cara seleccionada"
+      : "✅ Imagen de referencia seleccionada";
 
     setMessages((prev) => [
       ...prev,
-      { role: "user", content: "✅ Imagen de referencia seleccionada" },
+      { role: "user", content: message },
     ]);
 
     // Avanzar al siguiente step
@@ -436,12 +462,19 @@ export default function ConstructorPage() {
   };
 
   /**
-   * Manejador para cuando se omite la imagen de referencia
+   * Manejador para cuando se omite una imagen (avatar o referencia)
    */
   const handleImageSkipped = () => {
+    const currentStep = steps[step];
+    const field = currentStep.field as 'avatar' | 'referenceImage';
+
+    const message = field === 'avatar'
+      ? "⏭️ Foto de cara omitida (se usarán iniciales)"
+      : "⏭️ Imagen de referencia omitida (se generará automáticamente)";
+
     setMessages((prev) => [
       ...prev,
-      { role: "user", content: "⏭️ Imagen de referencia omitida (se generará automáticamente)" },
+      { role: "user", content: message },
     ]);
 
     // Avanzar al siguiente step sin imagen
@@ -499,16 +532,9 @@ export default function ConstructorPage() {
                 <CardTitle className="mb-2">
                   {draft.name || "Sin nombre"}
                 </CardTitle>
-                {draft.kind && (
-                  <Badge variant={draft.kind === "companion" ? "secondary" : "default"}>
-                    {draft.kind === "companion" ? (
-                      <Heart className="h-3 w-3 mr-1" />
-                    ) : (
-                      <Briefcase className="h-3 w-3 mr-1" />
-                    )}
-                    {draft.kind === "companion" ? "Compañero" : "Asistente"}
-                  </Badge>
-                )}
+                <Badge variant="secondary" className="text-xs">
+                  💝 Compañero IA
+                </Badge>
               </div>
             </div>
           </CardHeader>
@@ -639,7 +665,25 @@ export default function ConstructorPage() {
                         : "bg-primary text-primary-foreground"
                     }`}
                   >
-                    {message.content}
+                    {message.role === "architect" ? (
+                      <ReactMarkdown
+                        components={{
+                          // Personalizar estilos de elementos markdown
+                          p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
+                          strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+                          ul: ({ children }) => <ul className="space-y-1.5 my-3">{children}</ul>,
+                          li: ({ children }) => <li className="flex items-start gap-2 text-sm"><span className="mt-1.5 text-primary">•</span><span className="flex-1">{children}</span></li>,
+                          em: ({ children }) => <em className="text-muted-foreground text-xs block mt-2">{children}</em>,
+                          h1: ({ children }) => <h1 className="text-xl font-bold mb-2">{children}</h1>,
+                          h2: ({ children }) => <h2 className="text-lg font-bold mb-2">{children}</h2>,
+                          h3: ({ children }) => <h3 className="text-base font-bold mb-2">{children}</h3>,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    ) : (
+                      message.content
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -653,15 +697,41 @@ export default function ConstructorPage() {
         {!isComplete ? (
           <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6 shrink-0">
             <div className="max-w-4xl mx-auto">
-              {/* Si estamos en el paso de imagen de referencia, mostrar el selector visual */}
+              {/* Si estamos en el paso de imagen, mostrar el selector visual apropiado */}
               {step < steps.length && (steps[step] as any).isVisualStep ? (
-                <ReferenceImageSelector
-                  agentName={draft.name || "tu IA"}
-                  personality={draft.personality || ""}
-                  physicalAppearance={draft.physicalAppearance}
-                  onImageSelected={handleImageSelected}
-                  onSkip={handleImageSkipped}
-                />
+                steps[step].field === 'avatar' ? (
+                  <AvatarImageSelector
+                    agentName={draft.name || "tu IA"}
+                    personality={draft.personality || ""}
+                    physicalAppearance={draft.physicalAppearance}
+                    onImageSelected={handleImageSelected}
+                    onSkip={handleImageSkipped}
+                  />
+                ) : (
+                  <ReferenceImageSelector
+                    agentName={draft.name || "tu IA"}
+                    personality={draft.personality || ""}
+                    physicalAppearance={draft.physicalAppearance}
+                    onImageSelected={handleImageSelected}
+                    onSkip={handleImageSkipped}
+                  />
+                )
+              ) : waitingForCustomDescription ? (
+                /* Si estamos esperando descripción personalizada, mostrar input de texto */
+                <div className="flex gap-3">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !creating && handleSend()}
+                    placeholder="Escribe la descripción física detallada..."
+                    className="flex-1"
+                    disabled={creating}
+                    autoFocus
+                  />
+                  <Button onClick={() => handleSend()} size="icon" className="shrink-0" disabled={creating}>
+                    {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  </Button>
+                </div>
               ) : step < steps.length && (steps[step] as any).hasOptions ? (
                 /* Si el paso tiene opciones, mostrar botones */
                 <OptionSelector

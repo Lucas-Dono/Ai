@@ -255,15 +255,15 @@ export async function getRevenueStats(
 
   // Calculate MRR (Monthly Recurring Revenue)
   let mrr = 0;
-  if (user?.plan === "pro") mrr = 29;
-  if (user?.plan === "enterprise") mrr = 99;
+  if (user?.plan === "plus") mrr = 5;
+  if (user?.plan === "ultra") mrr = 15;
 
   const arr = mrr * 12;
 
   const subscriptionsByPlan: Record<string, number> = {
     free: user?.plan === "free" ? 1 : 0,
-    pro: user?.plan === "pro" ? 1 : 0,
-    enterprise: user?.plan === "enterprise" ? 1 : 0,
+    plus: user?.plan === "plus" ? 1 : 0,
+    ultra: user?.plan === "ultra" ? 1 : 0,
   };
 
   // Calculate lifetime value (simplified)

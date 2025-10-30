@@ -20,7 +20,7 @@ interface EmotionalState {
 interface EmotionalStateDisplayProps {
   state: EmotionalState;
   emotions?: string[];
-  relationLevel?: number; // 0-1 normalized value
+  relationLevel?: number | string; // 0-1 normalized value or stage string
 }
 
 const emotionEmojis: Record<string, string> = {
@@ -60,8 +60,15 @@ const relationLevelConfig: Record<string, { label: string; color: string; icon: 
 
 /**
  * Convierte nivel de relación numérico (0-1) a string key
+ * O retorna el string directamente si ya es un stage key
  */
-function getRelationLevelKey(level?: number): string {
+function getRelationLevelKey(level?: number | string): string {
+  // If it's already a string (stage key), return it directly
+  if (typeof level === 'string') {
+    return level;
+  }
+
+  // If it's a number, convert to stage key
   if (!level) return "stranger";
 
   if (level < 0.2) return "stranger";
@@ -78,7 +85,7 @@ export function EmotionalStateDisplay({
   relationLevel,
 }: EmotionalStateDisplayProps) {
   const relationKey = getRelationLevelKey(relationLevel);
-  const relation = relationLevelConfig[relationKey];
+  const relation = relationLevelConfig[relationKey] || relationLevelConfig.stranger; // Fallback to stranger if invalid
 
   return (
     <Card className="border-border/50">

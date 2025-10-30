@@ -36,13 +36,14 @@ async function testSimpleGeneration() {
     console.log('   🚀 Enviando request a Venice...');
     const response = await client.generate({
       prompt: 'Di "Hola mundo" en una oración',
+      model: 'llama-3.3-70b',
       temperature: 0.7,
       maxTokens: 50,
     });
 
     console.log('   ✓ Respuesta recibida');
     console.log(`   📝 Texto: "${response.text}"`);
-    console.log(`   📊 Tokens: ${response.usage.totalTokens} (input: ${response.usage.promptTokens}, output: ${response.usage.completionTokens})`);
+    console.log(`   📊 Tokens: ${response.usage?.totalTokens || 0} (input: ${response.usage?.promptTokens || 0}, output: ${response.usage?.completionTokens || 0})`);
     console.log(`   🎯 Modelo usado: ${response.model}`);
   } catch (error) {
     console.error('   ❌ Error en generación:', error);
@@ -68,7 +69,7 @@ async function testSystemPrompt() {
 
     console.log('   ✓ Respuesta recibida');
     console.log(`   📝 Texto: "${response.text}"`);
-    console.log(`   📊 Tokens: ${response.usage.totalTokens}`);
+    console.log(`   📊 Tokens: ${response.usage?.totalTokens || 0}`);
   } catch (error) {
     console.error('   ❌ Error con system prompt:', error);
     throw error;

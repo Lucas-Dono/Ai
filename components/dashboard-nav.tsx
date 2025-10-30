@@ -16,7 +16,7 @@ import {
   Shield,
   Sparkles,
   CreditCard,
-  Store,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,9 +26,8 @@ import { useEffect, useState } from "react";
 const navItems = [
   { href: "/dashboard", label: "Inicio", icon: Home },
   { href: "/dashboard?filter=companion", label: "Compañeros", icon: Heart },
-  { href: "/dashboard?filter=assistant", label: "Asistentes", icon: Briefcase },
-  { href: "/mundos", label: "Mundos", icon: Network },
-  { href: "/marketplace", label: "Marketplace", icon: Store },
+  { href: "/dashboard/mundos", label: "Mundos", icon: Network },
+  { href: "/community", label: "Community", icon: Users },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/configuracion", label: "Configuración", icon: Settings },
   { href: "/administracion", label: "Admin", icon: Shield },
@@ -77,9 +76,8 @@ export function DashboardNav() {
 
   const planLabels: Record<string, string> = {
     free: "Free",
-    basic: "Basic",
-    pro: "Pro",
-    enterprise: "Enterprise",
+    plus: "Plus",
+    ultra: "Ultra",
   };
 
   return (
@@ -95,7 +93,13 @@ export function DashboardNav() {
 
       <div className="flex-1 py-6 px-4 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          // Check if current path matches or starts with the item href (for nested routes)
+          const cleanHref = item.href.split('?')[0]; // Remove query params for matching
+
+          // Fix: Prevent /dashboard from matching all dashboard subroutes
+          const isActive = pathname === cleanHref ||
+            (pathname.startsWith(cleanHref + '/') && cleanHref !== '/dashboard');
+
           return (
             <Link key={item.href} href={item.href}>
               <motion.div

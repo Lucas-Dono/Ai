@@ -34,6 +34,7 @@ interface ChatHeaderProps {
   onSearch?: () => void;
   onExport?: () => void;
   onReset?: () => void;
+  onDelete?: () => void;
 }
 
 export function ChatHeader({
@@ -46,6 +47,7 @@ export function ChatHeader({
   onSearch,
   onExport,
   onReset,
+  onDelete,
 }: ChatHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -169,7 +171,7 @@ export function ChatHeader({
               <>
                 {/* Backdrop */}
                 <div
-                  className="fixed inset-0 z-30"
+                  className="fixed inset-0 z-30 cursor-pointer"
                   onClick={() => setShowMenu(false)}
                 />
 
@@ -203,19 +205,32 @@ export function ChatHeader({
                     />
                   )}
 
+                  {(onReset || onDelete) && (
+                    <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+                  )}
+
                   {onReset && (
-                    <>
-                      <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
-                      <MenuItem
-                        icon={<Trash2 className="w-4 h-4" />}
-                        label="Resetear conversación"
-                        onClick={() => {
-                          onReset();
-                          setShowMenu(false);
-                        }}
-                        variant="danger"
-                      />
-                    </>
+                    <MenuItem
+                      icon={<Trash2 className="w-4 h-4" />}
+                      label="Resetear conversación"
+                      onClick={() => {
+                        onReset();
+                        setShowMenu(false);
+                      }}
+                      variant="danger"
+                    />
+                  )}
+
+                  {onDelete && (
+                    <MenuItem
+                      icon={<Trash2 className="w-4 h-4" />}
+                      label="Eliminar agente"
+                      onClick={() => {
+                        onDelete();
+                        setShowMenu(false);
+                      }}
+                      variant="danger"
+                    />
                   )}
                 </motion.div>
               </>

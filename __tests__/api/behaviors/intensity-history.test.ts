@@ -142,7 +142,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${testAgentId}/behaviors/intensity-history`
     );
-    const response = await GET(req, { params: { id: testAgentId } });
+    const response = await GET(req, { params: Promise.resolve({ id: testAgentId }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -178,7 +178,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/fake-id/behaviors/intensity-history`
     );
-    const response = await GET(req, { params: { id: "fake-id" } });
+    const response = await GET(req, { params: Promise.resolve({ id: "fake-id" }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -201,7 +201,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${emptyAgent.id}/behaviors/intensity-history`
     );
-    const response = await GET(req, { params: { id: emptyAgent.id } });
+    const response = await GET(req, { params: Promise.resolve({ id: emptyAgent.id }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -215,7 +215,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${testAgentId}/behaviors/intensity-history`
     );
-    const response = await GET(req, { params: { id: testAgentId } });
+    const response = await GET(req, { params: Promise.resolve({ id: testAgentId }) });
     const data = await response.json();
 
     const dataPoints = data.data[0].data;

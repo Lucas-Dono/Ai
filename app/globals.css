@@ -1,60 +1,136 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ============================================
+   MATERIAL DESIGN 3 - MONOCHROMATIC THEME
+   Minimalist design system
+   ============================================ */
+
+/* Light Theme */
 :root {
-  --background: 248 250 252;
-  --foreground: 15 23 42;
+  /* Surface Colors - Light */
+  --md-sys-color-surface-dim: 220 220 220;           /* Dimmed surface */
+  --md-sys-color-surface: 250 250 250;               /* Default surface */
+  --md-sys-color-surface-bright: 255 255 255;        /* Bright surface */
+  --md-sys-color-surface-container-lowest: 255 255 255;
+  --md-sys-color-surface-container-low: 245 245 245;
+  --md-sys-color-surface-container: 240 240 240;
+  --md-sys-color-surface-container-high: 235 235 235;
+  --md-sys-color-surface-container-highest: 230 230 230;
+
+  /* Primary Color - Accent */
+  --md-sys-color-primary: 100 100 100;               /* Neutral gray */
+  --md-sys-color-primary-container: 220 220 220;
+  --md-sys-color-on-primary: 255 255 255;
+  --md-sys-color-on-primary-container: 30 30 30;
+
+  /* Text Colors */
+  --md-sys-color-on-surface: 28 28 28;               /* High emphasis */
+  --md-sys-color-on-surface-variant: 70 70 70;       /* Medium emphasis */
+  --md-sys-color-outline: 180 180 180;               /* Low emphasis */
+  --md-sys-color-outline-variant: 210 210 210;       /* Very low emphasis */
+
+  /* State Layers */
+  --md-sys-state-hover-opacity: 0.08;
+  --md-sys-state-focus-opacity: 0.12;
+  --md-sys-state-pressed-opacity: 0.16;
+
+  /* Elevation Shadows */
+  --md-sys-elevation-0: none;
+  --md-sys-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --md-sys-elevation-2: 0 2px 6px 0 rgb(0 0 0 / 0.06);
+  --md-sys-elevation-3: 0 4px 8px 0 rgb(0 0 0 / 0.08);
+  --md-sys-elevation-4: 0 6px 12px 0 rgb(0 0 0 / 0.10);
+  --md-sys-elevation-5: 0 8px 16px 0 rgb(0 0 0 / 0.12);
+
+  /* Shape */
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* Legacy support */
+  --background: 250 250 250;
+  --foreground: 28 28 28;
   --card: 255 255 255;
-  --card-foreground: 15 23 42;
+  --card-foreground: 28 28 28;
   --popover: 255 255 255;
-  --popover-foreground: 15 23 42;
-  --primary: 18 40 65;
-  --primary-foreground: 248 250 252;
-  --secondary: 246 185 34;
-  --secondary-foreground: 15 23 42;
-  --muted: 148 163 184;
-  --muted-foreground: 100 116 139;
-  --accent: 246 185 34;
-  --accent-foreground: 15 23 42;
-  --success: 22 163 74;
-  --success-foreground: 255 255 255;
-  --warning: 202 138 4;
-  --warning-foreground: 255 255 255;
+  --popover-foreground: 28 28 28;
+  --primary: 100 100 100;
+  --primary-foreground: 255 255 255;
+  --secondary: 220 220 220;
+  --secondary-foreground: 28 28 28;
+  --muted: 240 240 240;
+  --muted-foreground: 100 100 100;
+  --accent: 235 235 235;
+  --accent-foreground: 28 28 28;
   --destructive: 220 38 38;
   --destructive-foreground: 255 255 255;
-  --border: 226 232 240;
-  --input: 226 232 240;
-  --ring: 18 40 65;
-  --radius: 1rem;
+  --border: 210 210 210;
+  --input: 210 210 210;
+  --ring: 100 100 100;
+  --radius: 12px;
 }
 
+/* Dark Theme */
 .dark {
-  --background: 15 23 42;
-  --foreground: 248 250 252;
-  --card: 30 41 59;
-  --card-foreground: 248 250 252;
-  --popover: 30 41 59;
-  --popover-foreground: 248 250 252;
-  --primary: 246 185 34;
-  --primary-foreground: 15 23 42;
-  --secondary: 96 165 250;
-  --secondary-foreground: 15 23 42;
-  --muted: 71 85 105;
-  --muted-foreground: 203 213 225;
-  --accent: 246 185 34;
-  --accent-foreground: 15 23 42;
-  --success: 34 197 94;
-  --success-foreground: 15 23 42;
-  --warning: 250 204 21;
-  --warning-foreground: 15 23 42;
+  /* Surface Colors - Dark */
+  --md-sys-color-surface-dim: 20 20 20;
+  --md-sys-color-surface: 28 28 28;
+  --md-sys-color-surface-bright: 48 48 48;
+  --md-sys-color-surface-container-lowest: 18 18 18;
+  --md-sys-color-surface-container-low: 24 24 24;
+  --md-sys-color-surface-container: 32 32 32;
+  --md-sys-color-surface-container-high: 40 40 40;
+  --md-sys-color-surface-container-highest: 48 48 48;
+
+  /* Primary Color - Accent */
+  --md-sys-color-primary: 200 200 200;
+  --md-sys-color-primary-container: 70 70 70;
+  --md-sys-color-on-primary: 28 28 28;
+  --md-sys-color-on-primary-container: 230 230 230;
+
+  /* Text Colors */
+  --md-sys-color-on-surface: 230 230 230;
+  --md-sys-color-on-surface-variant: 180 180 180;
+  --md-sys-color-outline: 120 120 120;
+  --md-sys-color-outline-variant: 70 70 70;
+
+  /* Elevation Shadows - More subtle in dark mode */
+  --md-sys-elevation-1: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --md-sys-elevation-2: 0 2px 6px 0 rgb(0 0 0 / 0.35);
+  --md-sys-elevation-3: 0 4px 8px 0 rgb(0 0 0 / 0.4);
+  --md-sys-elevation-4: 0 6px 12px 0 rgb(0 0 0 / 0.45);
+  --md-sys-elevation-5: 0 8px 16px 0 rgb(0 0 0 / 0.5);
+
+  /* Legacy support */
+  --background: 28 28 28;
+  --foreground: 230 230 230;
+  --card: 32 32 32;
+  --card-foreground: 230 230 230;
+  --popover: 32 32 32;
+  --popover-foreground: 230 230 230;
+  --primary: 200 200 200;
+  --primary-foreground: 28 28 28;
+  --secondary: 70 70 70;
+  --secondary-foreground: 230 230 230;
+  --muted: 40 40 40;
+  --muted-foreground: 160 160 160;
+  --accent: 48 48 48;
+  --accent-foreground: 230 230 230;
   --destructive: 239 68 68;
   --destructive-foreground: 255 255 255;
-  --border: 51 65 85;
-  --input: 51 65 85;
-  --ring: 246 185 34;
+  --border: 70 70 70;
+  --input: 70 70 70;
+  --ring: 200 200 200;
 }
 
+/* MD3 Typography Scale */
 @theme inline {
+  /* Colors */
   --color-background: rgb(var(--background));
   --color-foreground: rgb(var(--foreground));
   --color-card: rgb(var(--card));
@@ -69,18 +145,18 @@
   --color-muted-foreground: rgb(var(--muted-foreground));
   --color-accent: rgb(var(--accent));
   --color-accent-foreground: rgb(var(--accent-foreground));
-  --color-success: rgb(var(--success));
-  --color-success-foreground: rgb(var(--success-foreground));
-  --color-warning: rgb(var(--warning));
-  --color-warning-foreground: rgb(var(--warning-foreground));
   --color-destructive: rgb(var(--destructive));
   --color-destructive-foreground: rgb(var(--destructive-foreground));
   --color-border: rgb(var(--border));
   --color-input: rgb(var(--input));
   --color-ring: rgb(var(--ring));
+
+  /* Radius */
   --radius-lg: calc(var(--radius) - 0.25rem);
   --radius-md: calc(var(--radius) - 0.5rem);
   --radius-sm: calc(var(--radius) - 0.75rem);
+
+  /* Font */
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -88,322 +164,287 @@
   border-color: rgb(var(--border));
 }
 
+html {
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background: rgb(var(--background));
-  color: rgb(var(--foreground));
+  margin: 0;
+  padding: 0;
+  background: rgb(var(--md-sys-color-surface));
+  color: rgb(var(--md-sys-color-on-surface));
   font-family: var(--font-sans);
   font-feature-settings: "rlig" 1, "calt" 1;
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* MD3 Utility Classes */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* Modern Chat Animations */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-}
-
-@keyframes gradient-x {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-.animate-gradient-x {
-  animation: gradient-x 15s ease infinite;
-  background-size: 200% 200%;
-}
-
-/* ============================================
-   BUSINESS ENTERPRISE THEME
-   Sistema de diseño para dashboard empresarial
-   ============================================ */
-
-/* Business Theme Variables - Light Mode */
-:root {
-  /* Business Brand Colors */
-  --business-primary: 30 64 175;        /* Blue-700 - Profesional */
-  --business-primary-hover: 30 58 138;  /* Blue-800 */
-  --business-primary-light: 59 130 246; /* Blue-500 */
-
-  --business-secondary: 15 23 42;       /* Slate-900 */
-  --business-secondary-light: 30 41 59; /* Slate-800 */
-
-  --business-accent: 6 182 212;         /* Cyan-500 - Info accent */
-  --business-accent-light: 34 211 238;  /* Cyan-400 */
-
-  --business-success: 16 185 129;       /* Emerald-500 */
-  --business-warning: 245 158 11;       /* Amber-500 */
-  --business-error: 239 68 68;          /* Red-500 */
-  --business-info: 59 130 246;          /* Blue-500 */
-
-  /* Business Backgrounds - Light */
-  --business-bg-primary: 255 255 255;   /* White */
-  --business-bg-secondary: 248 250 252; /* Slate-50 */
-  --business-bg-tertiary: 241 245 249;  /* Slate-100 */
-  --business-bg-hover: 241 245 249;     /* Slate-100 */
-
-  /* Business Text Colors - Light */
-  --business-text-primary: 15 23 42;    /* Slate-900 */
-  --business-text-secondary: 71 85 105; /* Slate-600 */
-  --business-text-muted: 100 116 139;   /* Slate-500 */
-
-  /* Business Borders - Light */
-  --business-border-default: 226 232 240; /* Slate-200 */
-  --business-border-light: 241 245 249;   /* Slate-100 */
-  --business-border-strong: 203 213 225;  /* Slate-300 */
-}
-
-/* Business Theme Variables - Dark Mode */
-.dark {
-  /* Business Backgrounds - Dark */
-  --business-bg-primary: 15 23 42;      /* Slate-900 */
-  --business-bg-secondary: 30 41 59;    /* Slate-800 */
-  --business-bg-tertiary: 51 65 85;     /* Slate-700 */
-  --business-bg-hover: 51 65 85;        /* Slate-700 */
-
-  /* Business Text Colors - Dark */
-  --business-text-primary: 241 245 249; /* Slate-100 */
-  --business-text-secondary: 148 163 184; /* Slate-400 */
-  --business-text-muted: 100 116 139;   /* Slate-500 */
-
-  /* Business Borders - Dark */
-  --business-border-default: 51 65 85;  /* Slate-700 */
-  --business-border-light: 71 85 105;   /* Slate-600 */
-  --business-border-strong: 71 85 105;  /* Slate-600 */
-}
-
-/* Business Layout Constants */
-:root {
-  --business-sidebar-width: 280px;
-  --business-header-height: 64px;
-  --business-card-radius: 12px;
-  --business-button-radius: 8px;
-  --business-input-radius: 6px;
-
-  /* Spacing Scale */
-  --business-spacing-xs: 0.25rem;   /* 4px */
-  --business-spacing-sm: 0.5rem;    /* 8px */
-  --business-spacing-md: 1rem;      /* 16px */
-  --business-spacing-lg: 1.5rem;    /* 24px */
-  --business-spacing-xl: 2rem;      /* 32px */
-  --business-spacing-2xl: 3rem;     /* 48px */
-  --business-spacing-3xl: 4rem;     /* 64px */
-
-  /* Typography Scale */
-  --business-text-xs: 0.75rem;      /* 12px */
-  --business-text-sm: 0.875rem;     /* 14px */
-  --business-text-base: 1rem;       /* 16px */
-  --business-text-lg: 1.125rem;     /* 18px */
-  --business-text-xl: 1.25rem;      /* 20px */
-  --business-text-2xl: 1.5rem;      /* 24px */
-  --business-text-3xl: 1.875rem;    /* 30px */
-  --business-text-4xl: 2.25rem;     /* 36px */
-
-  /* Shadows */
-  --business-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --business-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --business-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --business-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-}
-
-/* Business Utility Classes */
-@layer utilities {
-  /* Background utilities */
-  .bg-business-primary {
-    background-color: rgb(var(--business-bg-primary));
+  /* Surface utilities */
+  .md-surface {
+    background-color: rgb(var(--md-sys-color-surface));
+    color: rgb(var(--md-sys-color-on-surface));
   }
 
-  .bg-business-secondary {
-    background-color: rgb(var(--business-bg-secondary));
+  .md-surface-dim {
+    background-color: rgb(var(--md-sys-color-surface-dim));
   }
 
-  .bg-business-tertiary {
-    background-color: rgb(var(--business-bg-tertiary));
+  .md-surface-bright {
+    background-color: rgb(var(--md-sys-color-surface-bright));
   }
 
-  .bg-business-hover:hover {
-    background-color: rgb(var(--business-bg-hover));
+  .md-surface-container {
+    background-color: rgb(var(--md-sys-color-surface-container));
+  }
+
+  .md-surface-container-low {
+    background-color: rgb(var(--md-sys-color-surface-container-low));
+  }
+
+  .md-surface-container-high {
+    background-color: rgb(var(--md-sys-color-surface-container-high));
+  }
+
+  .md-surface-container-highest {
+    background-color: rgb(var(--md-sys-color-surface-container-highest));
+  }
+
+  /* Elevation utilities */
+  .md-elevation-0 {
+    box-shadow: var(--md-sys-elevation-0);
+  }
+
+  .md-elevation-1 {
+    box-shadow: var(--md-sys-elevation-1);
+  }
+
+  .md-elevation-2 {
+    box-shadow: var(--md-sys-elevation-2);
+  }
+
+  .md-elevation-3 {
+    box-shadow: var(--md-sys-elevation-3);
+  }
+
+  .md-elevation-4 {
+    box-shadow: var(--md-sys-elevation-4);
+  }
+
+  .md-elevation-5 {
+    box-shadow: var(--md-sys-elevation-5);
   }
 
   /* Text utilities */
-  .text-business-primary {
-    color: rgb(var(--business-text-primary));
+  .md-text-primary {
+    color: rgb(var(--md-sys-color-on-surface));
   }
 
-  .text-business-secondary {
-    color: rgb(var(--business-text-secondary));
+  .md-text-secondary {
+    color: rgb(var(--md-sys-color-on-surface-variant));
   }
 
-  .text-business-muted {
-    color: rgb(var(--business-text-muted));
+  .md-text-tertiary {
+    color: rgb(var(--md-sys-color-outline));
   }
 
-  /* Border utilities */
-  .border-business {
-    border-color: rgb(var(--business-border-default));
+  /* Shape utilities */
+  .md-shape-xs {
+    border-radius: var(--md-sys-shape-corner-extra-small);
   }
 
-  .border-business-light {
-    border-color: rgb(var(--business-border-light));
+  .md-shape-sm {
+    border-radius: var(--md-sys-shape-corner-small);
   }
 
-  .border-business-strong {
-    border-color: rgb(var(--business-border-strong));
+  .md-shape-md {
+    border-radius: var(--md-sys-shape-corner-medium);
   }
 
-  /* Brand color utilities */
-  .bg-business-brand {
-    background-color: rgb(var(--business-primary));
+  .md-shape-lg {
+    border-radius: var(--md-sys-shape-corner-large);
   }
 
-  .text-business-brand {
-    color: rgb(var(--business-primary));
+  .md-shape-xl {
+    border-radius: var(--md-sys-shape-corner-extra-large);
   }
 
-  .bg-business-accent {
-    background-color: rgb(var(--business-accent));
-  }
-
-  .text-business-accent {
-    color: rgb(var(--business-accent));
-  }
-
-  /* Status utilities */
-  .bg-business-success {
-    background-color: rgb(var(--business-success));
-  }
-
-  .text-business-success {
-    color: rgb(var(--business-success));
-  }
-
-  .bg-business-warning {
-    background-color: rgb(var(--business-warning));
-  }
-
-  .text-business-warning {
-    color: rgb(var(--business-warning));
-  }
-
-  .bg-business-error {
-    background-color: rgb(var(--business-error));
-  }
-
-  .text-business-error {
-    color: rgb(var(--business-error));
-  }
-
-  /* Layout utilities */
-  .business-sidebar-width {
-    width: var(--business-sidebar-width);
-  }
-
-  .business-header-height {
-    height: var(--business-header-height);
-  }
-
-  /* Shadow utilities */
-  .shadow-business-sm {
-    box-shadow: var(--business-shadow-sm);
-  }
-
-  .shadow-business-md {
-    box-shadow: var(--business-shadow-md);
-  }
-
-  .shadow-business-lg {
-    box-shadow: var(--business-shadow-lg);
-  }
-
-  .shadow-business-xl {
-    box-shadow: var(--business-shadow-xl);
+  .md-shape-full {
+    border-radius: var(--md-sys-shape-corner-full);
   }
 }
 
-/* Business Component Styles */
-.business-card {
-  background-color: rgb(var(--business-bg-secondary));
-  border: 1px solid rgb(var(--business-border-default));
-  border-radius: var(--business-card-radius);
-  padding: var(--business-spacing-lg);
-  transition: all 0.2s ease;
+/* MD3 Components */
+
+/* Cards */
+.md-card {
+  background-color: rgb(var(--md-sys-color-surface-container-low));
+  border-radius: var(--md-sys-shape-corner-large);
+  box-shadow: var(--md-sys-elevation-1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.business-card:hover {
-  box-shadow: var(--business-shadow-lg);
-  border-color: rgb(var(--business-border-strong));
+.md-card:hover {
+  box-shadow: var(--md-sys-elevation-2);
 }
 
-.business-stat-card {
-  background: linear-gradient(135deg, rgb(var(--business-bg-secondary)) 0%, rgb(var(--business-bg-tertiary)) 100%);
-  border: 1px solid rgb(var(--business-border-default));
-  border-radius: var(--business-card-radius);
-  padding: var(--business-spacing-lg);
+.md-card-filled {
+  background-color: rgb(var(--md-sys-color-surface-container-highest));
+}
+
+.md-card-elevated {
+  background-color: rgb(var(--md-sys-color-surface-container-low));
+  box-shadow: var(--md-sys-elevation-2);
+}
+
+.md-card-outlined {
+  background-color: rgb(var(--md-sys-color-surface));
+  border: 1px solid rgb(var(--md-sys-color-outline-variant));
+  box-shadow: none;
+}
+
+/* Buttons */
+.md-button {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border-radius: var(--md-sys-shape-corner-full);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
-.business-stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, rgb(var(--business-primary)), rgb(var(--business-accent)));
+.md-button-filled {
+  background-color: rgb(var(--md-sys-color-primary));
+  color: rgb(var(--md-sys-color-on-primary));
+  box-shadow: var(--md-sys-elevation-0);
 }
 
-.business-button-primary {
-  background-color: rgb(var(--business-primary));
-  color: white;
-  padding: var(--business-spacing-sm) var(--business-spacing-lg);
-  border-radius: var(--business-button-radius);
-  font-weight: 600;
-  transition: all 0.2s ease;
+.md-button-filled:hover {
+  box-shadow: var(--md-sys-elevation-1);
 }
 
-.business-button-primary:hover {
-  background-color: rgb(var(--business-primary-hover));
-  box-shadow: var(--business-shadow-md);
-  transform: translateY(-1px);
+.md-button-tonal {
+  background-color: rgb(var(--md-sys-color-secondary));
+  color: rgb(var(--md-sys-color-on-primary-container));
 }
 
-/* Business Animations */
-@keyframes business-fade-in {
+.md-button-outlined {
+  background-color: transparent;
+  border: 1px solid rgb(var(--md-sys-color-outline));
+  color: rgb(var(--md-sys-color-primary));
+}
+
+.md-button-text {
+  background-color: transparent;
+  color: rgb(var(--md-sys-color-primary));
+}
+
+/* FAB - Floating Action Button */
+.md-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-sys-shape-corner-large);
+  background-color: rgb(var(--md-sys-color-primary-container));
+  color: rgb(var(--md-sys-color-on-primary-container));
+  box-shadow: var(--md-sys-elevation-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  z-index: 50;
+}
+
+.md-fab:hover {
+  box-shadow: var(--md-sys-elevation-4);
+  transform: scale(1.05);
+}
+
+.md-fab:active {
+  box-shadow: var(--md-sys-elevation-2);
+  transform: scale(0.95);
+}
+
+.md-fab-extended {
+  width: auto;
+  padding: 0 20px;
+  gap: 12px;
+}
+
+.md-fab-large {
+  width: 96px;
+  height: 96px;
+}
+
+/* List Items */
+.md-list-item {
+  padding: 12px 16px;
+  border-radius: var(--md-sys-shape-corner-medium);
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.md-list-item:hover {
+  background-color: rgba(var(--md-sys-color-on-surface), var(--md-sys-state-hover-opacity));
+}
+
+.md-list-item:active {
+  background-color: rgba(var(--md-sys-color-on-surface), var(--md-sys-state-pressed-opacity));
+}
+
+/* Navigation Rail */
+.md-navigation-rail {
+  width: 80px;
+  background-color: rgb(var(--md-sys-color-surface-container));
+  border-right: 1px solid rgb(var(--md-sys-color-outline-variant));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+  gap: 12px;
+}
+
+.md-navigation-rail-item {
+  width: 56px;
+  height: 32px;
+  border-radius: var(--md-sys-shape-corner-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.md-navigation-rail-item:hover {
+  background-color: rgba(var(--md-sys-color-on-surface), var(--md-sys-state-hover-opacity));
+}
+
+.md-navigation-rail-item.active {
+  background-color: rgb(var(--md-sys-color-secondary));
+}
+
+/* Animations */
+@keyframes md-fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes md-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -411,21 +452,10 @@ body {
   }
 }
 
-@keyframes business-slide-in {
+@keyframes md-scale-in {
   from {
     opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes business-scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
@@ -433,192 +463,53 @@ body {
   }
 }
 
-@keyframes business-pulse {
-  0%, 100% {
-    opacity: 1;
+.md-animate-fade-in {
+  animation: md-fade-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.md-animate-slide-up {
+  animation: md-slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.md-animate-scale-in {
+  animation: md-scale-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--md-sys-color-surface-container-low));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--md-sys-color-outline));
+  border-radius: var(--md-sys-shape-corner-full);
+  border: 3px solid rgb(var(--md-sys-color-surface-container-low));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--md-sys-color-on-surface-variant));
+}
+
+/* Text Selection */
+::selection {
+  background-color: rgba(var(--md-sys-color-primary), 0.3);
+  color: rgb(var(--md-sys-color-on-surface));
+}
+
+/* Focus Visible */
+:focus-visible {
+  outline: 2px solid rgb(var(--md-sys-color-primary));
+  outline-offset: 2px;
+}
+
+/* Utility Classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes business-shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.business-animate-fade-in {
-  animation: business-fade-in 0.3s ease-out;
-}
-
-.business-animate-slide-in {
-  animation: business-slide-in 0.4s ease-out;
-}
-
-.business-animate-scale-in {
-  animation: business-scale-in 0.3s ease-out;
-}
-
-.business-animate-pulse {
-  animation: business-pulse 2s ease-in-out infinite;
-}
-
-.business-shimmer {
-  background: linear-gradient(
-    to right,
-    rgb(var(--business-bg-secondary)) 0%,
-    rgb(var(--business-bg-tertiary)) 50%,
-    rgb(var(--business-bg-secondary)) 100%
-  );
-  background-size: 1000px 100%;
-  animation: business-shimmer 2s infinite;
-}
-
-/* Business Scrollbar Styles */
-.business-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.business-scrollbar::-webkit-scrollbar-track {
-  background: rgb(var(--business-bg-secondary));
-  border-radius: 4px;
-}
-
-.business-scrollbar::-webkit-scrollbar-thumb {
-  background: rgb(var(--business-border-strong));
-  border-radius: 4px;
-}
-
-.business-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--business-text-muted));
-}
-
-/* Business Status Indicators */
-.status-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.status-indicator::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.status-active::before {
-  background-color: rgb(var(--business-success));
-  box-shadow: 0 0 8px rgb(var(--business-success) / 0.4);
-  animation: business-pulse 2s ease-in-out infinite;
-}
-
-.status-idle::before {
-  background-color: rgb(var(--business-warning));
-}
-
-.status-error::before {
-  background-color: rgb(var(--business-error));
-  animation: business-pulse 1s ease-in-out infinite;
-}
-
-.status-offline::before {
-  background-color: rgb(var(--business-text-muted));
-}
-
-/* Business Chart Styles */
-.business-chart-tooltip {
-  background-color: rgb(var(--business-bg-primary));
-  border: 1px solid rgb(var(--business-border-default));
-  border-radius: var(--business-input-radius);
-  padding: var(--business-spacing-sm) var(--business-spacing-md);
-  box-shadow: var(--business-shadow-lg);
-}
-
-/* Business Table Styles */
-.business-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.business-table thead tr {
-  background-color: rgb(var(--business-bg-tertiary));
-  border-bottom: 1px solid rgb(var(--business-border-default));
-}
-
-.business-table th {
-  padding: var(--business-spacing-md);
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--business-text-sm);
-  color: rgb(var(--business-text-secondary));
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.business-table tbody tr {
-  border-bottom: 1px solid rgb(var(--business-border-default));
-  transition: background-color 0.15s ease;
-}
-
-.business-table tbody tr:hover {
-  background-color: rgb(var(--business-bg-hover));
-}
-
-.business-table td {
-  padding: var(--business-spacing-md);
-  color: rgb(var(--business-text-primary));
-}
-
-/* Business Badge Styles */
-.business-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: var(--business-text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.business-badge-primary {
-  background-color: rgb(var(--business-primary) / 0.1);
-  color: rgb(var(--business-primary));
-}
-
-.business-badge-success {
-  background-color: rgb(var(--business-success) / 0.1);
-  color: rgb(var(--business-success));
-}
-
-.business-badge-warning {
-  background-color: rgb(var(--business-warning) / 0.1);
-  color: rgb(var(--business-warning));
-}
-
-.business-badge-error {
-  background-color: rgb(var(--business-error) / 0.1);
-  color: rgb(var(--business-error));
-}
-
-/* Business Loading States */
-.business-skeleton {
-  background: linear-gradient(
-    90deg,
-    rgb(var(--business-bg-secondary)) 0%,
-    rgb(var(--business-bg-tertiary)) 50%,
-    rgb(var(--business-bg-secondary)) 100%
-  );
-  background-size: 200% 100%;
-  animation: business-shimmer 1.5s infinite;
-  border-radius: var(--business-input-radius);
 }

@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { planId } = body;
 
-    if (!planId || (planId !== "pro" && planId !== "enterprise")) {
+    if (!planId || (planId !== "plus" && planId !== "ultra")) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 

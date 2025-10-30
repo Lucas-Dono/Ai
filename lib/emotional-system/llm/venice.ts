@@ -173,6 +173,95 @@ export class VeniceClient {
   }
 
   /**
+   * Genera respuesta con system prompt + múltiples mensajes (compatible con format de mundos)
+   */
+  async generateWithMessages(options: {
+    systemPrompt: string;
+    messages: Array<{ role: "user" | "assistant"; content: string }>;
+    temperature?: number;
+    maxTokens?: number;
+    model?: string;
+  }): Promise<string> {
+    const { systemPrompt, messages, temperature, maxTokens, model } = options;
+
+    let lastError: Error | null = null;
+    const maxRetries = this.apiKeys.length;
+
+    // Intentar con cada API key disponible
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const veniceMessages: VeniceMessage[] = [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          ...messages.map(m => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          })),
+        ];
+
+        const body: VeniceRequestBody = {
+          model: model || this.defaultModel,
+          messages: veniceMessages,
+          temperature: temperature ?? 0.9,
+          max_tokens: maxTokens ?? 1000,
+          top_p: 0.9,
+        };
+
+        const currentKey = this.getCurrentApiKey();
+        console.log(`[Venice] 🚀 Generating with ${messages.length} messages using API key #${this.currentKeyIndex + 1}...`);
+
+        const response = await fetch(`${this.baseURL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${currentKey}`,
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[Venice] ❌ Error ${response.status}:`, errorText);
+
+          // Detectar errores de cuota
+          const isQuotaError = response.status === 429 ||
+                               response.status === 403 ||
+                               errorText.toLowerCase().includes('quota') ||
+                               errorText.toLowerCase().includes('rate limit') ||
+                               errorText.toLowerCase().includes('rate-limited') ||
+                               errorText.toLowerCase().includes('insufficient credits');
+
+          if (isQuotaError && this.rotateApiKey()) {
+            console.log('[Venice] 💳 Error de cuota detectado en generateWithMessages, intentando con siguiente API key...');
+            lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
+            continue; // Reintentar con siguiente key
+          }
+
+          throw new Error(`Venice API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        return data.choices[0]?.message?.content || "";
+      } catch (error) {
+        lastError = error as Error;
+
+        // Si no es error de cuota, lanzar inmediatamente
+        if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
+          console.error("[Venice] ❌ Generation error:", error);
+          throw error;
+        }
+      }
+    }
+
+    // Si llegamos aquí, todas las keys fallaron
+    console.error('[Venice] ❌ Todas las API keys agotaron su cuota en generateWithMessages');
+    throw new Error("Todas las API keys de Venice han agotado su cuota. Por favor, agregue más créditos o keys.");
+  }
+
+  /**
    * Genera respuesta con system prompt + user message con rotación automática de API keys
    */
   async generateWithSystemPrompt(

@@ -11,14 +11,18 @@ import { createMemoryManager } from '@/lib/memory/manager';
 import { behaviorOrchestrator } from '@/lib/behavior-system';
 import { hybridEmotionalOrchestrator } from '@/lib/emotional-system/hybrid-orchestrator';
 import { getRelationshipStage, shouldAdvanceStage } from '@/lib/relationship/stages';
-import { getPromptForStage } from '@/lib/relationship/prompt-generator';
+import { getPromptForStage, getPromptForMessageNumber } from '@/lib/relationship/prompt-generator';
 import { getEmotionalSummary } from '@/lib/emotions/system';
 import { interceptKnowledgeCommand, buildExpandedPrompt, logCommandUsage } from '@/lib/profile/knowledge-interceptor';
+import { getTopRelevantCommand } from '@/lib/profile/command-detector';
+import { getKnowledgeGroup } from '@/lib/profile/knowledge-retrieval';
 import { buildTemporalPrompt } from '@/lib/context/temporal';
 import { interceptRememberCommands, buildReminderContext } from '@/lib/events/remember-interceptor';
 import { interceptPersonCommands, buildPeopleContext } from '@/lib/people/person-interceptor';
 import { getUserWeather, buildWeatherPrompt } from '@/lib/context/weather';
 import { markProactiveMessageResponded } from '@/lib/proactive/proactive-service';
+import { interceptSearchCommand } from '@/lib/memory/search-interceptor';
+import { storeMessageSelectively } from '@/lib/memory/selective-storage';
 import type { StagePrompts } from '@/lib/relationship/prompt-generator';
 import type { RelationshipStage } from '@/lib/relationship/stages';
 import type { PlutchikEmotionState } from '@/lib/emotions/plutchik';
@@ -236,7 +240,7 @@ export class MessageService {
         agent,
         userMessage,
         recentMessages,
-        dominantEmotion: (emotionalSummary.dominant[0] as string) || 'joy',
+        dominantEmotion: (emotionalSummary.dominant[0] || 'joy') as EmotionType,
         emotionalState: {
           valence: emotionalSummary.pad.valence,
           arousal: emotionalSummary.pad.arousal,
@@ -245,10 +249,28 @@ export class MessageService {
       });
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // BUILD ENHANCED PROMPT
+      // BUILD ENHANCED PROMPT (con sistema de mensajes progresivos)
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       const stagePrompts = agent.stagePrompts as StagePrompts | null;
-      const basePrompt = getPromptForStage(stagePrompts, newStage, agent.systemPrompt);
+
+      // Calcular número de mensaje del agente (cuántos mensajes ha enviado)
+      const agentMessageCount = await prisma.message.count({
+        where: {
+          agentId,
+          userId,
+          role: 'assistant',
+        },
+      });
+
+      const messageNumber = agentMessageCount + 1;
+
+      // Usar sistema de mensajes progresivos (1-3) o stage-based (4+)
+      const basePrompt = messageNumber <= 3
+        ? getPromptForMessageNumber(messageNumber, newTotalInteractions, stagePrompts, {
+            systemPrompt: agent.systemPrompt,
+            name: agent.name,
+          })
+        : getPromptForStage(stagePrompts, newStage, agent.systemPrompt);
 
       // Emotional context with dyads
       const emotionalContext = this.buildEmotionalContext(
@@ -288,6 +310,34 @@ export class MessageService {
       // Add behavior system prompt
       if (behaviorOrchestration.enhancedSystemPrompt) {
         enhancedPrompt += '\n\n' + behaviorOrchestration.enhancedSystemPrompt;
+      }
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // PROACTIVE KNOWLEDGE LOADING (Embeddings-based)
+      // Detecta qué información del profile es relevante y la carga
+      // ANTES de enviar al LLM, evitando roundtrips
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      try {
+        const relevantCommand = await getTopRelevantCommand(content, agentId);
+
+        if (relevantCommand) {
+          log.debug({ relevantCommand, query: content.substring(0, 50) }, 'Comando relevante detectado');
+
+          // Cargar el conocimiento relevante
+          const knowledgeContext = await getKnowledgeGroup(agentId, relevantCommand);
+
+          // Agregar al prompt
+          enhancedPrompt += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+          enhancedPrompt += `📌 INFORMACIÓN RELEVANTE PARA ESTA CONVERSACIÓN:\n`;
+          enhancedPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+          enhancedPrompt += knowledgeContext;
+          enhancedPrompt += `\n\n⚠️ IMPORTANTE: Esta información es relevante para la pregunta del usuario.\n`;
+          enhancedPrompt += `Úsala naturalmente en tu respuesta, pero NO menciones que "consultaste" algo.\n`;
+          enhancedPrompt += `Responde como si siempre hubieras tenido esta información en tu memoria.\n`;
+        }
+      } catch (error) {
+        log.warn({ error }, 'Error en detección proactiva de conocimiento, continuando sin ella');
+        // No fallar el mensaje completo si falla la detección
       }
 
       // RAG: Build enhanced prompt with memory context
@@ -341,6 +391,34 @@ export class MessageService {
           systemPrompt: expandedPrompt,
           messages: conversationMessages,
         });
+
+        // Limpiar tags de conocimiento de la nueva respuesta
+        const finalInterceptResult = await interceptKnowledgeCommand(agentId, response);
+        response = finalInterceptResult.cleanResponse;
+      } else {
+        // Si no hay comando, pero limpiar tags que puedan haber quedado
+        response = interceptResult.cleanResponse;
+      }
+
+      // SEARCH command interception (memoria inteligente)
+      const searchResult = await interceptSearchCommand(agentId, userId, response);
+
+      if (searchResult.shouldIntercept && searchResult.memoryContext) {
+        log.debug(
+          { searchQuery: searchResult.searchQuery },
+          'SEARCH command detected, executing memory search'
+        );
+
+        // Agregar contexto de memoria al prompt y regenerar
+        const expandedPromptWithMemory = finalPrompt + searchResult.memoryContext;
+
+        response = await llm.generate({
+          systemPrompt: expandedPromptWithMemory,
+          messages: conversationMessages,
+        });
+
+        // Limpiar el response en caso de que la IA siga teniendo [SEARCH:...]
+        response = searchResult.cleanResponse;
       }
 
       // REMEMBER command interception
@@ -365,6 +443,32 @@ export class MessageService {
         );
         // Use clean response (with [PERSON:...] removed)
         response = personResult.cleanResponse;
+      }
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // SAFETY: Check for empty response after all interceptors
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      if (!response || response.trim().length === 0) {
+        log.error(
+          { originalResponse: response },
+          'Response became empty after interceptors - regenerating'
+        );
+
+        // Regenerate without commands
+        response = await llm.generate({
+          systemPrompt: finalPrompt + '\n\n⚠️ IMPORTANTE: NO uses comandos ([INTERESTS], [WORK], etc.) en tu respuesta. Responde directamente con texto natural.',
+          messages: conversationMessages,
+        });
+
+        // Clean again just in case
+        const finalClean = await interceptKnowledgeCommand(agentId, response);
+        response = finalClean.cleanResponse;
+
+        // If STILL empty, provide fallback
+        if (!response || response.trim().length === 0) {
+          response = 'Hola! ¿Cómo estás? 😊';
+          log.warn('Using fallback response after empty regeneration');
+        }
       }
 
       // Content moderation for behaviors
@@ -407,6 +511,7 @@ export class MessageService {
         prisma.message.create({
           data: {
             agentId,
+            userId, // Important: Include userId so messages are scoped to user
             role: 'assistant',
             content: finalResponse,
             metadata: {
@@ -418,7 +523,7 @@ export class MessageService {
                 pad: emotionalSummary.pad,
                 visible: emotionalSummary.dominant,
               },
-              relationLevel: emotionalSummary.mood,
+              relationLevel: newStage, // Use relationship stage instead of mood
               tokensUsed: estimatedTokens,
               behaviors: {
                 active: behaviorOrchestration.metadata.behaviorsActive,
@@ -450,7 +555,7 @@ export class MessageService {
         prisma.internalState.update({
           where: { agentId },
           data: {
-            currentEmotions: newEmotionState,
+            currentEmotions: newEmotionState as any,
             moodValence: emotionalSummary.pad.valence,
             moodArousal: emotionalSummary.pad.arousal,
             moodDominance: emotionalSummary.pad.dominance,
@@ -459,17 +564,26 @@ export class MessageService {
         }),
       ]);
 
-      // Store memories in vector store (non-blocking, after assistantMessage is created)
-      memoryManager.storeMessage(content, 'user', { messageId: userMessage.id }).catch(err =>
-        log.warn({ error: err.message }, 'Failed to store user message in vector store')
+      // Store embeddings SELECTIVAMENTE (solo mensajes importantes, no bloqueante)
+      // Esto reduce costos en 95% (~40K embeddings/día → ~2K embeddings/día)
+      storeMessageSelectively(
+        userMessage.id,
+        content,
+        'user',
+        agentId,
+        userId
+      ).catch(err =>
+        log.warn({ error: err.message }, 'Failed to store user message embedding')
       );
 
-      memoryManager.storeMessage(finalResponse, 'assistant', {
-        messageId: assistantMessage.id,
-        emotions: emotionalSummary.dominant,
-        relationLevel: emotionalSummary.mood,
-      }).catch(err =>
-        log.warn({ error: err.message }, 'Failed to store assistant message in vector store')
+      storeMessageSelectively(
+        assistantMessage.id,
+        finalResponse,
+        'assistant',
+        agentId,
+        userId
+      ).catch(err =>
+        log.warn({ error: err.message }, 'Failed to store assistant message embedding')
       );
 
       log.info({ duration: timer(), agentId, userId }, 'Message processed successfully');

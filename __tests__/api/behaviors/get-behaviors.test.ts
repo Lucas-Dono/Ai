@@ -212,7 +212,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${testAgentId}/behaviors`
     );
-    const response = await GET(req, { params: { id: testAgentId } });
+    const response = await GET(req, { params: Promise.resolve({ id: testAgentId }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -260,7 +260,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${fakeAgentId}/behaviors`
     );
-    const response = await GET(req, { params: { id: fakeAgentId } });
+    const response = await GET(req, { params: Promise.resolve({ id: fakeAgentId }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -284,7 +284,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${emptyAgent.id}/behaviors`
     );
-    const response = await GET(req, { params: { id: emptyAgent.id } });
+    const response = await GET(req, { params: Promise.resolve({ id: emptyAgent.id }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -302,7 +302,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${testAgentId}/behaviors`
     );
-    const response = await GET(req, { params: { id: testAgentId } });
+    const response = await GET(req, { params: Promise.resolve({ id: testAgentId }) });
     const data = await response.json();
 
     // Verificar triggersByType
@@ -324,7 +324,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     const req = new NextRequest(
       `http://localhost:3000/api/agents/${testAgentId}/behaviors`
     );
-    const response = await GET(req, { params: { id: testAgentId } });
+    const response = await GET(req, { params: Promise.resolve({ id: testAgentId }) });
     const data = await response.json();
 
     const phaseHistory = data.behaviorProfiles[0].phaseHistory;

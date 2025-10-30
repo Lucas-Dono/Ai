@@ -12,12 +12,14 @@ import {
   TYPING_TIMEOUT,
 } from "./events";
 import { registerChatEvents, registerReactionEvents } from "./chat-events";
+import { worldSocketEvents } from "@/lib/worlds/socket-events";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { createMemoryManager } from "@/lib/memory/manager";
+import { warmupQwenModel } from "@/lib/memory/qwen-embeddings";
 
 type SocketServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 type AuthenticatedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -45,6 +47,18 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
     path: "/api/socketio",
     addTrailingSlash: false,
   });
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // WARMUP: Pre-calentar modelo de embeddings
+  // Esto evita cold start en la primera búsqueda del usuario
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  warmupQwenModel().catch(error => {
+    console.warn('[SocketServer] Failed to warmup Qwen model:', error.message);
+    console.warn('[SocketServer] Embeddings funcionará en modo degradado (solo keywords)');
+  });
+
+  // Initialize world socket events
+  worldSocketEvents.initialize(io);
 
   // Authentication middleware
   io.use(async (socket: AuthenticatedSocket, next) => {

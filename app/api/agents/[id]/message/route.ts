@@ -18,7 +18,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { messageService } from "@/lib/services/message.service";
 import { messageInputSchema, formatZodError } from "@/lib/validation/schemas";
 import { createLogger, logError } from "@/lib/logger";
@@ -28,6 +28,98 @@ import { HuggingFaceVisionClient } from "@/lib/vision/huggingface-vision";
 import { prisma } from "@/lib/prisma";
 
 const log = createLogger('API/Message');
+
+/**
+ * GET /api/agents/[id]/message
+ * Get message history for an agent
+ */
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: agentId } = await params;
+
+    // Authentication
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      log.warn({ agentId }, 'Unauthorized access attempt');
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = user.id;
+    log.info({ agentId, userId }, 'Loading message history');
+
+    // Get pagination params
+    const { searchParams } = new URL(req.url);
+    const limit = Math.min(
+      parseInt(searchParams.get('limit') || '50'),
+      100 // Max 100 messages per request for performance
+    );
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    // Load messages from database
+    // Filter by both agentId and userId to get conversation between user and agent
+    const messages = await prisma.message.findMany({
+      where: {
+        agentId,
+        userId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      skip: offset,
+      take: Math.min(limit, 100), // Max 100 messages per request
+      include: {
+        agent: {
+          select: {
+            name: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    // Get total count for pagination
+    const totalCount = await prisma.message.count({
+      where: {
+        agentId,
+        userId,
+      },
+    });
+
+    log.info({ agentId, userId, count: messages.length, total: totalCount }, 'Message history loaded');
+
+    return NextResponse.json({
+      messages: messages.map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        role: msg.role,
+        metadata: msg.metadata,
+        createdAt: msg.createdAt,
+        agentName: msg.agent?.name || null,
+        agentAvatar: msg.agent?.avatar || null,
+      })),
+      pagination: {
+        limit,
+        offset,
+        total: totalCount,
+        hasMore: offset + messages.length < totalCount,
+        returned: messages.length,
+      },
+    });
+
+  } catch (error) {
+    logError(error, { context: 'Loading message history failed' });
+    return NextResponse.json(
+      {
+        error: "Failed to load message history",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}
 
 // Helper para resetear contador mensual de imágenes
 async function checkAndResetImageCount(userId: string) {
@@ -71,16 +163,16 @@ export async function POST(
     const { id: agentId } = await params;
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // AUTHENTICATION
+    // AUTHENTICATION (supports both NextAuth cookies and JWT tokens)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
       log.warn({ agentId }, 'Unauthorized access attempt');
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
-    const userPlan = session.user.plan || "free";
+    const userId = user.id;
+    const userPlan = user.plan || "free";
 
     log.info({ agentId, userId }, 'Message request received');
 
@@ -137,7 +229,7 @@ export async function POST(
       // IMAGE UPLOAD HANDLING
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       const formData = await req.formData();
-      imageFile = formData.get('image') as File | null;
+      imageFile = (formData as any).get('image') as File | null;
 
       if (!imageFile) {
         return NextResponse.json(
@@ -211,7 +303,7 @@ export async function POST(
 
       // Construir body desde FormData
       body = {
-        content: formData.get('content') || imageCaption || "He enviado una imagen",
+        content: (formData as any).get('content') || imageCaption || "He enviado una imagen",
         messageType: 'image',
         metadata: {
           imageCaption,

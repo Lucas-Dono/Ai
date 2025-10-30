@@ -200,30 +200,52 @@ export function WhatsAppChat({
           const data = await response.json();
 
           // Convertir mensajes de DB al formato del componente
-          const historicalMessages: Message[] = (data.messagesAsAgent || []).map((msg: any) => ({
-            id: msg.id,
-            type: msg.role === "user" ? "user" : "agent",
-            content: {
-              text: msg.content,
-              // Extraer multimedia del metadata si existe
-              audio: msg.metadata?.multimedia?.[0]?.type === "audio" ? msg.metadata.multimedia[0].url : undefined,
-              image: msg.metadata?.multimedia?.[0]?.type === "image" ? msg.metadata.multimedia[0].url : undefined,
-            },
-            timestamp: new Date(msg.createdAt),
-            status: msg.role === "user" ? "sent" : "delivered",
-            agentName: msg.role === "assistant" ? agentName : undefined,
-            agentAvatar: msg.role === "assistant" ? agentAvatar : undefined,
-            behaviorData: msg.metadata?.behaviors,
-            emotionalData: msg.metadata?.emotions ? {
-              state: {
-                trust: 0.5,
-                affinity: 0.5,
-                respect: 0.5,
+          const historicalMessages: Message[] = (data.messagesAsAgent || []).map((msg: any) => {
+            // Extraer multimedia del metadata si existe
+            const audioData = msg.metadata?.multimedia?.[0]?.type === "audio" ? msg.metadata.multimedia[0] : null;
+            const imageData = msg.metadata?.multimedia?.[0]?.type === "image" ? msg.metadata.multimedia[0] : null;
+
+            // Determinar el texto a mostrar
+            let textContent: string | undefined;
+            if (audioData) {
+              // Si hay audio, NO mostrar texto (como WhatsApp)
+              textContent = undefined;
+            } else if (imageData) {
+              // Si hay imagen, mostrar descripción como caption
+              textContent = imageData.description;
+            } else {
+              // Si es texto normal, quitar placeholders [🎤] o [📸] si existen
+              textContent = msg.content;
+              if (textContent === '[🎤]' || textContent === '[📸]') {
+                textContent = undefined;
+              }
+            }
+
+            return {
+              id: msg.id,
+              type: msg.role === "user" ? "user" : "agent",
+              content: {
+                text: textContent,
+                audio: audioData?.url,
+                image: imageData?.url,
               },
-              emotions: msg.metadata.emotions.dominant || [],
-              relationLevel: msg.metadata.relationLevel || 0,
-            } : undefined,
-          }));
+              timestamp: new Date(msg.createdAt),
+              status: msg.role === "user" ? "sent" : "delivered",
+              // Add agent info for all non-user messages
+              agentName: msg.role !== "user" ? agentName : undefined,
+              agentAvatar: msg.role !== "user" ? agentAvatar : undefined,
+              behaviorData: msg.metadata?.behaviors,
+              emotionalData: msg.metadata?.emotions ? {
+                state: {
+                  trust: 0.5,
+                  affinity: 0.5,
+                  respect: 0.5,
+                },
+                emotions: msg.metadata.emotions.dominant || [],
+                relationLevel: msg.metadata.relationLevel || 0,
+              } : undefined,
+            };
+          });
 
           console.log(`[WhatsAppChat] Cargados ${historicalMessages.length} mensajes desde DB`);
           setMessages(historicalMessages);
@@ -242,20 +264,17 @@ export function WhatsAppChat({
   useEffect(() => {
     if (!socket) return;
 
-    // @ts-expect-error - Socket events need to be typed properly
-    socket.on("agent:message", (data: any) => {
+    const onAgentMessage = (data: any) => {
       handleAgentMessage(data);
-    });
+    };
 
-    // @ts-expect-error - Socket events need to be typed properly
-    socket.on("agent:typing", (data: { agentId: string; isTyping: boolean }) => {
+    const onAgentTyping = (data: { agentId: string; isTyping: boolean }) => {
       if (data.agentId === agentId) {
         setIsTyping(data.isTyping);
       }
-    });
+    };
 
-    // @ts-expect-error - Socket events need to be typed properly
-    socket.on("message:reactions:updated", (data: {
+    const onReactionsUpdated = (data: {
       messageId: string;
       reactions: Reaction[];
     }) => {
@@ -266,23 +285,22 @@ export function WhatsAppChat({
             : msg
         )
       );
-    });
+    };
+
+    socket.on("agent:message", onAgentMessage);
+    socket.on("agent:typing", onAgentTyping);
+    socket.on("message:reactions:updated", onReactionsUpdated);
 
     // Unirse a la sala del agente
-    // @ts-expect-error - Socket events need to be typed properly
     socket.emit("join:agent:room", { agentId });
 
     return () => {
       // Salir de la sala del agente
-      // @ts-expect-error - Socket events need to be typed properly
       socket.emit("leave:agent:room", { agentId });
 
-      // @ts-expect-error - Socket events need to be typed properly
-      socket.off("agent:message");
-      // @ts-expect-error - Socket events need to be typed properly
-      socket.off("agent:typing");
-      // @ts-expect-error - Socket events need to be typed properly
-      socket.off("message:reactions:updated");
+      socket.off("agent:message", onAgentMessage);
+      socket.off("agent:typing", onAgentTyping);
+      socket.off("message:reactions:updated", onReactionsUpdated);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, agentId]);
@@ -433,12 +451,34 @@ export function WhatsAppChat({
         pendingMessageIds.current.delete(data.message.id);
       }, 5000);
 
+      // Extraer multimedia del mensaje si existe
+      const audioData = data.message.metadata?.multimedia?.[0]?.type === "audio" ? data.message.metadata.multimedia[0] : null;
+      const imageData = data.message.metadata?.multimedia?.[0]?.type === "image" ? data.message.metadata.multimedia[0] : null;
+
+      // Determinar el texto a mostrar
+      let textContent: string | undefined;
+      if (audioData) {
+        // Si hay audio, NO mostrar texto (como WhatsApp)
+        textContent = undefined;
+      } else if (imageData) {
+        // Si hay imagen, mostrar descripción como caption
+        textContent = imageData.description;
+      } else {
+        // Si es texto normal, quitar placeholders [🎤] o [📸] si existen
+        textContent = data.message.content;
+        if (textContent === '[🎤]' || textContent === '[📸]') {
+          textContent = undefined;
+        }
+      }
+
       // Crear mensaje del agente
       const agentMessage: Message = {
         id: data.message.id,
         type: "agent",
         content: {
-          text: data.message.content,
+          text: textContent,
+          audio: audioData?.url,
+          image: imageData?.url,
         },
         timestamp: new Date(data.message.createdAt),
         status: "delivered",
@@ -602,7 +642,6 @@ export function WhatsAppChat({
       );
 
       // Emitir al socket con la transcripción
-      // @ts-expect-error - Socket events need to be typed properly
       socket.emit("user:message", {
         agentId,
         userId,
@@ -706,7 +745,6 @@ export function WhatsAppChat({
 
     // TODO: Emitir al socket
     if (socket) {
-      // @ts-expect-error - Socket events need to be typed properly
       socket.emit("user:message", {
         agentId,
         userId,
@@ -773,7 +811,6 @@ export function WhatsAppChat({
 
     // Emitir al socket para sincronizar con backend
     if (socket) {
-      // @ts-expect-error - Socket events need to be typed properly
       socket.emit("message:react", { messageId, emoji, userId });
     }
   };

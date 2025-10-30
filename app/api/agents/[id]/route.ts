@@ -17,6 +17,11 @@ export async function GET(
           orderBy: { createdAt: "asc" }, // ASC = orden cronológico (más antiguos primero)
           take: 50,
         },
+        _count: {
+          select: {
+            reviews: true,
+          },
+        },
       },
     });
 
@@ -24,7 +29,15 @@ export async function GET(
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    return NextResponse.json(agent);
+    // Mapear agent para incluir isPublic y reviewCount
+    const { _count, ...agentData } = agent;
+    const mappedAgent = {
+      ...agentData,
+      isPublic: agent.visibility === 'public',
+      reviewCount: _count?.reviews || 0,
+    };
+
+    return NextResponse.json(mappedAgent);
   } catch (error) {
     console.error("[API GET] Error fetching agent:", error);
     return NextResponse.json(

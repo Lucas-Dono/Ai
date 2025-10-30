@@ -21,7 +21,7 @@ interface AgentCardProps {
     user: {
       name: string | null;
       email: string;
-    };
+    } | null;
     _count: {
       reviews: number;
     };
@@ -83,7 +83,7 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <Avatar className="w-12 h-12 border-2 border-border">
-            <AvatarImage src={agent.avatar || ""} alt={agent.name} />
+            <AvatarImage src={agent.avatar || (agent as any).referenceImageUrl || ""} alt={agent.name} />
             <AvatarFallback>{agent.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
 
@@ -92,7 +92,7 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
               {agent.name}
             </h3>
             <p className="text-xs text-muted-foreground truncate">
-              by {agent.user.name || agent.user.email.split("@")[0]}
+              by {agent.user?.name || agent.user?.email?.split("@")[0] || "Unknown"}
             </p>
           </div>
         </div>

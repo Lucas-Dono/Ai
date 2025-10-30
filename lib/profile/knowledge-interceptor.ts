@@ -5,13 +5,13 @@
  * Si la IA responde con un comando, lo intercepta y reenvía el request con contexto expandido.
  */
 
-import { detectKnowledgeCommand, getKnowledgeGroup } from "./knowledge-retrieval";
+import { detectKnowledgeCommand, getKnowledgeGroup, cleanKnowledgeCommands } from "./knowledge-retrieval";
 
 export interface InterceptResult {
   shouldIntercept: boolean;
   command?: string;
   knowledgeContext?: string;
-  finalResponse?: string;
+  cleanResponse: string; // SIEMPRE retorna una respuesta limpia
 }
 
 /**
@@ -25,10 +25,10 @@ export async function interceptKnowledgeCommand(
   const command = detectKnowledgeCommand(aiResponse);
 
   if (!command) {
-    // No hay comando, la respuesta es final
+    // No hay comando, pero limpiar por si hay tags sueltos
     return {
       shouldIntercept: false,
-      finalResponse: aiResponse,
+      cleanResponse: cleanKnowledgeCommands(aiResponse),
     };
   }
 
@@ -43,6 +43,7 @@ export async function interceptKnowledgeCommand(
     shouldIntercept: true,
     command,
     knowledgeContext,
+    cleanResponse: cleanKnowledgeCommands(aiResponse),
   };
 }
 

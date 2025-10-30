@@ -12,6 +12,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useSocket } from "@/hooks/useSocket";
@@ -42,6 +43,7 @@ export function ModernChat({
   agentAvatar,
   userId,
 }: ModernChatProps) {
+  const router = useRouter();
   const sessionKey = `chat-messages-${agentId}-${userId}`;
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -59,39 +61,96 @@ export function ModernChat({
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Behavioral and emotional tracking
   const [latestBehaviorData, setLatestBehaviorData] = useState<Message["behaviorData"] | null>(null);
   const [latestEmotionalData, setLatestEmotionalData] = useState<Message["emotionalData"] | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const socket = useSocket();
 
   // Auto-scroll
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // Load messages from session storage
+  // Prevent body scroll when chat is mounted
   useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem(sessionKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const restored: Message[] = parsed.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
-        }));
-        setMessages(restored);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  // Load messages from backend (with sessionStorage fallback)
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        // Try to load from backend first (last 50 messages for performance)
+        const res = await fetch(`/api/agents/${agentId}/message?limit=50`);
+
+        if (res.ok) {
+          const data = await res.json();
+          const loadedMessages: Message[] = data.messages.map((msg: any) => ({
+            id: msg.id,
+            type: msg.role === 'user' ? 'user' : 'agent',
+            content: { text: msg.content },
+            timestamp: new Date(msg.createdAt),
+            metadata: msg.metadata,
+            // Add agent info for all non-user messages
+            ...(msg.role !== 'user' && {
+              agentName: msg.agentName,
+              agentAvatar: msg.agentAvatar,
+            }),
+          }));
+
+          console.log(`[ModernChat] Loaded ${loadedMessages.length} messages from backend`);
+          setMessages(loadedMessages);
+          return;
+        }
+
+        // Fallback to sessionStorage if backend fails
+        console.warn('[ModernChat] Failed to load from backend, trying sessionStorage');
+        const saved = sessionStorage.getItem(sessionKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const restored: Message[] = parsed.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          }));
+          setMessages(restored);
+        }
+      } catch (error) {
+        console.error('[ModernChat] Error loading messages:', error);
+
+        // Final fallback to sessionStorage
+        try {
+          const saved = sessionStorage.getItem(sessionKey);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            const restored: Message[] = parsed.map((msg: any) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp),
+            }));
+            setMessages(restored);
+          }
+        } catch (fallbackError) {
+          console.error('[ModernChat] Fallback also failed:', fallbackError);
+        }
       }
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    }
-  }, [sessionKey]);
+    };
+
+    loadMessages();
+  }, [agentId, sessionKey]);
 
   // Save messages to session storage
   useEffect(() => {
@@ -107,6 +166,32 @@ export function ModernChat({
       }
     }
   }, [messages, sessionKey]);
+
+  // Load initial emotional and behavioral state from server
+  useEffect(() => {
+    const loadAgentState = async () => {
+      try {
+        const res = await fetch(`/api/agents/${agentId}/state`);
+        if (res.ok) {
+          const data = await res.json();
+
+          if (data.emotional) {
+            setLatestEmotionalData(data.emotional);
+          }
+
+          if (data.behavior) {
+            setLatestBehaviorData(data.behavior);
+          }
+
+          console.log('[ModernChat] Loaded agent state from server:', data);
+        }
+      } catch (error) {
+        console.error('[ModernChat] Error loading agent state:', error);
+      }
+    };
+
+    loadAgentState();
+  }, [agentId]);
 
   // Update latest behavioral and emotional data when new messages arrive
   useEffect(() => {
@@ -128,8 +213,7 @@ export function ModernChat({
   useEffect(() => {
     if (!socket) return;
 
-    // @ts-expect-error - Using typed socket events
-    socket.on("agent:message", (data: any) => {
+    const onAgentMessage = (data: any) => {
       if (data.agentId !== agentId) return;
 
       const newMessage: Message = {
@@ -151,25 +235,23 @@ export function ModernChat({
 
       setMessages((prev) => [...prev, newMessage]);
       setIsTyping(false);
-    });
+    };
 
-    // @ts-expect-error - Socket.io types don't include custom events
-    socket.on("agent:typing", (data: { agentId: string; isTyping: boolean }) => {
+    const onAgentTyping = (data: { agentId: string; isTyping: boolean }) => {
       if (data.agentId === agentId) {
         setIsTyping(data.isTyping);
       }
-    });
+    };
 
-    // @ts-expect-error - Socket.io types don't include custom events
+    socket.on("agent:message", onAgentMessage);
+    socket.on("agent:typing", onAgentTyping);
+
     socket.emit("join:agent:room", { agentId });
 
     return () => {
-      // @ts-expect-error - Socket.io types don't include custom events
       socket.emit("leave:agent:room", { agentId });
-      // @ts-expect-error - Socket.io types don't include custom events
-      socket.off("agent:message");
-      // @ts-expect-error - Socket.io types don't include custom events
-      socket.off("agent:typing");
+      socket.off("agent:message", onAgentMessage);
+      socket.off("agent:typing", onAgentTyping);
     };
   }, [socket, agentId, agentName, agentAvatar]);
 
@@ -191,6 +273,19 @@ export function ModernChat({
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsTyping(true);
+
+    // Track message for recommendations (silently, don't block UX)
+    fetch("/api/recommendations/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        itemType: "agent",
+        itemId: agentId,
+        interactionType: "message",
+        messageCount: 1,
+      }),
+    }).catch(() => {}); // Silent fail
 
     try {
       const response = await fetch(`/api/agents/${agentId}/message`, {
@@ -457,8 +552,32 @@ export function ModernChat({
     }
   };
 
+  // Delete agent
+  const deleteAgent = async () => {
+    if (isDeleting) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/agents/${agentId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete agent");
+      }
+
+      // Redirect to dashboard after successful deletion
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error deleting agent:", error);
+      alert(error instanceof Error ? error.message : "Error al eliminar el agente. Intenta de nuevo.");
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className="flex h-full relative overflow-hidden">
+    <div className="fixed inset-0 flex overflow-hidden overscroll-none">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20" />
 
@@ -482,6 +601,7 @@ export function ModernChat({
           onSearch={() => setShowSearch(!showSearch)}
           onExport={exportToPDF}
           onReset={() => setShowResetConfirm(true)}
+          onDelete={() => setShowDeleteConfirm(true)}
         />
 
         {/* Search Bar */}
@@ -494,7 +614,7 @@ export function ModernChat({
         )}
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-2">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-2 overscroll-none">
           <AnimatePresence initial={false}>
             {messages.map((message) => (
               <MessageBubble
@@ -686,6 +806,63 @@ export function ModernChat({
                       <>
                         <Trash2 className="h-4 w-4 mr-2" />
                         Sí, resetear
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Delete Agent Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 max-w-md w-full border border-white/30 dark:border-gray-700/50 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-red-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                  ¿Eliminar agente permanentemente?
+                </h3>
+                <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">
+                  Esto eliminará <strong>el agente {agentName}</strong> y <strong>todos sus datos</strong> (mensajes, relación, comportamientos, etc.).
+                  Esta acción <strong>no se puede deshacer</strong>.
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    disabled={isDeleting}
+                    className="hover:bg-gray-200 dark:hover:bg-gray-800"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={deleteAgent}
+                    disabled={isDeleting}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {isDeleting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Eliminando...
+                      </div>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Sí, eliminar
                       </>
                     )}
                   </Button>

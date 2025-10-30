@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { SWRProvider } from "@/lib/swr/config";
+import { Toaster } from "sonner";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +16,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         disableTransitionOnChange={false}
       >
         <SWRProvider>
-          <OnboardingProvider>{children}</OnboardingProvider>
+          <OnboardingProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </OnboardingProvider>
         </SWRProvider>
       </ThemeProvider>
     </SessionProvider>

@@ -214,7 +214,8 @@ export function MessageBubble({
                     "shadow-sm",
                     "text-xs",
                     "hover:shadow-md",
-                    "transition-all duration-200"
+                    "transition-all duration-200",
+                    "cursor-pointer"
                   )}
                 >
                   {reaction.emoji}

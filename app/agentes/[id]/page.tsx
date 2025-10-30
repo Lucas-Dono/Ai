@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { ModernChat } from "@/components/chat/v2";
+import { useTrackInteraction } from "@/hooks/use-track-interaction";
 
 interface Agent {
   id: string;
   name: string;
+  avatar?: string;
   referenceImageUrl?: string;
 }
 
@@ -16,7 +18,15 @@ export default function AgentChatPage() {
   const router = useRouter();
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string>("default-user");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Auto-tracking de interacción para el sistema de recomendaciones
+  useTrackInteraction({
+    userId,
+    itemType: "agent",
+    itemId: params.id as string,
+    interactionType: "chat",
+  });
 
   useEffect(() => {
     const fetchAgent = async () => {
@@ -26,7 +36,7 @@ export default function AgentChatPage() {
         const data = await res.json();
         setAgent(data);
 
-        // Get userId from session or use default
+        // Get userId from session
         const sessionRes = await fetch('/api/auth/session');
         if (sessionRes.ok) {
           const session = await sessionRes.json();
@@ -56,13 +66,11 @@ export default function AgentChatPage() {
   if (!agent) return null;
 
   return (
-    <div className="h-screen">
-      <ModernChat
-        agentId={agent.id}
-        agentName={agent.name}
-        agentAvatar={agent.referenceImageUrl}
-        userId={userId}
-      />
-    </div>
+    <ModernChat
+      agentId={agent.id}
+      agentName={agent.name}
+      agentAvatar={agent.avatar}
+      userId={userId || "default-user"}
+    />
   );
 }

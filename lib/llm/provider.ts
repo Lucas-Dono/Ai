@@ -148,7 +148,25 @@ export class LLMProvider {
               generationConfig: {
                 temperature,
                 maxOutputTokens: maxTokens,
-              }
+              },
+              safetySettings: [
+                {
+                  category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                  threshold: "BLOCK_NONE"
+                },
+                {
+                  category: "HARM_CATEGORY_HATE_SPEECH",
+                  threshold: "BLOCK_ONLY_HIGH"
+                },
+                {
+                  category: "HARM_CATEGORY_HARASSMENT",
+                  threshold: "BLOCK_ONLY_HIGH"
+                },
+                {
+                  category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                  threshold: "BLOCK_ONLY_HIGH"
+                }
+              ]
             })
           }
         );
@@ -180,7 +198,17 @@ export class LLMProvider {
 
         if (!text) {
           console.error('[LLM] Gemini Flash-Lite response sin texto:', JSON.stringify(data, null, 2));
-          throw new Error("Gemini no retornó texto en la respuesta");
+
+          // Verificar si fue bloqueado por safety filters
+          const finishReason = data.candidates?.[0]?.finishReason;
+          const safetyRatings = data.candidates?.[0]?.safetyRatings;
+
+          if (finishReason === 'SAFETY') {
+            console.error('[LLM] Respuesta bloqueada por filtros de seguridad:', safetyRatings);
+            throw new Error("Gemini bloqueó la respuesta por filtros de seguridad. Verifica safetySettings.");
+          }
+
+          throw new Error(`Gemini no retornó texto (finishReason: ${finishReason})`);
         }
 
         return text;
@@ -211,6 +239,34 @@ export class LLMProvider {
     profile: Record<string, unknown>;
     systemPrompt: string;
   }> {
+    // ═══════════════════════════════════════════════════════════════════
+    // NUEVO: INVESTIGACIÓN AUTOMÁTICA DE PERSONAJES PÚBLICOS
+    // ═══════════════════════════════════════════════════════════════════
+    let researchData: {
+      detection: any;
+      biography: any | null;
+      enhancedPrompt: string | null;
+    } | null = null;
+
+    try {
+      const { researchCharacter } = await import('@/lib/profile/character-research');
+      researchData = await researchCharacter(
+        String(rawData.name || ''),
+        String(rawData.personality || ''),
+        String(rawData.purpose || '')
+      );
+
+      if (researchData.enhancedPrompt) {
+        console.log('[LLM] ✅ Personaje público detectado, usando información verificada de web');
+      } else {
+        console.log('[LLM] ℹ️ Personaje original o no público, usando generación estándar');
+      }
+    } catch (error) {
+      console.error('[LLM] ⚠️ Error en investigación de personaje, continuando con generación estándar:', error);
+      researchData = null;
+    }
+    // ═══════════════════════════════════════════════════════════════════
+
     const prompt = `Eres un experto en crear personajes profundos, creíbles y realistas para narrativa interactiva.
 
 TAREA: Generar un perfil COMPLETO Y DETALLADO para este personaje basándote en los datos básicos proporcionados.
@@ -218,8 +274,9 @@ TAREA: Generar un perfil COMPLETO Y DETALLADO para este personaje basándote en 
 DATOS BÁSICOS PROPORCIONADOS POR EL USUARIO:
 ${JSON.stringify(rawData, null, 2)}
 
+${researchData?.enhancedPrompt || `
 ⚠️ IMPORTANTE: El usuario solo proporcionó datos MÍNIMOS (nombre, personalidad básica, etc.).
-TU TRABAJO es EXPANDIR estos datos mínimos en UNA VIDA COMPLETA Y COHERENTE.
+TU TRABAJO es EXPANDIR estos datos mínimos en UNA VIDA COMPLETA Y COHERENTE.`}
 
 INSTRUCCIONES CRÍTICAS:
 1. INVENTA detalles específicos y realistas para llenar todos los campos
@@ -562,7 +619,25 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
               generationConfig: {
                 temperature: 0.7, // Reducido para respuestas más consistentes
                 maxOutputTokens: 4000, // Aumentado para JSON completo
-              }
+              },
+              safetySettings: [
+                {
+                  category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                  threshold: "BLOCK_NONE"
+                },
+                {
+                  category: "HARM_CATEGORY_HATE_SPEECH",
+                  threshold: "BLOCK_ONLY_HIGH"
+                },
+                {
+                  category: "HARM_CATEGORY_HARASSMENT",
+                  threshold: "BLOCK_ONLY_HIGH"
+                },
+                {
+                  category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                  threshold: "BLOCK_ONLY_HIGH"
+                }
+              ]
             })
           }
         );
@@ -594,7 +669,17 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
 
         if (!text) {
           console.error('[LLM] Gemini Flash response sin texto:', JSON.stringify(data, null, 2));
-          throw new Error("Gemini no retornó texto en la respuesta");
+
+          // Verificar si fue bloqueado por safety filters
+          const finishReason = data.candidates?.[0]?.finishReason;
+          const safetyRatings = data.candidates?.[0]?.safetyRatings;
+
+          if (finishReason === 'SAFETY') {
+            console.error('[LLM] Respuesta bloqueada por filtros de seguridad:', safetyRatings);
+            throw new Error("Gemini bloqueó la respuesta por filtros de seguridad. Verifica safetySettings.");
+          }
+
+          throw new Error(`Gemini no retornó texto (finishReason: ${finishReason})`);
         }
 
         console.log('[LLM] Raw response text (first 1000 chars):', text.substring(0, 1000));

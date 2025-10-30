@@ -40,7 +40,7 @@ export async function getOrCreateMercadoPagoCustomer(
 export async function createSubscriptionPreference(
   userId: string,
   email: string,
-  planId: "pro" | "enterprise",
+  planId: "plus" | "ultra",
   name?: string
 ): Promise<string> {
   const customerId = await getOrCreateMercadoPagoCustomer(userId, email, name);
@@ -140,9 +140,9 @@ export async function syncSubscription(
   }
 
   // Determinar el plan basado en el monto
-  let planId = "pro";
-  if (preapprovalData.auto_recurring?.transaction_amount >= PLANS.enterprise.price) {
-    planId = "enterprise";
+  let planId = "plus";
+  if (preapprovalData.auto_recurring?.transaction_amount >= PLANS.ultra.price) {
+    planId = "ultra";
   }
 
   // Actualizar plan del usuario

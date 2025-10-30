@@ -140,32 +140,40 @@ export function ReferenceImageSelector({
       {/* Vista previa de la imagen */}
       {imageUrl ? (
         <Card className="p-4">
-          <div className="relative">
-            <div className="relative w-full h-[600px] rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-              <Image
-                src={imageUrl}
-                alt={`Imagen de referencia de ${agentName}`}
-                fill
-                className="object-contain"
-                unoptimized
-              />
+          <div className="space-y-4">
+            {/* Preview con aspecto original preservado */}
+            <div className="relative">
+              <div className="relative w-full max-h-[600px] rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                <img
+                  src={imageUrl}
+                  alt={`Imagen de referencia de ${agentName}`}
+                  className="max-w-full max-h-[600px] w-auto h-auto object-contain"
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm"
+                onClick={handleClear}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm"
-              onClick={handleClear}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <Button onClick={handleConfirm} className="flex-1">
-              Usar esta imagen
-            </Button>
-            <Button variant="outline" onClick={onSkip}>
-              Omitir
-            </Button>
+
+            {/* Información sobre el aspecto */}
+            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
+              La imagen se mostrará con su aspecto original preservado (no se recortará ni deformará)
+            </div>
+
+            {/* Botones de confirmación */}
+            <div className="flex gap-2">
+              <Button onClick={handleConfirm} className="flex-1">
+                Usar esta imagen
+              </Button>
+              <Button variant="outline" onClick={onSkip}>
+                Omitir
+              </Button>
+            </div>
           </div>
         </Card>
       ) : (

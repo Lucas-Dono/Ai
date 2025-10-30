@@ -31,7 +31,7 @@ async function setupTestAgent() {
     },
   });
 
-  if (!agent) {
+  if (!agent || !agent.userId) {
     throw new Error('No agents found in database. Please create an agent first.');
   }
 

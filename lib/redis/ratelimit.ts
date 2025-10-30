@@ -35,8 +35,8 @@ export async function checkRateLimit(
   if (!isRedisConfigured()) {
     const limits = {
       free: { max: 10, window: 60000 }, // 10 req/min
-      pro: { max: 100, window: 60000 }, // 100 req/min
-      enterprise: { max: 1000, window: 60000 }, // 1000 req/min
+      plus: { max: 100, window: 60000 }, // 100 req/min
+      ultra: { max: 1000, window: 60000 }, // 1000 req/min
     };
 
     const planLimit = limits[plan as keyof typeof limits] || limits.free;

@@ -114,7 +114,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
       `http://localhost:3000/api/agents/${testAgentId}/behaviors/reset`,
       { method: "POST" }
     );
-    const response = await POST(req, { params: { id: testAgentId } });
+    const response = await POST(req, { params: Promise.resolve({ id: testAgentId }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -143,7 +143,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
       `http://localhost:3000/api/agents/fake-id/behaviors/reset`,
       { method: "POST" }
     );
-    const response = await POST(req, { params: { id: "fake-id" } });
+    const response = await POST(req, { params: Promise.resolve({ id: "fake-id" }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
@@ -167,7 +167,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
       `http://localhost:3000/api/agents/${emptyAgent.id}/behaviors/reset`,
       { method: "POST" }
     );
-    const response = await POST(req, { params: { id: emptyAgent.id } });
+    const response = await POST(req, { params: Promise.resolve({ id: emptyAgent.id }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);

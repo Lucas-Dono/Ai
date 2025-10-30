@@ -62,12 +62,7 @@ export function ChatInput({
   const canSend = value.trim().length > 0 && !disabled;
 
   return (
-    <motion.div
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="relative px-6 py-4"
-    >
+    <div className="relative px-6 py-4">
       {/* Glassmorphism Container */}
       <motion.div
         animate={{
@@ -200,7 +195,7 @@ export function ChatInput({
           </motion.button>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 

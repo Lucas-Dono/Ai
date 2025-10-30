@@ -17,7 +17,8 @@ model User {
   emailVerified         DateTime?
   name                  String?
   image                 String?
-  plan                  String    @default("free") // free, pro, enterprise
+  password              String? // Password hash para autenticación con credenciales
+  plan                  String    @default("free") // free, plus, ultra
   mercadopagoCustomerId String?   @unique // Mercado Pago customer ID
   apiKey                String?   @unique // API key opcional para usuarios avanzados
   location              String? // Ciudad del usuario para contexto de clima (ej: "Buenos Aires")
@@ -43,6 +44,22 @@ model User {
   teamMemberships    TeamMember[]
   fastsdInstallation FastSDInstallation?
   reactions          Reaction[]
+  interactions       UserInteraction[]
+  profile            UserProfile?
+  recommendations    RecommendationCache[]
+  publishedThemes    MarketplaceTheme[]  @relation("MarketplaceThemeAuthor")
+
+  // Community System Relations
+  communityPosts     CommunityPost[]     @relation("CommunityPostAuthor")
+  communityComments  CommunityComment[]  @relation("CommunityCommentAuthor")
+  ownedCommunities   Community[]         @relation("CommunityOwner")
+  organizedEvents    CommunityEvent[]    @relation("EventOrganizer")
+  givenAwards        PostAward[]         @relation("AwardGiver")
+  postReports        PostReport[]        @relation("PostReporter")
+  commentReports     CommentReport[]     @relation("CommentReporter")
+  publishedPrompts   MarketplacePrompt[] @relation("PromptAuthor")
+  publishedCharacters MarketplaceCharacter[] @relation("CharacterAuthor")
+  researchProjects   ResearchProject[]   @relation("ResearchLead")
 
   @@index([email])
   @@index([mercadopagoCustomerId])
@@ -88,7 +105,7 @@ model VerificationToken {
 // Modelo de Agente (IA)
 model Agent {
   id           String   @id @default(cuid())
-  userId       String
+  userId       String?  // Null para agentes predefinidos del sistema
   teamId       String? // ID del equipo propietario (opcional)
   kind         String // companion (emocional) o assistant (administrativo)
   name         String
@@ -118,14 +135,15 @@ model Agent {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
-  worldAgents      WorldAgent[]
-  messagesAsAgent  Message[]    @relation("AgentMessages")
-  relationsSubject Relation[]   @relation("SubjectRelations")
-  reviews          Review[]
-  clones           AgentClone[] @relation("OriginalAgent")
+  worldAgents         WorldAgent[]
+  messagesAsAgent     Message[]           @relation("AgentMessages")
+  relationsSubject    Relation[]          @relation("SubjectRelations")
+  reviews             Review[]
+  clones              AgentClone[]        @relation("OriginalAgent")
+  worldInteractions   WorldInteraction[]  @relation("SpeakerInteractions")
 
   // Sistema emocional avanzado
   personalityCore  PersonalityCore?
@@ -293,6 +311,10 @@ model SemanticMemory {
   // Conocimiento del mundo (opcional, puede ir creciendo)
   worldKnowledge Json?
 
+  // Metadata (embeddings, timestamps, etc)
+  // { "profileEmbeddings": [...], "embeddingsGeneratedAt": "...", "embeddingModel": "..." }
+  metadata Json?
+
   lastUpdated DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
@@ -356,21 +378,93 @@ model CharacterGrowth {
   @@index([agentId])
 }
 
-// Modelo de Mundo (entorno grupal)
+// ============================================
+// SISTEMA DE MUNDOS INTERACTIVOS
+// ============================================
+
+// Modelo de Mundo (entorno grupal donde múltiples IAs interactúan)
 model World {
   id          String   @id @default(cuid())
-  userId      String
+  userId      String?  // Null para mundos predefinidos del sistema
   name        String
   description String?
+
+  // Sistema de mundos predefinidos
+  isPredefined Boolean @default(false) // Mundos creados por el sistema
+  category     String? // Categoría del mundo: "social", "profesional", "fantasia", "educativo", etc.
+  featured     Boolean @default(false) // Destacar en la lista de mundos predefinidos
+  difficulty   String? // "beginner", "intermediate", "advanced"
+
+  // Configuración del entorno
+  scenario    String?  @db.Text // Escenario/contexto del mundo (ej: "Oficina corporativa", "Escuela secundaria")
+  initialContext String? @db.Text // Contexto inicial de la simulación
+  rules       Json?    // Reglas del mundo (ej: {"allowConflict": true, "theme": "fantasy"})
+
+  // Estado de la simulación
+  status      WorldStatus @default(STOPPED) // RUNNING, PAUSED, STOPPED
+  visibility  String      @default("private") // private, public, shared
+
+  // Configuración de simulación
+  autoMode           Boolean @default(true) // Modo automático (IAs hablan sin intervención)
+  turnsPerCycle      Int     @default(1) // Cuántos turnos por ciclo de simulación
+  interactionDelay   Int     @default(3000) // Delay entre interacciones (ms)
+  maxInteractions    Int?    // Límite opcional de interacciones
+
+  // Configuración de personalidad grupal
+  allowEmotionalBonds Boolean @default(true) // Permitir que IAs desarrollen lazos emocionales
+  allowConflicts      Boolean @default(true) // Permitir conflictos entre IAs
+  topicFocus         String? // Tema de enfoque (opcional)
+
+  // Sistema de narrativa guiada (para mundos tipo historia)
+  storyMode           Boolean @default(false) // Si está en modo historia con guión
+  currentStoryBeat    String? // Evento/beat actual del guión
+  storyProgress       Float   @default(0) // Progreso general de la historia (0-1)
+  directorAgentId     String? // ID del agente IA Director (gestiona la narrativa)
+  storyScript         Json? // Guión completo con eventos y arcos
+  directorState       Json? // Estado del AI Director (decisiones, timing, etc.)
+  currentSceneDirection Json? // Dirección actual de escena del Director (tone, pacing, etc.)
+  currentEmergentEvent Json? // Evento emergente activo (bump-into, interruption, etc.)
+
+  // Especificación editable del mundo (para modo creador)
+  worldSpec           Json? // Especificación completa del mundo para poder editarlo después
+  creationMode        String? // "simple" | "advanced" - indica cómo se creó el mundo
+
+  // Métricas para ranking
+  viewCount           Int      @default(0) // Número de veces que se ha visitado
+  totalTimeSpent      Int      @default(0) // Tiempo total en segundos que usuarios han pasado
+  lastViewedAt        DateTime? // Última vez que alguien vio este mundo
+  rating              Float? // Rating promedio del mundo (si implementamos reviews para mundos)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  worldAgents WorldAgent[]
-  messages    Message[]
+  worldAgents      WorldAgent[]
+  messages         Message[]
+  interactions     WorldInteraction[]
+  simulationState  WorldSimulationState?
+  agentRelations   AgentToAgentRelation[] // Relaciones entre IAs en este mundo
+  storyEvents      StoryEvent[] // Eventos programados del guión
+  characterArcs    CharacterArc[] // Arcos de personajes
 
   @@index([userId])
+  @@index([status])
+  @@index([visibility])
+  @@index([isPredefined])
+  @@index([category])
+  @@index([featured])
+  @@index([storyMode])
+  @@index([viewCount])
+  @@index([rating])
+  @@index([lastViewedAt])
+}
+
+// ENUM: Estado de la simulación del mundo
+enum WorldStatus {
+  RUNNING  // Simulación activa
+  PAUSED   // Simulación pausada
+  STOPPED  // Simulación detenida
 }
 
 // Tabla intermedia para Mundos y Agentes
@@ -379,10 +473,140 @@ model WorldAgent {
   agentId  String
   joinedAt DateTime @default(now())
 
+  // Rol del agente en el mundo (opcional)
+  role     String? // "leader", "observer", "participant", etc.
+
+  // Estado del agente en el mundo
+  isActive Boolean @default(true) // Si el agente está participando activamente
+
+  // Estadísticas
+  totalInteractions Int @default(0) // Número de veces que ha hablado
+  lastInteractionAt DateTime? // Última vez que interactuó
+
+  // Sistema de importancia narrativa (para mundos con historia)
+  importanceLevel   String  @default("secondary") // "main", "secondary", "filler"
+  screenTime        Int     @default(0) // Tracking de participación total
+  promotionScore    Float   @default(0.5) // Score para determinar promoción/degradación (0-1)
+  characterArcStage String? // Etapa actual en su arco: "introduction", "development", "climax", "resolution"
+  emotionalState    Json? // Estado emocional actual del personaje en este mundo
+  isFocused         Boolean @default(false) // Si el Director ha marcado este personaje como foco
+  focusedUntil      DateTime? // Hasta cuándo está en foco
+
   world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@id([worldId, agentId])
+  @@index([worldId, isActive])
+  @@index([worldId, importanceLevel])
+}
+
+// Interacciones entre IAs en un mundo
+model WorldInteraction {
+  id       String   @id @default(cuid())
+  worldId  String
+
+  // Agentes involucrados
+  speakerId  String // ID del agente que habla
+  targetId   String? // ID del agente objetivo (null si es mensaje grupal)
+
+  // Contenido
+  content    String   @db.Text
+  messageId  String?  @unique // Referencia al mensaje en la tabla Message
+
+  // Contexto emocional
+  speakerEmotion Json? // Estado emocional del hablante
+  targetEmotion  Json? // Estado emocional del objetivo (si aplica)
+
+  // Metadata
+  interactionType String @default("dialogue") // dialogue, action, thought, system
+  turnNumber      Int // Número de turno en la simulación
+  turn            Int? // Alias de turnNumber para compatibilidad
+  sentiment       String? // Análisis de sentimiento: "positive", "negative", "neutral", etc.
+  metadata        Json? // Datos adicionales (topics, etc.)
+
+  createdAt DateTime @default(now())
+
+  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  speaker Agent @relation("SpeakerInteractions", fields: [speakerId], references: [id], onDelete: Cascade)
+
+  @@index([worldId])
+  @@index([worldId, turnNumber])
+  @@index([speakerId])
+  @@index([targetId])
+  @@index([createdAt])
+}
+
+// Estado de simulación del mundo (cache/snapshot)
+model WorldSimulationState {
+  id      String @id @default(cuid())
+  worldId String @unique
+
+  // Estado actual
+  currentTurn      Int      @default(0) // Turno actual
+  totalInteractions Int     @default(0) // Total de interacciones
+  lastSpeakerId    String? // Último agente que habló
+
+  // Contexto de conversación
+  recentTopics     Json    @default("[]") // Temas recientes discutidos
+  activeSpeakers   Json    @default("[]") // Agentes que han hablado recientemente
+
+  // Estadísticas agregadas
+  statistics       Json    @default("{}") // Stats del mundo (emotions, interactions, etc.)
+
+  // Control de simulación
+  startedAt        DateTime?
+  pausedAt         DateTime?
+  resumedAt        DateTime?
+  stoppedAt        DateTime?
+
+  lastUpdated      DateTime @default(now())
+
+  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
+
+  @@index([worldId])
+}
+
+// Relaciones emocionales entre agentes (en contexto de un mundo)
+model AgentToAgentRelation {
+  id        String   @id @default(cuid())
+  worldId   String
+
+  // Agentes involucrados
+  subjectId String // Agente que tiene los sentimientos
+  targetId  String // Agente objetivo
+
+  // Métricas relacionales (similar a Relation pero entre IAs)
+  trust       Float @default(0.5) // Confianza (0-1)
+  affinity    Float @default(0.5) // Afinidad/simpatía (0-1)
+  respect     Float @default(0.5) // Respeto (0-1)
+  attraction  Float @default(0.5) // Atracción (romántica o platónica) (0-1)
+
+  // Estado emocional privado (no visible al usuario directamente)
+  privateState Json @default("{}") // { "love": 0.3, "jealousy": 0.1, "admiration": 0.7 }
+
+  // Interacciones
+  totalInteractions Int @default(0)
+  positiveInteractions Int @default(0)
+  negativeInteractions Int @default(0)
+  neutralInteractions Int @default(0)
+
+  // Historia de relación
+  relationshipHistory Json @default("[]") // [{turn: 10, event: "conflict", impact: -0.2}, ...]
+
+  // Progresión
+  stage              String @default("strangers") // strangers | acquaintances | friends | close | complex
+  lastInteractionAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
+
+  @@unique([worldId, subjectId, targetId])
+  @@index([worldId])
+  @@index([subjectId])
+  @@index([targetId])
+  @@index([stage])
 }
 
 // Modelo de Relaciones (emocionales entre agentes o usuario-agente)
@@ -584,7 +808,7 @@ model Team {
   name        String
   description String?
   ownerId     String
-  plan        String   @default("free") // free, pro, enterprise
+  plan        String   @default("free") // free, plus, ultra
   metadata    Json? // Configuración adicional del equipo
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -1081,5 +1305,1289 @@ model ProactiveMessage {
   @@index([status])
   @@index([triggerType])
   @@index([sentAt])
+  @@index([createdAt])
+}
+
+// ========================================
+// SISTEMA DE NARRATIVA GUIADA
+// ========================================
+
+// Eventos programados del guión (ej: festival cultural, exámenes, confesión)
+model StoryEvent {
+  id          String   @id @default(cuid())
+  worldId     String
+  
+  // Información del evento
+  eventType   String // "school_festival", "exam_week", "confession", "conflict", "resolution"
+  eventName   String // Nombre del evento
+  description String   @db.Text
+  
+  // Trigger conditions
+  triggerType       String // "automatic", "progress_based", "character_action"
+  triggerConditions Json? // Condiciones para que se active
+  requiredProgress  Float? // Progreso mínimo requerido (0-1)
+  
+  // Participantes
+  involvedCharacters Json @default("[]") // IDs de personajes que participan
+  focusCharacter     String? // Personaje principal del evento
+  
+  // Estado
+  isCompleted Boolean  @default(false)
+  isActive    Boolean  @default(false)
+  outcome     String? // Resultado del evento
+  
+  // Scheduling
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  // Metadata
+  storyImpact Json? // Impacto en la historia y personajes
+  nextEvents  Json? // IDs de eventos que pueden seguir
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  
+  @@index([worldId])
+  @@index([worldId, isCompleted])
+  @@index([worldId, isActive])
+  @@index([eventType])
+}
+
+// Arcos de personajes (desarrollo narrativo individual)
+model CharacterArc {
+  id        String   @id @default(cuid())
+  worldId   String
+  agentId   String
+  
+  // Información del arco
+  arcName        String // "Tsundere Redemption", "Shy Girl Opens Up", "Rival to Friend"
+  arcType        String // "romance", "friendship", "rivalry", "personal_growth", "comedy"
+  description    String   @db.Text
+  
+  // Estructura del arco
+  milestones     Json // Array de hitos del arco con sus condiciones
+  currentMilestone Int @default(0) // Índice del hito actual
+  progress       Float @default(0) // Progreso en el arco actual (0-1)
+  
+  // Estado
+  isActive    Boolean @default(true)
+  isCompleted Boolean @default(false)
+  
+  // Relaciones con otros personajes
+  relatedCharacters Json @default("[]") // IDs de personajes relacionados
+  conflictsWith     Json @default("[]") // IDs de personajes en conflicto
+  alliesWith        Json @default("[]") // IDs de personajes aliados
+  
+  // Progreso narrativo
+  keyMoments  Json @default("[]") // Momentos clave ya ocurridos
+  currentGoal String? // Objetivo actual del personaje
+  
+  // Metadata
+  emotionalTone   String? // "comedic", "dramatic", "heartwarming", "bittersweet"
+  characterGrowth Json? // Cambios en la personalidad/relaciones
+  
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime @updatedAt
+  
+  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  
+  @@index([worldId])
+  @@index([agentId])
+  @@index([worldId, isActive])
+  @@index([worldId, agentId])
+  @@index([arcType])
+}
+
+// ========================================
+// SISTEMA DE RECOMENDACIÓN IA
+// ========================================
+
+// TRACKING DE INTERACCIONES (estilo Netflix/YouTube)
+model UserInteraction {
+  id              String   @id @default(cuid())
+  userId          String
+
+  // Qué interactuó
+  itemType        String   // "agent" | "world"
+  itemId          String   // ID del agente o mundo
+
+  // Tipo de interacción
+  interactionType String   // "view", "chat", "message", "rating", "like", "share", "finish"
+
+  // Métricas de engagement
+  duration        Int      @default(0) // Segundos de interacción
+  messageCount    Int?     // Número de mensajes enviados (si aplica)
+  completionRate  Float?   // 0-1, ¿completó la interacción?
+  rating          Int?     // 1-5 si dejó rating
+
+  // Feedback explícito
+  liked           Boolean? // Like/dislike explícito
+  shared          Boolean  @default(false)
+
+  // Contexto (para mejorar recomendaciones)
+  deviceType      String?  // "mobile", "desktop", "tablet"
+  timeOfDay       String?  // "morning", "afternoon", "evening", "night"
+  dayOfWeek       String?  // "monday", "tuesday", etc.
+
+  // Metadata adicional (flexible)
+  metadata        Json?    // { topics: [], emotions: [], etc. }
+
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, itemType])
+  @@index([userId, itemId])
+  @@index([itemType, itemId])
+  @@index([interactionType])
+  @@index([createdAt])
+  @@index([userId, createdAt]) // Para obtener historial temporal
+}
+
+// PERFIL DE USUARIO (agregado de preferencias)
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Preferencias inferidas
+  favoriteCategories  Json @default("[]") // ["ciencia", "romance", "historia"]
+  favoriteTags        Json @default("[]") // ["física", "anime", "vulnerable"]
+  preferredAgentTypes Json @default("[]") // ["companion", "assistant"]
+
+  // Patrones de comportamiento
+  avgSessionDuration  Int  @default(0) // Segundos promedio por sesión
+  preferredTimeOfDay  String? // Cuándo más usa la app
+  interactionCount    Int  @default(0) // Total de interacciones
+  totalTimeSpent      Int  @default(0) // Tiempo total en segundos
+
+  // Métricas de engagement
+  avgCompletionRate   Float @default(0.5) // Promedio de completion
+  avgRating           Float? // Rating promedio que da
+
+  // Embeddings (para similarity search)
+  preferenceEmbedding Json? // Vector de preferencias del usuario
+
+  // Metadata
+  lastInteractionAt   DateTime?
+  profileVersion      Int   @default(1) // Para migraciones futuras
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// CACHE DE RECOMENDACIONES (regeneración diaria)
+model RecommendationCache {
+  id     String @id @default(cuid())
+  userId String
+
+  // Recomendaciones generadas
+  recommendations Json // Array de {itemType, itemId, score, reason}
+
+  // Metadata de generación
+  algorithm       String   // "llm", "collaborative", "hybrid"
+  generatedAt     DateTime @default(now())
+  expiresAt       DateTime // Cuándo regenerar
+
+  // Métricas de calidad
+  diversityScore  Float?   // Qué tan diversas son las recos
+  noveltyScore    Float?   // Qué tan nuevas son
+
+  // Tracking de efectividad
+  impressions     Int      @default(0) // Cuántas veces se mostraron
+  clicks          Int      @default(0) // Cuántas veces hicieron click
+  ctr             Float?   // Click-through rate
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([generatedAt])
+  @@unique([userId, generatedAt]) // Solo una cache por usuario por timestamp
+}
+
+// ========================================
+// MARKETPLACE DE TEMAS DEL CHAT
+// ========================================
+
+// TEMAS PUBLICADOS EN EL MARKETPLACE
+model MarketplaceTheme {
+  id        String   @id @default(cuid())
+  authorId  String
+
+  // Información del tema
+  name              String
+  description       String?  @db.Text
+  userBubbleColor   String
+  agentBubbleColor  String
+  backgroundColor   String
+  backgroundGradient Json?   // Array de colores para gradiente
+  accentColor       String
+  textColor         String?
+  backgroundImage   String?  // URL de imagen de fondo (si tiene)
+
+  // Categorización
+  category          String   // "dark", "light", "colorful", "minimal", "anime", "nature", etc.
+  tags              Json     @default("[]") // Array de tags para búsqueda
+
+  // Estado y moderación
+  status            String   @default("pending") // pending, approved, rejected, removed
+  moderationNotes   String?  @db.Text
+  moderatedBy       String?
+  moderatedAt       DateTime?
+
+  // Visibilidad
+  isPublic          Boolean  @default(true)
+  isFeatured        Boolean  @default(false) // Featured en homepage
+  isPremium         Boolean  @default(false) // Solo para usuarios premium
+
+  // Métricas
+  downloadCount     Int      @default(0)
+  viewCount         Int      @default(0)
+  rating            Float    @default(0) // 0-5
+  ratingCount       Int      @default(0)
+
+  // Versioning
+  version           String   @default("1.0")
+  isLatestVersion   Boolean  @default(true)
+  previousVersionId String?  @unique // ID de la versión anterior
+
+  // Preview images (screenshots del tema)
+  previewImages     Json     @default("[]") // URLs de previews
+
+  // Metadata de exportación
+  exportData        Json     // JSON del tema para importar
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publishedAt DateTime @default(now())
+
+  author User @relation("MarketplaceThemeAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  ratings MarketplaceThemeRating[]
+  downloads MarketplaceThemeDownload[]
+  reports MarketplaceThemeReport[]
+  collections MarketplaceCollection[] @relation("CollectionThemes")
+
+  @@index([authorId])
+  @@index([status])
+  @@index([category])
+  @@index([isFeatured])
+  @@index([downloadCount])
+  @@index([rating])
+  @@index([createdAt])
+  @@index([publishedAt])
+}
+
+// RATINGS Y REVIEWS DE TEMAS
+model MarketplaceThemeRating {
+  id      String @id @default(cuid())
+  themeId String
+  userId  String
+
+  // Rating
+  rating  Int // 1-5 estrellas
+  review  String? @db.Text
+
+  // Metadata
+  helpful Int @default(0) // Contador de "útil"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  theme MarketplaceTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([themeId, userId]) // Un usuario solo puede dejar un rating por tema
+  @@index([themeId])
+  @@index([userId])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+// DESCARGAS DE TEMAS (tracking)
+model MarketplaceThemeDownload {
+  id      String @id @default(cuid())
+  themeId String
+  userId  String
+
+  // Metadata
+  platform String? // "mobile", "web"
+  version  String? // Versión del tema descargada
+
+  createdAt DateTime @default(now())
+
+  theme MarketplaceTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@index([themeId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([themeId, userId]) // Para evitar contar duplicados
+}
+
+// REPORTES DE TEMAS (moderación)
+model MarketplaceThemeReport {
+  id      String @id @default(cuid())
+  themeId String
+  userId  String
+
+  // Información del reporte
+  reason      String // "inappropriate", "spam", "copyright", "broken", "other"
+  description String? @db.Text
+
+  // Estado
+  status      String   @default("pending") // pending, reviewed, action_taken, dismissed
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  resolution  String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  theme MarketplaceTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@index([themeId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// COLECCIONES DE TEMAS (curated lists)
+model MarketplaceCollection {
+  id          String @id @default(cuid())
+  curatorId   String
+
+  // Información de la colección
+  name        String
+  description String? @db.Text
+  coverImage  String? // URL de imagen de portada
+
+  // Estado
+  isPublic    Boolean @default(true)
+  isFeatured  Boolean @default(false)
+  isOfficial  Boolean @default(false) // Colecciones oficiales del equipo
+
+  // Métricas
+  views       Int @default(0)
+  followers   Int @default(0)
+
+  // Temas en la colección
+  themes      MarketplaceTheme[] @relation("CollectionThemes")
+  themeOrder  Json @default("[]") // Array de IDs para mantener orden
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([curatorId])
+  @@index([isPublic])
+  @@index([isFeatured])
+  @@index([isOfficial])
+  @@index([createdAt])
+}
+
+// ========================================
+// SISTEMA COMMUNITY - PLATAFORMA SOCIAL
+// ========================================
+
+// POSTS Y DISCUSIONES (Reddit/Discord style)
+model CommunityPost {
+  id        String   @id @default(cuid())
+  authorId  String
+
+  // Contenido
+  title     String
+  content   String   @db.Text
+  contentType String @default("markdown") // markdown, html, plain
+
+  // Tipo de post
+  type      String   // discussion, question, showcase, help, research, poll, announcement
+
+  // Categorización
+  tags      Json     @default("[]") // Array de tags
+  communityId String? // Null = post global
+
+  // Estado
+  isPinned  Boolean  @default(false)
+  isLocked  Boolean  @default(false) // No más comentarios
+  isFeatured Boolean @default(false)
+  status    String   @default("published") // draft, published, removed, flagged
+
+  // Métricas de engagement
+  upvotes   Int      @default(0)
+  downvotes Int      @default(0)
+  score     Int      @default(0) // upvotes - downvotes
+  commentCount Int   @default(0)
+  viewCount Int      @default(0)
+  shareCount Int     @default(0)
+
+  // Awards recibidos
+  awardCount Int     @default(0)
+
+  // Poll data (si type = poll)
+  pollOptions Json?  // Array de opciones
+  pollEndDate DateTime?
+
+  // Multimedia
+  images    Json     @default("[]") // URLs de imágenes
+  videos    Json     @default("[]") // URLs de videos
+  attachments Json   @default("[]") // Otros archivos
+
+  // SEO y sharing
+  slug      String?  @unique // URL-friendly slug
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastActivityAt DateTime @default(now()) // Para ordenar por actividad
+
+  author    User @relation("CommunityPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  comments  CommunityComment[]
+  votes     PostVote[]
+  awards    PostAward[]
+  reports   PostReport[]
+
+  @@index([authorId])
+  @@index([communityId])
+  @@index([type])
+  @@index([status])
+  @@index([score])
+  @@index([createdAt])
+  @@index([lastActivityAt])
+  @@index([isPinned, score])
+}
+
+// COMENTARIOS (anidados/threaded)
+model CommunityComment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  parentId  String?  // Para comentarios anidados
+
+  // Contenido
+  content   String   @db.Text
+  contentType String @default("markdown")
+
+  // Estado
+  isEdited  Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+  status    String   @default("published") // published, removed, flagged
+
+  // Métricas
+  upvotes   Int      @default(0)
+  downvotes Int      @default(0)
+  score     Int      @default(0)
+
+  // Special flags
+  isAcceptedAnswer Boolean @default(false) // Si es respuesta aceptada a pregunta
+  isByOP    Boolean  @default(false) // Si es comentario del autor original
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User @relation("CommunityCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  parent    CommunityComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   CommunityComment[] @relation("CommentReplies")
+  votes     CommentVote[]
+  reports   CommentReport[]
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([score])
+  @@index([createdAt])
+  @@index([postId, score])
+}
+
+// VOTOS DE POSTS
+model PostVote {
+  id       String @id @default(cuid())
+  postId   String
+  userId   String
+  voteType String // "upvote" o "downvote"
+
+  createdAt DateTime @default(now())
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+// VOTOS DE COMENTARIOS
+model CommentVote {
+  id        String @id @default(cuid())
+  commentId String
+  userId    String
+  voteType  String // "upvote" o "downvote"
+
+  createdAt DateTime @default(now())
+
+  comment CommunityComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+}
+
+// AWARDS (premios que usuarios dan a posts)
+model PostAward {
+  id       String @id @default(cuid())
+  postId   String
+  giverId  String // Usuario que lo da
+
+  awardType String // "helpful", "wholesome", "gold", "platinum", etc
+  cost      Int    // Costo en coins
+
+  createdAt DateTime @default(now())
+
+  post  CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  giver User @relation("AwardGiver", fields: [giverId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([giverId])
+}
+
+// COMUNIDADES/GRUPOS
+model Community {
+  id          String @id @default(cuid())
+  ownerId     String
+
+  // Información básica
+  name        String
+  slug        String @unique // URL-friendly
+  description String @db.Text
+  rules       String? @db.Text // Reglas de la comunidad
+
+  // Branding
+  icon        String? // URL del icono
+  banner      String? // URL del banner
+  primaryColor String @default("#8B5CF6")
+
+  // Tipo y visibilidad
+  type        String @default("public") // public, private, restricted
+  category    String // tema, educación, gaming, etc
+
+  // Estado
+  isOfficial  Boolean @default(false) // Comunidad oficial del equipo
+  isFeatured  Boolean @default(false)
+  isVerified  Boolean @default(false)
+
+  // Métricas
+  memberCount Int @default(0)
+  postCount   Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner   User @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members CommunityMember[]
+  posts   CommunityPost[]
+  channels CommunityChannel[]
+  events  CommunityEvent[]
+
+  @@index([ownerId])
+  @@index([slug])
+  @@index([type])
+  @@index([category])
+  @@index([memberCount])
+  @@index([isOfficial])
+  @@index([isFeatured])
+}
+
+// MIEMBROS DE COMUNIDAD
+model CommunityMember {
+  id          String @id @default(cuid())
+  communityId String
+  userId      String
+
+  // Rol en la comunidad
+  role        String @default("member") // owner, moderator, member
+
+  // Permisos personalizados
+  canPost     Boolean @default(true)
+  canComment  Boolean @default(true)
+  canModerate Boolean @default(false)
+
+  // Estado
+  isBanned    Boolean @default(false)
+  isMuted     Boolean @default(false)
+  mutedUntil  DateTime?
+
+  // Métricas
+  postCount   Int @default(0)
+  commentCount Int @default(0)
+
+  joinedAt  DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([communityId])
+  @@index([userId])
+  @@index([role])
+}
+
+// CANALES DENTRO DE COMUNIDADES (como Discord)
+model CommunityChannel {
+  id          String @id @default(cuid())
+  communityId String
+
+  name        String
+  description String?
+  type        String @default("discussion") // discussion, announcements, resources
+
+  // Orden y organización
+  position    Int @default(0)
+  categoryName String? // Para agrupar canales
+
+  // Permisos
+  isPrivate   Boolean @default(false)
+  allowedRoles Json @default("[]") // Roles que pueden acceder
+
+  createdAt DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([position])
+}
+
+// REPORTES DE POSTS
+model PostReport {
+  id       String @id @default(cuid())
+  postId   String
+  reporterId String
+
+  reason      String // spam, harassment, inappropriate, etc
+  description String? @db.Text
+
+  // Estado
+  status      String @default("pending") // pending, reviewed, action_taken, dismissed
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  action      String? // removed, warned, banned, dismissed
+
+  createdAt DateTime @default(now())
+
+  post     CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporter User @relation("PostReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([reporterId])
+  @@index([status])
+}
+
+// REPORTES DE COMENTARIOS
+model CommentReport {
+  id        String @id @default(cuid())
+  commentId String
+  reporterId String
+
+  reason      String
+  description String? @db.Text
+
+  status      String @default("pending")
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  action      String?
+
+  createdAt DateTime @default(now())
+
+  comment  CommunityComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter User @relation("CommentReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([commentId])
+  @@index([reporterId])
+  @@index([status])
+}
+
+// EVENTOS DE COMUNIDAD
+model CommunityEvent {
+  id          String @id @default(cuid())
+  communityId String?
+  organizerId String
+
+  // Información del evento
+  title       String
+  description String @db.Text
+  type        String // challenge, workshop, ama, meetup, competition, release
+
+  // Fechas
+  startDate   DateTime
+  endDate     DateTime
+  registrationDeadline DateTime?
+
+  // Ubicación (virtual)
+  meetingUrl  String? // URL de Zoom/Meet/etc
+  streamUrl   String? // URL de stream
+
+  // Premios (para challenges/competitions)
+  prizes      Json @default("[]") // Array de premios
+  winners     Json @default("[]") // Array de ganadores
+
+  // Metadata
+  maxParticipants Int?
+  currentParticipants Int @default(0)
+  coverImage  String?
+  tags        Json @default("[]")
+
+  // Estado
+  status      String @default("upcoming") // upcoming, ongoing, completed, cancelled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  organizer User @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
+  registrations EventRegistration[]
+
+  @@index([communityId])
+  @@index([organizerId])
+  @@index([type])
+  @@index([status])
+  @@index([startDate])
+}
+
+// REGISTROS A EVENTOS
+model EventRegistration {
+  id      String @id @default(cuid())
+  eventId String
+  userId  String
+
+  status  String @default("registered") // registered, attended, no_show, cancelled
+
+  // Metadata
+  joinedAt DateTime?
+  leftAt   DateTime?
+
+  createdAt DateTime @default(now())
+
+  event CommunityEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([status])
+}
+
+// SISTEMA DE REPUTACIÓN Y GAMIFICACIÓN
+model UserReputation {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Puntos totales
+  totalPoints Int @default(0)
+  level       Int @default(1)
+
+  // Desglose por tipo de actividad
+  postKarma         Int @default(0) // Upvotes en posts
+  commentKarma      Int @default(0) // Upvotes en comentarios
+  contributionPoints Int @default(0) // Contribuciones (research, etc)
+  creatorPoints     Int @default(0) // Items en marketplace
+  helperPoints      Int @default(0) // Respuestas aceptadas
+
+  // Social metrics
+  followersCount Int @default(0)
+  followingCount Int @default(0)
+
+  // Streaks (racha de actividad diaria)
+  currentStreak Int @default(0)
+  longestStreak Int @default(0)
+  lastActiveDate DateTime @default(now())
+
+  // Areas de expertise (tags donde es activo)
+  expertiseAreas Json @default("[]")
+
+  updatedAt DateTime @updatedAt
+
+  badges UserBadge[]
+
+  @@index([userId])
+  @@index([totalPoints])
+  @@index([level])
+}
+
+// BADGES GANADOS POR USUARIOS
+model UserBadge {
+  id          String @id @default(cuid())
+  userId      String
+  reputationId String
+
+  // Badge info
+  badgeType   String // contributor, creator, helper, researcher, social, special
+  badgeName   String // "Gold Contributor", "Theme Master", etc
+  badgeLevel  String // bronze, silver, gold, diamond, platinum
+
+  // Metadata
+  description String?
+  iconUrl     String?
+
+  // Cuándo se ganó
+  awardedAt DateTime @default(now())
+
+  reputation UserReputation @relation(fields: [reputationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([reputationId])
+  @@index([badgeType])
+  @@index([badgeLevel])
+}
+
+// SISTEMA DE SEGUIR USUARIOS (Follow)
+model Follow {
+  id         String @id @default(cuid())
+  followerId String
+  followingId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// MENSAJERÍA DIRECTA
+model DirectMessage {
+  id           String @id @default(cuid())
+  conversationId String
+  senderId     String
+  recipientId  String
+
+  // Contenido
+  content      String @db.Text
+  contentType  String @default("text") // text, image, file, shared_post, shared_item
+
+  // Metadata para tipos especiales
+  attachmentUrl String?
+  sharedItemId  String? // ID de post/item compartido
+  sharedItemType String? // post, theme, character, etc
+
+  // Estado
+  isRead       Boolean @default(false)
+  isEdited     Boolean @default(false)
+  isDeleted    Boolean @default(false)
+
+  // Reacciones
+  reactions    Json @default("[]") // Array de {emoji, userId}
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  readAt    DateTime?
+
+  conversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([createdAt])
+}
+
+// CONVERSACIONES (1-on-1 o grupos)
+model DirectConversation {
+  id    String @id @default(cuid())
+
+  // Tipo
+  type  String @default("direct") // direct (1-on-1) o group
+
+  // Nombre (para grupos)
+  name  String?
+  icon  String?
+
+  // Participantes (array de user IDs)
+  participants Json // Array de user IDs
+
+  // Metadata
+  lastMessageAt DateTime @default(now())
+  lastMessagePreview String?
+
+  // Configuración
+  isMuted  Boolean @default(false)
+  isArchived Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages DirectMessage[]
+
+  @@index([lastMessageAt])
+}
+
+// NOTIFICACIONES
+model Notification {
+  id         String @id @default(cuid())
+  recipientId String
+
+  // Tipo de notificación
+  type       String // post_reply, comment_reply, mention, upvote, award, follow, dm, event_reminder, etc
+
+  // Contenido
+  title      String
+  message    String
+  actionUrl  String? // URL para abrir al hacer click
+
+  // Metadata
+  relatedId  String? // ID del post/comment/user relacionado
+  relatedType String? // post, comment, user, etc
+  actorId    String? // Usuario que causó la notificación
+  actorName  String?
+  actorAvatar String?
+
+  // Estado
+  isRead     Boolean @default(false)
+  isPush     Boolean @default(false) // Si se envió push notification
+
+  createdAt DateTime @default(now())
+  readAt    DateTime?
+
+  @@index([recipientId])
+  @@index([recipientId, isRead])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// MARKETPLACE EXPANDIDO - PROMPTS
+model MarketplacePrompt {
+  id        String @id @default(cuid())
+  authorId  String
+
+  // Información del prompt
+  name        String
+  description String @db.Text
+  category    String // personality, roleplay, assistant, creative, educational, etc
+  tags        Json @default("[]")
+
+  // Contenido del prompt
+  systemPrompt String @db.Text
+  exampleInputs Json @default("[]") // Array de ejemplos de input
+  exampleOutputs Json @default("[]") // Array de ejemplos de output
+
+  // Configuración recomendada
+  recommendedModel String? // venice-uncensored, etc
+  temperature Float @default(0.7)
+  maxTokens   Int @default(2000)
+
+  // Casos de uso
+  useCase     String @db.Text
+  targetAudience String? // developers, writers, students, etc
+
+  // Estado y moderación
+  status      String @default("pending")
+  isPublic    Boolean @default(true)
+  isFeatured  Boolean @default(false)
+  isPremium   Boolean @default(false)
+
+  // Métricas
+  downloadCount Int @default(0)
+  viewCount     Int @default(0)
+  rating        Float @default(0)
+  ratingCount   Int @default(0)
+  useCount      Int @default(0) // Cuántas veces se usó
+
+  // Versioning
+  version     String @default("1.0")
+  changelog   String? @db.Text
+
+  // Preview
+  previewImages Json @default("[]")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime @default(now())
+
+  author  User @relation("PromptAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  ratings PromptRating[]
+  downloads PromptDownload[]
+
+  @@index([authorId])
+  @@index([category])
+  @@index([status])
+  @@index([downloadCount])
+  @@index([rating])
+}
+
+// RATINGS DE PROMPTS
+model PromptRating {
+  id       String @id @default(cuid())
+  promptId String
+  userId   String
+
+  rating   Int // 1-5
+  review   String? @db.Text
+  helpful  Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prompt MarketplacePrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@unique([promptId, userId])
+  @@index([promptId])
+  @@index([userId])
+}
+
+// DESCARGAS DE PROMPTS
+model PromptDownload {
+  id       String @id @default(cuid())
+  promptId String
+  userId   String
+  platform String?
+
+  createdAt DateTime @default(now())
+
+  prompt MarketplacePrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([promptId])
+  @@index([userId])
+}
+
+// MARKETPLACE - PERSONAJES PRE-CONFIGURADOS
+model MarketplaceCharacter {
+  id        String @id @default(cuid())
+  authorId  String
+
+  // Información básica
+  name        String
+  description String @db.Text
+  category    String // anime, realistic, fantasy, sci-fi, historical, etc
+  tags        Json @default("[]")
+
+  // Configuración del personaje
+  personality String @db.Text
+  systemPrompt String @db.Text
+  avatar      String? // URL del avatar
+
+  // Voice config
+  voiceId     String?
+  voiceName   String?
+  voiceGender String?
+
+  // Appearance (si tiene)
+  appearancePrompt String? @db.Text
+  appearanceStyle  String? // anime, realistic, semi-realistic
+
+  // Behavioral tags
+  attachmentStyle String? // secure, anxious, avoidant, etc
+  archetypes      Json @default("[]") // tsundere, yandere, kuudere, etc
+
+  // Casos de uso
+  useCase     String @db.Text
+  ageRating   String @default("mature") // teen, mature, adult
+
+  // Estado
+  status      String @default("pending")
+  isPublic    Boolean @default(true)
+  isFeatured  Boolean @default(false)
+  isPremium   Boolean @default(false)
+  isNSFW      Boolean @default(false)
+
+  // Métricas
+  downloadCount Int @default(0)
+  viewCount     Int @default(0)
+  rating        Float @default(0)
+  ratingCount   Int @default(0)
+  chatCount     Int @default(0) // Cuántas veces se chateó con él
+
+  // Media
+  previewImages Json @default("[]")
+  previewVideo  String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime @default(now())
+
+  author  User @relation("CharacterAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  ratings CharacterRating[]
+  downloads CharacterDownload[]
+
+  @@index([authorId])
+  @@index([category])
+  @@index([status])
+  @@index([downloadCount])
+  @@index([rating])
+  @@index([isNSFW])
+}
+
+// RATINGS DE PERSONAJES
+model CharacterRating {
+  id          String @id @default(cuid())
+  characterId String
+  userId      String
+
+  rating      Int // 1-5
+  review      String? @db.Text
+  helpful     Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  character MarketplaceCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, userId])
+  @@index([characterId])
+  @@index([userId])
+}
+
+// DESCARGAS DE PERSONAJES
+model CharacterDownload {
+  id          String @id @default(cuid())
+  characterId String
+  userId      String
+  platform    String?
+
+  createdAt DateTime @default(now())
+
+  character MarketplaceCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@index([userId])
+}
+
+// RESEARCH HUB - PROYECTOS DE INVESTIGACIÓN
+model ResearchProject {
+  id       String @id @default(cuid())
+  leadAuthorId String
+
+  // Información básica
+  title    String
+  slug     String @unique
+  abstract String @db.Text
+  category String // psychology, ai_behavior, language_models, character_dev, data_analysis
+
+  // Estado
+  status   String @default("draft") // draft, peer_review, published, archived
+
+  // Contenido (almacenado como JSON estructurado)
+  sections Json // Array de secciones: intro, methodology, results, discussion, conclusion
+  references Json @default("[]") // Bibliografía
+
+  // Colaboración
+  openForContributions Boolean @default(false)
+  discussionThreadId   String? // ID del post de discusión
+
+  // Métricas
+  viewCount        Int @default(0)
+  citationCount    Int @default(0)
+  implementationCount Int @default(0) // Cuántas veces se implementó en agentes
+  downloadCount    Int @default(0)
+
+  // Tags
+  tags             Json @default("[]")
+
+  // Versioning
+  version          String @default("1.0")
+  doi              String? @unique // Digital Object Identifier (futuro)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  leadAuthor   User @relation("ResearchLead", fields: [leadAuthorId], references: [id], onDelete: Cascade)
+  contributors ResearchContributor[]
+  datasets     ResearchDataset[]
+  reviews      ResearchReview[]
+
+  @@index([leadAuthorId])
+  @@index([category])
+  @@index([status])
+  @@index([slug])
+  @@index([publishedAt])
+}
+
+// CONTRIBUIDORES DE INVESTIGACIÓN
+model ResearchContributor {
+  id        String @id @default(cuid())
+  projectId String
+  userId    String
+
+  role      String // co-author, data_contributor, reviewer, editor
+  contribution String? @db.Text // Descripción de su contribución
+
+  addedAt DateTime @default(now())
+
+  project ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+// DATASETS COMPARTIDOS EN RESEARCH
+model ResearchDataset {
+  id        String @id @default(cuid())
+  projectId String
+  uploaderId String
+
+  name      String
+  description String @db.Text
+  format    String // csv, json, xlsx, etc
+  fileUrl   String
+  fileSize  Int // bytes
+
+  // Metadata
+  rowCount  Int?
+  columnCount Int?
+  schema    Json? // Descripción de columnas
+
+  downloadCount Int @default(0)
+
+  uploadedAt DateTime @default(now())
+
+  project  ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([uploaderId])
+}
+
+// PEER REVIEWS DE INVESTIGACIONES
+model ResearchReview {
+  id        String @id @default(cuid())
+  projectId String
+  reviewerId String
+
+  // Review
+  rating    Int // 1-5
+  comments  String @db.Text
+  suggestions String? @db.Text
+
+  // Decisión
+  decision  String // approve, request_changes, reject
+
+  createdAt DateTime @default(now())
+
+  project  ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([reviewerId])
+}
+
+// ACCIONES DE MODERACIÓN (log)
+model ModerationAction {
+  id        String @id @default(cuid())
+  moderatorId String
+  targetType String // post, comment, user
+  targetId   String
+
+  action    String // remove, ban, warn, mute, lock
+  reason    String
+  details   String? @db.Text
+
+  // Duración (para bans/mutes temporales)
+  duration  Int? // En horas
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([moderatorId])
+  @@index([targetType, targetId])
+  @@index([action])
   @@index([createdAt])
 }

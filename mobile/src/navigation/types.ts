@@ -1,0 +1,49 @@
+/**
+ * Tipos de navegación de React Navigation
+ */
+
+import { NavigatorScreenParams } from '@react-navigation/native';
+
+// Parámetros del Auth Stack
+export type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  Welcome: undefined;
+};
+
+// Parámetros del Main Stack
+export type MainStackParamList = {
+  MainTabs: NavigatorScreenParams<MainTabsParamList>;
+  Chat: { worldId: string };
+  ChatDetail: { worldId: string; agentName: string; agentAvatar?: string };
+  AgentDetail: { agentId: string };
+  WorldDetail: { worldId: string };
+  CreateAgent: undefined;
+  CreateWorld: { agentId?: string } | undefined;
+  EditAgent: { agentId: string };
+  Settings: undefined;
+  // Community screens
+  CommunityDetail: { communityId: string };
+  PostDetail: { postId: string };
+  EventDetail: { eventId: string };
+  CreatePost: undefined;
+  CreateCommunity: undefined;
+  CreateEvent: undefined;
+  // Messaging screens
+  Conversation: { conversationId: string };
+  StartConversation: { userId: string };
+};
+
+// Parámetros de los tabs principales
+export type MainTabsParamList = {
+  Home: undefined;
+  Worlds: undefined;
+  Community: undefined;
+  Profile: undefined;
+};
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends MainStackParamList {}
+  }
+}

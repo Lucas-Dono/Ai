@@ -39,11 +39,12 @@ export async function DELETE(
     console.log(`[Reset] Borrando conversación para agente ${agentId} y usuario ${userId}`);
 
     // Ejecutar operaciones en paralelo
-    const [deletedMessages, resetRelation, resetInternalState] = await Promise.all([
-      // 1. Borrar todos los mensajes del agente (tanto del usuario como del agente)
+    const [deletedMessages, resetRelation] = await Promise.all([
+      // 1. Borrar solo los mensajes de este usuario con el agente
       prisma.message.deleteMany({
         where: {
           agentId,
+          userId, // Important: Only delete this user's messages
         },
       }),
 
@@ -55,26 +56,20 @@ export async function DELETE(
           targetType: "user",
         },
       }),
-
-      // 3. Resetear el estado emocional interno
-      prisma.internalState.deleteMany({
-        where: {
-          agentId,
-        },
-      }),
     ]);
+
+    // Note: We DON'T reset InternalState because it's shared across all users
+    // and represents the agent's global emotional state
 
     console.log(`[Reset] Resultados:`);
     console.log(`  - Mensajes borrados: ${deletedMessages.count}`);
     console.log(`  - Relaciones borradas: ${resetRelation.count}`);
-    console.log(`  - Estados internos borrados: ${resetInternalState.count}`);
 
     return NextResponse.json({
       success: true,
       deleted: {
         messages: deletedMessages.count,
         relations: resetRelation.count,
-        internalStates: resetInternalState.count,
       },
       message: "Conversación reseteada exitosamente",
     });
