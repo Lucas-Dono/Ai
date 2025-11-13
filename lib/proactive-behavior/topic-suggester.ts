@@ -213,9 +213,9 @@ export class TopicSuggester {
       where: { userId },
     });
 
-    if (!userProfile || !userProfile.interests) return [];
+    if (!userProfile || !userProfile.favoriteTags) return [];
 
-    const interests = userProfile.interests as string[];
+    const interests = userProfile.favoriteTags as string[];
 
     if (interests.length === 0) return [];
 
@@ -242,14 +242,8 @@ export class TopicSuggester {
     // Obtener últimos 10 mensajes del usuario
     const recentMessages = await prisma.message.findMany({
       where: {
-        conversationId: {
-          in: (
-            await prisma.conversation.findMany({
-              where: { agentId, userId },
-              select: { id: true },
-            })
-          ).map((c) => c.id),
-        },
+        agentId,
+        userId,
         role: "user",
       },
       orderBy: { createdAt: "desc" },
@@ -303,7 +297,7 @@ export class TopicSuggester {
 
     if (!internalState) return [];
 
-    const emotionalState = internalState.currentEmotions as PlutchikEmotionState;
+    const emotionalState = internalState.currentEmotions as unknown as PlutchikEmotionState;
 
     // Encontrar emoción dominante
     const emotions: Array<{

@@ -33,57 +33,57 @@ export const commentApi = {
    * Obtener comentarios de un post
    */
   async getByPostId(postId: string) {
-    const response = await apiClient.get('/api/community/comments', {
+    const response: any = await apiClient.get('/api/community/comments', {
       params: { postId },
     });
-    return response.data;
+    return response.data as any;
   },
 
   /**
    * Obtener respuestas de un comentario
    */
   async getReplies(commentId: string) {
-    const response = await apiClient.get(`/community/comments/${commentId}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/community/comments/${commentId}`);
+    return response.data as any;
   },
 
   /**
    * Crear comentario
    */
   async create(data: CreateCommentData) {
-    const response = await apiClient.post('/api/community/comments', data) as any;
-    return response.data;
+    const response: any = await apiClient.post('/api/community/comments', data);
+    return response.data as any;
   },
 
   /**
    * Actualizar comentario
    */
   async update(id: string, content: string) {
-    const response = await apiClient.patch(`/community/comments/${id}`, { content }) as any;
-    return response.data;
+    const response: any = await apiClient.patch(`/community/comments/${id}`, { content });
+    return response.data as any;
   },
 
   /**
    * Eliminar comentario
    */
   async delete(id: string) {
-    const response = await apiClient.delete(`/community/comments/${id}`) as any;
-    return response.data;
+    const response: any = await apiClient.delete(`/community/comments/${id}`);
+    return response.data as any;
   },
 
   /**
    * Votar comentario
    */
   async vote(id: string, voteType: 'upvote' | 'downvote') {
-    const response = await apiClient.post(`/community/comments/${id}/vote`, { voteType }) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/comments/${id}/vote`, { voteType });
+    return response.data as any;
   },
 
   /**
    * Marcar como respuesta aceptada
    */
   async markAsAccepted(id: string) {
-    const response = await apiClient.post(`/community/comments/${id}/accept`) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/comments/${id}/accept`);
+    return response.data as any;
   },
 };

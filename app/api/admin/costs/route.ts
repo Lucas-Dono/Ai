@@ -1,0 +1,107 @@
+/**
+ * Admin Costs API
+ * GET /api/admin/costs - Get cost summary and analytics
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import {
+  getCostSummary,
+  getDailyCosts,
+  getTopUsers,
+  getCostProjection,
+} from '@/lib/cost-tracking/tracker';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin (you can add admin field to User model)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true, email: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // TODO: Add admin check here
+    // For now, allow any authenticated user to view costs
+    // if (!user.isAdmin) {
+    //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // }
+
+    const searchParams = request.nextUrl.searchParams;
+    const userId = searchParams.get('userId') || undefined;
+    const startDateStr = searchParams.get('startDate');
+    const endDateStr = searchParams.get('endDate');
+    const days = parseInt(searchParams.get('days') || '30', 10);
+    const view = searchParams.get('view') || 'summary'; // summary, daily, top-users, projection
+
+    const startDate = startDateStr ? new Date(startDateStr) : undefined;
+    const endDate = endDateStr ? new Date(endDateStr) : undefined;
+
+    switch (view) {
+      case 'daily':
+        const dailyCosts = await getDailyCosts(userId, days);
+        return NextResponse.json({
+          success: true,
+          data: dailyCosts,
+        });
+
+      case 'top-users':
+        const topUsers = await getTopUsers(10, startDate, endDate);
+        // Fetch user details
+        const userIds = topUsers.map(u => u.userId);
+        const users = await prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, email: true, name: true, plan: true },
+        });
+
+        const topUsersWithDetails = topUsers.map(tu => {
+          const userDetail = users.find(u => u.id === tu.userId);
+          return {
+            ...tu,
+            email: userDetail?.email,
+            name: userDetail?.name,
+            plan: userDetail?.plan,
+          };
+        });
+
+        return NextResponse.json({
+          success: true,
+          data: topUsersWithDetails,
+        });
+
+      case 'projection':
+        const projection = await getCostProjection(userId);
+        return NextResponse.json({
+          success: true,
+          data: projection,
+        });
+
+      case 'summary':
+      default:
+        const summary = await getCostSummary(userId, startDate, endDate);
+        return NextResponse.json({
+          success: true,
+          data: summary,
+        });
+    }
+  } catch (error) {
+    console.error('[Admin Costs API] Error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to fetch cost data',
+      },
+      { status: 500 }
+    );
+  }
+}

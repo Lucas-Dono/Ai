@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface Agent {
   id: string;
@@ -26,6 +29,8 @@ export default function EditAgentPage() {
   const params = useParams();
   const router = useRouter();
   const agentId = params.id as string;
+  const t = useTranslations("agents.edit");
+  const tCommon = useTranslations("common");
 
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,11 +59,11 @@ export default function EditAgentPage() {
           setTone(data.tone || "");
           setDescription(data.description || "");
         } else {
-          setError("No se pudo cargar la IA");
+          setError(t("loadError"));
         }
       } catch (err) {
         console.error("Error fetching agent:", err);
-        setError("Error al cargar la IA");
+        setError(t("loadError"));
       } finally {
         setLoading(false);
       }
@@ -67,11 +72,11 @@ export default function EditAgentPage() {
     if (agentId) {
       fetchAgent();
     }
-  }, [agentId]);
+  }, [agentId, t]);
 
   const handleSave = async () => {
     if (!name.trim()) {
-      alert("El nombre es requerido");
+      alert(t("form.nameRequired"));
       return;
     }
 
@@ -96,11 +101,11 @@ export default function EditAgentPage() {
         router.push("/dashboard");
       } else {
         const error = await res.json();
-        alert(error.error || "Error al guardar los cambios");
+        alert(error.error || t("errors.saveFailed"));
       }
     } catch (err) {
       console.error("Error saving agent:", err);
-      alert("Error al guardar los cambios");
+      alert(t("errors.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -119,14 +124,14 @@ export default function EditAgentPage() {
       <div className="container max-w-2xl mx-auto py-8">
         <Card>
           <CardHeader>
-            <CardTitle>Error</CardTitle>
-            <CardDescription>{error || "IA no encontrada"}</CardDescription>
+            <CardTitle>{t("error")}</CardTitle>
+            <CardDescription>{error || t("notFound")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/dashboard">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver al dashboard
+                {t("backToDashboard")}
               </Button>
             </Link>
           </CardContent>
@@ -142,107 +147,107 @@ export default function EditAgentPage() {
         <Link href="/dashboard">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver
+            {tCommon("back")}
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold mb-2">Editar IA</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
         <p className="text-muted-foreground">
-          Modifica los detalles de tu inteligencia artificial
+          {t("subtitle")}
         </p>
       </div>
 
       {/* Edit Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Información de la IA</CardTitle>
+          <CardTitle>{t("form.title")}</CardTitle>
           <CardDescription>
-            Actualiza los campos que desees modificar
+            {t("form.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Nombre *</Label>
+            <Label htmlFor="name">{t("form.nameLabel")}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre de la IA"
+              placeholder={t("form.namePlaceholder")}
               required
             />
           </div>
 
           {/* Kind */}
           <div className="space-y-2">
-            <Label htmlFor="kind">Tipo *</Label>
+            <Label htmlFor="kind">{t("form.kindLabel")}</Label>
             <Select value={kind} onValueChange={(value: "companion" | "assistant") => setKind(value)}>
               <SelectTrigger id="kind">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="companion">Compañero (Emocional)</SelectItem>
-                <SelectItem value="assistant">Asistente (Administrativo)</SelectItem>
+                <SelectItem value="companion">{t("form.kindCompanion")}</SelectItem>
+                <SelectItem value="assistant">{t("form.kindAssistant")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Personality */}
           <div className="space-y-2">
-            <Label htmlFor="personality">Personalidad</Label>
+            <Label htmlFor="personality">{t("form.personalityLabel")}</Label>
             <Textarea
               id="personality"
               value={personality}
               onChange={(e) => setPersonality(e.target.value)}
-              placeholder="Describe la personalidad de la IA"
+              placeholder={t("form.personalityPlaceholder")}
               rows={3}
             />
           </div>
 
           {/* Purpose */}
           <div className="space-y-2">
-            <Label htmlFor="purpose">Propósito</Label>
+            <Label htmlFor="purpose">{t("form.purposeLabel")}</Label>
             <Textarea
               id="purpose"
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
-              placeholder="¿Cuál es el propósito principal de esta IA?"
+              placeholder={t("form.purposePlaceholder")}
               rows={3}
             />
           </div>
 
           {/* Tone */}
           <div className="space-y-2">
-            <Label htmlFor="tone">Tono de Comunicación</Label>
+            <Label htmlFor="tone">{t("form.toneLabel")}</Label>
             <Input
               id="tone"
               value={tone}
               onChange={(e) => setTone(e.target.value)}
-              placeholder="Ej: Amigable, Profesional, Casual"
+              placeholder={t("form.tonePlaceholder")}
             />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">{t("form.descriptionLabel")}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descripción adicional de la IA"
+              placeholder={t("form.descriptionPlaceholder")}
               rows={4}
             />
           </div>
 
           {/* Profile (Read-only) */}
           <div className="space-y-2">
-            <Label>Perfil Generado (Solo lectura)</Label>
-            <div className="p-4 bg-muted rounded-lg">
+            <Label>{t("form.profileLabel")}</Label>
+            <div className="p-4 bg-muted rounded-2xl">
               <pre className="text-xs overflow-auto max-h-60">
                 {JSON.stringify(agent.profile, null, 2)}
               </pre>
             </div>
             <p className="text-xs text-muted-foreground">
-              El perfil es generado automáticamente por Gemini y no se puede editar directamente
+              {t("form.profileNote")}
             </p>
           </div>
 
@@ -256,18 +261,18 @@ export default function EditAgentPage() {
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Guardando...
+                  {t("actions.saving")}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Guardar Cambios
+                  {t("actions.save")}
                 </>
               )}
             </Button>
             <Link href="/dashboard" className="flex-1">
               <Button variant="outline" className="w-full">
-                Cancelar
+                {t("actions.cancel")}
               </Button>
             </Link>
           </div>

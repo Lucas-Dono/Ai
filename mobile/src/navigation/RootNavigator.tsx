@@ -6,6 +6,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { AccessibilityProvider } from '../contexts/AccessibilityContext';
 import { AuthStack } from './AuthStack';
 import { MainStack } from './MainStack';
 
@@ -21,8 +22,10 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer>
-      {isAuthenticated ? <MainStack /> : <AuthStack />}
-    </NavigationContainer>
+    <AccessibilityProvider>
+      <NavigationContainer>
+        {isAuthenticated ? <MainStack /> : <AuthStack />}
+      </NavigationContainer>
+    </AccessibilityProvider>
   );
 }

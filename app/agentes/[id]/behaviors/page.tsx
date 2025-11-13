@@ -11,6 +11,8 @@
 
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +24,7 @@ import {
   EmotionalStatePAD,
   CriticalTriggers,
 } from "@/components/psychology";
+import { useTranslations } from "next-intl";
 
 interface EmotionalData {
   state: {
@@ -91,6 +94,8 @@ export default function PsychologyDashboard() {
   const params = useParams();
   const router = useRouter();
   const agentId = params.id as string;
+  const t = useTranslations("agents.psychology");
+  const tCommon = useTranslations("common");
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -139,7 +144,7 @@ export default function PsychologyDashboard() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Loader2 className="animate-spin h-12 w-12 text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground">Cargando análisis psicológico...</p>
+            <p className="text-muted-foreground">{t("loading")}</p>
           </div>
         </div>
       </div>
@@ -153,14 +158,14 @@ export default function PsychologyDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />
-              Error al cargar datos
+              {t("error.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">{error || "No se pudieron cargar los datos"}</p>
+            <p className="text-muted-foreground mb-4">{error || t("error.description")}</p>
             <Button onClick={() => router.back()}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver
+              {tCommon("back")}
             </Button>
           </CardContent>
         </Card>
@@ -202,18 +207,18 @@ export default function PsychologyDashboard() {
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="hover:bg-muted rounded-xl"
+              className="hover:bg-muted rounded-2xl"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
               <h1 className="text-4xl font-extrabold text-foreground tracking-tight">{data.agent.name}</h1>
-              <p className="text-muted-foreground font-medium mt-1">Análisis Psicológico Completo</p>
+              <p className="text-muted-foreground font-medium mt-1">{t("subtitle")}</p>
             </div>
           </div>
           {data.agent.nsfwMode && (
-            <span className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold rounded-xl md-elevation-2">
-              Modo NSFW Activo
+            <span className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold rounded-2xl md-elevation-2">
+              {t("nsfwMode")}
             </span>
           )}
         </div>
@@ -223,7 +228,7 @@ export default function PsychologyDashboard() {
           <Card className="bg-blue-500/10 border-2 border-blue-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold text-blue-400 flex items-center gap-2">
-                <span className="text-lg">💬</span> Interacciones Totales
+                <span className="text-lg">💬</span> {t("metrics.totalInteractions")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -231,7 +236,7 @@ export default function PsychologyDashboard() {
                 {data.progressionState?.totalInteractions || 0}
               </div>
               <p className="text-xs text-blue-400/80 mt-2 font-semibold">
-                Etapa: {data.relationship.stage}
+                {t("metrics.stage")}: {data.relationship.stage}
               </p>
             </CardContent>
           </Card>
@@ -239,7 +244,7 @@ export default function PsychologyDashboard() {
           <Card className="bg-purple-500/10 border-2 border-purple-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold text-purple-400 flex items-center gap-2">
-                <span className="text-lg">🎭</span> Behaviors Activos
+                <span className="text-lg">🎭</span> {t("metrics.activeBehaviors")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -247,7 +252,7 @@ export default function PsychologyDashboard() {
                 {data.behavior?.active.length || 0}
               </div>
               <p className="text-xs text-purple-400/80 mt-2 font-semibold">
-                Safety: {data.behavior?.safetyLevel || "N/A"}
+                {t("metrics.safety")}: {data.behavior?.safetyLevel || "N/A"}
               </p>
             </CardContent>
           </Card>
@@ -255,13 +260,13 @@ export default function PsychologyDashboard() {
           <Card className="bg-orange-500/10 border-2 border-orange-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold text-orange-400 flex items-center gap-2">
-                <span className="text-lg">⚡</span> Triggers Detectados
+                <span className="text-lg">⚡</span> {t("metrics.triggersDetected")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-extrabold text-orange-300">{data.stats.totalTriggers}</div>
               <p className="text-xs text-orange-400/80 mt-2 font-semibold">
-                {criticalTriggerCount} críticos
+                {t("metrics.critical", { count: criticalTriggerCount })}
               </p>
             </CardContent>
           </Card>
@@ -269,7 +274,7 @@ export default function PsychologyDashboard() {
           <Card className="bg-green-500/10 border-2 border-green-500/30 md-elevation-1 hover:md-elevation-2 transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold text-green-400 flex items-center gap-2">
-                <span className="text-lg">📊</span> Peso Promedio
+                <span className="text-lg">📊</span> {t("metrics.averageWeight")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -278,10 +283,10 @@ export default function PsychologyDashboard() {
               </div>
               <p className="text-xs text-green-400/80 mt-2 font-semibold">
                 {data.stats.averageWeight > 0.7
-                  ? "Alto impacto"
+                  ? t("metrics.impact.high")
                   : data.stats.averageWeight > 0.4
-                  ? "Moderado"
-                  : "Bajo impacto"}
+                  ? t("metrics.impact.moderate")
+                  : t("metrics.impact.low")}
               </p>
             </CardContent>
           </Card>
@@ -328,13 +333,10 @@ export default function PsychologyDashboard() {
             <div className="text-center space-y-4">
               <div className="text-4xl mb-3">💡</div>
               <h3 className="text-2xl font-extrabold text-foreground">
-                Sobre este Panel de Análisis
+                {t("info.title")}
               </h3>
               <p className="text-base text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium">
-                Este dashboard utiliza el <strong className="text-blue-400">Modelo de Plutchik</strong> para visualizar emociones
-                y el <strong className="text-indigo-400">Modelo PAD</strong> (Pleasure-Arousal-Dominance) para análisis dimensional.
-                Los comportamientos se evalúan usando frameworks de psicología clínica moderna.
-                Todos los análisis se generan automáticamente basándose en las interacciones reales.
+                {t("info.description")}
               </p>
             </div>
           </CardContent>

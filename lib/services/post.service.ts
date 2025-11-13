@@ -8,13 +8,15 @@ import type { Prisma } from '@prisma/client';
 export interface CreatePostData {
   title: string;
   content: string;
-  type: 'discussion' | 'question' | 'showcase' | 'help' | 'research' | 'poll' | 'announcement';
+  type: 'discussion' | 'question' | 'showcase' | 'help' | 'research' | 'poll' | 'announcement' | 'shared_agent';
   communityId?: string;
+  communitySlug?: string;
   tags?: string[];
   images?: string[];
   videos?: string[];
   pollOptions?: Array<{ text: string }>;
   pollEndDate?: Date;
+  sharedAgentId?: string; // For shared_agent posts
 }
 
 export interface UpdatePostData {
@@ -38,12 +40,24 @@ export const PostService = {
    * Crear nuevo post
    */
   async createPost(authorId: string, data: CreatePostData) {
+    // Resolver communityId desde communitySlug si es necesario
+    let communityId = data.communityId;
+    if (!communityId && data.communitySlug) {
+      const community = await prisma.community.findUnique({
+        where: { slug: data.communitySlug },
+        select: { id: true },
+      });
+      if (community) {
+        communityId = community.id;
+      }
+    }
+
     // Si es en una comunidad, verificar permisos
-    if (data.communityId) {
+    if (communityId) {
       const member = await prisma.communityMember.findUnique({
         where: {
           communityId_userId: {
-            communityId: data.communityId,
+            communityId: communityId,
             userId: authorId,
           },
         },
@@ -67,12 +81,14 @@ export const PostService = {
         title: data.title,
         content: data.content,
         type: data.type,
-        communityId: data.communityId,
-        tags: (data.tags || []) as Prisma.JsonValue,
-        images: (data.images || []) as Prisma.JsonValue,
-        videos: (data.videos || []) as Prisma.JsonValue,
-        pollOptions: data.pollOptions as Prisma.JsonValue,
+        status: 'published',
+        communityId: communityId,
+        tags: data.tags || [],
+        images: data.images || [],
+        videos: data.videos || [],
+        pollOptions: data.pollOptions || undefined,
         pollEndDate: data.pollEndDate,
+        sharedAgentId: data.sharedAgentId,
         slug,
       },
       include: {
@@ -95,9 +111,9 @@ export const PostService = {
     });
 
     // Incrementar contador de posts en la comunidad
-    if (data.communityId) {
+    if (communityId) {
       await prisma.community.update({
-        where: { id: data.communityId },
+        where: { id: communityId },
         data: { postCount: { increment: 1 } },
       });
     }
@@ -193,7 +209,7 @@ export const PostService = {
       where: { id: postId },
       data: {
         ...data,
-        tags: data.tags as Prisma.JsonValue | undefined,
+        isEdited: true,
       },
     });
 

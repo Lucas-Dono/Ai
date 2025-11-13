@@ -70,7 +70,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+        <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
           <div className="flex items-center gap-2 mb-1">
             <Users className="w-4 h-4 text-blue-400" />
             <span className="text-xs text-gray-400">Characters</span>
@@ -78,7 +78,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
           <p className="text-2xl font-bold">{activeCharacters.length}</p>
         </div>
 
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+        <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
           <div className="flex items-center gap-2 mb-1">
             <Zap className="w-4 h-4 text-yellow-400" />
             <span className="text-xs text-gray-400">Turns</span>
@@ -86,7 +86,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
           <p className="text-2xl font-bold">{totalTurns}</p>
         </div>
 
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+        <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
           <div className="flex items-center gap-2 mb-1">
             <Heart className="w-4 h-4 text-pink-400" />
             <span className="text-xs text-gray-400">Relationships</span>
@@ -94,7 +94,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
           <p className="text-2xl font-bold">{relations.length}</p>
         </div>
 
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+        <div className="bg-white/5 rounded-2xl p-3 border border-white/10">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="w-4 h-4 text-green-400" />
             <span className="text-xs text-gray-400">Progress</span>
@@ -113,7 +113,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
           {mainCharacters.map((agent: any) => (
             <div
               key={agent.id}
-              className="bg-pink-500/10 border border-pink-500/30 rounded-lg p-3"
+              className="bg-pink-500/10 border border-pink-500/30 rounded-2xl p-3"
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="font-medium">{agent.name}</span>
@@ -138,7 +138,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
             {secondaryCharacters.slice(0, 3).map((agent: any) => (
               <div
                 key={agent.id}
-                className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-2"
+                className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-2"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm">{agent.name}</span>
@@ -157,7 +157,7 @@ export function WorldStatePanel({ worldId }: WorldStatePanelProps) {
 
       {/* Story Mode Info */}
       {worldData.storyMode && (
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-3">
           <h4 className="text-sm font-semibold mb-2">📖 Story Mode</h4>
           <div className="space-y-1 text-xs">
             <div className="flex justify-between">

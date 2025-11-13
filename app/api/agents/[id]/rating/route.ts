@@ -4,10 +4,10 @@ import { prisma } from "@/lib/prisma";
 // GET /api/agents/[id]/rating - Obtener rating de un agente
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const agentId = params.id;
+    const { id: agentId } = await params;
 
     // Obtener agente con reviews
     const agent = await prisma.agent.findUnique({

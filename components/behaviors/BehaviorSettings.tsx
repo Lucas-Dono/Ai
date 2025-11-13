@@ -260,7 +260,7 @@ export function BehaviorSettings({
                 return (
                   <div
                     key={behavior.id}
-                    className="border rounded-lg p-4 space-y-4"
+                    className="border rounded-2xl p-4 space-y-4"
                   >
                     <div className="flex items-start justify-between">
                       <div>

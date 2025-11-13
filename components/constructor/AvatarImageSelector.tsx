@@ -196,13 +196,25 @@ export function AvatarImageSelector({
     const minDimension = Math.min(width, height);
     const size = (minDimension / Math.max(width, height)) * 100;
 
-    setCrop({
-      unit: "%",
+    const newCrop = {
+      unit: "%" as const,
       width: size,
       height: size,
       x: (100 - size) / 2,
       y: (100 - size) / 2,
-    });
+    };
+
+    setCrop(newCrop);
+
+    // Establecer completedCrop automáticamente para permitir guardar sin interacción
+    const pixelCrop: PixelCrop = {
+      unit: 'px',
+      x: (newCrop.x / 100) * width,
+      y: (newCrop.y / 100) * height,
+      width: (newCrop.width / 100) * width,
+      height: (newCrop.height / 100) * height,
+    };
+    setCompletedCrop(pixelCrop);
   }, []);
 
   /**
@@ -223,7 +235,7 @@ export function AvatarImageSelector({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour="avatar-selector">
       {/* Modo de recorte de imagen */}
       {uploadedImage && !imageUrl ? (
         <Card className="p-4">
@@ -233,7 +245,7 @@ export function AvatarImageSelector({
             </div>
 
             {/* Herramienta de crop */}
-            <div className="relative bg-black/5 rounded-lg overflow-hidden">
+            <div className="relative bg-black/5 rounded-2xl overflow-hidden">
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
@@ -253,7 +265,7 @@ export function AvatarImageSelector({
 
             {/* Preview del crop en tamaño de avatar */}
             {completedCrop && (
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-2xl border border-border">
                 <div className="text-xs text-muted-foreground">Vista previa:</div>
                 <div className="flex items-center gap-2">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary">
@@ -311,7 +323,7 @@ export function AvatarImageSelector({
         <Card className="p-4">
           <div className="space-y-4">
             {/* Preview grande cuadrado */}
-            <div className="relative w-full aspect-square max-w-md mx-auto rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+            <div className="relative w-full aspect-square max-w-md mx-auto rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
               <Image
                 src={imageUrl}
                 alt={`Avatar de ${agentName}`}
@@ -330,7 +342,7 @@ export function AvatarImageSelector({
             </div>
 
             {/* Preview en tamaño de avatar */}
-            <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-muted rounded-2xl">
               <Avatar className="w-16 h-16 border-2 border-border">
                 <AvatarImage src={imageUrl} alt={agentName} />
                 <AvatarFallback>{agentName.slice(0, 2).toUpperCase()}</AvatarFallback>

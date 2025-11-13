@@ -84,7 +84,7 @@ export default function CheckoutSuccessPage() {
             </div>
           </div>
 
-          <div className="p-4 bg-background rounded-lg border border-border">
+          <div className="p-4 bg-background rounded-2xl border border-border">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-muted-foreground">

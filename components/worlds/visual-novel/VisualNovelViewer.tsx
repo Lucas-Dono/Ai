@@ -480,7 +480,7 @@ export function VisualNovelViewer({
 
           {/* Turn Counter (Top Left, below scene info) - More subtle */}
           <div className="absolute top-20 left-4 z-20">
-            <div className="bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 px-3 py-1.5">
+            <div className="bg-black/40 backdrop-blur-sm rounded-2xl border border-white/10 px-3 py-1.5">
               <div className="text-xs text-gray-400">
                 {currentIndex + 1} / {interactionHistory.length || '?'}
               </div>
@@ -535,12 +535,12 @@ export function VisualNovelViewer({
             }}
             placeholder="Escribe algo para interactuar con el mundo..."
             disabled={isSendingMessage}
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 disabled:opacity-50"
+            className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50 disabled:opacity-50"
           />
           <button
             onClick={handleSendMessage}
             disabled={isSendingMessage || !userInput.trim()}
-            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg text-white font-medium hover:from-pink-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl text-white font-medium hover:from-pink-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSendingMessage ? 'Enviando...' : 'Enviar'}
           </button>

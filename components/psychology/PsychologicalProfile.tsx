@@ -169,8 +169,8 @@ export function PsychologicalProfile({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Safety Level Alert */}
-        <div className={`${safetyConfig.bgColor} ${safetyConfig.borderColor} border-2 rounded-xl p-5 flex items-start gap-4 md-elevation-1`}>
-          <div className={`${safetyConfig.bgColor} p-2 rounded-lg border ${safetyConfig.borderColor}`}>
+        <div className={`${safetyConfig.bgColor} ${safetyConfig.borderColor} border-2 rounded-2xl p-5 flex items-start gap-4 md-elevation-1`}>
+          <div className={`${safetyConfig.bgColor} p-2 rounded-2xl border ${safetyConfig.borderColor}`}>
             <SafetyIcon className={`h-6 w-6 ${safetyConfig.color} shrink-0`} />
           </div>
           <div className="flex-1">
@@ -186,7 +186,7 @@ export function PsychologicalProfile({
         {/* Primary Behavior Analysis */}
         {primaryBehavior && behaviorInfo ? (
           <div className="space-y-5">
-            <div className="bg-muted/20 rounded-xl p-5 border-2 border-border md-elevation-1">
+            <div className="bg-muted/20 rounded-2xl p-5 border-2 border-border md-elevation-1">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold flex items-center gap-3 text-foreground">
                   <span className="text-3xl">{behaviorInfo.emoji}</span>
@@ -206,7 +206,7 @@ export function PsychologicalProfile({
 
               {/* Trend Indicator */}
               {primaryBehavior.trend !== undefined && (
-                <div className={`flex items-center gap-2.5 text-sm p-3 rounded-lg border ${
+                <div className={`flex items-center gap-2.5 text-sm p-3 rounded-2xl border ${
                   primaryBehavior.trend > 5 ? 'bg-red-500/10 border-red-500/30' :
                   primaryBehavior.trend < -5 ? 'bg-green-500/10 border-green-500/30' :
                   'bg-muted/30 border-border/50'
@@ -236,7 +236,7 @@ export function PsychologicalProfile({
             </div>
 
             {/* Clinical Analysis */}
-            <div className="bg-blue-500/10 border-2 border-blue-500/30 rounded-xl p-5 md-elevation-1">
+            <div className="bg-blue-500/10 border-2 border-blue-500/30 rounded-2xl p-5 md-elevation-1">
               <h4 className="text-base font-bold text-blue-400 mb-3 flex items-center gap-2">
                 <span className="text-xl">📋</span> Análisis Clínico
               </h4>
@@ -246,7 +246,7 @@ export function PsychologicalProfile({
             </div>
 
             {/* Recommendations */}
-            <div className="bg-purple-500/10 border-2 border-purple-500/30 rounded-xl p-5 md-elevation-1">
+            <div className="bg-purple-500/10 border-2 border-purple-500/30 rounded-2xl p-5 md-elevation-1">
               <h4 className="text-base font-bold text-purple-400 mb-3 flex items-center gap-2">
                 <span className="text-xl">💡</span> Recomendaciones
               </h4>
@@ -262,8 +262,8 @@ export function PsychologicalProfile({
 
             {/* Critical Triggers Warning */}
             {criticalTriggerCount > 0 && (
-              <div className="bg-red-500/10 border-2 border-red-500/30 rounded-xl p-5 flex items-start gap-4 md-elevation-1">
-                <div className="bg-red-500/20 p-2 rounded-lg border border-red-500/40">
+              <div className="bg-red-500/10 border-2 border-red-500/30 rounded-2xl p-5 flex items-start gap-4 md-elevation-1">
+                <div className="bg-red-500/20 p-2 rounded-2xl border border-red-500/40">
                   <AlertTriangle className="h-6 w-6 text-red-400 shrink-0" />
                 </div>
                 <div className="flex-1">
@@ -278,7 +278,7 @@ export function PsychologicalProfile({
             )}
           </div>
         ) : (
-          <div className="text-center py-12 bg-muted/20 rounded-xl border-2 border-border">
+          <div className="text-center py-12 bg-muted/20 rounded-2xl border-2 border-border">
             <div className="text-5xl mb-3">💭</div>
             <p className="text-base font-bold text-foreground">No se detectaron patrones de comportamiento activos</p>
             <p className="text-sm mt-2 text-muted-foreground font-medium">
@@ -289,7 +289,7 @@ export function PsychologicalProfile({
 
         {/* Additional Behaviors */}
         {sortedBehaviors.length > 1 && (
-          <div className="bg-muted/20 rounded-xl p-5 border-2 border-border md-elevation-1">
+          <div className="bg-muted/20 rounded-2xl p-5 border-2 border-border md-elevation-1">
             <h4 className="text-base font-bold text-foreground mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></span>
               Otros comportamientos detectados
@@ -300,12 +300,12 @@ export function PsychologicalProfile({
                 if (!info) return null;
 
                 return (
-                  <div key={behavior.type} className="flex items-center justify-between bg-muted/30 rounded-lg p-3.5 border border-border/50 hover:border-border transition-all">
+                  <div key={behavior.type} className="flex items-center justify-between bg-muted/30 rounded-2xl p-3.5 border border-border/50 hover:border-border transition-all">
                     <span className="flex items-center gap-3">
-                      <span className="text-2xl bg-muted/50 p-2 rounded-lg border border-border/60">{info.emoji}</span>
+                      <span className="text-2xl bg-muted/50 p-2 rounded-2xl border border-border/60">{info.emoji}</span>
                       <span className="font-bold text-foreground">{info.name}</span>
                     </span>
-                    <span className="text-foreground font-extrabold text-base bg-muted px-3 py-1.5 rounded-lg">
+                    <span className="text-foreground font-extrabold text-base bg-muted px-3 py-1.5 rounded-2xl">
                       {(behavior.intensity * 100).toFixed(0)}%
                     </span>
                   </div>

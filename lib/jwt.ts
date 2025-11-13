@@ -5,10 +5,22 @@
 
 import { SignJWT, jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+// SECURITY FIX #4: Forzar error si JWT_SECRET no está configurado en producción
+// Previene uso de secretos por defecto inseguros
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('CRITICAL SECURITY ERROR: NEXTAUTH_SECRET or JWT_SECRET must be set in production');
+  }
+  console.warn('⚠️  WARNING: Using default JWT secret in development. Set NEXTAUTH_SECRET or JWT_SECRET in production!');
+}
+
+const DEVELOPMENT_SECRET = 'dev-secret-key-only-for-development';
+const SECRET_TO_USE = JWT_SECRET || DEVELOPMENT_SECRET;
 
 // Convert secret string to Uint8Array for jose
-const getSecretKey = () => new TextEncoder().encode(JWT_SECRET);
+const getSecretKey = () => new TextEncoder().encode(SECRET_TO_USE);
 
 export interface TokenPayload {
   userId: string;

@@ -75,50 +75,50 @@ export const MarketplaceAPI = {
     if (filters.isFeatured !== undefined) params.append('isFeatured', filters.isFeatured.toString());
     if (filters.isPremium !== undefined) params.append('isPremium', filters.isPremium.toString());
 
-    const response = await apiClient.get(`/marketplace/themes?${params.toString()}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/marketplace/themes?${params.toString()}`) as any;
+    return response.data as any;
   },
 
   /**
    * Obtener tema por ID
    */
   async getTheme(themeId: string): Promise<MarketplaceTheme> {
-    const response = await apiClient.get(`/marketplace/themes/${themeId}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/marketplace/themes/${themeId}`) as any;
+    return response.data as any;
   },
 
   /**
    * Obtener temas destacados
    */
   async getFeaturedThemes(limit = 10): Promise<MarketplaceTheme[]> {
-    const response = await apiClient.get(`/marketplace/themes/featured?limit=${limit}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/marketplace/themes/featured?limit=${limit}`) as any;
+    return response.data as any;
   },
 
   /**
    * Obtener temas trending
    */
   async getTrendingThemes(limit = 10): Promise<MarketplaceTheme[]> {
-    const response = await apiClient.get(`/marketplace/themes/trending?limit=${limit}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/marketplace/themes/trending?limit=${limit}`) as any;
+    return response.data as any;
   },
 
   /**
    * Obtener categorías y tags
    */
   async getCategoriesAndTags(): Promise<{ categories: string[]; tags: { tag: string; count: number }[] }> {
-    const response = await apiClient.get('/marketplace/themes/categories') as any;
-    return response.data;
+    const response: any = await apiClient.get('/marketplace/themes/categories') as any;
+    return response.data as any;
   },
 
   /**
    * Descargar tema
    */
   async downloadTheme(themeId: string): Promise<{ exportData: any; name: string }> {
-    const response = await apiClient.post(`/marketplace/themes/${themeId}/download`, {
+    const response: any = await apiClient.post(`/marketplace/themes/${themeId}/download`, {
       platform: 'mobile',
     });
-    return response.data;
+    return response.data as any;
   },
 
   /**
@@ -138,8 +138,8 @@ export const MarketplaceAPI = {
     tags: string[];
     previewImages?: string[];
   }): Promise<MarketplaceTheme> {
-    const response = await apiClient.post('/marketplace/themes', themeData) as any;
-    return response.data;
+    const response: any = await apiClient.post('/marketplace/themes', themeData) as any;
+    return response.data as any;
   },
 
   /**
@@ -151,27 +151,27 @@ export const MarketplaceAPI = {
     category: string;
     tags: string[];
   }>): Promise<MarketplaceTheme> {
-    const response = await apiClient.put(`/marketplace/themes/${themeId}`, updates) as any;
-    return response.data;
+    const response: any = await apiClient.put(`/marketplace/themes/${themeId}`, updates) as any;
+    return response.data as any;
   },
 
   /**
    * Eliminar tema
    */
   async deleteTheme(themeId: string): Promise<{ success: boolean }> {
-    const response = await apiClient.delete(`/marketplace/themes/${themeId}`) as any;
-    return response.data;
+    const response: any = await apiClient.delete(`/marketplace/themes/${themeId}`) as any;
+    return response.data as any;
   },
 
   /**
    * Dejar rating
    */
   async rateTheme(themeId: string, rating: number, review?: string): Promise<ThemeRating> {
-    const response = await apiClient.post(`/marketplace/themes/${themeId}/rating`, {
+    const response: any = await apiClient.post(`/marketplace/themes/${themeId}/rating`, {
       rating,
       review,
     });
-    return response.data;
+    return response.data as any;
   },
 
   /**
@@ -182,18 +182,18 @@ export const MarketplaceAPI = {
     reason: 'inappropriate' | 'spam' | 'copyright' | 'broken' | 'other',
     description?: string
   ): Promise<{ id: string }> {
-    const response = await apiClient.post(`/marketplace/themes/${themeId}/report`, {
+    const response: any = await apiClient.post(`/marketplace/themes/${themeId}/report`, {
       reason,
       description,
     });
-    return response.data;
+    return response.data as any;
   },
 
   /**
    * Obtener mis temas publicados
    */
   async getMyThemes(): Promise<MarketplaceTheme[]> {
-    const response = await apiClient.get('/marketplace/themes/my-themes') as any;
-    return response.data;
+    const response: any = await apiClient.get('/marketplace/themes/my-themes') as any;
+    return response.data as any;
   },
 };

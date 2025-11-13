@@ -1,6 +1,9 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +45,7 @@ interface Agent {
 }
 
 export default function MarketplacePage() {
+  const t = useTranslations("marketplace");
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -193,14 +197,14 @@ export default function MarketplacePage() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-6">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">AI Marketplace</span>
+              <span className="text-sm font-medium text-primary">{t("hero.badge")}</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Discover Amazing AI Agents
+              {t("hero.title")}
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Browse, clone, and customize AI agents created by the community
+              {t("hero.subtitle")}
             </p>
 
             {/* Search Bar */}
@@ -208,7 +212,7 @@ export default function MarketplacePage() {
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search agents..."
+                  placeholder={t("search.placeholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -228,7 +232,7 @@ export default function MarketplacePage() {
           <div className="container mx-auto px-4 py-8">
             <div className="flex items-center gap-2 mb-6">
               <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-              <h2 className="text-2xl font-bold">Featured Agents</h2>
+              <h2 className="text-2xl font-bold">{t("featured.title")}</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -245,8 +249,8 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Filters and Sort */}
-      <div className="border-b bg-background">
+      {/* Filters and Sort - STICKY ON MOBILE */}
+      <div className="sticky top-0 lg:top-auto z-30 lg:z-auto border-b bg-background/95 lg:bg-background backdrop-blur-xl lg:backdrop-blur-none">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="flex flex-wrap gap-3">
@@ -255,32 +259,32 @@ export default function MarketplacePage() {
                 className="cursor-pointer"
                 onClick={() => setKindFilter("all")}
               >
-                All
+                {t("filters.all")}
               </Badge>
               <Badge
                 variant={kindFilter === "companion" ? "default" : "outline"}
                 className="cursor-pointer"
                 onClick={() => setKindFilter("companion")}
               >
-                Companions
+                {t("filters.companions")}
               </Badge>
               <Badge
                 variant={kindFilter === "assistant" ? "default" : "outline"}
                 className="cursor-pointer"
                 onClick={() => setKindFilter("assistant")}
               >
-                Assistants
+                {t("filters.assistants")}
               </Badge>
               {showFeatured && (
                 <Badge variant="secondary">
                   <Star className="w-3 h-3 mr-1 fill-current" />
-                  Featured Only
+                  {t("filters.featuredOnly")}
                 </Badge>
               )}
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Sort by:</span>
+              <span className="text-sm text-muted-foreground">{t("sort.label")}</span>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[160px]">
                   <SelectValue />
@@ -289,19 +293,19 @@ export default function MarketplacePage() {
                   <SelectItem value="popular">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
-                      Most Popular
+                      {t("sort.popular")}
                     </div>
                   </SelectItem>
                   <SelectItem value="rating">
                     <div className="flex items-center gap-2">
                       <Star className="w-4 h-4" />
-                      Highest Rated
+                      {t("sort.rating")}
                     </div>
                   </SelectItem>
                   <SelectItem value="recent">
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      Most Recent
+                      {t("sort.recent")}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -316,17 +320,17 @@ export default function MarketplacePage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading agents...</p>
+            <p className="text-muted-foreground">{t("loading")}</p>
           </div>
         ) : filteredAgents.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No agents found matching your criteria</p>
+            <p className="text-muted-foreground">{t("empty.noResults")}</p>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between mb-6">
               <p className="text-sm text-muted-foreground">
-                {filteredAgents.length} {filteredAgents.length === 1 ? "agent" : "agents"} found
+                {t("results.count", { count: filteredAgents.length, plural: filteredAgents.length === 1 ? "" : "s" })}
               </p>
             </div>
 

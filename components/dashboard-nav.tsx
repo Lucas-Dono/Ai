@@ -4,6 +4,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingMenu } from "@/components/onboarding/OnboardingMenu";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useClientLocale } from "@/hooks/useClientLocale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
@@ -13,29 +16,21 @@ import {
   Network,
   Settings,
   Plus,
-  Shield,
   Sparkles,
   CreditCard,
   Users,
+  BarChart3,
+  Activity,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-const navItems = [
-  { href: "/dashboard", label: "Inicio", icon: Home },
-  { href: "/dashboard?filter=companion", label: "Compañeros", icon: Heart },
-  { href: "/dashboard/mundos", label: "Mundos", icon: Network },
-  { href: "/community", label: "Community", icon: Users },
-  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { href: "/configuracion", label: "Configuración", icon: Settings },
-  { href: "/administracion", label: "Admin", icon: Shield },
-];
-
 export function DashboardNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { t } = useClientLocale();
   const [userPlan, setUserPlan] = useState<string>("free");
 
   useEffect(() => {
@@ -75,19 +70,29 @@ export function DashboardNav() {
     .slice(0, 2);
 
   const planLabels: Record<string, string> = {
-    free: "Free",
-    plus: "Plus",
-    ultra: "Ultra",
+    free: t("navigation.planLabels.free"),
+    plus: t("navigation.planLabels.plus"),
+    ultra: t("navigation.planLabels.ultra"),
   };
 
+  const navItems = [
+    { href: "/dashboard", label: t("navigation.home"), icon: Home },
+    { href: "/dashboard/mundos", label: t("navigation.worlds"), icon: Network },
+    { href: "/dashboard/my-stats", label: t("navigation.myProgress"), icon: BarChart3 },
+    { href: "/community", label: t("navigation.community"), icon: Users },
+    { href: "/dashboard/billing", label: t("navigation.billing"), icon: CreditCard },
+    { href: "/dashboard/kpis", label: t("navigation.kpis"), icon: Activity },
+    { href: "/configuracion", label: t("navigation.settings"), icon: Settings },
+  ];
+
   return (
-    <nav className="fixed left-0 top-0 h-full w-64 border-r border-border bg-card/50 backdrop-blur-sm flex flex-col">
+    <nav data-tour="sidebar-nav" className="hidden lg:flex fixed left-0 top-0 h-full w-64 border-r border-border bg-card/50 backdrop-blur-sm flex-col">
       <div className="p-6 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-2 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
             <Sparkles className="h-6 w-6 text-white" />
           </div>
-          <span className="font-bold text-lg">Creador IA</span>
+          <span className="font-bold text-lg">{t("navigation.brand")}</span>
         </Link>
       </div>
 
@@ -100,8 +105,17 @@ export function DashboardNav() {
           const isActive = pathname === cleanHref ||
             (pathname.startsWith(cleanHref + '/') && cleanHref !== '/dashboard');
 
+          // Add data-tour attribute based on route
+          const getTourAttr = (href: string) => {
+            if (href === '/community') return 'community-link';
+            if (href === '/dashboard/mundos') return 'worlds-link';
+            if (href === '/dashboard/billing') return 'billing-link';
+            if (href === '/dashboard/my-stats') return 'my-stats-link';
+            return undefined;
+          };
+
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} data-tour={getTourAttr(item.href)}>
               <motion.div
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
@@ -121,16 +135,17 @@ export function DashboardNav() {
       </div>
 
       <div className="p-4 border-t border-border space-y-4">
-        <Link href="/constructor">
+        <Link href="/constructor" data-tour="create-ai-button">
           <Button className="w-full" size="sm">
             <Plus className="h-4 w-4 mr-2" />
-            Nueva IA
+            {t("navigation.newAI")}
           </Button>
         </Link>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 py-2">
+          <NotificationDropdown />
           <OnboardingMenu />
-          <ThemeToggle />
+          <LanguageSwitcher variant="compact" />
         </div>
 
         <div className="flex items-center gap-3 px-3">

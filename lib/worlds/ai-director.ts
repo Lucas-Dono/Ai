@@ -264,7 +264,7 @@ export class AIDirector {
       temperature: 0.7,
     });
 
-    const decision = parseDirectorResponse<MacroDecision>(response.content, 'macro');
+    const decision = parseDirectorResponse<MacroDecision>(response.text, 'macro');
 
     if (!decision) {
       log.warn({ worldId: this.worldId }, 'Failed to parse macro decision');
@@ -309,7 +309,7 @@ export class AIDirector {
       temperature: 0.7,
     });
 
-    const decision = parseDirectorResponse<MesoDecision>(response.content, 'meso');
+    const decision = parseDirectorResponse<MesoDecision>(response.text, 'meso');
 
     if (!decision) {
       log.warn({ worldId: this.worldId }, 'Failed to parse meso decision');
@@ -364,7 +364,7 @@ export class AIDirector {
       temperature: 0.8,
     });
 
-    const decision = parseDirectorResponse<MicroDecision>(response.content, 'micro');
+    const decision = parseDirectorResponse<MicroDecision>(response.text, 'micro');
 
     if (!decision) {
       log.debug({ worldId: this.worldId }, 'Failed to parse micro decision (non-critical)');

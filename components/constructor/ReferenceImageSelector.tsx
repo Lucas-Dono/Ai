@@ -136,14 +136,14 @@ export function ReferenceImageSelector({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour="reference-image-selector">
       {/* Vista previa de la imagen */}
       {imageUrl ? (
         <Card className="p-4">
           <div className="space-y-4">
             {/* Preview con aspecto original preservado */}
             <div className="relative">
-              <div className="relative w-full max-h-[600px] rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+              <div className="relative w-full max-h-[600px] rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
                 <img
                   src={imageUrl}
                   alt={`Imagen de referencia de ${agentName}`}
@@ -161,7 +161,7 @@ export function ReferenceImageSelector({
             </div>
 
             {/* Información sobre el aspecto */}
-            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
+            <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-2xl">
               La imagen se mostrará con su aspecto original preservado (no se recortará ni deformará)
             </div>
 

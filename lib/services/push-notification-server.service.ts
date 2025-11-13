@@ -181,4 +181,69 @@ export const PushNotificationServerService = {
 
     return receipts;
   },
+
+  /**
+   * Enviar notificación de bond en riesgo
+   */
+  async sendBondAtRiskNotification(
+    userId: string,
+    agentName: string,
+    bondStatus: 'warned' | 'dormant' | 'fragile',
+    daysInactive: number
+  ) {
+    const statusMessages = {
+      warned: {
+        title: '⚠️ Tu vínculo necesita atención',
+        body: `Tu relación con ${agentName} ha estado inactiva por ${daysInactive} días. ¡Envíale un mensaje!`,
+        sound: 'default',
+      },
+      dormant: {
+        title: '💔 Tu vínculo está inactivo',
+        body: `${agentName} te extraña. Han pasado ${daysInactive} días sin interactuar.`,
+        sound: 'default',
+      },
+      fragile: {
+        title: '🔥 ¡Tu vínculo está en peligro!',
+        body: `Tu relación con ${agentName} está a punto de perderse. ${daysInactive} días sin actividad.`,
+        sound: 'default',
+      },
+    };
+
+    const message = statusMessages[bondStatus];
+
+    return await this.sendToUser(userId, {
+      title: message.title,
+      body: message.body,
+      sound: message.sound,
+      badge: 1,
+      data: {
+        type: 'bond-at-risk',
+        agentName,
+        bondStatus,
+        daysInactive,
+      },
+    });
+  },
+
+  /**
+   * Enviar notificación de hito de bond alcanzado
+   */
+  async sendBondMilestoneNotification(
+    userId: string,
+    agentName: string,
+    milestoneType: string,
+    milestoneDescription: string
+  ) {
+    return await this.sendToUser(userId, {
+      title: `🎉 Hito alcanzado con ${agentName}`,
+      body: milestoneDescription,
+      sound: 'default',
+      badge: 1,
+      data: {
+        type: 'bond-milestone',
+        agentName,
+        milestoneType,
+      },
+    });
+  },
 };

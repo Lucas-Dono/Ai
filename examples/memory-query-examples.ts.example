@@ -1,0 +1,400 @@
+/**
+ * MEMORY QUERY SYSTEM - Examples
+ *
+ * Ejemplos prácticos de cómo usar el sistema de memory queries
+ */
+
+import { memoryQueryDetector } from '@/lib/memory/memory-query-detector';
+import { memoryQueryHandler } from '@/lib/memory/memory-query-handler';
+
+/**
+ * EJEMPLO 1: Detección Básica
+ */
+async function example1_BasicDetection() {
+  console.log('EJEMPLO 1: Detección Básica\n');
+
+  const messages = [
+    '¿Recuerdas mi cumpleaños?',
+    '¿Te dije que me mudé?',
+    '¿Qué te conté sobre mi familia?',
+    '¿Cómo estás hoy?', // No es memory query
+  ];
+
+  for (const message of messages) {
+    const detection = memoryQueryDetector.detectMemoryQuery(message);
+
+    console.log(`Mensaje: "${message}"`);
+    console.log(`Es memory query: ${detection.isMemoryQuery}`);
+    console.log(`Tipo: ${detection.queryType}`);
+    console.log(`Confidence: ${detection.confidence.toFixed(2)}`);
+    console.log(`Keywords: ${detection.keywords.join(', ')}`);
+    console.log('---\n');
+  }
+}
+
+/**
+ * EJEMPLO 2: Búsqueda Completa con Handler
+ */
+async function example2_FullSearch() {
+  console.log('EJEMPLO 2: Búsqueda Completa\n');
+
+  const agentId = 'test-agent-123';
+  const userId = 'test-user-456';
+  const message = '¿Recuerdas cuándo es mi cumpleaños?';
+
+  const result = await memoryQueryHandler.handleQuery(
+    message,
+    agentId,
+    userId
+  );
+
+  if (result.detected) {
+    console.log('✅ Memory query detectada');
+    console.log(`Tipo: ${result.detection.queryType}`);
+    console.log(`Confidence: ${result.detection.confidence.toFixed(2)}`);
+    console.log(`Keywords: ${result.detection.keywords.join(', ')}`);
+    console.log('\nMemorias encontradas:');
+
+    for (const memory of result.memories) {
+      console.log(`- [${memory.source.toUpperCase()}] ${memory.content.substring(0, 100)}`);
+      console.log(`  Score: ${memory.score.toFixed(2)}`);
+      console.log(`  Timestamp: ${memory.timestamp.toISOString()}`);
+    }
+
+    console.log('\nMetadata:');
+    console.log(`- Tiempo de búsqueda: ${result.metadata.searchTimeMs}ms`);
+    console.log(`- Memorias encontradas: ${result.metadata.memoriesFound}`);
+    console.log(`- Similitud promedio: ${result.metadata.avgSimilarity.toFixed(2)}`);
+    console.log(`- Sources: episodic=${result.metadata.sources.episodic}, rag=${result.metadata.sources.rag}, knowledge=${result.metadata.sources.knowledge}`);
+
+    console.log('\nContexto generado:');
+    console.log(result.contextPrompt.substring(0, 500) + '...');
+  } else {
+    console.log('❌ No es memory query');
+  }
+}
+
+/**
+ * EJEMPLO 3: Configuración Personalizada
+ */
+async function example3_CustomConfig() {
+  console.log('EJEMPLO 3: Configuración Personalizada\n');
+
+  const agentId = 'test-agent-123';
+  const userId = 'test-user-456';
+  const message = '¿Qué te dije sobre mi familia?';
+
+  // Configuración strict: solo memorias muy relevantes
+  const strictResult = await memoryQueryHandler.handleQuery(
+    message,
+    agentId,
+    userId,
+    {
+      maxMemories: 3,
+      minSimilarity: 0.8, // ↑ Alto threshold
+      maxTokens: 500,     // ↓ Menos tokens
+      useSemanticSearch: true,
+    }
+  );
+
+  console.log('Config STRICT:');
+  console.log(`- Memorias: ${strictResult.memories.length}`);
+  console.log(`- Avg similarity: ${strictResult.metadata.avgSimilarity.toFixed(2)}`);
+  console.log(`- Context length: ${strictResult.contextPrompt.length} chars\n`);
+
+  // Configuración permissive: más memorias, threshold bajo
+  const permissiveResult = await memoryQueryHandler.handleQuery(
+    message,
+    agentId,
+    userId,
+    {
+      maxMemories: 10,
+      minSimilarity: 0.4, // ↓ Bajo threshold
+      maxTokens: 2000,    // ↑ Más tokens
+      useSemanticSearch: true,
+    }
+  );
+
+  console.log('Config PERMISSIVE:');
+  console.log(`- Memorias: ${permissiveResult.memories.length}`);
+  console.log(`- Avg similarity: ${permissiveResult.metadata.avgSimilarity.toFixed(2)}`);
+  console.log(`- Context length: ${permissiveResult.contextPrompt.length} chars\n`);
+}
+
+/**
+ * EJEMPLO 4: Quick Check (sin búsqueda)
+ */
+async function example4_QuickCheck() {
+  console.log('EJEMPLO 4: Quick Check\n');
+
+  const messages = [
+    '¿Recuerdas mi nombre?',
+    '¿Cómo estás?',
+    '¿Te dije mi edad?',
+    'Hola',
+  ];
+
+  for (const message of messages) {
+    const isMemoryQuery = memoryQueryHandler.isMemoryQuery(message);
+    console.log(`"${message}" → ${isMemoryQuery ? '✅' : '❌'}`);
+  }
+}
+
+/**
+ * EJEMPLO 5: Extracción de Topic
+ */
+async function example5_TopicExtraction() {
+  console.log('EJEMPLO 5: Extracción de Topic\n');
+
+  const queries = [
+    '¿Recuerdas mi cumpleaños?',
+    '¿Qué te dije sobre mi trabajo?',
+    '¿Te conté de mi viaje a España?',
+    '¿Cuál era el nombre de mi perro?',
+  ];
+
+  for (const query of queries) {
+    const detection = memoryQueryDetector.detectMemoryQuery(query);
+    const topic = memoryQueryDetector.extractTopic(query, detection);
+
+    console.log(`Query: "${query}"`);
+    console.log(`Topic: "${topic}"`);
+    console.log(`Keywords: ${detection.keywords.join(', ')}`);
+    console.log('---\n');
+  }
+}
+
+/**
+ * EJEMPLO 6: Temporal Context Detection
+ */
+async function example6_TemporalContext() {
+  console.log('EJEMPLO 6: Temporal Context Detection\n');
+
+  const queries = [
+    '¿Recuerdas lo que pasó hace poco?',      // recent
+    '¿Qué te dije ayer?',                     // specific
+    '¿Te acuerdas de antes?',                 // past
+    'La última vez que hablamos',             // past
+  ];
+
+  for (const query of queries) {
+    const detection = memoryQueryDetector.detectMemoryQuery(query);
+
+    console.log(`Query: "${query}"`);
+    console.log(`Temporal context: ${detection.temporalContext || 'none'}`);
+    console.log('---\n');
+  }
+}
+
+/**
+ * EJEMPLO 7: Integration con Message Service (conceptual)
+ */
+async function example7_MessageServiceIntegration() {
+  console.log('EJEMPLO 7: Integration con Message Service\n');
+
+  const agentId = 'agent-123';
+  const userId = 'user-456';
+  const userMessage = '¿Recuerdas mi comida favorita?';
+
+  // Paso 1: Procesar mensaje normal
+  console.log('1. Processing user message...');
+  let enhancedPrompt = 'Eres un asistente útil y amigable.';
+
+  // Paso 2: Detectar memory query
+  console.log('2. Checking for memory query...');
+  const memoryQueryResult = await memoryQueryHandler.handleQuery(
+    userMessage,
+    agentId,
+    userId
+  );
+
+  // Paso 3: Si se detecta, agregar contexto
+  if (memoryQueryResult.detected && memoryQueryResult.contextPrompt) {
+    console.log('3. Memory query detected! Adding context...');
+    console.log(`   - Found ${memoryQueryResult.metadata.memoriesFound} memories`);
+    console.log(`   - Search time: ${memoryQueryResult.metadata.searchTimeMs}ms`);
+
+    enhancedPrompt += '\n\n' + memoryQueryResult.contextPrompt;
+  }
+
+  // Paso 4: Enviar a LLM con contexto enriquecido
+  console.log('4. Sending to LLM with enriched prompt...');
+  console.log(`   - Prompt length: ${enhancedPrompt.length} chars`);
+
+  // Mock LLM response
+  const llmResponse = 'Tu comida favorita es la pizza 🍕';
+  console.log(`   - LLM response: "${llmResponse}"`);
+
+  return llmResponse;
+}
+
+/**
+ * EJEMPLO 8: Error Handling
+ */
+async function example8_ErrorHandling() {
+  console.log('EJEMPLO 8: Error Handling\n');
+
+  const agentId = 'agent-123';
+  const userId = 'user-456';
+  const message = '¿Recuerdas algo?';
+
+  try {
+    const result = await memoryQueryHandler.handleQuery(
+      message,
+      agentId,
+      userId,
+      {
+        maxMemories: 5,
+        minSimilarity: 0.5,
+        useSemanticSearch: true,
+      }
+    );
+
+    if (result.detected) {
+      if (result.memories.length === 0) {
+        console.log('⚠️ Memory query detected but no memories found');
+        console.log('Contextual response should indicate uncertainty');
+      } else {
+        console.log(`✅ Found ${result.memories.length} memories`);
+      }
+    } else {
+      console.log('ℹ️ Not a memory query, proceeding normally');
+    }
+  } catch (error) {
+    console.error('❌ Error processing memory query:', error);
+    console.log('Fallback: Process message without memory context');
+  }
+}
+
+/**
+ * EJEMPLO 9: Performance Monitoring
+ */
+async function example9_PerformanceMonitoring() {
+  console.log('EJEMPLO 9: Performance Monitoring\n');
+
+  const agentId = 'agent-123';
+  const userId = 'user-456';
+  const queries = [
+    '¿Recuerdas mi cumpleaños?',
+    '¿Qué te dije sobre mi familia?',
+    '¿Te conté de mi trabajo?',
+  ];
+
+  const results = [];
+
+  for (const query of queries) {
+    const start = Date.now();
+
+    const result = await memoryQueryHandler.handleQuery(
+      query,
+      agentId,
+      userId
+    );
+
+    const totalTime = Date.now() - start;
+
+    results.push({
+      query,
+      detected: result.detected,
+      searchTime: result.metadata.searchTimeMs,
+      totalTime,
+      memoriesFound: result.metadata.memoriesFound,
+    });
+  }
+
+  console.log('Performance Results:');
+  console.log('-------------------');
+
+  for (const result of results) {
+    console.log(`Query: "${result.query.substring(0, 40)}..."`);
+    console.log(`  Total time: ${result.totalTime}ms`);
+    console.log(`  Search time: ${result.searchTime}ms`);
+    console.log(`  Memories: ${result.memoriesFound}`);
+    console.log('');
+  }
+
+  const avgTotalTime = results.reduce((sum, r) => sum + r.totalTime, 0) / results.length;
+  const avgSearchTime = results.reduce((sum, r) => sum + r.searchTime, 0) / results.length;
+
+  console.log('Averages:');
+  console.log(`  Avg total time: ${avgTotalTime.toFixed(2)}ms`);
+  console.log(`  Avg search time: ${avgSearchTime.toFixed(2)}ms`);
+}
+
+/**
+ * EJEMPLO 10: A/B Testing Different Configs
+ */
+async function example10_ABTesting() {
+  console.log('EJEMPLO 10: A/B Testing Different Configs\n');
+
+  const agentId = 'agent-123';
+  const userId = 'user-456';
+  const message = '¿Recuerdas algo sobre mi familia?';
+
+  // Config A: Semantic Search ON
+  const configA = await memoryQueryHandler.handleQuery(message, agentId, userId, {
+    useSemanticSearch: true,
+    maxMemories: 5,
+    minSimilarity: 0.5,
+  });
+
+  // Config B: Semantic Search OFF (fallback)
+  const configB = await memoryQueryHandler.handleQuery(message, agentId, userId, {
+    useSemanticSearch: false,
+    maxMemories: 5,
+    minSimilarity: 0.5,
+  });
+
+  console.log('CONFIG A (Semantic Search ON):');
+  console.log(`  Memories: ${configA.metadata.memoriesFound}`);
+  console.log(`  Avg similarity: ${configA.metadata.avgSimilarity.toFixed(2)}`);
+  console.log(`  Time: ${configA.metadata.searchTimeMs}ms`);
+  console.log('');
+
+  console.log('CONFIG B (Semantic Search OFF):');
+  console.log(`  Memories: ${configB.metadata.memoriesFound}`);
+  console.log(`  Avg similarity: ${configB.metadata.avgSimilarity.toFixed(2)}`);
+  console.log(`  Time: ${configB.metadata.searchTimeMs}ms`);
+  console.log('');
+
+  console.log('Winner: ', configA.metadata.avgSimilarity > configB.metadata.avgSimilarity ? 'A' : 'B');
+}
+
+// ============================================================================
+// MAIN: Run all examples
+// ============================================================================
+
+async function runAllExamples() {
+  try {
+    await example1_BasicDetection();
+    await example2_FullSearch();
+    await example3_CustomConfig();
+    await example4_QuickCheck();
+    await example5_TopicExtraction();
+    await example6_TemporalContext();
+    await example7_MessageServiceIntegration();
+    await example8_ErrorHandling();
+    await example9_PerformanceMonitoring();
+    await example10_ABTesting();
+
+    console.log('\n✅ All examples completed successfully!');
+  } catch (error) {
+    console.error('❌ Error running examples:', error);
+  }
+}
+
+// Uncomment to run:
+// runAllExamples();
+
+export {
+  example1_BasicDetection,
+  example2_FullSearch,
+  example3_CustomConfig,
+  example4_QuickCheck,
+  example5_TopicExtraction,
+  example6_TemporalContext,
+  example7_MessageServiceIntegration,
+  example8_ErrorHandling,
+  example9_PerformanceMonitoring,
+  example10_ABTesting,
+};

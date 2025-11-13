@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -8,10 +7,10 @@ import { MessagingService } from '@/lib/services/messaging.service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
@@ -21,7 +20,7 @@ export async function GET(
     const limit = parseInt(searchParams.get('limit') || '50');
 
     const result = await MessagingService.getMessages(
-      params.id,
+      (await params).id,
       session.user.id,
       page,
       limit
@@ -29,6 +28,57 @@ export async function GET(
 
     return NextResponse.json(result);
   } catch (error: any) {
+    console.error('Error getting messages:', error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}
+
+/**
+ * PATCH /api/messages/conversations/[id] - Actualizar configuración de conversación
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const data = await request.json();
+
+    const updated = await MessagingService.updateConversation(
+      (await params).id,
+      session.user.id,
+      data
+    );
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error('Error updating conversation:', error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}
+
+/**
+ * DELETE /api/messages/conversations/[id] - Eliminar conversación
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const result = await MessagingService.deleteConversation((await params).id, session.user.id);
+
+    return NextResponse.json(result);
+  } catch (error: any) {
+    console.error('Error deleting conversation:', error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

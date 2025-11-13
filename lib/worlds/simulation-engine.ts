@@ -16,11 +16,14 @@ import { getStoryEngine } from './story-engine';
 import { getCharacterImportanceManager } from './character-importance-manager';
 import { getNarrativeAnalyzer, type InteractionForAnalysis } from './narrative-analyzer';
 import { getEmergentEventsGenerator } from './emergent-events';
+import { getWorldStateRedis, withWorldLock, type WorldState as RedisWorldState } from './world-state-redis';
+import { WorldAgentMemoryService, shouldSaveEpisode } from './world-agent-memory.service';
+import { getEventApplicationService } from './event-application.service';
 import type { WorldStatus } from '@prisma/client';
 
 const log = createLogger('SimulationEngine');
 
-interface WorldState {
+interface SimulationWorldState {
   worldId: string;
   isRunning: boolean;
   intervalId?: NodeJS.Timeout;
@@ -46,7 +49,7 @@ interface InteractionContext {
  * Motor de simulación de mundos
  */
 export class WorldSimulationEngine {
-  private activeWorlds: Map<string, WorldState> = new Map();
+  private activeWorlds: Map<string, SimulationWorldState> = new Map();
 
   /**
    * Inicia la simulación de un mundo
@@ -60,28 +63,44 @@ export class WorldSimulationEngine {
       return;
     }
 
-    // Cargar mundo con todos sus agentes
-    const world = await prisma.world.findUnique({
-      where: { id: worldId },
-      include: {
-        worldAgents: {
-          where: { isActive: true },
-          include: {
-            agent: {
-              include: {
-                personalityCore: true,
-                internalState: true,
-                semanticMemory: true,
+    // 🔥 REDIS: Adquirir lock para prevenir race conditions
+    const redisService = getWorldStateRedis();
+    const lock = await redisService.lockWorld(worldId, 60);
+
+    if (!lock.acquired) {
+      log.warn({ worldId }, '⚠️  Could not acquire lock - simulation may already be starting');
+      throw new Error('World is locked by another process');
+    }
+
+    try {
+      // Cargar mundo con todos sus agentes
+      const world = await prisma.world.findUnique({
+        where: { id: worldId },
+        include: {
+          worldAgents: {
+            where: { isActive: true },
+            include: {
+              agent: {
+                include: {
+                  personalityCore: true,
+                  internalState: true,
+                  semanticMemory: true,
+                },
               },
             },
           },
+          simulationState: true,
         },
-        simulationState: true,
-      },
-    });
+      });
 
     if (!world) {
       throw new Error(`World ${worldId} not found`);
+    }
+
+    // OPTIMIZATION: Verificar si el mundo está pausado por auto-pause
+    if (world.isPaused) {
+      log.warn({ worldId, pauseReason: world.pauseReason }, 'Cannot start simulation: world is paused');
+      throw new Error(`World is paused (reason: ${world.pauseReason}). Resume world before starting simulation.`);
     }
 
     if (world.worldAgents.length < 2) {
@@ -108,57 +127,68 @@ export class WorldSimulationEngine {
       });
     }
 
-    // Actualizar estado a RUNNING
-    await prisma.world.update({
-      where: { id: worldId },
-      data: { status: 'RUNNING' },
-    });
+      // Actualizar estado a RUNNING
+      await prisma.world.update({
+        where: { id: worldId },
+        data: { status: 'RUNNING' },
+      });
 
-    // Emitir evento de cambio de estado
-    worldSocketEvents.emitStatusChange({
-      worldId,
-      status: 'RUNNING',
-      currentTurn: simState?.currentTurn || 0,
-      totalInteractions: simState?.totalInteractions || 0,
-      timestamp: new Date(),
-    });
+      // 🔥 REDIS: Cargar estado inicial a cache
+      const initialState = await redisService.getWorldState(worldId);
+      if (initialState) {
+        log.info({ worldId }, '✅ World state loaded into Redis cache');
+      }
 
-    // Configurar loop de simulación
-    const worldState: WorldState = {
-      worldId,
-      isRunning: true,
-    };
+      // Emitir evento de cambio de estado
+      worldSocketEvents.emitStatusChange({
+        worldId,
+        status: 'RUNNING',
+        currentTurn: simState?.currentTurn || 0,
+        totalInteractions: simState?.totalInteractions || 0,
+        timestamp: new Date(),
+      });
 
-    this.activeWorlds.set(worldId, worldState);
+      // Configurar loop de simulación
+      const worldState: SimulationWorldState = {
+        worldId,
+        isRunning: true,
+      };
 
-    // Ejecutar primer turno inmediatamente
-    this.executeSimulationTurn(worldId).catch(err => {
-      log.error({ error: err, worldId }, 'Error in first simulation turn');
-    });
+      this.activeWorlds.set(worldId, worldState);
 
-    // Si está en modo auto, configurar intervalo
-    if (world.autoMode) {
-      const interval = setInterval(async () => {
-        const state = this.activeWorlds.get(worldId);
-        if (!state || !state.isRunning) {
-          clearInterval(interval);
-          return;
-        }
+      // Ejecutar primer turno inmediatamente
+      this.executeSimulationTurn(worldId).catch(err => {
+        log.error({ error: err, worldId }, 'Error in first simulation turn');
+      });
 
-        try {
-          await this.executeSimulationTurn(worldId);
-        } catch (error) {
-          log.error({ error, worldId }, 'Error in simulation turn');
-          // En caso de error, pausar la simulación
-          await this.pauseSimulation(worldId);
-          clearInterval(interval);
-        }
-      }, world.interactionDelay);
+      // Si está en modo auto, configurar intervalo
+      if (world.autoMode) {
+        const interval = setInterval(async () => {
+          const state = this.activeWorlds.get(worldId);
+          if (!state || !state.isRunning) {
+            clearInterval(interval);
+            return;
+          }
 
-      worldState.intervalId = interval;
+          try {
+            await this.executeSimulationTurn(worldId);
+          } catch (error) {
+            log.error({ error, worldId }, 'Error in simulation turn');
+            // En caso de error, pausar la simulación
+            await this.pauseSimulation(worldId);
+            clearInterval(interval);
+          }
+        }, world.interactionDelay) as unknown as NodeJS.Timeout;
+
+        worldState.intervalId = interval;
+      }
+
+      log.info({ worldId }, 'Simulation started successfully');
+
+    } finally {
+      // 🔥 REDIS: Liberar lock
+      await redisService.unlockWorld(worldId, lock.lockId);
     }
-
-    log.info({ worldId }, 'Simulation started successfully');
   }
 
   /**
@@ -249,6 +279,21 @@ export class WorldSimulationEngine {
   private async executeSimulationTurn(worldId: string): Promise<void> {
     const timer = Date.now();
     log.debug({ worldId }, 'Executing simulation turn');
+
+    // OPTIMIZATION: Verificar que el mundo no esté pausado antes de procesar
+    const pauseCheck = await prisma.world.findUnique({
+      where: { id: worldId },
+      select: { isPaused: true, pauseReason: true },
+    });
+
+    if (pauseCheck?.isPaused) {
+      log.warn(
+        { worldId, pauseReason: pauseCheck.pauseReason },
+        'Skipping turn: world is paused'
+      );
+      await this.pauseSimulation(worldId);
+      return;
+    }
 
     // Cargar contexto completo
     const context = await this.loadInteractionContext(worldId);
@@ -420,8 +465,72 @@ export class WorldSimulationEngine {
 
   /**
    * Carga todo el contexto necesario para una interacción
+   * 🔥 OPTIMIZADO: Usa Redis cache para reducir DB queries
    */
   private async loadInteractionContext(worldId: string): Promise<InteractionContext> {
+    const redisService = getWorldStateRedis();
+
+    // 🔥 REDIS: Intentar cargar de cache primero
+    const cachedState = await redisService.getWorldState(worldId);
+
+    if (cachedState) {
+      // Cache HIT: usar datos de Redis
+      log.debug({ worldId }, '✅ Using cached world state');
+
+      const [agentsWithDetails, relations] = await Promise.all([
+        // Solo necesitamos cargar detalles de personalidad y estado
+        prisma.worldAgent.findMany({
+          where: { worldId, isActive: true },
+          include: {
+            agent: {
+              include: {
+                personalityCore: true,
+                internalState: true,
+                semanticMemory: true,
+              },
+            },
+          },
+        }),
+
+        // Cargar relaciones entre agentes (menos frecuentes, OK desde DB)
+        prisma.agentToAgentRelation.findMany({
+          where: { worldId },
+        }),
+      ]);
+
+      const world = {
+        ...cachedState.world,
+        simulationState: cachedState.simulationState,
+      };
+
+      // Construir mapa de agentes
+      const agentInfos: AgentInfo[] = agentsWithDetails.map(wa => ({
+        id: wa.agent.id,
+        name: wa.agent.name,
+        description: wa.agent.description || '',
+        systemPrompt: wa.agent.systemPrompt,
+        personality: wa.agent.personalityCore,
+        emotionalState: wa.agent.internalState,
+      }));
+
+      // Construir mapa de relaciones por agente
+      const agentRelations = new Map<string, any[]>();
+      for (const agent of agentInfos) {
+        const rels = relations.filter(r => r.subjectId === agent.id);
+        agentRelations.set(agent.id, rels);
+      }
+
+      return {
+        world: world as any,
+        agents: agentInfos,
+        recentInteractions: cachedState.recentInteractions.slice(-20),
+        agentRelations,
+      };
+    }
+
+    // Cache MISS: cargar de DB (fallback)
+    log.debug({ worldId }, '⚠️  Cache miss - loading from DB');
+
     const [world, agents, recentInteractions, relations] = await Promise.all([
       // Cargar mundo
       prisma.world.findUnique({
@@ -617,7 +726,7 @@ export class WorldSimulationEngine {
     const { world, agents, recentInteractions } = context;
 
     // Construir prompt de contexto grupal
-    const groupContextPrompt = this.buildGroupContextPrompt(speaker, context);
+    const groupContextPrompt = await this.buildGroupContextPrompt(speaker, context);
 
     // Construir historial de conversación
     const conversationHistory = recentInteractions
@@ -695,7 +804,7 @@ NO incluyas tu nombre al inicio de la respuesta, solo el contenido.`;
   /**
    * Construye el prompt de contexto grupal para un agente
    */
-  private buildGroupContextPrompt(speaker: AgentInfo, context: InteractionContext): string {
+  private async buildGroupContextPrompt(speaker: AgentInfo, context: InteractionContext): Promise<string> {
     const { world, agents, agentRelations } = context;
 
     const otherAgents = agents.filter(a => a.id !== speaker.id);
@@ -739,6 +848,72 @@ NO incluyas tu nombre al inicio de la respuesta, solo el contenido.`;
         .map(([emotion, value]: any) => `${emotion} (${(value * 100).toFixed(0)}%)`)
         .join(', ');
       prompt += `Estado emocional: ${topEmotions}\n`;
+    }
+
+    // ========================================
+    // ESTADO FÍSICO Y EFECTOS PERSISTENTES
+    // ========================================
+    try {
+      const eventService = getEventApplicationService(world.id);
+      const stateDescription = await eventService.getAgentStateDescription(speaker.id);
+
+      if (stateDescription) {
+        prompt += `\nEstado físico: ${stateDescription}\n`;
+
+        // Obtener efectos activos
+        const activeEffects = await eventService.getActiveEffects(speaker.id);
+        if (activeEffects.length > 0) {
+          prompt += `\nEfectos activos:\n`;
+          for (const effect of activeEffects.slice(0, 3)) {
+            const effectDesc = effect.metadata?.description || effect.type;
+            const severity = (effect.severity * 100).toFixed(0);
+            prompt += `  - ${effectDesc} (severidad: ${severity}%)\n`;
+          }
+        }
+      }
+    } catch (error) {
+      // Si falla, continuar sin estado físico
+      log.warn({ speakerId: speaker.id, error }, 'Failed to load agent state for prompt');
+    }
+
+    // ========================================
+    // EPISODIC MEMORY: Memorias relevantes
+    // ========================================
+    try {
+      const memoryService = new WorldAgentMemoryService(world.id);
+
+      // Construir query basada en conversación reciente
+      const recentContent = context.recentInteractions
+        .slice(-5)
+        .map(i => i.content)
+        .join(' ');
+
+      const memories = await memoryService.retrieveRelevantEpisodes({
+        agentId: speaker.id,
+        query: recentContent,
+        limit: 3, // Máximo 3 memorias para no saturar el prompt
+        minImportance: 0.5,
+        emotionalContext: {
+          currentEmotion: this.getDominantEmotion(speaker.emotionalState?.currentEmotions),
+          currentValence: this.calculateEmotionalValence(speaker.emotionalState?.currentEmotions || {}),
+        },
+      });
+
+      if (memories.length > 0) {
+        prompt += `\n=== MEMORIAS RELEVANTES ===\n`;
+        for (const { memory, relevanceReason } of memories) {
+          const turnsAgo = (context.world.simulationState?.currentTurn || 0) - memory.turnNumber;
+          prompt += `\n- (Turno ${memory.turnNumber}, hace ${turnsAgo} turnos): ${memory.event}`;
+
+          if (memory.dominantEmotion) {
+            prompt += ` [${memory.dominantEmotion}]`;
+          }
+        }
+        prompt += `\n`;
+      }
+    } catch (error) {
+      // Si falla, continuar sin memorias
+      log.warn({ speakerId: speaker.id, error }, 'Failed to load episodic memories for prompt');
     }
 
     return prompt;
@@ -802,6 +977,17 @@ NO incluyas tu nombre al inicio de la respuesta, solo el contenido.`;
         lastInteractionAt: new Date(),
       },
     });
+
+    // ========================================
+    // EPISODIC MEMORY: Guardar eventos importantes
+    // ========================================
+    await this.saveEpisodicMemoryIfImportant(
+      worldId,
+      speakerId,
+      content,
+      turnNumber,
+      context
+    );
 
     return interaction;
   }
@@ -946,6 +1132,7 @@ NO incluyas tu nombre al inicio de la respuesta, solo el contenido.`;
 
   /**
    * Actualiza el estado de simulación del mundo
+   * 🔥 OPTIMIZADO: Actualiza Redis inmediatamente, DB en background
    */
   private async updateSimulationState(
     worldId: string,
@@ -968,18 +1155,223 @@ NO incluyas tu nombre al inicio de la respuesta, solo el contenido.`;
       : [];
     const updatedSpeakers = [speakerId, ...activeSpeakers.filter((id: string) => id !== speakerId)].slice(0, 5);
 
-    const updated = await prisma.worldSimulationState.update({
-      where: { id: simState.id },
-      data: {
-        currentTurn: newTurn,
-        totalInteractions: newTotal,
-        lastSpeakerId: speakerId,
-        activeSpeakers: updatedSpeakers,
-        lastUpdated: new Date(),
-      },
-    });
+    // 🔥 REDIS: Actualizar cache primero (fast path)
+    const redisService = getWorldStateRedis();
+    const cachedState = await redisService.getWorldState(worldId);
 
-    return { currentTurn: updated.currentTurn, totalInteractions: updated.totalInteractions };
+    if (cachedState && cachedState.simulationState) {
+      // Actualizar en memoria
+      cachedState.simulationState.currentTurn = newTurn;
+      cachedState.simulationState.totalInteractions = newTotal;
+      cachedState.simulationState.lastSpeakerId = speakerId;
+      cachedState.simulationState.activeSpeakers = updatedSpeakers;
+      cachedState.simulationState.lastUpdated = new Date();
+
+      // Guardar en Redis (no bloqueante)
+      await redisService.saveWorldState(worldId, cachedState);
+
+      log.debug({ worldId, turn: newTurn }, '✅ State updated in Redis cache');
+    }
+
+    // 🔥 OPTIMIZATION: Actualizar DB solo cada 10 turnos o si Redis falla
+    if (newTurn % 10 === 0 || !cachedState) {
+      const updated = await prisma.worldSimulationState.update({
+        where: { id: simState.id },
+        data: {
+          currentTurn: newTurn,
+          totalInteractions: newTotal,
+          lastSpeakerId: speakerId,
+          activeSpeakers: updatedSpeakers,
+          lastUpdated: new Date(),
+        },
+      });
+
+      log.debug({ worldId, turn: newTurn }, '💾 State synced to database');
+
+      return { currentTurn: updated.currentTurn, totalInteractions: updated.totalInteractions };
+    }
+
+    // Retornar valores en memoria
+    return { currentTurn: newTurn, totalInteractions: newTotal };
+  }
+
+  /**
+   * Guarda episodio en memoria episódica si es importante
+   *
+   * Criterios para guardar:
+   * - Eventos emergentes (siempre)
+   * - Alta importancia narrativa (importance > 0.7)
+   * - Alto arousal emocional (arousal > 0.8)
+   * - Interacciones entre múltiples agentes con importancia moderada
+   */
+  private async saveEpisodicMemoryIfImportant(
+    worldId: string,
+    speakerId: string,
+    content: string,
+    turnNumber: number,
+    context: InteractionContext
+  ): Promise<void> {
+    try {
+      const speaker = context.agents.find(a => a.id === speakerId);
+      if (!speaker) return;
+
+      // Calcular importance basada en múltiples factores
+      let importance = 0.5; // Base
+
+      // Factor 1: Eventos emergentes son siempre importantes
+      const isEmergentEvent = context.world.currentEmergentEvent !== null;
+      if (isEmergentEvent) {
+        importance = Math.max(importance, 0.8);
+      }
+
+      // Factor 2: Estado emocional del speaker
+      const emotionalState = speaker.emotionalState?.currentEmotions || {};
+      const emotionalIntensity = Object.values(emotionalState).reduce((sum: number, val: any) => sum + val, 0) / Object.keys(emotionalState).length;
+
+      if (emotionalIntensity > 0.7) {
+        importance = Math.max(importance, 0.7);
+      }
+
+      // Factor 3: Menciones de otros agentes (interacción social importante)
+      const mentionedAgents = context.agents.filter(a =>
+        a.id !== speakerId && content.toLowerCase().includes(a.name.toLowerCase())
+      );
+
+      if (mentionedAgents.length > 0) {
+        importance = Math.max(importance, 0.6);
+      }
+
+      // Factor 4: Story mode - eventos en momentos clave de la historia
+      if (context.world.storyMode && context.world.storyProgress) {
+        const progress = context.world.storyProgress as number;
+        // Hitos narrativos importantes: inicio, acto 2, climax, final
+        if (progress < 0.1 || (progress > 0.4 && progress < 0.6) || progress > 0.85) {
+          importance = Math.max(importance, 0.7);
+        }
+      }
+
+      // Calcular emotional arousal
+      const emotionalArousal = speaker.emotionalState?.moodArousal || 0.5;
+
+      // Calcular emotional valence
+      const emotionalValence = this.calculateEmotionalValence(emotionalState);
+
+      // Determinar agentes involucrados (mencionados + speaker)
+      const involvedAgentIds = [
+        ...mentionedAgents.map(a => a.id),
+      ];
+
+      // Verificar si debe guardarse
+      const shouldSave = shouldSaveEpisode({
+        importance,
+        emotionalArousal,
+        involvedAgentsCount: involvedAgentIds.length + 1, // +1 por el speaker
+        isEmergentEvent,
+      });
+
+      if (!shouldSave) {
+        return;
+      }
+
+      // Guardar episodio para el speaker
+      const memoryService = new WorldAgentMemoryService(worldId);
+      await memoryService.saveEpisode({
+        agentId: speakerId,
+        event: content,
+        involvedAgentIds,
+        turnNumber,
+        importance,
+        emotionalArousal,
+        emotionalValence,
+        dominantEmotion: this.getDominantEmotion(emotionalState),
+        agentEmotions: {
+          [speakerId]: emotionalState,
+        },
+        metadata: {
+          isEmergentEvent,
+          storyProgress: context.world.storyProgress,
+          mentionedAgents: mentionedAgents.map(a => ({ id: a.id, name: a.name })),
+        },
+      });
+
+      // También guardar para agentes mencionados (desde su perspectiva)
+      for (const mentionedAgent of mentionedAgents) {
+        const observedEvent = `${speaker.name} dijo: "${content}"`;
+
+        await memoryService.saveEpisode({
+          agentId: mentionedAgent.id,
+          event: observedEvent,
+          involvedAgentIds: [speakerId, ...involvedAgentIds.filter(id => id !== mentionedAgent.id)],
+          turnNumber,
+          importance: importance * 0.8, // Ligeramente menos importante para observadores
+          emotionalArousal: emotionalArousal * 0.7,
+          emotionalValence,
+          metadata: {
+            isObserved: true,
+            speakerId,
+            speakerName: speaker.name,
+          },
+        });
+      }
+
+      log.debug(
+        {
+          worldId,
+          speakerId,
+          turnNumber,
+          importance,
+          involvedCount: involvedAgentIds.length + 1
+        },
+        '💾 Episodic memory saved'
+      );
+
+    } catch (error) {
+      log.error({ error, worldId, speakerId }, 'Failed to save episodic memory');
+      // No bloqueante - continuar simulación
+    }
+  }
+
+  /**
+   * Calcula valence emocional promedio (-1 a 1)
+   */
+  private calculateEmotionalValence(emotions: any): number {
+    const positiveEmotions = ['joy', 'satisfaction', 'relief', 'happy_for', 'pride', 'admiration', 'gratitude', 'liking', 'affection', 'love'];
+    const negativeEmotions = ['distress', 'disappointment', 'fears_confirmed', 'resentment', 'pity', 'shame', 'reproach', 'anger', 'disliking'];
+
+    let positiveSum = 0;
+    let negativeSum = 0;
+
+    for (const [emotion, intensity] of Object.entries(emotions)) {
+      if (positiveEmotions.includes(emotion)) {
+        positiveSum += intensity as number;
+      } else if (negativeEmotions.includes(emotion)) {
+        negativeSum += intensity as number;
+      }
+    }
+
+    const total = positiveSum + negativeSum;
+    if (total === 0) return 0;
+
+    return (positiveSum - negativeSum) / total;
+  }
+
+  /**
+   * Obtiene la emoción dominante
+   */
+  private getDominantEmotion(emotions: any): string | undefined {
+    if (!emotions || Object.keys(emotions).length === 0) return undefined;
+
+    let maxEmotion = '';
+    let maxIntensity = 0;
+
+    for (const [emotion, intensity] of Object.entries(emotions)) {
+      if ((intensity as number) > maxIntensity) {
+        maxIntensity = intensity as number;
+        maxEmotion = emotion;
+      }
+    }
+
+    return maxEmotion;
   }
 
   /**

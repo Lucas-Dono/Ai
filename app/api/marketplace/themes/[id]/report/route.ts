@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request);
@@ -42,7 +42,7 @@ export async function POST(
     }
 
     const report = await MarketplaceThemeService.reportTheme(
-      params.id,
+      (await params).id,
       user.id,
       body.reason,
       body.description

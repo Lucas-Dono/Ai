@@ -11,13 +11,14 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
-import { WorldsService, AgentsService, buildAvatarUrl } from '../../services/api';
+import { WorldsService, AgentsService, buildAvatarUrl, apiClient } from '../../services/api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 
 type ChatDetailScreenProps = {
@@ -38,6 +39,7 @@ export default function ChatDetailScreen({ navigation, route }: ChatDetailScreen
   const { worldId, agentName, agentAvatar } = route.params;
   const [agent, setAgent] = useState<AgentInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deletingMessages, setDeletingMessages] = useState(false);
 
   useEffect(() => {
     loadAgentInfo();
@@ -72,6 +74,65 @@ export default function ChatDetailScreen({ navigation, route }: ChatDetailScreen
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * Handle search in chat
+   * TODO: Implement full search functionality with modal
+   */
+  const handleSearchChat = () => {
+    Alert.alert(
+      'Buscar en chat',
+      'La funcionalidad de búsqueda estará disponible próximamente.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  /**
+   * Handle clear chat - delete all messages
+   */
+  const handleClearChat = () => {
+    Alert.alert(
+      'Limpiar chat',
+      '¿Estás seguro de que quieres eliminar todos los mensajes? Esta acción no se puede deshacer.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeletingMessages(true);
+
+              // Call API to delete all messages for this world/agent
+              await apiClient.delete(`/api/messages/delete-all?worldId=${worldId}`);
+
+              Alert.alert(
+                'Chat limpiado',
+                'Se han eliminado todos los mensajes correctamente.',
+                [
+                  {
+                    text: 'OK',
+                    onPress: () => navigation.goBack(),
+                  },
+                ]
+              );
+            } catch (error: any) {
+              console.error('Error clearing chat:', error);
+              Alert.alert(
+                'Error',
+                'No se pudieron eliminar los mensajes. Por favor, inténtalo de nuevo.'
+              );
+            } finally {
+              setDeletingMessages(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading) {
@@ -166,10 +227,7 @@ export default function ChatDetailScreen({ navigation, route }: ChatDetailScreen
         <View style={styles.actionsSection}>
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => {
-              navigation.goBack();
-              // TODO: Implementar búsqueda en chat
-            }}
+            onPress={handleSearchChat}
           >
             <View style={styles.actionIconContainer}>
               <Ionicons name="search-outline" size={24} color={colors.primary[500]} />
@@ -193,15 +251,19 @@ export default function ChatDetailScreen({ navigation, route }: ChatDetailScreen
 
           <TouchableOpacity
             style={[styles.actionButton, styles.dangerAction]}
-            onPress={() => {
-              // TODO: Implementar limpiar chat
-              console.log('Limpiar chat');
-            }}
+            onPress={handleClearChat}
+            disabled={deletingMessages}
           >
             <View style={styles.actionIconContainer}>
-              <Ionicons name="trash-outline" size={24} color={colors.error.main} />
+              {deletingMessages ? (
+                <ActivityIndicator size="small" color={colors.error.main} />
+              ) : (
+                <Ionicons name="trash-outline" size={24} color={colors.error.main} />
+              )}
             </View>
-            <Text style={[styles.actionText, styles.dangerText]}>Limpiar chat</Text>
+            <Text style={[styles.actionText, styles.dangerText]}>
+              {deletingMessages ? 'Eliminando...' : 'Limpiar chat'}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

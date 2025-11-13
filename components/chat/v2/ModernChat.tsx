@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useSocket } from "@/hooks/useSocket";
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { AlertTriangle, Trash2, AlertCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
@@ -27,8 +27,25 @@ import { ImageUploader } from "@/components/chat/ImageUploader";
 import { StickerGifPicker } from "@/components/chat/StickerGifPicker";
 import { BehaviorPanel } from "@/components/chat/BehaviorPanel";
 import { EmotionalStateDisplay } from "@/components/chat/EmotionalStateDisplay";
+import { RelationshipProgressBar } from "@/components/bonds/RelationshipProgressBar";
+import {
+  BondMilestoneNotification,
+  useBondMilestones,
+} from "@/components/bonds/BondMilestoneNotification";
+import { useBondMilestoneDetector } from "@/hooks/useBondMilestoneDetector";
+import { BondRiskAlert } from "@/components/bonds/BondRiskAlert";
+import { useBondProgress } from "@/hooks/useBondProgress";
 import { ChatSearch } from "@/components/chat/ChatSearch";
 import { exportConversationToPDF } from "@/lib/utils/pdf-export";
+import { TokenUsageDisplay } from "@/components/upgrade/TokenUsageDisplay";
+import {
+  UpgradeNotificationUI,
+  useUpgradeNotifications,
+} from "@/components/upgrade/UpgradeNotification";
+import { getUpgradeNotification } from "@/lib/usage/upgrade-prompts";
+import { Sparkles, useEmotionalSparkles } from "@/components/effects/Sparkles";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { ProactiveMessageNotification } from "@/components/chat/ProactiveMessageNotification";
 
 interface ModernChatProps {
   agentId: string;
@@ -67,6 +84,51 @@ export function ModernChat({
   // Behavioral and emotional tracking
   const [latestBehaviorData, setLatestBehaviorData] = useState<Message["behaviorData"] | null>(null);
   const [latestEmotionalData, setLatestEmotionalData] = useState<Message["emotionalData"] | null>(null);
+
+  // Upgrade notifications
+  const {
+    notification,
+    showNotification,
+    dismissNotification,
+  } = useUpgradeNotifications();
+
+  // Sparkles for first message and milestones
+  const { showSparkles, sparklesConfig, triggerSparkles } = useEmotionalSparkles();
+
+  // Upgrade modal for limit reached
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeContext, setUpgradeContext] = useState<{
+    type: "limit_reached" | "feature_locked" | "voluntary";
+    message?: string;
+    limitType?: "messages" | "agents" | "worlds" | "images";
+  } | undefined>();
+
+  // PHASE 5: Quick Win #3 - Visual limit warning
+  const [usageStats, setUsageStats] = useState<{
+    current: number;
+    limit: number;
+    period: string;
+  } | null>(null);
+  const [userPlan, setUserPlan] = useState<string>("free");
+
+  // Bond milestone notifications
+  const {
+    currentMilestone,
+    showMilestone,
+    dismissMilestone,
+  } = useBondMilestones();
+
+  // Detect bond milestones automatically
+  useBondMilestoneDetector({
+    agentId,
+    agentName,
+    agentAvatar,
+    onMilestone: showMilestone,
+    enabled: true,
+  });
+
+  // Get bond progress for risk alerts
+  const { bondProgress } = useBondProgress(agentId);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -151,6 +213,33 @@ export function ModernChat({
 
     loadMessages();
   }, [agentId, sessionKey]);
+
+  // PHASE 5: Quick Win #3 - Fetch usage stats for limit warning
+  useEffect(() => {
+    const fetchUsageStats = async () => {
+      try {
+        const response = await fetch("/api/billing/usage");
+        if (response.ok) {
+          const data = await response.json();
+          setUsageStats(data.messages);
+
+          // Fetch user plan from session or API
+          const sessionResponse = await fetch("/api/auth/session");
+          if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json();
+            setUserPlan(sessionData?.user?.plan || "free");
+          }
+        }
+      } catch (error) {
+        console.error("[ModernChat] Error fetching usage stats:", error);
+      }
+    };
+
+    fetchUsageStats();
+    // Refresh every minute
+    const interval = setInterval(fetchUsageStats, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Save messages to session storage
   useEffect(() => {
@@ -262,6 +351,11 @@ export function ModernChat({
     const messageText = inputMessage;
     const tempId = `temp-${Date.now()}`;
 
+    // Check for first message or milestones
+    const currentMessageCount = messages.filter(m => m.type === "user").length;
+    const isFirstMessage = currentMessageCount === 0;
+    const isMilestone = [10, 50, 100].includes(currentMessageCount + 1);
+
     const userMessage: Message = {
       id: tempId,
       type: "user",
@@ -273,6 +367,13 @@ export function ModernChat({
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsTyping(true);
+
+    // Trigger sparkles for special moments
+    if (isFirstMessage) {
+      triggerSparkles({ emotion: "excitement", intensity: 8, duration: 2 });
+    } else if (isMilestone) {
+      triggerSparkles({ emotion: "achievement", intensity: 7, duration: 1.5 });
+    }
 
     // Track message for recommendations (silently, don't block UX)
     fetch("/api/recommendations/track", {
@@ -297,7 +398,22 @@ export function ModernChat({
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to send message");
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        // Check if it's a limit reached error
+        if (response.status === 429 || errorData.error?.includes("límite") || errorData.error?.includes("limit")) {
+          setUpgradeContext({
+            type: "limit_reached",
+            limitType: "messages",
+            message: errorData.error || "Has alcanzado tu límite diario de mensajes",
+          });
+          setShowUpgradeModal(true);
+          throw new Error(errorData.error || "Límite alcanzado");
+        }
+
+        throw new Error(errorData.error || "Failed to send message");
+      }
 
       const data = await response.json();
 
@@ -581,19 +697,29 @@ export function ModernChat({
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20" />
 
-      {/* Animated mesh gradient */}
-      <div className="absolute inset-0 opacity-30">
+      {/* Animated mesh gradient - Hidden on mobile for performance */}
+      <div className="absolute inset-0 opacity-30 hidden md:block">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob" />
         <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000" />
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000" />
       </div>
 
       {/* Main Chat Container */}
-      <div className="relative z-10 flex flex-col flex-1 min-w-0">
+      <div className="relative z-10 flex flex-col flex-1 min-w-0 w-full md:w-auto">
+        {/* Upgrade Notification (if active) */}
+        {notification && (
+          <UpgradeNotificationUI
+            notification={notification}
+            onDismiss={dismissNotification}
+            onPrimaryAction={() => router.push('/pricing')}
+          />
+        )}
+
         {/* Header */}
         <ChatHeader
           agentName={agentName}
           agentAvatar={agentAvatar}
+          agentId={agentId}
           isTyping={isTyping}
           isOnline={true}
           sidebarOpen={sidebarOpen}
@@ -602,6 +728,119 @@ export function ModernChat({
           onExport={exportToPDF}
           onReset={() => setShowResetConfirm(true)}
           onDelete={() => setShowDeleteConfirm(true)}
+        />
+
+        {/* PHASE 5: Quick Win #3 - Visual Limit Warning Banner */}
+        {usageStats && (
+          (() => {
+            const messagesLeft = usageStats.limit - usageStats.current;
+            const shouldShowWarning = messagesLeft <= 5 && messagesLeft > 0;
+            const isAtLimit = messagesLeft <= 0;
+
+            if (!shouldShowWarning && !isAtLimit) return null;
+
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={cn(
+                  "mx-3 md:mx-4 mt-3 p-4 rounded-xl border-2 shadow-lg backdrop-blur-md",
+                  isAtLimit
+                    ? "bg-red-500/10 border-red-500/30 dark:bg-red-500/20"
+                    : messagesLeft === 1
+                    ? "bg-red-500/10 border-red-500/30 dark:bg-red-500/20"
+                    : messagesLeft <= 3
+                    ? "bg-orange-500/10 border-orange-500/30 dark:bg-orange-500/20"
+                    : "bg-yellow-500/10 border-yellow-500/30 dark:bg-yellow-500/20"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                      isAtLimit || messagesLeft === 1
+                        ? "bg-red-500/20"
+                        : messagesLeft <= 3
+                        ? "bg-orange-500/20"
+                        : "bg-yellow-500/20"
+                    )}
+                  >
+                    <AlertCircle
+                      className={cn(
+                        "w-5 h-5",
+                        isAtLimit || messagesLeft === 1
+                          ? "text-red-600 dark:text-red-400"
+                          : messagesLeft <= 3
+                          ? "text-orange-600 dark:text-orange-400"
+                          : "text-yellow-600 dark:text-yellow-400"
+                      )}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4
+                      className={cn(
+                        "font-semibold mb-1",
+                        isAtLimit || messagesLeft === 1
+                          ? "text-red-700 dark:text-red-300"
+                          : messagesLeft <= 3
+                          ? "text-orange-700 dark:text-orange-300"
+                          : "text-yellow-700 dark:text-yellow-300"
+                      )}
+                    >
+                      {isAtLimit
+                        ? "¡Límite alcanzado!"
+                        : messagesLeft === 1
+                        ? "¡Último mensaje!"
+                        : `${messagesLeft} mensajes restantes`}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {isAtLimit
+                        ? `Has alcanzado tu límite de ${usageStats.limit} mensajes ${usageStats.period === "day" ? "diarios" : "mensuales"}.`
+                        : `Estás cerca de tu límite ${usageStats.period === "day" ? "diario" : "mensual"} de ${usageStats.limit} mensajes.`}
+                      {userPlan === "free" && " Actualiza a Plus para continuar sin interrupciones."}
+                    </p>
+                    {userPlan === "free" && (
+                      <Button
+                        size="sm"
+                        onClick={() => setShowUpgradeModal(true)}
+                        className={cn(
+                          "text-white",
+                          isAtLimit || messagesLeft === 1
+                            ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
+                            : messagesLeft <= 3
+                            ? "bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800"
+                            : "bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800"
+                        )}
+                      >
+                        <Zap className="w-4 h-4 mr-2" />
+                        {isAtLimit ? "Actualizar Ahora" : "Ver Planes"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })()
+        )}
+
+        {/* Token Usage Warning (only shows when approaching limit) */}
+        <TokenUsageDisplay
+          showUpgradeHint={true}
+          onUpgradeClick={() => router.push('/dashboard/billing')}
+        />
+
+        {/* Proactive Messages - Mensajes iniciados por la IA */}
+        <ProactiveMessageNotification
+          agentId={agentId}
+          agentName={agentName}
+          inline={true}
+          className="mx-3 md:mx-4 mt-3"
+          onMessageClick={(message) => {
+            console.log('[ModernChat] Usuario interactuó con mensaje proactivo:', message);
+            // El mensaje proactivo se mostrará como parte del chat
+            // No necesitamos agregarlo manualmente ya que se renderiza inline
+          }}
         />
 
         {/* Search Bar */}
@@ -614,7 +853,7 @@ export function ModernChat({
         )}
 
         {/* Messages Area */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-2 overscroll-none">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-3 md:px-4 py-4 md:py-6 space-y-2 overscroll-none safe-area-inset-bottom">
           <AnimatePresence initial={false}>
             {messages.map((message) => (
               <MessageBubble
@@ -670,7 +909,7 @@ export function ModernChat({
 
         {/* Voice Recorder */}
         {showVoiceRecorder && (
-          <div className="px-6 pb-4">
+          <div className="px-3 md:px-6 pb-3 md:pb-4 safe-area-inset-bottom">
             <VoiceRecorder
               onSend={sendVoiceMessage}
               onCancel={() => setShowVoiceRecorder(false)}
@@ -680,7 +919,7 @@ export function ModernChat({
 
         {/* Image Uploader */}
         {showImageUploader && (
-          <div className="px-6 pb-4">
+          <div className="px-3 md:px-6 pb-3 md:pb-4 safe-area-inset-bottom">
             <ImageUploader
               onSend={sendImageMessage}
               onCancel={() => setShowImageUploader(false)}
@@ -690,7 +929,7 @@ export function ModernChat({
 
         {/* Sticker/GIF Picker */}
         {showStickerGifPicker && (
-          <div className="px-6 pb-4 flex justify-center">
+          <div className="px-3 md:px-6 pb-3 md:pb-4 flex justify-center safe-area-inset-bottom">
             <StickerGifPicker
               onSend={sendStickerOrGif}
               onClose={() => setShowStickerGifPicker(false)}
@@ -711,14 +950,15 @@ export function ModernChat({
         )}
       </div>
 
-      {/* Sidebar with Behavioral & Emotional Data */}
+      {/* Sidebar with Behavioral & Emotional Data - Desktop Only */}
       <aside
         className={cn(
           "relative z-10 border-l transition-all duration-300 overflow-y-auto",
           sidebarOpen ? "w-80" : "w-0",
           "hidden lg:block",
           "bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl",
-          "border-white/30 dark:border-gray-700/50"
+          "border-white/30 dark:border-gray-700/50",
+          "max-h-screen"
         )}
       >
         {sidebarOpen && (
@@ -731,6 +971,29 @@ export function ModernChat({
                 relationLevel={latestEmotionalData.relationLevel}
               />
             )}
+
+            {/* Bond Risk Alert - Shows when bond is at risk */}
+            {bondProgress?.hasBond && bondProgress.status && bondProgress.status !== 'active' && (
+              <BondRiskAlert
+                status={bondProgress.status}
+                agentName={agentName}
+                daysInactive={bondProgress.durationDays}
+                onAction={() => {
+                  // Scroll to input to encourage messaging
+                  const input = document.querySelector('textarea');
+                  if (input) {
+                    input.focus();
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
+              />
+            )}
+
+            {/* Relationship Progress */}
+            <RelationshipProgressBar
+              agentId={agentId}
+              variant="detailed"
+            />
 
             {/* Behavior Panel */}
             {latestBehaviorData && (
@@ -872,6 +1135,36 @@ export function ModernChat({
           </motion.div>
         </div>
       )}
+
+      {/* Sparkles for first message and milestones */}
+      <Sparkles show={showSparkles} {...sparklesConfig} />
+
+      {/* Upgrade Modal for limit reached */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        currentPlan="free" // TODO: Get from user session
+        onUpgrade={async (planId) => {
+          // Redirect to checkout
+          const response = await fetch("/api/billing/checkout-unified", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ planId, interval: "month" }),
+          });
+
+          if (response.ok) {
+            const { checkoutUrl } = await response.json();
+            window.location.href = checkoutUrl;
+          }
+        }}
+        context={upgradeContext}
+      />
+
+      {/* Bond Milestone Notifications */}
+      <BondMilestoneNotification
+        milestone={currentMilestone}
+        onClose={dismissMilestone}
+      />
     </div>
   );
 }

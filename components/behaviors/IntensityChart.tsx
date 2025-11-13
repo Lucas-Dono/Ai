@@ -255,7 +255,7 @@ export function IntensityChart({ agentId }: IntensityChartProps) {
           {data.map((behavior) => (
             <div
               key={behavior.behaviorType}
-              className="border rounded-lg p-3 text-center"
+              className="border rounded-2xl p-3 text-center"
             >
               <div
                 className="text-sm font-medium mb-1"

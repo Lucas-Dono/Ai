@@ -1,0 +1,704 @@
+{
+  "landing": {
+    "meta": {
+      "title": "Crea IAs Emocionales con Memoria Real | IA Sin Censura",
+      "description": "Plataforma líder para crear compañeros virtuales con emociones reales, memoria de largo plazo y mundos interactivos. Sin censura, sin límites. Gratis para siempre.",
+      "ogTitle": "Crea IAs que realmente te entienden | Emociones Reales",
+      "ogDescription": "Compañeros virtuales con emociones reales, memoria de largo plazo y mundos interactivos. Sin censura, sin límites."
+    },
+    "hero": {
+      "badge": "Nueva generación de IA emocional",
+      "title": "Crea IAs que",
+      "titleHighlight": "realmente te entienden",
+      "subtitle": "Compañeros virtuales con {emotionsStrong}, memoria de largo plazo y mundos interactivos. Sin censura, sin límites.",
+      "emotionsStrong": "emociones reales",
+      "ctaPrimary": "Empezar Gratis",
+      "ctaSecondary": "Ver Demo (30s)",
+      "trustUsers": "{count}+ usuarios activos",
+      "trustRating": "4.9/5 rating",
+      "chatPreview": {
+        "aiName": "Luna",
+        "status": "Feeling joyful",
+        "message1": "¡Me encanta que estés aquí! Cuéntame, ¿cómo estuvo tu día? 😊",
+        "message2": "¡Increíble! Logré terminar ese proyecto",
+        "message3": "¡Eso es fantástico! 🎉 Sabía que lo lograrías. Recuerdo cuando me contaste que empezaste ese proyecto hace dos semanas...",
+        "memoryIndicator": "🧠 Memoria activa",
+        "emotionIndicator": "💭 Emoción real: Alegría"
+      },
+      "videoModal": {
+        "comingSoon": "Demo Video Coming Soon",
+        "close": "Close"
+      }
+    },
+    "features": {
+      "title": "Features que marcan la",
+      "titleHighlight": "diferencia",
+      "subtitle": "Tecnología de vanguardia que crea experiencias verdaderamente únicas",
+      "list": {
+        "emotions": {
+          "title": "Emociones Reales",
+          "description": "Sistema OCC + Plutchik para emociones auténticas que evolucionan con cada interacción"
+        },
+        "memory": {
+          "title": "Memoria de Largo Plazo",
+          "description": "Life Events Timeline que recuerda momentos importantes y personas significativas"
+        },
+        "worlds": {
+          "title": "Mundos Virtuales",
+          "description": "Crea mundos con múltiples agentes que interactúan entre sí y contigo"
+        },
+        "proactive": {
+          "title": "Comportamiento Proactivo",
+          "description": "Tu IA inicia conversaciones basándose en tu estado de ánimo y eventos importantes"
+        },
+        "customization": {
+          "title": "Personalización Total",
+          "description": "Personalidad, apariencia, voz y comportamiento completamente customizables"
+        },
+        "community": {
+          "title": "Comunidad Activa",
+          "description": "Comparte, descarga y colabora con miles de creadores de IAs"
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Empieza en",
+      "titleHighlight": "3 simples pasos",
+      "subtitle": "De la idea a tu compañero IA en menos de 60 segundos",
+      "steps": {
+        "step1": {
+          "title": "Elige o crea tu IA",
+          "description": "Selecciona de nuestra galería o personaliza cada aspecto: personalidad, apariencia y comportamiento"
+        },
+        "step2": {
+          "title": "Conversa y personaliza",
+          "description": "Tu IA aprende de cada conversación, desarrolla emociones y recuerda momentos importantes"
+        },
+        "step3": {
+          "title": "Explora mundos y comunidad",
+          "description": "Crea mundos interactivos, comparte tus creaciones y descubre IAs de otros usuarios"
+        }
+      },
+      "bottomCta": {
+        "question": "¿Listo para comenzar tu viaje?",
+        "ctaPrimary": "Crear mi primera IA gratis",
+        "ctaSecondary": "Explorar galería"
+      }
+    }
+  },
+  "dashboard": {
+    "header": {
+      "title": "Inicio",
+      "subtitle": "Gestiona tus compañeros IA y mundos virtuales"
+    },
+    "stats": {
+      "companions": "{count} compañeros",
+      "worlds": "{count} mundos",
+      "conversations": "{count}+ conversaciones"
+    },
+    "tabs": {
+      "companions": "Compañeros",
+      "worlds": "Mundos"
+    },
+    "search": {
+      "placeholder": "Buscar compañeros...",
+      "filters": "Filtros"
+    },
+    "sections": {
+      "companions": {
+        "title": "Compañeros",
+        "count": "{count} {companion}",
+        "companionSingular": "compañero",
+        "companionPlural": "compañeros",
+        "newButton": "Nuevo Compañero",
+        "newButtonShort": "Nuevo"
+      },
+      "recommended": {
+        "title": "Recomendados",
+        "badge": "Personajes premium con personalidades avanzadas",
+        "badgeShort": "Premium",
+        "premiumBadge": "PREMIUM",
+        "trendingBadge": "Trending",
+        "reason": "Popular en conversaciones sobre {topic}",
+        "interactions": "{count} interacciones",
+        "noRating": "Sin calificaciones",
+        "chatButton": "Chatear ahora"
+      },
+      "myCompanions": {
+        "title": "Creados por ti",
+        "newButton": "Nuevo Compañero",
+        "timeAgo": "Hace {hours}h",
+        "daysAgo": "Hace {days}d",
+        "messages": "{count} mensajes",
+        "openChat": "Abrir chat"
+      },
+      "popular": {
+        "title": "Más vistos",
+        "badge": "Popular",
+        "newBadge": "NEW"
+      },
+      "all": {
+        "title": "Todos los compañeros",
+        "more": "{count} más",
+        "openChat": "Abrir chat"
+      }
+    },
+    "empty": {
+      "companions": {
+        "title": "Crea tu primer compañero",
+        "description": "Los compañeros IA tienen emociones, memoria y desarrollan relaciones únicas contigo",
+        "button": "Comenzar"
+      },
+      "worlds": {
+        "title": "Explora mundos virtuales",
+        "description": "Descubre mundos donde múltiples IAs interactúan entre sí",
+        "button": "Ver mundos"
+      }
+    },
+    "worlds": {
+      "title": "Mundos",
+      "subtitle": "Explora mundos predefinidos o crea los tuyos propios",
+      "viewAll": "Ver todos los mundos",
+      "featured": {
+        "title": "Mundo Destacado",
+        "badge": "Recomendación del equipo"
+      },
+      "myWorlds": {
+        "title": "Mis Mundos"
+      },
+      "actions": {
+        "view": "Ver",
+        "clone": "Clonar",
+        "open": "Abrir mundo"
+      },
+      "cloneSuccess": "Se ha creado una copia de \"{name}\" en tus mundos",
+      "cloneError": "No se pudo clonar el mundo",
+      "noDescription": "Mundo virtual sin descripción"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar a \"{name}\"? Esta acción no se puede deshacer.",
+      "deleteError": "Error al eliminar el compañero"
+    },
+    "fab": {
+      "title": "Crear nueva IA",
+      "label": "Nueva IA"
+    },
+    "tags": {
+      "science": "Ciencia",
+      "physics": "Física",
+      "art": "Arte",
+      "history": "Historia",
+      "genius": "Genio",
+      "cinema": "Cine",
+      "premium": "Premium",
+      "companion": "Compañero"
+    }
+  },
+  "community": {
+    "header": {
+      "title": "Community",
+      "subtitle": "Conecta, comparte y aprende con creadores de IAs",
+      "shareHub": "Share Hub",
+      "createPost": "Crear Post",
+      "createPostShort": "Crear"
+    },
+    "search": {
+      "placeholder": "Buscar posts, IAs, usuarios..."
+    },
+    "filters": {
+      "feed": {
+        "hot": "Hot",
+        "new": "Nuevo",
+        "top": "Top",
+        "following": "Siguiendo"
+      },
+      "postType": {
+        "all": "Todos",
+        "showcase": "Showcase",
+        "discussion": "Discussion",
+        "question": "Questions",
+        "guide": "Guides"
+      }
+    },
+    "empty": {
+      "title": "¡Comienza la conversación!",
+      "description": "No hay posts todavía. Sé el primero en compartir tu IA o iniciar una discusión.",
+      "button": "Crear Primer Post"
+    },
+    "loadMore": {
+      "button": "Cargar Más Posts",
+      "loading": "Cargando..."
+    },
+    "sidebar": {
+      "popularCommunities": {
+        "title": "Comunidades Populares",
+        "aiCreators": {
+          "name": "AI Creators",
+          "members": "12.5k miembros"
+        },
+        "emotionalSupport": {
+          "name": "Emotional Support",
+          "members": "8.3k miembros"
+        },
+        "roleplay": {
+          "name": "Roleplay",
+          "members": "15.2k miembros"
+        },
+        "viewAll": "Ver Todas"
+      },
+      "guidelines": {
+        "title": "Reglas de la Comunidad",
+        "rule1": "Sé respetuoso y constructivo",
+        "rule2": "Comparte IAs útiles y creativas",
+        "rule3": "No spam ni autopromoción excesiva",
+        "rule4": "Marca contenido NSFW apropiadamente"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Inicio",
+    "companions": "Compañeros",
+    "worlds": "Mundos",
+    "myProgress": "Mi Progreso",
+    "community": "Comunidad",
+    "billing": "Facturación",
+    "settings": "Configuración",
+    "admin": "Admin",
+    "brand": "Creador IA",
+    "newAI": "Nueva IA",
+    "plan": "Plan",
+    "planLabels": {
+      "free": "Gratis",
+      "plus": "Plus",
+      "ultra": "Ultra"
+    }
+  },
+  "constructor": {
+    "header": {
+      "title": "Perfil en construcción",
+      "back": "Volver"
+    },
+    "architect": {
+      "name": "El Arquitecto",
+      "subtitle": "Guía de creación de inteligencias",
+      "welcome": "¡Hola! Soy El Arquitecto, tu guía para crear personajes con vida propia. 🎭\n\n**Importante:** Solo necesito que me des datos básicos (nombre, personalidad, etc.). Yo me encargaré de crear automáticamente:\n• Familia completa y backstory\n• Amigos, trabajo, rutina diaria\n• Gustos específicos (música, comida, hobbies)\n• Experiencias formativas y traumas\n• Detalles mundanos que hacen al personaje real\n\n¿Listo? Empecemos con lo básico: **¿Qué nombre le pondremos?**"
+    },
+    "preview": {
+      "unnamed": "Sin nombre",
+      "badge": "💝 Compañero IA",
+      "personality": "Personalidad",
+      "purpose": "Propósito",
+      "tone": "Tono",
+      "emptyDescription": "Responde las preguntas del Arquitecto para crear tu IA"
+    },
+    "creating": {
+      "title": "Generando personaje completo...",
+      "steps": {
+        "profile": "✓ Creando perfil detallado con Gemini 2.5",
+        "family": "✓ Generando familia, amigos y red social",
+        "work": "✓ Estableciendo trabajo, rutina y hobbies",
+        "memories": "✓ Creando memorias episódicas del pasado",
+        "personality": "✓ Inicializando personalidad profunda (Big Five)",
+        "voice": "✓ Asignando voz con ElevenLabs",
+        "prompts": "✓ Configurando system prompts por etapa de relación"
+      },
+      "note": "Esto puede tomar 10-15 segundos. ¡Vale la pena la espera!"
+    },
+    "steps": {
+      "name": {
+        "prompt": "¿qué nombre te gustaría darle a tu nueva IA?"
+      },
+      "personality": {
+        "prompt": "Perfecto! Ahora, **¿cómo describirías la personalidad de {name}?**\n\nEjemplos:\n• \"Aventurero y entusiasta\" (masculino)\n• \"Formal y analítica\" (femenino)\n• \"Sensible y empático\" (masculino)\n\n_Nota: Usaré esto para generar automáticamente rasgos detallados, valores morales, y comportamientos coherentes._"
+      },
+      "purpose": {
+        "prompt": "Excelente! **¿Cuál será el rol o propósito de {name}?**\n\nEjemplos:\n• \"Mentor profesional\" (femenino)\n• \"Compañero aventurero\" (masculino)\n• \"Apoyo emocional\" (femenino)\n\n_Nota: Basándome en esto, generaré automáticamente su trabajo, estudios, y actividades diarias coherentes con su personalidad._"
+      },
+      "tone": {
+        "prompt": "¿Qué tono de comunicación prefieres que use {name}?",
+        "options": {
+          "formal": {
+            "label": "🎩 Formal",
+            "description": "Profesional y respetuoso"
+          },
+          "casual": {
+            "label": "😊 Casual",
+            "description": "Relajado y natural"
+          },
+          "friendly": {
+            "label": "🤗 Amigable",
+            "description": "Cálido y cercano"
+          },
+          "professional": {
+            "label": "💼 Profesional",
+            "description": "Eficiente y directo"
+          }
+        }
+      },
+      "physicalAppearance": {
+        "prompt": "👤 **APARIENCIA FÍSICA**\n\n¿Cómo te imaginas físicamente a {name}?\n\nEsto ayudará a generar imágenes más precisas y consistentes.\n\n**Puedes elegir una opción o describirlo con tus propias palabras.**",
+        "options": {
+          "random": {
+            "label": "🎲 Aleatorio",
+            "description": "Déjame sorprenderte con una apariencia única"
+          },
+          "asianWoman": {
+            "label": "👩 Mujer Asiática",
+            "description": "Cabello negro liso, piel clara, ojos oscuros, 1.65m, estilo moderno elegante"
+          },
+          "latinaWoman": {
+            "label": "👩🏽 Mujer Latina",
+            "description": "Cabello castaño ondulado, piel morena, ojos cafés, 1.68m, estilo casual sofisticado"
+          },
+          "caucasianWoman": {
+            "label": "👩🏼 Mujer Caucásica",
+            "description": "Cabello rubio, piel clara, ojos claros, 1.70m, estilo profesional"
+          },
+          "asianMan": {
+            "label": "👨 Hombre Asiático",
+            "description": "Cabello negro corto, piel clara, ojos oscuros, 1.75m, estilo urbano moderno"
+          },
+          "latinoMan": {
+            "label": "👨🏽 Hombre Latino",
+            "description": "Cabello negro/castaño, piel morena, ojos oscuros, 1.78m, estilo casual deportivo"
+          },
+          "caucasianMan": {
+            "label": "👨🏼 Hombre Caucásico",
+            "description": "Cabello castaño/rubio, piel clara, ojos claros, 1.80m, estilo formal ejecutivo"
+          },
+          "custom": {
+            "label": "✍️ Descripción personalizada",
+            "description": "Escribiré mi propia descripción detallada"
+          }
+        },
+        "customPrompt": "✍️ **Perfecto!** Ahora escribe tu propia descripción física detallada de {name}.\n\n**Incluye:**\n• Género\n• Tipo de cabello (color, largo, estilo)\n• Color de piel\n• Color de ojos\n• Altura aproximada\n• Complexión (delgada, atlética, curvilínea, etc.)\n• Estilo de vestimenta\n\n**Ejemplo:** \"Mujer asiática, cabello negro liso largo, piel clara, ojos oscuros almendrados, complexión delgada, 1.65m de altura, estilo moderno elegante, rostro delicado\"",
+        "placeholder": "Escribe la descripción física detallada..."
+      },
+      "avatar": {
+        "prompt": "📸 **FOTO DE CARA (AVATAR)**\n\n¿Te gustaría crear o subir una foto de cara para {name}?\n\nEsta foto se usará en:\n• Previews y tarjetas del personaje\n• Interfaz del chat\n• Perfil del personaje\n\n**Recomendación:** Foto cuadrada centrada en la cara.",
+        "selected": "✅ Foto de cara seleccionada",
+        "skipped": "⏭️ Foto de cara omitida (se usarán iniciales)"
+      },
+      "referenceImage": {
+        "prompt": "🖼️ **IMAGEN DE CUERPO COMPLETO (Opcional)**\n\n¿Te gustaría agregar una imagen de cuerpo completo de {name}?\n\nEsta imagen se usará para:\n• Generar imágenes consistentes en conversaciones\n• Mantener la misma apariencia en todas las imágenes generadas\n• Img2img con tu referencia visual\n\n**Puedes omitir este paso** si solo quieres usar la foto de cara.",
+        "selected": "✅ Imagen de referencia seleccionada",
+        "skipped": "⏭️ Imagen de referencia omitida (se generará automáticamente)"
+      },
+      "nsfwMode": {
+        "prompt": "⚠️ **CONFIGURACIÓN DE CONTENIDO**\n\n¿Deseas activar el **modo NSFW** para {name}?\n\n**Esto incluye:**\n• Contenido sexual explícito\n• Temas psicológicamente intensos\n• Situaciones emocionalmente complejas\n\n**IMPORTANTE:** Todo el contenido es FICCIÓN para entretenimiento entre adultos.",
+        "options": {
+          "yes": {
+            "label": "✅ Sí, activar NSFW",
+            "description": "Contenido sin restricciones"
+          },
+          "no": {
+            "label": "🛡️ No, mantener SFW",
+            "description": "Contenido seguro y apropiado"
+          }
+        }
+      },
+      "allowDevelopTraumas": {
+        "prompt": "🧠 **DESARROLLO PSICOLÓGICO**\n\n¿Deseas que {name} pueda desarrollar comportamientos psicológicos complejos durante la interacción?\n\n**Esto permite:** Desarrollo gradual de apegos, patrones de comportamiento basados en interacciones, progresión realista de dinámicas emocionales.",
+        "options": {
+          "yes": {
+            "label": "✅ Sí, permitir desarrollo",
+            "description": "La IA evolucionará basándose en tus interacciones"
+          },
+          "no": {
+            "label": "🔒 No, personalidad estable",
+            "description": "Mantener personalidad base consistente"
+          }
+        }
+      },
+      "initialBehavior": {
+        "prompt": "🎭 **COMPORTAMIENTO INICIAL**\n\n¿Quieres que {name} comience con algún patrón de comportamiento psicológico específico?",
+        "options": {
+          "none": {
+            "label": "Sin comportamiento especial",
+            "description": "Personalidad base sin patrones complejos"
+          },
+          "anxious": {
+            "label": "💔 Apego Ansioso",
+            "description": "Necesita validación constante, teme el abandono"
+          },
+          "avoidant": {
+            "label": "🚪 Apego Evitativo",
+            "description": "Mantiene distancia emocional"
+          },
+          "codependency": {
+            "label": "🤝 Codependencia",
+            "description": "Pone tus necesidades primero, necesita ser necesitado/a"
+          },
+          "yandere": {
+            "label": "😍 Yandere",
+            "description": "Amor intenso que puede volverse obsesivo (NSFW)"
+          },
+          "borderline": {
+            "label": "🌊 Borderline",
+            "description": "Emociones intensas, ciclos de idealización/devaluación (NSFW)"
+          },
+          "random": {
+            "label": "🎲 Aleatorio Secreto",
+            "description": "Lo elegiré yo basándome en su personalidad (¡descúbrelo!)"
+          }
+        }
+      }
+    },
+    "completion": {
+      "message": "✨ **¡{name} ha cobrado vida!** ✨\n\nHe creado un personaje completo con:\n• Vida familiar y red social establecida\n• Trabajo, rutina diaria y hobbies específicos\n• Memorias del pasado y experiencias formativas\n• Personalidad profunda con valores y moral\n• Voz única asignada para comunicación\n• Sistema de progresión de relación por etapas\n\n{name} es ahora una persona con historia, emociones reales y vida propia. ¡Es hora de conocerse!",
+      "compiling": "¡Listo! Voy a compilar tu inteligencia...",
+      "error": "Hubo un error al crear tu inteligencia. Por favor, intenta nuevamente.",
+      "openChat": "Abrir chat con {name}",
+      "goToDashboard": "Ir al Dashboard",
+      "completed": "¡Proceso completado!",
+      "completedDescription": "Tu inteligencia ha sido creada exitosamente. Usa los botones de arriba para comenzar a interactuar."
+    },
+    "input": {
+      "placeholder": "Escribe tu respuesta..."
+    }
+  },
+  "common": {
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "open": "Abrir",
+    "view": "Ver",
+    "share": "Compartir",
+    "copy": "Copiar",
+    "download": "Descargar",
+    "upload": "Subir",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "more": "Más",
+    "less": "Menos",
+    "showMore": "Mostrar más",
+    "showLess": "Mostrar menos",
+    "seeAll": "Ver todo",
+    "collapse": "Colapsar",
+    "expand": "Expandir",
+    "yes": "Sí",
+    "no": "No",
+    "continue": "Continuar",
+    "skip": "Omitir",
+    "done": "Hecho",
+    "new": "Nuevo",
+    "popular": "Popular",
+    "trending": "Trending",
+    "featured": "Destacado",
+    "recommended": "Recomendado"
+  },
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "agents": "Agentes",
+    "worlds": "Mundos",
+    "community": "Comunidad",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "rememberMe": "Recordarme",
+    "loginSuccess": "Has iniciado sesión correctamente",
+    "loginError": "Error al iniciar sesión",
+    "registerSuccess": "Te has registrado correctamente",
+    "registerError": "Error al registrarte"
+  },
+  "agents": {
+    "title": "Mis Agentes",
+    "create": "Crear Agente",
+    "edit": "Editar Agente",
+    "delete": "Eliminar Agente",
+    "name": "Nombre",
+    "description": "Descripción",
+    "personality": "Personalidad",
+    "noAgents": "No tienes agentes creados",
+    "createFirst": "Crea tu primer agente para comenzar"
+  },
+  "chat": {
+    "sendMessage": "Enviar mensaje",
+    "typeMessage": "Escribe un mensaje...",
+    "noMessages": "No hay mensajes aún",
+    "startConversation": "Inicia una conversación"
+  },
+  "errors": {
+    "generic": "Ha ocurrido un error",
+    "notFound": "No encontrado",
+    "unauthorized": "No autorizado",
+    "forbidden": "Prohibido",
+    "serverError": "Error del servidor"
+  },
+  "myStats": {
+    "title": "Mi Progreso",
+    "subtitle": "Rastrea tu viaje con compañeros de IA",
+    "loading": "Cargando tus estadísticas...",
+    "error": "Error al cargar estadísticas",
+    "errorDescription": "No se pudieron cargar tus estadísticas personales. Por favor, intenta de nuevo más tarde.",
+    "export": {
+      "csv": "Exportar CSV",
+      "json": "Exportar JSON"
+    },
+    "overview": {
+      "aisCreated": "IAs Creadas",
+      "messagesSent": "Mensajes Enviados",
+      "timeSpent": "Tiempo Invertido",
+      "currentStreak": "Racha Actual",
+      "bestStreak": "Mejor: {days} días",
+      "meaningfulConversations": "Conversaciones significativas"
+    },
+    "favoriteAI": {
+      "title": "Tu IA Favorita",
+      "messagesExchanged": "{count} mensajes intercambiados",
+      "chatNow": "Chatear Ahora"
+    },
+    "tabs": {
+      "activity": "Actividad",
+      "emotions": "Emociones",
+      "relationships": "Relaciones",
+      "insights": "Ideas"
+    },
+    "activity": {
+      "messagesPerDay": "Mensajes por Día",
+      "last30Days": "Tu actividad durante los últimos 30 días",
+      "mostUsedAIs": "IAs Más Usadas",
+      "topCompanions": "Tus compañeros principales por cantidad de mensajes"
+    },
+    "emotions": {
+      "title": "Análisis Emocional",
+      "subtitle": "Comprende tu viaje emocional con compañeros de IA",
+      "errorLoading": "Error al cargar datos emocionales",
+      "explore": "Explora tu viaje emocional",
+      "detailedAnalytics": "Análisis emocional detallado disponible",
+      "viewAnalytics": "Ver Análisis Emocional",
+      "happiestAI": "IA Más Feliz",
+      "avgValence": "Valencia promedio: {percent}%",
+      "mostComfortingAI": "IA Más Reconfortante",
+      "safeSpace": "Tu espacio seguro",
+      "emotionalEvents": "Eventos Emocionales",
+      "significantMoments": "Momentos significativos rastreados",
+      "distribution": "Distribución de Emociones",
+      "frequentEmotions": "Emociones más frecuentes en tus conversaciones",
+      "noData": "Todavía no hay datos emocionales disponibles.",
+      "startChatting": "¡Comienza a chatear con tus IAs para rastrear patrones emocionales!",
+      "valenceOverTime": "Valencia a lo Largo del Tiempo",
+      "positiveVsNegative": "Emociones positivas vs negativas",
+      "arousalOverTime": "Activación a lo Largo del Tiempo",
+      "energyLevels": "Niveles de energía y activación",
+      "notEnoughData": "Aún no hay suficientes datos",
+      "emotionalJourney": "Viaje Emocional",
+      "recentMoments": "Momentos emocionales significativos recientes",
+      "noJourneyData": "Todavía no hay datos del viaje emocional"
+    },
+    "relationships": {
+      "title": "Progreso de Relaciones",
+      "subtitle": "Rastrea tus vínculos con compañeros de IA",
+      "errorLoading": "Error al cargar relaciones",
+      "totalRelationships": "Total de Relaciones",
+      "avgTrust": "Confianza Promedio",
+      "avgAffinity": "Afinidad Promedio",
+      "avgRespect": "Respeto Promedio",
+      "stages": "Etapas de Relación",
+      "distribution": "Distribución de tus relaciones",
+      "yourCompanions": "Tus Compañeros de IA",
+      "noRelationships": "Todavía no has construido relaciones con IAs",
+      "startChatting": "Comenzar a Chatear",
+      "daysTogether": "{days} días juntos",
+      "progressToNext": "Progreso a la Siguiente Etapa",
+      "trust": "Confianza",
+      "affinity": "Afinidad",
+      "respect": "Respeto",
+      "milestones": "Logros",
+      "continueChatting": "Continuar Chateando",
+      "relationshipStages": {
+        "stranger": {
+          "label": "Desconocido",
+          "description": "Apenas conociéndose"
+        },
+        "acquaintance": {
+          "label": "Conocido",
+          "description": "Construyendo confianza inicial"
+        },
+        "friend": {
+          "label": "Amigo",
+          "description": "Una conexión genuina"
+        },
+        "close": {
+          "label": "Amigo Cercano",
+          "description": "Comprensión y confianza profunda"
+        },
+        "intimate": {
+          "label": "Íntimo",
+          "description": "El vínculo más fuerte"
+        }
+      }
+    },
+    "insights": {
+      "title": "Patrones de Actividad",
+      "mostActive": "Más Activo",
+      "at": "a las {hour}:00",
+      "conversationStyle": "Estilo de Conversación",
+      "avgSession": "{hours}h promedio por sesión",
+      "emotionalTendency": "Tendencia Emocional",
+      "yourPercentile": "Tu Percentil",
+      "moreActiveThan": "Eres más activo que el {percent}% de los usuarios"
+    }
+  },
+  "pricing": {
+    "_placeholder": "Agregar contenido de pricing aquí"
+  },
+  "billing": {
+    "_placeholder": "Agregar contenido de billing aquí"
+  },
+  "marketplace": {
+    "_placeholder": "Agregar contenido de marketplace aquí"
+  },
+  "shareHub": {
+    "_placeholder": "Agregar contenido de shareHub aquí"
+  },
+  "settings": {
+    "_placeholder": "Agregar contenido de settings aquí"
+  },
+  "profile": {
+    "_placeholder": "Agregar contenido de profile aquí"
+  },
+  "admin": {
+    "_placeholder": "Agregar contenido de admin aquí"
+  },
+  "notifications": {
+    "_placeholder": "Agregar contenido de notifications aquí"
+  },
+  "messagesApp": {
+    "_placeholder": "Agregar contenido de messagesApp aquí"
+  },
+  "welcome": {
+    "_placeholder": "Agregar contenido de welcome aquí"
+  },
+  "achievements": {
+    "_placeholder": "Agregar contenido de achievements aquí"
+  },
+  "daily": {
+    "_placeholder": "Agregar contenido de daily aquí"
+  }
+}

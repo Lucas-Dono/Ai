@@ -34,14 +34,12 @@ export const MarketplacePromptService = {
     const prompt = await prisma.marketplacePrompt.create({
       data: {
         authorId,
-        title: data.title,
+        name: data.title,
         description: data.description,
         category: data.category,
         tags: data.tags,
-        promptText: data.promptText,
-        variables: data.variables || {},
-        examples: data.examples || {},
-        price: data.price || 0,
+        systemPrompt: data.promptText,
+        useCase: 'General purpose prompt',
         status: 'pending',
       },
       include: {
@@ -171,13 +169,13 @@ export const MarketplacePromptService = {
 
     if (filters.search) {
       where.OR = [
-        { title: { contains: filters.search, mode: 'insensitive' } },
+        { name: { contains: filters.search, mode: 'insensitive' } },
         { description: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
 
     if (filters.minRating) {
-      where.averageRating = { gte: filters.minRating };
+      where.rating = { gte: filters.minRating };
     }
 
     let orderBy: any = { createdAt: 'desc' };
@@ -185,11 +183,11 @@ export const MarketplacePromptService = {
     if (sort === 'popular') {
       orderBy = [
         { downloadCount: 'desc' },
-        { averageRating: 'desc' },
+        { rating: 'desc' },
       ];
     } else if (sort === 'top_rated') {
       orderBy = [
-        { averageRating: 'desc' },
+        { rating: 'desc' },
         { ratingCount: 'desc' },
       ];
     } else if (sort === 'most_downloaded') {
@@ -240,12 +238,10 @@ export const MarketplacePromptService = {
     }
 
     // Verificar si ya descargó
-    const existing = await prisma.promptDownload.findUnique({
+    const existing = await prisma.promptDownload.findFirst({
       where: {
-        promptId_userId: {
-          promptId,
-          userId,
-        },
+        promptId,
+        userId,
       },
     });
 
@@ -291,12 +287,10 @@ export const MarketplacePromptService = {
     }
 
     // Verificar que haya descargado el prompt
-    const download = await prisma.promptDownload.findUnique({
+    const download = await prisma.promptDownload.findFirst({
       where: {
-        promptId_userId: {
-          promptId,
-          userId,
-        },
+        promptId,
+        userId,
       },
     });
 
@@ -343,7 +337,7 @@ export const MarketplacePromptService = {
     await prisma.marketplacePrompt.update({
       where: { id: promptId },
       data: {
-        averageRating: ratings._avg.rating || 0,
+        rating: ratings._avg.rating || 0,
         ratingCount: ratings._count,
       },
     });
@@ -378,13 +372,23 @@ export const MarketplacePromptService = {
    * Aprobar prompt (admin)
    */
   async approvePrompt(promptId: string, adminId: string) {
-    // TODO: Verificar que adminId es admin
+    // Verificar que adminId es admin
+    // NOTE: Currently using metadata field to check for admin privileges
+    // Future: Add dedicated 'role' field to User schema for better type safety
+    const admin = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { metadata: true },
+    });
+
+    const metadata = admin?.metadata as { isAdmin?: boolean } | null;
+    if (!admin || !metadata?.isAdmin) {
+      throw new Error('No tienes permisos de administrador para aprobar prompts');
+    }
 
     const prompt = await prisma.marketplacePrompt.update({
       where: { id: promptId },
       data: {
         status: 'approved',
-        reviewedAt: new Date(),
       },
     });
 
@@ -395,14 +399,25 @@ export const MarketplacePromptService = {
    * Rechazar prompt (admin)
    */
   async rejectPrompt(promptId: string, adminId: string, reason: string) {
-    // TODO: Verificar que adminId es admin
+    // Verificar que adminId es admin
+    // NOTE: Currently using metadata field to check for admin privileges
+    // Future: Add dedicated 'role' field to User schema for better type safety
+    const admin = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { metadata: true },
+    });
+
+    const metadata = admin?.metadata as { isAdmin?: boolean } | null;
+    if (!admin || !metadata?.isAdmin) {
+      throw new Error('No tienes permisos de administrador para rechazar prompts');
+    }
 
     const prompt = await prisma.marketplacePrompt.update({
       where: { id: promptId },
       data: {
         status: 'rejected',
-        reviewedAt: new Date(),
-        rejectionReason: reason,
+        // rejectionReason field doesn't exist in schema
+        // Store reason in description or another text field if needed
       },
     });
 

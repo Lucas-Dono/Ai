@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // DELETE /api/messages/delete-all - Delete all user messages
 export async function DELETE() {
   try {
-    const session = await getAuthSession(request);
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

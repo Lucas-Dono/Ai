@@ -1,0 +1,430 @@
+/**
+ * GAMIFICATION INTEGRATION EXAMPLES
+ *
+ * Este archivo muestra ejemplos de cómo integrar el sistema de gamificación
+ * en diferentes partes de la aplicación.
+ */
+
+// ============================================
+// 1. DASHBOARD SIDEBAR
+// ============================================
+
+import { GamificationWidget, DailyCheckIn } from '@/components/gamification';
+
+export function DashboardSidebar() {
+  return (
+    <aside className="w-64 space-y-4">
+      {/* Widget compacto con nivel, streak y accesos rápidos */}
+      <GamificationWidget />
+
+      {/* Otros widgets del sidebar */}
+    </aside>
+  );
+}
+
+// ============================================
+// 2. DASHBOARD MAIN - DAILY CHECK-IN
+// ============================================
+
+export function DashboardMain() {
+  return (
+    <main className="flex-1 space-y-6">
+      {/* Widget de check-in diario */}
+      <DailyCheckIn />
+
+      {/* Resto del contenido del dashboard */}
+    </main>
+  );
+}
+
+// ============================================
+// 3. NAVBAR - NIVEL Y PERFIL
+// ============================================
+
+import { UserLevelBadge, StreakFlame } from '@/components/gamification';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import Link from 'next/link';
+import { useGamification } from '@/hooks/useGamification';
+
+export function UserNav() {
+  const { reputation, loading } = useGamification();
+
+  if (loading || !reputation) return null;
+
+  return (
+    <Link href={`/profile/${reputation.userId}`}>
+      <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent">
+        <Avatar>
+          <AvatarImage src="/avatar.jpg" />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">Usuario</span>
+            <UserLevelBadge level={reputation.level} size="sm" showText={false} />
+          </div>
+          <div className="flex items-center gap-2">
+            <StreakFlame streak={reputation.currentStreak} size="sm" showText={false} />
+            <span className="text-xs text-muted-foreground">
+              {reputation.points.toLocaleString()} karma
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ============================================
+// 4. POSTS EN COMUNIDAD - BADGES DEL AUTOR
+// ============================================
+
+import { UserBadgeDisplay } from '@/components/gamification';
+import { Card } from '@/components/ui/card';
+
+interface PostProps {
+  post: {
+    id: string;
+    title: string;
+    content: string;
+    author: {
+      id: string;
+      name: string;
+      image: string;
+      level: number;
+      badges: Array<{ icon: string; name: string; description: string }>;
+    };
+  };
+}
+
+export function CommunityPost({ post }: PostProps) {
+  return (
+    <Card className="p-4">
+      {/* Author info con badges */}
+      <div className="flex items-center gap-2 mb-4">
+        <Avatar>
+          <AvatarImage src={post.author.image} />
+          <AvatarFallback>{post.author.name[0]}</AvatarFallback>
+        </Avatar>
+
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">{post.author.name}</span>
+            <UserLevelBadge level={post.author.level} size="sm" showText={false} />
+            <UserBadgeDisplay
+              badges={post.author.badges}
+              maxDisplay={2}
+              size="sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Post content */}
+      <h3 className="text-lg font-bold">{post.title}</h3>
+      <p className="text-muted-foreground">{post.content}</p>
+    </Card>
+  );
+}
+
+// ============================================
+// 5. NAVBAR LINKS - MENÚ DE NAVEGACIÓN
+// ============================================
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+
+export function GamificationMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          🎮 Gamificación
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem asChild>
+          <Link href="/profile/[userId]">Mi Perfil</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/community/leaderboard">Leaderboard</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/achievements">Mis Logros</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/daily">Recompensas Diarias</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// ============================================
+// 6. ACTIONS CON GAMIFICACIÓN
+// ============================================
+
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
+
+export function ActionWithGamification() {
+  const { checkAndNotifyBadges } = useGamification();
+
+  const handleCreateAI = async () => {
+    try {
+      // Crear IA
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        body: JSON.stringify({ /* ... */ }),
+      });
+
+      if (response.ok) {
+        // Verificar y notificar nuevos badges
+        await checkAndNotifyBadges();
+
+        toast.success('IA creada exitosamente!');
+      }
+    } catch (error) {
+      toast.error('Error al crear IA');
+    }
+  };
+
+  return (
+    <Button onClick={handleCreateAI}>
+      Crear IA
+    </Button>
+  );
+}
+
+// ============================================
+// 7. LEVEL UP MODAL - NOTIFICACIÓN AUTOMÁTICA
+// ============================================
+
+import { LevelUpModal } from '@/components/gamification';
+import { useState, useEffect } from 'react';
+
+export function GamificationNotifications() {
+  const { reputation } = useGamification();
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(0);
+  const [lastLevel, setLastLevel] = useState(0);
+
+  useEffect(() => {
+    if (reputation && lastLevel && reputation.level > lastLevel) {
+      setNewLevel(reputation.level);
+      setShowLevelUp(true);
+    }
+    if (reputation) {
+      setLastLevel(reputation.level);
+    }
+  }, [reputation?.level]);
+
+  const getLevelRewards = (level: number): string[] => {
+    const rewards: string[] = [];
+    if (level === 5) rewards.push('Custom profile badge');
+    if (level === 10) rewards.push('Featured creator');
+    if (level === 20) rewards.push('Early access a features');
+    if (level === 50) rewards.push('Special role en community');
+    return rewards;
+  };
+
+  return (
+    <LevelUpModal
+      isOpen={showLevelUp}
+      onClose={() => setShowLevelUp(false)}
+      newLevel={newLevel}
+      rewards={getLevelRewards(newLevel)}
+    />
+  );
+}
+
+// ============================================
+// 8. FOLLOW BUTTON
+// ============================================
+
+import { useState } from 'react';
+
+interface FollowButtonProps {
+  userId: string;
+  initialFollowing: boolean;
+}
+
+export function FollowButton({ userId, initialFollowing }: FollowButtonProps) {
+  const [isFollowing, setIsFollowing] = useState(initialFollowing);
+  const [loading, setLoading] = useState(false);
+  const { followUser } = useGamification();
+
+  const handleToggleFollow = async () => {
+    setLoading(true);
+    const following = await followUser(userId);
+    setIsFollowing(following);
+    setLoading(false);
+  };
+
+  return (
+    <Button
+      onClick={handleToggleFollow}
+      disabled={loading}
+      variant={isFollowing ? 'outline' : 'default'}
+    >
+      {isFollowing ? 'Siguiendo' : 'Seguir'}
+    </Button>
+  );
+}
+
+// ============================================
+// 9. STATS OVERVIEW - PEQUEÑO WIDGET
+// ============================================
+
+export function QuickStats() {
+  const { reputation, stats, loading } = useGamification();
+
+  if (loading || !reputation || !stats) return null;
+
+  return (
+    <div className="grid grid-cols-4 gap-2 text-center text-sm">
+      <div>
+        <div className="font-bold text-lg">{reputation.level}</div>
+        <div className="text-muted-foreground text-xs">Nivel</div>
+      </div>
+      <div>
+        <div className="font-bold text-lg">{reputation.points.toLocaleString()}</div>
+        <div className="text-muted-foreground text-xs">Karma</div>
+      </div>
+      <div>
+        <div className="font-bold text-lg">{reputation.badges.length}</div>
+        <div className="text-muted-foreground text-xs">Badges</div>
+      </div>
+      <div>
+        <div className="font-bold text-lg">{reputation.currentStreak}</div>
+        <div className="text-muted-foreground text-xs">Racha</div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// 10. LEADERBOARD WIDGET - MINI VERSION
+// ============================================
+
+import { LeaderboardEntry } from '@/components/gamification';
+
+export function MiniLeaderboard() {
+  const [leaders, setLeaders] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/community/reputation/leaderboard?limit=5')
+      .then(res => res.json())
+      .then(data => setLeaders(data));
+  }, []);
+
+  return (
+    <Card className="p-4">
+      <h3 className="font-bold mb-4">Top Creators</h3>
+      <div className="space-y-2">
+        {leaders.map((leader, index) => (
+          <LeaderboardEntry
+            key={leader.userId}
+            rank={index + 1}
+            user={leader.user}
+            level={leader.level}
+            points={leader.points}
+            badges={leader.badges}
+          />
+        ))}
+      </div>
+      <Link href="/community/leaderboard">
+        <Button variant="outline" className="w-full mt-4">
+          Ver Leaderboard Completo
+        </Button>
+      </Link>
+    </Card>
+  );
+}
+
+// ============================================
+// 11. ACHIEVEMENT PROGRESS - PRÓXIMO LOGRO
+// ============================================
+
+import { BadgeCard } from '@/components/gamification';
+import { BADGES } from '@/lib/services/reputation.service';
+
+export function NextAchievement() {
+  const { reputation, stats } = useGamification();
+
+  if (!reputation || !stats) return null;
+
+  // Find next badge to unlock
+  const earnedBadgeIds = reputation.badges.map((b: any) => b.badgeId);
+  const nextBadge = BADGES.find(badge => {
+    if (earnedBadgeIds.includes(badge.id)) return false;
+
+    if (badge.pointsRequired) {
+      return reputation.points < badge.pointsRequired;
+    }
+
+    // Check condition badges
+    return true;
+  });
+
+  if (!nextBadge) return null;
+
+  const progress = nextBadge.pointsRequired
+    ? Math.min(reputation.points, nextBadge.pointsRequired)
+    : undefined;
+
+  return (
+    <Card className="p-4">
+      <h3 className="font-bold mb-4">Próximo Logro</h3>
+      <BadgeCard
+        icon={nextBadge.icon}
+        name={nextBadge.name}
+        description={nextBadge.description}
+        earned={false}
+        progress={progress}
+        maxProgress={nextBadge.pointsRequired}
+      />
+    </Card>
+  );
+}
+
+// ============================================
+// 12. USAGE TIPS
+// ============================================
+
+/*
+INTEGRACIÓN RECOMENDADA:
+
+1. Dashboard:
+   - GamificationWidget en sidebar
+   - DailyCheckIn en main area
+   - QuickStats en header
+   - NextAchievement widget
+
+2. Navbar:
+   - UserNav con nivel y streak
+   - GamificationMenu con links
+   - Badge counter con notification
+
+3. Comunidad:
+   - UserBadgeDisplay en posts
+   - MiniLeaderboard en sidebar
+   - FollowButton en perfiles
+
+4. Actions:
+   - Llamar checkAndNotifyBadges() después de acciones importantes
+   - Usar hook useGamification() para estado global
+   - Toast notifications para feedback inmediato
+
+5. Profile:
+   - Link a /profile/[userId] desde avatar
+   - Mostrar level badge en todo momento
+   - Stats overview en sidebar
+
+NOTAS:
+- Todos los componentes son independientes
+- Usa el hook para lógica centralizada
+- Las notificaciones son automáticas con el hook
+- Confetti se dispara automáticamente en logros
+*/

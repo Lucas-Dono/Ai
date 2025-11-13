@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
 import { WorldsService, buildAvatarUrl } from '../../services/api';
+import worldApi from '../../services/api/world.api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 
 type WorldsScreenProps = {
@@ -250,7 +251,7 @@ export default function WorldsScreen({ navigation }: WorldsScreenProps) {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => navigation.navigate('CreateAgent')}
+            onPress={() => navigation.navigate('CreateWorld')}
           >
             <Ionicons name="add-circle-outline" size={24} color={colors.primary[500]} />
           </TouchableOpacity>

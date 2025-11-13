@@ -232,12 +232,67 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
           <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Billing')}
+        >
           <View style={styles.menuItemLeft}>
             <View style={styles.menuItemIcon}>
               <Ionicons name="star-outline" size={20} color={colors.warning.main} />
             </View>
             <Text style={styles.menuItemText}>Suscripción</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Achievements')}
+        >
+          <View style={styles.menuItemLeft}>
+            <View style={styles.menuItemIcon}>
+              <Ionicons name="trophy-outline" size={20} color={colors.warning.main} />
+            </View>
+            <Text style={styles.menuItemText}>Logros</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Leaderboard')}
+        >
+          <View style={styles.menuItemLeft}>
+            <View style={styles.menuItemIcon}>
+              <Ionicons name="podium-outline" size={20} color={colors.primary[500]} />
+            </View>
+            <Text style={styles.menuItemText}>Clasificación</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('DailyCheckIn')}
+        >
+          <View style={styles.menuItemLeft}>
+            <View style={styles.menuItemIcon}>
+              <Ionicons name="calendar-outline" size={20} color={colors.success.main} />
+            </View>
+            <Text style={styles.menuItemText}>Check-In Diario</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('MyStats')}
+        >
+          <View style={styles.menuItemLeft}>
+            <View style={styles.menuItemIcon}>
+              <Ionicons name="bar-chart-outline" size={20} color={colors.info.main} />
+            </View>
+            <Text style={styles.menuItemText}>Mis Estadísticas</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
         </TouchableOpacity>

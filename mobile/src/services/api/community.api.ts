@@ -41,74 +41,74 @@ export const communityApi = {
     page?: number;
     limit?: number;
   }) {
-    const response = await apiClient.get('/api/community/communities', { params }) as any;
-    return response.data;
+    const response: any = await apiClient.get('/api/community/communities', { params });
+    return response.data as any;
   },
 
   /**
    * Obtener comunidad por ID
    */
   async getById(id: string) {
-    const response = await apiClient.get(`/community/communities/${id}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/community/communities/${id}`);
+    return response.data as any;
   },
 
   /**
    * Crear comunidad
    */
   async create(data: CreateCommunityData) {
-    const response = await apiClient.post('/api/community/communities', data) as any;
-    return response.data;
+    const response: any = await apiClient.post('/api/community/communities', data);
+    return response.data as any;
   },
 
   /**
    * Actualizar comunidad
    */
   async update(id: string, data: Partial<CreateCommunityData>) {
-    const response = await apiClient.patch(`/community/communities/${id}`, data) as any;
-    return response.data;
+    const response: any = await apiClient.patch(`/community/communities/${id}`, data);
+    return response.data as any;
   },
 
   /**
    * Eliminar comunidad
    */
   async delete(id: string) {
-    const response = await apiClient.delete(`/community/communities/${id}`) as any;
-    return response.data;
+    const response: any = await apiClient.delete(`/community/communities/${id}`);
+    return response.data as any;
   },
 
   /**
    * Unirse a comunidad
    */
   async join(id: string) {
-    const response = await apiClient.post(`/community/communities/${id}/join`) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/communities/${id}/join`);
+    return response.data as any;
   },
 
   /**
    * Salir de comunidad
    */
   async leave(id: string) {
-    const response = await apiClient.post(`/community/communities/${id}/leave`) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/communities/${id}/leave`);
+    return response.data as any;
   },
 
   /**
    * Obtener miembros
    */
   async getMembers(id: string) {
-    const response = await apiClient.get(`/community/communities/${id}/members`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/community/communities/${id}/members`);
+    return response.data as any;
   },
 
   /**
    * Banear usuario (moderador)
    */
   async banUser(communityId: string, userId: string, reason?: string) {
-    const response = await apiClient.post(`/community/communities/${communityId}/ban`, {
+    const response: any = await apiClient.post(`/community/communities/${communityId}/ban`, {
       userId,
       reason,
     });
-    return response.data;
+    return response.data as any;
   },
 };

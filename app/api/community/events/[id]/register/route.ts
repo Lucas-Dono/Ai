@@ -8,7 +8,7 @@ import { EventService } from '@/lib/services/event.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -18,7 +18,7 @@ export async function POST(
 
     const { teamName } = await request.json();
     const registration = await EventService.registerForEvent(
-      params.id,
+      (await params).id,
       session.user.id,
       teamName
     );
@@ -34,7 +34,7 @@ export async function POST(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -42,7 +42,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await EventService.unregisterFromEvent(params.id, session.user.id);
+    const result = await EventService.unregisterFromEvent((await params).id, session.user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

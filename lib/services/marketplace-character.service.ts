@@ -45,12 +45,9 @@ export const MarketplaceCharacterService = {
         category: data.category,
         tags: data.tags,
         personality: data.personality,
-        backstory: data.backstory,
-        avatarUrl: data.avatarUrl,
-        voiceSettings: data.voiceSettings || {},
+        avatar: data.avatarUrl,
         systemPrompt: data.systemPrompt,
-        exampleDialogues: data.exampleDialogues || [],
-        price: data.price || 0,
+        useCase: 'General conversation and roleplay',
         status: 'pending',
       },
       include: {
@@ -140,7 +137,6 @@ export const MarketplaceCharacterService = {
         ...character,
         systemPrompt: '[Preview no disponible - Personaje en revisión]',
         personality: character.personality.substring(0, 100) + '...',
-        backstory: character.backstory.substring(0, 200) + '...',
       };
     }
 
@@ -252,12 +248,10 @@ export const MarketplaceCharacterService = {
     }
 
     // Verificar si ya descargó
-    const existing = await prisma.characterDownload.findUnique({
+    const existing = await prisma.characterDownload.findFirst({
       where: {
-        characterId_userId: {
-          characterId,
-          userId,
-        },
+        characterId,
+        userId,
       },
     });
 
@@ -303,12 +297,10 @@ export const MarketplaceCharacterService = {
     }
 
     // Verificar que haya descargado el personaje
-    const download = await prisma.characterDownload.findUnique({
+    const download = await prisma.characterDownload.findFirst({
       where: {
-        characterId_userId: {
-          characterId,
-          userId,
-        },
+        characterId,
+        userId,
       },
     });
 
@@ -355,7 +347,7 @@ export const MarketplaceCharacterService = {
     await prisma.marketplaceCharacter.update({
       where: { id: characterId },
       data: {
-        averageRating: ratings._avg.rating || 0,
+        rating: ratings._avg.rating || 0,
         ratingCount: ratings._count,
       },
     });
@@ -390,13 +382,23 @@ export const MarketplaceCharacterService = {
    * Aprobar personaje (admin)
    */
   async approveCharacter(characterId: string, adminId: string) {
-    // TODO: Verificar que adminId es admin
+    // Verificar que adminId es admin
+    // NOTE: Currently using metadata field to check for admin privileges
+    // Future: Add dedicated 'role' field to User schema for better type safety
+    const admin = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { metadata: true },
+    });
+
+    const metadata = admin?.metadata as { isAdmin?: boolean } | null;
+    if (!admin || !metadata?.isAdmin) {
+      throw new Error('No tienes permisos de administrador para aprobar personajes');
+    }
 
     const character = await prisma.marketplaceCharacter.update({
       where: { id: characterId },
       data: {
         status: 'approved',
-        reviewedAt: new Date(),
       },
     });
 
@@ -407,14 +409,23 @@ export const MarketplaceCharacterService = {
    * Rechazar personaje (admin)
    */
   async rejectCharacter(characterId: string, adminId: string, reason: string) {
-    // TODO: Verificar que adminId es admin
+    // Verificar que adminId es admin
+    // NOTE: Currently using metadata field to check for admin privileges
+    // Future: Add dedicated 'role' field to User schema for better type safety
+    const admin = await prisma.user.findUnique({
+      where: { id: adminId },
+      select: { metadata: true },
+    });
+
+    const metadata = admin?.metadata as { isAdmin?: boolean } | null;
+    if (!admin || !metadata?.isAdmin) {
+      throw new Error('No tienes permisos de administrador para rechazar personajes');
+    }
 
     const character = await prisma.marketplaceCharacter.update({
       where: { id: characterId },
       data: {
         status: 'rejected',
-        reviewedAt: new Date(),
-        rejectionReason: reason,
       },
     });
 
@@ -471,17 +482,21 @@ export const MarketplaceCharacterService = {
   async importToAgent(characterId: string, userId: string, agentName?: string) {
     const character = await this.downloadCharacter(characterId, userId);
 
+    if (!character) {
+      throw new Error('No se pudo descargar el personaje');
+    }
+
     // Crear agente basado en el personaje
     const agent = await prisma.agent.create({
       data: {
         userId,
         name: agentName || character.name,
-        description: character.description,
+        description: character.description || '',
         personality: character.personality,
-        avatarUrl: character.avatarUrl,
         systemPrompt: character.systemPrompt,
-        voiceEnabled: !!character.voiceSettings,
-        voiceId: character.voiceSettings?.voiceId,
+        kind: 'companion',
+        profile: {}, // Profile vacío por defecto
+        avatar: character.avatar,
         // Copiar configuraciones relevantes
       },
     });

@@ -67,8 +67,8 @@ async function main() {
         console.log(`   Acts: ${result.storyScript.totalActs}`);
       }
 
-      console.log(`\n💡 Tips (${result.tips.length}):`);
-      result.tips.forEach((tip, idx) => {
+      console.log(`\n💡 Tips (${result.tips?.length || 0}):`);
+      result.tips?.forEach((tip, idx) => {
         console.log(`  ${idx + 1}. ${tip}`);
       });
 

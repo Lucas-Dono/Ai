@@ -12,6 +12,7 @@ import { getGeminiImagenClient } from "./gemini-imagen-client";
 import { getHuggingFaceSpacesClient } from "./huggingface-spaces-client";
 import { getFastSDLocalClient } from "./fastsd-local-client";
 import { getAIHordeClient } from "./ai-horde-client";
+import { trackImageGeneration } from "@/lib/cost-tracking/tracker";
 
 export type ContentType = "sfw" | "suggestive" | "nsfw";
 export type UserTier = "free" | "plus" | "ultra";
@@ -207,6 +208,20 @@ export class VisualGenerationService {
         seed: appearance.seed,
       });
 
+      // Track image generation cost (AI Horde is free)
+      trackImageGeneration({
+        agentId: appearance.agentId,
+        provider: 'aihorde',
+        model: 'stable-diffusion-xl',
+        resolution: '512x512',
+        cost: 0, // AI Horde is free
+        metadata: {
+          emotionType,
+          intensity,
+          seed: result.seed,
+        },
+      }).catch(err => console.warn('[VisualGen] Failed to track image cost:', err));
+
       return {
         imageUrl: result.imageUrl, // Ya es una URL de R2 storage
         seed: result.seed,
@@ -220,6 +235,20 @@ export class VisualGenerationService {
         intensity,
         seed: appearance.seed || undefined,
       });
+
+      // Track image generation cost (FastSD local is free)
+      trackImageGeneration({
+        agentId: appearance.agentId,
+        provider: 'fastsd-local',
+        model: 'stable-diffusion-cpu',
+        resolution: '512x512',
+        cost: 0, // Local model
+        metadata: {
+          emotionType,
+          intensity,
+          seed: result.seed,
+        },
+      }).catch(err => console.warn('[VisualGen] Failed to track image cost:', err));
 
       // Convertir base64 a data URL
       return {
@@ -324,8 +353,8 @@ export class VisualGenerationService {
 
     // 1. NSFW solo para premium users
     if (contentType === "nsfw") {
-      if (userTier !== "premium") {
-        throw new Error("NSFW content requires premium tier");
+      if (userTier !== "ultra") {
+        throw new Error("NSFW content requires ultra tier");
       }
       // Premium NSFW: AI Horde -> FastSD local -> HF (fallback)
       const fastsdAvailable = await this.isFastSDAvailable();

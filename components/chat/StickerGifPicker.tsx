@@ -96,7 +96,7 @@ const GifGrid = ({ gifs, onSelect }: { gifs: GiphyGif[]; onSelect: (gif: GiphyGi
       <div style={style}>
         <button
           onClick={() => onSelect(gif)}
-          className="w-full h-full bg-[#2a2a2a] rounded-lg overflow-hidden hover:ring-2 hover:ring-green-500 transition-all"
+          className="w-full h-full bg-[#2a2a2a] rounded-2xl overflow-hidden hover:ring-2 hover:ring-green-500 transition-all"
           style={{
             margin: gapSize / 2,
             width: columnWidth - gapSize,
@@ -137,7 +137,7 @@ export function StickerGifPicker({
   const [gifSearchQuery, setGifSearchQuery] = useState("");
   const [gifs, setGifs] = useState<GiphyGif[]>([]);
   const [isLoadingGifs, setIsLoadingGifs] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Buscar GIFs en Giphy con cache
@@ -315,7 +315,7 @@ export function StickerGifPicker({
                         onSend(sticker.emoji, "sticker");
                         onClose();
                       }}
-                      className="aspect-square bg-[#2a2a2a] rounded-lg hover:bg-[#3a3a3a] transition-colors flex items-center justify-center text-4xl"
+                      className="aspect-square bg-[#2a2a2a] rounded-2xl hover:bg-[#3a3a3a] transition-colors flex items-center justify-center text-4xl"
                     >
                       {sticker.emoji}
                     </button>
@@ -330,7 +330,7 @@ export function StickerGifPicker({
         <TabsContent value="gifs" className="p-4">
           {/* Búsqueda de GIFs */}
           <div className="mb-4">
-            <div className="flex items-center gap-2 bg-[#2a2a2a] rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 bg-[#2a2a2a] rounded-2xl px-3 py-2">
               <Search className="h-4 w-4 text-gray-400" />
               <input
                 type="text"

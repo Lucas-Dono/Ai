@@ -200,7 +200,7 @@ export default function WorldPage() {
 
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <Users className="h-6 w-6 text-white" />
             </div>
             <div>

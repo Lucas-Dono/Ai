@@ -3,90 +3,75 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { NotificationService } from './notification.service';
 
 export interface CreateConversationData {
   participants: string[]; // Array de user IDs
-  title?: string;
+  type?: 'direct' | 'group';
+  name?: string;
+  icon?: string;
 }
 
 export interface SendMessageData {
   conversationId: string;
   senderId: string;
+  recipientId: string;
   content: string;
-  attachments?: any;
+  contentType?: string;
+  attachmentUrl?: string;
+  sharedItemId?: string;
+  sharedItemType?: string;
 }
 
 export const MessagingService = {
   /**
    * Crear o obtener conversación
    */
-  async getOrCreateConversation(userId: string, otherUserIds: string[], title?: string) {
+  async getOrCreateConversation(
+    userId: string,
+    otherUserIds: string[],
+    options?: { name?: string; icon?: string; type?: 'direct' | 'group' }
+  ) {
     const allParticipants = [userId, ...otherUserIds].sort();
+    const type = options?.type || (allParticipants.length === 2 ? 'direct' : 'group');
 
-    // Buscar conversación existente con los mismos participantes
-    const existing = await prisma.directConversation.findFirst({
-      where: {
-        participants: {
-          every: {
-            userId: { in: allParticipants },
+    // Para conversaciones 1-on-1, buscar existente
+    if (type === 'direct' && allParticipants.length === 2) {
+      // Find all direct conversations and filter in memory
+      // (JSON hasEvery operator is not supported)
+      const conversations = await prisma.directConversation.findMany({
+        where: {
+          type: 'direct',
+        },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
           },
         },
-        AND: [
-          {
-            participants: {
-              some: { userId: allParticipants[0] },
-            },
-          },
-          ...allParticipants.slice(1).map(id => ({
-            participants: {
-              some: { userId: id },
-            },
-          })),
-        ],
-      },
-      include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
-        lastMessage: true,
-      },
-    });
+      });
 
-    if (existing) {
-      return existing;
+      const existing = conversations.find(conv => {
+        const participants = conv.participants as string[];
+        return participants.length === 2 &&
+               allParticipants.every(p => participants.includes(p));
+      });
+
+      if (existing) {
+        return existing;
+      }
     }
 
     // Crear nueva conversación
     const conversation = await prisma.directConversation.create({
       data: {
-        title,
-        participants: {
-          create: allParticipants.map(participantId => ({
-            userId: participantId,
-          })),
-        },
+        type,
+        name: options?.name,
+        icon: options?.icon,
+        participants: allParticipants,
+        lastMessageAt: new Date(),
       },
       include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
+        messages: true,
       },
     });
 
@@ -97,18 +82,17 @@ export const MessagingService = {
    * Enviar mensaje
    */
   async sendMessage(data: SendMessageData) {
-    // Verificar que el sender es participante
-    const participant = await prisma.$queryRaw<Array<{ id: string }>>`
-      SELECT id FROM "DirectConversation"
-      WHERE id = ${data.conversationId}
-      AND EXISTS (
-        SELECT 1 FROM "_DirectConversationParticipants"
-        WHERE "A" = ${data.conversationId}
-        AND "B" = ${data.senderId}
-      )
-    `;
+    // Verificar que la conversación existe y el sender es participante
+    const conversation = await prisma.directConversation.findUnique({
+      where: { id: data.conversationId },
+    });
 
-    if (!participant || participant.length === 0) {
+    if (!conversation) {
+      throw new Error('Conversación no encontrada');
+    }
+
+    const participants = conversation.participants as string[];
+    if (!participants.includes(data.senderId)) {
       throw new Error('No eres participante de esta conversación');
     }
 
@@ -117,62 +101,23 @@ export const MessagingService = {
       data: {
         conversationId: data.conversationId,
         senderId: data.senderId,
+        recipientId: data.recipientId,
         content: data.content,
-        attachments: data.attachments || {},
-      },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
+        contentType: data.contentType || 'text',
+        attachmentUrl: data.attachmentUrl,
+        sharedItemId: data.sharedItemId,
+        sharedItemType: data.sharedItemType,
       },
     });
 
-    // Actualizar última actividad y último mensaje
+    // Actualizar conversación
     await prisma.directConversation.update({
       where: { id: data.conversationId },
       data: {
-        lastMessageId: message.id,
-        lastActivityAt: new Date(),
+        lastMessageAt: new Date(),
+        lastMessagePreview: data.content.substring(0, 100),
       },
     });
-
-    // Incrementar contador de no leídos para otros participantes
-    await prisma.$executeRaw`
-      UPDATE "_DirectConversationParticipants" AS dcp
-      SET "unreadCount" = COALESCE("unreadCount", 0) + 1
-      WHERE dcp."A" = ${data.conversationId}
-      AND dcp."B" != ${data.senderId}
-    `;
-
-    // Notificar a otros participantes
-    const conversation = await prisma.directConversation.findUnique({
-      where: { id: data.conversationId },
-      include: {
-        participants: {
-          select: { userId: true },
-        },
-      },
-    });
-
-    const otherParticipants = conversation!.participants
-      .filter(p => p.userId !== data.senderId)
-      .map(p => p.userId);
-
-    // Crear notificaciones
-    await Promise.all(
-      otherParticipants.map(recipientId =>
-        NotificationService.notifyDirectMessage(
-          data.conversationId,
-          data.senderId,
-          recipientId,
-          data.content.substring(0, 100)
-        )
-      )
-    );
 
     return message;
   },
@@ -182,37 +127,35 @@ export const MessagingService = {
    */
   async getMessages(conversationId: string, userId: string, page = 1, limit = 50) {
     // Verificar que el usuario es participante
-    const participant = await prisma.$queryRaw<Array<{ id: string }>>`
-      SELECT id FROM "DirectConversation"
-      WHERE id = ${conversationId}
-      AND EXISTS (
-        SELECT 1 FROM "_DirectConversationParticipants"
-        WHERE "A" = ${conversationId}
-        AND "B" = ${userId}
-      )
-    `;
+    const conversation = await prisma.directConversation.findUnique({
+      where: { id: conversationId },
+    });
 
-    if (!participant || participant.length === 0) {
+    if (!conversation) {
+      throw new Error('Conversación no encontrada');
+    }
+
+    const participants = conversation.participants as string[];
+    if (!participants.includes(userId)) {
       throw new Error('No tienes acceso a esta conversación');
     }
 
     const [messages, total] = await Promise.all([
       prisma.directMessage.findMany({
-        where: { conversationId },
+        where: {
+          conversationId,
+          isDeleted: false,
+        },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: {
-          sender: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-            },
-          },
+      }),
+      prisma.directMessage.count({
+        where: {
+          conversationId,
+          isDeleted: false,
         },
       }),
-      prisma.directMessage.count({ where: { conversationId } }),
     ]);
 
     return {
@@ -227,55 +170,43 @@ export const MessagingService = {
    * Obtener conversaciones del usuario
    */
   async getUserConversations(userId: string) {
-    const conversations = await prisma.directConversation.findMany({
-      where: {
-        participants: {
-          some: {
-            userId,
-          },
-        },
-      },
+    // Get all conversations and filter in memory
+    // (JSON has operator is not supported)
+    const allConversations = await prisma.directConversation.findMany({
       include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
-        lastMessage: {
-          include: {
-            sender: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+        messages: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          where: {
+            isDeleted: false,
           },
         },
       },
       orderBy: {
-        lastActivityAt: 'desc',
+        lastMessageAt: 'desc',
       },
     });
 
-    // Calcular unread count para cada conversación
+    const conversations = allConversations.filter(conv => {
+      const participants = conv.participants as string[];
+      return participants.includes(userId);
+    });
+
+    // Calcular mensajes no leídos para cada conversación
     const conversationsWithUnread = await Promise.all(
       conversations.map(async (conv) => {
-        const unreadResult = await prisma.$queryRaw<Array<{ unreadCount: number }>>`
-          SELECT COALESCE("unreadCount", 0) as "unreadCount"
-          FROM "_DirectConversationParticipants"
-          WHERE "A" = ${conv.id}
-          AND "B" = ${userId}
-        `;
+        const unreadCount = await prisma.directMessage.count({
+          where: {
+            conversationId: conv.id,
+            recipientId: userId,
+            isRead: false,
+            isDeleted: false,
+          },
+        });
 
         return {
           ...conv,
-          unreadCount: unreadResult[0]?.unreadCount || 0,
+          unreadCount,
         };
       })
     );
@@ -284,17 +215,64 @@ export const MessagingService = {
   },
 
   /**
-   * Marcar conversación como leída
+   * Marcar mensajes como leídos
    */
   async markAsRead(conversationId: string, userId: string) {
-    await prisma.$executeRaw`
-      UPDATE "_DirectConversationParticipants"
-      SET "unreadCount" = 0
-      WHERE "A" = ${conversationId}
-      AND "B" = ${userId}
-    `;
+    // Verificar que el usuario es participante
+    const conversation = await prisma.directConversation.findUnique({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversación no encontrada');
+    }
+
+    const participants = conversation.participants as string[];
+    if (!participants.includes(userId)) {
+      throw new Error('No tienes acceso a esta conversación');
+    }
+
+    // Marcar mensajes como leídos
+    await prisma.directMessage.updateMany({
+      where: {
+        conversationId,
+        recipientId: userId,
+        isRead: false,
+      },
+      data: {
+        isRead: true,
+        readAt: new Date(),
+      },
+    });
 
     return { success: true };
+  },
+
+  /**
+   * Editar mensaje
+   */
+  async editMessage(messageId: string, userId: string, newContent: string) {
+    const message = await prisma.directMessage.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message) {
+      throw new Error('Mensaje no encontrado');
+    }
+
+    if (message.senderId !== userId) {
+      throw new Error('No tienes permisos para editar este mensaje');
+    }
+
+    const updated = await prisma.directMessage.update({
+      where: { id: messageId },
+      data: {
+        content: newContent,
+        isEdited: true,
+      },
+    });
+
+    return updated;
   },
 
   /**
@@ -313,8 +291,73 @@ export const MessagingService = {
       throw new Error('No tienes permisos para eliminar este mensaje');
     }
 
-    await prisma.directMessage.delete({
+    // Soft delete
+    await prisma.directMessage.update({
       where: { id: messageId },
+      data: {
+        isDeleted: true,
+        content: '[Mensaje eliminado]',
+      },
+    });
+
+    return { success: true };
+  },
+
+  /**
+   * Actualizar configuración de conversación
+   */
+  async updateConversation(
+    conversationId: string,
+    userId: string,
+    data: { isMuted?: boolean; isArchived?: boolean; name?: string; icon?: string }
+  ) {
+    // Verificar que el usuario es participante
+    const conversation = await prisma.directConversation.findUnique({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversación no encontrada');
+    }
+
+    const participants = conversation.participants as string[];
+    if (!participants.includes(userId)) {
+      throw new Error('No tienes acceso a esta conversación');
+    }
+
+    const updated = await prisma.directConversation.update({
+      where: { id: conversationId },
+      data,
+    });
+
+    return updated;
+  },
+
+  /**
+   * Eliminar conversación
+   */
+  async deleteConversation(conversationId: string, userId: string) {
+    // Verificar que el usuario es participante
+    const conversation = await prisma.directConversation.findUnique({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversación no encontrada');
+    }
+
+    const participants = conversation.participants as string[];
+    if (!participants.includes(userId)) {
+      throw new Error('No tienes acceso a esta conversación');
+    }
+
+    // Eliminar todos los mensajes y la conversación
+    await prisma.directMessage.deleteMany({
+      where: { conversationId },
+    });
+
+    await prisma.directConversation.delete({
+      where: { id: conversationId },
     });
 
     return { success: true };
@@ -324,46 +367,34 @@ export const MessagingService = {
    * Buscar mensajes
    */
   async searchMessages(userId: string, query: string, limit = 20) {
+    // Obtener IDs de conversaciones del usuario
+    // (JSON has operator is not supported)
+    const allConversations = await prisma.directConversation.findMany({
+      select: { id: true, participants: true },
+    });
+
+    const conversationIds = allConversations
+      .filter(conv => {
+        const participants = conv.participants as string[];
+        return participants.includes(userId);
+      })
+      .map(c => c.id);
+
     const messages = await prisma.directMessage.findMany({
       where: {
+        conversationId: { in: conversationIds },
         content: {
           contains: query,
           mode: 'insensitive',
         },
-        conversation: {
-          participants: {
-            some: {
-              userId,
-            },
-          },
-        },
+        isDeleted: false,
       },
       take: limit,
       orderBy: {
         createdAt: 'desc',
       },
       include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-        conversation: {
-          include: {
-            participants: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+        conversation: true,
       },
     });
 

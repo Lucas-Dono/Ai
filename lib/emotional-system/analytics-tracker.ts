@@ -96,7 +96,7 @@ export class EmotionalSystemAnalyticsTracker {
   private events: InMemoryEvent[] = [];
   private readonly FLUSH_INTERVAL_MS = 60000; // 1 minuto
   private readonly MAX_EVENTS_IN_MEMORY = 100;
-  private flushTimer?: NodeJS.Timeout;
+  private flushTimer?: ReturnType<typeof setInterval>;
 
   constructor() {
     // Auto-flush periódico
@@ -169,37 +169,10 @@ export class EmotionalSystemAnalyticsTracker {
       console.error("[Analytics] Error flushing to DB:", error);
 
       try {
-        // Fallback: guardar en InternalState como JSON
-        for (const event of eventsToFlush) {
-          const internalState = await prisma.internalState.findUnique({
-            where: { agentId: event.agentId },
-          });
-
-          if (internalState) {
-            const existingAnalytics =
-              (internalState.metadata as any)?.analytics || [];
-            const updatedAnalytics = [
-              ...existingAnalytics,
-              {
-                ...event,
-                timestamp: event.timestamp.toISOString(),
-              },
-            ].slice(-100); // Mantener últimos 100
-
-            await prisma.internalState.update({
-              where: { agentId: event.agentId },
-              data: {
-                metadata: {
-                  ...(internalState.metadata as any),
-                  analytics: updatedAnalytics,
-                },
-              },
-            });
-          }
-        }
-
+        // TODO: Fallback mechanism disabled - InternalState schema doesn't have metadata field
+        // If analytics persistence is needed, add a dedicated field to InternalState schema
         console.log(
-          `[Analytics] Fallback save successful (${eventsToFlush.length} events)`
+          `[Analytics] Fallback save skipped (${eventsToFlush.length} events) - schema not configured`
         );
       } catch (fallbackError) {
         console.error("[Analytics] Fallback also failed:", fallbackError);
@@ -244,24 +217,8 @@ export class EmotionalSystemAnalyticsTracker {
         timestamp: new Date(e.timestamp),
       }));
     } catch (error) {
-      // Fallback: leer de InternalState
-      console.log("[Analytics] Using fallback storage");
-
-      const internalState = await prisma.internalState.findUnique({
-        where: { agentId },
-      });
-
-      if (internalState && (internalState.metadata as any)?.analytics) {
-        const storedEvents = (internalState.metadata as any).analytics;
-        events = storedEvents
-          .map((e: any) => ({
-            ...e,
-            timestamp: new Date(e.timestamp),
-          }))
-          .filter(
-            (e: InMemoryEvent) => e.timestamp >= startDate
-          ) as InMemoryEvent[];
-      }
+      // TODO: Fallback storage disabled - InternalState schema doesn't have metadata field
+      console.log("[Analytics] Fallback storage not available - using in-memory events only");
     }
 
     // Agregar eventos en memoria

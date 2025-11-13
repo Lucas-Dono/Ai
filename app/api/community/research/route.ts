@@ -11,15 +11,15 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category') || undefined;
     const tags = searchParams.get('tags')?.split(',') || undefined;
-    const leaderId = searchParams.get('leaderId') || undefined;
+    const leadAuthorId = searchParams.get('leadAuthorId') || searchParams.get('leaderId') || undefined;
     const status = searchParams.get('status') || undefined;
     const search = searchParams.get('search') || undefined;
-    const lookingForCollaborators = searchParams.get('lookingForCollaborators') === 'true' || undefined;
+    const openForContributions = searchParams.get('openForContributions') === 'true' || searchParams.get('lookingForCollaborators') === 'true' || undefined;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '25');
 
     const result = await ResearchService.listProjects(
-      { category, tags, leaderId, status, search, lookingForCollaborators },
+      { category, tags, leadAuthorId, status, search, openForContributions },
       page,
       limit
     );

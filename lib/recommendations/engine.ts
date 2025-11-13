@@ -98,15 +98,11 @@ async function generateCandidates(userId: string): Promise<{
     likedKinds.add(agent.kind);
   });
 
-  // Buscar agentes con tags similares
+  // Buscar agentes con kind similar
+  // TODO: Implementar filtro por tags cuando se mejore el schema
   const contentBasedAgents = await prisma.agent.findMany({
     where: {
-      OR: [
-        ...(Array.from(likedTags).length > 0
-          ? [{ tags: { hasSome: Array.from(likedTags) } }]
-          : []),
-        { kind: { in: Array.from(likedKinds) } },
-      ],
+      kind: { in: Array.from(likedKinds) },
       id: { notIn: Array.from(interactedItemIds) },
       userId: null, // Solo agentes públicos
       visibility: "public",

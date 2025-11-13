@@ -30,7 +30,7 @@ export function canAccessWorld(
   // Usuarios free solo pueden acceder a mundos específicos
   const allowedWorlds = plan.limits.worldsAllowed;
 
-  if (allowedWorlds.includes(worldId)) {
+  if ((allowedWorlds as readonly string[]).includes(worldId)) {
     return {
       allowed: true,
     };

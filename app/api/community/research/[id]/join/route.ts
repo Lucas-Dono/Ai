@@ -8,7 +8,7 @@ import { ResearchService } from '@/lib/services/research.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -18,7 +18,7 @@ export async function POST(
 
     const { message } = await request.json();
     const contributor = await ResearchService.requestToJoin(
-      params.id,
+      (await params).id,
       session.user.id,
       message
     );

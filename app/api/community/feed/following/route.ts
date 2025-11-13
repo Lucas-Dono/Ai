@@ -18,7 +18,15 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '25');
 
     const posts = await FeedService.getFollowingFeed(session.user.id, page, limit);
-    return NextResponse.json({ posts, page, limit });
+
+    return NextResponse.json({
+      posts,
+      pagination: {
+        page,
+        limit,
+        hasMore: posts.length === limit
+      }
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }

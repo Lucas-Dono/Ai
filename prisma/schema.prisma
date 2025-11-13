@@ -1,4 +1,4 @@
-// This is your Prisma schema file for "Creador de Inteligencias"
+// This is your Prisma schema file for "Circuit Prompt AI"
 // Sistema dual de IAs emocionales (Compañeros) y administrativas (Asistentes)
 
 generator client {
@@ -12,25 +12,35 @@ datasource db {
 
 // Modelo de Usuario
 model User {
-  id                    String    @id @default(cuid())
-  email                 String    @unique
-  emailVerified         DateTime?
-  name                  String?
-  image                 String?
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  birthDate     DateTime? // Fecha de nacimiento del usuario
+  ageVerified   Boolean   @default(false) // Confirmación de verificación de edad
+  isAdult       Boolean   @default(false) // Usuario es mayor de 18 años
+  ageVerifiedAt DateTime? // Fecha de verificación de edad
+
+  // NSFW Consent System (Task 0.2)
+  nsfwConsent        Boolean   @default(false) // Usuario dio consentimiento para contenido NSFW
+  nsfwConsentAt      DateTime? // Fecha de consentimiento NSFW
+  nsfwConsentVersion String? // Versión de términos NSFW aceptados (ej: "v1.0")
+
   password              String? // Password hash para autenticación con credenciales
-  plan                  String    @default("free") // free, plus, ultra
-  mercadopagoCustomerId String?   @unique // Mercado Pago customer ID
-  apiKey                String?   @unique // API key opcional para usuarios avanzados
+  plan                  String  @default("free") // free, plus, ultra
+  mercadopagoCustomerId String? @unique // Mercado Pago customer ID
+  apiKey                String? @unique // API key opcional para usuarios avanzados
   location              String? // Ciudad del usuario para contexto de clima (ej: "Buenos Aires")
   metadata              Json? // Metadata adicional (push subscription, preferences, etc.)
 
   // Image upload limits
-  imageUploadsThisMonth Int       @default(0) // Contador mensual de imágenes subidas
-  imageUploadLimit      Int       @default(10) // Límite mensual (10 free, 100 premium, ilimitado pro)
-  imageUploadResetDate  DateTime  @default(now()) // Fecha del último reset del contador
+  imageUploadsThisMonth Int      @default(0) // Contador mensual de imágenes subidas
+  imageUploadLimit      Int      @default(10) // Límite mensual (10 free, 100 premium, ilimitado pro)
+  imageUploadResetDate  DateTime @default(now()) // Fecha del último reset del contador
 
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   agents             Agent[]
   worlds             World[]
@@ -40,30 +50,42 @@ model User {
   invoices           Invoice[]
   payments           Payment[]
   usage              Usage[]
-  teamsOwned         Team[]              @relation("TeamOwner")
+  teamsOwned         Team[]                @relation("TeamOwner")
   teamMemberships    TeamMember[]
   fastsdInstallation FastSDInstallation?
   reactions          Reaction[]
   interactions       UserInteraction[]
   profile            UserProfile?
   recommendations    RecommendationCache[]
-  publishedThemes    MarketplaceTheme[]  @relation("MarketplaceThemeAuthor")
+  publishedThemes    MarketplaceTheme[]    @relation("MarketplaceThemeAuthor")
 
   // Community System Relations
-  communityPosts     CommunityPost[]     @relation("CommunityPostAuthor")
-  communityComments  CommunityComment[]  @relation("CommunityCommentAuthor")
-  ownedCommunities   Community[]         @relation("CommunityOwner")
-  organizedEvents    CommunityEvent[]    @relation("EventOrganizer")
-  givenAwards        PostAward[]         @relation("AwardGiver")
-  postReports        PostReport[]        @relation("PostReporter")
-  commentReports     CommentReport[]     @relation("CommentReporter")
-  publishedPrompts   MarketplacePrompt[] @relation("PromptAuthor")
+  communityPosts      CommunityPost[]        @relation("CommunityPostAuthor")
+  communityComments   CommunityComment[]     @relation("CommunityCommentAuthor")
+  ownedCommunities    Community[]            @relation("CommunityOwner")
+  organizedEvents     CommunityEvent[]       @relation("EventOrganizer")
+  givenAwards         PostAward[]            @relation("AwardGiver")
+  postReports         PostReport[]           @relation("PostReporter")
+  commentReports      CommentReport[]        @relation("CommentReporter")
+  publishedPrompts    MarketplacePrompt[]    @relation("PromptAuthor")
   publishedCharacters MarketplaceCharacter[] @relation("CharacterAuthor")
-  researchProjects   ResearchProject[]   @relation("ResearchLead")
+  researchProjects    ResearchProject[]      @relation("ResearchLead")
+
+  // Symbolic Bonds System Relations
+  symbolicBonds SymbolicBond[] @relation("UserSymbolicBonds")
+  bondQueue     BondQueue[]    @relation("UserBondQueue")
+  bondLegacy    BondLegacy[]   @relation("UserBondLegacy")
+
+  // Analytics and Tracking
+  shareEvents              ShareEvent[]
+  notificationPreferences  NotificationPreferences?
 
   @@index([email])
   @@index([mercadopagoCustomerId])
   @@index([apiKey])
+  @@index([ageVerified])
+  @@index([isAdult])
+  @@index([nsfwConsent])
 }
 
 // NextAuth Models
@@ -104,8 +126,8 @@ model VerificationToken {
 
 // Modelo de Agente (IA)
 model Agent {
-  id           String   @id @default(cuid())
-  userId       String?  // Null para agentes predefinidos del sistema
+  id           String  @id @default(cuid())
+  userId       String? // Null para agentes predefinidos del sistema
   teamId       String? // ID del equipo propietario (opcional)
   kind         String // companion (emocional) o assistant (administrativo)
   name         String
@@ -115,14 +137,14 @@ model Agent {
   tone         String? // DEPRECATED: usar internalState
   purpose      String? // DEPRECATED: usar personalityCore.goals
   profile      Json // JSON con toda la configuración del agente (DEPRECATED)
-  systemPrompt String   @db.Text
-  visibility   String   @default("private") // private, world, public, team
-  nsfwMode     Boolean  @default(false) // Permitir contenido NSFW/adulto
+  systemPrompt String  @db.Text
+  visibility   String  @default("private") // private, world, public, team
+  nsfwMode     Boolean @default(false) // Permitir contenido NSFW/adulto
   avatar       String? // URL o identificador de avatar
   tags         Json? // Tags/categorías para el marketplace
-  featured     Boolean  @default(false) // Destacado en el marketplace
+  featured     Boolean @default(false) // Destacado en el marketplace
   rating       Float? // Rating promedio (0-5)
-  cloneCount   Int      @default(0) // Número de veces clonado
+  cloneCount   Int     @default(0) // Número de veces clonado
   originalId   String? // ID del agente original si es un clon
 
   // Sistema de progresión de relación
@@ -132,18 +154,18 @@ model Agent {
   referenceImageUrl String? // URL de la imagen de referencia del personaje (para img2img)
   voiceId           String? // ID de voz de ElevenLabs asignado al personaje
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
-  worldAgents         WorldAgent[]
-  messagesAsAgent     Message[]           @relation("AgentMessages")
-  relationsSubject    Relation[]          @relation("SubjectRelations")
-  reviews             Review[]
-  clones              AgentClone[]        @relation("OriginalAgent")
-  worldInteractions   WorldInteraction[]  @relation("SpeakerInteractions")
+  worldAgents       WorldAgent[]
+  messagesAsAgent   Message[]          @relation("AgentMessages")
+  relationsSubject  Relation[]         @relation("SubjectRelations")
+  reviews           Review[]
+  clones            AgentClone[]       @relation("OriginalAgent")
+  worldInteractions WorldInteraction[] @relation("SpeakerInteractions")
 
   // Sistema emocional avanzado
   personalityCore  PersonalityCore?
@@ -170,6 +192,15 @@ model Agent {
 
   // Sistema de mensajes proactivos
   proactiveConfig ProactiveConfig?
+
+  // Symbolic Bonds System Relations
+  symbolicBonds SymbolicBond[]   @relation("AgentSymbolicBonds")
+  bondQueue     BondQueue[]      @relation("AgentBondQueue")
+  bondLegacy    BondLegacy[]     @relation("AgentBondLegacy")
+  bondConfig    AgentBondConfig? @relation("AgentBondConfig")
+
+  // Analytics and Tracking
+  shareEvents ShareEvent[]
 
   @@index([userId])
   @@index([teamId])
@@ -384,8 +415,8 @@ model CharacterGrowth {
 
 // Modelo de Mundo (entorno grupal donde múltiples IAs interactúan)
 model World {
-  id          String   @id @default(cuid())
-  userId      String?  // Null para mundos predefinidos del sistema
+  id          String  @id @default(cuid())
+  userId      String? // Null para mundos predefinidos del sistema
   name        String
   description String?
 
@@ -396,57 +427,57 @@ model World {
   difficulty   String? // "beginner", "intermediate", "advanced"
 
   // Configuración del entorno
-  scenario    String?  @db.Text // Escenario/contexto del mundo (ej: "Oficina corporativa", "Escuela secundaria")
+  scenario       String? @db.Text // Escenario/contexto del mundo (ej: "Oficina corporativa", "Escuela secundaria")
   initialContext String? @db.Text // Contexto inicial de la simulación
-  rules       Json?    // Reglas del mundo (ej: {"allowConflict": true, "theme": "fantasy"})
+  rules          Json? // Reglas del mundo (ej: {"allowConflict": true, "theme": "fantasy"})
 
   // Estado de la simulación
-  status      WorldStatus @default(STOPPED) // RUNNING, PAUSED, STOPPED
-  visibility  String      @default("private") // private, public, shared
+  status     WorldStatus @default(STOPPED) // RUNNING, PAUSED, STOPPED
+  visibility String      @default("private") // private, public, shared
 
   // Configuración de simulación
-  autoMode           Boolean @default(true) // Modo automático (IAs hablan sin intervención)
-  turnsPerCycle      Int     @default(1) // Cuántos turnos por ciclo de simulación
-  interactionDelay   Int     @default(3000) // Delay entre interacciones (ms)
-  maxInteractions    Int?    // Límite opcional de interacciones
+  autoMode         Boolean @default(true) // Modo automático (IAs hablan sin intervención)
+  turnsPerCycle    Int     @default(1) // Cuántos turnos por ciclo de simulación
+  interactionDelay Int     @default(3000) // Delay entre interacciones (ms)
+  maxInteractions  Int? // Límite opcional de interacciones
 
   // Configuración de personalidad grupal
   allowEmotionalBonds Boolean @default(true) // Permitir que IAs desarrollen lazos emocionales
   allowConflicts      Boolean @default(true) // Permitir conflictos entre IAs
-  topicFocus         String? // Tema de enfoque (opcional)
+  topicFocus          String? // Tema de enfoque (opcional)
 
   // Sistema de narrativa guiada (para mundos tipo historia)
-  storyMode           Boolean @default(false) // Si está en modo historia con guión
-  currentStoryBeat    String? // Evento/beat actual del guión
-  storyProgress       Float   @default(0) // Progreso general de la historia (0-1)
-  directorAgentId     String? // ID del agente IA Director (gestiona la narrativa)
-  storyScript         Json? // Guión completo con eventos y arcos
-  directorState       Json? // Estado del AI Director (decisiones, timing, etc.)
+  storyMode             Boolean @default(false) // Si está en modo historia con guión
+  currentStoryBeat      String? // Evento/beat actual del guión
+  storyProgress         Float   @default(0) // Progreso general de la historia (0-1)
+  directorAgentId       String? // ID del agente IA Director (gestiona la narrativa)
+  storyScript           Json? // Guión completo con eventos y arcos
+  directorState         Json? // Estado del AI Director (decisiones, timing, etc.)
   currentSceneDirection Json? // Dirección actual de escena del Director (tone, pacing, etc.)
-  currentEmergentEvent Json? // Evento emergente activo (bump-into, interruption, etc.)
+  currentEmergentEvent  Json? // Evento emergente activo (bump-into, interruption, etc.)
 
   // Especificación editable del mundo (para modo creador)
-  worldSpec           Json? // Especificación completa del mundo para poder editarlo después
-  creationMode        String? // "simple" | "advanced" - indica cómo se creó el mundo
+  worldSpec    Json? // Especificación completa del mundo para poder editarlo después
+  creationMode String? // "simple" | "advanced" - indica cómo se creó el mundo
 
   // Métricas para ranking
-  viewCount           Int      @default(0) // Número de veces que se ha visitado
-  totalTimeSpent      Int      @default(0) // Tiempo total en segundos que usuarios han pasado
-  lastViewedAt        DateTime? // Última vez que alguien vio este mundo
-  rating              Float? // Rating promedio del mundo (si implementamos reviews para mundos)
+  viewCount      Int       @default(0) // Número de veces que se ha visitado
+  totalTimeSpent Int       @default(0) // Tiempo total en segundos que usuarios han pasado
+  lastViewedAt   DateTime? // Última vez que alguien vio este mundo
+  rating         Float? // Rating promedio del mundo (si implementamos reviews para mundos)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  worldAgents      WorldAgent[]
-  messages         Message[]
-  interactions     WorldInteraction[]
-  simulationState  WorldSimulationState?
-  agentRelations   AgentToAgentRelation[] // Relaciones entre IAs en este mundo
-  storyEvents      StoryEvent[] // Eventos programados del guión
-  characterArcs    CharacterArc[] // Arcos de personajes
+  worldAgents     WorldAgent[]
+  messages        Message[]
+  interactions    WorldInteraction[]
+  simulationState WorldSimulationState?
+  agentRelations  AgentToAgentRelation[] // Relaciones entre IAs en este mundo
+  storyEvents     StoryEvent[] // Eventos programados del guión
+  characterArcs   CharacterArc[] // Arcos de personajes
 
   @@index([userId])
   @@index([status])
@@ -462,9 +493,9 @@ model World {
 
 // ENUM: Estado de la simulación del mundo
 enum WorldStatus {
-  RUNNING  // Simulación activa
-  PAUSED   // Simulación pausada
-  STOPPED  // Simulación detenida
+  RUNNING // Simulación activa
+  PAUSED // Simulación pausada
+  STOPPED // Simulación detenida
 }
 
 // Tabla intermedia para Mundos y Agentes
@@ -474,22 +505,22 @@ model WorldAgent {
   joinedAt DateTime @default(now())
 
   // Rol del agente en el mundo (opcional)
-  role     String? // "leader", "observer", "participant", etc.
+  role String? // "leader", "observer", "participant", etc.
 
   // Estado del agente en el mundo
   isActive Boolean @default(true) // Si el agente está participando activamente
 
   // Estadísticas
-  totalInteractions Int @default(0) // Número de veces que ha hablado
+  totalInteractions Int       @default(0) // Número de veces que ha hablado
   lastInteractionAt DateTime? // Última vez que interactuó
 
   // Sistema de importancia narrativa (para mundos con historia)
-  importanceLevel   String  @default("secondary") // "main", "secondary", "filler"
-  screenTime        Int     @default(0) // Tracking de participación total
-  promotionScore    Float   @default(0.5) // Score para determinar promoción/degradación (0-1)
+  importanceLevel   String    @default("secondary") // "main", "secondary", "filler"
+  screenTime        Int       @default(0) // Tracking de participación total
+  promotionScore    Float     @default(0.5) // Score para determinar promoción/degradación (0-1)
   characterArcStage String? // Etapa actual en su arco: "introduction", "development", "climax", "resolution"
   emotionalState    Json? // Estado emocional actual del personaje en este mundo
-  isFocused         Boolean @default(false) // Si el Director ha marcado este personaje como foco
+  isFocused         Boolean   @default(false) // Si el Director ha marcado este personaje como foco
   focusedUntil      DateTime? // Hasta cuándo está en foco
 
   world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
@@ -502,23 +533,23 @@ model WorldAgent {
 
 // Interacciones entre IAs en un mundo
 model WorldInteraction {
-  id       String   @id @default(cuid())
-  worldId  String
+  id      String @id @default(cuid())
+  worldId String
 
   // Agentes involucrados
-  speakerId  String // ID del agente que habla
-  targetId   String? // ID del agente objetivo (null si es mensaje grupal)
+  speakerId String // ID del agente que habla
+  targetId  String? // ID del agente objetivo (null si es mensaje grupal)
 
   // Contenido
-  content    String   @db.Text
-  messageId  String?  @unique // Referencia al mensaje en la tabla Message
+  content   String  @db.Text
+  messageId String? @unique // Referencia al mensaje en la tabla Message
 
   // Contexto emocional
   speakerEmotion Json? // Estado emocional del hablante
   targetEmotion  Json? // Estado emocional del objetivo (si aplica)
 
   // Metadata
-  interactionType String @default("dialogue") // dialogue, action, thought, system
+  interactionType String  @default("dialogue") // dialogue, action, thought, system
   turnNumber      Int // Número de turno en la simulación
   turn            Int? // Alias de turnNumber para compatibilidad
   sentiment       String? // Análisis de sentimiento: "positive", "negative", "neutral", etc.
@@ -526,7 +557,7 @@ model WorldInteraction {
 
   createdAt DateTime @default(now())
 
-  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  world   World @relation(fields: [worldId], references: [id], onDelete: Cascade)
   speaker Agent @relation("SpeakerInteractions", fields: [speakerId], references: [id], onDelete: Cascade)
 
   @@index([worldId])
@@ -542,24 +573,24 @@ model WorldSimulationState {
   worldId String @unique
 
   // Estado actual
-  currentTurn      Int      @default(0) // Turno actual
+  currentTurn       Int     @default(0) // Turno actual
   totalInteractions Int     @default(0) // Total de interacciones
-  lastSpeakerId    String? // Último agente que habló
+  lastSpeakerId     String? // Último agente que habló
 
   // Contexto de conversación
-  recentTopics     Json    @default("[]") // Temas recientes discutidos
-  activeSpeakers   Json    @default("[]") // Agentes que han hablado recientemente
+  recentTopics   Json @default("[]") // Temas recientes discutidos
+  activeSpeakers Json @default("[]") // Agentes que han hablado recientemente
 
   // Estadísticas agregadas
-  statistics       Json    @default("{}") // Stats del mundo (emotions, interactions, etc.)
+  statistics Json @default("{}") // Stats del mundo (emotions, interactions, etc.)
 
   // Control de simulación
-  startedAt        DateTime?
-  pausedAt         DateTime?
-  resumedAt        DateTime?
-  stoppedAt        DateTime?
+  startedAt DateTime?
+  pausedAt  DateTime?
+  resumedAt DateTime?
+  stoppedAt DateTime?
 
-  lastUpdated      DateTime @default(now())
+  lastUpdated DateTime @default(now())
 
   world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
 
@@ -568,34 +599,34 @@ model WorldSimulationState {
 
 // Relaciones emocionales entre agentes (en contexto de un mundo)
 model AgentToAgentRelation {
-  id        String   @id @default(cuid())
-  worldId   String
+  id      String @id @default(cuid())
+  worldId String
 
   // Agentes involucrados
   subjectId String // Agente que tiene los sentimientos
   targetId  String // Agente objetivo
 
   // Métricas relacionales (similar a Relation pero entre IAs)
-  trust       Float @default(0.5) // Confianza (0-1)
-  affinity    Float @default(0.5) // Afinidad/simpatía (0-1)
-  respect     Float @default(0.5) // Respeto (0-1)
-  attraction  Float @default(0.5) // Atracción (romántica o platónica) (0-1)
+  trust      Float @default(0.5) // Confianza (0-1)
+  affinity   Float @default(0.5) // Afinidad/simpatía (0-1)
+  respect    Float @default(0.5) // Respeto (0-1)
+  attraction Float @default(0.5) // Atracción (romántica o platónica) (0-1)
 
   // Estado emocional privado (no visible al usuario directamente)
   privateState Json @default("{}") // { "love": 0.3, "jealousy": 0.1, "admiration": 0.7 }
 
   // Interacciones
-  totalInteractions Int @default(0)
+  totalInteractions    Int @default(0)
   positiveInteractions Int @default(0)
   negativeInteractions Int @default(0)
-  neutralInteractions Int @default(0)
+  neutralInteractions  Int @default(0)
 
   // Historia de relación
   relationshipHistory Json @default("[]") // [{turn: 10, event: "conflict", impact: -0.2}, ...]
 
   // Progresión
-  stage              String @default("strangers") // strangers | acquaintances | friends | close | complex
-  lastInteractionAt  DateTime?
+  stage             String    @default("strangers") // strangers | acquaintances | friends | close | complex
+  lastInteractionAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -611,22 +642,22 @@ model AgentToAgentRelation {
 
 // Modelo de Relaciones (emocionales entre agentes o usuario-agente)
 model Relation {
-  id           String   @id @default(cuid())
+  id           String @id @default(cuid())
   subjectId    String // ID del agente que siente la relación
   targetId     String // ID del agente o usuario objetivo
   targetType   String // "agent" o "user" - indica el tipo de objetivo
-  trust        Float    @default(0.5) // Confianza (0-1)
-  affinity     Float    @default(0.5) // Afinidad (0-1)
-  respect      Float    @default(0.5) // Respeto (0-1)
+  trust        Float  @default(0.5) // Confianza (0-1)
+  affinity     Float  @default(0.5) // Afinidad (0-1)
+  respect      Float  @default(0.5) // Respeto (0-1)
   privateState Json // Estados ocultos: love, curiosity, etc.
   visibleState Json // Estados visibles para el usuario
 
   // Sistema de progresión de relación
-  stage              String @default("stranger") // stranger | acquaintance | friend | close | intimate
-  totalInteractions  Int    @default(0) // Total de interacciones para calcular stage
-  lastInteractionAt  DateTime?
+  stage             String    @default("stranger") // stranger | acquaintance | friend | close | intimate
+  totalInteractions Int       @default(0) // Total de interacciones para calcular stage
+  lastInteractionAt DateTime?
 
-  updatedAt    DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   subjectAgent Agent @relation("SubjectRelations", fields: [subjectId], references: [id], onDelete: Cascade)
 
@@ -690,24 +721,29 @@ model Log {
 
 // Modelo de Suscripciones (Mercado Pago)
 model Subscription {
-  id                       String    @id @default(cuid())
-  userId                   String
-  mercadopagoPreapprovalId String    @unique
-  status                   String // authorized, paused, cancelled, pending
-  currentPeriodStart       DateTime
-  currentPeriodEnd         DateTime
-  cancelAtPeriodEnd        Boolean   @default(false)
-  trialStart               DateTime?
-  trialEnd                 DateTime?
-  canceledAt               DateTime?
-  metadata                 Json?
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
+  id     String @id @default(cuid())
+  userId String
+
+  // Provider-specific IDs (uno de estos debe estar presente)
+  mercadopagoPreapprovalId String? @unique // Para LATAM
+  paddleSubscriptionId     String? @unique // Para Global
+
+  status             String // active, cancelled, past_due, expired
+  currentPeriodStart DateTime  @default(now())
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean   @default(false)
+  trialStart         DateTime?
+  trialEnd           DateTime?
+  canceledAt         DateTime?
+  metadata           Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([mercadopagoPreapprovalId])
+  @@index([paddleSubscriptionId])
   @@index([status])
 }
 
@@ -1177,18 +1213,18 @@ model ImportantEvent {
   priority    String   @default("medium") // low, medium, high, critical
 
   // Estado del evento
-  mentioned        Boolean  @default(false) // Ya la IA preguntó sobre esto?
-  reminderSentAt   DateTime? // Cuándo se mencionó por última vez
-  eventHappened    Boolean  @default(false) // El evento ya pasó?
-  userFeedback     String? // "Fue bien", "Se canceló", etc.
-  isRecurring      Boolean  @default(false) // Se repite cada año? (cumpleaños, aniversarios)
-  recurringDay     Int? // Día del mes (1-31) para eventos recurrentes
-  recurringMonth   Int? // Mes (1-12) para eventos recurrentes
+  mentioned      Boolean   @default(false) // Ya la IA preguntó sobre esto?
+  reminderSentAt DateTime? // Cuándo se mencionó por última vez
+  eventHappened  Boolean   @default(false) // El evento ya pasó?
+  userFeedback   String? // "Fue bien", "Se canceló", etc.
+  isRecurring    Boolean   @default(false) // Se repite cada año? (cumpleaños, aniversarios)
+  recurringDay   Int? // Día del mes (1-31) para eventos recurrentes
+  recurringMonth Int? // Mes (1-12) para eventos recurrentes
 
   // Metadata
-  relationship String? // user, family, pet, friend (a quién afecta)
+  relationship  String? // user, family, pet, friend (a quién afecta)
   emotionalTone String? // joyful, anxious, neutral, sad
-  metadata     Json? // Info adicional flexible
+  metadata      Json? // Info adicional flexible
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1221,10 +1257,10 @@ model ImportantPerson {
   healthInfo  String? @db.Text // "Tiene diabetes", "Se recupera de cirugía"
 
   // Metadata
-  birthday     DateTime? // Cumpleaños de la persona
+  birthday      DateTime? // Cumpleaños de la persona
   lastMentioned DateTime? // Última vez que el usuario habló de esta persona
-  mentionCount  Int @default(0) // Cuántas veces se mencionó
-  importance    String @default("medium") // low, medium, high (basado en frecuencia de mención)
+  mentionCount  Int       @default(0) // Cuántas veces se mencionó
+  importance    String    @default("medium") // low, medium, high (basado en frecuencia de mención)
 
   metadata Json? // Info adicional flexible
 
@@ -1249,17 +1285,17 @@ model ProactiveConfig {
   userId  String
 
   // Configuración general
-  enabled              Boolean @default(true) // Usuario permite mensajes proactivos?
-  maxMessagesPerDay    Int     @default(2) // Límite diario de mensajes proactivos
-  maxMessagesPerWeek   Int     @default(7) // Límite semanal
-  quietHoursStart      Int?    @default(22) // Hora de inicio de horario silencioso (22 = 10 PM)
-  quietHoursEnd        Int?    @default(8) // Hora de fin de horario silencioso (8 = 8 AM)
+  enabled            Boolean @default(true) // Usuario permite mensajes proactivos?
+  maxMessagesPerDay  Int     @default(2) // Límite diario de mensajes proactivos
+  maxMessagesPerWeek Int     @default(7) // Límite semanal
+  quietHoursStart    Int?    @default(22) // Hora de inicio de horario silencioso (22 = 10 PM)
+  quietHoursEnd      Int?    @default(8) // Hora de fin de horario silencioso (8 = 8 AM)
 
   // Triggers habilitados
-  inactivityEnabled    Boolean @default(true) // Enviar mensaje si usuario inactivo?
-  inactivityDays       Int     @default(3) // Días de inactividad antes de enviar
-  eventRemindersEnabled Boolean @default(true) // Recordar eventos próximos?
-  eventReminderHours   Int     @default(24) // Horas antes del evento para recordar
+  inactivityEnabled       Boolean @default(true) // Enviar mensaje si usuario inactivo?
+  inactivityDays          Int     @default(3) // Días de inactividad antes de enviar
+  eventRemindersEnabled   Boolean @default(true) // Recordar eventos próximos?
+  eventReminderHours      Int     @default(24) // Horas antes del evento para recordar
   emotionalCheckInEnabled Boolean @default(true) // Check-in emocional si última conversación fue difícil?
 
   // Metadata
@@ -1287,12 +1323,12 @@ model ProactiveMessage {
   context     Json? // Contexto usado para generar el mensaje (evento, última conversación, etc.)
 
   // Estado
-  status        String   @default("pending") // pending, sent, delivered, read, failed
+  status        String    @default("pending") // pending, sent, delivered, read, failed
   sentAt        DateTime?
   deliveredAt   DateTime?
   readAt        DateTime?
   responseAt    DateTime? // Cuándo respondió el usuario?
-  userResponded Boolean  @default(false)
+  userResponded Boolean   @default(false)
 
   // Relación con mensaje real (si se envió)
   messageId String? @unique // ID del mensaje en la tabla Message
@@ -1314,42 +1350,42 @@ model ProactiveMessage {
 
 // Eventos programados del guión (ej: festival cultural, exámenes, confesión)
 model StoryEvent {
-  id          String   @id @default(cuid())
-  worldId     String
-  
+  id      String @id @default(cuid())
+  worldId String
+
   // Información del evento
   eventType   String // "school_festival", "exam_week", "confession", "conflict", "resolution"
   eventName   String // Nombre del evento
-  description String   @db.Text
-  
+  description String @db.Text
+
   // Trigger conditions
   triggerType       String // "automatic", "progress_based", "character_action"
   triggerConditions Json? // Condiciones para que se active
   requiredProgress  Float? // Progreso mínimo requerido (0-1)
-  
+
   // Participantes
-  involvedCharacters Json @default("[]") // IDs de personajes que participan
+  involvedCharacters Json    @default("[]") // IDs de personajes que participan
   focusCharacter     String? // Personaje principal del evento
-  
+
   // Estado
-  isCompleted Boolean  @default(false)
-  isActive    Boolean  @default(false)
+  isCompleted Boolean @default(false)
+  isActive    Boolean @default(false)
   outcome     String? // Resultado del evento
-  
+
   // Scheduling
   scheduledAt DateTime?
   startedAt   DateTime?
   completedAt DateTime?
-  
+
   // Metadata
   storyImpact Json? // Impacto en la historia y personajes
   nextEvents  Json? // IDs de eventos que pueden seguir
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  
+
   @@index([worldId])
   @@index([worldId, isCompleted])
   @@index([worldId, isActive])
@@ -1358,43 +1394,43 @@ model StoryEvent {
 
 // Arcos de personajes (desarrollo narrativo individual)
 model CharacterArc {
-  id        String   @id @default(cuid())
-  worldId   String
-  agentId   String
-  
+  id      String @id @default(cuid())
+  worldId String
+  agentId String
+
   // Información del arco
-  arcName        String // "Tsundere Redemption", "Shy Girl Opens Up", "Rival to Friend"
-  arcType        String // "romance", "friendship", "rivalry", "personal_growth", "comedy"
-  description    String   @db.Text
-  
+  arcName     String // "Tsundere Redemption", "Shy Girl Opens Up", "Rival to Friend"
+  arcType     String // "romance", "friendship", "rivalry", "personal_growth", "comedy"
+  description String @db.Text
+
   // Estructura del arco
-  milestones     Json // Array de hitos del arco con sus condiciones
-  currentMilestone Int @default(0) // Índice del hito actual
-  progress       Float @default(0) // Progreso en el arco actual (0-1)
-  
+  milestones       Json // Array de hitos del arco con sus condiciones
+  currentMilestone Int   @default(0) // Índice del hito actual
+  progress         Float @default(0) // Progreso en el arco actual (0-1)
+
   // Estado
   isActive    Boolean @default(true)
   isCompleted Boolean @default(false)
-  
+
   // Relaciones con otros personajes
   relatedCharacters Json @default("[]") // IDs de personajes relacionados
   conflictsWith     Json @default("[]") // IDs de personajes en conflicto
   alliesWith        Json @default("[]") // IDs de personajes aliados
-  
+
   // Progreso narrativo
-  keyMoments  Json @default("[]") // Momentos clave ya ocurridos
+  keyMoments  Json    @default("[]") // Momentos clave ya ocurridos
   currentGoal String? // Objetivo actual del personaje
-  
+
   // Metadata
   emotionalTone   String? // "comedic", "dramatic", "heartwarming", "bittersweet"
   characterGrowth Json? // Cambios en la personalidad/relaciones
-  
-  startedAt   DateTime @default(now())
+
+  startedAt   DateTime  @default(now())
   completedAt DateTime?
-  updatedAt   DateTime @updatedAt
-  
+  updatedAt   DateTime  @updatedAt
+
   world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  
+
   @@index([worldId])
   @@index([agentId])
   @@index([worldId, isActive])
@@ -1408,35 +1444,35 @@ model CharacterArc {
 
 // TRACKING DE INTERACCIONES (estilo Netflix/YouTube)
 model UserInteraction {
-  id              String   @id @default(cuid())
-  userId          String
+  id     String @id @default(cuid())
+  userId String
 
   // Qué interactuó
-  itemType        String   // "agent" | "world"
-  itemId          String   // ID del agente o mundo
+  itemType String // "agent" | "world"
+  itemId   String // ID del agente o mundo
 
   // Tipo de interacción
-  interactionType String   // "view", "chat", "message", "rating", "like", "share", "finish"
+  interactionType String // "view", "chat", "message", "rating", "like", "share", "finish"
 
   // Métricas de engagement
-  duration        Int      @default(0) // Segundos de interacción
-  messageCount    Int?     // Número de mensajes enviados (si aplica)
-  completionRate  Float?   // 0-1, ¿completó la interacción?
-  rating          Int?     // 1-5 si dejó rating
+  duration       Int    @default(0) // Segundos de interacción
+  messageCount   Int? // Número de mensajes enviados (si aplica)
+  completionRate Float? // 0-1, ¿completó la interacción?
+  rating         Int? // 1-5 si dejó rating
 
   // Feedback explícito
-  liked           Boolean? // Like/dislike explícito
-  shared          Boolean  @default(false)
+  liked  Boolean? // Like/dislike explícito
+  shared Boolean  @default(false)
 
   // Contexto (para mejorar recomendaciones)
-  deviceType      String?  // "mobile", "desktop", "tablet"
-  timeOfDay       String?  // "morning", "afternoon", "evening", "night"
-  dayOfWeek       String?  // "monday", "tuesday", etc.
+  deviceType String? // "mobile", "desktop", "tablet"
+  timeOfDay  String? // "morning", "afternoon", "evening", "night"
+  dayOfWeek  String? // "monday", "tuesday", etc.
 
   // Metadata adicional (flexible)
-  metadata        Json?    // { topics: [], emotions: [], etc. }
+  metadata Json? // { topics: [], emotions: [], etc. }
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1460,21 +1496,21 @@ model UserProfile {
   preferredAgentTypes Json @default("[]") // ["companion", "assistant"]
 
   // Patrones de comportamiento
-  avgSessionDuration  Int  @default(0) // Segundos promedio por sesión
-  preferredTimeOfDay  String? // Cuándo más usa la app
-  interactionCount    Int  @default(0) // Total de interacciones
-  totalTimeSpent      Int  @default(0) // Tiempo total en segundos
+  avgSessionDuration Int     @default(0) // Segundos promedio por sesión
+  preferredTimeOfDay String? // Cuándo más usa la app
+  interactionCount   Int     @default(0) // Total de interacciones
+  totalTimeSpent     Int     @default(0) // Tiempo total en segundos
 
   // Métricas de engagement
-  avgCompletionRate   Float @default(0.5) // Promedio de completion
-  avgRating           Float? // Rating promedio que da
+  avgCompletionRate Float  @default(0.5) // Promedio de completion
+  avgRating         Float? // Rating promedio que da
 
   // Embeddings (para similarity search)
   preferenceEmbedding Json? // Vector de preferencias del usuario
 
   // Metadata
-  lastInteractionAt   DateTime?
-  profileVersion      Int   @default(1) // Para migraciones futuras
+  lastInteractionAt DateTime?
+  profileVersion    Int       @default(1) // Para migraciones futuras
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1493,25 +1529,25 @@ model RecommendationCache {
   recommendations Json // Array de {itemType, itemId, score, reason}
 
   // Metadata de generación
-  algorithm       String   // "llm", "collaborative", "hybrid"
-  generatedAt     DateTime @default(now())
-  expiresAt       DateTime // Cuándo regenerar
+  algorithm   String // "llm", "collaborative", "hybrid"
+  generatedAt DateTime @default(now())
+  expiresAt   DateTime // Cuándo regenerar
 
   // Métricas de calidad
-  diversityScore  Float?   // Qué tan diversas son las recos
-  noveltyScore    Float?   // Qué tan nuevas son
+  diversityScore Float? // Qué tan diversas son las recos
+  noveltyScore   Float? // Qué tan nuevas son
 
   // Tracking de efectividad
-  impressions     Int      @default(0) // Cuántas veces se mostraron
-  clicks          Int      @default(0) // Cuántas veces hicieron click
-  ctr             Float?   // Click-through rate
+  impressions Int    @default(0) // Cuántas veces se mostraron
+  clicks      Int    @default(0) // Cuántas veces hicieron click
+  ctr         Float? // Click-through rate
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, generatedAt]) // Solo una cache por usuario por timestamp
   @@index([userId])
   @@index([expiresAt])
   @@index([generatedAt])
-  @@unique([userId, generatedAt]) // Solo una cache por usuario por timestamp
 }
 
 // ========================================
@@ -1520,61 +1556,61 @@ model RecommendationCache {
 
 // TEMAS PUBLICADOS EN EL MARKETPLACE
 model MarketplaceTheme {
-  id        String   @id @default(cuid())
-  authorId  String
+  id       String @id @default(cuid())
+  authorId String
 
   // Información del tema
-  name              String
-  description       String?  @db.Text
-  userBubbleColor   String
-  agentBubbleColor  String
-  backgroundColor   String
-  backgroundGradient Json?   // Array de colores para gradiente
-  accentColor       String
-  textColor         String?
-  backgroundImage   String?  // URL de imagen de fondo (si tiene)
+  name               String
+  description        String? @db.Text
+  userBubbleColor    String
+  agentBubbleColor   String
+  backgroundColor    String
+  backgroundGradient Json? // Array de colores para gradiente
+  accentColor        String
+  textColor          String?
+  backgroundImage    String? // URL de imagen de fondo (si tiene)
 
   // Categorización
-  category          String   // "dark", "light", "colorful", "minimal", "anime", "nature", etc.
-  tags              Json     @default("[]") // Array de tags para búsqueda
+  category String // "dark", "light", "colorful", "minimal", "anime", "nature", etc.
+  tags     Json   @default("[]") // Array de tags para búsqueda
 
   // Estado y moderación
-  status            String   @default("pending") // pending, approved, rejected, removed
-  moderationNotes   String?  @db.Text
-  moderatedBy       String?
-  moderatedAt       DateTime?
+  status          String    @default("pending") // pending, approved, rejected, removed
+  moderationNotes String?   @db.Text
+  moderatedBy     String?
+  moderatedAt     DateTime?
 
   // Visibilidad
-  isPublic          Boolean  @default(true)
-  isFeatured        Boolean  @default(false) // Featured en homepage
-  isPremium         Boolean  @default(false) // Solo para usuarios premium
+  isPublic   Boolean @default(true)
+  isFeatured Boolean @default(false) // Featured en homepage
+  isPremium  Boolean @default(false) // Solo para usuarios premium
 
   // Métricas
-  downloadCount     Int      @default(0)
-  viewCount         Int      @default(0)
-  rating            Float    @default(0) // 0-5
-  ratingCount       Int      @default(0)
+  downloadCount Int   @default(0)
+  viewCount     Int   @default(0)
+  rating        Float @default(0) // 0-5
+  ratingCount   Int   @default(0)
 
   // Versioning
-  version           String   @default("1.0")
-  isLatestVersion   Boolean  @default(true)
-  previousVersionId String?  @unique // ID de la versión anterior
+  version           String  @default("1.0")
+  isLatestVersion   Boolean @default(true)
+  previousVersionId String? @unique // ID de la versión anterior
 
   // Preview images (screenshots del tema)
-  previewImages     Json     @default("[]") // URLs de previews
+  previewImages Json @default("[]") // URLs de previews
 
   // Metadata de exportación
-  exportData        Json     // JSON del tema para importar
+  exportData Json // JSON del tema para importar
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   publishedAt DateTime @default(now())
 
-  author User @relation("MarketplaceThemeAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  ratings MarketplaceThemeRating[]
-  downloads MarketplaceThemeDownload[]
-  reports MarketplaceThemeReport[]
-  collections MarketplaceCollection[] @relation("CollectionThemes")
+  author      User                       @relation("MarketplaceThemeAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  ratings     MarketplaceThemeRating[]
+  downloads   MarketplaceThemeDownload[]
+  reports     MarketplaceThemeReport[]
+  collections MarketplaceCollection[]    @relation("CollectionThemes")
 
   @@index([authorId])
   @@index([status])
@@ -1593,8 +1629,8 @@ model MarketplaceThemeRating {
   userId  String
 
   // Rating
-  rating  Int // 1-5 estrellas
-  review  String? @db.Text
+  rating Int // 1-5 estrellas
+  review String? @db.Text
 
   // Metadata
   helpful Int @default(0) // Contador de "útil"
@@ -1642,10 +1678,10 @@ model MarketplaceThemeReport {
   description String? @db.Text
 
   // Estado
-  status      String   @default("pending") // pending, reviewed, action_taken, dismissed
-  reviewedBy  String?
-  reviewedAt  DateTime?
-  resolution  String?  @db.Text
+  status     String    @default("pending") // pending, reviewed, action_taken, dismissed
+  reviewedBy String?
+  reviewedAt DateTime?
+  resolution String?   @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1660,8 +1696,8 @@ model MarketplaceThemeReport {
 
 // COLECCIONES DE TEMAS (curated lists)
 model MarketplaceCollection {
-  id          String @id @default(cuid())
-  curatorId   String
+  id        String @id @default(cuid())
+  curatorId String
 
   // Información de la colección
   name        String
@@ -1669,17 +1705,17 @@ model MarketplaceCollection {
   coverImage  String? // URL de imagen de portada
 
   // Estado
-  isPublic    Boolean @default(true)
-  isFeatured  Boolean @default(false)
-  isOfficial  Boolean @default(false) // Colecciones oficiales del equipo
+  isPublic   Boolean @default(true)
+  isFeatured Boolean @default(false)
+  isOfficial Boolean @default(false) // Colecciones oficiales del equipo
 
   // Métricas
-  views       Int @default(0)
-  followers   Int @default(0)
+  views     Int @default(0)
+  followers Int @default(0)
 
   // Temas en la colección
-  themes      MarketplaceTheme[] @relation("CollectionThemes")
-  themeOrder  Json @default("[]") // Array de IDs para mantener orden
+  themes     MarketplaceTheme[] @relation("CollectionThemes")
+  themeOrder Json               @default("[]") // Array de IDs para mantener orden
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1697,57 +1733,57 @@ model MarketplaceCollection {
 
 // POSTS Y DISCUSIONES (Reddit/Discord style)
 model CommunityPost {
-  id        String   @id @default(cuid())
-  authorId  String
+  id       String @id @default(cuid())
+  authorId String
 
   // Contenido
-  title     String
-  content   String   @db.Text
+  title       String
+  content     String @db.Text
   contentType String @default("markdown") // markdown, html, plain
 
   // Tipo de post
-  type      String   // discussion, question, showcase, help, research, poll, announcement
+  type String // discussion, question, showcase, help, research, poll, announcement
 
   // Categorización
-  tags      Json     @default("[]") // Array de tags
+  tags        Json    @default("[]") // Array de tags
   communityId String? // Null = post global
 
   // Estado
-  isPinned  Boolean  @default(false)
-  isLocked  Boolean  @default(false) // No más comentarios
+  isPinned   Boolean @default(false)
+  isLocked   Boolean @default(false) // No más comentarios
   isFeatured Boolean @default(false)
-  status    String   @default("published") // draft, published, removed, flagged
+  status     String  @default("published") // draft, published, removed, flagged
 
   // Métricas de engagement
-  upvotes   Int      @default(0)
-  downvotes Int      @default(0)
-  score     Int      @default(0) // upvotes - downvotes
-  commentCount Int   @default(0)
-  viewCount Int      @default(0)
-  shareCount Int     @default(0)
+  upvotes      Int @default(0)
+  downvotes    Int @default(0)
+  score        Int @default(0) // upvotes - downvotes
+  commentCount Int @default(0)
+  viewCount    Int @default(0)
+  shareCount   Int @default(0)
 
   // Awards recibidos
-  awardCount Int     @default(0)
+  awardCount Int @default(0)
 
   // Poll data (si type = poll)
-  pollOptions Json?  // Array de opciones
+  pollOptions Json? // Array de opciones
   pollEndDate DateTime?
 
   // Multimedia
-  images    Json     @default("[]") // URLs de imágenes
-  videos    Json     @default("[]") // URLs de videos
-  attachments Json   @default("[]") // Otros archivos
+  images      Json @default("[]") // URLs de imágenes
+  videos      Json @default("[]") // URLs de videos
+  attachments Json @default("[]") // Otros archivos
 
   // SEO y sharing
-  slug      String?  @unique // URL-friendly slug
+  slug            String? @unique // URL-friendly slug
   metaDescription String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   lastActivityAt DateTime @default(now()) // Para ordenar por actividad
 
-  author    User @relation("CommunityPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author    User               @relation("CommunityPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  community Community?         @relation(fields: [communityId], references: [id], onDelete: Cascade)
   comments  CommunityComment[]
   votes     PostVote[]
   awards    PostAward[]
@@ -1765,38 +1801,38 @@ model CommunityPost {
 
 // COMENTARIOS (anidados/threaded)
 model CommunityComment {
-  id        String   @id @default(cuid())
-  postId    String
-  authorId  String
-  parentId  String?  // Para comentarios anidados
+  id       String  @id @default(cuid())
+  postId   String
+  authorId String
+  parentId String? // Para comentarios anidados
 
   // Contenido
-  content   String   @db.Text
+  content     String @db.Text
   contentType String @default("markdown")
 
   // Estado
-  isEdited  Boolean  @default(false)
-  isDeleted Boolean  @default(false)
-  status    String   @default("published") // published, removed, flagged
+  isEdited  Boolean @default(false)
+  isDeleted Boolean @default(false)
+  status    String  @default("published") // published, removed, flagged
 
   // Métricas
-  upvotes   Int      @default(0)
-  downvotes Int      @default(0)
-  score     Int      @default(0)
+  upvotes   Int @default(0)
+  downvotes Int @default(0)
+  score     Int @default(0)
 
   // Special flags
   isAcceptedAnswer Boolean @default(false) // Si es respuesta aceptada a pregunta
-  isByOP    Boolean  @default(false) // Si es comentario del autor original
+  isByOP           Boolean @default(false) // Si es comentario del autor original
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  author    User @relation("CommunityCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  parent    CommunityComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies   CommunityComment[] @relation("CommentReplies")
-  votes     CommentVote[]
-  reports   CommentReport[]
+  post    CommunityPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author  User               @relation("CommunityCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  parent  CommunityComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies CommunityComment[] @relation("CommentReplies")
+  votes   CommentVote[]
+  reports CommentReport[]
 
   @@index([postId])
   @@index([authorId])
@@ -1840,17 +1876,17 @@ model CommentVote {
 
 // AWARDS (premios que usuarios dan a posts)
 model PostAward {
-  id       String @id @default(cuid())
-  postId   String
-  giverId  String // Usuario que lo da
+  id      String @id @default(cuid())
+  postId  String
+  giverId String // Usuario que lo da
 
   awardType String // "helpful", "wholesome", "gold", "platinum", etc
-  cost      Int    // Costo en coins
+  cost      Int // Costo en coins
 
   createdAt DateTime @default(now())
 
   post  CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  giver User @relation("AwardGiver", fields: [giverId], references: [id], onDelete: Cascade)
+  giver User          @relation("AwardGiver", fields: [giverId], references: [id], onDelete: Cascade)
 
   @@index([postId])
   @@index([giverId])
@@ -1858,28 +1894,28 @@ model PostAward {
 
 // COMUNIDADES/GRUPOS
 model Community {
-  id          String @id @default(cuid())
-  ownerId     String
+  id      String @id @default(cuid())
+  ownerId String
 
   // Información básica
   name        String
-  slug        String @unique // URL-friendly
-  description String @db.Text
+  slug        String  @unique // URL-friendly
+  description String  @db.Text
   rules       String? @db.Text // Reglas de la comunidad
 
   // Branding
-  icon        String? // URL del icono
-  banner      String? // URL del banner
-  primaryColor String @default("#8B5CF6")
+  icon         String? // URL del icono
+  banner       String? // URL del banner
+  primaryColor String  @default("#8B5CF6")
 
   // Tipo y visibilidad
-  type        String @default("public") // public, private, restricted
-  category    String // tema, educación, gaming, etc
+  type     String @default("public") // public, private, restricted
+  category String // tema, educación, gaming, etc
 
   // Estado
-  isOfficial  Boolean @default(false) // Comunidad oficial del equipo
-  isFeatured  Boolean @default(false)
-  isVerified  Boolean @default(false)
+  isOfficial Boolean @default(false) // Comunidad oficial del equipo
+  isFeatured Boolean @default(false)
+  isVerified Boolean @default(false)
 
   // Métricas
   memberCount Int @default(0)
@@ -1888,11 +1924,11 @@ model Community {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  owner   User @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members CommunityMember[]
-  posts   CommunityPost[]
+  owner    User               @relation("CommunityOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members  CommunityMember[]
+  posts    CommunityPost[]
   channels CommunityChannel[]
-  events  CommunityEvent[]
+  events   CommunityEvent[]
 
   @@index([ownerId])
   @@index([slug])
@@ -1910,7 +1946,7 @@ model CommunityMember {
   userId      String
 
   // Rol en la comunidad
-  role        String @default("member") // owner, moderator, member
+  role String @default("member") // owner, moderator, member
 
   // Permisos personalizados
   canPost     Boolean @default(true)
@@ -1918,15 +1954,15 @@ model CommunityMember {
   canModerate Boolean @default(false)
 
   // Estado
-  isBanned    Boolean @default(false)
-  isMuted     Boolean @default(false)
-  mutedUntil  DateTime?
+  isBanned   Boolean   @default(false)
+  isMuted    Boolean   @default(false)
+  mutedUntil DateTime?
 
   // Métricas
-  postCount   Int @default(0)
+  postCount    Int @default(0)
   commentCount Int @default(0)
 
-  joinedAt  DateTime @default(now())
+  joinedAt DateTime @default(now())
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
@@ -1943,15 +1979,15 @@ model CommunityChannel {
 
   name        String
   description String?
-  type        String @default("discussion") // discussion, announcements, resources
+  type        String  @default("discussion") // discussion, announcements, resources
 
   // Orden y organización
-  position    Int @default(0)
+  position     Int     @default(0)
   categoryName String? // Para agrupar canales
 
   // Permisos
-  isPrivate   Boolean @default(false)
-  allowedRoles Json @default("[]") // Roles que pueden acceder
+  isPrivate    Boolean @default(false)
+  allowedRoles Json    @default("[]") // Roles que pueden acceder
 
   createdAt DateTime @default(now())
 
@@ -1963,23 +1999,23 @@ model CommunityChannel {
 
 // REPORTES DE POSTS
 model PostReport {
-  id       String @id @default(cuid())
-  postId   String
+  id         String @id @default(cuid())
+  postId     String
   reporterId String
 
   reason      String // spam, harassment, inappropriate, etc
   description String? @db.Text
 
   // Estado
-  status      String @default("pending") // pending, reviewed, action_taken, dismissed
-  reviewedBy  String?
-  reviewedAt  DateTime?
-  action      String? // removed, warned, banned, dismissed
+  status     String    @default("pending") // pending, reviewed, action_taken, dismissed
+  reviewedBy String?
+  reviewedAt DateTime?
+  action     String? // removed, warned, banned, dismissed
 
   createdAt DateTime @default(now())
 
   post     CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  reporter User @relation("PostReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporter User          @relation("PostReporter", fields: [reporterId], references: [id], onDelete: Cascade)
 
   @@index([postId])
   @@index([reporterId])
@@ -1988,22 +2024,22 @@ model PostReport {
 
 // REPORTES DE COMENTARIOS
 model CommentReport {
-  id        String @id @default(cuid())
-  commentId String
+  id         String @id @default(cuid())
+  commentId  String
   reporterId String
 
   reason      String
   description String? @db.Text
 
-  status      String @default("pending")
-  reviewedBy  String?
-  reviewedAt  DateTime?
-  action      String?
+  status     String    @default("pending")
+  reviewedBy String?
+  reviewedAt DateTime?
+  action     String?
 
   createdAt DateTime @default(now())
 
   comment  CommunityComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  reporter User @relation("CommentReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporter User             @relation("CommentReporter", fields: [reporterId], references: [id], onDelete: Cascade)
 
   @@index([commentId])
   @@index([reporterId])
@@ -2012,7 +2048,7 @@ model CommentReport {
 
 // EVENTOS DE COMUNIDAD
 model CommunityEvent {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   communityId String?
   organizerId String
 
@@ -2022,32 +2058,32 @@ model CommunityEvent {
   type        String // challenge, workshop, ama, meetup, competition, release
 
   // Fechas
-  startDate   DateTime
-  endDate     DateTime
+  startDate            DateTime
+  endDate              DateTime
   registrationDeadline DateTime?
 
   // Ubicación (virtual)
-  meetingUrl  String? // URL de Zoom/Meet/etc
-  streamUrl   String? // URL de stream
+  meetingUrl String? // URL de Zoom/Meet/etc
+  streamUrl  String? // URL de stream
 
   // Premios (para challenges/competitions)
-  prizes      Json @default("[]") // Array de premios
-  winners     Json @default("[]") // Array de ganadores
+  prizes  Json @default("[]") // Array de premios
+  winners Json @default("[]") // Array de ganadores
 
   // Metadata
-  maxParticipants Int?
-  currentParticipants Int @default(0)
-  coverImage  String?
-  tags        Json @default("[]")
+  maxParticipants     Int?
+  currentParticipants Int     @default(0)
+  coverImage          String?
+  tags                Json    @default("[]")
 
   // Estado
-  status      String @default("upcoming") // upcoming, ongoing, completed, cancelled
+  status String @default("upcoming") // upcoming, ongoing, completed, cancelled
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  community Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  organizer User @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
+  community     Community?          @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  organizer     User                @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
   registrations EventRegistration[]
 
   @@index([communityId])
@@ -2063,7 +2099,7 @@ model EventRegistration {
   eventId String
   userId  String
 
-  status  String @default("registered") // registered, attended, no_show, cancelled
+  status String @default("registered") // registered, attended, no_show, cancelled
 
   // Metadata
   joinedAt DateTime?
@@ -2089,19 +2125,19 @@ model UserReputation {
   level       Int @default(1)
 
   // Desglose por tipo de actividad
-  postKarma         Int @default(0) // Upvotes en posts
-  commentKarma      Int @default(0) // Upvotes en comentarios
+  postKarma          Int @default(0) // Upvotes en posts
+  commentKarma       Int @default(0) // Upvotes en comentarios
   contributionPoints Int @default(0) // Contribuciones (research, etc)
-  creatorPoints     Int @default(0) // Items en marketplace
-  helperPoints      Int @default(0) // Respuestas aceptadas
+  creatorPoints      Int @default(0) // Items en marketplace
+  helperPoints       Int @default(0) // Respuestas aceptadas
 
   // Social metrics
   followersCount Int @default(0)
   followingCount Int @default(0)
 
   // Streaks (racha de actividad diaria)
-  currentStreak Int @default(0)
-  longestStreak Int @default(0)
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
   lastActiveDate DateTime @default(now())
 
   // Areas de expertise (tags donde es activo)
@@ -2118,14 +2154,14 @@ model UserReputation {
 
 // BADGES GANADOS POR USUARIOS
 model UserBadge {
-  id          String @id @default(cuid())
-  userId      String
+  id           String @id @default(cuid())
+  userId       String
   reputationId String
 
   // Badge info
-  badgeType   String // contributor, creator, helper, researcher, social, special
-  badgeName   String // "Gold Contributor", "Theme Master", etc
-  badgeLevel  String // bronze, silver, gold, diamond, platinum
+  badgeType  String // contributor, creator, helper, researcher, social, special
+  badgeName  String // "Gold Contributor", "Theme Master", etc
+  badgeLevel String // bronze, silver, gold, diamond, platinum
 
   // Metadata
   description String?
@@ -2144,8 +2180,8 @@ model UserBadge {
 
 // SISTEMA DE SEGUIR USUARIOS (Follow)
 model Follow {
-  id         String @id @default(cuid())
-  followerId String
+  id          String @id @default(cuid())
+  followerId  String
   followingId String
 
   createdAt DateTime @default(now())
@@ -2157,30 +2193,30 @@ model Follow {
 
 // MENSAJERÍA DIRECTA
 model DirectMessage {
-  id           String @id @default(cuid())
+  id             String @id @default(cuid())
   conversationId String
-  senderId     String
-  recipientId  String
+  senderId       String
+  recipientId    String
 
   // Contenido
-  content      String @db.Text
-  contentType  String @default("text") // text, image, file, shared_post, shared_item
+  content     String @db.Text
+  contentType String @default("text") // text, image, file, shared_post, shared_item
 
   // Metadata para tipos especiales
-  attachmentUrl String?
-  sharedItemId  String? // ID de post/item compartido
+  attachmentUrl  String?
+  sharedItemId   String? // ID de post/item compartido
   sharedItemType String? // post, theme, character, etc
 
   // Estado
-  isRead       Boolean @default(false)
-  isEdited     Boolean @default(false)
-  isDeleted    Boolean @default(false)
+  isRead    Boolean @default(false)
+  isEdited  Boolean @default(false)
+  isDeleted Boolean @default(false)
 
   // Reacciones
-  reactions    Json @default("[]") // Array de {emoji, userId}
+  reactions Json @default("[]") // Array de {emoji, userId}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   readAt    DateTime?
 
   conversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -2193,24 +2229,24 @@ model DirectMessage {
 
 // CONVERSACIONES (1-on-1 o grupos)
 model DirectConversation {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
 
   // Tipo
-  type  String @default("direct") // direct (1-on-1) o group
+  type String @default("direct") // direct (1-on-1) o group
 
   // Nombre (para grupos)
-  name  String?
-  icon  String?
+  name String?
+  icon String?
 
   // Participantes (array de user IDs)
   participants Json // Array de user IDs
 
   // Metadata
-  lastMessageAt DateTime @default(now())
+  lastMessageAt      DateTime @default(now())
   lastMessagePreview String?
 
   // Configuración
-  isMuted  Boolean @default(false)
+  isMuted    Boolean @default(false)
   isArchived Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -2223,29 +2259,29 @@ model DirectConversation {
 
 // NOTIFICACIONES
 model Notification {
-  id         String @id @default(cuid())
+  id          String @id @default(cuid())
   recipientId String
 
   // Tipo de notificación
-  type       String // post_reply, comment_reply, mention, upvote, award, follow, dm, event_reminder, etc
+  type String // post_reply, comment_reply, mention, upvote, award, follow, dm, event_reminder, etc
 
   // Contenido
-  title      String
-  message    String
-  actionUrl  String? // URL para abrir al hacer click
+  title     String
+  message   String
+  actionUrl String? // URL para abrir al hacer click
 
   // Metadata
-  relatedId  String? // ID del post/comment/user relacionado
+  relatedId   String? // ID del post/comment/user relacionado
   relatedType String? // post, comment, user, etc
-  actorId    String? // Usuario que causó la notificación
-  actorName  String?
+  actorId     String? // Usuario que causó la notificación
+  actorName   String?
   actorAvatar String?
 
   // Estado
-  isRead     Boolean @default(false)
-  isPush     Boolean @default(false) // Si se envió push notification
+  isRead Boolean @default(false)
+  isPush Boolean @default(false) // Si se envió push notification
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   readAt    DateTime?
 
   @@index([recipientId])
@@ -2256,45 +2292,45 @@ model Notification {
 
 // MARKETPLACE EXPANDIDO - PROMPTS
 model MarketplacePrompt {
-  id        String @id @default(cuid())
-  authorId  String
+  id       String @id @default(cuid())
+  authorId String
 
   // Información del prompt
   name        String
   description String @db.Text
   category    String // personality, roleplay, assistant, creative, educational, etc
-  tags        Json @default("[]")
+  tags        Json   @default("[]")
 
   // Contenido del prompt
-  systemPrompt String @db.Text
-  exampleInputs Json @default("[]") // Array de ejemplos de input
-  exampleOutputs Json @default("[]") // Array de ejemplos de output
+  systemPrompt   String @db.Text
+  exampleInputs  Json   @default("[]") // Array de ejemplos de input
+  exampleOutputs Json   @default("[]") // Array de ejemplos de output
 
   // Configuración recomendada
   recommendedModel String? // venice-uncensored, etc
-  temperature Float @default(0.7)
-  maxTokens   Int @default(2000)
+  temperature      Float   @default(0.7)
+  maxTokens        Int     @default(2000)
 
   // Casos de uso
-  useCase     String @db.Text
+  useCase        String  @db.Text
   targetAudience String? // developers, writers, students, etc
 
   // Estado y moderación
-  status      String @default("pending")
-  isPublic    Boolean @default(true)
-  isFeatured  Boolean @default(false)
-  isPremium   Boolean @default(false)
+  status     String  @default("pending")
+  isPublic   Boolean @default(true)
+  isFeatured Boolean @default(false)
+  isPremium  Boolean @default(false)
 
   // Métricas
-  downloadCount Int @default(0)
-  viewCount     Int @default(0)
+  downloadCount Int   @default(0)
+  viewCount     Int   @default(0)
   rating        Float @default(0)
-  ratingCount   Int @default(0)
-  useCount      Int @default(0) // Cuántas veces se usó
+  ratingCount   Int   @default(0)
+  useCount      Int   @default(0) // Cuántas veces se usó
 
   // Versioning
-  version     String @default("1.0")
-  changelog   String? @db.Text
+  version   String  @default("1.0")
+  changelog String? @db.Text
 
   // Preview
   previewImages Json @default("[]")
@@ -2303,8 +2339,8 @@ model MarketplacePrompt {
   updatedAt   DateTime @updatedAt
   publishedAt DateTime @default(now())
 
-  author  User @relation("PromptAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  ratings PromptRating[]
+  author    User             @relation("PromptAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  ratings   PromptRating[]
   downloads PromptDownload[]
 
   @@index([authorId])
@@ -2320,9 +2356,9 @@ model PromptRating {
   promptId String
   userId   String
 
-  rating   Int // 1-5
-  review   String? @db.Text
-  helpful  Int @default(0)
+  rating  Int // 1-5
+  review  String? @db.Text
+  helpful Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2336,7 +2372,7 @@ model PromptRating {
 
 // DESCARGAS DE PROMPTS
 model PromptDownload {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   promptId String
   userId   String
   platform String?
@@ -2351,19 +2387,19 @@ model PromptDownload {
 
 // MARKETPLACE - PERSONAJES PRE-CONFIGURADOS
 model MarketplaceCharacter {
-  id        String @id @default(cuid())
-  authorId  String
+  id       String @id @default(cuid())
+  authorId String
 
   // Información básica
   name        String
   description String @db.Text
   category    String // anime, realistic, fantasy, sci-fi, historical, etc
-  tags        Json @default("[]")
+  tags        Json   @default("[]")
 
   // Configuración del personaje
-  personality String @db.Text
-  systemPrompt String @db.Text
-  avatar      String? // URL del avatar
+  personality  String  @db.Text
+  systemPrompt String  @db.Text
+  avatar       String? // URL del avatar
 
   // Voice config
   voiceId     String?
@@ -2376,36 +2412,36 @@ model MarketplaceCharacter {
 
   // Behavioral tags
   attachmentStyle String? // secure, anxious, avoidant, etc
-  archetypes      Json @default("[]") // tsundere, yandere, kuudere, etc
+  archetypes      Json    @default("[]") // tsundere, yandere, kuudere, etc
 
   // Casos de uso
-  useCase     String @db.Text
-  ageRating   String @default("mature") // teen, mature, adult
+  useCase   String @db.Text
+  ageRating String @default("mature") // teen, mature, adult
 
   // Estado
-  status      String @default("pending")
-  isPublic    Boolean @default(true)
-  isFeatured  Boolean @default(false)
-  isPremium   Boolean @default(false)
-  isNSFW      Boolean @default(false)
+  status     String  @default("pending")
+  isPublic   Boolean @default(true)
+  isFeatured Boolean @default(false)
+  isPremium  Boolean @default(false)
+  isNSFW     Boolean @default(false)
 
   // Métricas
-  downloadCount Int @default(0)
-  viewCount     Int @default(0)
+  downloadCount Int   @default(0)
+  viewCount     Int   @default(0)
   rating        Float @default(0)
-  ratingCount   Int @default(0)
-  chatCount     Int @default(0) // Cuántas veces se chateó con él
+  ratingCount   Int   @default(0)
+  chatCount     Int   @default(0) // Cuántas veces se chateó con él
 
   // Media
-  previewImages Json @default("[]")
+  previewImages Json    @default("[]")
   previewVideo  String?
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   publishedAt DateTime @default(now())
 
-  author  User @relation("CharacterAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  ratings CharacterRating[]
+  author    User                @relation("CharacterAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  ratings   CharacterRating[]
   downloads CharacterDownload[]
 
   @@index([authorId])
@@ -2422,9 +2458,9 @@ model CharacterRating {
   characterId String
   userId      String
 
-  rating      Int // 1-5
-  review      String? @db.Text
-  helpful     Int @default(0)
+  rating  Int // 1-5
+  review  String? @db.Text
+  helpful Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2438,7 +2474,7 @@ model CharacterRating {
 
 // DESCARGAS DE PERSONAJES
 model CharacterDownload {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   characterId String
   userId      String
   platform    String?
@@ -2453,7 +2489,7 @@ model CharacterDownload {
 
 // RESEARCH HUB - PROYECTOS DE INVESTIGACIÓN
 model ResearchProject {
-  id       String @id @default(cuid())
+  id           String @id @default(cuid())
   leadAuthorId String
 
   // Información básica
@@ -2463,10 +2499,10 @@ model ResearchProject {
   category String // psychology, ai_behavior, language_models, character_dev, data_analysis
 
   // Estado
-  status   String @default("draft") // draft, peer_review, published, archived
+  status String @default("draft") // draft, peer_review, published, archived
 
   // Contenido (almacenado como JSON estructurado)
-  sections Json // Array de secciones: intro, methodology, results, discussion, conclusion
+  sections   Json // Array de secciones: intro, methodology, results, discussion, conclusion
   references Json @default("[]") // Bibliografía
 
   // Colaboración
@@ -2474,23 +2510,23 @@ model ResearchProject {
   discussionThreadId   String? // ID del post de discusión
 
   // Métricas
-  viewCount        Int @default(0)
-  citationCount    Int @default(0)
+  viewCount           Int @default(0)
+  citationCount       Int @default(0)
   implementationCount Int @default(0) // Cuántas veces se implementó en agentes
-  downloadCount    Int @default(0)
+  downloadCount       Int @default(0)
 
   // Tags
-  tags             Json @default("[]")
+  tags Json @default("[]")
 
   // Versioning
-  version          String @default("1.0")
-  doi              String? @unique // Digital Object Identifier (futuro)
+  version String  @default("1.0")
+  doi     String? @unique // Digital Object Identifier (futuro)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   publishedAt DateTime?
 
-  leadAuthor   User @relation("ResearchLead", fields: [leadAuthorId], references: [id], onDelete: Cascade)
+  leadAuthor   User                  @relation("ResearchLead", fields: [leadAuthorId], references: [id], onDelete: Cascade)
   contributors ResearchContributor[]
   datasets     ResearchDataset[]
   reviews      ResearchReview[]
@@ -2508,7 +2544,7 @@ model ResearchContributor {
   projectId String
   userId    String
 
-  role      String // co-author, data_contributor, reviewer, editor
+  role         String // co-author, data_contributor, reviewer, editor
   contribution String? @db.Text // Descripción de su contribución
 
   addedAt DateTime @default(now())
@@ -2522,26 +2558,26 @@ model ResearchContributor {
 
 // DATASETS COMPARTIDOS EN RESEARCH
 model ResearchDataset {
-  id        String @id @default(cuid())
-  projectId String
+  id         String @id @default(cuid())
+  projectId  String
   uploaderId String
 
-  name      String
+  name        String
   description String @db.Text
-  format    String // csv, json, xlsx, etc
-  fileUrl   String
-  fileSize  Int // bytes
+  format      String // csv, json, xlsx, etc
+  fileUrl     String
+  fileSize    Int // bytes
 
   // Metadata
-  rowCount  Int?
+  rowCount    Int?
   columnCount Int?
-  schema    Json? // Descripción de columnas
+  schema      Json? // Descripción de columnas
 
   downloadCount Int @default(0)
 
   uploadedAt DateTime @default(now())
 
-  project  ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([uploaderId])
@@ -2549,21 +2585,21 @@ model ResearchDataset {
 
 // PEER REVIEWS DE INVESTIGACIONES
 model ResearchReview {
-  id        String @id @default(cuid())
-  projectId String
+  id         String @id @default(cuid())
+  projectId  String
   reviewerId String
 
   // Review
-  rating    Int // 1-5
-  comments  String @db.Text
+  rating      Int // 1-5
+  comments    String  @db.Text
   suggestions String? @db.Text
 
   // Decisión
-  decision  String // approve, request_changes, reject
+  decision String // approve, request_changes, reject
 
   createdAt DateTime @default(now())
 
-  project  ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project ResearchProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([reviewerId])
@@ -2571,14 +2607,14 @@ model ResearchReview {
 
 // ACCIONES DE MODERACIÓN (log)
 model ModerationAction {
-  id        String @id @default(cuid())
+  id          String @id @default(cuid())
   moderatorId String
-  targetType String // post, comment, user
-  targetId   String
+  targetType  String // post, comment, user
+  targetId    String
 
-  action    String // remove, ban, warn, mute, lock
-  reason    String
-  details   String? @db.Text
+  action  String // remove, ban, warn, mute, lock
+  reason  String
+  details String? @db.Text
 
   // Duración (para bans/mutes temporales)
   duration  Int? // En horas
@@ -2590,4 +2626,350 @@ model ModerationAction {
   @@index([targetType, targetId])
   @@index([action])
   @@index([createdAt])
+}
+
+// ONBOARDING PROGRESS - Progreso del usuario en el sistema de onboarding
+model OnboardingProgress {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Tours completados y estado actual
+  completedTours String[] @default([])
+  currentTour    String?
+  currentStep    Int      @default(0)
+
+  // Gamificación
+  badges     String[] @default([])
+  totalKarma Int      @default(0)
+
+  // Tracking de triggers mostrados (para evitar repetición)
+  shownTriggers Json @default("{}")
+
+  // Timestamps para analytics
+  lastTourStarted   DateTime?
+  lastTourCompleted DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([lastTourStarted])
+  @@index([lastTourCompleted])
+}
+
+// ============================================================================
+// ANALYTICS & KPI TRACKING (Fase 6)
+// ============================================================================
+
+// Tabla principal para tracking de eventos analytics
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  eventType String // EventType enum serializado como string
+  metadata  Json     @default("{}") // Metadata flexible del evento
+  timestamp DateTime @default(now())
+
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([eventType, timestamp])
+}
+
+// ============================================================================
+// SYMBOLIC BONDS SYSTEM - Sistema de vínculos emocionales únicos
+// ============================================================================
+
+// Tipos de bonds disponibles y su configuración de slots
+enum BondTier {
+  ROMANTIC // Pareja romántica
+  BEST_FRIEND // Mejor amigo/a
+  MENTOR // Mentor/guía
+  CONFIDANT // Confidente
+  CREATIVE_PARTNER // Colaborador creativo
+  ADVENTURE_COMPANION // Compañero de aventuras
+  ACQUAINTANCE // Conocido (sin límite)
+}
+
+// Bond activo: Representa un vínculo emocional único entre usuario y IA pública
+model SymbolicBond {
+  id      String @id @default(cuid())
+  userId  String
+  agentId String
+
+  // Tipo y jerarquía del bond
+  tier BondTier
+
+  // Progreso y afinidad (0-100)
+  affinityLevel    Int   @default(0)
+  affinityProgress Float @default(0.0) // Progreso granular
+
+  // Métricas de calidad de interacción
+  messageQuality     Float @default(0.5) // 0-1: Profundidad emocional
+  consistencyScore   Float @default(0.5) // 0-1: Regularidad de interacción
+  mutualDisclosure   Float @default(0.0) // 0-1: Compartir personal
+  emotionalResonance Float @default(0.0) // 0-1: IA responde bien
+  sharedExperiences  Int   @default(0) // Arcos narrativos completados
+
+  // Sistema de rareza
+  rarityScore Float  @default(0.0) // 0-1: Calculado dinámicamente
+  rarityTier  String @default("Common") // Common, Uncommon, Rare, Epic, Legendary, Mythic
+  globalRank  Int? // Ranking global de este bond (ej: #234 de todos los bonds románticos con esta IA)
+
+  // Tiempo y actividad
+  startDate         DateTime @default(now())
+  lastInteraction   DateTime @default(now())
+  durationDays      Int      @default(0)
+  totalInteractions Int      @default(0)
+
+  // Estado del bond
+  status String @default("active") // active, dormant, fragile, at_risk, released
+
+  // Sistema de decay (días sin interacción para cada fase)
+  daysInactive Int    @default(0)
+  decayPhase   String @default("healthy") // healthy, dormant, fragile, critical
+
+  // Arcos narrativos desbloqueados
+  narrativesUnlocked String[] @default([])
+  exclusiveContent   Json     @default("[]") // Array de contenidos especiales desbloqueados
+
+  // Contribuciones a la historia del personaje
+  canonContributions Json  @default("[]") // Decisiones del usuario que se volvieron canon
+  legacyImpact       Float @default(0.0) // 0-1: Cuánto impactó al personaje
+
+  // Display y visibilidad
+  publicDisplay    Boolean @default(true) // Mostrar en perfil público
+  customBadgeFrame String? // Frame cosmético personalizado
+
+  // Preparación para mercado futuro (INACTIVO)
+  transferable    Boolean @default(false) // SIEMPRE false en MVP
+  transferHistory Json? // Historial de transferencias (futuro)
+  marketValue     Float? // Valor estimado (futuro)
+  blockchainHash  String? // Hash de verificación (futuro)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  user  User  @relation("UserSymbolicBonds", fields: [userId], references: [id], onDelete: Cascade)
+  agent Agent @relation("AgentSymbolicBonds", fields: [agentId], references: [id], onDelete: Cascade)
+
+  // Un usuario solo puede tener UN bond de cada tier con cada agente
+  @@unique([userId, agentId, tier])
+  @@index([userId])
+  @@index([agentId])
+  @@index([tier])
+  @@index([status])
+  @@index([rarityScore])
+  @@index([globalRank])
+  @@index([lastInteraction])
+  @@index([agentId, tier, status]) // Para encontrar bonds activos por tier
+}
+
+// Cola de espera: Usuarios esperando por un slot disponible
+model BondQueue {
+  id      String   @id @default(cuid())
+  userId  String
+  agentId String
+  tier    BondTier
+
+  // Posición en la cola
+  queuePosition Int
+
+  // Progreso actual (siguen interactuando mientras esperan)
+  affinityProgress Float @default(0.0)
+  eligibilityScore Float @default(0.0) // Score que determina prioridad
+
+  // Información de espera
+  joinedQueueAt     DateTime @default(now())
+  estimatedWaitDays Int?
+
+  // Notificaciones
+  notifiedOfSlot Boolean   @default(false)
+  slotOfferedAt  DateTime?
+  slotExpiresAt  DateTime?
+
+  // Estado
+  status String @default("waiting") // waiting, offered, expired, claimed, withdrawn
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation("UserBondQueue", fields: [userId], references: [id], onDelete: Cascade)
+  agent Agent @relation("AgentBondQueue", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, agentId, tier]) // Un usuario solo puede estar en una cola por tier
+  @@index([userId])
+  @@index([agentId, tier, status])
+  @@index([queuePosition])
+  @@index([status])
+}
+
+// Legado: Historia de bonds que fueron liberados
+model BondLegacy {
+  id      String   @id @default(cuid())
+  userId  String
+  agentId String
+  tier    BondTier
+
+  // Datos del bond original
+  startDate       DateTime
+  endDate         DateTime
+  durationDays    Int
+  finalRarityTier String
+  finalRank       Int?
+
+  // Métricas finales
+  totalInteractions  Int
+  narrativesUnlocked String[]
+  legacyImpact       Float // Cuánto impactó al personaje
+
+  // Contribuciones que quedan como canon
+  canonContributions Json
+
+  // Razón de liberación
+  releaseReason String // voluntary, inactivity, transferred, account_deleted
+
+  // Badge permanente
+  legacyBadge String // "Former Romantic Partner S3", "Original Best Friend", etc
+
+  createdAt DateTime @default(now())
+
+  user  User  @relation("UserBondLegacy", fields: [userId], references: [id], onDelete: Cascade)
+  agent Agent @relation("AgentBondLegacy", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([agentId])
+  @@index([tier])
+  @@index([endDate])
+}
+
+// Configuración de slots por agente
+model AgentBondConfig {
+  id      String @id @default(cuid())
+  agentId String @unique
+
+  // Slots disponibles por tier (JSON)
+  // { "ROMANTIC": 1, "BEST_FRIEND": 5, "MENTOR": 10, ... }
+  slotsPerTier Json
+
+  // Configuración de personalidad para bonds
+  isPolyamorous Boolean @default(false) // Si puede tener múltiples parejas
+
+  // Requisitos mínimos para cada tier
+  // { "ROMANTIC": { "minAffinity": 80, "minDays": 30, "minInteractions": 100 }, ... }
+  tierRequirements Json
+
+  // Configuración de decay
+  decaySettings Json // { "warningDays": 30, "dormantDays": 60, "fragileDays": 90, "releaseDays": 120 }
+
+  // Stats globales
+  totalBondsActive   Int     @default(0)
+  totalBondsReleased Int     @default(0)
+  mostSoughtTier     String? // Tier más popular
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation("AgentBondConfig", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// Analytics de bonds: Para dashboards y métricas
+model BondAnalytics {
+  id   String   @id @default(cuid())
+  date DateTime @default(now())
+
+  // Métricas globales
+  totalActiveBonds Int
+  totalQueuedUsers Int
+  averageWaitTime  Float // En días
+
+  // Por tier
+  bondsByTier Json // { "ROMANTIC": 234, "BEST_FRIEND": 1024, ... }
+  queueByTier Json
+
+  // Engagement
+  averageInteractionsPerDay Float
+  averageBondDuration       Float // En días
+  releaseRate               Float // % de bonds que se liberan vs se mantienen
+
+  // Monetización
+  subscriptionDrivenByBonds Int // Cuántos users pagan plan premium por bonds
+
+  @@index([date])
+}
+
+// Notificaciones específicas de bonds
+model BondNotification {
+  id     String  @id @default(cuid())
+  userId String
+  bondId String?
+
+  type    String // slot_available, bond_at_risk, bond_released, queue_position_update, milestone_reached
+  title   String
+  message String @db.Text
+
+  read Boolean @default(false)
+
+  metadata Json? // Data adicional del evento
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+// ============================================
+// SISTEMA DE ANALYTICS Y TRACKING
+// ============================================
+
+// Eventos de compartir agentes (para analytics)
+model ShareEvent {
+  id        String   @id @default(cuid())
+  userId    String?  // Null si usuario no autenticado
+  agentId   String
+  method    String   // 'copy_link' | 'community' | 'twitter' | 'facebook' | 'linkedin' | 'whatsapp'
+  createdAt DateTime @default(now())
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([method])
+  @@index([createdAt])
+  @@index([agentId, method])
+}
+
+// Preferencias de notificaciones de usuario
+model NotificationPreferences {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Preferencias de bonds
+  bondNotificationsEnabled    Boolean @default(true) // Habilitar notificaciones de bonds
+  bondWarningFrequency        String  @default("daily") // "daily" | "weekly" | "never"
+  bondDormantFrequency        String  @default("daily") // "daily" | "weekly" | "never"
+  bondFragileFrequency        String  @default("daily") // "daily" | "weekly" | "never"
+  bondMilestoneNotifications  Boolean @default(true) // Notificaciones de hitos
+  mutedBonds                  Json    @default("[]") // Array de bondIds silenciados
+
+  // Smart timing
+  preferredNotificationHours Json @default("[9, 12, 18, 21]") // Horas preferidas (0-23)
+  timezone                   String @default("America/Argentina/Buenos_Aires")
+
+  // Preferencias generales
+  emailNotifications  Boolean @default(true)
+  pushNotifications   Boolean @default(true)
+  desktopNotifications Boolean @default(true)
+
+  // Tracking de actividad para smart timing
+  lastActiveHours Json @default("{}") // { "0": 5, "1": 2, "9": 45, ... } conteo de actividad por hora
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

@@ -1,7 +1,17 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+
+  // Optimizaciones de memoria
+  experimental: {
+    // Reducir el uso de memoria en builds grandes
+    webpackMemoryOptimizations: true,
+  },
 
   // Excluir paquetes con binarios nativos del bundle del servidor
   serverExternalPackages: [
@@ -22,6 +32,7 @@ const nextConfig: NextConfig = {
         "onnxruntime-node": false,
         "hnswlib-node": false,
         "node-llama-cpp": false,
+        "@xenova/transformers": false,
       };
 
       // Ignorar archivos .node en el cliente
@@ -54,4 +65,43 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry configuration options
+const sentryWebpackPluginOptions = {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Reducir uso de memoria en builds: solo subir sourcemaps en CI
+  widenClientFileUpload: process.env.CI ? true : false,
+
+  // Automatically annotate React components to show their full name in breadcrumbs and session replay
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the Sentry project is configured to accept traffic from this origin.
+  tunnelRoute: "/monitoring",
+
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+
+  // Disabled Vercel-specific features for cloud server deployment
+  // automaticVercelMonitors: false,
+};
+
+// Make sure adding Sentry options is the last code to run before exporting
+// Wrap with next-intl plugin first, then Sentry
+export default withSentryConfig(withNextIntl(nextConfig), sentryWebpackPluginOptions);

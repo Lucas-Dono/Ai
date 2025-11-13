@@ -8,10 +8,10 @@ import { CommentService } from '@/lib/services/comment.service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const replies = await CommentService.getCommentReplies(params.id);
+    const replies = await CommentService.getCommentReplies((await params).id);
     return NextResponse.json(replies);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 404 });
@@ -23,7 +23,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -33,7 +33,7 @@ export async function PATCH(
 
     const { content } = await request.json();
     const comment = await CommentService.updateComment(
-      params.id,
+      (await params).id,
       session.user.id,
       content
     );
@@ -49,7 +49,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -57,7 +57,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await CommentService.deleteComment(params.id, session.user.id);
+    const result = await CommentService.deleteComment((await params).id, session.user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

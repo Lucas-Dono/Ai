@@ -162,7 +162,7 @@ function SpriteCard({ sprite, isSelected, onSelect }: SpriteCardProps) {
     <button
       onClick={onSelect}
       className={`
-        relative rounded-lg border-2 overflow-hidden transition-all
+        relative rounded-2xl border-2 overflow-hidden transition-all
         hover:scale-105 hover:shadow-lg cursor-pointer
         ${isSelected
           ? 'border-blue-500 ring-2 ring-blue-500 ring-offset-2'

@@ -1,0 +1,217 @@
+/**
+ * GET /api/user/shared - Obtener estadísticas y contenido compartido del usuario
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth-server';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(req: NextRequest) {
+  try {
+    // Verificar autenticación
+    const currentUser = await requireAuth();
+
+    // Obtener parámetros de filtro
+    const { searchParams } = new URL(req.url);
+    const type = searchParams.get('type') as 'all' | 'characters' | 'prompts' | 'themes' | null;
+
+    // Construir estadísticas del usuario
+    const [charactersCount, promptsCount, themesCount] = await Promise.all([
+      prisma.marketplaceCharacter.count({
+        where: { authorId: currentUser.id },
+      }),
+      prisma.marketplacePrompt.count({
+        where: { authorId: currentUser.id },
+      }),
+      prisma.marketplaceTheme.count({
+        where: { authorId: currentUser.id },
+      }),
+    ]);
+
+    // Calcular totales de downloads desde las tablas de relación
+    const [charactersDownloads, promptsDownloads, themesDownloads] = await Promise.all([
+      prisma.characterDownload.count({
+        where: {
+          character: {
+            authorId: currentUser.id,
+          },
+        },
+      }),
+      prisma.promptDownload.count({
+        where: {
+          prompt: {
+            authorId: currentUser.id,
+          },
+        },
+      }),
+      prisma.marketplaceThemeDownload.count({
+        where: {
+          theme: {
+            authorId: currentUser.id,
+          },
+        },
+      }),
+    ]);
+
+    // Obtener ratings (likes) del contenido del usuario
+    const [characterRatings, promptRatings, themeRatings] = await Promise.all([
+      prisma.characterRating.aggregate({
+        where: {
+          character: {
+            authorId: currentUser.id,
+          },
+          rating: { gte: 4 }, // Contar solo ratings positivos como "likes"
+        },
+        _count: true,
+      }),
+      prisma.promptRating.aggregate({
+        where: {
+          prompt: {
+            authorId: currentUser.id,
+          },
+          rating: { gte: 4 },
+        },
+        _count: true,
+      }),
+      prisma.marketplaceTheme.findMany({
+        where: { authorId: currentUser.id },
+        select: { rating: true },
+      }),
+    ]);
+
+    // Calcular estadísticas totales
+    const stats = {
+      totalShared: charactersCount + promptsCount + themesCount,
+      totalLikes: characterRatings._count + promptRatings._count,
+      totalDownloads: charactersDownloads + promptsDownloads + themesDownloads,
+      totalComments: 0, // TODO: Implementar cuando haya sistema de comentarios
+      reputation: 0, // TODO: Implementar sistema de reputación
+      badges: [], // TODO: Implementar sistema de badges
+    };
+
+    // Obtener items compartidos según el filtro
+    let items: any[] = [];
+
+    if (!type || type === 'all' || type === 'characters') {
+      const characters = await prisma.marketplaceCharacter.findMany({
+        where: { authorId: currentUser.id },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          createdAt: true,
+          ratings: {
+            where: { rating: { gte: 4 } },
+            select: { id: true },
+          },
+          downloads: {
+            select: { id: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: type === 'characters' ? 50 : 10,
+      });
+
+      items.push(
+        ...characters.map((c) => ({
+          id: c.id,
+          type: 'character' as const,
+          name: c.name,
+          category: c.category,
+          likes: c.ratings.length,
+          downloads: c.downloads.length,
+          views: 0, // TODO: Implementar tracking de vistas
+          comments: 0, // TODO: Implementar comentarios
+          createdAt: c.createdAt.toISOString(),
+        }))
+      );
+    }
+
+    if (!type || type === 'all' || type === 'prompts') {
+      const prompts = await prisma.marketplacePrompt.findMany({
+        where: { authorId: currentUser.id },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          createdAt: true,
+          ratings: {
+            where: { rating: { gte: 4 } },
+            select: { id: true },
+          },
+          downloads: {
+            select: { id: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: type === 'prompts' ? 50 : 10,
+      });
+
+      items.push(
+        ...prompts.map((p) => ({
+          id: p.id,
+          type: 'prompt' as const,
+          name: p.name,
+          category: p.category,
+          likes: p.ratings.length,
+          downloads: p.downloads.length,
+          views: 0,
+          comments: 0,
+          createdAt: p.createdAt.toISOString(),
+        }))
+      );
+    }
+
+    if (!type || type === 'all' || type === 'themes') {
+      const themes = await prisma.marketplaceTheme.findMany({
+        where: { authorId: currentUser.id },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          createdAt: true,
+          rating: true,
+          downloads: {
+            select: { id: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: type === 'themes' ? 50 : 10,
+      });
+
+      items.push(
+        ...themes.map((t) => ({
+          id: t.id,
+          type: 'theme' as const,
+          name: t.name,
+          category: t.category || 'general',
+          likes: Math.floor((t.rating || 0) * 10), // Aproximar likes del rating
+          downloads: t.downloads.length,
+          views: 0,
+          comments: 0,
+          createdAt: t.createdAt.toISOString(),
+        }))
+      );
+    }
+
+    // Ordenar items por fecha
+    items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    return NextResponse.json({
+      stats,
+      items,
+      count: items.length,
+    });
+  } catch (error: any) {
+    console.error('Error loading shared content:', error);
+
+    if (error.message === 'No autorizado') {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    return NextResponse.json(
+      { error: 'Error al cargar el contenido compartido' },
+      { status: 500 }
+    );
+  }
+}

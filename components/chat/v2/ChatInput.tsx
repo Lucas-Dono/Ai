@@ -15,6 +15,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Send, Mic, ImageIcon, Smile } from "lucide-react";
+import { MessageSendAnimation } from "./MessageSendAnimation";
 
 interface ChatInputProps {
   value: string;
@@ -40,6 +41,7 @@ export function ChatInput({
   maxLength = 10000,
 }: ChatInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [sendAnimationTriggered, setSendAnimationTriggered] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
@@ -50,11 +52,23 @@ export function ChatInput({
     }
   }, [value]);
 
+  const handleSend = () => {
+    if (!value.trim() || disabled) return;
+
+    // Trigger animation
+    setSendAnimationTriggered(true);
+
+    // Send message after short delay (for visual effect)
+    setTimeout(() => {
+      onSend();
+    }, 200);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (value.trim()) {
-        onSend();
+        handleSend();
       }
     }
   };
@@ -159,7 +173,7 @@ export function ChatInput({
           <motion.button
             whileHover={canSend ? { scale: 1.05 } : {}}
             whileTap={canSend ? { scale: 0.95 } : {}}
-            onClick={onSend}
+            onClick={handleSend}
             disabled={!canSend}
             className={cn(
               "p-3 rounded-full mb-2",
@@ -195,6 +209,12 @@ export function ChatInput({
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Send Animation */}
+      <MessageSendAnimation
+        triggered={sendAnimationTriggered}
+        onComplete={() => setSendAnimationTriggered(false)}
+      />
     </div>
   );
 }

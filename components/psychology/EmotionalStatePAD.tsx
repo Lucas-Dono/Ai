@@ -89,7 +89,7 @@ export function EmotionalStatePAD({
       <CardContent className="space-y-6">
         {/* Emociones Dominantes */}
         {dominantEmotion && (
-          <div className="space-y-3 bg-muted/30 rounded-lg p-4 border border-border">
+          <div className="space-y-3 bg-muted/30 rounded-2xl p-4 border border-border">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-muted-foreground">Emoción Dominante:</span>
               <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export function EmotionalStatePAD({
           </h4>
 
           {/* Valence */}
-          <div className="space-y-2.5 bg-muted/20 rounded-lg p-4 border border-border/50">
+          <div className="space-y-2.5 bg-muted/20 rounded-2xl p-4 border border-border/50">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">
                 Valence <span className="text-xs text-muted-foreground font-normal">(Placer/Displacer)</span>
@@ -159,7 +159,7 @@ export function EmotionalStatePAD({
           </div>
 
           {/* Arousal */}
-          <div className="space-y-2.5 bg-muted/20 rounded-lg p-4 border border-border/50">
+          <div className="space-y-2.5 bg-muted/20 rounded-2xl p-4 border border-border/50">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">
                 Arousal <span className="text-xs text-muted-foreground font-normal">(Activación)</span>
@@ -176,7 +176,7 @@ export function EmotionalStatePAD({
           </div>
 
           {/* Dominance */}
-          <div className="space-y-2.5 bg-muted/20 rounded-lg p-4 border border-border/50">
+          <div className="space-y-2.5 bg-muted/20 rounded-2xl p-4 border border-border/50">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">
                 Dominance <span className="text-xs text-muted-foreground font-normal">(Control)</span>

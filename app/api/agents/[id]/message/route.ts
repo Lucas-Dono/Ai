@@ -16,47 +16,41 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit } from "@/lib/redis/ratelimit";
+import { checkTierRateLimit } from "@/lib/redis/ratelimit";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { messageService } from "@/lib/services/message.service";
 import { messageInputSchema, formatZodError } from "@/lib/validation/schemas";
-import { createLogger, logError } from "@/lib/logger";
+import { apiLogger as log, logError, createTimer } from "@/lib/logging";
 import { ZodError } from "zod";
-import { Prisma } from "@prisma/client";
+import { handlePrismaError, isPrismaError } from "@/lib/api/prisma-error-handler";
+import { withAuth, parsePagination, createPaginationResult } from "@/lib/api/middleware";
 import { HuggingFaceVisionClient } from "@/lib/vision/huggingface-vision";
 import { prisma } from "@/lib/prisma";
-
-const log = createLogger('API/Message');
+import { LifeEventsTimelineService } from "@/lib/life-events/timeline.service";
+import { checkTierResourceLimit, trackMessageUsage, canAnalyzeImage, trackImageAnalysisUsage } from "@/lib/usage/daily-limits";
+import { canSendMessage, trackTokenUsage, estimateTokensFromText, getTokenUsageStats } from "@/lib/usage/token-limits";
+import { semanticCache } from "@/lib/cache/semantic-cache";
+import { checkCooldown, trackCooldown } from "@/lib/usage/cooldown-tracker";
+import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
 
 /**
  * GET /api/agents/[id]/message
  * Get message history for an agent
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const GET = withAuth(async (req, { params, user }) => {
   try {
-    const { id: agentId } = await params;
-
-    // Authentication
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      log.warn({ agentId }, 'Unauthorized access attempt');
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const { id: agentId } = params;
     const userId = user.id;
+
     log.info({ agentId, userId }, 'Loading message history');
 
-    // Get pagination params
+    // Parse pagination params with safe defaults
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || '50'),
-      100 // Max 100 messages per request for performance
-    );
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const { limit, offset } = parsePagination(searchParams, {
+      defaultLimit: 50,
+      maxLimit: 100,
+    });
 
     // Load messages from database
     // Filter by both agentId and userId to get conversation between user and agent
@@ -69,7 +63,7 @@ export async function GET(
         createdAt: 'asc',
       },
       skip: offset,
-      take: Math.min(limit, 100), // Max 100 messages per request
+      take: limit,
       include: {
         agent: {
           select: {
@@ -100,17 +94,14 @@ export async function GET(
         agentName: msg.agent?.name || null,
         agentAvatar: msg.agent?.avatar || null,
       })),
-      pagination: {
-        limit,
-        offset,
-        total: totalCount,
-        hasMore: offset + messages.length < totalCount,
-        returned: messages.length,
-      },
+      pagination: createPaginationResult({ limit, offset }, totalCount, messages.length),
     });
 
   } catch (error) {
-    logError(error, { context: 'Loading message history failed' });
+    if (isPrismaError(error)) {
+      return handlePrismaError(error, { context: 'Loading message history' });
+    }
+    logError(log, error, { context: 'Loading message history failed' });
     return NextResponse.json(
       {
         error: "Failed to load message history",
@@ -119,46 +110,14 @@ export async function GET(
       { status: 500 }
     );
   }
-}
-
-// Helper para resetear contador mensual de imágenes
-async function checkAndResetImageCount(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      imageUploadResetDate: true,
-      imageUploadsThisMonth: true,
-      imageUploadLimit: true,
-    },
-  });
-
-  if (!user) return null;
-
-  const now = new Date();
-  const lastReset = new Date(user.imageUploadResetDate);
-
-  // Si pasó un mes desde el último reset, resetear contador
-  const monthsElapsed = (now.getFullYear() - lastReset.getFullYear()) * 12 +
-                        (now.getMonth() - lastReset.getMonth());
-
-  if (monthsElapsed >= 1) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        imageUploadsThisMonth: 0,
-        imageUploadResetDate: now,
-      },
-    });
-    return { ...user, imageUploadsThisMonth: 0 };
-  }
-
-  return user;
-}
+});
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const timer = createTimer(log, 'Process message');
+
   try {
     const { id: agentId } = await params;
 
@@ -174,46 +133,62 @@ export async function POST(
     const userId = user.id;
     const userPlan = user.plan || "free";
 
-    log.info({ agentId, userId }, 'Message request received');
+    log.info({ agentId, userId, userPlan }, 'Message request received');
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // RATE LIMITING
+    // COOLDOWN CHECK (Anti-Bot Protection)
+    // Free: 5s, Plus: 2s, Ultra: 1s
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const rateLimitResult = await checkRateLimit(userId, userPlan);
-    if (!rateLimitResult.success) {
-      log.warn({ userId, userPlan }, 'Rate limit exceeded');
-      return NextResponse.json(
-        {
-          error: "Rate limit exceeded. Please try again later.",
-          limit: rateLimitResult.limit,
-          reset: rateLimitResult.reset,
+    const cooldownCheck = await checkCooldown(userId, "message", userPlan);
+
+    if (!cooldownCheck.allowed) {
+      log.warn({
+        userId,
+        userPlan,
+        waitMs: cooldownCheck.waitMs,
+      }, 'Message blocked by cooldown');
+
+      return NextResponse.json({
+        error: cooldownCheck.message || "Por favor espera antes de enviar otro mensaje",
+        code: "COOLDOWN_ACTIVE",
+        waitMs: cooldownCheck.waitMs,
+        retryAfter: new Date(Date.now() + cooldownCheck.waitMs).toISOString(),
+      }, {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil(cooldownCheck.waitMs / 1000).toString(),
+          "X-Cooldown-Type": "message",
+          "X-Cooldown-Wait-Ms": cooldownCheck.waitMs.toString(),
         },
-        {
-          status: 429,
-          headers: {
-            "X-RateLimit-Limit": rateLimitResult.limit?.toString() || "0",
-            "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": rateLimitResult.reset?.toString() || "0",
-          },
-        }
-      );
+      });
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // QUOTA CHECK
+    // TIER-BASED RATE LIMITING (comprehensive)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const quotaCheck = await canUseResource(userId, "message");
-    if (!quotaCheck.allowed) {
-      log.warn({ userId, quota: quotaCheck }, 'Message quota exceeded');
-      return NextResponse.json(
-        {
-          error: quotaCheck.reason,
-          current: quotaCheck.current,
-          limit: quotaCheck.limit,
-          upgrade: "/pricing",
+    const rateLimitResult = await checkTierRateLimit(userId, userPlan);
+    if (!rateLimitResult.success) {
+      log.warn({
+        userId,
+        userPlan,
+        tier: rateLimitResult.tier,
+        violatedWindow: rateLimitResult.violatedWindow
+      }, 'Tier rate limit exceeded');
+
+      const error = rateLimitResult.error!;
+      return NextResponse.json(error, {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": rateLimitResult.reset?.toString() || "0",
+          "X-RateLimit-Tier": rateLimitResult.tier,
+          "X-RateLimit-Window": rateLimitResult.violatedWindow || "unknown",
+          "Retry-After": rateLimitResult.reset
+            ? Math.ceil(rateLimitResult.reset - Date.now() / 1000).toString()
+            : "60",
         },
-        { status: 403 }
-      );
+      });
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -240,25 +215,55 @@ export async function POST(
 
       log.info({ userId, imageSize: imageFile.size }, 'Image upload detected');
 
-      // Verificar límite de imágenes del usuario
-      const userImageLimits = await checkAndResetImageCount(userId);
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // COOLDOWN CHECK for Images (Anti-Bot Protection)
+      // Free: 10s, Plus: 3s, Ultra: 5s
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const imageCooldownCheck = await checkCooldown(userId, "image", userPlan);
 
-      if (!userImageLimits) {
-        return NextResponse.json(
-          { error: "User not found" },
-          { status: 404 }
-        );
+      if (!imageCooldownCheck.allowed) {
+        log.warn({
+          userId,
+          userPlan,
+          waitMs: imageCooldownCheck.waitMs,
+        }, 'Image analysis blocked by cooldown');
+
+        return NextResponse.json({
+          error: imageCooldownCheck.message || "Por favor espera antes de analizar otra imagen",
+          code: "COOLDOWN_ACTIVE",
+          waitMs: imageCooldownCheck.waitMs,
+          retryAfter: new Date(Date.now() + imageCooldownCheck.waitMs).toISOString(),
+        }, {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(imageCooldownCheck.waitMs / 1000).toString(),
+            "X-Cooldown-Type": "image",
+            "X-Cooldown-Wait-Ms": imageCooldownCheck.waitMs.toString(),
+          },
+        });
       }
 
-      if (userImageLimits.imageUploadsThisMonth >= userImageLimits.imageUploadLimit) {
-        log.warn({ userId, current: userImageLimits.imageUploadsThisMonth, limit: userImageLimits.imageUploadLimit }, 'Image upload limit exceeded');
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // ANTI-ABUSE: Verificar límites diarios Y mensuales de análisis de imágenes
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const imageCheck = await canAnalyzeImage(userId, userPlan);
+
+      if (!imageCheck.allowed) {
+        log.warn({
+          userId,
+          userPlan,
+          current: imageCheck.current,
+          limit: imageCheck.limit,
+          reason: imageCheck.reason,
+        }, 'Image analysis limit exceeded');
+
         return NextResponse.json(
           {
-            error: "Límite mensual de imágenes alcanzado",
-            current: userImageLimits.imageUploadsThisMonth,
-            limit: userImageLimits.imageUploadLimit,
-            resetDate: userImageLimits.imageUploadResetDate,
-            upgrade: "/pricing",
+            error: imageCheck.reason || "Límite de análisis de imágenes alcanzado",
+            current: imageCheck.current,
+            limit: imageCheck.limit,
+            canUseRewarded: imageCheck.canUseRewarded,
+            upgradeUrl: "/pricing",
           },
           { status: 429 }
         );
@@ -280,15 +285,11 @@ export async function POST(
 
         log.info({ userId, caption: imageCaption.substring(0, 100) }, 'Image caption generated successfully');
 
-        // Incrementar contador de imágenes
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            imageUploadsThisMonth: {
-              increment: 1,
-            },
-          },
-        });
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ANTI-ABUSE: Registrar uso de análisis de imagen (después de éxito)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await trackImageAnalysisUsage(userId, false);
+        log.info({ userId }, 'Image analysis usage tracked');
 
       } catch (error) {
         log.error({ error }, 'Error generating image caption');
@@ -340,36 +341,215 @@ export async function POST(
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // MESSAGE PROCESSING (Service Layer)
+    // TOKEN-BASED LIMIT CHECK (after content is ready)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const result = await messageService.processMessage({
-      agentId,
-      userId,
-      content,
-      messageType,
-      metadata,
-    });
+    const estimatedInputTokens = estimateTokensFromText(content);
+    const tokenQuota = await canSendMessage(userId, userPlan, estimatedInputTokens);
+
+    if (!tokenQuota.allowed) {
+      log.warn({
+        userId,
+        userPlan,
+        messagesUsed: tokenQuota.messagesUsedToday,
+        messagesLimit: tokenQuota.messagesLimitToday,
+        inputTokensUsed: tokenQuota.inputTokensUsed,
+        inputTokensLimit: tokenQuota.inputTokensLimit,
+      }, 'Token quota exceeded');
+
+      return NextResponse.json({
+        error: tokenQuota.reason || 'Daily token limit exceeded',
+        messagesUsedToday: tokenQuota.messagesUsedToday,
+        messagesLimitToday: tokenQuota.messagesLimitToday,
+        canUseRewarded: tokenQuota.canUseRewarded,
+        upgradeUrl: userPlan === 'free' ? '/dashboard/billing' : undefined,
+      }, { status: 429 });
+    }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // TRACK USAGE
+    // CONTENT MODERATION (before processing)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    await trackUsage(userId, "message", 1, result.assistantMessage.id, {
+    const { moderateMessage } = await import('@/lib/moderation/moderation.service');
+    const moderationResult = await moderateMessage(userId, content, {
       agentId,
+      quickCheck: false, // Full check for all messages
+    });
+
+    if (moderationResult.blocked) {
+      log.warn({
+        userId,
+        agentId,
+        severity: moderationResult.severity,
+        reason: moderationResult.reason,
+        violationId: moderationResult.violationId,
+      }, 'Message blocked by moderation system');
+
+      return NextResponse.json({
+        error: 'Contenido no permitido',
+        reason: moderationResult.reason,
+        suggestion: moderationResult.suggestion,
+        severity: moderationResult.severity,
+        action: moderationResult.action,
+      }, { status: 400 });
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MESSAGE PROCESSING (Service Layer with Semantic Cache)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    // Try to get from semantic cache first
+    const cacheKey = `${agentId}:${content}`;
+    const cachedResponse = await semanticCache.get(
+      content,
+      agentId,
+      {
+        model: 'qwen-2.5-72b-instruct', // Model used in orchestrator
+        temperature: 0.7,
+      }
+    );
+
+    let result;
+    let fromCache = false;
+
+    if (cachedResponse) {
+      // Cache HIT - Parse cached response
+      try {
+        result = JSON.parse(cachedResponse);
+        fromCache = true;
+        log.info({ agentId, userId, similarity: 'high' }, 'Semantic cache HIT - using cached response');
+      } catch (error) {
+        log.warn({ error }, 'Failed to parse cached response, generating new one');
+        result = await messageService.processMessage({
+          agentId,
+          userId,
+          content,
+          messageType,
+          metadata,
+          userPlan,
+        });
+      }
+    } else {
+      // Cache MISS - Generate new response
+      result = await messageService.processMessage({
+        agentId,
+        userId,
+        content,
+        messageType,
+        metadata,
+        userPlan,
+      });
+
+      // Cache the response for future use (async, don't block)
+      semanticCache.set(
+        content,
+        JSON.stringify(result),
+        agentId,
+        {
+          model: 'qwen-2.5-72b-instruct',
+          temperature: 0.7,
+          ttl: 7 * 24 * 60 * 60, // 7 days
+        }
+      ).catch((error) => {
+        log.warn({ error }, 'Failed to cache response');
+      });
+
+      log.info({ agentId, userId }, 'Semantic cache MISS - generated new response');
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // TRACK TOKEN USAGE (new token-based system)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const outputTokens = estimateTokensFromText(result.assistantMessage.content);
+
+    await trackTokenUsage(
+      userId,
+      estimatedInputTokens,
+      outputTokens,
+      {
+        agentId,
+        messageId: result.assistantMessage.id,
+        userMessageContent: content.substring(0, 100), // First 100 chars for debugging
+      }
+    );
+
+    log.info({
+      userId,
+      agentId,
+      inputTokens: estimatedInputTokens,
+      outputTokens,
+      totalTokens: estimatedInputTokens + outputTokens,
+    }, 'Token usage tracked');
+
+    // Get updated token usage stats for response
+    const tokenStats = await getTokenUsageStats(userId, userPlan);
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // NARRATIVE ARC DETECTION (async, no await)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Detectar arcos narrativos en el mensaje del usuario (sin bloquear respuesta)
+    LifeEventsTimelineService.processMessage({
+      message: content,
+      timestamp: new Date(),
+      agentId,
+      userId,
+    }).catch((error) => {
+      log.warn({ error, agentId, userId }, 'Failed to process narrative arc detection');
+    });
+
+    timer.end({
+      agentId,
+      userId,
+      messageId: result.assistantMessage.id,
       tokensUsed: result.usage.tokensUsed,
     });
 
-    log.info(
-      {
-        agentId,
-        userId,
-        messageId: result.assistantMessage.id,
-        tokensUsed: result.usage.tokensUsed,
-      },
-      'Message processed successfully'
-    );
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // COOLDOWN TRACKING (after successful processing)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    await trackCooldown(userId, "message", userPlan);
+    if (imageCaption) {
+      // Track image cooldown too if image was analyzed
+      await trackCooldown(userId, "image", userPlan);
+    }
+    log.info({ userId, userPlan }, 'Cooldowns tracked successfully');
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // RESPONSE
+    // ANALYTICS TRACKING (Fase 6 - User Experience & Engagement)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    try {
+      // Check if this is the user's first message ever
+      const messageCount = await prisma.message.count({
+        where: {
+          senderId: userId,
+          role: "user",
+        },
+      });
+
+      if (messageCount === 1) {
+        // This is the first message - track for UX metrics
+        await trackEvent(EventType.FIRST_MESSAGE_SENT, {
+          userId,
+          agentId,
+          messageId: result.userMessage.id,
+          sessionId: result.userMessage.sessionId,
+        });
+        log.info({ userId, agentId }, 'TRACKING: First message sent event tracked');
+      }
+
+      // Track every message for engagement metrics
+      await trackEvent(EventType.MESSAGE_SENT, {
+        userId,
+        agentId,
+        messageId: result.userMessage.id,
+        sessionId: result.userMessage.sessionId,
+        messageLength: content.length,
+      });
+    } catch (trackError) {
+      // No lanzar error si falla el tracking, solo loguearlo
+      log.warn({ trackError }, 'Failed to track message analytics events');
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // RESPONSE (with comprehensive rate limit headers)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     return NextResponse.json({
       // User message data
@@ -391,10 +571,42 @@ export async function POST(
 
       // Usage tracking
       usage: result.usage,
+
+      // Resource quota info (token-based, shown as messages for UX)
+      quota: {
+        messagesUsed: tokenStats.messages.used,
+        messagesLimit: tokenStats.messages.limit,
+        messagesRemaining: tokenStats.messages.remaining,
+        tier: tokenStats.tier,
+        // Detailed token info (for debugging/advanced users)
+        tokens: {
+          input: tokenStats.tokens.input,
+          output: tokenStats.tokens.output,
+          total: tokenStats.tokens.total,
+          rewarded: tokenStats.tokens.rewarded,
+        },
+      },
+
+      // Cache info
+      cache: {
+        hit: fromCache,
+        enabled: true,
+      },
     }, {
       headers: {
-        "X-RateLimit-Limit": rateLimitResult.limit?.toString() || "0",
-        "X-RateLimit-Remaining": rateLimitResult.remaining?.toString() || "0",
+        "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+        "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+        "X-RateLimit-Tier": rateLimitResult.tier,
+        "X-RateLimit-Reset": rateLimitResult.reset?.toString() || "0",
+        // Token-based quota (shown as messages for UX)
+        "X-Resource-Quota-Messages-Used": tokenStats.messages.used.toString(),
+        "X-Resource-Quota-Messages-Limit": tokenStats.messages.limit.toString(),
+        "X-Resource-Quota-Messages-Remaining": tokenStats.messages.remaining.toString(),
+        // Actual token counts (for debugging)
+        "X-Resource-Quota-Tokens-Used": tokenStats.tokens.total.used.toString(),
+        "X-Resource-Quota-Tokens-Limit": tokenStats.tokens.total.limit.toString(),
+        // Cache headers
+        "X-Cache-Status": fromCache ? "HIT" : "MISS",
       },
     });
 
@@ -413,26 +625,12 @@ export async function POST(
     }
 
     // Handle Prisma errors
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        log.warn({ error: error.message }, 'Resource not found');
-        return NextResponse.json(
-          { error: "Agent or relation not found" },
-          { status: 404 }
-        );
-      }
-
-      if (error.code === 'P2002') {
-        log.warn({ error: error.message }, 'Unique constraint violation');
-        return NextResponse.json(
-          { error: "Duplicate resource" },
-          { status: 409 }
-        );
-      }
+    if (isPrismaError(error)) {
+      return handlePrismaError(error, { context: 'Message processing' });
     }
 
     // Handle generic errors
-    logError(error, { context: 'Message processing failed' });
+    logError(log, error, { context: 'Message processing failed' });
 
     return NextResponse.json(
       {

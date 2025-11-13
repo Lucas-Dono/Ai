@@ -6,7 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { getWhisperClient } from "@/lib/voice-system/whisper-client";
 import { getElevenLabsClient } from "@/lib/voice-system/elevenlabs-client";
@@ -28,7 +29,7 @@ import os from "os";
 export async function POST(req: NextRequest) {
   try {
     // 1. Autenticación
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
@@ -118,11 +119,19 @@ export async function POST(req: NextRequest) {
     // 9. Procesar mensaje con el sistema emocional
     const orchestrator = getEmotionalSystemOrchestrator();
 
+    // Preparar contexto adicional con tono emocional detectado
+    const messageContext = emotionalTone
+      ? {
+          userEmotionalTone: emotionalTone,
+          isVoiceInput: true,
+        }
+      : undefined;
+
     const response = await orchestrator.processMessage({
       agentId,
       userMessage: transcription.text,
       userId: session.user.id,
-      // TODO: Pasar emotionalTone al orchestrator para enriquecer appraisal
+      context: messageContext,
     });
 
     // 10. Generar voz de la respuesta (si está habilitado)
@@ -132,10 +141,19 @@ export async function POST(req: NextRequest) {
     if (agent.voiceConfig.enableVoiceOutput) {
       const elevenlabs = getElevenLabsClient();
 
+      // Calcular intensidad emocional desde las emociones triggeradas
+      const emotionCount = response.metadata.emotionsTriggered?.length || 0;
+      let intensity = 0.5; // default medium
+      if (emotionCount === 0) {
+        intensity = 0.3; // low
+      } else if (emotionCount >= 3) {
+        intensity = 0.8; // high
+      }
+
       // Calcular modulación emocional desde el estado del personaje
       const modulation = {
         currentEmotion: response.metadata.emotionsTriggered[0] || "neutral",
-        intensity: 0.5, // TODO: Calcular desde EmotionState
+        intensity,
         mood: {
           valence: agent.internalState?.moodValence || 0,
           arousal: agent.internalState?.moodArousal || 0.5,

@@ -22,6 +22,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { optimizedVectorSearch } from "@/lib/memory/optimized-vector-search";
 
 export interface MemoryChunk {
   id: string;
@@ -123,6 +124,7 @@ export class UnifiedMemoryRetrieval {
 
   /**
    * Retrieve desde RAG (vector similarity search)
+   * OPTIMIZADO: Usa vector embeddings y cosine similarity
    */
   private async retrieveFromRAG(
     agentId: string,
@@ -131,56 +133,28 @@ export class UnifiedMemoryRetrieval {
     config: RetrievalConfig
   ): Promise<MemoryChunk[]> {
     try {
-      // Buscar mensajes similares usando búsqueda full-text
-      // (En un sistema real, usarías embeddings + pgvector)
-      const messages = await prisma.message.findMany({
-        where: {
-          conversationId: {
-            in: (
-              await prisma.conversation.findMany({
-                where: { agentId, userId },
-                select: { id: true },
-              })
-            ).map((c) => c.id),
-          },
-          role: "user",
-        },
-        orderBy: { createdAt: "desc" },
-        take: 50, // Últimos 50 mensajes
-      });
-
-      // Simple keyword matching (reemplazar con vector search real)
-      const queryWords = query.toLowerCase().split(/\s+/);
-      const chunks: MemoryChunk[] = [];
-
-      for (const message of messages) {
-        const messageWords = message.content.toLowerCase().split(/\s+/);
-        let matches = 0;
-
-        for (const word of queryWords) {
-          if (word.length > 3 && messageWords.includes(word)) {
-            matches++;
-          }
+      // Usar búsqueda vectorial optimizada
+      const results = await optimizedVectorSearch.searchMessages(
+        agentId,
+        userId,
+        query,
+        {
+          topK: 5,
+          minScore: 0.3,
+          useCache: true,
+          maxAgeDays: 365,
         }
+      );
 
-        if (matches > 0) {
-          const score = (matches / queryWords.length) * config.ragWeight;
-
-          chunks.push({
-            id: message.id,
-            content: message.content,
-            source: "rag",
-            score,
-            timestamp: message.createdAt,
-            metadata: {
-              conversationId: message.conversationId,
-              matches,
-            },
-          });
-        }
-      }
-
-      return chunks.slice(0, 5); // Top 5 RAG results
+      // Convertir a MemoryChunk con peso de RAG
+      return results.map((result) => ({
+        id: result.id,
+        content: result.content,
+        source: "rag" as const,
+        score: result.score * config.ragWeight,
+        timestamp: result.timestamp,
+        metadata: result.metadata,
+      }));
     } catch (error) {
       console.error("[UnifiedMemoryRetrieval] Error en RAG:", error);
       return [];
@@ -189,6 +163,7 @@ export class UnifiedMemoryRetrieval {
 
   /**
    * Retrieve desde Episodic Memory
+   * OPTIMIZADO: Usa vector embeddings y cosine similarity
    */
   private async retrieveFromEpisodicMemory(
     agentId: string,
@@ -197,52 +172,27 @@ export class UnifiedMemoryRetrieval {
     config: RetrievalConfig
   ): Promise<MemoryChunk[]> {
     try {
-      // Buscar episodic memories
-      const episodicMemories = await prisma.episodicMemory.findMany({
-        where: {
-          agentId,
-          userId,
-        },
-        orderBy: { timestamp: "desc" },
-        take: 20,
-      });
-
-      const queryWords = query.toLowerCase().split(/\s+/);
-      const chunks: MemoryChunk[] = [];
-
-      for (const memory of episodicMemories) {
-        const memoryContent = `${memory.summary} ${memory.content || ""}`.toLowerCase();
-        let matches = 0;
-
-        for (const word of queryWords) {
-          if (word.length > 3 && memoryContent.includes(word)) {
-            matches++;
-          }
+      // Usar búsqueda vectorial optimizada
+      const results = await optimizedVectorSearch.searchEpisodicMemories(
+        agentId,
+        query,
+        {
+          topK: 5,
+          minScore: 0.3,
+          useCache: true,
+          maxAgeDays: 365,
         }
+      );
 
-        if (matches > 0) {
-          // Score basado en matches + importance
-          const matchScore = matches / queryWords.length;
-          const importanceScore = memory.importance;
-          const combinedScore =
-            (matchScore * 0.6 + importanceScore * 0.4) * config.episodicWeight;
-
-          chunks.push({
-            id: memory.id,
-            content: memory.summary,
-            source: "episodic",
-            score: combinedScore,
-            timestamp: memory.timestamp,
-            metadata: {
-              type: memory.type,
-              importance: memory.importance,
-              emotionalImpact: memory.emotionalImpact,
-            },
-          });
-        }
-      }
-
-      return chunks.slice(0, 5); // Top 5 episodic results
+      // Convertir a MemoryChunk con peso episódico
+      return results.map((result) => ({
+        id: result.id,
+        content: result.content,
+        source: "episodic" as const,
+        score: result.score * config.episodicWeight,
+        timestamp: result.timestamp,
+        metadata: result.metadata,
+      }));
     } catch (error) {
       console.error("[UnifiedMemoryRetrieval] Error en Episodic:", error);
       return [];
@@ -250,7 +200,8 @@ export class UnifiedMemoryRetrieval {
   }
 
   /**
-   * Retrieve desde Knowledge
+   * Retrieve desde Knowledge (SemanticMemory)
+   * Busca en userFacts y userPreferences del modelo SemanticMemory
    */
   private async retrieveFromKnowledge(
     agentId: string,
@@ -258,42 +209,86 @@ export class UnifiedMemoryRetrieval {
     config: RetrievalConfig
   ): Promise<MemoryChunk[]> {
     try {
-      const knowledgeGroups = await prisma.knowledge.findMany({
+      // Buscar SemanticMemory del agente
+      const semanticMemory = await prisma.semanticMemory.findUnique({
         where: { agentId },
       });
 
-      const queryWords = query.toLowerCase().split(/\s+/);
+      if (!semanticMemory) {
+        return [];
+      }
+
       const chunks: MemoryChunk[] = [];
+      const queryWords = query.toLowerCase().split(/\s+/);
 
-      for (const knowledge of knowledgeGroups) {
-        const knowledgeContent =
-          `${knowledge.name} ${knowledge.description || ""} ${knowledge.content || ""}`.toLowerCase();
-        let matches = 0;
+      // Extraer userFacts del JSON
+      const userFacts = semanticMemory.userFacts as Record<string, any>;
+      if (userFacts && typeof userFacts === "object") {
+        for (const [key, value] of Object.entries(userFacts)) {
+          // Convertir valor a string para buscar
+          const valueStr = JSON.stringify(value).toLowerCase();
+          let matches = 0;
 
-        for (const word of queryWords) {
-          if (word.length > 3 && knowledgeContent.includes(word)) {
-            matches++;
+          for (const word of queryWords) {
+            if (word.length > 3 && (key.toLowerCase().includes(word) || valueStr.includes(word))) {
+              matches++;
+            }
           }
-        }
 
-        if (matches > 0) {
-          const score = (matches / queryWords.length) * config.knowledgeWeight;
+          if (matches > 0) {
+            const score = (matches / queryWords.length) * config.knowledgeWeight;
+            const content = `${key}: ${typeof value === "string" ? value : JSON.stringify(value)}`;
 
-          chunks.push({
-            id: knowledge.id,
-            content: `[${knowledge.name}] ${knowledge.content || knowledge.description || ""}`,
-            source: "knowledge",
-            score,
-            timestamp: knowledge.createdAt,
-            metadata: {
-              name: knowledge.name,
-              category: knowledge.category,
-            },
-          });
+            chunks.push({
+              id: `fact-${key}`,
+              content,
+              source: "knowledge",
+              score,
+              timestamp: semanticMemory.lastUpdated,
+              metadata: {
+                type: "userFact",
+                key,
+                value,
+              },
+            });
+          }
         }
       }
 
-      return chunks.slice(0, 3); // Top 3 knowledge results
+      // Extraer userPreferences del JSON
+      const userPreferences = semanticMemory.userPreferences as Record<string, any>;
+      if (userPreferences && typeof userPreferences === "object") {
+        for (const [key, value] of Object.entries(userPreferences)) {
+          const valueStr = JSON.stringify(value).toLowerCase();
+          let matches = 0;
+
+          for (const word of queryWords) {
+            if (word.length > 3 && (key.toLowerCase().includes(word) || valueStr.includes(word))) {
+              matches++;
+            }
+          }
+
+          if (matches > 0) {
+            const score = (matches / queryWords.length) * config.knowledgeWeight;
+            const content = `Preferencia - ${key}: ${typeof value === "string" ? value : JSON.stringify(value)}`;
+
+            chunks.push({
+              id: `pref-${key}`,
+              content,
+              source: "knowledge",
+              score,
+              timestamp: semanticMemory.lastUpdated,
+              metadata: {
+                type: "userPreference",
+                key,
+                value,
+              },
+            });
+          }
+        }
+      }
+
+      return chunks.slice(0, 5); // Top 5 knowledge results
     } catch (error) {
       console.error("[UnifiedMemoryRetrieval] Error en Knowledge:", error);
       return [];

@@ -40,8 +40,19 @@ export function RewardedVideoAd({
     setIsLoading(true);
     setWatchStartTime(Date.now());
 
-    // TODO: Integrar con Google AdMob o tu proveedor de ads
-    // Por ahora, simulamos un video de 30-60 segundos
+    /**
+     * FEATURE FUTURA: Integración con Google AdMob
+     *
+     * Para implementar completamente:
+     * 1. Crear cuenta en Google AdMob (https://admob.google.com)
+     * 2. Configurar App ID y Ad Unit IDs
+     * 3. Instalar SDK: npm install @react-native-google-mobile-ads/admob
+     * 4. Configurar en app.json o next.config.js
+     * 5. Implementar RewardedAd.load() y .show()
+     * 6. Los endpoints /api/rewarded-ads/grant-* ya están listos para validar rewards
+     *
+     * Mientras tanto, simulamos un video de 30 segundos para testing
+     */
     const videoLength = 30; // segundos
 
     // Simular carga del ad
@@ -125,7 +136,7 @@ export function RewardedVideoAd({
               </div>
             ) : (
               <>
-                <div className="bg-muted rounded-lg p-6 text-center">
+                <div className="bg-muted rounded-2xl p-6 text-center">
                   <p className="text-lg font-semibold mb-2">
                     Recompensa: {rewardText}
                   </p>

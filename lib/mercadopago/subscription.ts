@@ -43,28 +43,37 @@ export async function createSubscriptionPreference(
   planId: "plus" | "ultra",
   name?: string
 ): Promise<string> {
-  const customerId = await getOrCreateMercadoPagoCustomer(userId, email, name);
   const plan = PLANS[planId];
 
-  const preapproval = await preApprovalClient.create({
-    body: {
-      payer_email: email,
-      back_url: MERCADOPAGO_URLS.success,
-      reason: `Suscripción ${plan.name} - Creador de Inteligencias`,
-      auto_recurring: {
-        frequency: 1,
-        frequency_type: "months",
-        transaction_amount: plan.price,
-        currency_id: plan.currency,
-        start_date: new Date().toISOString(),
-        end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 año
-      },
-      external_reference: userId,
-      // @ts-expect-error - notification_url exists but not in type definition
-      notification_url: MERCADOPAGO_URLS.notification,
-      status: "pending",
+  console.log("📝 Creando PreApproval con:");
+  console.log(`   payer_email: ${email}`);
+  console.log(`   transaction_amount: ${plan.price}`);
+
+  // Solo incluir back_url si no es localhost (MercadoPago lo rechaza)
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || "";
+  const isLocalhost = baseUrl.includes("localhost") || baseUrl.includes("127.0.0.1");
+
+  const body: any = {
+    payer_email: email,
+    reason: `Suscripción ${plan.name} - Circuit Prompt AI`,
+    auto_recurring: {
+      frequency: 1,
+      frequency_type: "months",
+      transaction_amount: plan.price,
+      currency_id: plan.currency,
     },
-  });
+    external_reference: userId,
+  };
+
+  // Solo agregar back_url si no es localhost
+  if (!isLocalhost && baseUrl) {
+    body.back_url = `${baseUrl}/dashboard/billing/success`;
+    console.log(`   back_url: ${body.back_url}`);
+  } else {
+    console.log(`   back_url: (omitido - localhost no es válido)`);
+  }
+
+  const preapproval = await preApprovalClient.create({ body });
 
   return preapproval.init_point!;
 }

@@ -1,132 +1,117 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { withOwnership, errorResponse } from "@/lib/api/middleware";
+import { apiLogger as log } from "@/lib/logging/loggers";
+import { z } from "zod";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    console.log('[API GET] Obteniendo agente:', id);
+/**
+ * GET /api/agents/[id]
+ * Get agent details (requires ownership or public visibility)
+ */
+export const GET = withOwnership(
+  'agent',
+  async (req, { resource }) => {
+    try {
+      log.info({ agentId: resource.id }, 'Fetching agent details');
 
-    const agent = await prisma.agent.findUnique({
-      where: { id },
-      include: {
-        messagesAsAgent: {
-          orderBy: { createdAt: "asc" }, // ASC = orden cronológico (más antiguos primero)
-          take: 50,
-        },
-        _count: {
-          select: {
-            reviews: true,
+      const agent = await prisma.agent.findUnique({
+        where: { id: resource.id },
+        include: {
+          messagesAsAgent: {
+            orderBy: { createdAt: "asc" },
+            take: 50,
+          },
+          _count: {
+            select: {
+              reviews: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!agent) {
-      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+      if (!agent) {
+        log.warn({ agentId: resource.id }, 'Agent not found');
+        return errorResponse("Agent not found", 404);
+      }
+
+      // Mapear agent para incluir isPublic y reviewCount
+      const { _count, ...agentData } = agent;
+      const mappedAgent = {
+        ...agentData,
+        isPublic: agent.visibility === 'public',
+        reviewCount: _count?.reviews || 0,
+      };
+
+      log.info({ agentId: resource.id, visibility: agent.visibility }, 'Agent details fetched successfully');
+      return NextResponse.json(mappedAgent);
+    } catch (error) {
+      log.error({ err: error, agentId: resource.id }, 'Error fetching agent');
+      return errorResponse("Failed to fetch agent", 500);
     }
+  },
+  { allowPublic: true } // Allow access to public agents
+)
 
-    // Mapear agent para incluir isPublic y reviewCount
-    const { _count, ...agentData } = agent;
-    const mappedAgent = {
-      ...agentData,
-      isPublic: agent.visibility === 'public',
-      reviewCount: _count?.reviews || 0,
-    };
-
-    return NextResponse.json(mappedAgent);
-  } catch (error) {
-    console.error("[API GET] Error fetching agent:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch agent" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+/**
+ * DELETE /api/agents/[id]
+ * Delete an agent (requires ownership)
+ */
+export const DELETE = withOwnership('agent', async (req, { resource }) => {
   try {
-    const { id } = await params;
-    console.log('[API DELETE] Eliminando agente:', id);
-
-    // Verificar autenticación
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Verificar que el agente pertenece al usuario
-    const agent = await prisma.agent.findUnique({
-      where: { id },
-    });
-
-    if (!agent) {
-      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
-    }
-
-    if (agent.userId !== session.user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    log.info({ agentId: resource.id }, 'Deleting agent');
 
     // Eliminar el agente (esto también eliminará las relaciones por CASCADE)
     await prisma.agent.delete({
-      where: { id },
+      where: { id: resource.id },
     });
 
-    console.log('[API DELETE] Agente eliminado exitosamente');
+    log.info({ agentId: resource.id }, 'Agent deleted successfully');
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("[API DELETE] Error deleting agent:", error);
-    return NextResponse.json(
-      { error: "Failed to delete agent" },
-      { status: 500 }
-    );
+    log.error({ err: error, agentId: resource.id }, 'Error deleting agent');
+    return errorResponse("Failed to delete agent", 500);
   }
-}
+});
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+/**
+ * PATCH /api/agents/[id]
+ * Update agent details (requires ownership)
+ */
+const patchAgentSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  personality: z.string().optional(),
+  purpose: z.string().optional(),
+  tone: z.string().optional(),
+  description: z.string().optional(),
+});
+
+export const PATCH = withOwnership('agent', async (req, { resource }) => {
   try {
-    const { id } = await params;
-    console.log('[API PATCH] Actualizando agente:', id);
+    log.info({ agentId: resource.id }, 'Updating agent');
 
-    // Verificar autenticación
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Verificar que el agente pertenece al usuario
-    const agent = await prisma.agent.findUnique({
-      where: { id },
-    });
-
-    if (!agent) {
-      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
-    }
-
-    if (agent.userId !== session.user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // Obtener datos del body
+    // Obtener y validar datos del body
     const body = await req.json();
-    const { name, personality, purpose, tone, description } = body;
+    const validation = patchAgentSchema.safeParse(body);
 
-    console.log('[API PATCH] Datos a actualizar:', { name, personality, purpose, tone, description });
+    if (!validation.success) {
+      log.warn({ agentId: resource.id, errors: validation.error.issues }, 'Validation failed');
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: validation.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { name, personality, purpose, tone, description } = validation.data;
+
+    log.debug({ agentId: resource.id, updates: { name, personality, purpose, tone, description } }, 'Update data validated');
 
     // Actualizar el agente
     const updatedAgent = await prisma.agent.update({
-      where: { id },
+      where: { id: resource.id },
       data: {
         ...(name && { name }),
         ...(personality && { personality }),
@@ -136,14 +121,11 @@ export async function PATCH(
       },
     });
 
-    console.log('[API PATCH] Agente actualizado exitosamente');
+    log.info({ agentId: resource.id }, 'Agent updated successfully');
 
     return NextResponse.json(updatedAgent);
   } catch (error) {
-    console.error("[API PATCH] Error updating agent:", error);
-    return NextResponse.json(
-      { error: "Failed to update agent" },
-      { status: 500 }
-    );
+    log.error({ err: error, agentId: resource.id }, 'Error updating agent');
+    return errorResponse("Failed to update agent", 500);
   }
-}
+});

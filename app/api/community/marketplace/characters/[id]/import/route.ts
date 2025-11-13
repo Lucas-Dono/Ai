@@ -8,7 +8,7 @@ import { MarketplaceCharacterService } from '@/lib/services/marketplace-characte
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -18,7 +18,7 @@ export async function POST(
 
     const { agentName } = await request.json();
     const agent = await MarketplaceCharacterService.importToAgent(
-      params.id,
+      (await params).id,
       session.user.id,
       agentName
     );

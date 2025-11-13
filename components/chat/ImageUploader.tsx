@@ -115,7 +115,7 @@ export function ImageUploader({ onSend, onCancel }: ImageUploaderProps) {
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
         placeholder="Añade un mensaje (opcional)..."
-        className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-md border-white/30 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none rounded-xl"
+        className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-md border-white/30 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-none rounded-2xl"
         rows={2}
       />
 

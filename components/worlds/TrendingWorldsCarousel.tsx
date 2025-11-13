@@ -185,7 +185,7 @@ export function TrendingWorldsCarousel() {
                   {/* World Icon */}
                   <div className="flex items-start gap-4 mb-4">
                     <div
-                      className="h-16 w-16 rounded-xl flex items-center justify-center shrink-0 shadow-lg"
+                      className="h-16 w-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg"
                       style={{ background: generateGradient(world.name) }}
                     >
                       <span className="text-3xl">🌍</span>
@@ -243,7 +243,7 @@ export function TrendingWorldsCarousel() {
                   </div>
 
                   {/* Action Button */}
-                  <Button className="w-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 hover:from-orange-500/30 hover:to-pink-500/30 border border-orange-500/30 text-white py-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+                  <Button className="w-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 hover:from-orange-500/30 hover:to-pink-500/30 border border-orange-500/30 text-white py-2 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
                     <Play className="w-4 h-4" />
                     Explorar mundo
                   </Button>

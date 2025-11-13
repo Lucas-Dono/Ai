@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { DangerConfirmDialog } from "@/components/DangerConfirmDialog";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import {
   User,
   Key,
@@ -32,7 +35,11 @@ import {
   MessageSquare,
   Users,
   Trash2,
+  Accessibility,
 } from "lucide-react";
+import { AccessibilitySettings } from "@/components/accessibility/AccessibilitySettings";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 interface UserProfile {
   id: string;
@@ -50,6 +57,7 @@ interface UserStats {
 }
 
 export default function ConfiguracionPage() {
+  const t = useTranslations("settings");
   const { data: session, update: updateSession } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -89,7 +97,7 @@ export default function ConfiguracionPage() {
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
-        toast.error("Error al cargar el perfil");
+        toast.error(t("profile.toasts.loadError"));
       } finally {
         setLoading(false);
       }
@@ -115,13 +123,13 @@ export default function ConfiguracionPage() {
         const data = await res.json();
         setProfile(data.user);
         await updateSession();
-        toast.success("Perfil actualizado exitosamente");
+        toast.success(t("profile.toasts.saveSuccess"));
       } else {
-        toast.error("Error al guardar los cambios");
+        toast.error(t("profile.toasts.saveError"));
       }
     } catch (error) {
       console.error("Error saving profile:", error);
-      toast.error("Error al guardar los cambios");
+      toast.error(t("profile.toasts.saveError"));
     } finally {
       setSaving(false);
     }
@@ -144,7 +152,7 @@ export default function ConfiguracionPage() {
 
       if (res.ok) {
         const data = await res.json();
-        toast.success(data.message);
+        toast.success(data.message || t("danger.toasts.deleteMessagesSuccess"));
         // Refresh stats
         const profileRes = await fetch("/api/user/profile");
         if (profileRes.ok) {
@@ -152,11 +160,11 @@ export default function ConfiguracionPage() {
           setStats(profileData.stats);
         }
       } else {
-        toast.error("Error al eliminar los mensajes");
+        toast.error(t("danger.toasts.deleteMessagesError"));
       }
     } catch (error) {
       console.error("Error deleting messages:", error);
-      toast.error("Error al eliminar los mensajes");
+      toast.error(t("danger.toasts.deleteMessagesError"));
     }
   };
 
@@ -168,7 +176,7 @@ export default function ConfiguracionPage() {
 
       if (res.ok) {
         const data = await res.json();
-        toast.success(data.message);
+        toast.success(data.message || t("danger.toasts.deleteAgentsSuccess"));
         // Refresh stats
         const profileRes = await fetch("/api/user/profile");
         if (profileRes.ok) {
@@ -176,11 +184,11 @@ export default function ConfiguracionPage() {
           setStats(profileData.stats);
         }
       } else {
-        toast.error("Error al eliminar los agentes");
+        toast.error(t("danger.toasts.deleteAgentsError"));
       }
     } catch (error) {
       console.error("Error deleting agents:", error);
-      toast.error("Error al eliminar los agentes");
+      toast.error(t("danger.toasts.deleteAgentsError"));
     }
   };
 
@@ -191,62 +199,66 @@ export default function ConfiguracionPage() {
       });
 
       if (res.ok) {
-        toast.success("Cuenta eliminada. Redirigiendo...");
+        toast.success(t("danger.deleteAccount.toast"));
         // Sign out and redirect to home
         setTimeout(() => {
           signOut({ callbackUrl: "/" });
         }, 1500);
       } else {
-        toast.error("Error al eliminar la cuenta");
+        toast.error(t("danger.deleteAccount.toastError"));
       }
     } catch (error) {
       console.error("Error deleting account:", error);
-      toast.error("Error al eliminar la cuenta");
+      toast.error(t("danger.deleteAccount.toastError"));
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Cargando configuración...</p>
-        </div>
-      </div>
+      <LoadingIndicator
+        variant="page"
+        message={t("loading")}
+        submessage={t("loadingSettings")}
+      />
     );
   }
 
   return (
+    <ErrorBoundary variant="page">
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto p-6 lg:p-8 space-y-8">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Configuración
+            {t("title")}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Administra tu cuenta, preferencias y configuración de la plataforma
+            {t("subtitle")}
           </p>
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Perfil</span>
+              <span className="hidden sm:inline">{t("tabs.profile")}</span>
             </TabsTrigger>
             <TabsTrigger value="plan" className="gap-2">
               <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Plan</span>
+              <span className="hidden sm:inline">{t("tabs.plan")}</span>
             </TabsTrigger>
             <TabsTrigger value="preferences" className="gap-2">
               <Palette className="h-4 w-4" />
-              <span className="hidden sm:inline">Preferencias</span>
+              <span className="hidden sm:inline">{t("tabs.preferences")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="accessibility" className="gap-2">
+              <Accessibility className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("tabs.accessibility")}</span>
             </TabsTrigger>
             <TabsTrigger value="danger" className="gap-2">
               <AlertTriangle className="h-4 w-4" />
-              <span className="hidden sm:inline">Avanzado</span>
+              <span className="hidden sm:inline">{t("tabs.danger")}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -254,9 +266,9 @@ export default function ConfiguracionPage() {
           <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Información Personal</CardTitle>
+                <CardTitle>{t("profile.title")}</CardTitle>
                 <CardDescription>
-                  Actualiza tu información de perfil visible para otros usuarios
+                  {t("profile.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -269,11 +281,11 @@ export default function ConfiguracionPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-2">
-                    <h3 className="font-semibold text-lg">{userName || "Sin nombre"}</h3>
+                    <h3 className="font-semibold text-lg">{userName || t("profile.avatar.noName")}</h3>
                     <p className="text-sm text-muted-foreground">{profile?.email}</p>
                     <Button variant="outline" size="sm" disabled>
-                      Cambiar avatar
-                      <span className="ml-2 text-xs text-muted-foreground">(Próximamente)</span>
+                      {t("profile.avatar.changeAvatar")}
+                      <span className="ml-2 text-xs text-muted-foreground">{t("profile.avatar.comingSoon")}</span>
                     </Button>
                   </div>
                 </div>
@@ -281,17 +293,17 @@ export default function ConfiguracionPage() {
                 {/* Form Fields */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nombre</Label>
+                    <Label htmlFor="name">{t("profile.form.nameLabel")}</Label>
                     <Input
                       id="name"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Tu nombre completo"
+                      placeholder={t("profile.form.namePlaceholder")}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t("profile.form.emailLabel")}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -300,7 +312,7 @@ export default function ConfiguracionPage() {
                       className="bg-muted"
                     />
                     <p className="text-xs text-muted-foreground">
-                      El email no se puede cambiar en este momento
+                      {t("profile.form.emailReadonly")}
                     </p>
                   </div>
                 </div>
@@ -310,12 +322,12 @@ export default function ConfiguracionPage() {
                     {saving ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Guardando...
+                        {t("profile.actions.saving")}
                       </>
                     ) : (
                       <>
                         <Save className="h-4 w-4 mr-2" />
-                        Guardar cambios
+                        {t("profile.actions.save")}
                       </>
                     )}
                   </Button>
@@ -332,9 +344,9 @@ export default function ConfiguracionPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <currentPlan.icon className="h-5 w-5" />
-                    Plan Actual
+                    {t("plan.current.title")}
                   </CardTitle>
-                  <CardDescription>Tu plan de suscripción activo</CardDescription>
+                  <CardDescription>{t("plan.current.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="text-center py-6">
@@ -343,13 +355,13 @@ export default function ConfiguracionPage() {
                     </Badge>
                     <p className="text-sm text-muted-foreground mb-6">
                       {profile?.plan === "ultra"
-                        ? "Acceso completo e ilimitado a todas las funciones"
-                        : "Actualiza tu plan para desbloquear más funciones"}
+                        ? t("plan.current.ultraMessage")
+                        : t("plan.current.upgradeMessage")}
                     </p>
                     {profile?.plan !== "ultra" && (
                       <Button className="w-full">
                         <Sparkles className="h-4 w-4 mr-2" />
-                        Mejorar Plan
+                        {t("plan.current.upgradeButton")}
                       </Button>
                     )}
                   </div>
@@ -359,39 +371,39 @@ export default function ConfiguracionPage() {
               {/* Usage Stats */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Uso del Plan</CardTitle>
-                  <CardDescription>Tu uso actual de recursos</CardDescription>
+                  <CardTitle>{t("plan.usage.title")}</CardTitle>
+                  <CardDescription>{t("plan.usage.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                      <span className="text-sm font-medium">IAs creadas</span>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/50">
+                      <span className="text-sm font-medium">{t("plan.usage.agentsCreated")}</span>
                       <span className="text-sm font-bold">
-                        {stats.agentsCount} {profile?.plan === "ultra" ? "/ ∞" : profile?.plan === "plus" ? "/ 10" : "/ 3"}
+                        {stats.agentsCount} {profile?.plan === "ultra" ? `/ ${t("plan.usage.unlimited")}` : profile?.plan === "plus" ? "/ 10" : "/ 3"}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                      <span className="text-sm font-medium">Mundos activos</span>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/50">
+                      <span className="text-sm font-medium">{t("plan.usage.worldsActive")}</span>
                       <span className="text-sm font-bold">
-                        {stats.worldsCount} {profile?.plan === "ultra" ? "/ ∞" : profile?.plan === "plus" ? "/ 5" : "/ 1"}
+                        {stats.worldsCount} {profile?.plan === "ultra" ? `/ ${t("plan.usage.unlimited")}` : profile?.plan === "plus" ? "/ 5" : "/ 1"}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                      <span className="text-sm font-medium">Mensajes este mes</span>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/50">
+                      <span className="text-sm font-medium">{t("plan.usage.messagesThisMonth")}</span>
                       <span className="text-sm font-bold">
-                        {stats.messagesThisMonth.toLocaleString()} {profile?.plan !== "free" ? "/ ∞" : "/ 600"}
+                        {stats.messagesThisMonth.toLocaleString()} {profile?.plan !== "free" ? `/ ${t("plan.usage.unlimited")}` : "/ 600"}
                       </span>
                     </div>
                   </div>
 
                   {profile?.plan === "ultra" && (
-                    <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+                    <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
                       <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2">
                         <Crown className="h-5 w-5" />
-                        <span className="font-semibold">Plan Ultra</span>
+                        <span className="font-semibold">{t("plan.usage.ultraBadge.title")}</span>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Disfrutas de recursos ilimitados y acceso prioritario a nuevas funciones.
+                        {t("plan.usage.ultraBadge.message")}
                       </p>
                     </div>
                   )}
@@ -404,15 +416,15 @@ export default function ConfiguracionPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Key className="h-5 w-5" />
-                  API Keys
+                  {t("plan.apiKeys.title")}
                 </CardTitle>
                 <CardDescription>
-                  Configura tus claves de API para integrar servicios externos
+                  {t("plan.apiKeys.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="gemini-key">Google Gemini API Key</Label>
+                  <Label htmlFor="gemini-key">{t("plan.apiKeys.geminiLabel")}</Label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Input
@@ -420,7 +432,7 @@ export default function ConfiguracionPage() {
                         type={showApiKey ? "text" : "password"}
                         value={geminiApiKey}
                         onChange={(e) => setGeminiApiKey(e.target.value)}
-                        placeholder="AIza..."
+                        placeholder={t("plan.apiKeys.geminiPlaceholder")}
                       />
                       <Button
                         variant="ghost"
@@ -432,18 +444,18 @@ export default function ConfiguracionPage() {
                       </Button>
                     </div>
                     <Button variant="outline" disabled>
-                      Verificar
+                      {t("plan.apiKeys.verifyButton")}
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Obtén tu API key en{" "}
+                    {t("plan.apiKeys.getKeyMessage")}{" "}
                     <a
                       href="https://makersuite.google.com/app/apikey"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      Google AI Studio
+                      {t("plan.apiKeys.getKeyLink")}
                     </a>
                   </p>
                 </div>
@@ -458,20 +470,20 @@ export default function ConfiguracionPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="h-5 w-5" />
-                  Apariencia
+                  {t("preferences.appearance.title")}
                 </CardTitle>
                 <CardDescription>
-                  Personaliza la interfaz de la aplicación
+                  {t("preferences.appearance.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Tema</Label>
-                  <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/50">
+                  <Label>{t("preferences.appearance.theme.label")}</Label>
+                  <div className="flex items-center justify-between p-4 rounded-2xl border bg-muted/50">
                     <div>
-                      <p className="font-medium">Modo oscuro / claro</p>
+                      <p className="font-medium">{t("preferences.appearance.theme.title")}</p>
                       <p className="text-xs text-muted-foreground">
-                        Cambia entre modo oscuro y claro
+                        {t("preferences.appearance.theme.description")}
                       </p>
                     </div>
                     <ThemeToggle />
@@ -481,10 +493,10 @@ export default function ConfiguracionPage() {
                 <Separator />
 
                 <div className="space-y-2">
-                  <Label htmlFor="language">Idioma</Label>
-                  <Input id="language" value="Español" disabled className="bg-muted" />
+                  <Label htmlFor="language">{t("preferences.appearance.language.label")}</Label>
+                  <Input id="language" value={t("preferences.appearance.language.current")} disabled className="bg-muted" />
                   <p className="text-xs text-muted-foreground">
-                    Más idiomas disponibles próximamente
+                    {t("preferences.appearance.language.comingSoon")}
                   </p>
                 </div>
               </CardContent>
@@ -495,20 +507,20 @@ export default function ConfiguracionPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5" />
-                  Notificaciones
+                  {t("preferences.notifications.title")}
                 </CardTitle>
                 <CardDescription>
-                  Gestiona cómo y cuándo recibes notificaciones
+                  {t("preferences.notifications.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center justify-between p-4 rounded-lg border">
+                <div className="flex items-center justify-between p-4 rounded-2xl border">
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium text-sm">Notificaciones por email</p>
+                      <p className="font-medium text-sm">{t("preferences.notifications.email.title")}</p>
                       <p className="text-xs text-muted-foreground">
-                        Recibe actualizaciones importantes por correo
+                        {t("preferences.notifications.email.description")}
                       </p>
                     </div>
                   </div>
@@ -520,21 +532,21 @@ export default function ConfiguracionPage() {
                     {emailNotifications ? (
                       <>
                         <Check className="h-4 w-4 mr-1" />
-                        Activado
+                        {t("preferences.notifications.email.enabled")}
                       </>
                     ) : (
-                      "Desactivado"
+                      t("preferences.notifications.email.disabled")
                     )}
                   </Button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg border">
+                <div className="flex items-center justify-between p-4 rounded-2xl border">
                   <div className="flex items-center gap-3">
                     <Sparkles className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium text-sm">Actualizaciones de agentes</p>
+                      <p className="font-medium text-sm">{t("preferences.notifications.agentUpdates.title")}</p>
                       <p className="text-xs text-muted-foreground">
-                        Notificaciones sobre la actividad de tus IAs
+                        {t("preferences.notifications.agentUpdates.description")}
                       </p>
                     </div>
                   </div>
@@ -546,15 +558,20 @@ export default function ConfiguracionPage() {
                     {agentUpdates ? (
                       <>
                         <Check className="h-4 w-4 mr-1" />
-                        Activado
+                        {t("preferences.notifications.email.enabled")}
                       </>
                     ) : (
-                      "Desactivado"
+                      t("preferences.notifications.email.disabled")
                     )}
                   </Button>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Accessibility Tab */}
+          <TabsContent value="accessibility" className="space-y-6">
+            <AccessibilitySettings />
           </TabsContent>
 
           {/* Danger Zone Tab */}
@@ -563,21 +580,21 @@ export default function ConfiguracionPage() {
               <CardHeader>
                 <CardTitle className="text-destructive flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5" />
-                  Zona de Peligro
+                  {t("danger.title")}
                 </CardTitle>
                 <CardDescription>
-                  Acciones irreversibles relacionadas con tu cuenta y datos
+                  {t("danger.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="p-4 rounded-lg border border-destructive/30 bg-destructive/5">
+                  <div className="p-4 rounded-2xl border border-destructive/30 bg-destructive/5">
                     <div className="flex items-start gap-3 mb-3">
                       <MessageSquare className="h-5 w-5 text-destructive mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-semibold mb-1">Eliminar todas las conversaciones</h4>
+                        <h4 className="font-semibold mb-1">{t("danger.deleteMessages.title")}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Esto eliminará permanentemente {stats.messagesThisMonth > 0 ? `${stats.messagesThisMonth.toLocaleString()} mensajes de este mes y ` : ""}todas tus conversaciones con las IAs
+                          {t("danger.deleteMessages.description")} {stats.messagesThisMonth > 0 ? t("danger.deleteMessages.messagesCount", { count: stats.messagesThisMonth.toLocaleString() }) : ""}{t("danger.deleteMessages.descriptionSuffix")}
                         </p>
                       </div>
                     </div>
@@ -587,17 +604,20 @@ export default function ConfiguracionPage() {
                       onClick={() => setDeleteMessagesDialog(true)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Eliminar conversaciones
+                      {t("danger.deleteMessages.button")}
                     </Button>
                   </div>
 
-                  <div className="p-4 rounded-lg border border-destructive/30 bg-destructive/5">
+                  <div className="p-4 rounded-2xl border border-destructive/30 bg-destructive/5">
                     <div className="flex items-start gap-3 mb-3">
                       <Users className="h-5 w-5 text-destructive mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-semibold mb-1">Eliminar todos los agentes</h4>
+                        <h4 className="font-semibold mb-1">{t("danger.deleteAgents.title")}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Esto eliminará permanentemente {stats.agentsCount > 0 ? `${stats.agentsCount} ${stats.agentsCount === 1 ? "agente" : "agentes"} y ` : ""}todas las IAs que has creado, incluyendo sus memorias y configuraciones
+                          {t("danger.deleteAgents.description")} {stats.agentsCount > 0 ? t("danger.deleteAgents.agentsCount", {
+                            count: stats.agentsCount,
+                            plural: stats.agentsCount === 1 ? t("danger.deleteAgents.agentSingular") : t("danger.deleteAgents.agentPlural")
+                          }) + " " : ""}{t("danger.deleteAgents.descriptionSuffix")}
                         </p>
                       </div>
                     </div>
@@ -607,17 +627,17 @@ export default function ConfiguracionPage() {
                       onClick={() => setDeleteAgentsDialog(true)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Eliminar agentes
+                      {t("danger.deleteAgents.button")}
                     </Button>
                   </div>
 
-                  <div className="p-4 rounded-lg border border-destructive bg-destructive/10">
+                  <div className="p-4 rounded-2xl border border-destructive bg-destructive/10">
                     <div className="flex items-start gap-3 mb-3">
                       <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 animate-pulse" />
                       <div className="flex-1">
-                        <h4 className="font-semibold mb-1 text-destructive">Eliminar cuenta permanentemente</h4>
+                        <h4 className="font-semibold mb-1 text-destructive">{t("danger.deleteAccount.title")}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Una vez eliminada, no podrás recuperar tu cuenta ni tus datos. Se eliminarán todos tus agentes, conversaciones, mundos y configuraciones.
+                          {t("danger.deleteAccount.description")}
                         </p>
                       </div>
                     </div>
@@ -626,7 +646,7 @@ export default function ConfiguracionPage() {
                       onClick={() => setDeleteAccountDialog(true)}
                     >
                       <AlertTriangle className="h-4 w-4 mr-2" />
-                      Eliminar cuenta
+                      {t("danger.deleteAccount.button")}
                     </Button>
                   </div>
                 </div>
@@ -639,35 +659,39 @@ export default function ConfiguracionPage() {
         <DangerConfirmDialog
           open={deleteMessagesDialog}
           onOpenChange={setDeleteMessagesDialog}
-          title="¿Eliminar todas las conversaciones?"
-          description={`Estás a punto de eliminar TODAS tus conversaciones. ${
+          title={t("danger.deleteMessages.dialogTitle")}
+          description={`${t("danger.deleteMessages.dialogDescription")} ${
             stats.messagesThisMonth > 0
-              ? `Esto incluye ${stats.messagesThisMonth.toLocaleString()} mensajes de este mes.`
+              ? t("danger.deleteMessages.dialogInclude", { count: stats.messagesThisMonth.toLocaleString() })
               : ""
-          } Esta acción no se puede deshacer y perderás todo el historial de chats con tus IAs.`}
+          } ${t("danger.deleteMessages.dialogWarning")}`}
           onConfirm={handleDeleteMessages}
         />
 
         <DangerConfirmDialog
           open={deleteAgentsDialog}
           onOpenChange={setDeleteAgentsDialog}
-          title="¿Eliminar todos los agentes?"
-          description={`Estás a punto de eliminar TODAS tus IAs. ${
+          title={t("danger.deleteAgents.dialogTitle")}
+          description={`${t("danger.deleteAgents.dialogDescription")} ${
             stats.agentsCount > 0
-              ? `Esto incluye ${stats.agentsCount} ${stats.agentsCount === 1 ? "agente" : "agentes"}.`
+              ? t("danger.deleteAgents.dialogInclude", {
+                  count: stats.agentsCount,
+                  plural: stats.agentsCount === 1 ? t("danger.deleteAgents.agentSingular") : t("danger.deleteAgents.agentPlural")
+                })
               : ""
-          } Se perderán todas sus memorias, configuraciones, personalidades y datos asociados. Esta acción no se puede deshacer.`}
+          } ${t("danger.deleteAgents.dialogWarning")}`}
           onConfirm={handleDeleteAgents}
         />
 
         <DangerConfirmDialog
           open={deleteAccountDialog}
           onOpenChange={setDeleteAccountDialog}
-          title="¿ELIMINAR TU CUENTA PERMANENTEMENTE?"
-          description="Estás a punto de ELIMINAR COMPLETAMENTE tu cuenta. Se eliminarán TODOS tus datos: agentes, conversaciones, mundos, configuraciones y cualquier contenido asociado. NO HAY FORMA DE RECUPERAR ESTA INFORMACIÓN. Esta es una acción PERMANENTE e IRREVERSIBLE."
+          title={t("danger.deleteAccount.dialogTitle")}
+          description={t("danger.deleteAccount.dialogDescription")}
           onConfirm={handleDeleteAccount}
         />
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

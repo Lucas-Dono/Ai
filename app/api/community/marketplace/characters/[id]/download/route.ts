@@ -8,7 +8,7 @@ import { MarketplaceCharacterService } from '@/lib/services/marketplace-characte
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,7 +16,7 @@ export async function POST(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const character = await MarketplaceCharacterService.downloadCharacter(params.id, session.user.id);
+    const character = await MarketplaceCharacterService.downloadCharacter((await params).id, session.user.id);
     return NextResponse.json(character);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

@@ -8,7 +8,7 @@ import { ResearchService } from '@/lib/services/research.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -17,7 +17,7 @@ export async function POST(
     }
 
     const data = await request.json();
-    const dataset = await ResearchService.addDataset(params.id, session.user.id, data);
+    const dataset = await ResearchService.addDataset((await params).id, session.user.id, data);
 
     return NextResponse.json(dataset, { status: 201 });
   } catch (error: any) {

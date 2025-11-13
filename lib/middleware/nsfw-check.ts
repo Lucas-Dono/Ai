@@ -13,8 +13,24 @@ export interface NSFWCheckResult {
 
 /**
  * Verifica si el usuario puede acceder a contenido NSFW
+ * IMPORTANTE: Verifica EDAD primero (compliance), luego plan
  */
-export function canAccessNSFW(userPlan: string = "free"): NSFWCheckResult {
+export function canAccessNSFW(
+  userPlan: string = "free",
+  isAdult: boolean = false
+): NSFWCheckResult {
+  // PRIORITY 1: Age verification (COMPLIANCE)
+  // Usuarios menores de 18 NO pueden acceder a NSFW, incluso con plan de pago
+  if (!isAdult) {
+    return {
+      allowed: false,
+      reason:
+        "El contenido NSFW está restringido a mayores de 18 años. Debes tener 18 años o más para acceder a este contenido.",
+      requiresPlan: undefined, // No es tema de plan, es tema de edad
+    };
+  }
+
+  // PRIORITY 2: Plan verification
   const plan = PLANS[userPlan as keyof typeof PLANS] || PLANS.free;
 
   if (plan.limits.nsfwMode) {
@@ -33,10 +49,31 @@ export function canAccessNSFW(userPlan: string = "free"): NSFWCheckResult {
 
 /**
  * Verifica si el usuario puede usar comportamientos avanzados (Yandere, BPD, NPD, etc.)
+ * IMPORTANTE: Algunos comportamientos requieren ser adulto (18+)
  */
 export function canUseAdvancedBehaviors(
-  userPlan: string = "free"
+  userPlan: string = "free",
+  isAdult: boolean = false,
+  behaviorType?: string
 ): NSFWCheckResult {
+  // Comportamientos que requieren ser adulto (18+) por contenido maduro
+  const adultOnlyBehaviors = ["YANDERE_OBSESSIVE", "HYPERSEXUALITY"];
+
+  // PRIORITY 1: Age verification para comportamientos sensibles
+  if (
+    behaviorType &&
+    adultOnlyBehaviors.includes(behaviorType) &&
+    !isAdult
+  ) {
+    return {
+      allowed: false,
+      reason:
+        "Este comportamiento está restringido a mayores de 18 años debido a su contenido psicológicamente intenso.",
+      requiresPlan: undefined,
+    };
+  }
+
+  // PRIORITY 2: Plan verification
   const plan = PLANS[userPlan as keyof typeof PLANS] || PLANS.free;
 
   if (plan.limits.advancedBehaviors) {
@@ -77,13 +114,14 @@ export function detectNSFWContent(text: string): boolean {
  */
 export function sanitizeNSFWContent(
   text: string,
-  userPlan: string = "free"
+  userPlan: string = "free",
+  isAdult: boolean = false
 ): {
   sanitized: string;
   wasBlocked: boolean;
   reason?: string;
 } {
-  const check = canAccessNSFW(userPlan);
+  const check = canAccessNSFW(userPlan, isAdult);
 
   if (check.allowed) {
     return {

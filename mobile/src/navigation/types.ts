@@ -22,6 +22,7 @@ export type MainStackParamList = {
   CreateWorld: { agentId?: string } | undefined;
   EditAgent: { agentId: string };
   Settings: undefined;
+  AccessibilitySettings: undefined;
   // Community screens
   CommunityDetail: { communityId: string };
   PostDetail: { postId: string };
@@ -31,7 +32,22 @@ export type MainStackParamList = {
   CreateEvent: undefined;
   // Messaging screens
   Conversation: { conversationId: string };
-  StartConversation: { userId: string };
+  StartConversation: { userId?: string };
+  // Billing screens
+  Billing: undefined;
+  // Gamification screens
+  Achievements: undefined;
+  Leaderboard: undefined;
+  DailyCheckIn: undefined;
+  // Analytics screens
+  MyStats: undefined;
+  // Memory screens
+  ImportantEvents: { agentId: string };
+  ImportantPeople: { agentId: string };
+  // Legal screens
+  Terms: undefined;
+  Privacy: undefined;
+  Help: undefined;
 };
 
 // Parámetros de los tabs principales

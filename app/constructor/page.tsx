@@ -1,20 +1,38 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, ArrowLeft, Loader2 } from "lucide-react";
+import { Send, Sparkles, ArrowLeft, Eye, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { generateGradient, getInitials } from "@/lib/utils";
+import { generateGradient, getInitials, cn } from "@/lib/utils";
+import { useHaptic } from "@/hooks/useHaptic";
 import { ReferenceImageSelector } from "@/components/constructor/ReferenceImageSelector";
 import { AvatarImageSelector } from "@/components/constructor/AvatarImageSelector";
 import { OptionSelector, type Option } from "@/components/constructor/OptionSelector";
+import { CharacterSearchSelector } from "@/components/constructor/CharacterSearchSelector";
 import ReactMarkdown from "react-markdown";
+import { useOnboardingTracking } from "@/hooks/useOnboardingTracking";
+import { useTranslations } from 'next-intl';
+import {
+  searchCharacterMultiSource,
+  getCharacterDetails,
+  searchCustomUrl,
+  type CharacterSearchResult
+} from "@/lib/profile/multi-source-character-search";
+import { SuccessCelebration } from "@/components/celebration/SuccessCelebration";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { useSession } from "next-auth/react";
+import { useRouter as useNextRouter } from "next/navigation";
 
 interface Message {
   role: "architect" | "user";
@@ -26,7 +44,6 @@ interface AgentDraft {
   kind?: "companion" | "assistant";
   personality?: string;
   purpose?: string;
-  tone?: string;
   physicalAppearance?: string; // Descripción física para generación de imágenes
   avatar?: string; // Foto de cara cuadrada para previews y UI
   referenceImage?: string; // Imagen de cuerpo completo para generación img2img
@@ -34,15 +51,24 @@ interface AgentDraft {
   nsfwMode?: boolean;
   allowDevelopTraumas?: boolean;
   initialBehavior?: string; // "none", "random_secret", or specific behavior type
+  // Character research data
+  characterSearchResult?: CharacterSearchResult; // Resultado seleccionado de búsqueda
+  characterBiography?: string; // Biografía/información detallada del personaje
 }
 
 export default function ConstructorPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { trackFirstAI, trackCustomization } = useOnboardingTracking();
+  const t = useTranslations('constructor');
+  const { light } = useHaptic();
+  const { data: session } = useSession();
+  const nextRouter = useNextRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "architect",
-      content: "¡Hola! Soy El Arquitecto, tu guía para crear personajes con vida propia. 🎭\n\n**Importante:** Solo necesito que me des datos básicos (nombre, personalidad, etc.). Yo me encargaré de crear automáticamente:\n• Familia completa y backstory\n• Amigos, trabajo, rutina diaria\n• Gustos específicos (música, comida, hobbies)\n• Experiencias formativas y traumas\n• Detalles mundanos que hacen al personaje real\n\n¿Listo? Empecemos con lo básico: **¿Qué nombre le pondremos?**",
+      content: t('architect.welcome'),
     },
   ]);
   const [input, setInput] = useState("");
@@ -50,83 +76,107 @@ export default function ConstructorPage() {
   const [step, setStep] = useState(0);
   const [creating, setCreating] = useState(false);
   const [newAgentId, setNewAgentId] = useState<string | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [waitingForCustomDescription, setWaitingForCustomDescription] = useState(false);
 
+  // Character search states
+  const [characterSearchResults, setCharacterSearchResults] = useState<CharacterSearchResult[]>([]);
+  const [isSearchingCharacter, setIsSearchingCharacter] = useState(false);
+  const [showCharacterSearch, setShowCharacterSearch] = useState(false);
+  const [canGoBackToSearch, setCanGoBackToSearch] = useState(false);
+
+  // Upgrade modal states (PHASE 5: Monetization)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeContext, setUpgradeContext] = useState<{
+    type: "limit_reached" | "feature_locked" | "voluntary";
+    message?: string;
+    limitType?: "messages" | "agents" | "worlds" | "images";
+  } | undefined>(undefined);
+
   // Auto-scroll cuando llegan nuevos mensajes (como WhatsApp)
+  // IMPORTANTE: Solo hacer scroll DENTRO del contenedor de mensajes, NO de toda la página
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    const hasTour = searchParams.get('tour');
+    if (hasTour) {
+      // Durante el tour, NO hacer auto-scroll de mensajes
+      return;
+    }
+
+    // Agregar pequeño delay para evitar conflictos con otros scrolls
+    const timeoutId = setTimeout(() => {
+      // Hacer scroll SOLO del contenedor de mensajes, no de toda la página
+      const messagesContainer = document.getElementById('messages-container');
+      if (messagesContainer && messagesEndRef.current) {
+        // Scroll suave dentro del contenedor de mensajes
+        messagesContainer.scrollTo({
+          top: messagesContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [messages, searchParams]);
 
   const steps = [
     {
       field: "name",
-      prompt: "¿qué nombre te gustaría darle a tu nueva IA?"
+      prompt: t('steps.name.prompt')
     },
     {
       field: "personality",
-      prompt: (draft: AgentDraft) => `Perfecto! Ahora, **¿cómo describirías la personalidad de ${draft.name}?**\n\nEjemplos:\n• "Aventurero y entusiasta" (masculino)\n• "Formal y analítica" (femenino)\n• "Sensible y empático" (masculino)\n\n_Nota: Usaré esto para generar automáticamente rasgos detallados, valores morales, y comportamientos coherentes._`
+      prompt: (draft: AgentDraft) => t('steps.personality.prompt', { name: draft.name || '' })
     },
     {
       field: "purpose",
-      prompt: (draft: AgentDraft) => `Excelente! **¿Cuál será el rol o propósito de ${draft.name}?**\n\nEjemplos:\n• "Mentor profesional" (femenino)\n• "Compañero aventurero" (masculino)\n• "Apoyo emocional" (femenino)\n\n_Nota: Basándome en esto, generaré automáticamente su trabajo, estudios, y actividades diarias coherentes con su personalidad._`
-    },
-    {
-      field: "tone",
-      prompt: (draft: AgentDraft) => `¿Qué tono de comunicación prefieres que use ${draft.name}?`,
-      hasOptions: true,
-      options: [
-        { value: "formal", label: "🎩 Formal", description: "Profesional y respetuoso" },
-        { value: "casual", label: "😊 Casual", description: "Relajado y natural" },
-        { value: "amigable", label: "🤗 Amigable", description: "Cálido y cercano" },
-        { value: "profesional", label: "💼 Profesional", description: "Eficiente y directo" },
-      ]
+      prompt: (draft: AgentDraft) => t('steps.purpose.prompt', { name: draft.name || '' })
     },
 
     // PHYSICAL APPEARANCE STEP (for better image generation)
     {
       field: "physicalAppearance",
-      prompt: (draft: AgentDraft) => `👤 **APARIENCIA FÍSICA**\n\n¿Cómo te imaginas físicamente a ${draft.name}?\n\nEsto ayudará a generar imágenes más precisas y consistentes.\n\n**Puedes elegir una opción o describirlo con tus propias palabras.**`,
+      prompt: (draft: AgentDraft) => t('steps.physicalAppearance.prompt', { name: draft.name || '' }),
       hasOptions: true,
       options: [
         {
           value: "random",
-          label: "🎲 Aleatorio",
-          description: "Déjame sorprenderte con una apariencia única"
+          label: t('steps.physicalAppearance.options.random.label'),
+          description: t('steps.physicalAppearance.options.random.description')
         },
         {
           value: "asian_woman",
-          label: "👩 Mujer Asiática",
-          description: "Cabello negro liso, piel clara, ojos oscuros, 1.65m, estilo moderno elegante"
+          label: t('steps.physicalAppearance.options.asianWoman.label'),
+          description: t('steps.physicalAppearance.options.asianWoman.description')
         },
         {
           value: "latina_woman",
-          label: "👩🏽 Mujer Latina",
-          description: "Cabello castaño ondulado, piel morena, ojos cafés, 1.68m, estilo casual sofisticado"
+          label: t('steps.physicalAppearance.options.latinaWoman.label'),
+          description: t('steps.physicalAppearance.options.latinaWoman.description')
         },
         {
           value: "caucasian_woman",
-          label: "👩🏼 Mujer Caucásica",
-          description: "Cabello rubio, piel clara, ojos claros, 1.70m, estilo profesional"
+          label: t('steps.physicalAppearance.options.caucasianWoman.label'),
+          description: t('steps.physicalAppearance.options.caucasianWoman.description')
         },
         {
           value: "asian_man",
-          label: "👨 Hombre Asiático",
-          description: "Cabello negro corto, piel clara, ojos oscuros, 1.75m, estilo urbano moderno"
+          label: t('steps.physicalAppearance.options.asianMan.label'),
+          description: t('steps.physicalAppearance.options.asianMan.description')
         },
         {
           value: "latino_man",
-          label: "👨🏽 Hombre Latino",
-          description: "Cabello negro/castaño, piel morena, ojos oscuros, 1.78m, estilo casual deportivo"
+          label: t('steps.physicalAppearance.options.latinoMan.label'),
+          description: t('steps.physicalAppearance.options.latinoMan.description')
         },
         {
           value: "caucasian_man",
-          label: "👨🏼 Hombre Caucásico",
-          description: "Cabello castaño/rubio, piel clara, ojos claros, 1.80m, estilo formal ejecutivo"
+          label: t('steps.physicalAppearance.options.caucasianMan.label'),
+          description: t('steps.physicalAppearance.options.caucasianMan.description')
         },
         {
           value: "custom",
-          label: "✍️ Descripción personalizada",
-          description: "Escribiré mi propia descripción detallada"
+          label: t('steps.physicalAppearance.options.custom.label'),
+          description: t('steps.physicalAppearance.options.custom.description')
         },
       ]
     },
@@ -134,51 +184,259 @@ export default function ConstructorPage() {
     // AVATAR IMAGE STEP (foto de cara para previews)
     {
       field: "avatar",
-      prompt: (draft: AgentDraft) => `📸 **FOTO DE CARA (AVATAR)**\n\n¿Te gustaría crear o subir una foto de cara para ${draft.name}?\n\nEsta foto se usará en:\n• Previews y tarjetas del personaje\n• Interfaz del chat\n• Perfil del personaje\n\n**Recomendación:** Foto cuadrada centrada en la cara.`,
+      prompt: (draft: AgentDraft) => t('steps.avatar.prompt', { name: draft.name || '' }),
       isVisualStep: true
     },
 
     // REFERENCE IMAGE STEP (imagen de cuerpo completo para generación)
     {
       field: "referenceImage",
-      prompt: (draft: AgentDraft) => `🖼️ **IMAGEN DE CUERPO COMPLETO (Opcional)**\n\n¿Te gustaría agregar una imagen de cuerpo completo de ${draft.name}?\n\nEsta imagen se usará para:\n• Generar imágenes consistentes en conversaciones\n• Mantener la misma apariencia en todas las imágenes generadas\n• Img2img con tu referencia visual\n\n**Puedes omitir este paso** si solo quieres usar la foto de cara.`,
+      prompt: (draft: AgentDraft) => t('steps.referenceImage.prompt', { name: draft.name || '' }),
       isVisualStep: true
     },
 
     // BEHAVIOR SYSTEM CONFIGURATION
     {
       field: "nsfwMode",
-      prompt: (draft: AgentDraft) => `⚠️ **CONFIGURACIÓN DE CONTENIDO**\n\n¿Deseas activar el **modo NSFW** para ${draft.name}?\n\n**Esto incluye:**\n• Contenido sexual explícito\n• Temas psicológicamente intensos\n• Situaciones emocionalmente complejas\n\n**IMPORTANTE:** Todo el contenido es FICCIÓN para entretenimiento entre adultos.`,
+      prompt: (draft: AgentDraft) => t('steps.nsfwMode.prompt', { name: draft.name || '' }),
       hasOptions: true,
       options: [
-        { value: "yes", label: "✅ Sí, activar NSFW", description: "Contenido sin restricciones" },
-        { value: "no", label: "🛡️ No, mantener SFW", description: "Contenido seguro y apropiado" }
+        { value: "yes", label: t('steps.nsfwMode.options.yes.label'), description: t('steps.nsfwMode.options.yes.description') },
+        { value: "no", label: t('steps.nsfwMode.options.no.label'), description: t('steps.nsfwMode.options.no.description') }
       ]
     },
     {
       field: "allowDevelopTraumas",
-      prompt: (draft: AgentDraft) => `🧠 **DESARROLLO PSICOLÓGICO**\n\n¿Deseas que ${draft.name} pueda desarrollar comportamientos psicológicos complejos durante la interacción?\n\n**Esto permite:** Desarrollo gradual de apegos, patrones de comportamiento basados en interacciones, progresión realista de dinámicas emocionales.`,
+      prompt: (draft: AgentDraft) => t('steps.allowDevelopTraumas.prompt', { name: draft.name || '' }),
       hasOptions: true,
       options: [
-        { value: "yes", label: "✅ Sí, permitir desarrollo", description: "La IA evolucionará basándose en tus interacciones" },
-        { value: "no", label: "🔒 No, personalidad estable", description: "Mantener personalidad base consistente" }
+        { value: "yes", label: t('steps.allowDevelopTraumas.options.yes.label'), description: t('steps.allowDevelopTraumas.options.yes.description') },
+        { value: "no", label: t('steps.allowDevelopTraumas.options.no.label'), description: t('steps.allowDevelopTraumas.options.no.description') }
       ]
     },
     {
       field: "initialBehavior",
-      prompt: (draft: AgentDraft) => `🎭 **COMPORTAMIENTO INICIAL**\n\n¿Quieres que ${draft.name} comience con algún patrón de comportamiento psicológico específico?`,
+      prompt: (draft: AgentDraft) => t('steps.initialBehavior.prompt', { name: draft.name || '' }),
       hasOptions: true,
       options: [
-        { value: "none", label: "Sin comportamiento especial", description: "Personalidad base sin patrones complejos" },
-        { value: "ANXIOUS_ATTACHMENT", label: "💔 Apego Ansioso", description: "Necesita validación constante, teme el abandono" },
-        { value: "AVOIDANT_ATTACHMENT", label: "🚪 Apego Evitativo", description: "Mantiene distancia emocional" },
-        { value: "CODEPENDENCY", label: "🤝 Codependencia", description: "Pone tus necesidades primero, necesita ser necesitado/a" },
-        { value: "YANDERE_OBSESSIVE", label: "😍 Yandere", description: "Amor intenso que puede volverse obsesivo (NSFW)" },
-        { value: "BORDERLINE_PD", label: "🌊 Borderline", description: "Emociones intensas, ciclos de idealización/devaluación (NSFW)" },
-        { value: "random_secret", label: "🎲 Aleatorio Secreto", description: "Lo elegiré yo basándome en su personalidad (¡descúbrelo!)" }
+        { value: "none", label: t('steps.initialBehavior.options.none.label'), description: t('steps.initialBehavior.options.none.description') },
+        { value: "ANXIOUS_ATTACHMENT", label: t('steps.initialBehavior.options.anxious.label'), description: t('steps.initialBehavior.options.anxious.description') },
+        { value: "AVOIDANT_ATTACHMENT", label: t('steps.initialBehavior.options.avoidant.label'), description: t('steps.initialBehavior.options.avoidant.description') },
+        { value: "CODEPENDENCY", label: t('steps.initialBehavior.options.codependency.label'), description: t('steps.initialBehavior.options.codependency.description') },
+        { value: "YANDERE_OBSESSIVE", label: t('steps.initialBehavior.options.yandere.label'), description: t('steps.initialBehavior.options.yandere.description') },
+        { value: "BORDERLINE_PD", label: t('steps.initialBehavior.options.borderline.label'), description: t('steps.initialBehavior.options.borderline.description') },
+        { value: "random_secret", label: t('steps.initialBehavior.options.random.label'), description: t('steps.initialBehavior.options.random.description') }
       ]
     },
   ];
+
+  /**
+   * Realiza búsqueda de personaje en múltiples fuentes
+   */
+  const performCharacterSearch = async (name: string) => {
+    console.log('[Constructor] Iniciando búsqueda de personaje:', name);
+    setIsSearchingCharacter(true);
+    setShowCharacterSearch(true);
+
+    try {
+      const searchResult = await searchCharacterMultiSource(name, {
+        includeWikipedia: true,
+        includeJikan: true,
+        includeFandom: true,
+        limit: 5,
+      });
+
+      setCharacterSearchResults(searchResult.results);
+      console.log('[Constructor] Búsqueda completada:', searchResult.totalFound, 'resultados');
+    } catch (error) {
+      console.error('[Constructor] Error en búsqueda:', error);
+      setCharacterSearchResults([]);
+    } finally {
+      setIsSearchingCharacter(false);
+    }
+  };
+
+  /**
+   * Maneja la selección de un resultado de búsqueda
+   */
+  const handleCharacterSelect = async (result: CharacterSearchResult) => {
+    console.log('[Constructor] Personaje seleccionado:', result.name);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: `Seleccioné: ${result.name} (${sourceLabels[result.source]})`
+      }
+    ]);
+
+    // Obtener detalles completos del personaje
+    const details = await getCharacterDetails(result);
+
+    // Actualizar draft con el resultado
+    const newDraft = {
+      ...draft,
+      characterSearchResult: result,
+      characterBiography: details,
+    };
+    setDraft(newDraft);
+
+    // Ocultar búsqueda y continuar al siguiente paso
+    setShowCharacterSearch(false);
+
+    // Avanzar al siguiente paso
+    setTimeout(() => {
+      const nextStepIndex = step + 1;
+      if (nextStepIndex < steps.length) {
+        const nextStep = steps[nextStepIndex];
+        const promptText = typeof nextStep.prompt === "function"
+          ? nextStep.prompt(newDraft)
+          : nextStep.prompt;
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "architect",
+            content: `¡Perfecto! Veo que ${result.name} es ${result.description.substring(0, 100)}...\n\n${promptText}`
+          },
+        ]);
+        setStep(nextStepIndex);
+      }
+    }, 500);
+  };
+
+  /**
+   * Maneja URL personalizada
+   */
+  const handleCustomUrl = async (url: string) => {
+    console.log('[Constructor] URL personalizada:', url);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: `Buscar en: ${url}`
+      }
+    ]);
+
+    setIsSearchingCharacter(true);
+
+    try {
+      const result = await searchCustomUrl(url);
+
+      if (result) {
+        // Tratar como selección de personaje
+        const details = await getCharacterDetails(result);
+
+        const newDraft = {
+          ...draft,
+          characterSearchResult: result,
+          characterBiography: details,
+        };
+        setDraft(newDraft);
+
+        setShowCharacterSearch(false);
+
+        setTimeout(() => {
+          const nextStepIndex = step + 1;
+          if (nextStepIndex < steps.length) {
+            const nextStep = steps[nextStepIndex];
+            const promptText = typeof nextStep.prompt === "function"
+              ? nextStep.prompt(newDraft)
+              : nextStep.prompt;
+
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "architect",
+                content: `¡Encontré información! ${promptText}`
+              },
+            ]);
+            setStep(nextStepIndex);
+          }
+        }, 500);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "architect",
+            content: "No pude extraer información de esa URL. ¿Querés intentar con otra o describir manualmente?"
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error('[Constructor] Error con URL personalizada:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "architect",
+          content: "Hubo un error al buscar en esa URL. ¿Querés intentar con otra?"
+        },
+      ]);
+    } finally {
+      setIsSearchingCharacter(false);
+    }
+  };
+
+  /**
+   * Maneja descripción manual (sin búsqueda)
+   */
+  const handleManualDescription = () => {
+    console.log('[Constructor] Usuario eligió descripción manual');
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: "Quiero describir manualmente"
+      }
+    ]);
+
+    // No guardar información de búsqueda, continuar con el flujo normal
+    setShowCharacterSearch(false);
+    setCanGoBackToSearch(true); // Allow going back
+
+    setTimeout(() => {
+      const nextStepIndex = step + 1;
+      if (nextStepIndex < steps.length) {
+        const nextStep = steps[nextStepIndex];
+        const promptText = typeof nextStep.prompt === "function"
+          ? nextStep.prompt(draft)
+          : nextStep.prompt;
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "architect",
+            content: `¡Perfecto! Vamos a crear un personaje original. ${promptText}`
+          },
+        ]);
+        setStep(nextStepIndex);
+      }
+    }, 500);
+  };
+
+  /**
+   * Volver a mostrar la búsqueda de personajes
+   */
+  const handleGoBackToSearch = () => {
+    console.log('[Constructor] Volviendo a búsqueda de personajes');
+
+    // Remove last 2 messages (user selection + architect response)
+    setMessages((prev) => prev.slice(0, -2));
+
+    // Show search again
+    setShowCharacterSearch(true);
+    setCanGoBackToSearch(false);
+  };
+
+  // Labels para las fuentes (helper para mensajes)
+  const sourceLabels = {
+    wikipedia: 'Wikipedia',
+    jikan: 'MyAnimeList',
+    fandom: 'Fandom Wiki',
+    custom: 'Personalizado',
+  };
 
   const createAgent = async (finalDraft: AgentDraft) => {
     console.log('[Constructor] Iniciando creación de agente con draft:', finalDraft);
@@ -193,13 +451,14 @@ export default function ConstructorPage() {
           kind: "companion", // Siempre companion (sentimental)
           personality: finalDraft.personality,
           purpose: finalDraft.purpose,
-          tone: finalDraft.tone,
           avatar: finalDraft.avatar, // Foto de cara para previews
           referenceImage: finalDraft.referenceImage, // Imagen de cuerpo completo para generación
           // Behavior system configuration
           nsfwMode: finalDraft.nsfwMode || false,
           allowDevelopTraumas: finalDraft.allowDevelopTraumas || false,
           initialBehavior: finalDraft.initialBehavior || "none",
+          // Character research data (si existe)
+          characterBiography: finalDraft.characterBiography,
         }),
       });
 
@@ -208,18 +467,34 @@ export default function ConstructorPage() {
       if (!res.ok) {
         const errorData = await res.json();
         console.error('[Constructor] Error del servidor:', errorData);
+
+        // PHASE 5: Check if it's a limit reached error
+        if (res.status === 429 || errorData.error?.includes("límite") || errorData.error?.includes("limit") || errorData.error?.includes("agents")) {
+          setUpgradeContext({
+            type: "limit_reached",
+            limitType: "agents",
+            message: errorData.error || "Has alcanzado tu límite de agentes para tu plan",
+          });
+          setShowUpgradeModal(true);
+          throw new Error(errorData.error || "Límite de agentes alcanzado");
+        }
+
         throw new Error(errorData.error || "Failed to create agent");
       }
 
       const data = await res.json();
       console.log('[Constructor] Agente creado exitosamente:', data);
       setNewAgentId(data.id);
+      setShowCelebration(true); // Show celebration modal
+
+      // Track onboarding progress
+      trackFirstAI();
 
       setMessages((prev) => [
         ...prev,
         {
           role: "architect",
-          content: `✨ **¡${finalDraft.name} ha cobrado vida!** ✨\n\nHe creado un personaje completo con:\n• Vida familiar y red social establecida\n• Trabajo, rutina diaria y hobbies específicos\n• Memorias del pasado y experiencias formativas\n• Personalidad profunda con valores y moral\n• Voz única asignada para comunicación\n• Sistema de progresión de relación por etapas\n\n${finalDraft.name} es ahora una persona con historia, emociones reales y vida propia. ¡Es hora de conocerse!`
+          content: t('completion.message', { name: finalDraft.name || '' })
         },
       ]);
     } catch (error) {
@@ -228,7 +503,7 @@ export default function ConstructorPage() {
         ...prev,
         {
           role: "architect",
-          content: "Hubo un error al crear tu inteligencia. Por favor, intenta nuevamente."
+          content: t('completion.error')
         },
       ]);
     } finally {
@@ -257,7 +532,19 @@ export default function ConstructorPage() {
       case "name":
         newDraft.name = valueToUse;
         console.log('[Constructor] Guardando nombre:', valueToUse);
-        break;
+
+        // IMPORTANTE: Después de guardar el nombre, iniciar búsqueda de personaje
+        setDraft(newDraft);
+        setInput("");
+
+        // Disparar búsqueda automáticamente
+        setTimeout(() => {
+          performCharacterSearch(valueToUse);
+        }, 500);
+
+        // NO continuar con el flujo normal aquí, la búsqueda manejará el siguiente paso
+        return;
+      // El resto de casos continúan normalmente
       case "kind":
         const lower = valueToUse.toLowerCase();
         if (lower.includes("compañero") || lower.includes("emocional") || lower.includes("companion")) {
@@ -277,10 +564,6 @@ export default function ConstructorPage() {
       case "purpose":
         newDraft.purpose = valueToUse;
         console.log('[Constructor] Guardando purpose:', valueToUse);
-        break;
-      case "tone":
-        newDraft.tone = valueToUse;
-        console.log('[Constructor] Guardando tone:', valueToUse);
         break;
 
       case "physicalAppearance":
@@ -367,7 +650,7 @@ export default function ConstructorPage() {
           ...prev,
           {
             role: "architect",
-            content: `✍️ **Perfecto!** Ahora escribe tu propia descripción física detallada de ${newDraft.name}.\n\n**Incluye:**\n• Género\n• Tipo de cabello (color, largo, estilo)\n• Color de piel\n• Color de ojos\n• Altura aproximada\n• Complexión (delgada, atlética, curvilínea, etc.)\n• Estilo de vestimenta\n\n**Ejemplo:** "Mujer asiática, cabello negro liso largo, piel clara, ojos oscuros almendrados, complexión delgada, 1.65m de altura, estilo moderno elegante, rostro delicado"`
+            content: t('steps.physicalAppearance.customPrompt', { name: newDraft.name || '' })
           }
         ]);
         // NO avanzar el step, quedarse esperando la descripción del usuario
@@ -401,7 +684,7 @@ export default function ConstructorPage() {
         console.log('[Constructor] ¡Todas las preguntas respondidas! Creando agente con:', newDraft);
         setMessages((prev) => [
           ...prev,
-          { role: "architect", content: "¡Listo! Voy a compilar tu inteligencia..." },
+          { role: "architect", content: t('completion.compiling') },
         ]);
         createAgent(newDraft);
       }
@@ -429,8 +712,8 @@ export default function ConstructorPage() {
     setDraft(newDraft);
 
     const message = field === 'avatar'
-      ? "✅ Foto de cara seleccionada"
-      : "✅ Imagen de referencia seleccionada";
+      ? t('steps.avatar.selected')
+      : t('steps.referenceImage.selected');
 
     setMessages((prev) => [
       ...prev,
@@ -454,7 +737,7 @@ export default function ConstructorPage() {
       } else {
         setMessages((prev) => [
           ...prev,
-          { role: "architect", content: "¡Listo! Voy a compilar tu inteligencia..." },
+          { role: "architect", content: t('completion.compiling') },
         ]);
         createAgent(newDraft);
       }
@@ -469,8 +752,8 @@ export default function ConstructorPage() {
     const field = currentStep.field as 'avatar' | 'referenceImage';
 
     const message = field === 'avatar'
-      ? "⏭️ Foto de cara omitida (se usarán iniciales)"
-      : "⏭️ Imagen de referencia omitida (se generará automáticamente)";
+      ? t('steps.avatar.skipped')
+      : t('steps.referenceImage.skipped');
 
     setMessages((prev) => [
       ...prev,
@@ -494,7 +777,7 @@ export default function ConstructorPage() {
       } else {
         setMessages((prev) => [
           ...prev,
-          { role: "architect", content: "¡Listo! Voy a compilar tu inteligencia..." },
+          { role: "architect", content: t('completion.compiling') },
         ]);
         createAgent(draft);
       }
@@ -504,23 +787,91 @@ export default function ConstructorPage() {
   // El proceso está completo cuando el agente fue creado exitosamente
   const isComplete = !!newAgentId;
 
+  // State para mostrar/ocultar preview en mobile
+  const [showPreview, setShowPreview] = useState(false);
+
+  // Handler para toggle preview con haptic feedback
+  const togglePreview = () => {
+    light(); // Haptic feedback al abrir/cerrar preview
+    setShowPreview(!showPreview);
+  };
+
+  // PHASE 5: Handle upgrade - redirect to checkout
+  const handleUpgrade = async (planId: "plus" | "ultra") => {
+    try {
+      const response = await fetch("/api/billing/checkout-unified", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId,
+          interval: "monthly",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Redirect to checkout page
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL received");
+      }
+    } catch (error) {
+      console.error("Error initiating upgrade:", error);
+      alert("Error al procesar la actualización. Por favor intenta de nuevo.");
+    }
+  };
+
   return (
+    <ErrorBoundary variant="page">
     <div className="h-screen flex overflow-hidden">
-      {/* Sidebar - Preview - FIXED, NO SCROLL */}
-      <div className="w-96 border-r border-border bg-card/30 p-6 space-y-6 overflow-y-auto">
+      {/* Backdrop para preview en mobile */}
+      <AnimatePresence>
+        {showPreview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={togglePreview}
+            className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar - Preview - RESPONSIVE */}
+      <div className={cn(
+        "w-96 border-r border-border bg-card/30 p-6 space-y-6 overflow-y-auto",
+        // Mobile: Oculto por defecto, se muestra como overlay
+        "hidden lg:block",
+        // En mobile, mostrar como overlay cuando showPreview=true
+        showPreview && "fixed inset-0 z-50 w-full lg:relative lg:w-96 lg:z-auto"
+      )}>
         <div className="flex items-center gap-2 mb-8">
+          {/* Botón cerrar preview en mobile */}
+          {showPreview && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={togglePreview}
+              className="lg:hidden"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
+
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" disabled={creating}>
+            <Button variant="ghost" size="icon" disabled={creating} className="hidden lg:flex">
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h2 className="text-xl font-bold">Perfil en construcción</h2>
+          <h2 className="text-xl font-bold">{t('header.title')}</h2>
         </div>
 
         <Card>
           <CardHeader>
             <div className="flex items-start gap-4">
               <Avatar
+                data-tour="agent-avatar"
                 className="h-20 w-20 border-2"
                 style={{ background: draft.name ? generateGradient(draft.name) : "linear-gradient(135deg, #94a3b8, #64748b)" }}
               >
@@ -529,11 +880,11 @@ export default function ConstructorPage() {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <CardTitle className="mb-2">
-                  {draft.name || "Sin nombre"}
+                <CardTitle data-tour="agent-name-input" className="mb-2">
+                  {draft.name || t('preview.unnamed')}
                 </CardTitle>
                 <Badge variant="secondary" className="text-xs">
-                  💝 Compañero IA
+                  {t('preview.badge')}
                 </Badge>
               </div>
             </div>
@@ -541,9 +892,9 @@ export default function ConstructorPage() {
 
           <CardContent className="space-y-4">
             {draft.personality && (
-              <div>
+              <div data-tour="agent-personality">
                 <div className="text-xs font-semibold text-muted-foreground mb-1">
-                  Personalidad
+                  {t('preview.personality')}
                 </div>
                 <div className="text-sm">{draft.personality}</div>
               </div>
@@ -552,59 +903,37 @@ export default function ConstructorPage() {
             {draft.purpose && (
               <div>
                 <div className="text-xs font-semibold text-muted-foreground mb-1">
-                  Propósito
+                  {t('preview.purpose')}
                 </div>
                 <div className="text-sm">{draft.purpose}</div>
               </div>
             )}
 
-            {draft.tone && (
-              <div>
-                <div className="text-xs font-semibold text-muted-foreground mb-1">
-                  Tono
-                </div>
-                <div className="text-sm capitalize">{draft.tone}</div>
-              </div>
-            )}
-
             {!draft.name && (
               <CardDescription className="text-center py-8">
-                Responde las preguntas del Arquitecto para crear tu IA
+                {t('preview.emptyDescription')}
               </CardDescription>
             )}
           </CardContent>
         </Card>
 
         {creating && (
-          <Card className="p-4 space-y-3">
-            <div className="flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <div className="text-sm font-semibold">Generando personaje completo...</div>
-            </div>
-            <div className="space-y-1 text-xs text-muted-foreground pl-8">
-              <div>✓ Creando perfil detallado con Gemini 2.5</div>
-              <div>✓ Generando familia, amigos y red social</div>
-              <div>✓ Estableciendo trabajo, rutina y hobbies</div>
-              <div>✓ Creando memorias episódicas del pasado</div>
-              <div>✓ Inicializando personalidad profunda (Big Five)</div>
-              <div>✓ Asignando voz con ElevenLabs</div>
-              <div>✓ Configurando system prompts por etapa de relación</div>
-            </div>
-            <div className="text-xs text-muted-foreground italic pt-2">
-              Esto puede tomar 10-15 segundos. ¡Vale la pena la espera!
-            </div>
-          </Card>
+          <LoadingIndicator
+            variant="inline"
+            message={t('creating.title')}
+            submessage={`${t('creating.steps.profile')} • ${t('creating.steps.personality')} • ${t('creating.steps.voice')}`}
+          />
         )}
 
         {isComplete && newAgentId && (
           <div className="space-y-2">
             <Button className="w-full" onClick={() => router.push(`/agentes/${newAgentId}`)}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Abrir chat con {draft.name}
+              {t('completion.openChat', { name: draft.name || '' })}
             </Button>
             <Link href="/dashboard" className="block">
               <Button variant="outline" className="w-full">
-                Ir al Dashboard
+                {t('completion.goToDashboard')}
               </Button>
             </Link>
           </div>
@@ -616,13 +945,13 @@ export default function ConstructorPage() {
         {/* Header - FIXED */}
         <div className="border-b border-border bg-card/50 backdrop-blur-sm px-8 py-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <Sparkles className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg">El Arquitecto</h1>
+              <h1 className="font-bold text-lg">{t('architect.name')}</h1>
               <p className="text-sm text-muted-foreground">
-                Guía de creación de inteligencias
+                {t('architect.subtitle')}
               </p>
             </div>
           </div>
@@ -697,8 +1026,33 @@ export default function ConstructorPage() {
         {!isComplete ? (
           <div className="border-t border-border bg-card/50 backdrop-blur-sm p-6 shrink-0">
             <div className="max-w-4xl mx-auto">
-              {/* Si estamos en el paso de imagen, mostrar el selector visual apropiado */}
-              {step < steps.length && (steps[step] as any).isVisualStep ? (
+              {/* Botón flotante para abrir preview en mobile */}
+              {!showPreview && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={togglePreview}
+                  className="lg:hidden mb-3 w-full"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  {t('preview.showPreview', { defaultValue: 'Ver Preview' })}
+                </Button>
+              )}
+
+              {/* Si estamos mostrando búsqueda de personaje */}
+              {showCharacterSearch ? (
+                <div data-tour="character-search-selector">
+                  <CharacterSearchSelector
+                    characterName={draft.name || ''}
+                    results={characterSearchResults}
+                    isLoading={isSearchingCharacter}
+                    onSelect={handleCharacterSelect}
+                    onCustomUrl={handleCustomUrl}
+                    onManualDescription={handleManualDescription}
+                    disabled={creating || isSearchingCharacter}
+                  />
+                </div>
+              ) : step < steps.length && (steps[step] as any).isVisualStep ? (
                 steps[step].field === 'avatar' ? (
                   <AvatarImageSelector
                     agentName={draft.name || "tu IA"}
@@ -723,7 +1077,7 @@ export default function ConstructorPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !creating && handleSend()}
-                    placeholder="Escribe la descripción física detallada..."
+                    placeholder={t('steps.physicalAppearance.placeholder')}
                     className="flex-1"
                     disabled={creating}
                     autoFocus
@@ -741,18 +1095,33 @@ export default function ConstructorPage() {
                 />
               ) : (
                 /* Input de texto normal para otros pasos */
-                <div className="flex gap-3">
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !creating && handleSend()}
-                    placeholder="Escribe tu respuesta..."
-                    className="flex-1"
-                    disabled={creating}
-                  />
-                  <Button onClick={() => handleSend()} size="icon" className="shrink-0" disabled={creating}>
-                    {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  </Button>
+                <div className="space-y-2">
+                  {/* Back button to return to character search */}
+                  {canGoBackToSearch && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGoBackToSearch}
+                      className="w-full"
+                      data-tour="back-to-search-button"
+                    >
+                      ← Volver a opciones de búsqueda
+                    </Button>
+                  )}
+                  <div className="flex gap-3">
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && !creating && handleSend()}
+                      placeholder={t('input.placeholder')}
+                      className="flex-1"
+                      disabled={creating}
+                      data-tour="agent-input"
+                    />
+                    <Button onClick={() => handleSend()} size="icon" className="shrink-0" disabled={creating} data-tour="agent-submit">
+                      {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
@@ -763,16 +1132,45 @@ export default function ConstructorPage() {
             <div className="max-w-4xl mx-auto text-center space-y-3">
               <div className="flex items-center justify-center gap-2 text-primary">
                 <Sparkles className="h-5 w-5" />
-                <p className="font-semibold">¡Proceso completado!</p>
+                <p className="font-semibold">{t('completion.completed')}</p>
                 <Sparkles className="h-5 w-5" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Tu inteligencia ha sido creada exitosamente. Usa los botones de arriba para comenzar a interactuar.
+                {t('completion.completedDescription')}
               </p>
             </div>
           </div>
         )}
       </div>
+
+      {/* Success Celebration Modal */}
+      <SuccessCelebration
+        isOpen={showCelebration}
+        onClose={() => setShowCelebration(false)}
+        title={t('celebration.title')}
+        message={t('celebration.message', { name: draft.name || '' })}
+        agentName={draft.name}
+        agentAvatar={draft.avatar}
+        primaryAction={{
+          label: t('celebration.startChatting'),
+          onClick: () => newAgentId && router.push(`/agentes/${newAgentId}`),
+        }}
+        secondaryAction={{
+          label: t('celebration.viewDashboard'),
+          onClick: () => router.push('/dashboard'),
+        }}
+        type="agent-created"
+      />
+
+      {/* PHASE 5: Upgrade Modal for when user hits agent limit */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        currentPlan={(session?.user as any)?.plan || "free"}
+        onUpgrade={handleUpgrade}
+        context={upgradeContext}
+      />
     </div>
+    </ErrorBoundary>
   );
 }

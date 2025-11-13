@@ -277,7 +277,7 @@ export default function AnalyticsDashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {data.agentComparison.map((agent) => (
-                    <div key={agent.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                    <div key={agent.id} className="border rounded-2xl p-4 hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="font-semibold text-lg">{agent.name}</h3>

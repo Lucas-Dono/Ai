@@ -51,71 +51,71 @@ export const postApi = {
     page?: number;
     limit?: number;
   }) {
-    const response = await apiClient.get('/api/community/posts', { params }) as any;
-    return response.data;
+    const response: any = await apiClient.get('/api/community/posts', { params });
+    return response.data as any;
   },
 
   /**
    * Obtener post por ID
    */
   async getById(id: string) {
-    const response = await apiClient.get(`/community/posts/${id}`) as any;
-    return response.data;
+    const response: any = await apiClient.get(`/community/posts/${id}`);
+    return response.data as any;
   },
 
   /**
    * Crear post
    */
   async create(data: CreatePostData) {
-    const response = await apiClient.post('/api/community/posts', data) as any;
-    return response.data;
+    const response: any = await apiClient.post('/api/community/posts', data);
+    return response.data as any;
   },
 
   /**
    * Actualizar post
    */
   async update(id: string, data: Partial<CreatePostData>) {
-    const response = await apiClient.patch(`/community/posts/${id}`, data) as any;
-    return response.data;
+    const response: any = await apiClient.patch(`/community/posts/${id}`, data);
+    return response.data as any;
   },
 
   /**
    * Eliminar post
    */
   async delete(id: string) {
-    const response = await apiClient.delete(`/community/posts/${id}`) as any;
-    return response.data;
+    const response: any = await apiClient.delete(`/community/posts/${id}`);
+    return response.data as any;
   },
 
   /**
    * Votar post
    */
   async vote(id: string, voteType: 'upvote' | 'downvote') {
-    const response = await apiClient.post(`/community/posts/${id}/vote`, { voteType }) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/posts/${id}/vote`, { voteType });
+    return response.data as any;
   },
 
   /**
    * Dar award
    */
   async award(id: string, awardType: string) {
-    const response = await apiClient.post(`/community/posts/${id}/award`, { awardType }) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/posts/${id}/award`, { awardType });
+    return response.data as any;
   },
 
   /**
    * Pin post (moderador)
    */
   async pin(id: string, pinned: boolean) {
-    const response = await apiClient.post(`/community/posts/${id}/pin`, { pinned }) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/posts/${id}/pin`, { pinned });
+    return response.data as any;
   },
 
   /**
    * Lock post (moderador)
    */
   async lock(id: string, locked: boolean) {
-    const response = await apiClient.post(`/community/posts/${id}/lock`, { locked }) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/community/posts/${id}/lock`, { locked });
+    return response.data as any;
   },
 };

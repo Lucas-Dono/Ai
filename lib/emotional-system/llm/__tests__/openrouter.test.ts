@@ -84,12 +84,13 @@ describe('OpenRouterClient - API Key Rotation', () => {
       });
 
       const response = await client.generate({
-        prompt: 'Test prompt'
+        prompt: 'Test prompt',
+        model: 'test-model'
       });
 
       expect(response.text).toBe('Test response');
       expect(response.model).toBe('test-model');
-      expect(response.usage.totalTokens).toBe(30);
+      expect(response.usage?.totalTokens).toBe(30);
 
       // Verificar que fetch fue llamado con Authorization usando primera key
       expect(global.fetch).toHaveBeenCalledWith(
@@ -136,7 +137,8 @@ describe('OpenRouterClient - API Key Rotation', () => {
       });
 
       const response = await client.generate({
-        prompt: 'Test'
+        prompt: 'Test',
+        model: 'test-model'
       });
 
       expect(response.text).toBe('Success with second key');
@@ -170,7 +172,7 @@ describe('OpenRouterClient - API Key Rotation', () => {
         apiKeys: ['test-key-1', 'test-key-2']
       });
 
-      const response = await client.generate({ prompt: 'Test' });
+      const response = await client.generate({ prompt: 'Test', model: 'test-model' });
 
       expect(response.text).toBe('Success');
       expect(callCount).toBe(2);
@@ -203,7 +205,7 @@ describe('OpenRouterClient - API Key Rotation', () => {
         apiKeys: ['test-key-1', 'test-key-2']
       });
 
-      const response = await client.generate({ prompt: 'Test' });
+      const response = await client.generate({ prompt: 'Test', model: 'test-model' });
 
       expect(response.text).toBe('Success');
       expect(callCount).toBe(2);
@@ -226,7 +228,7 @@ describe('OpenRouterClient - API Key Rotation', () => {
       });
 
       await expect(
-        client.generate({ prompt: 'Test' })
+        client.generate({ prompt: 'Test', model: 'test-model' })
       ).rejects.toThrow('Todas las API keys de OpenRouter han agotado su cuota');
 
       expect(callCount).toBe(3);
@@ -244,7 +246,7 @@ describe('OpenRouterClient - API Key Rotation', () => {
       });
 
       await expect(
-        client.generate({ prompt: 'Test' })
+        client.generate({ prompt: 'Test', model: 'test-model' })
       ).rejects.toThrow('OpenRouter API error: 500');
 
       // Solo 1 intento, no debe rotar

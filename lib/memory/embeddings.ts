@@ -42,10 +42,23 @@ async function getEmbeddingPipeline() {
     env.cacheDir = "./.cache/transformers";
     env.allowLocalModels = false;
 
-    // Deshabilitar Sharp - no es necesario para embeddings de texto
-    // Esto permite que el código funcione en Windows y Linux sin problemas de binarios
-    env.backends.onnx.wasm.proxy = false;
-    env.useBrowserCache = false;
+    /**
+     * CONFIGURACIÓN IMPORTANTE - NO USAR WEB WORKERS:
+     *
+     * Este módulo NO USA WEB WORKERS porque:
+     * 1. Ejecuta solo en servidor (Node.js API routes)
+     * 2. Workers de navegador no aplican en Node.js runtime
+     * 3. Thread único es más eficiente para embeddings individuales
+     * 4. Ya tenemos Redis queues para concurrencia a nivel aplicación
+     * 5. Evita errores "Cannot find module worker.js" en build
+     *
+     * Performance con thread único: ~50-200ms por embedding (suficiente para MVP)
+     * Cuando escalemos: migraremos a OpenAI embeddings (cloud)
+     */
+    env.backends.onnx.wasm.proxy = false;      // Sin WASM proxy (no necesita workers)
+    env.useBrowserCache = false;               // Caché en servidor, no navegador
+    env.backends.onnx.wasm.numThreads = 1;     // Thread único (óptimo para Node.js)
+    (env as any).useWorker = false;            // Deshabilitar workers explícitamente
 
     const pipe = await pipeline("feature-extraction", EMBEDDING_MODEL);
     embeddingPipeline = pipe;

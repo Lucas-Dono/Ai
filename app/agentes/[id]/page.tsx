@@ -1,10 +1,14 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { ModernChat } from "@/components/chat/v2";
 import { useTrackInteraction } from "@/hooks/use-track-interaction";
+import { useTranslations } from "next-intl";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 interface Agent {
   id: string;
@@ -16,6 +20,7 @@ interface Agent {
 export default function AgentChatPage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations("agents.chat");
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -57,20 +62,24 @@ export default function AgentChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-      </div>
+      <LoadingIndicator
+        variant="page"
+        message={t("loading.agent")}
+        submessage={t("loading.agentSubtitle")}
+      />
     );
   }
 
   if (!agent) return null;
 
   return (
-    <ModernChat
-      agentId={agent.id}
-      agentName={agent.name}
-      agentAvatar={agent.avatar}
-      userId={userId || "default-user"}
-    />
+    <ErrorBoundary variant="page">
+      <ModernChat
+        agentId={agent.id}
+        agentName={agent.name}
+        agentAvatar={agent.avatar}
+        userId={userId || "default-user"}
+      />
+    </ErrorBoundary>
   );
 }

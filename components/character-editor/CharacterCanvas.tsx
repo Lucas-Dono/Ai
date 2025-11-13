@@ -172,7 +172,7 @@ export function CharacterCanvas({
         ref={canvasRef}
         width={width}
         height={height}
-        className="border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800"
+        className="border border-gray-300 rounded-2xl shadow-lg bg-white dark:bg-gray-800"
         style={{
           width: `${displayWidth}px`,
           height: `${displayHeight}px`,
@@ -185,8 +185,8 @@ export function CharacterCanvas({
 
       {/* Loading overlay con progreso detallado */}
       {isLoading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-xs w-full mx-4">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-2xl backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl max-w-xs w-full mx-4">
             <div className="text-center mb-4">
               <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Cargando personaje...
@@ -205,8 +205,8 @@ export function CharacterCanvas({
 
       {/* Error overlay */}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-lg backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-xs mx-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-red-500/20 rounded-2xl backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl max-w-xs mx-4">
             <div className="text-red-600 dark:text-red-400 text-sm font-medium text-center">
               {error}
             </div>

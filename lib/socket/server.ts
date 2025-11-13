@@ -13,6 +13,7 @@ import {
 } from "./events";
 import { registerChatEvents, registerReactionEvents } from "./chat-events";
 import { worldSocketEvents } from "@/lib/worlds/socket-events";
+import { initializeRedisSync } from "@/lib/worlds/redis-sync-initializer";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
@@ -38,6 +39,9 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
   if (io) {
     return io;
   }
+
+  // 🔥 REDIS: Inicializar sistema de sincronización de mundos
+  initializeRedisSync();
 
   io = new SocketIOServer(httpServer, {
     cors: {
@@ -528,7 +532,7 @@ function handleTypingIndicator(
         timestamp: Date.now(),
       });
       typingTimeouts.delete(timeoutKey);
-    }, TYPING_TIMEOUT);
+    }, TYPING_TIMEOUT) as unknown as NodeJS.Timeout;
 
     typingTimeouts.set(timeoutKey, timeout);
   }

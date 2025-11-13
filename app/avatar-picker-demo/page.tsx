@@ -90,7 +90,7 @@ export default function AvatarPickerDemoPage() {
                         {avatarMethod === 'upload' && 'Upload'}
                       </Badge>
                     </div>
-                    <div className="rounded-lg overflow-hidden border-2 border-green-500">
+                    <div className="rounded-2xl overflow-hidden border-2 border-green-500">
                       <img
                         src={selectedAvatar}
                         alt="Avatar seleccionado"
@@ -117,7 +117,7 @@ export default function AvatarPickerDemoPage() {
         </div>
 
         {/* Info */}
-        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
           <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
             ℹ️ Cómo funciona
           </h3>

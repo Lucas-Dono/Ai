@@ -43,6 +43,25 @@ app.prepare().then(() => {
     });
   }
 
+  // Initialize Cron Jobs for World Management
+  // NOTA: Los cron jobs solo funcionan en producción cuando los archivos están compilados
+  // En desarrollo, Next.js no compila archivos fuera de app/pages/api
+  if (process.env.ENABLE_CRON_JOBS === "true" && process.env.NODE_ENV === "production") {
+    import("./lib/worlds/jobs/index.js").then((module) => {
+      const { cronManager } = module;
+      cronManager.initialize().then(() => {
+        console.log("[Server] Cron jobs initialized for world management");
+      }).catch((err) => {
+        console.error("[Server] Failed to initialize cron jobs:", err);
+      });
+    }).catch((err) => {
+      console.error("[Server] Failed to load cron manager:", err);
+      console.log("[Server] Continuing without cron jobs");
+    });
+  } else {
+    console.log("[Server] Cron jobs disabled (set ENABLE_CRON_JOBS=true in production to enable)");
+  }
+
   server.listen(port, () => {
     console.log(`[Server] Ready on http://${hostname}:${port}`);
   });

@@ -4,10 +4,10 @@ import { prisma } from "@/lib/prisma";
 // POST /api/worlds/[id]/track-view - Trackear visita a un mundo
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const worldId = params.id;
+    const { id: worldId } = await params;
     const body = await request.json();
     const { timeSpent } = body; // Tiempo en segundos (opcional)
 

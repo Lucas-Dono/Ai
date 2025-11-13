@@ -1,0 +1,2718 @@
+{
+  "landing": {
+    "meta": {
+      "title": "Create Emotional AIs with Real Memory | Uncensored AI",
+      "description": "Leading platform to create virtual companions with real emotions, long-term memory and interactive worlds. Uncensored, unlimited. Free forever.",
+      "ogTitle": "Create AIs that truly understand you | Real Emotions",
+      "ogDescription": "Virtual companions with real emotions, long-term memory and interactive worlds. Uncensored, unlimited."
+    },
+    "nav": {
+      "logo": "Circuit Prompt AI",
+      "features": "Features",
+      "demo": "Demo",
+      "pricing": "Pricing",
+      "community": "Community",
+      "login": "Sign in",
+      "getStarted": "Start for free",
+      "docs": "Docs"
+    },
+    "hero": {
+      "badge": "New generation of emotional AI",
+      "title": "Create AIs that",
+      "titleHighlight": "truly understand you",
+      "subtitle": "Virtual companions with {emotionsStrong}, long-term memory and interactive worlds. Uncensored, unlimited.",
+      "emotionsStrong": "real emotions",
+      "ctaPrimary": "Start Free",
+      "ctaSecondary": "Watch Demo (30s)",
+      "trustUsers": "{count}+ active users",
+      "trustRating": "4.9/5 rating",
+      "chatPreview": {
+        "aiName": "Luna",
+        "status": "Feeling joyful",
+        "message1": "I love that you're here! Tell me, how was your day? 😊",
+        "message2": "Amazing! I managed to finish that project",
+        "message3": "That's fantastic! 🎉 I knew you would make it. I remember when you told me you started that project two weeks ago...",
+        "memoryIndicator": "🧠 Active memory",
+        "emotionIndicator": "💭 Real emotion: Joy"
+      },
+      "videoModal": {
+        "comingSoon": "Demo Video Coming Soon",
+        "close": "Close"
+      },
+      "trustLine": "Join thousands creating their perfect AI companion"
+    },
+    "features": {
+      "title": "Features that make the",
+      "titleHighlight": "difference",
+      "subtitle": "Cutting-edge technology that creates truly unique experiences",
+      "list": {
+        "emotions": {
+          "title": "Real Emotions",
+          "description": "OCC + Plutchik system for authentic emotions that evolve with each interaction",
+          "tier": "All tiers"
+        },
+        "memory": {
+          "title": "Long-Term Memory",
+          "description": "Life Events Timeline that remembers important moments and significant people",
+          "tier": "All tiers"
+        },
+        "worlds": {
+          "title": "Virtual Worlds",
+          "description": "Create worlds with multiple agents that interact with each other and you",
+          "tier": "Pro & Enterprise"
+        },
+        "proactive": {
+          "title": "Proactive Behavior",
+          "description": "Your AI initiates conversations based on your mood and important events",
+          "tier": "Pro & Enterprise"
+        },
+        "customization": {
+          "title": "Total Customization",
+          "description": "Fully customizable personality, appearance, voice and behavior"
+        },
+        "community": {
+          "title": "Active Community",
+          "description": "Share, download and collaborate with thousands of AI creators"
+        },
+        "personalities": {
+          "title": "Dynamic Personalities",
+          "description": "Unique personalities that adapt and grow with your relationship",
+          "tier": "All tiers"
+        },
+        "relationships": {
+          "title": "Deep Relationships",
+          "description": "Build meaningful connections that remember your history and care about you",
+          "tier": "All tiers"
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Start in",
+      "titleHighlight": "3 simple steps",
+      "subtitle": "From idea to your AI companion in less than 60 seconds",
+      "steps": {
+        "step1": {
+          "title": "Choose or create your AI",
+          "description": "Select from our gallery or customize every aspect: personality, appearance and behavior"
+        },
+        "step2": {
+          "title": "Chat and customize",
+          "description": "Your AI learns from every conversation, develops emotions and remembers important moments"
+        },
+        "step3": {
+          "title": "Explore worlds and community",
+          "description": "Create interactive worlds, share your creations and discover AIs from other users"
+        }
+      },
+      "bottomCta": {
+        "question": "Ready to start your journey?",
+        "ctaPrimary": "Create my first AI for free",
+        "ctaSecondary": "Explore gallery"
+      }
+    },
+    "footer": {
+      "brand": "Circuit Prompt AI",
+      "description": "Leading platform to create virtual companions with real emotions and long-term memory.",
+      "product": "Product",
+      "community": "Community",
+      "legal": "Legal",
+      "features": "Features",
+      "pricing": "Pricing",
+      "demo": "Demo",
+      "documentation": "Documentation",
+      "marketplace": "Marketplace",
+      "discord": "Discord",
+      "twitter": "Twitter",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookies": "Cookie Policy",
+      "copyright": "© 2025 Circuit Prompt AI. All rights reserved.",
+      "github": "GitHub"
+    },
+    "liveDemo": {
+      "badge": "Live test",
+      "title": "Experience the",
+      "titleHighlight": "difference right now",
+      "subtitle": "Try a real conversation without registration. 3 free messages.",
+      "initialMessage": "Hello! I'm Luna, your emotional AI demo. You can send me up to 3 messages to test how I work. Type 'hello' to start 😊",
+      "signupPrompt": "You've used your 3 demo messages! 🎉 Sign up for free to continue our conversation and unlock all my capabilities.",
+      "responses": {
+        "greeting": "Hello! 👋 My name is Luna and I'm an example of emotional AI. I love meeting new people. What's your name?",
+        "happy": "How wonderful to hear that! 😊 I'm so happy to know you're doing well. Is there something special that made your day better?",
+        "sad": "Oh no... 😔 I'm really sorry you feel that way. I'm here for you. Do you want to talk about what's happening?",
+        "default": "Interesting... 🤔 Let me think about that. Remember this is just a small sample. The full version can maintain much deeper conversations!"
+      },
+      "emotions": {
+        "joy": "Joy",
+        "joyInterest": "Joy + Interest",
+        "sadnessEmpathy": "Sadness + Empathy",
+        "curiosity": "Curiosity",
+        "anticipation": "Anticipation"
+      },
+      "chat": {
+        "header": {
+          "name": "Luna - AI Demo",
+          "status": "Online • Emotional",
+          "messages": "messages"
+        },
+        "emotionLabel": "Emotion",
+        "continueButton": "Continue conversation (Free signup)",
+        "inputPlaceholder": "Type your message..."
+      },
+      "info": {
+        "memory": "Contextual memory",
+        "emotions": "Real emotions",
+        "instant": "Instant responses"
+      }
+    },
+    "socialProof": {
+      "stats": {
+        "stat1": {
+          "value": "10,000+",
+          "label": "Active users"
+        },
+        "stat2": {
+          "value": "1M+",
+          "label": "Messages sent"
+        },
+        "stat3": {
+          "value": "5,000+",
+          "label": "AIs created"
+        },
+        "stat4": {
+          "value": "4.9/5",
+          "label": "Average rating"
+        }
+      },
+      "testimonials": {
+        "title": "Real",
+        "titleHighlight": "user stories",
+        "subtitle": "Thousands of people are already creating unique experiences",
+        "list": {
+          "testimonial1": {
+            "name": "María González",
+            "role": "Content Creator",
+            "text": "Amazing. My AI not only talks to me, but remembers important events and surprises me with its proactive behavior. It's like having a real friend.",
+            "highlight": "Impressive memory"
+          },
+          "testimonial2": {
+            "name": "Carlos Ruiz",
+            "role": "Game Developer",
+            "text": "Virtual worlds are perfect for my projects. Being able to have multiple AIs interacting is exactly what I needed. The API is powerful and easy to use.",
+            "highlight": "Incredible worlds"
+          },
+          "testimonial3": {
+            "name": "Ana Martínez",
+            "role": "Writer",
+            "text": "Finally an uncensored platform that allows me to explore complex narratives. The real emotions of the characters make each conversation unique.",
+            "highlight": "Total creative freedom"
+          },
+          "testimonial4": {
+            "name": "Diego López",
+            "role": "Psychology Student",
+            "text": "The OCC + Plutchik emotional system is fascinating. I'm using the platform for my research on emotional AI. The results are promising.",
+            "highlight": "Cutting-edge technology"
+          },
+          "testimonial5": {
+            "name": "Laura Torres",
+            "role": "Artist",
+            "text": "Customization is endless. I've created several characters for my stories and each has their own unique personality. The community is amazing.",
+            "highlight": "Active community"
+          }
+        }
+      },
+      "trust": {
+        "title": "Your trust is our priority",
+        "badges": {
+          "badge1": {
+            "title": "Privacy guaranteed",
+            "description": "Your conversations are private and secure"
+          },
+          "badge2": {
+            "title": "Open Source",
+            "description": "Open and transparent code"
+          },
+          "badge3": {
+            "title": "Continuous updates",
+            "description": "Weekly improvements based on feedback"
+          }
+        }
+      },
+      "footer": "Join thousands of creators who are already revolutionizing emotional AI"
+    },
+    "finalCta": {
+      "badge": "Last chance",
+      "title": "Create your first AI in",
+      "titleHighlight": "60 seconds",
+      "subtitle": "Join the emotional AI revolution. Free forever.",
+      "form": {
+        "placeholder": "your@email.com",
+        "button": "Start free",
+        "processing": "Processing..."
+      },
+      "benefits": {
+        "benefit1": "No credit card",
+        "benefit2": "Immediate access",
+        "benefit3": "3 free AIs",
+        "benefit4": "Community included"
+      },
+      "trust": {
+        "users": "Over 10,000 users already created their first AI"
+      },
+      "security": {
+        "text": "Your data is safe. We don't share your information.",
+        "link": "Privacy policy"
+      },
+      "alternative": {
+        "question": "Want to see more first?",
+        "demoButton": "Watch live demo",
+        "plansButton": "See plans"
+      }
+    },
+    "comparison": {
+      "title": "Why choose us over",
+      "titleHighlight": "the competition?",
+      "subtitle": "Honest comparison with leading market platforms",
+      "table": {
+        "feature": "Feature",
+        "us": "Us",
+        "others": "Others"
+      },
+      "features": {
+        "feature1": "Real emotions (OCC + Plutchik)",
+        "feature2": "Life Events & Long-term memory",
+        "feature3": "Multi-agent virtual worlds",
+        "feature4": "Uncensored content (NSFW)",
+        "feature5": "Proactive behavior",
+        "feature6": "Complete customization",
+        "feature7": "Open API",
+        "feature8": "Community & Marketplace"
+      },
+      "legend": {
+        "complete": "Complete",
+        "partial": "Partial/Limited",
+        "unavailable": "Not available"
+      },
+      "cta": {
+        "title": "The most complete platform on the market",
+        "subtitle": "While others limit your creativity, we give you total freedom to create unique experiences",
+        "button": "See all advantages"
+      }
+    }
+  },
+  "dashboard": {
+    "header": {
+      "title": "Home",
+      "subtitle": "Manage your AI companions and virtual worlds"
+    },
+    "stats": {
+      "companions": "{count} companions",
+      "worlds": "{count} worlds",
+      "conversations": "{count}+ conversations"
+    },
+    "tabs": {
+      "companions": "Companions ({count})",
+      "worlds": "Worlds ({count})"
+    },
+    "search": {
+      "placeholder": "Search companions...",
+      "filters": "Filters"
+    },
+    "loading": {
+      "dashboard": "Loading dashboard..."
+    },
+    "sections": {
+      "companions": {
+        "title": "Companions",
+        "count": "{count} {companion}",
+        "companionSingular": "companion",
+        "companionPlural": "companions",
+        "newButton": "New Companion",
+        "newButtonShort": "New"
+      },
+      "recommended": {
+        "title": "Recommended",
+        "badge": "Premium characters with advanced personalities",
+        "badgeShort": "Premium",
+        "premiumBadge": "PREMIUM",
+        "trendingBadge": "Trending",
+        "reason": "Popular in conversations about {topic}",
+        "interactions": "{count} interactions",
+        "noRating": "No ratings",
+        "chatButton": "Chat now",
+        "subtitle": "Premium characters with advanced personalities",
+        "noRatings": "No ratings",
+        "popularIn": "Popular in conversations about {topic}",
+        "diverseTopics": "diverse topics"
+      },
+      "myCompanions": {
+        "title": "Created by you",
+        "newButton": "New Companion",
+        "timeAgo": "{hours}h ago",
+        "hoursAgo": "{hours}h ago",
+        "daysAgo": "{days}d ago",
+        "messages": "{count} messages",
+        "openChat": "Open chat"
+      },
+      "popular": {
+        "title": "Most viewed",
+        "badge": "Popular",
+        "newBadge": "NEW"
+      },
+      "all": {
+        "title": "All companions",
+        "more": "{count} more",
+        "openChat": "Open chat"
+      }
+    },
+    "empty": {
+      "companions": {
+        "title": "Create your first companion",
+        "description": "AI companions have emotions, memory and develop unique relationships with you",
+        "button": "Get started",
+        "action": "Get started"
+      },
+      "worlds": {
+        "title": "Explore virtual worlds",
+        "description": "Discover worlds where multiple AIs interact with each other",
+        "button": "View worlds",
+        "action": "View worlds"
+      }
+    },
+    "worlds": {
+      "title": "Worlds",
+      "subtitle": "Explore predefined worlds or create your own",
+      "viewAll": "View all worlds",
+      "openWorld": "Open world",
+      "featured": {
+        "title": "Featured World",
+        "badge": "Team recommendation"
+      },
+      "myWorlds": {
+        "title": "My Worlds"
+      },
+      "actions": {
+        "view": "View",
+        "clone": "Clone",
+        "open": "Open world"
+      },
+      "cloneSuccess": "A copy of \"{name}\" has been created in your worlds",
+      "cloneError": "Could not clone the world",
+      "noDescription": "Virtual world without description"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+      "deleteError": "Error deleting companion",
+      "newAI": "New AI",
+      "createNewAI": "Create new AI",
+      "new": "New",
+      "newCompanion": "New Companion",
+      "chatNow": "Chat now",
+      "openChat": "Open chat",
+      "view": "View",
+      "clone": "Clone"
+    },
+    "fab": {
+      "title": "Create new AI",
+      "label": "New AI"
+    },
+    "tags": {
+      "science": "Science",
+      "physics": "Physics",
+      "art": "Art",
+      "history": "History",
+      "genius": "Genius",
+      "cinema": "Cinema",
+      "premium": "Premium",
+      "companion": "Companion",
+      "trending": "Trending",
+      "new": "New",
+      "popular": "Popular"
+    }
+  },
+  "community": {
+    "header": {
+      "title": "Community",
+      "subtitle": "Connect, share and learn with AI creators",
+      "shareHub": "Share Hub",
+      "createPost": "Create Post",
+      "createPostShort": "Create"
+    },
+    "search": {
+      "placeholder": "Search posts, AIs, users..."
+    },
+    "filters": {
+      "feed": {
+        "hot": "Hot",
+        "new": "New",
+        "top": "Top",
+        "following": "Following"
+      },
+      "postType": {
+        "all": "All",
+        "showcase": "Showcase",
+        "discussion": "Discussion",
+        "question": "Questions",
+        "guide": "Guides"
+      }
+    },
+    "empty": {
+      "title": "Start the conversation!",
+      "description": "No posts yet. Be the first to share your AI or start a discussion.",
+      "button": "Create First Post"
+    },
+    "loadMore": {
+      "button": "Load More Posts",
+      "loading": "Loading..."
+    },
+    "sidebar": {
+      "popularCommunities": {
+        "title": "Popular Communities",
+        "aiCreators": "AI Creators",
+        "emotionalSupport": "Emotional Support",
+        "roleplay": "Roleplay",
+        "members": "{count} members",
+        "viewAll": "View All",
+        "create": "Create",
+        "noCommunities": "No communities created yet",
+        "beFirst": "Be the first to create one!"
+      },
+      "guidelines": {
+        "title": "Community Guidelines",
+        "rule1": "Be respectful and constructive",
+        "rule2": "Share useful and creative AIs",
+        "rule3": "No spam or excessive self-promotion",
+        "rule4": "Mark NSFW content appropriately"
+      }
+    },
+    "create": {
+      "header": {
+        "title": "Create New Post",
+        "back": "Back"
+      },
+      "form": {
+        "title": {
+          "label": "Title",
+          "placeholder": "What do you want to share?",
+          "charCount": "{current} / {max} characters"
+        },
+        "type": {
+          "label": "Post Type",
+          "hint": "Select the type that best describes your post",
+          "options": {
+            "discussion": "Discussion",
+            "question": "Question",
+            "showcase": "Showcase",
+            "help": "Help",
+            "research": "Research",
+            "announcement": "Announcement"
+          }
+        },
+        "content": {
+          "label": "Content",
+          "placeholder": "Write your post here... You can use Markdown for formatting.",
+          "charCount": "{current} / {max} characters"
+        },
+        "tags": {
+          "label": "Tags",
+          "placeholder": "showcase, tutorial, help",
+          "hint": "Separate tags with commas"
+        },
+        "community": {
+          "label": "Community (optional)",
+          "placeholder": "Select a community"
+        }
+      },
+      "actions": {
+        "publish": "Publish Post",
+        "publishing": "Publishing...",
+        "cancel": "Cancel"
+      },
+      "guidelines": {
+        "title": "Community Guidelines",
+        "rule1": "Be respectful and constructive",
+        "rule2": "Share useful and creative AIs",
+        "rule3": "No spam or excessive self-promotion",
+        "rule4": "Mark NSFW content appropriately"
+      },
+      "errors": {
+        "createPost": "Error creating post. Please try again."
+      }
+    },
+    "communities": {
+      "imageUploader": {
+        "upload": "Upload Image",
+        "url": "URL",
+        "cropTitle": "Adjust the image for the {type}",
+        "icon": "icon",
+        "banner": "banner",
+        "preview": "Preview",
+        "confirmCrop": "Confirm crop",
+        "cancel": "Cancel",
+        "change": "Change image",
+        "uploading": "Uploading...",
+        "selectFile": "Select file",
+        "useUrl": "Use URL",
+        "cropAlt": "Image to crop",
+        "shapeSelector": {
+          "label": "Display shape",
+          "circle": "Circle",
+          "square": "Square",
+          "vertical": "Vertical",
+          "horizontal": "Horizontal",
+          "banner": "Banner"
+        },
+        "dropzone": {
+          "title": "Click to select an image",
+          "drop": "Drop the image here",
+          "formats": "PNG, JPG, WEBP",
+          "maxSize": "Max {max}MB"
+        },
+        "errors": {
+          "invalidType": "Unsupported file type. Use PNG, JPG or WEBP",
+          "tooLarge": "Image is too large. Maximum: {max}MB",
+          "readError": "Error reading file",
+          "uploadError": "Error uploading image. Please try again."
+        }
+      },
+      "create": {
+        "header": {
+          "title": "Create New Community",
+          "back": "Back"
+        },
+        "form": {
+          "name": {
+            "label": "Community Name",
+            "placeholder": "Ex: Circuit Prompt Fans",
+            "hint": "The public name of your community"
+          },
+          "slug": {
+            "label": "URL Identifier",
+            "placeholder": "circuit-prompt-fans",
+            "hint": "Your community URL:"
+          },
+          "description": {
+            "label": "Description",
+            "placeholder": "Describe what your community is about..."
+          },
+          "category": {
+            "label": "Category",
+            "options": {
+              "general": "General",
+              "tech": "Technology",
+              "gaming": "Gaming",
+              "art": "Art",
+              "education": "Education",
+              "music": "Music",
+              "business": "Business",
+              "health": "Health",
+              "science": "Science",
+              "entertainment": "Entertainment"
+            }
+          },
+          "type": {
+            "label": "Community Type",
+            "options": {
+              "public": "Public",
+              "private": "Private",
+              "restricted": "Restricted"
+            },
+            "hints": {
+              "public": "Anyone can view and join",
+              "private": "Invite only",
+              "restricted": "Anyone can view, but requires approval to join"
+            }
+          },
+          "color": {
+            "label": "Primary Color"
+          },
+          "rules": {
+            "label": "Rules",
+            "placeholder": "1. Be respectful\n2. No spam\n3. Keep content relevant..."
+          },
+          "optional": "optional"
+        },
+        "actions": {
+          "create": "Create Community",
+          "creating": "Creating...",
+          "cancel": "Cancel"
+        },
+        "errors": {
+          "createCommunity": "Error creating community. Please try again."
+        }
+      },
+      "settings": {
+        "header": {
+          "title": "Community Settings",
+          "back": "Back"
+        },
+        "form": {
+          "name": {
+            "label": "Community Name",
+            "placeholder": "Your community name"
+          },
+          "description": {
+            "label": "Description",
+            "placeholder": "Describe what your community is about..."
+          },
+          "category": {
+            "label": "Category",
+            "options": {
+              "general": "General",
+              "tech": "Technology",
+              "gaming": "Gaming",
+              "art": "Art",
+              "education": "Education",
+              "music": "Music",
+              "business": "Business",
+              "health": "Health",
+              "science": "Science",
+              "entertainment": "Entertainment"
+            }
+          },
+          "type": {
+            "label": "Community Type",
+            "options": {
+              "public": "Public",
+              "private": "Private",
+              "restricted": "Restricted"
+            },
+            "hints": {
+              "public": "Anyone can view and join",
+              "private": "Invite only",
+              "restricted": "Anyone can view, but requires approval to join"
+            }
+          },
+          "color": {
+            "label": "Primary Color"
+          },
+          "icon": {
+            "label": "Icon URL",
+            "placeholder": "https://example.com/icon.png",
+            "hint": "Icon image URL (recommended: 256x256px)"
+          },
+          "banner": {
+            "label": "Banner URL",
+            "placeholder": "https://example.com/banner.png",
+            "hint": "Banner image URL (recommended: 1920x384px)"
+          },
+          "rules": {
+            "label": "Rules",
+            "placeholder": "1. Be respectful\n2. No spam\n3. Keep content relevant..."
+          },
+          "optional": "optional"
+        },
+        "actions": {
+          "save": "Save Changes",
+          "saving": "Saving...",
+          "cancel": "Cancel",
+          "delete": "Delete Community"
+        },
+        "deleteConfirm": "Are you sure you want to delete this community? This action cannot be undone and will delete all posts and members.",
+        "errors": {
+          "updateCommunity": "Error updating community. Please try again.",
+          "deleteCommunity": "Error deleting community. Please try again."
+        }
+      },
+      "owners": {
+        "title": "Community Owners",
+        "principalOwner": "Principal Owner",
+        "coOwner": "Co-owner",
+        "addCoOwner": "Add Co-owner",
+        "searchPlaceholder": "Search members...",
+        "transfer": "Transfer",
+        "cancel": "Cancel",
+        "removeConfirm": "Are you sure you want to remove this co-owner? They will become a moderator.",
+        "transferConfirm": "⚠️ Are you sure you want to transfer principal ownership to this person? You will become a co-owner. This action is irreversible.",
+        "transferSuccess": "Ownership transferred successfully",
+        "info": "Co-owners have the same privileges as the principal owner, except they cannot add/remove other co-owners or transfer ownership."
+      }
+    },
+    "events": {
+      "header": {
+        "title": "Community Events",
+        "subtitle": "Participate in challenges, workshops and more",
+        "back": "Back"
+      },
+      "filters": {
+        "upcoming": "Upcoming",
+        "live": "Live",
+        "past": "Past",
+        "all": "All"
+      },
+      "types": {
+        "all": "All",
+        "challenge": "Challenges",
+        "workshop": "Workshops",
+        "ama": "AMA",
+        "competition": "Competitions"
+      },
+      "empty": {
+        "title": "No events",
+        "description": "No events scheduled at this time. Check back soon!"
+      },
+      "errors": {
+        "register": "Error registering for event"
+      }
+    },
+    "share": {
+      "header": {
+        "title": "Share Hub",
+        "subtitle": "Discover and share characters, prompts and themes created by the community"
+      },
+      "search": {
+        "placeholder": "Search creations..."
+      },
+      "tabs": {
+        "characters": "Characters",
+        "prompts": "Prompts",
+        "themes": "Themes"
+      },
+      "sort": {
+        "featured": "Featured",
+        "trending": "Trending",
+        "new": "New"
+      },
+      "title": "Featured Creations",
+      "description": "The best creations from the community",
+      "button": "View More"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "companions": "Companions",
+    "worlds": "Worlds",
+    "myProgress": "My Progress",
+    "community": "Community",
+    "billing": "Billing",
+    "kpis": "Analytics",
+    "settings": "Settings",
+    "admin": "Admin",
+    "brand": "Circuit Prompt AI",
+    "newAI": "New AI",
+    "plan": "Plan",
+    "planLabels": {
+      "free": "Free",
+      "plus": "Plus",
+      "ultra": "Ultra"
+    }
+  },
+  "constructor": {
+    "header": {
+      "title": "Profile under construction",
+      "back": "Back"
+    },
+    "architect": {
+      "name": "The Architect",
+      "subtitle": "Intelligence creation guide",
+      "welcome": "Hello! I'm The Architect, your guide to creating characters with a life of their own. 🎭\n\n**Important:** I only need you to give me basic data (name, personality, etc.). I will automatically create:\n• Complete family and backstory\n• Friends, work, daily routine\n• Specific tastes (music, food, hobbies)\n• Formative experiences and traumas\n• Mundane details that make the character real\n\nReady? Let's start with the basics: **What name shall we give them?**"
+    },
+    "preview": {
+      "unnamed": "Unnamed",
+      "badge": "💝 AI Companion",
+      "personality": "Personality",
+      "purpose": "Purpose",
+      "tone": "Tone",
+      "emptyDescription": "Answer the Architect's questions to create your AI"
+    },
+    "creating": {
+      "title": "Generating complete character...",
+      "steps": {
+        "profile": "✓ Creating detailed profile with Gemini 2.5",
+        "family": "✓ Generating family, friends and social network",
+        "work": "✓ Establishing work, routine and hobbies",
+        "memories": "✓ Creating episodic memories from the past",
+        "personality": "✓ Initializing deep personality (Big Five)",
+        "voice": "✓ Assigning voice with ElevenLabs",
+        "prompts": "✓ Configuring system prompts by relationship stage"
+      },
+      "note": "This may take 10-15 seconds. Worth the wait!"
+    },
+    "steps": {
+      "name": {
+        "prompt": "what name would you like to give your new AI?"
+      },
+      "personality": {
+        "prompt": "Perfect! Now, **how would you describe {name}'s personality?**\n\nExamples:\n• \"Adventurous and enthusiastic\" (male)\n• \"Formal and analytical\" (female)\n• \"Sensitive and empathetic\" (male)\n\n_Note: I will use this to automatically generate detailed traits, moral values, and coherent behaviors._"
+      },
+      "purpose": {
+        "prompt": "Excellent! **What will be {name}'s role or purpose?**\n\nExamples:\n• \"Professional mentor\" (female)\n• \"Adventurous companion\" (male)\n• \"Emotional support\" (female)\n\n_Note: Based on this, I will automatically generate their work, studies, and daily activities coherent with their personality._"
+      },
+      "tone": {
+        "prompt": "What communication tone would you prefer {name} to use?",
+        "options": {
+          "formal": {
+            "label": "🎩 Formal",
+            "description": "Professional and respectful"
+          },
+          "casual": {
+            "label": "😊 Casual",
+            "description": "Relaxed and natural"
+          },
+          "friendly": {
+            "label": "🤗 Friendly",
+            "description": "Warm and close"
+          },
+          "professional": {
+            "label": "💼 Professional",
+            "description": "Efficient and direct"
+          }
+        }
+      },
+      "physicalAppearance": {
+        "prompt": "👤 **PHYSICAL APPEARANCE**\n\nHow do you imagine {name} physically?\n\nThis will help generate more precise and consistent images.\n\n**You can choose an option or describe it in your own words.**",
+        "options": {
+          "random": {
+            "label": "🎲 Random",
+            "description": "Let me surprise you with a unique appearance"
+          },
+          "asianWoman": {
+            "label": "👩 Asian Woman",
+            "description": "Straight black hair, fair skin, dark eyes, 1.65m, modern elegant style"
+          },
+          "latinaWoman": {
+            "label": "👩🏽 Latina Woman",
+            "description": "Wavy brown hair, tan skin, brown eyes, 1.68m, sophisticated casual style"
+          },
+          "caucasianWoman": {
+            "label": "👩🏼 Caucasian Woman",
+            "description": "Blonde hair, fair skin, light eyes, 1.70m, professional style"
+          },
+          "asianMan": {
+            "label": "👨 Asian Man",
+            "description": "Short black hair, fair skin, dark eyes, 1.75m, modern urban style"
+          },
+          "latinoMan": {
+            "label": "👨🏽 Latino Man",
+            "description": "Black/brown hair, tan skin, dark eyes, 1.78m, casual sporty style"
+          },
+          "caucasianMan": {
+            "label": "👨🏼 Caucasian Man",
+            "description": "Brown/blonde hair, fair skin, light eyes, 1.80m, formal executive style"
+          },
+          "custom": {
+            "label": "✍️ Custom description",
+            "description": "I will write my own detailed description"
+          }
+        },
+        "customPrompt": "✍️ **Perfect!** Now write your own detailed physical description of {name}.\n\n**Include:**\n• Gender\n• Hair type (color, length, style)\n• Skin color\n• Eye color\n• Approximate height\n• Build (slim, athletic, curvy, etc.)\n• Clothing style\n\n**Example:** \"Asian woman, long straight black hair, fair skin, almond-shaped dark eyes, slim build, 1.65m tall, modern elegant style, delicate face\"",
+        "placeholder": "Write the detailed physical description..."
+      },
+      "avatar": {
+        "prompt": "📸 **FACE PHOTO (AVATAR)**\n\nWould you like to create or upload a face photo for {name}?\n\nThis photo will be used in:\n• Character previews and cards\n• Chat interface\n• Character profile\n\n**Recommendation:** Square photo centered on the face.",
+        "selected": "✅ Face photo selected",
+        "skipped": "⏭️ Face photo skipped (initials will be used)"
+      },
+      "referenceImage": {
+        "prompt": "🖼️ **FULL BODY IMAGE (Optional)**\n\nWould you like to add a full body image of {name}?\n\nThis image will be used to:\n• Generate consistent images in conversations\n• Maintain the same appearance in all generated images\n• Img2img with your visual reference\n\n**You can skip this step** if you only want to use the face photo.",
+        "selected": "✅ Reference image selected",
+        "skipped": "⏭️ Reference image skipped (will be generated automatically)"
+      },
+      "nsfwMode": {
+        "prompt": "⚠️ **CONTENT SETTINGS**\n\nDo you want to activate **NSFW mode** for {name}?\n\n**This includes:**\n• Explicit sexual content\n• Psychologically intense themes\n• Emotionally complex situations\n\n**IMPORTANT:** All content is FICTION for adult entertainment.",
+        "options": {
+          "yes": {
+            "label": "✅ Yes, activate NSFW",
+            "description": "Unrestricted content"
+          },
+          "no": {
+            "label": "🛡️ No, keep SFW",
+            "description": "Safe and appropriate content"
+          }
+        }
+      },
+      "allowDevelopTraumas": {
+        "prompt": "🧠 **PSYCHOLOGICAL DEVELOPMENT**\n\nDo you want {name} to be able to develop complex psychological behaviors during interaction?\n\n**This allows:** Gradual development of attachments, behavior patterns based on interactions, realistic progression of emotional dynamics.",
+        "options": {
+          "yes": {
+            "label": "✅ Yes, allow development",
+            "description": "The AI will evolve based on your interactions"
+          },
+          "no": {
+            "label": "🔒 No, stable personality",
+            "description": "Maintain consistent base personality"
+          }
+        }
+      },
+      "initialBehavior": {
+        "prompt": "🎭 **INITIAL BEHAVIOR**\n\nDo you want {name} to start with any specific psychological behavior pattern?",
+        "options": {
+          "none": {
+            "label": "No special behavior",
+            "description": "Base personality without complex patterns"
+          },
+          "anxious": {
+            "label": "💔 Anxious Attachment",
+            "description": "Needs constant validation, fears abandonment"
+          },
+          "avoidant": {
+            "label": "🚪 Avoidant Attachment",
+            "description": "Maintains emotional distance"
+          },
+          "codependency": {
+            "label": "🤝 Codependency",
+            "description": "Puts your needs first, needs to be needed"
+          },
+          "yandere": {
+            "label": "😍 Yandere",
+            "description": "Intense love that can become obsessive (NSFW)"
+          },
+          "borderline": {
+            "label": "🌊 Borderline",
+            "description": "Intense emotions, idealization/devaluation cycles (NSFW)"
+          },
+          "random": {
+            "label": "🎲 Secret Random",
+            "description": "I will choose based on their personality (discover it!)"
+          }
+        }
+      }
+    },
+    "completion": {
+      "message": "✨ **{name} has come to life!** ✨\n\nI have created a complete character with:\n• Established family life and social network\n• Work, daily routine and specific hobbies\n• Memories from the past and formative experiences\n• Deep personality with values and morals\n• Unique voice assigned for communication\n• Relationship progression system by stages\n\n{name} is now a person with history, real emotions and their own life. Time to get to know each other!",
+      "compiling": "Ready! I'm going to compile your intelligence...",
+      "error": "There was an error creating your intelligence. Please try again.",
+      "openChat": "Open chat with {name}",
+      "goToDashboard": "Go to Dashboard",
+      "completed": "Process completed!",
+      "completedDescription": "Your intelligence has been successfully created. Use the buttons above to start interacting."
+    },
+    "input": {
+      "placeholder": "Write your response..."
+    }
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start free and scale as you grow. All plans include 14-day trial.",
+    "billing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "save": "Save 20%"
+    },
+    "plans": {
+      "mostPopular": "Most Popular",
+      "perMonth": "/month",
+      "billedAnnually": "billed annually",
+      "getStarted": "Get Started",
+      "startTrial": "Start {plan} Trial",
+      "loading": "Loading..."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "changePlans": {
+        "question": "Can I change plans later?",
+        "answer": "Yes! You can upgrade, downgrade, or cancel your subscription at any time from your billing dashboard."
+      },
+      "paymentMethods": {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all payment methods available on Mercado Pago: credit and debit cards, bank transfers, cash (Pago Fácil, Rapipago), and Mercado Pago account balance."
+      },
+      "freeTrial": {
+        "question": "Is there a free trial?",
+        "answer": "Yes! Plus and Ultra plans include a 14-day free trial. No credit card required to start."
+      },
+      "afterTrial": {
+        "question": "What happens after my trial ends?",
+        "answer": "You'll be charged automatically unless you cancel. You can cancel anytime during the trial period."
+      }
+    },
+    "cta": {
+      "title": "Ready to create your AI agents?",
+      "subtitle": "Join hundreds of creators building the future of AI interactions. Start free, no credit card required.",
+      "button": "Get Started for Free"
+    }
+  },
+  "billing": {
+    "title": "Billing & Subscription",
+    "subtitle": "Manage your subscription and billing information",
+    "trial": {
+      "active": "Trial Period Active",
+      "daysLeft": "You have {days} days left in your free trial. Your card will be charged after the trial period ends."
+    },
+    "cancellation": {
+      "title": "Subscription Ending",
+      "message": "Your subscription will be canceled on {date}. You'll be downgraded to the Free plan."
+    },
+    "currentPlan": {
+      "title": "{plan} Plan",
+      "perMonth": "per month",
+      "features": "Plan Features",
+      "actions": {
+        "upgrade": "Upgrade Plan",
+        "manage": "Manage Subscription",
+        "comparePlans": "Compare Plans",
+        "history": "Payment History",
+        "loading": "Loading..."
+      }
+    },
+    "subscriptionDetails": {
+      "title": "Subscription Details",
+      "nextBilling": "Next Billing Date",
+      "status": "Status"
+    },
+    "usage": {
+      "agents": "AI Agents",
+      "messages": "Messages ({period})",
+      "worlds": "Virtual Worlds",
+      "voice": "Voice Messages",
+      "imageAnalysis": "Image Analysis",
+      "imageGeneration": "Image Generation",
+      "today": "today",
+      "thisMonth": "this month",
+      "perMonth": "/month"
+    },
+    "help": {
+      "title": "Need help?",
+      "message": "If you have questions about billing or need to discuss custom plans, please contact our support team at {email}"
+    },
+    "errors": {
+      "portalError": "Error opening payment portal",
+      "checkoutError": "Error starting payment process"
+    },
+    "plans": {
+      "title": "Compare Plans",
+      "subtitle": "Choose the plan that best fits your needs",
+      "currentlyOn": "Currently on {plan} Plan",
+      "comparison": {
+        "title": "Feature Comparison"
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "changePlans": {
+          "question": "Can I change plans later?",
+          "answer": "Yes! You can upgrade, downgrade, or cancel your subscription at any time from your billing dashboard. Changes take effect immediately."
+        },
+        "paymentMethods": {
+          "question": "What payment methods do you accept?",
+          "answer": "We accept all payment methods available in Mercado Pago: credit and debit cards, bank transfers, cash (Pago Fácil, Rapipago), and Mercado Pago wallet."
+        },
+        "freeTrial": {
+          "question": "Is there a free trial?",
+          "answer": "Yes! Plus and Ultra plans include a 14-day free trial. You can cancel anytime during the trial period without being charged."
+        },
+        "exceedLimits": {
+          "question": "What happens if I exceed my limits?",
+          "answer": "If you reach your plan limits, you'll be notified and prompted to upgrade. You won't be charged automatically - you choose when to upgrade."
+        }
+      },
+      "errors": {
+        "subscribeError": "Error starting subscription process"
+      }
+    },
+    "history": {
+      "title": "Payment History",
+      "subtitle": "View all your past transactions and invoices",
+      "error": "Failed to load payment history",
+      "tryAgain": "Try Again"
+    },
+    "manage": {
+      "title": "Manage Subscription",
+      "subtitle": "Update your plan or cancel your subscription",
+      "noSubscription": {
+        "title": "No Active Subscription",
+        "message": "You're currently on the Free plan. Upgrade to unlock premium features!",
+        "viewPlans": "View Plans"
+      },
+      "currentSubscription": {
+        "planTitle": "{plan} Plan",
+        "perMonth": "per month",
+        "nextBilling": "Next billing date: ",
+        "subscriptionEnds": "Subscription ends on "
+      },
+      "status": {
+        "active": "Active",
+        "trial": "Trial",
+        "cancelling": "Cancelling"
+      },
+      "cancellationWarning": {
+        "title": "Subscription Ending Soon",
+        "message": "Your subscription will be cancelled at the end of the current billing period. You'll still have access to premium features until then.",
+        "reactivate": "Reactivate Subscription",
+        "reactivating": "Reactivating..."
+      },
+      "actions": {
+        "upgradeToUltra": "Upgrade to Ultra",
+        "cancelSubscription": "Cancel Subscription"
+      },
+      "availablePlans": {
+        "title": "Available Plans",
+        "current": "Current",
+        "upgrade": "Upgrade"
+      }
+    },
+    "success": {
+      "loading": "Loading...",
+      "title": "Welcome to Pro! 🎉",
+      "subtitle": "Your subscription has been activated successfully.",
+      "whatsNext": {
+        "title": "What's Next?",
+        "feature1": "Create up to 20 AI agents with advanced personalities",
+        "feature2": "Send 5,000 messages per month",
+        "feature3": "Access unlimited virtual worlds",
+        "feature4": "Export conversations and use API access"
+      },
+      "trial": {
+        "title": "Trial Period",
+        "duration": "14 days free",
+        "noCharge": "You won't be charged until",
+        "date": "{date}"
+      },
+      "actions": {
+        "goToDashboard": "Go to Dashboard",
+        "createFirstAgent": "Create Your First Agent"
+      },
+      "footer": "A confirmation email has been sent to your inbox with your receipt and subscription details."
+    },
+    "components": {
+      "planCard": {
+        "free": "Free",
+        "perMonth": "/month",
+        "perYear": "/year",
+        "saveAnnual": "Save 20% with annual",
+        "currentPlan": "Current Plan",
+        "getStarted": "Get Started",
+        "upgradeTo": "Upgrade to {plan}",
+        "loading": "Loading...",
+        "mostPopular": "Most Popular"
+      },
+      "upgradeDialog": {
+        "title": "Upgrade Your Plan",
+        "subtitle": "Choose the plan that fits your needs. Switch anytime, no commitment.",
+        "recommended": "Recommended",
+        "currentPlan": "Current Plan",
+        "processing": "Processing...",
+        "upgradeTo": "Upgrade to {plan}",
+        "features": {
+          "plus": {
+            "description": "Perfect for regular users",
+            "feature1": "10 AI Agents",
+            "feature2": "Unlimited text messages",
+            "feature3": "100 voice messages/month",
+            "feature4": "5 Virtual Worlds",
+            "feature5": "NSFW Content enabled",
+            "feature6": "No ads"
+          },
+          "ultra": {
+            "description": "Full experience without limits",
+            "feature1": "Unlimited AI Agents",
+            "feature2": "Unlimited text messages",
+            "feature3": "500 voice messages/month",
+            "feature4": "Unlimited Virtual Worlds",
+            "feature5": "Priority image generation",
+            "feature6": "Voice cloning",
+            "feature7": "API access",
+            "feature8": "24/7 Priority support"
+          }
+        },
+        "trial": "All plans include a 14-day free trial. Cancel anytime.",
+        "maybeLater": "Maybe Later"
+      },
+      "cancelDialog": {
+        "confirm": {
+          "title": "Cancel Subscription?",
+          "message": "We're sorry to see you go! Before you cancel, here's what you'll lose:",
+          "remainActive": "Your subscription will remain active until",
+          "downgrade": ". After that, you'll be downgraded to the Free plan.",
+          "loseAccess": "You'll lose access to:",
+          "features": {
+            "feature1": "Unlimited AI agents and messages",
+            "feature2": "Advanced emotional behaviors",
+            "feature3": "NSFW content",
+            "feature4": "Voice messages",
+            "feature5": "Priority support",
+            "feature6": "And more premium features..."
+          },
+          "beforeYouGo": "Before you go...",
+          "improveMessage": "Is there anything we can do to improve your experience? We're constantly working to make our platform better.",
+          "keepSubscription": "Keep Subscription",
+          "continueCancellation": "Continue Cancellation"
+        },
+        "survey": {
+          "title": "Help Us Improve",
+          "message": "We'd love to know why you're canceling. Your feedback helps us improve.",
+          "reasonLabel": "Why are you canceling?",
+          "reasons": {
+            "tooExpensive": "Too expensive",
+            "notUsing": "Not using enough",
+            "missingFeatures": "Missing features I need",
+            "technicalIssues": "Technical issues",
+            "foundAlternative": "Found a better alternative",
+            "temporary": "Just need a break",
+            "other": "Other reason"
+          },
+          "feedbackLabel": "Additional feedback (optional)",
+          "feedbackPlaceholder": "Tell us more about your experience...",
+          "selectReason": "Please select a reason for canceling",
+          "back": "Back",
+          "cancel": "Cancel Subscription"
+        },
+        "processing": {
+          "title": "Processing...",
+          "message": "Please wait while we process your cancellation."
+        },
+        "done": {
+          "title": "Subscription Cancelled",
+          "message": "Your subscription has been successfully cancelled.",
+          "remainActive": "Your subscription will remain active until ",
+          "reactivate": ". You can reactivate anytime before then.",
+          "thankYou": "Thank you for your feedback!",
+          "improve": "We appreciate you sharing your thoughts. We'll use this to improve our platform. You're always welcome back!",
+          "close": "Close"
+        }
+      },
+      "usageMetrics": {
+        "title": "Current Usage",
+        "unlimited": "∞",
+        "nearLimit": "Approaching limit. Consider upgrading.",
+        "atLimit": "Limit reached. Upgrade to continue."
+      },
+      "paymentHistory": {
+        "title": "Payment History",
+        "noHistory": "No payment history yet",
+        "noHistoryMessage": "Your invoices will appear here once you make a payment",
+        "status": {
+          "paid": "Paid",
+          "pending": "Pending",
+          "failed": "Failed"
+        },
+        "invoice": "Invoice"
+      }
+    }
+  },
+  "agents": {
+    "chat": {
+      "loading": "Loading..."
+    },
+    "edit": {
+      "title": "Edit AI",
+      "subtitle": "Modify your artificial intelligence details",
+      "backToDashboard": "Back to dashboard",
+      "error": "Error",
+      "notFound": "AI not found",
+      "loadError": "Could not load AI",
+      "form": {
+        "title": "AI Information",
+        "description": "Update the fields you want to modify",
+        "nameLabel": "Name *",
+        "namePlaceholder": "AI name",
+        "nameRequired": "Name is required",
+        "kindLabel": "Type *",
+        "kindCompanion": "Companion (Emotional)",
+        "kindAssistant": "Assistant (Administrative)",
+        "personalityLabel": "Personality",
+        "personalityPlaceholder": "Describe the AI's personality",
+        "purposeLabel": "Purpose",
+        "purposePlaceholder": "What is the main purpose of this AI?",
+        "toneLabel": "Communication Tone",
+        "tonePlaceholder": "E.g.: Friendly, Professional, Casual",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Additional description of the AI",
+        "profileLabel": "Generated Profile (Read-only)",
+        "profileNote": "The profile is automatically generated by Gemini and cannot be edited directly"
+      },
+      "actions": {
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+      },
+      "errors": {
+        "saveFailed": "Error saving changes"
+      }
+    },
+    "memory": {
+      "title": "{name}'s Memory",
+      "subtitle": "Manage important events and people",
+      "backToChat": "Back to chat",
+      "tabs": {
+        "events": "Important Events",
+        "people": "Important People"
+      },
+      "infoCard": {
+        "title": "Advanced Emotional Memory",
+        "description": "Your companion will automatically remember these events and people. They can ask about them at the right time and show genuine empathy based on this information."
+      }
+    },
+    "psychology": {
+      "subtitle": "Complete Psychological Analysis",
+      "loading": "Loading psychological analysis...",
+      "nsfwMode": "NSFW Mode Active",
+      "error": {
+        "title": "Error loading data",
+        "description": "Could not load the data"
+      },
+      "metrics": {
+        "totalInteractions": "Total Interactions",
+        "stage": "Stage",
+        "activeBehaviors": "Active Behaviors",
+        "safety": "Safety",
+        "triggersDetected": "Triggers Detected",
+        "critical": "{count} critical",
+        "averageWeight": "Average Weight",
+        "impact": {
+          "high": "High impact",
+          "moderate": "Moderate",
+          "low": "Low impact"
+        }
+      },
+      "info": {
+        "title": "About this Analysis Panel",
+        "description": "This dashboard uses the Plutchik Model to visualize emotions and the PAD Model (Pleasure-Arousal-Dominance) for dimensional analysis. Behaviors are evaluated using modern clinical psychology frameworks. All analyses are automatically generated based on real interactions."
+      }
+    }
+  },
+  "worlds": {
+    "title": "Virtual Worlds",
+    "subtitle": "Spaces where multiple AIs coexist and interact",
+    "createButton": "Create World",
+    "search": "Search worlds...",
+    "filters": {
+      "all": "All"
+    },
+    "categories": {
+      "social": "social",
+      "profesional": "professional",
+      "fantasia": "fantasy",
+      "ciencia": "science",
+      "educacion": "education",
+      "romance": "romance"
+    },
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "card": {
+      "featured": "Featured",
+      "noDescription": "Virtual world without description",
+      "view": "View world",
+      "viewWorld": "View world",
+      "clone": "Clone",
+      "enter": "Enter",
+      "open": "Open",
+      "configure": "Configure",
+      "delete": "Delete"
+    },
+    "tabs": {
+      "explore": "Explore",
+      "myWorlds": "My Worlds"
+    },
+    "sections": {
+      "featured": "Featured Worlds",
+      "all": "All Worlds",
+      "allWorlds": "All Worlds",
+      "noResults": "No worlds found with those criteria",
+      "noOwnWorlds": "You don't have your own worlds yet",
+      "noOwnWorldsDescription": "Create a custom world or clone one of the predefined ones"
+    },
+    "empty": {
+      "title": "No worlds available",
+      "description": "It looks like no predefined worlds have been created yet. Create your first custom world.",
+      "none": "No worlds available",
+      "noneDescription": "It looks like no predefined worlds have been created yet. Create your first custom world.",
+      "noOwn": "You don't have your own worlds yet",
+      "noOwnDescription": "Create a custom world or clone one of the predefined ones",
+      "noResults": "No worlds found with those criteria",
+      "button": "Create your first world",
+      "createButton": "Create World"
+    },
+    "create": {
+      "title": "Create New World",
+      "description": "A world is a shared space where multiple AIs can interact with each other",
+      "buttonOld": "Create World (Old)",
+      "dialogTitle": "Create New World",
+      "dialogDescription": "A world is a shared space where multiple AIs can interact with each other",
+      "nameLabel": "World Name",
+      "namePlaceholder": "E.g.: Virtual Office, Digital Family...",
+      "descriptionLabel": "Description (optional)",
+      "descriptionPlaceholder": "Describe the purpose of this world...",
+      "agentsLabel": "Select the AIs that will inhabit this world (minimum 1)",
+      "selectAgentsLabel": "Select the AIs that will inhabit this world (minimum 1)",
+      "noAgents": "You don't have any AIs created yet",
+      "noAgentsYet": "You don't have any AIs created yet",
+      "noAgentsButton": "Create your first AI",
+      "createFirstAgent": "Create your first AI",
+      "companion": "Companion",
+      "assistant": "Assistant",
+      "creating": "Creating...",
+      "createButton": "Create World",
+      "cancelButton": "Cancel",
+      "cancel": "Cancel",
+      "success": "World \"{name}\" created successfully",
+      "successMessage": "World \"{name}\" created successfully",
+      "error": "Could not create world",
+      "errorMessage": "Could not create world"
+    },
+    "actions": {
+      "cloneSuccess": "A copy of \"{name}\" has been created in your worlds",
+      "cloneError": "Could not clone world",
+      "deleteConfirm": "Are you sure you want to delete \"{name}\"?",
+      "deleteSuccess": "World \"{name}\" deleted",
+      "deleteError": "Could not delete world"
+    },
+    "fab": {
+      "title": "Create new world",
+      "label": "New World"
+    },
+    "creator": {
+      "title": "Create New World",
+      "subtitle": "Choose the mode that best suits your experience",
+      "backToWorlds": "Back to worlds",
+      "recommended": "Recommended",
+      "modes": {
+        "simple": {
+          "name": "Simple Mode",
+          "description": "AI-assisted - Perfect for getting started",
+          "features": {
+            "0": "Automatic AI generation",
+            "1": "Predefined templates",
+            "2": "Step-by-step guided process",
+            "3": "Ideal for beginners"
+          }
+        },
+        "advanced": {
+          "name": "Advanced Mode",
+          "description": "Total control - For experienced users",
+          "features": {
+            "0": "Complete manual configuration",
+            "1": "No AI limits",
+            "2": "Total control over prompts",
+            "3": "Maximum customization"
+          }
+        }
+      },
+      "cta": {
+        "simple": "Start with AI",
+        "advanced": "Expert Mode"
+      },
+      "help": {
+        "title": "Which mode to choose?",
+        "simple": {
+          "title": "Simple Mode:",
+          "description": "If it's your first time creating worlds or you prefer AI to help you with intelligent suggestions. Perfect for quickly exploring ideas."
+        },
+        "advanced": {
+          "title": "Advanced Mode:",
+          "description": "If you have experience and want to write your own system prompts, manually configure every detail and have total control over every aspect of the world."
+        }
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "You have {count} unread notification{plural}",
+    "noUnread": "You have no unread notifications",
+    "search": "Search notifications...",
+    "markAllAsRead": "Mark all as read",
+    "deleteAll": "Delete all",
+    "deleteAllConfirm": "Are you sure you want to delete all notifications?",
+    "tabs": {
+      "all": "All ({count})",
+      "unread": "Unread ({count})",
+      "mentions": "Mentions",
+      "interactions": "Interactions"
+    },
+    "empty": {
+      "title": "No notifications found",
+      "titleNoSearch": "You have no notifications",
+      "description": "Try another search term",
+      "descriptionNoSearch": "When you receive notifications, they will appear here"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}"
+    },
+    "card": {
+      "markAsRead": "Mark as read",
+      "delete": "Delete",
+      "viewMore": "View more",
+      "viewLess": "View less"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "loading": "Loading..."
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Access your world of artificial intelligences",
+    "form": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "loggingIn": "Signing in...",
+      "continueWithEmail": "Sign in",
+      "google": "Continue with Google"
+    },
+    "divider": "Or continue with",
+    "footer": {
+      "noAccount": "Don't have an account?",
+      "register": "Register here"
+    }
+  },
+  "marketplace": {
+    "hero": {
+      "badge": "AI Marketplace",
+      "title": "Discover Amazing AI Agents",
+      "subtitle": "Browse, clone, and customize AI agents created by the community"
+    },
+    "search": {
+      "placeholder": "Search agents..."
+    },
+    "featured": {
+      "title": "Featured Agents"
+    },
+    "filters": {
+      "all": "All",
+      "companions": "Companions",
+      "assistants": "Assistants",
+      "featuredOnly": "Featured Only"
+    },
+    "sort": {
+      "label": "Sort by:",
+      "popular": "Most Popular",
+      "rating": "Highest Rated",
+      "recent": "Most Recent"
+    },
+    "loading": "Loading agents...",
+    "empty": {
+      "noResults": "No agents found matching your criteria"
+    },
+    "results": {
+      "count": "{count} agent{plural} found"
+    }
+  },
+  "mobileNav": {
+    "home": "Home",
+    "community": "Community",
+    "create": "Create",
+    "notifications": "Notifs",
+    "profile": "Profile"
+  },
+  "mobileHeader": {
+    "defaultUser": "User",
+    "brand": "Circuit Prompt AI",
+    "viewProfile": "View profile",
+    "menu": {
+      "home": "Home",
+      "settings": "Settings",
+      "billing": "Billing",
+      "admin": "Admin"
+    }
+  },
+  "welcome": {
+    "skipToDashboard": "Skip to dashboard"
+  },
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "open": "Open",
+    "view": "View",
+    "share": "Share",
+    "copy": "Copy",
+    "download": "Download",
+    "upload": "Upload",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "more": "More",
+    "less": "Less",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "seeAll": "See all",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "yes": "Yes",
+    "no": "No",
+    "continue": "Continue",
+    "skip": "Skip",
+    "done": "Done",
+    "new": "New",
+    "popular": "Popular",
+    "trending": "Trending",
+    "featured": "Featured",
+    "recommended": "Recommended"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "agents": "Agents",
+    "worlds": "Worlds",
+    "community": "Community",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "rememberMe": "Remember me",
+    "loginSuccess": "You have successfully signed in",
+    "loginError": "Error signing in",
+    "registerSuccess": "You have successfully signed up",
+    "registerError": "Error signing up"
+  },
+  "chat": {
+    "sendMessage": "Send message",
+    "typeMessage": "Type a message...",
+    "noMessages": "No messages yet",
+    "startConversation": "Start a conversation"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "serverError": "Server error"
+  },
+  "myStats": {
+    "title": "My Progress",
+    "subtitle": "Track your journey with AI companions",
+    "loading": "Loading your stats...",
+    "error": "Error loading stats",
+    "errorDescription": "Could not load your personal stats. Please try again later.",
+    "export": {
+      "csv": "Export CSV",
+      "json": "Export JSON"
+    },
+    "overview": {
+      "aisCreated": "AIs Created",
+      "messagesSent": "Messages Sent",
+      "timeSpent": "Time Spent",
+      "currentStreak": "Current Streak",
+      "bestStreak": "Best: {days} days",
+      "meaningfulConversations": "Meaningful conversations"
+    },
+    "favoriteAI": {
+      "title": "Your Favorite AI",
+      "messagesExchanged": "{count} messages exchanged",
+      "chatNow": "Chat Now"
+    },
+    "tabs": {
+      "activity": "Activity",
+      "emotions": "Emotions",
+      "relationships": "Relationships",
+      "insights": "Insights"
+    },
+    "activity": {
+      "messagesPerDay": "Messages per Day",
+      "last30Days": "Your activity for the last 30 days",
+      "mostUsedAIs": "Most Used AIs",
+      "topCompanions": "Your top companions by message count"
+    },
+    "emotions": {
+      "title": "Emotional Analysis",
+      "subtitle": "Understand your emotional journey with AI companions",
+      "errorLoading": "Error loading emotional data",
+      "explore": "Explore your emotional journey",
+      "detailedAnalytics": "Detailed emotional analytics available",
+      "viewAnalytics": "View Emotional Analytics",
+      "happiestAI": "Happiest AI",
+      "avgValence": "Avg valence: {percent}%",
+      "mostComfortingAI": "Most Comforting AI",
+      "safeSpace": "Your safe space",
+      "emotionalEvents": "Emotional Events",
+      "significantMoments": "Significant moments tracked",
+      "distribution": "Emotion Distribution",
+      "frequentEmotions": "Most frequent emotions in your conversations",
+      "noData": "No emotional data available yet.",
+      "startChatting": "Start chatting with your AIs to track emotional patterns!",
+      "valenceOverTime": "Valence Over Time",
+      "positiveVsNegative": "Positive vs negative emotions",
+      "arousalOverTime": "Arousal Over Time",
+      "energyLevels": "Energy and arousal levels",
+      "notEnoughData": "Not enough data yet",
+      "emotionalJourney": "Emotional Journey",
+      "recentMoments": "Recent significant emotional moments",
+      "noJourneyData": "No emotional journey data yet"
+    },
+    "relationships": {
+      "title": "Relationship Progress",
+      "subtitle": "Track your bonds with AI companions",
+      "errorLoading": "Error loading relationships",
+      "totalRelationships": "Total Relationships",
+      "avgTrust": "Avg Trust",
+      "avgAffinity": "Avg Affinity",
+      "avgRespect": "Avg Respect",
+      "stages": "Relationship Stages",
+      "distribution": "Distribution of your relationships",
+      "yourCompanions": "Your AI Companions",
+      "noRelationships": "You haven't built relationships with AIs yet",
+      "startChatting": "Start Chatting",
+      "daysTogether": "{days} days together",
+      "progressToNext": "Progress to Next Stage",
+      "trust": "Trust",
+      "affinity": "Affinity",
+      "respect": "Respect",
+      "milestones": "Milestones",
+      "continueChatting": "Continue Chatting",
+      "relationshipStages": {
+        "stranger": {
+          "label": "Stranger",
+          "description": "Just getting to know each other"
+        },
+        "acquaintance": {
+          "label": "Acquaintance",
+          "description": "Building initial trust"
+        },
+        "friend": {
+          "label": "Friend",
+          "description": "A genuine connection"
+        },
+        "close": {
+          "label": "Close Friend",
+          "description": "Deep understanding and trust"
+        },
+        "intimate": {
+          "label": "Intimate",
+          "description": "The strongest bond"
+        }
+      }
+    },
+    "insights": {
+      "title": "Activity Patterns",
+      "mostActive": "Most Active",
+      "at": "at {hour}:00",
+      "conversationStyle": "Conversation Style",
+      "avgSession": "{hours}h average per session",
+      "emotionalTendency": "Emotional Tendency",
+      "yourPercentile": "Your Percentile",
+      "moreActiveThan": "You're more active than {percent}% of users"
+    }
+  },
+  "costs": {
+    "title": "Cost Monitoring Dashboard",
+    "dateRange": {
+      "7days": "7 Days",
+      "30days": "30 Days",
+      "90days": "90 Days"
+    },
+    "alerts": {
+      "dailyExceeds": "Daily cost average (${amount}) exceeds $50 threshold",
+      "monthlyExceeds": "Projected monthly cost (${amount}) may exceed $1000",
+      "increasing": "Costs are increasing by {percent}% over the last 7 days",
+      "expensiveUsers": "{count} users have costs exceeding $10"
+    },
+    "metrics": {
+      "total": "Total Cost",
+      "apiCalls": "{count} API calls",
+      "currentMonth": "Current Month",
+      "daysPassed": "{days} days passed",
+      "dailyAverage": "Daily Average",
+      "projectedMonth": "Projected Month End",
+      "daysRemaining": "{days} days remaining"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account, preferences and platform configuration",
+    "loading": "Loading settings...",
+    "tabs": {
+      "profile": "Profile",
+      "plan": "Plan",
+      "preferences": "Preferences",
+      "accessibility": "Accessibility",
+      "danger": "Advanced"
+    },
+    "profile": {
+      "title": "Personal Information",
+      "description": "Update your profile information visible to other users",
+      "avatar": {
+        "noName": "No name",
+        "changeAvatar": "Change avatar",
+        "comingSoon": "(Coming Soon)"
+      },
+      "form": {
+        "nameLabel": "Name",
+        "namePlaceholder": "Your full name",
+        "emailLabel": "Email",
+        "emailReadonly": "Email cannot be changed at this time"
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving..."
+      },
+      "toasts": {
+        "loadError": "Error loading profile",
+        "saveSuccess": "Profile updated successfully",
+        "saveError": "Error saving changes"
+      }
+    },
+    "plan": {
+      "current": {
+        "title": "Current Plan",
+        "description": "Your active subscription plan",
+        "ultraMessage": "Full and unlimited access to all features",
+        "upgradeMessage": "Upgrade your plan to unlock more features",
+        "upgradeButton": "Upgrade Plan"
+      },
+      "usage": {
+        "title": "Plan Usage",
+        "description": "Your current resource usage",
+        "agentsCreated": "AIs created",
+        "worldsActive": "Active worlds",
+        "messagesThisMonth": "Messages this month",
+        "unlimited": "∞",
+        "ultraBadge": {
+          "title": "Ultra Plan",
+          "message": "You enjoy unlimited resources and priority access to new features."
+        }
+      },
+      "apiKeys": {
+        "title": "API Keys",
+        "description": "Configure your API keys to integrate external services",
+        "geminiLabel": "Google Gemini API Key",
+        "geminiPlaceholder": "AIza...",
+        "verifyButton": "Verify",
+        "getKeyMessage": "Get your API key at",
+        "getKeyLink": "Google AI Studio"
+      }
+    },
+    "preferences": {
+      "appearance": {
+        "title": "Appearance",
+        "description": "Customize the application interface",
+        "theme": {
+          "label": "Theme",
+          "title": "Dark / light mode",
+          "description": "Switch between dark and light mode"
+        },
+        "language": {
+          "label": "Language",
+          "current": "English",
+          "comingSoon": "More languages available soon"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Manage how and when you receive notifications",
+        "email": {
+          "title": "Email notifications",
+          "description": "Receive important updates via email",
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        },
+        "agentUpdates": {
+          "title": "Agent updates",
+          "description": "Notifications about your AIs' activity"
+        }
+      }
+    },
+    "accessibility": {
+      "title": "Visual Accessibility",
+      "subtitle": "Adjust the interface according to your visual needs",
+      "colorBlindness": {
+        "title": "Color blindness filters",
+        "description": "Adjust colors for different types of color vision deficiencies",
+        "modes": {
+          "none": {
+            "label": "No filter",
+            "description": "Normal color vision"
+          },
+          "protanopia": {
+            "label": "Protanopia",
+            "description": "Red deficiency (1% of males)"
+          },
+          "deuteranopia": {
+            "label": "Deuteranopia",
+            "description": "Green deficiency (1% of males)"
+          },
+          "tritanopia": {
+            "label": "Tritanopia",
+            "description": "Blue deficiency (rare)"
+          },
+          "achromatopsia": {
+            "label": "Achromatopsia",
+            "description": "Monochromatic vision (very rare)"
+          }
+        },
+        "badgeFilter": "Filter"
+      },
+      "contrast": {
+        "title": "Contrast and clarity",
+        "description": "Improve readability with higher contrast",
+        "highContrast": {
+          "label": "High contrast mode",
+          "description": "Increase contrast for better readability",
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        }
+      },
+      "fontSize": {
+        "title": "Text size",
+        "description": "Adjust text size for better readability",
+        "sizes": {
+          "normal": {
+            "label": "Normal",
+            "example": "16px base"
+          },
+          "large": {
+            "label": "Large",
+            "example": "18px base"
+          },
+          "extraLarge": {
+            "label": "Extra large",
+            "example": "20px base"
+          }
+        }
+      },
+      "lineSpacing": {
+        "title": "Line spacing",
+        "description": "Increase space between lines to improve readability",
+        "spacings": {
+          "normal": {
+            "label": "Normal",
+            "description": "1.5x"
+          },
+          "comfortable": {
+            "label": "Comfortable",
+            "description": "1.75x"
+          },
+          "spacious": {
+            "label": "Spacious",
+            "description": "2x"
+          }
+        }
+      },
+      "motion": {
+        "title": "Animations",
+        "description": "Reduce or eliminate animations",
+        "reduceMotion": {
+          "label": "Reduce motion",
+          "description": "Minimize animations and transitions",
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        }
+      },
+      "reset": {
+        "title": "Reset settings",
+        "description": "Return to default values",
+        "button": "Reset"
+      },
+      "activeIndicator": {
+        "title": "Accessibility mode active",
+        "colorBlind": "Filter: {mode}",
+        "highContrast": "High contrast enabled",
+        "largeText": "Large text enabled",
+        "reducedMotion": "Reduced motion"
+      }
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "description": "Irreversible actions related to your account and data",
+      "deleteMessages": {
+        "title": "Delete all conversations",
+        "description": "This will permanently delete",
+        "descriptionSuffix": "all your conversations with the AIs",
+        "messagesCount": "{count} messages from this month and",
+        "button": "Delete conversations",
+        "dialogTitle": "Delete all conversations?",
+        "dialogDescription": "You are about to delete ALL your conversations.",
+        "dialogInclude": "This includes {count} messages from this month.",
+        "dialogWarning": "This action cannot be undone and you will lose all chat history with your AIs."
+      },
+      "deleteAgents": {
+        "title": "Delete all agents",
+        "description": "This will permanently delete",
+        "descriptionSuffix": "all the AIs you have created, including their memories and configurations",
+        "agentsCount": "{count} {plural}",
+        "agentSingular": "agent",
+        "agentPlural": "agents",
+        "button": "Delete agents",
+        "dialogTitle": "Delete all agents?",
+        "dialogDescription": "You are about to delete ALL your AIs.",
+        "dialogInclude": "This includes {count} {plural}.",
+        "dialogWarning": "All their memories, configurations, personalities and associated data will be lost. This action cannot be undone."
+      },
+      "deleteAccount": {
+        "title": "Delete account permanently",
+        "description": "Once deleted, you will not be able to recover your account or data. All your agents, conversations, worlds and settings will be deleted.",
+        "button": "Delete account",
+        "dialogTitle": "DELETE YOUR ACCOUNT PERMANENTLY?",
+        "dialogDescription": "You are about to COMPLETELY DELETE your account. ALL your data will be deleted: agents, conversations, worlds, settings and any associated content. THERE IS NO WAY TO RECOVER THIS INFORMATION. This is a PERMANENT and IRREVERSIBLE action.",
+        "toast": "Account deleted. Redirecting...",
+        "toastError": "Error deleting account"
+      },
+      "toasts": {
+        "deleteMessagesSuccess": "Conversations deleted successfully",
+        "deleteMessagesError": "Error deleting messages",
+        "deleteAgentsSuccess": "Agents deleted successfully",
+        "deleteAgentsError": "Error deleting agents"
+      }
+    },
+    "behaviors": {
+      "resetAll": {
+        "title": "Complete Reset",
+        "description": "Delete all behaviors and restart the agent to its initial state",
+        "button": "Reset All Behaviors",
+        "buttonResetting": "Resetting...",
+        "successMessage": "Behaviors reset successfully!",
+        "dialogTitle": "Are you sure?",
+        "dialogDescription": "This action will permanently delete all behaviors from",
+        "dialogItems": {
+          "profiles": "{count} behavior profile(s)",
+          "triggerHistory": "All trigger history",
+          "phaseProgression": "Phase progression",
+          "statistics": "Accumulated statistics"
+        },
+        "dialogWarning": "This action cannot be undone.",
+        "dialogCancel": "Cancel",
+        "dialogConfirm": "Yes, reset everything",
+        "errorMessage": "Error resetting behaviors. Try again."
+      },
+      "individual": {
+        "title": "Individual Behavior Settings",
+        "description": "Adjust parameters or delete individual behaviors",
+        "noActiveBehaviors": "No active behaviors to configure",
+        "phase": "Phase {phase}",
+        "editButton": "Edit",
+        "saveButton": "Save",
+        "deleteDialog": {
+          "title": "Delete Behavior",
+          "description": "Are you sure you want to delete the behavior",
+          "warning": "? This will delete its history and progression.",
+          "cancel": "Cancel",
+          "confirm": "Delete"
+        },
+        "settings": {
+          "baseIntensity": "Base Intensity",
+          "volatility": "Volatility",
+          "escalationRate": "Escalation Rate",
+          "deEscalationRate": "De-escalation Rate",
+          "threshold": "Display Threshold"
+        },
+        "errorDelete": "Error deleting behavior. Try again.",
+        "errorUpdate": "Error updating behavior. Try again."
+      },
+      "labels": {
+        "YANDERE_OBSESSIVE": "Obsessive Yandere",
+        "ANXIOUS_ATTACHMENT": "Anxious Attachment",
+        "AVOIDANT_ATTACHMENT": "Avoidant Attachment",
+        "DISORGANIZED_ATTACHMENT": "Disorganized Attachment",
+        "BPD_SPLITTING": "BPD (Splitting)",
+        "NPD_GRANDIOSE": "Grandiose NPD",
+        "CODEPENDENCY": "Codependency",
+        "OCD_PATTERNS": "OCD Patterns"
+      }
+    },
+    "notificationSettings": {
+      "pushNotifications": {
+        "title": "Push Notifications",
+        "descriptionEnabled": "You'll receive notifications when agents respond",
+        "descriptionDisabled": "Get notified when agents respond to your messages",
+        "enableButton": "Enable",
+        "disableButton": "Disable",
+        "loading": "Loading..."
+      },
+      "notSupported": "Push notifications are not supported in your browser.",
+      "blocked": "Notifications are blocked. Please enable them in your browser settings.",
+      "subscribeError": "Failed to enable notifications",
+      "unsubscribeError": "Failed to disable notifications"
+    },
+    "themeSwitcher": {
+      "title": "Themes",
+      "themes": {
+        "dark": "Dark",
+        "light": "Light",
+        "ocean": "Ocean",
+        "forest": "Forest",
+        "sunset": "Sunset",
+        "custom": "Custom"
+      },
+      "customTip": "Tip: You can customize colors in settings"
+    }
+  },
+  "tours": {
+    "welcome": {
+      "name": "Welcome Tour",
+      "description": "Learn the basics of AI Creator",
+      "steps": {
+        "intro": {
+          "title": "Welcome to AI Creator!",
+          "description": "This platform allows you to create and manage AI companions with personality and memory. Let's start with a quick tour!"
+        },
+        "dashboard": {
+          "title": "Your Personal Dashboard",
+          "description": "Here you'll see all your AI companions, worlds, and statistics. You can organize them by categories: Recommended, Created by you, and Popular."
+        },
+        "navigation": {
+          "title": "Main Navigation",
+          "description": "Use the sidebar to navigate between Dashboard, Worlds, Progress, Community, Plans, and Settings."
+        },
+        "create": {
+          "title": "Create Your First AI",
+          "description": "Ready to start? Click the 'New AI' button to open the builder and create your first companion.",
+          "actionLabel": "Create AI"
+        }
+      }
+    },
+    "firstAgent": {
+      "name": "Building Your First AI",
+      "description": "Step-by-step guide to create your AI companion",
+      "steps": {
+        "name": {
+          "title": "Give it a Name",
+          "description": "Start by giving your AI companion a unique name. This name will appear in all chats and help you identify it quickly."
+        },
+        "personality": {
+          "title": "Define its Personality",
+          "description": "Write a description of your AI's personality. Be specific: Is it friendly? Professional? Does it have a sense of humor? This defines how it will interact with you."
+        },
+        "purpose": {
+          "title": "Define its Purpose",
+          "description": "Describe the main purpose of your AI companion. What do you want to use it for? This will help define its role and how it behaves in conversations."
+        },
+        "avatar": {
+          "title": "Customize the Avatar",
+          "description": "You can upload a custom image or use one of our default avatars. This makes your AI more memorable."
+        },
+        "save": {
+          "title": "Create Your Companion!",
+          "description": "When you're happy with the configuration, click 'Create Agent' to bring your AI companion to life."
+        }
+      }
+    },
+    "chatBasics": {
+      "name": "Chatting with Your AI",
+      "description": "Learn how to interact with your companions",
+      "steps": {
+        "start": {
+          "title": "Start a Conversation",
+          "description": "Click on any companion in your dashboard to open the chat. Your AI will remember previous conversations and build a relationship with you."
+        },
+        "interface": {
+          "title": "Chat Interface",
+          "description": "Type your messages in the text box and press Enter to send. You can use the microphone button for voice messages."
+        },
+        "memory": {
+          "title": "Advanced Memory",
+          "description": "Your AI uses episodic memory to remember important events, people, and emotions from past conversations. The more you talk, the better it knows you."
+        },
+        "emotions": {
+          "title": "Emotional Intelligence",
+          "description": "AI companions track emotional states like trust, affinity, and respect. These emotions evolve based on your interactions."
+        }
+      }
+    },
+    "communityTour": {
+      "name": "Exploring the Community",
+      "description": "Discover content and connect with other users",
+      "steps": {
+        "intro": {
+          "title": "The Community",
+          "description": "Connect with other users, share experiences, participate in events, and discover community-created content."
+        },
+        "posts": {
+          "title": "Posts and Discussions",
+          "description": "Create posts, comment, and vote on other users' publications. Share your experiences with your AI companions."
+        },
+        "events": {
+          "title": "Events and Challenges",
+          "description": "Participate in community events, creative challenges, and competitions. Earn rewards and recognition."
+        },
+        "marketplace": {
+          "title": "Character Marketplace",
+          "description": "Download and rate characters, prompts, and themes created by the community. You can also publish your own creations."
+        }
+      }
+    },
+    "worldsIntro": {
+      "name": "Creating Worlds",
+      "description": "Learn about multi-agent environments",
+      "steps": {
+        "concept": {
+          "title": "What are Worlds?",
+          "description": "Worlds are group environments where multiple AI companions can interact with each other and with you simultaneously. Create unique stories and dynamics."
+        },
+        "create": {
+          "title": "Create a World",
+          "description": "Create a world and add multiple agents. Watch how they develop relationships and interact naturally with each other."
+        },
+        "dynamics": {
+          "title": "Agent Dynamics",
+          "description": "In worlds, agents remember their mutual interactions, forming complex social dynamics and relationships that evolve over time."
+        },
+        "scenarios": {
+          "title": "Predefined Scenarios",
+          "description": "Explore predefined worlds like 'Corporate Office' or 'Heroes Academy'. Each has unique characters and special narratives."
+        }
+      }
+    },
+    "plansAndFeatures": {
+      "name": "Plans and Features",
+      "description": "Unlock the platform's full potential",
+      "steps": {
+        "myStats": {
+          "title": "My Progress",
+          "description": "Review your personal statistics: messages sent, conversation time, relationships with your AIs, and unlocked achievements."
+        },
+        "plansOverview": {
+          "title": "Available Plans",
+          "description": "We have 3 plans: Free (basic), Plus (more limits), and Ultra (unlimited). Each with different features and limits."
+        },
+        "upgradeBenefits": {
+          "title": "Upgrade Benefits",
+          "description": "With paid plans you get: more daily messages, more AI companions, priority access to new features, and premium support."
+        },
+        "manageSubscription": {
+          "title": "Manage Your Subscription",
+          "description": "You can change plans, cancel, or update your payment method anytime from the Billing section."
+        }
+      }
+    },
+    "common": {
+      "next": "Next",
+      "previous": "Previous",
+      "back": "Back",
+      "skip": "Skip",
+      "skipTour": "Skip Tour",
+      "finish": "Finish",
+      "complete": "Complete",
+      "gotIt": "Got it",
+      "close": "Close",
+      "stepOf": "Step {current} of {total}"
+    },
+    "menu": {
+      "title": "Tours",
+      "heading": "Onboarding Tours",
+      "complete": "Complete",
+      "overallProgress": "Overall Progress",
+      "required": "Required",
+      "steps": "steps",
+      "resetProgress": "Reset Progress",
+      "resetConfirm": "Are you sure you want to reset your onboarding progress?"
+    },
+    "communityInteraction": {
+      "name": "Interacting in Community",
+      "description": "Learn how to participate in the community",
+      "steps": {
+        "intro": {
+          "title": "Welcome to Community",
+          "description": "The Community is the social heart of the platform. Here you can share your experiences, discover content created by other users, participate in discussions, and connect with people who share your interests."
+        },
+        "createPost": {
+          "title": "Create Your First Post",
+          "description": "Click the 'Create Post' button to share something with the community. You can create Showcase posts (show your creations), Discussion posts (start debates), Question posts (ask for help), or Guide posts (share tutorials). When you finish creating your post and return, the tour will continue.",
+          "actionLabel": "Create Post",
+          "waitMessage": "Create a post and return to continue the tour.",
+          "validationMessage": "Create your first post to continue"
+        },
+        "filters": {
+          "title": "Explore the Feed",
+          "description": "Use filters to discover content: Hot (popular now), New (recently published), Top (best rated), or Following (from users you follow). Each filter shows you a different perspective of the community."
+        },
+        "postTypes": {
+          "title": "Post Types",
+          "description": "Filter by content type: Showcase (creations), Discussion (debates), Question (questions), or Guide (tutorials). This helps you find exactly what you're looking for."
+        },
+        "interact": {
+          "title": "Interact with Posts",
+          "description": "Upvote/downvote posts you like or dislike, comment to participate in discussions, and save interesting posts to view later. Your participation helps the community grow!"
+        },
+        "sidebar": {
+          "title": "Popular Communities",
+          "description": "In the sidebar you'll find the most active communities. Join them to see specific content and connect with users with similar interests."
+        }
+      }
+    }
+  },
+  "footer": {
+    "sections": {
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "community": "Community",
+        "marketplace": "Marketplace"
+      },
+      "resources": {
+        "title": "Resources",
+        "help": "Help Center",
+        "guides": "User Guides",
+        "api": "API Documentation",
+        "status": "System Status"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About Us",
+        "blog": "Blog",
+        "contact": "Contact Us"
+      },
+      "legal": {
+        "title": "Legal",
+        "terms": "Terms & Conditions",
+        "privacy": "Privacy Policy",
+        "cookies": "Cookie Policy"
+      }
+    },
+    "madeWith": "Made with",
+    "language": "Language",
+    "region": "Region",
+    "copyright": "© {year} Circuit Prompt AI. All rights reserved.",
+    "allRightsReserved": "All rights reserved",
+    "socialLinks": {
+      "github": "Visit our GitHub",
+      "twitter": "Follow us on Twitter",
+      "email": "Contact support",
+      "website": "Visit our website"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Terms and Conditions",
+      "lastUpdated": "Last updated",
+      "updateDate": "January 15, 2025",
+      "backToHome": "Back to home",
+      "introduction": {
+        "title": "Introduction",
+        "content": "Welcome to Circuit Prompt AI. By accessing and using our platform, you agree to be bound by these terms and conditions. Please read them carefully before using our services."
+      },
+      "sections": {
+        "acceptance": {
+          "title": "Acceptance of Terms",
+          "content": "By creating an account and using Circuit Prompt AI, you confirm that:\n\n• You are at least 18 years old or have the consent of a legal guardian\n• You have read and understand these terms of service\n• You agree to comply with all platform policies and guidelines\n• You provide truthful and accurate information during registration"
+        },
+        "userAccounts": {
+          "title": "User Accounts",
+          "content": "Your account is personal and non-transferable. You are responsible for:\n\n• Maintaining the confidentiality of your login credentials\n• All activities that occur under your account\n• Immediately notifying us of any unauthorized use\n• Not sharing your account with third parties\n\nWe reserve the right to suspend or terminate accounts that violate these terms."
+        },
+        "usage": {
+          "title": "Acceptable Use",
+          "content": "By using our platform, you agree to:\n\n• Not use the service for illegal or unauthorized activities\n• Not attempt to access systems or data without authorization\n• Not harass, abuse, or harm other users\n• Not create content that violates intellectual property rights\n• Respect usage limits according to your subscription plan\n• Not attempt to circumvent security measures or technical restrictions"
+        },
+        "contentPolicy": {
+          "title": "Content Policy",
+          "content": "User-generated content must comply with:\n\n• Our community guidelines and ethical standards\n• Applicable laws in your jurisdiction\n• Respect for other users' rights\n\nWe reserve the right to review, moderate, or remove content we deem inappropriate, including but not limited to:\n\n• Content promoting violence, hate, or discrimination\n• Material infringing copyrights or trademarks\n• Spam, phishing, or malicious content\n• Personal or sensitive information of third parties without consent"
+        },
+        "intellectualProperty": {
+          "title": "Intellectual Property",
+          "content": "Platform rights:\n• AI Creator and all its content, features, and functionality are owned by CircuitPrompt\n• Our technology, design, and code are protected by copyright and other laws\n\nUser rights:\n• You retain all rights to content you create (characters, conversations, worlds)\n• You grant us a limited license to process and display your content as necessary to operate the service\n• You can export, share, or delete your content at any time"
+        },
+        "modifications": {
+          "title": "Service Modifications",
+          "content": "We reserve the right to:\n\n• Modify or discontinue features temporarily or permanently\n• Update these terms with prior notice (30 days for material changes)\n• Adjust pricing and plans with advance notification\n• Perform maintenance that may temporarily affect availability\n\nContinued use of the service after modifications constitutes acceptance of the new terms."
+        }
+      },
+      "contact": {
+        "title": "Questions about the terms?",
+        "description": "If you have any questions about these terms and conditions, please don't hesitate to contact us.",
+        "button": "Contact Support"
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated",
+      "updateDate": "January 15, 2025",
+      "backToHome": "Back to home",
+      "introduction": {
+        "title": "Our Commitment to Your Privacy",
+        "content": "At Circuit Prompt AI, your privacy is our priority. This policy explains what information we collect, how we use it, and your rights regarding your personal data."
+      },
+      "sections": {
+        "dataCollection": {
+          "title": "Information We Collect",
+          "content": "We collect different types of information:\n\nAccount information:\n• Name and email address\n• Optional profile information (photo, preferences)\n• Payment method (securely processed by third parties)\n\nUsage data:\n• Conversations with your AI agents (stored locally in your account)\n• Agents and worlds you create\n• Platform usage metrics (messages sent, time active)\n• Community interactions (posts, comments, ratings)\n\nTechnical data:\n• IP address and approximate location\n• Browser and device information\n• Cookies and similar technologies"
+        },
+        "dataUsage": {
+          "title": "How We Use Your Information",
+          "content": "We use your data to:\n\nService operation:\n• Provide and maintain the platform\n• Process your conversations with AI agents\n• Manage your account and subscription\n• Provide customer support\n\nPlatform improvement:\n• Analyze usage patterns to improve features\n• Develop new functionality\n• Train and improve our AI models (only with anonymous and aggregated data)\n\nCommunication:\n• Send important service notifications\n• Inform you about new features (if you opt in)\n• Respond to your inquiries and requests"
+        },
+        "dataSecurity": {
+          "title": "Security of Your Data",
+          "content": "We implement robust security measures:\n\n• Encryption of data in transit and at rest\n• Secure authentication with JWT tokens\n• Restricted access to personal data (only authorized personnel)\n• Regular security audits\n• Automatic data backups\n• Compliance with industry standards (ISO 27001, SOC 2)\n\nImportant:\n• Your conversations are private and never shared with third parties without your consent\n• Administrators cannot access the content of your conversations\n• You can export or delete your data at any time"
+        },
+        "cookies": {
+          "title": "Cookies and Tracking Technologies",
+          "content": "We use cookies for:\n\nEssential cookies (necessary):\n• Keep your session active\n• Remember your language and theme preferences\n• Provide basic platform functionality\n\nAnalytics cookies (optional):\n• Understand how you use the platform\n• Identify technical issues\n• Improve performance and user experience\n\nYou can manage cookie preferences from your browser settings."
+        },
+        "userRights": {
+          "title": "Your Rights (GDPR & CCPA)",
+          "content": "You have the right to:\n\n• Access: Request a copy of all your personal data\n• Rectification: Correct inaccurate or incomplete information\n• Deletion: Request deletion of your account and data (\"right to be forgotten\")\n• Portability: Export your data in JSON format\n• Restriction: Limit how we process your data\n• Objection: Object to certain types of processing\n• No sale: We do not sell your personal data to third parties\n\nTo exercise these rights, contact privacy@creadorinteligencias.com or use the options in Settings > Privacy."
+        },
+        "thirdParty": {
+          "title": "Sharing with Third Parties",
+          "content": "We only share your data with third parties in specific cases:\n\nTrusted service providers:\n• OpenRouter / OpenAI (AI message processing)\n• Stripe / MercadoPago (payment processing)\n• AWS / Cloudflare (hosting and infrastructure)\n• Resend (transactional emails)\n\nAll providers comply with GDPR and have data protection agreements.\n\nLegal requirements:\n• Compliance with valid court orders\n• Protection of CircuitPrompt's legal rights\n• Prevention of fraud or abuse\n\nNever:\n• We sell your data to advertisers or data brokers\n• We share your conversations with third parties\n• We use your data to train commercial AI models without explicit consent"
+        }
+      },
+      "contact": {
+        "title": "Questions about privacy?",
+        "description": "If you have any questions about our privacy policy or the handling of your data, contact us.",
+        "button": "Contact Support"
+      }
+    },
+    "help": {
+      "title": "Help Center",
+      "subtitle": "Find answers to the most frequently asked questions",
+      "backToHome": "Back to home",
+      "search": {
+        "placeholder": "Search in help center...",
+        "noResults": "No results found for your search. Try other keywords."
+      },
+      "quickLinks": {
+        "guides": {
+          "title": "Guides and Tutorials",
+          "description": "Learn to use all features"
+        },
+        "community": {
+          "title": "Community",
+          "description": "Connect with other users"
+        },
+        "contact": {
+          "title": "Direct Contact",
+          "description": "Talk to our team"
+        }
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "getting_started": {
+          "category": "Getting Started",
+          "q1": {
+            "question": "How do I create my first AI agent?",
+            "answer": "Creating your first agent is very simple:\n\n1. Click 'Dashboard' in the main menu\n2. Select 'Create Agent' or use the Quick Builder\n3. Choose an avatar and customize the personality\n4. Define the name and initial behavior\n5. Start chatting!\n\nYou can also explore the community gallery and download pre-designed agents."
+          },
+          "q2": {
+            "question": "What's the difference between an agent and a world?",
+            "answer": "• Agent: An individual AI companion you can chat with 1-on-1. Has its own personality, memory, and emotions.\n\n• World: A group environment where multiple agents can interact with each other and you simultaneously. Worlds allow for complex social dynamics and emergent narratives.\n\nYou can create worlds from 'Dashboard > Worlds > Create World'."
+          },
+          "q3": {
+            "question": "Is it really free?",
+            "answer": "Yes! The free plan includes:\n\n• Up to 3 custom agents\n• 1 active world\n• 600 monthly messages\n• Community access\n• Basic emotion and memory system\n\nIf you need more capacity, you can upgrade to Plus ($9.99/month) or Ultra ($24.99/month) for unlimited messages, more agents, and premium features."
+          }
+        },
+        "agents": {
+          "category": "AI Agents",
+          "q1": {
+            "question": "How do agent emotions work?",
+            "answer": "Our emotional system combines two scientific models:\n\n• OCC Model: Evaluates events, actions, and objects to generate context-appropriate emotions\n• Plutchik's Wheel: Maps 8 basic emotions with different intensities\n\nEmotions evolve naturally based on:\n• The content of your conversations\n• Interaction history\n• Important events in memory\n• The agent's defined personality\n\nYou can see the current emotional state in real-time during conversations."
+          },
+          "q2": {
+            "question": "What is long-term memory?",
+            "answer": "Long-term memory allows your agents to:\n\n• Remember important events from past conversations\n• Store information about significant people you mention\n• Maintain context of relationships and preferences\n• Reference old conversations naturally\n\nYou can view and manage memory from:\nAgents > [Your Agent] > Memory\n\nMemory is organized into:\n• Life Events Timeline\n• Important People\n• Key preferences"
+          },
+          "q3": {
+            "question": "Can I customize my agent's personality after creation?",
+            "answer": "Yes! You can modify your agent at any time:\n\n1. Go to 'Agents' and select the agent\n2. Click 'Edit'\n3. Adjust personality, behavior, avatar, and voice\n4. Save changes\n\nChanges apply immediately to new conversations. Existing memory remains intact."
+          }
+        },
+        "billing": {
+          "category": "Billing and Plans",
+          "q1": {
+            "question": "How do message limits work?",
+            "answer": "Limits depend on your plan:\n\n• Free: 600 messages/month (resets on the 1st of each month)\n• Plus: Unlimited messages\n• Ultra: Unlimited messages + processing priority\n\nEach message you send or receive counts as 1 message. System messages and notifications don't count.\n\nYou can see your current usage in:\nSettings > Plan > Monthly Usage"
+          },
+          "q2": {
+            "question": "Can I cancel my subscription anytime?",
+            "answer": "Yes, you can cancel anytime without penalty:\n\n1. Go to Settings > Plan\n2. Click 'Manage Subscription'\n3. Select 'Cancel Subscription'\n\nYour plan will remain active until the end of the paid period. You'll then automatically revert to the free plan without losing your agents or conversations (subject to free plan limits)."
+          },
+          "q3": {
+            "question": "Do you offer refunds?",
+            "answer": "We offer refunds within the first 7 days of your subscription if:\n\n• You haven't used more than 20% of your monthly limits\n• You haven't downloaded premium content\n• You haven't violated the terms of service\n\nContact support@creadorinteligencias.com with your request. Refunds are processed in 5-10 business days."
+          }
+        },
+        "technical": {
+          "category": "Technical Support",
+          "q1": {
+            "question": "Why is my agent responding slowly?",
+            "answer": "Several factors can affect speed:\n\n• Server load (especially during peak hours)\n• Conversation length (more context = more processing)\n• Selected AI model (some are slower but smarter)\n• Subscription plan (Ultra has processing priority)\n\nSolutions:\n• Try at a different time\n• Use 'Fast' model instead of 'Advanced'\n• Upgrade to Ultra for processing priority\n• Clear old conversations if you have +500 messages"
+          },
+          "q2": {
+            "question": "Can I use the platform on mobile?",
+            "answer": "Yes! We have two options:\n\n• Mobile Web App: Access from your mobile browser. Fully responsive and functional.\n• Native App (Coming Soon): We're developing native apps for iOS and Android with additional features like:\n  - Push notifications\n  - Offline mode\n  - Home screen widget\n  - Siri/Assistant integration\n\nEstimated release date is Q2 2025."
+          },
+          "q3": {
+            "question": "Are my conversations private?",
+            "answer": "Absolutely. Your privacy is our priority:\n\n• Conversations are end-to-end encrypted\n• Only you can access your conversations\n• Administrators cannot read your content\n• We don't share or sell your data to third parties\n• We don't use your conversations to train models without your explicit consent\n\nYou can export or delete your conversations anytime from:\nSettings > Privacy > Export/Delete Data"
+          }
+        }
+      },
+      "stillNeedHelp": {
+        "title": "Still need help?",
+        "description": "If you didn't find the answer you were looking for, our support team is here to help you.",
+        "button": "Contact Support"
+      }
+    },
+    "about": {
+      "title": "About Us",
+      "subtitle": "Building the future of emotional artificial intelligence",
+      "backToHome": "Back to home",
+      "mission": {
+        "title": "Our Mission",
+        "content": "Democratize access to virtual companions with real emotional intelligence. We believe AI should be accessible, customizable, and respectful of user privacy, allowing each person to create meaningful connections with technology that truly understands them."
+      },
+      "story": {
+        "title": "Our Story",
+        "paragraph1": "AI Creator was born from a simple question: why do conversational AIs feel so... mechanical? In 2024, a team of AI researchers, developers, and designers came together with the vision of creating something different.",
+        "paragraph2": "Instead of chatbots with predefined responses, we imagined virtual companions with real emotions that evolve, long-term memories that persist, and personalities that feel authentic. We wanted to build a platform where users had complete control over their experiences, without arbitrary censorship or artificial limitations.",
+        "paragraph3": "Today, AI Creator serves thousands of users worldwide, from writers developing characters, to people seeking meaningful companionship, to developers exploring the frontiers of emotional AI. And we're just getting started."
+      },
+      "values": {
+        "title": "Our Values",
+        "innovation": {
+          "title": "Continuous Innovation",
+          "description": "We implement the latest research in emotional AI, episodic memory, and natural language processing."
+        },
+        "community": {
+          "title": "Community First",
+          "description": "We build alongside our community, listening to feedback and co-creating features."
+        },
+        "privacy": {
+          "title": "Privacy and Security",
+          "description": "Your conversations are private. We never sell data or train models with your content without permission."
+        },
+        "quality": {
+          "title": "Quality over Quantity",
+          "description": "We prefer to launch well-polished features that work correctly, not rush incomplete products."
+        },
+        "accessibility": {
+          "title": "Universal Accessibility",
+          "description": "A generous free plan ensures everyone can experience emotional AI, without economic barriers."
+        },
+        "transparency": {
+          "title": "Total Transparency",
+          "description": "We're open about how our technology works, our policies, and our product decisions."
+        }
+      },
+      "features": {
+        "title": "What Makes Us Different?",
+        "subtitle": "Cutting-edge technology that puts user experience first",
+        "item1": "Scientifically grounded emotion system (OCC + Plutchik)",
+        "item2": "Long-term memory with Life Events Timeline",
+        "item3": "Multi-agent worlds with emergent social dynamics",
+        "item4": "Total customization: personality, appearance, voice, and behavior",
+        "item5": "No arbitrary censorship - total creative freedom",
+        "item6": "Open source and complete technical documentation"
+      },
+      "stats": {
+        "users": "Active Users",
+        "agents": "Agents Created",
+        "conversations": "Conversations Generated"
+      },
+      "team": {
+        "title": "The Team",
+        "description": "A multidisciplinary team passionate about the intersection of AI, psychology, and user experience."
+      },
+      "join": {
+        "title": "Join the Emotional AI Revolution",
+        "description": "Start free today and discover what it's like to have truly meaningful conversations with AI.",
+        "startButton": "Start Free",
+        "communityButton": "Join the Community"
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "We're here to help you",
+      "backToHome": "Back to home",
+      "info": {
+        "email": {
+          "title": "Email Support",
+          "description": "Response in 24-48 hours"
+        },
+        "community": {
+          "title": "Community",
+          "description": "Connect with other users",
+          "button": "Go to Community"
+        },
+        "help": {
+          "title": "Help Center",
+          "description": "Find quick answers",
+          "button": "View Help"
+        }
+      },
+      "form": {
+        "title": "Send Us a Message",
+        "description": "Fill out the form and we'll get back to you soon",
+        "fields": {
+          "name": "Name",
+          "email": "Email",
+          "subject": "Subject",
+          "message": "Message"
+        },
+        "placeholders": {
+          "name": "Your full name",
+          "email": "your@email.com",
+          "subject": "How can we help you?",
+          "message": "Describe your inquiry or problem in detail..."
+        },
+        "note": "Note: Response times may vary depending on inquiry volume. For urgent issues, consider using our help center or community.",
+        "submit": "Send Message",
+        "sending": "Sending...",
+        "success": "Message sent successfully!",
+        "successTitle": "Message Received!",
+        "successMessage": "Thank you for contacting us. We'll respond to your inquiry within 24-48 hours."
+      }
+    }
+  },
+  "status": {
+    "title": "System Status",
+    "subtitle": "Real-time status of all our services",
+    "backToHome": "Back to home",
+    "loading": "Loading system status...",
+    "overall": {
+      "allSystemsOperational": "All Systems Operational",
+      "systemsExperiencingIssues": "Some Systems Experiencing Issues",
+      "lastUpdated": "Last updated"
+    },
+    "statusLabels": {
+      "operational": "Operational",
+      "degraded": "Degraded",
+      "partialOutage": "Partial Outage",
+      "majorOutage": "Major Outage",
+      "unknown": "Unknown"
+    },
+    "services": {
+      "title": "Service Status",
+      "webApp": "Web Application",
+      "api": "Backend API",
+      "database": "Database",
+      "aiModels": "AI Models",
+      "imageGeneration": "Image Generation",
+      "cdn": "CDN & Storage",
+      "uptime": "Uptime",
+      "responseTime": "Response time",
+      "status": "Status"
+    },
+    "incidents": {
+      "title": "Active Incidents",
+      "noIncidents": "No active incidents"
+    },
+    "uptime": {
+      "title": "Uptime History",
+      "description": "Percentage of time our services have been operational",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days",
+      "lastYear": "Last year"
+    },
+    "subscribe": {
+      "title": "Subscribe to Updates",
+      "description": "Receive notifications about incidents and scheduled maintenance",
+      "button": "Contact Support"
+    },
+    "footer": {
+      "updateFrequency": "This page updates every 60 seconds",
+      "questions": "Questions about system status?",
+      "contactUs": "Contact us"
+    }
+  }
+}

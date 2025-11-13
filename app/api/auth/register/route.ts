@@ -1,106 +1,212 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { generateToken } from '@/lib/jwt';
-import bcrypt from 'bcryptjs';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+import { checkRegisterRateLimit, getClientIp } from "@/lib/auth/rate-limit";
+import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
 
-export async function POST(request: NextRequest) {
+const registerSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  birthDate: z.string().refine((date) => {
+    const d = new Date(date);
+    const now = new Date();
+    const age = now.getFullYear() - d.getFullYear();
+    return age >= 13 && age <= 120; // Validar edad mínima 13 años
+  }, "Debes tener al menos 13 años para registrarte"),
+});
+
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const { email, password, name } = body;
+    // Rate limiting
+    const ip = getClientIp(req);
+    const rateLimit = await checkRegisterRateLimit(ip);
 
-    // Validar campos requeridos
-    if (!email || !password || !name) {
+    if (!rateLimit.success) {
+      console.log(`[REGISTER] Rate limit exceeded for IP: ${ip}`);
       return NextResponse.json(
-        { error: 'Email, password y name son requeridos' },
-        { status: 400 }
+        {
+          error: `Demasiados intentos de registro. Por favor, intenta de nuevo en ${Math.ceil((rateLimit.reset - Date.now()) / 1000 / 60)} minutos.`,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Remaining": rateLimit.remaining.toString(),
+            "X-RateLimit-Reset": rateLimit.reset.toString(),
+            "Content-Type": "application/json",
+          },
+        }
       );
     }
 
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      console.error("[REGISTER] Error parsing request body:", error);
       return NextResponse.json(
-        { error: 'Email inválido' },
-        { status: 400 }
+        { error: "Datos de solicitud inválidos" },
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
     }
 
-    // Validar longitud de password
-    if (password.length < 8) {
+    // Validar datos
+    const validationResult = registerSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      console.log("[REGISTER] Validation failed:", validationResult.error.issues[0].message);
       return NextResponse.json(
-        { error: 'La contraseña debe tener al menos 8 caracteres' },
-        { status: 400 }
+        {
+          error: validationResult.error.issues[0].message
+        },
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
     }
+
+    const { email, password, name, birthDate } = validationResult.data;
 
     // Verificar si el usuario ya existe
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    let existingUser;
+    try {
+      existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+    } catch (dbError) {
+      console.error("[REGISTER] Database error checking existing user:", dbError);
+      return NextResponse.json(
+        { error: "Error de conexión con la base de datos. Por favor, intenta de nuevo." },
+        {
+          status: 503,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    if (existingUser) {
+      console.log(`[REGISTER] Email already registered: ${email}`);
+      return NextResponse.json(
+        { error: "Este email ya está registrado" },
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
 
     // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let user;
+    // Calcular edad y verificar automáticamente
+    const birthDateObj = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDateObj.getFullYear();
+    const monthDiff = today.getMonth() - birthDateObj.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+      age--;
+    }
 
-    if (existingUser) {
-      // Si el usuario existe pero no tiene contraseña (creado desde web con OAuth/email),
-      // actualizar con contraseña y nombre
-      if (!existingUser.password) {
-        user = await prisma.user.update({
-          where: { email },
-          data: {
-            password: hashedPassword,
-            name, // Actualizar nombre también
-          },
-        });
-      } else {
-        // Si ya tiene contraseña, no permitir registro
-        return NextResponse.json(
-          { error: 'El email ya está registrado. Por favor inicia sesión.' },
-          { status: 409 }
-        );
-      }
-    } else {
-      // Crear usuario nuevo
+    const isAdult = age >= 18;
+
+    // Crear usuario con verificación de edad automática
+    let user;
+    try {
       user = await prisma.user.create({
         data: {
           email,
-          name,
           password: hashedPassword,
-          plan: 'free',
+          name,
+          birthDate: birthDateObj,
+          plan: "free",
+          // Age verification automática en registro
+          ageVerified: true,
+          isAdult: isAdult,
+          ageVerifiedAt: new Date(),
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          birthDate: true,
+          plan: true,
+          ageVerified: true,
+          isAdult: true,
         },
       });
+      console.log(`[REGISTER] User created successfully: ${email} (Age: ${age}, Adult: ${isAdult})`);
+    } catch (dbError) {
+      console.error("[REGISTER] Database error creating user:", dbError);
+      return NextResponse.json(
+        { error: "Error al crear el usuario. Por favor, intenta de nuevo." },
+        {
+          status: 503,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     }
 
-    // Generar token JWT
-    const token = await generateToken({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
-      plan: user.plan,
-    });
+    // TRACKING: Age Verification Completed (Fase 6 - Compliance)
+    try {
+      await trackEvent(EventType.AGE_VERIFICATION_COMPLETED, {
+        userId: user.id,
+        age,
+        isAdult,
+        method: "birthdate",
+      });
 
-    // Devolver respuesta
+      // TRACKING: Signup Completed (Fase 6 - User Experience)
+      await trackEvent(EventType.SIGNUP_COMPLETED, {
+        userId: user.id,
+        method: "credentials",
+        email: user.email,
+      });
+    } catch (trackError) {
+      // No lanzar error si falla el tracking, solo loguearlo
+      console.error("[REGISTER] Error tracking events:", trackError);
+    }
+
     return NextResponse.json(
       {
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          plan: user.plan,
-          image: user.image,
-          createdAt: user.createdAt,
-        },
+        success: true,
+        message: "Usuario registrado exitosamente",
+        user
       },
-      { status: 201 }
+      {
+        status: 201,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
   } catch (error) {
-    console.error('Error en registro:', error);
+    console.error("[REGISTER] Unexpected error:", error);
     return NextResponse.json(
-      { error: 'Error al registrar usuario' },
-      { status: 500 }
+      {
+        error: "Error inesperado al registrar usuario. Por favor, intenta de nuevo.",
+        details: process.env.NODE_ENV === "development" ? String(error) : undefined,
+      },
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
 }

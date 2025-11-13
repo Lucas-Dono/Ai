@@ -171,7 +171,7 @@ export class HybridEmotionalOrchestrator {
     await prisma.internalState.update({
       where: { agentId },
       data: {
-        currentEmotions: newEmotionState,
+        currentEmotions: newEmotionState as any,
         moodValence: pad.valence,
         moodArousal: pad.arousal,
         moodDominance: pad.dominance,
@@ -257,7 +257,7 @@ export class HybridEmotionalOrchestrator {
     await prisma.internalState.update({
       where: { agentId },
       data: {
-        currentEmotions: plutchikState,
+        currentEmotions: plutchikState as any,
         moodValence: pad.valence,
         moodArousal: pad.arousal,
         moodDominance: pad.dominance,

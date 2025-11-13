@@ -8,7 +8,7 @@ import { CommentService } from '@/lib/services/comment.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,12 +16,31 @@ export async function POST(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    // RATE LIMITING for votes
+    const { checkVoteLimit } = await import('@/lib/redis/ratelimit');
+    const { prisma } = await import('@/lib/prisma');
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    });
+
+    const plan = user?.plan || 'free';
+
+    const limitCheck = await checkVoteLimit(session.user.id, plan);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { error: limitCheck.reason },
+        { status: 429 }
+      );
+    }
+
     const { voteType } = await request.json();
     if (!['upvote', 'downvote'].includes(voteType)) {
       return NextResponse.json({ error: 'Tipo de voto inválido' }, { status: 400 });
     }
 
-    const result = await CommentService.voteComment(params.id, session.user.id, voteType);
+    const result = await CommentService.voteComment((await params).id, session.user.id, voteType);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

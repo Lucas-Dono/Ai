@@ -57,7 +57,7 @@ async function testEmbeddingDetection() {
           {
             semanticMemory: {
               worldKnowledge: {
-                not: null,
+                not: {},
               },
             },
           },

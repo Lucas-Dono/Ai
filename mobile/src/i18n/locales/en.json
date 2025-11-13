@@ -1,0 +1,118 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "search": "Search..."
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "welcome": "Welcome to AI Creator",
+    "welcomeSubtitle": "Create and chat with emotional AI companions"
+  },
+  "home": {
+    "title": "Home",
+    "greeting": "Hello, {{name}}!",
+    "continueChat": "Continue Chat",
+    "myCompanions": "My Companions",
+    "featured": "Featured",
+    "forYou": "For You",
+    "trending": "Trending",
+    "createFirst": "Create your first AI companion"
+  },
+  "worlds": {
+    "title": "Worlds",
+    "create": "Create World",
+    "noWorlds": "You don't have any conversations",
+    "exploreCompanions": "Explore amazing companions on the home page",
+    "goHome": "Go Home"
+  },
+  "community": {
+    "title": "Community",
+    "createPost": "Create Post",
+    "noPosts": "No posts yet",
+    "hot": "Hot",
+    "new": "New",
+    "top": "Top"
+  },
+  "profile": {
+    "title": "Profile",
+    "level": "Level",
+    "points": "Points",
+    "badges": "Badges",
+    "settings": "Settings",
+    "logout": "Log Out"
+  },
+  "chat": {
+    "typeMessage": "Type a message...",
+    "sending": "Sending...",
+    "voiceInput": "Voice Input",
+    "imageInput": "Image",
+    "emojiPicker": "Emoji",
+    "gifPicker": "GIF"
+  },
+  "billing": {
+    "title": "Subscription",
+    "currentPlan": "Your Plan",
+    "upgrade": "Upgrade",
+    "selectPlan": "Select",
+    "free": "Free",
+    "plus": "Plus",
+    "ultra": "Ultra",
+    "perMonth": "/ month",
+    "features": "Features",
+    "usage": "Usage",
+    "messages": "Messages",
+    "voice": "Voice",
+    "images": "Images",
+    "agents": "Agents",
+    "unlimited": "Unlimited",
+    "notAvailable": "Not available",
+    "resetDate": "Resets: {{date}}"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "yourProgress": "Your Progress",
+    "all": "All",
+    "earned": "Earned",
+    "locked": "Locked",
+    "noEarned": "You haven't earned any badges yet",
+    "noLocked": "No locked badges"
+  },
+  "createWorld": {
+    "title": "Create World",
+    "basicInfo": "Basic Information",
+    "basicInfoSub": "Give your world a name and description",
+    "worldName": "World Name",
+    "worldNamePlaceholder": "E.g: Sakura Academy",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe your world, its atmosphere and what will happen...",
+    "genre": "Genre",
+    "genreSub": "What kind of experience do you want to create?",
+    "format": "Format",
+    "formatSub": "How do you want to experience your world?",
+    "characters": "Characters (Optional)",
+    "charactersSub": "Select the agents that will participate in this world",
+    "noAgents": "You don't have agents yet. Create one first.",
+    "createAgent": "Create Agent",
+    "createWorld": "Create World",
+    "worldCreated": "World Created!",
+    "worldCreatedMsg": "Your world \"{{name}}\" has been created successfully",
+    "goToWorld": "Go to World"
+  }
+}

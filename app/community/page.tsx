@@ -1,10 +1,13 @@
 /**
- * Community Feed Page - Página principal del feed de comunidad
+ * Community Feed Page - Feed principal mejorado con filtros B2C
  */
 
 "use client";
 
-import { useState, useEffect } from "react";
+export const dynamic = 'force-dynamic';
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
@@ -12,290 +15,298 @@ import {
   Star,
   Users,
   MessageSquare,
-  ThumbsUp,
-  ThumbsDown,
-  Share2,
   Plus,
+  Search,
+  Sparkles,
+  HelpCircle,
+  BookOpen,
   Filter,
-  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-
-type FeedType = 'personalized' | 'hot' | 'new' | 'top' | 'following';
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  author: {
-    name: string;
-    avatar?: string;
-  };
-  community?: {
-    name: string;
-    color: string;
-  };
-  upvotes: number;
-  downvotes: number;
-  commentCount: number;
-  tags?: string[];
-  createdAt: string;
-  userVote?: 'upvote' | 'downvote' | null;
-}
+import { useFeed, type FeedFilter, type PostType } from "@/hooks/useFeed";
+import { PostCard } from "@/components/community";
+import { useTranslations } from "next-intl";
+import { usePopularCommunities } from "@/hooks/usePopularCommunities";
+import { ModerationSuggestions } from "@/components/moderation/ModerationSuggestions";
+import { PullToRefresh } from "@/components/mobile/PullToRefresh";
+import { EmptyFeed } from "@/components/ui/empty-states/empty-feed";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export default function CommunityPage() {
-  const [feedType, setFeedType] = useState<FeedType>('personalized');
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const t = useTranslations('community');
+  const router = useRouter();
+  const [feedFilter, setFeedFilter] = useState<FeedFilter>('hot');
+  const [postType, setPostType] = useState<PostType>('all');
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    loadFeed();
-  }, [feedType]);
+  const { posts, loading, votePost, savePost, loadMore, hasMore, refresh } = useFeed({
+    filter: feedFilter,
+    postType,
+  });
 
-  const loadFeed = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/community/feed?type=${feedType}`);
-      const data = await response.json();
-      setPosts(data.posts || []);
-    } catch (error) {
-      console.error('Error loading feed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVote = async (postId: string, voteType: 'upvote' | 'downvote') => {
-    try {
-      await fetch(`/api/community/posts/${postId}/vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ voteType }),
-      });
-      loadFeed();
-    } catch (error) {
-      console.error('Error voting:', error);
-    }
-  };
+  const { communities: popularCommunities, loading: communitiesLoading } = usePopularCommunities({
+    limit: 3,
+  });
 
   const feedTabs = [
-    { type: 'personalized' as FeedType, label: 'Para Ti', icon: Star },
-    { type: 'hot' as FeedType, label: 'Hot', icon: TrendingUp },
-    { type: 'new' as FeedType, label: 'Nuevo', icon: Clock },
-    { type: 'top' as FeedType, label: 'Top', icon: ThumbsUp },
-    { type: 'following' as FeedType, label: 'Siguiendo', icon: Users },
+    { type: 'hot' as FeedFilter, label: t('filters.feed.hot'), icon: TrendingUp },
+    { type: 'new' as FeedFilter, label: t('filters.feed.new'), icon: Clock },
+    { type: 'top' as FeedFilter, label: t('filters.feed.top'), icon: Star },
+    { type: 'following' as FeedFilter, label: t('filters.feed.following'), icon: Users },
+  ];
+
+  const postTypeTabs = [
+    { type: 'all' as PostType, label: t('filters.postType.all'), icon: Filter },
+    { type: 'showcase' as PostType, label: t('filters.postType.showcase'), icon: Sparkles },
+    { type: 'discussion' as PostType, label: t('filters.postType.discussion'), icon: MessageSquare },
+    { type: 'question' as PostType, label: t('filters.postType.question'), icon: HelpCircle },
+    { type: 'guide' as PostType, label: t('filters.postType.guide'), icon: BookOpen },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-border bg-card/95 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-              Community
-            </h1>
-            <Link href="/community/create">
-              <Button size="sm" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Crear Post
-              </Button>
-            </Link>
+    <ErrorBoundary variant="page">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pb-20 lg:pb-0" data-tour="community-feed">
+      {/* Hero Header */}
+      <div className="sticky top-0 z-10 border-b border-border/50 bg-card/80 backdrop-blur-xl safe-area-inset-top">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent mb-1 md:mb-2">
+                {t('header.title')}
+              </h1>
+              <p className="text-muted-foreground text-xs md:text-sm">
+                {t('header.subtitle')}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/community/share">
+                <Button variant="outline" size="lg" className="gap-2 min-h-[44px] md:min-h-0">
+                  <Sparkles className="h-4 md:h-5 w-4 md:w-5" />
+                  <span className="hidden sm:inline">{t('header.shareHub')}</span>
+                </Button>
+              </Link>
+              <Link href="/community/create">
+                <Button size="lg" className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 min-h-[44px] md:min-h-0" data-tour="create-post-button">
+                  <Plus className="h-4 md:h-5 w-4 md:w-5" />
+                  <span className="hidden sm:inline">{t('header.createPost')}</span>
+                  <span className="sm:hidden">{t('header.createPostShort')}</span>
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Search Bar */}
-          <div className="relative mb-4">
+          <div className="relative mb-3 md:mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar en la comunidad..."
+              placeholder={t('search.placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-background/50 border-border/50 h-11 md:h-10"
             />
           </div>
 
-          {/* Feed Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {/* Feed Filters */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-3 -mx-4 px-4 md:mx-0 md:px-0" data-tour="feed-filters">
             {feedTabs.map((tab) => (
               <button
                 key={tab.type}
-                onClick={() => setFeedType(tab.type)}
+                onClick={() => setFeedFilter(tab.type)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all",
-                  feedType === tab.type
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-accent hover:bg-accent/80 text-muted-foreground hover:text-foreground"
+                  "flex items-center gap-2 px-3 md:px-4 py-2.5 md:py-2 rounded-full whitespace-nowrap transition-all min-h-[44px] md:min-h-0",
+                  feedFilter === tab.type
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/50"
+                    : "bg-background/50 hover:bg-background/80 text-muted-foreground hover:text-foreground"
                 )}
               >
                 <tab.icon className="h-4 w-4" />
-                <span className="text-sm font-medium">{tab.label}</span>
+                <span className="text-xs md:text-sm font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Post Type Filters */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0" data-tour="post-type-filters">
+            {postTypeTabs.map((tab) => (
+              <button
+                key={tab.type}
+                onClick={() => setPostType(tab.type)}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-full whitespace-nowrap transition-all text-[10px] md:text-xs font-semibold min-h-[36px] md:min-h-0",
+                  postType === tab.type
+                    ? "bg-secondary text-secondary-foreground"
+                    : "bg-background/30 hover:bg-background/60 text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <tab.icon className="h-3 w-3" />
+                {tab.label}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Feed Content */}
-      <div className="max-w-5xl mx-auto px-6 py-6">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      {/* Main Content with Pull-to-Refresh */}
+      <PullToRefresh onRefresh={refresh} className="lg:h-auto">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Main Feed */}
+          <div className="lg:col-span-2 space-y-3 md:space-y-4">
+            {loading ? (
+              <div className="flex items-center justify-center py-12 md:py-20">
+                <LoadingIndicator
+                  variant="inline"
+                  size="lg"
+                  message={t('loading.feed')}
+                />
+              </div>
+            ) : posts.length === 0 ? (
+              // Empty State - Using EmptyFeed component
+              <EmptyFeed
+                title={t('empty.title')}
+                description={t('empty.description')}
+                actionLabel={t('empty.button')}
+                onAction={() => router.push('/community/create')}
+              />
+            ) : (
+              <>
+                {/* Posts List */}
+                <AnimatePresence mode="popLayout">
+                  {posts.map((post, index) => (
+                    <motion.div
+                      key={post.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <PostCard
+                        post={post}
+                        onVote={votePost}
+                        onSave={savePost}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {/* Load More */}
+                {hasMore && (
+                  <div className="flex justify-center pt-6">
+                    <Button
+                      onClick={loadMore}
+                      disabled={loading}
+                      variant="outline"
+                      size="lg"
+                      className="min-h-[44px]"
+                    >
+                      {loading ? t('loadMore.loading') : t('loadMore.button')}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        ) : posts.length === 0 ? (
-          // Empty State
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20 text-center"
-          >
-            <MessageSquare className="h-20 w-20 text-muted-foreground/50 mb-4" />
-            <h3 className="text-2xl font-bold mb-2">¡Comienza la conversación!</h3>
-            <p className="text-muted-foreground mb-6 max-w-md">
-              No hay posts todavía. Sé el primero en compartir algo interesante con la comunidad.
-            </p>
-            <Link href="/community/create">
-              <Button size="lg" className="gap-2">
-                <Plus className="h-5 w-5" />
-                Crear Primer Post
-              </Button>
-            </Link>
-          </motion.div>
-        ) : (
-          // Posts List
-          <div className="space-y-4">
-            <AnimatePresence>
-              {posts.map((post, index) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <PostCard post={post} onVote={handleVote} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+
+          {/* Sidebar - Hidden on mobile */}
+          <div className="hidden lg:block space-y-4">
+            {/* Moderation Suggestions */}
+            <ModerationSuggestions maxSuggestions={2} compact={true} />
+
+            {/* Popular Communities */}
+            <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-4" data-tour="popular-communities">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                {t('sidebar.popularCommunities.title')}
+              </h3>
+
+              {communitiesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-12 bg-accent/30 rounded-2xl" />
+                    </div>
+                  ))}
+                </div>
+              ) : popularCommunities.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {t('sidebar.popularCommunities.noCommunities') || 'Aún no hay comunidades creadas'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('sidebar.popularCommunities.beFirst') || '¡Sé el primero en crear una!'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {popularCommunities.map((community) => (
+                    <Link
+                      key={community.id}
+                      href={`/community/${community.slug}`}
+                      className="block hover:bg-accent/50 rounded-2xl p-2 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <div
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: community.primaryColor }}
+                        />
+                        <span className="font-semibold text-sm">{community.name}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t('sidebar.popularCommunities.members', {
+                          count: community.memberCount.toLocaleString()
+                        })}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-2 mt-4">
+                <Link href="/community/explore" className="flex-1">
+                  <Button variant="outline" size="sm" className="w-full">
+                    {t('sidebar.popularCommunities.viewAll')}
+                  </Button>
+                </Link>
+                <Link href="/community/communities/create" className="flex-1">
+                  <Button size="sm" className="w-full gap-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                    <Plus className="h-3 w-3" />
+                    {t('sidebar.popularCommunities.create')}
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Community Guidelines */}
+            <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-4">
+              <h3 className="font-semibold mb-3 text-sm">{t('sidebar.guidelines.title')}</h3>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1" />
+                  <span>{t('sidebar.guidelines.rule1')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1" />
+                  <span>{t('sidebar.guidelines.rule2')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1" />
+                  <span>{t('sidebar.guidelines.rule3')}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1" />
+                  <span>{t('sidebar.guidelines.rule4')}</span>
+                </li>
+              </ul>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+        </div>
+      </PullToRefresh>
     </div>
-  );
-}
-
-// PostCard Component
-function PostCard({ post, onVote }: { post: Post; onVote: (postId: string, voteType: 'upvote' | 'downvote') => void }) {
-  const voteScore = post.upvotes - post.downvotes;
-
-  return (
-    <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-all group">
-      {/* Community Badge */}
-      {post.community && (
-        <div className="flex items-center gap-2 mb-3">
-          <div
-            className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: post.community.color }}
-          />
-          <span className="text-sm font-semibold text-primary">
-            {post.community.name}
-          </span>
-        </div>
-      )}
-
-      {/* Author & Time */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-          <span className="text-xs font-semibold text-primary">
-            {post.author.name.slice(0, 2).toUpperCase()}
-          </span>
-        </div>
-        <div>
-          <p className="text-sm font-medium">{post.author.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {new Date(post.createdAt).toLocaleDateString('es-ES', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric'
-            })}
-          </p>
-        </div>
-      </div>
-
-      {/* Title & Content */}
-      <Link href={`/community/post/${post.id}`}>
-        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-          {post.title}
-        </h3>
-        <p className="text-muted-foreground mb-4 line-clamp-3">
-          {post.content}
-        </p>
-      </Link>
-
-      {/* Tags */}
-      {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {post.tags.slice(0, 3).map((tag, index) => (
-            <span
-              key={index}
-              className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-6">
-        {/* Voting */}
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant={post.userVote === 'upvote' ? 'default' : 'ghost'}
-            onClick={() => onVote(post.id, 'upvote')}
-            className="gap-1"
-          >
-            <ThumbsUp className="h-4 w-4" />
-            <span className="text-sm font-semibold">{post.upvotes}</span>
-          </Button>
-          <Button
-            size="sm"
-            variant={post.userVote === 'downvote' ? 'default' : 'ghost'}
-            onClick={() => onVote(post.id, 'downvote')}
-            className="gap-1"
-          >
-            <ThumbsDown className="h-4 w-4" />
-            <span className="text-sm font-semibold">{post.downvotes}</span>
-          </Button>
-        </div>
-
-        {/* Comments */}
-        <Link href={`/community/post/${post.id}#comments`}>
-          <Button size="sm" variant="ghost" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="text-sm">{post.commentCount}</span>
-          </Button>
-        </Link>
-
-        {/* Share */}
-        <Button size="sm" variant="ghost" className="gap-2">
-          <Share2 className="h-4 w-4" />
-        </Button>
-
-        {/* Vote Score */}
-        <div className="ml-auto">
-          <span className={cn(
-            "text-sm font-bold",
-            voteScore > 0 ? "text-green-500" : voteScore < 0 ? "text-red-500" : "text-muted-foreground"
-          )}>
-            {voteScore > 0 ? '+' : ''}{voteScore}
-          </span>
-        </div>
-      </div>
-    </div>
+    </ErrorBoundary>
   );
 }

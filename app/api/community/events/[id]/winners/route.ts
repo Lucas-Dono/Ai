@@ -8,7 +8,7 @@ import { EventService } from '@/lib/services/event.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -18,7 +18,7 @@ export async function POST(
 
     const { winners } = await request.json();
     const result = await EventService.declareWinners(
-      params.id,
+      (await params).id,
       session.user.id,
       winners
     );

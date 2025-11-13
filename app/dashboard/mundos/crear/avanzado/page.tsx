@@ -169,7 +169,7 @@ export default function AdvancedWorldCreatorPage() {
         </Link>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
             <Sliders className="h-7 w-7 text-white" />
           </div>
           <div>

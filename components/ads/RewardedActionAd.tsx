@@ -30,7 +30,7 @@ const ACTIONS = {
   share_twitter: {
     icon: Twitter,
     label: "Compartir en Twitter",
-    description: "Comparte sobre Creador de Inteligencias en Twitter",
+    description: "Comparte sobre Circuit Prompt AI en Twitter",
     reward: { messages: 5, images: 2 },
     action: "compartir",
   },
@@ -173,7 +173,7 @@ export function RewardedActionAd({
                   <button
                     key={actionKey}
                     onClick={() => setSelectedAction(actionKey)}
-                    className={`w-full p-4 rounded-lg border-2 transition-all hover:bg-accent ${
+                    className={`w-full p-4 rounded-2xl border-2 transition-all hover:bg-accent ${
                       selectedAction === actionKey
                         ? "border-primary bg-accent"
                         : "border-border"
@@ -199,7 +199,7 @@ export function RewardedActionAd({
             </div>
 
             {/* Banner Ad (AdSense) */}
-            <div className="bg-muted rounded-lg p-4 text-center">
+            <div className="bg-muted rounded-2xl p-4 text-center">
               <p className="text-xs text-muted-foreground mb-2">
                 Patrocinado
               </p>

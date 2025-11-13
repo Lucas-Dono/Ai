@@ -17,10 +17,10 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const theme = await MarketplaceThemeService.getThemeById(params.id);
+    const theme = await MarketplaceThemeService.getThemeById((await params).id);
 
     if (!theme) {
       return NextResponse.json({ error: 'Tema no encontrado' }, { status: 404 });
@@ -42,7 +42,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request);
@@ -54,7 +54,7 @@ export async function PUT(
     const body = await request.json();
 
     const theme = await MarketplaceThemeService.updateTheme(
-      params.id,
+      (await params).id,
       user.id,
       body
     );
@@ -84,7 +84,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request);
@@ -93,7 +93,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    await MarketplaceThemeService.deleteTheme(params.id, user.id);
+    await MarketplaceThemeService.deleteTheme((await params).id, user.id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

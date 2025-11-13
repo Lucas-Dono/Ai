@@ -23,7 +23,7 @@ interface OptionSelectorProps {
 
 export function OptionSelector({ options, onSelect, disabled }: OptionSelectorProps) {
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3" data-tour="option-selector">
       {options.map((option, index) => (
         <motion.div
           key={option.value}

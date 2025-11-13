@@ -4,25 +4,63 @@
 
 "use client";
 
-import { useState } from "react";
+export const dynamic = 'force-dynamic';
+
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Tag, Users } from "lucide-react";
+import { ArrowLeft, Tag, Users, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+
+interface Community {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  primaryColor?: string;
+  type: string;
+  description?: string;
+  memberCount: number;
+}
 
 export default function CreatePostPage() {
+  const t = useTranslations('community.create');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [loadingCommunities, setLoadingCommunities] = useState(true);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+    type: "discussion",
     tags: "",
     communityId: "",
+    isNSFW: false,
   });
+
+  // Cargar comunidades del usuario al montar el componente
+  useEffect(() => {
+    async function loadCommunities() {
+      try {
+        const response = await fetch('/api/community/my-communities');
+        if (response.ok) {
+          const data = await response.json();
+          setCommunities(data.communities || []);
+        }
+      } catch (error) {
+        console.error('Error loading communities:', error);
+      } finally {
+        setLoadingCommunities(false);
+      }
+    }
+
+    loadCommunities();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,21 +78,33 @@ export default function CreatePostPage() {
         body: JSON.stringify({
           title: formData.title,
           content: formData.content,
+          type: formData.type,
           tags,
           communityId: formData.communityId || null,
+          isNSFW: formData.isNSFW,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        router.push(`/community/post/${data.post.id}`);
+
+        // Check if user came from the community tour
+        const isFromTour = sessionStorage.getItem('community_tour_active') === 'true';
+
+        if (isFromTour) {
+          // Mark that the user created a post for the tour validation
+          sessionStorage.setItem('returned_from_create', 'true');
+        }
+
+        // Always redirect to community page to see the new post
+        router.push('/community');
       } else {
         const error = await response.json();
-        alert(error.error || 'Error al crear el post');
+        alert(error.error || t('errors.createPost'));
       }
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Error al crear el post');
+      alert(t('errors.createPost'));
     } finally {
       setLoading(false);
     }
@@ -69,10 +119,10 @@ export default function CreatePostPage() {
             <Link href="/community">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                Volver
+                {t('header.back')}
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">Crear Nuevo Post</h1>
+            <h1 className="text-2xl font-bold">{t('header.title')}</h1>
           </div>
         </div>
       </div>
@@ -88,11 +138,11 @@ export default function CreatePostPage() {
           {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium mb-2">
-              Título del Post
+              {t('form.title.label')}
             </label>
             <Input
               id="title"
-              placeholder="¿De qué quieres hablar?"
+              placeholder={t('form.title.placeholder')}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
@@ -100,18 +150,45 @@ export default function CreatePostPage() {
               className="text-lg"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              {formData.title.length}/200 caracteres
+              {t('form.title.charCount', { current: formData.title.length, max: 200 })}
+            </p>
+          </div>
+
+          {/* Type */}
+          <div>
+            <label htmlFor="type" className="block text-sm font-medium mb-2">
+              {t('form.type.label')}
+            </label>
+            <select
+              id="type"
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              className={cn(
+                "w-full px-3 py-2 rounded-md border border-input bg-background",
+                "focus:outline-none focus:ring-2 focus:ring-primary"
+              )}
+              required
+            >
+              <option value="discussion">{t('form.type.options.discussion')}</option>
+              <option value="question">{t('form.type.options.question')}</option>
+              <option value="showcase">{t('form.type.options.showcase')}</option>
+              <option value="help">{t('form.type.options.help')}</option>
+              <option value="research">{t('form.type.options.research')}</option>
+              <option value="announcement">{t('form.type.options.announcement')}</option>
+            </select>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t('form.type.hint')}
             </p>
           </div>
 
           {/* Content */}
           <div>
             <label htmlFor="content" className="block text-sm font-medium mb-2">
-              Contenido
+              {t('form.content.label')}
             </label>
             <Textarea
               id="content"
-              placeholder="Comparte tus pensamientos, experiencias o preguntas..."
+              placeholder={t('form.content.placeholder')}
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               required
@@ -120,7 +197,7 @@ export default function CreatePostPage() {
               className="resize-none"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              {formData.content.length}/5000 caracteres
+              {t('form.content.charCount', { current: formData.content.length, max: 5000 })}
             </p>
           </div>
 
@@ -128,16 +205,16 @@ export default function CreatePostPage() {
           <div>
             <label htmlFor="tags" className="block text-sm font-medium mb-2">
               <Tag className="h-4 w-4 inline mr-1" />
-              Tags (opcional)
+              {t('form.tags.label')}
             </label>
             <Input
               id="tags"
-              placeholder="ia, tecnología, tutorial (separados por comas)"
+              placeholder={t('form.tags.placeholder')}
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Ayuda a otros a encontrar tu post. Máximo 5 tags.
+              {t('form.tags.hint')}
             </p>
           </div>
 
@@ -145,7 +222,7 @@ export default function CreatePostPage() {
           <div>
             <label htmlFor="community" className="block text-sm font-medium mb-2">
               <Users className="h-4 w-4 inline mr-1" />
-              Comunidad (opcional)
+              {t('form.community.label')}
             </label>
             <select
               id="community"
@@ -155,20 +232,64 @@ export default function CreatePostPage() {
                 "w-full px-3 py-2 rounded-md border border-input bg-background",
                 "focus:outline-none focus:ring-2 focus:ring-primary"
               )}
+              disabled={loadingCommunities}
             >
-              <option value="">Sin comunidad específica</option>
-              {/* TODO: Load communities from API */}
+              <option value="">
+                {loadingCommunities
+                  ? 'Cargando comunidades...'
+                  : communities.length === 0
+                    ? 'Sin comunidades (Post global)'
+                    : t('form.community.placeholder')}
+              </option>
+              {communities.map((community) => (
+                <option key={community.id} value={community.id}>
+                  {community.name} ({community.memberCount} miembros)
+                </option>
+              ))}
             </select>
+            {!loadingCommunities && communities.length === 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                No eres miembro de ninguna comunidad. Tu post será global y visible para todos.
+              </p>
+            )}
+            {!loadingCommunities && communities.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Deja en blanco para crear un post global visible para todos.
+              </p>
+            )}
+          </div>
+
+          {/* NSFW Switch */}
+          <div className="flex items-start gap-3 p-4 border border-border rounded-2xl bg-background">
+            <div className="flex items-center h-6">
+              <input
+                type="checkbox"
+                id="nsfw"
+                checked={formData.isNSFW}
+                onChange={(e) => setFormData({ ...formData, isNSFW: e.target.checked })}
+                className="w-5 h-5 rounded border-border text-primary focus:ring-2 focus:ring-primary cursor-pointer"
+              />
+            </div>
+            <div className="flex-1">
+              <label htmlFor="nsfw" className="block text-sm font-medium mb-1 cursor-pointer flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                Marcar como NSFW (Contenido +18)
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Marca esta opción si tu post contiene contenido para adultos, violencia, lenguaje explícito o temas sensibles.
+                El contenido NSFW se mostrará con una advertencia y filtros visuales.
+              </p>
+            </div>
           </div>
 
           {/* Guidelines */}
-          <div className="bg-accent/50 border border-border rounded-lg p-4">
-            <h3 className="font-semibold mb-2 text-sm">Pautas de la Comunidad</h3>
+          <div className="bg-accent/50 border border-border rounded-2xl p-4">
+            <h3 className="font-semibold mb-2 text-sm">{t('guidelines.title')}</h3>
             <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• Sé respetuoso con los demás miembros</li>
-              <li>• No compartas contenido ofensivo o spam</li>
-              <li>• Usa tags relevantes para tu contenido</li>
-              <li>• Responde a los comentarios de manera constructiva</li>
+              <li>• {t('guidelines.rule1')}</li>
+              <li>• {t('guidelines.rule2')}</li>
+              <li>• {t('guidelines.rule3')}</li>
+              <li>• {t('guidelines.rule4')}</li>
             </ul>
           </div>
 
@@ -176,17 +297,17 @@ export default function CreatePostPage() {
           <div className="flex gap-3 justify-end pt-4">
             <Link href="/community">
               <Button variant="outline" type="button" disabled={loading}>
-                Cancelar
+                {t('actions.cancel')}
               </Button>
             </Link>
             <Button type="submit" disabled={loading || !formData.title || !formData.content}>
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Publicando...
+                  {t('actions.publishing')}
                 </>
               ) : (
-                'Publicar Post'
+                t('actions.publish')
               )}
             </Button>
           </div>

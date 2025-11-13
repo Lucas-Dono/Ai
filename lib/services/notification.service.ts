@@ -21,12 +21,16 @@ export const NotificationService = {
   async createNotification(data: CreateNotificationData) {
     const notification = await prisma.notification.create({
       data: {
-        userId: data.userId,
+        recipientId: data.userId,
         type: data.type,
         title: data.title,
         message: data.message,
         actionUrl: data.actionUrl,
-        metadata: data.metadata || {},
+        relatedId: (data.metadata as any)?.relatedId,
+        relatedType: (data.metadata as any)?.relatedType,
+        actorId: (data.metadata as any)?.actorId,
+        actorName: (data.metadata as any)?.actorName,
+        actorAvatar: (data.metadata as any)?.actorAvatar,
       },
     });
 
@@ -55,7 +59,18 @@ export const NotificationService = {
    */
   async createBulkNotifications(notifications: CreateNotificationData[]) {
     const created = await prisma.notification.createMany({
-      data: notifications,
+      data: notifications.map(n => ({
+        recipientId: n.userId,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        actionUrl: n.actionUrl,
+        relatedId: (n.metadata as any)?.relatedId,
+        relatedType: (n.metadata as any)?.relatedType,
+        actorId: (n.metadata as any)?.actorId,
+        actorName: (n.metadata as any)?.actorName,
+        actorAvatar: (n.metadata as any)?.actorAvatar,
+      })),
     });
 
     return created;
@@ -67,13 +82,13 @@ export const NotificationService = {
   async getUserNotifications(userId: string, page = 1, limit = 50) {
     const [notifications, total, unreadCount] = await Promise.all([
       prisma.notification.findMany({
-        where: { userId },
+        where: { recipientId: userId },
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.notification.count({ where: { userId } }),
-      prisma.notification.count({ where: { userId, isRead: false } }),
+      prisma.notification.count({ where: { recipientId: userId } }),
+      prisma.notification.count({ where: { recipientId: userId, isRead: false } }),
     ]);
 
     return {
@@ -93,7 +108,7 @@ export const NotificationService = {
       where: { id: notificationId },
     });
 
-    if (!notification || notification.userId !== userId) {
+    if (!notification || notification.recipientId !== userId) {
       throw new Error('Notificación no encontrada');
     }
 
@@ -111,7 +126,7 @@ export const NotificationService = {
   async markAllAsRead(userId: string) {
     await prisma.notification.updateMany({
       where: {
-        userId,
+        recipientId: userId,
         isRead: false,
       },
       data: {
@@ -130,7 +145,7 @@ export const NotificationService = {
       where: { id: notificationId },
     });
 
-    if (!notification || notification.userId !== userId) {
+    if (!notification || notification.recipientId !== userId) {
       throw new Error('Notificación no encontrada');
     }
 
@@ -146,7 +161,7 @@ export const NotificationService = {
    */
   async deleteAllNotifications(userId: string) {
     await prisma.notification.deleteMany({
-      where: { userId },
+      where: { recipientId: userId },
     });
 
     return { success: true };
@@ -158,7 +173,7 @@ export const NotificationService = {
   async getUnreadCount(userId: string) {
     const count = await prisma.notification.count({
       where: {
-        userId,
+        recipientId: userId,
         isRead: false,
       },
     });

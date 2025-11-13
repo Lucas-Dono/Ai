@@ -19,6 +19,7 @@ import {
 import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 import { BehavioralCuesMapper } from "./behavioral-cues";
 import { AntiSycophancySystem } from "./anti-sycophancy";
+import { intelligentStorageSystem, type StorageDecision } from "../memory/intelligent-storage";
 
 // Optional: Behavior system integration
 import type { BehaviorIntensityResult } from "@/lib/behavior-system/types";
@@ -27,6 +28,9 @@ export class ResponseGenerator {
   private llmClient = getHybridLLMProvider();
   private cuesMapper = new BehavioralCuesMapper();
   private antiSycophancy = new AntiSycophancySystem();
+
+  // Storage decision para uso externo
+  public lastStorageDecision: StorageDecision | null = null;
 
   /**
    * Genera respuesta final
@@ -100,7 +104,40 @@ export class ResponseGenerator {
       // 6. Post-process response
       const cleanedResponse = this.postProcessResponse(response.text, behavioralCues);
 
-      // 7. Calcular metadata
+      // 7. INTELLIGENT STORAGE DECISION
+      // Usar sistema multi-factor en lugar de cálculo simple
+      console.log("[ResponseGenerator] Running intelligent storage analysis...");
+      const storageDecision = await intelligentStorageSystem.decideStorage({
+        agentId: input.characterState.agentId,
+        userId: input.characterState.agentId, // TODO: Pasar userId real desde input
+        userMessage: input.userMessage,
+        characterResponse: cleanedResponse,
+        emotions: input.newEmotions,
+        appraisal: input.appraisal,
+        conversationHistory: input.characterState.workingMemory?.conversationBuffer?.map(cb => ({
+          userMessage: typeof cb === 'string' ? cb : (cb as any).userMessage || '',
+          timestamp: new Date(),
+        })),
+      });
+
+      // Guardar decisión para uso externo
+      this.lastStorageDecision = storageDecision;
+
+      console.log(
+        `[ResponseGenerator] Storage decision: ${storageDecision.shouldStore ? 'STORE' : 'SKIP'} ` +
+        `(score: ${storageDecision.finalScore.toFixed(1)}/${intelligentStorageSystem['STORAGE_THRESHOLD']})`
+      );
+
+      // Log factores que contribuyeron
+      if (storageDecision.shouldStore) {
+        const activeFactors = Object.entries(storageDecision.factors)
+          .filter(([_, score]) => score > 0)
+          .map(([name, score]) => `${name}:${score.toFixed(0)}`)
+          .join(', ');
+        console.log(`[ResponseGenerator] Active factors: ${activeFactors}`);
+      }
+
+      // 8. Calcular metadata
       const processingTimeMs = Date.now() - startTime;
       const emotionsTriggered = Object.keys(input.newEmotions).filter(
         (e) => input.newEmotions[e as keyof typeof input.newEmotions]! > 0.3
@@ -119,7 +156,15 @@ export class ResponseGenerator {
           userEmotion: this.detectUserEmotion(input.appraisal),
           characterEmotion: this.getPrimaryEmotion(input.newEmotions),
           emotionalValence: input.appraisal.desirabilityForUser,
-          importance: this.calculateMemoryImportance(input.appraisal, input.newEmotions),
+          importance: storageDecision.importance, // Usar importance del sistema inteligente
+          metadata: {
+            storageDecision: {
+              shouldStore: storageDecision.shouldStore,
+              score: storageDecision.finalScore,
+              factors: storageDecision.factors,
+              detectedEntities: storageDecision.detectedEntities,
+            },
+          },
         },
         metadata: {
           processingTimeMs,

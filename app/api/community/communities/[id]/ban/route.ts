@@ -8,7 +8,7 @@ import { CommunityService } from '@/lib/services/community.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -18,7 +18,7 @@ export async function POST(
 
     const { userId } = await request.json();
     const result = await CommunityService.banUser(
-      params.id,
+      (await params).id,
       userId,
       session.user.id
     );

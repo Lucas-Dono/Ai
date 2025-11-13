@@ -287,7 +287,7 @@ describe('LLMProvider - API Key Rotation', () => {
       expect(result).toBeDefined();
       expect(result.profile).toBeDefined();
       expect(result.systemPrompt).toBeDefined();
-      expect(result.profile.name).toBe('Test Agent');
+      expect((result.profile as any)?.name).toBe('Test Agent');
     });
 
     it('debe intentar con todas las keys antes de usar fallback', async () => {

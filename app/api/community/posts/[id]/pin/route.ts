@@ -8,7 +8,7 @@ import { PostService } from '@/lib/services/post.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,7 +16,7 @@ export async function POST(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const post = await PostService.pinPost(params.id, session.user.id);
+    const post = await PostService.pinPost((await params).id, session.user.id);
 
     return NextResponse.json(post);
   } catch (error: any) {

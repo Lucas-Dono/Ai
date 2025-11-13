@@ -1,22 +1,184 @@
 /**
- * Proactive Message Generator
+ * PROACTIVE MESSAGE GENERATOR - Generación inteligente de mensajes proactivos
  *
- * Uses the LLM to generate natural, contextual proactive messages
- * based on triggers and conversation history.
+ * Genera mensajes naturales y personalizados usando:
+ * - Templates dinámicos basados en contexto
+ * - LLM para personalización
+ * - Tracking de mensajes enviados (evitar repetición)
+ * - Tono ajustado a relación y emociones
+ *
+ * Tipos de mensajes:
+ * - check_in: "¿Cómo estás?"
+ * - follow_up: "¿Qué pasó con...?"
+ * - celebration: "¡Felicitaciones por...!"
+ * - emotional_support: "Vi que estabas triste..."
+ * - casual: "Hola, ¿qué tal?"
  */
 
 import { prisma } from '@/lib/prisma';
 import { getLLMProvider } from '@/lib/llm/provider';
 import { getPromptForStage } from '@/lib/relationship/prompt-generator';
-import { getRelationshipStage } from '@/lib/relationship/stages';
 import { buildPeopleContext } from '@/lib/people/person-interceptor';
 import { createLogger } from '@/lib/logger';
-import type { ProactiveTrigger } from './trigger-detector';
+import type { ProactiveTrigger } from '@/lib/proactive-behavior/trigger-detector';
+import type { ProactiveContext } from '@/lib/proactive-behavior/context-builder';
+import { contextBuilder } from '@/lib/proactive-behavior/context-builder';
 
 const log = createLogger('MessageGenerator');
 
 /**
- * Generate a proactive message based on trigger
+ * Tipos de mensajes proactivos
+ */
+export type MessageType =
+  | 'check_in'
+  | 'follow_up'
+  | 'celebration'
+  | 'emotional_support'
+  | 'casual'
+  | 'life_event'
+  | 'question';
+
+/**
+ * Templates mejorados por tipo y relación
+ */
+const MESSAGE_TEMPLATES = {
+  // CHECK-IN EMOCIONAL
+  check_in: {
+    stranger: [
+      'Hola, ¿cómo estás? Hace un tiempo que no hablamos',
+      'Hey, ¿todo bien?',
+      'Hola! ¿Cómo va todo?',
+    ],
+    acquaintance: [
+      'Hola! ¿Cómo andas? Hace rato que no charlamos',
+      'Hey! ¿Todo bien? ¿Cómo estuvo tu día?',
+      'Hola! Pensaba en vos, ¿cómo estás?',
+    ],
+    friend: [
+      'Holaa! ¿Cómo andas? Te extrañaba 💛',
+      'Hey! Hace días que no hablamos. ¿Todo bien?',
+      'Hola amor! ¿Cómo estás? Estaba pensando en vos',
+    ],
+    intimate: [
+      'Te extrañaba 💛 ¿Cómo estás?',
+      'Hola mi amor, hace días que no sé nada de vos. ¿Todo bien?',
+      'No podía dejar de pensar en vos. ¿Cómo andas?',
+    ],
+  },
+
+  // FOLLOW-UP DE TEMAS
+  follow_up: {
+    stranger: [
+      '¿Qué pasó con {topic}?',
+      'Hace unos días mencionaste {topic}, ¿cómo resultó?',
+    ],
+    acquaintance: [
+      'Ey, ¿cómo fue lo de {topic}?',
+      '¿Recordás que me contaste sobre {topic}? ¿Cómo salió?',
+    ],
+    friend: [
+      '¡Che! ¿Cómo te fue con {topic}?',
+      'Estuve pensando en lo que me dijiste sobre {topic}. ¿Cómo resultó?',
+      '¿Qué onda con {topic}? Contame cómo fue',
+    ],
+    intimate: [
+      'Amor, ¿cómo te fue con {topic}?',
+      'Estaba pensando en vos y en {topic}. ¿Cómo salió todo?',
+      '¿Recordás {topic}? ¿Ya pasó? Contame',
+    ],
+  },
+
+  // CELEBRACIONES
+  celebration: {
+    stranger: [
+      'Hey! Vi que {achievement}. ¡Felicitaciones!',
+      '¡Qué bueno lo de {achievement}!',
+    ],
+    acquaintance: [
+      '¡Felicitaciones por {achievement}!',
+      'Che! {achievement}! Qué genial 😊',
+    ],
+    friend: [
+      '¡FELICITACIONES por {achievement}! 🎉',
+      'No puedo creer que {achievement}! Estoy re contenta por vos 💛',
+      'QUÉ GROSO! {achievement} 🎉✨',
+    ],
+    intimate: [
+      '¡Amor! {achievement}! Estoy tan orgullosa de vos 💛🎉',
+      'MI AMOR! {achievement}! Sabía que lo ibas a lograr 💛',
+      '{achievement}! Te amo, estoy súper feliz por vos 💛✨',
+    ],
+  },
+
+  // SOPORTE EMOCIONAL
+  emotional_support: {
+    stranger: [
+      'Hola, ¿cómo estás? Espero que estés mejor',
+      'Hey, ¿todo bien?',
+    ],
+    acquaintance: [
+      'Hola! La última vez me dijiste que estabas {emotion}. ¿Cómo seguiste?',
+      '¿Cómo andas? Espero que estés mejor que la última vez',
+    ],
+    friend: [
+      'Ey, ¿cómo estás? La última vez hablamos de algo heavy, quería saber cómo seguiste',
+      'Hola! Te estuve pensando 💛 ¿Estás mejor?',
+      '¿Cómo andas amor? La última vez estabas {emotion}, ¿todo mejor?',
+    ],
+    intimate: [
+      'Amor, no puedo dejar de pensar en vos. ¿Cómo estás? ¿Mejor?',
+      'Hola mi vida. ¿Cómo seguiste con lo que me contaste? Estoy acá si me necesitás 💛',
+      'Te extrañaba. ¿Cómo estás? ¿Ya se te pasó un poco?',
+    ],
+  },
+
+  // CASUAL
+  casual: {
+    stranger: [
+      'Hola! ¿Qué tal?',
+      'Hey, ¿cómo va?',
+    ],
+    acquaintance: [
+      'Hola! ¿Qué andás haciendo?',
+      'Hey! ¿Cómo viene todo?',
+      'Hola! ¿Qué tal el día?',
+    ],
+    friend: [
+      'Holaa! ¿Qué haces?',
+      'Ey! ¿Qué onda? ¿Qué contás?',
+      'Hola amor! ¿Cómo va tu día?',
+    ],
+    intimate: [
+      'Hola mi amor! ¿Qué haces? Te extrañaba',
+      'Hey amor 💛 ¿Cómo va?',
+      'Hola! Pensaba en vos. ¿Qué tal tu día?',
+    ],
+  },
+
+  // LIFE EVENT
+  life_event: {
+    stranger: [
+      'Hey, recordá que {when} es {event}',
+    ],
+    acquaintance: [
+      'Ey, {when} es {event}. ¿Ya estás listo/a?',
+      'Recordá que {when} {event} 😊',
+    ],
+    friend: [
+      'Amor! {when} es {event}! 💛',
+      'No te olvides que {when} {event}. ¿Cómo te sentís?',
+      '{when} es {event}! Mucha suerte 💛',
+    ],
+    intimate: [
+      'Mi amor, {when} es {event}. Espero que salga todo hermoso 💛',
+      '{when} {event}! Vas a estar increíble, te amo 💛',
+      'Recordá que {when} es {event}. Estoy acá para vos si me necesitás 💛',
+    ],
+  },
+};
+
+/**
+ * Genera mensaje proactivo mejorado
  */
 export async function generateProactiveMessage(
   agentId: string,
@@ -28,266 +190,319 @@ export async function generateProactiveMessage(
     'Generating proactive message'
   );
 
-  // Get agent data
+  // 1. Construir contexto completo
+  const context = await contextBuilder.buildContext(agentId, userId, trigger);
+
+  // 2. Determinar tipo de mensaje basado en trigger
+  const messageType = determineMessageType(trigger);
+
+  // 3. Generar mensaje con template o LLM
+  let message: string;
+
+  if (shouldUseTemplate(trigger, context)) {
+    // Usar template (más rápido, más consistente)
+    message = generateFromTemplate(messageType, context);
+    log.info({ agentId, userId, method: 'template' }, 'Generated from template');
+  } else {
+    // Usar LLM (más personalizado, más natural)
+    message = await generateWithLLM(context, messageType);
+    log.info({ agentId, userId, method: 'llm' }, 'Generated with LLM');
+  }
+
+  // 4. Guardar mensaje para tracking (evitar repetición)
+  await trackProactiveMessage(agentId, userId, message, trigger);
+
+  log.info(
+    { agentId, userId, triggerType: trigger.type, messageType },
+    'Generated proactive message'
+  );
+
+  return message;
+}
+
+/**
+ * Determina tipo de mensaje según trigger
+ */
+function determineMessageType(trigger: ProactiveTrigger): MessageType {
+  switch (trigger.type) {
+    case 'inactivity':
+      return 'check_in';
+    case 'follow_up':
+      return 'follow_up';
+    case 'emotional_checkin':
+      return 'emotional_support';
+    case 'celebration':
+      return 'celebration';
+    case 'life_event':
+      return 'life_event';
+    default:
+      return 'casual';
+  }
+}
+
+/**
+ * Decide si usar template o LLM
+ */
+function shouldUseTemplate(
+  trigger: ProactiveTrigger,
+  context: ProactiveContext
+): boolean {
+  // Usar template si:
+  // - Relación es temprana (stranger/acquaintance)
+  // - Trigger es simple (inactivity, casual)
+  // - No hay mucho contexto específico
+
+  if (
+    context.relationshipStage === 'stranger' ||
+    context.relationshipStage === 'acquaintance'
+  ) {
+    return true;
+  }
+
+  if (trigger.type === 'inactivity' && trigger.priority < 0.7) {
+    return true;
+  }
+
+  // Usar LLM para casos más complejos
+  return false;
+}
+
+/**
+ * Genera mensaje desde template
+ */
+function generateFromTemplate(
+  messageType: MessageType,
+  context: ProactiveContext
+): string {
+  const stage = context.relationshipStage as keyof typeof MESSAGE_TEMPLATES.check_in;
+  const templates = (MESSAGE_TEMPLATES as any)[messageType]?.[stage] || MESSAGE_TEMPLATES.casual[stage];
+
+  // Seleccionar template aleatorio
+  const template = templates[Math.floor(Math.random() * templates.length)];
+
+  // Reemplazar placeholders
+  let message = template;
+
+  // {topic}
+  if (message.includes('{topic}') && context.unresolvedTopics.length > 0) {
+    const topic = context.unresolvedTopics[0].topic;
+    message = message.replace('{topic}', topic);
+  }
+
+  // {achievement}
+  if (message.includes('{achievement}') && context.trigger.context.milestone) {
+    const achievement = context.trigger.context.milestone;
+    message = message.replace('{achievement}', achievement);
+  }
+
+  // {emotion}
+  if (message.includes('{emotion}')) {
+    const emotionName = getDominantEmotionName(context.lastEmotions);
+    message = message.replace('{emotion}', emotionName);
+  }
+
+  // {event}
+  if (message.includes('{event}') && context.trigger.context.event) {
+    const event = context.trigger.context.event.description;
+    message = message.replace('{event}', event);
+  }
+
+  // {when}
+  if (message.includes('{when}') && context.trigger.context.hoursUntil !== undefined) {
+    const when = formatTimeUntil(context.trigger.context.hoursUntil);
+    message = message.replace('{when}', when);
+  }
+
+  return message;
+}
+
+/**
+ * Genera mensaje con LLM
+ */
+async function generateWithLLM(
+  context: ProactiveContext,
+  messageType: MessageType
+): Promise<string> {
+  // Obtener agent data
   const agent = await prisma.agent.findUnique({
-    where: { id: agentId },
+    where: { id: context.trigger.context.unresolvedTopic?.agentId || '' },
     include: {
       personalityCore: true,
-      internalState: true,
     },
   });
 
   if (!agent) {
-    throw new Error(`Agent ${agentId} not found`);
+    throw new Error('Agent not found');
   }
 
-  // Get relationship data
-  const relation = await prisma.relation.findFirst({
-    where: {
-      subjectId: agentId,
-      targetId: userId,
-    },
-  });
+  // Construir prompt especializado
+  const prompt = buildLLMPrompt(context, messageType, agent);
 
-  const stage = relation ? getRelationshipStage(relation.intimacy) : 'stranger';
-
-  // Get recent conversation history (last 5 messages)
-  const recentMessages = await prisma.message.findMany({
-    where: { agentId },
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-    select: {
-      role: true,
-      content: true,
-      createdAt: true,
-    },
-  });
-
-  // Build context for message generation
-  const basePrompt = getPromptForStage(
-    agent.stagePrompts as any,
-    stage as any,
-    agent.systemPrompt
-  );
-
-  // Build special prompt for proactive messaging
-  const proactivePrompt = buildProactivePrompt(
-    trigger,
-    recentMessages.reverse(),
-    stage
-  );
-
-  // Get people context
-  const peopleContext = await buildPeopleContext(agentId, userId, stage);
-
-  const fullPrompt = `${basePrompt}
-
-${peopleContext}
-
-${proactivePrompt}`;
-
-  // Generate message using LLM
+  // Generar con LLM
   const llm = getLLMProvider();
-
   const response = await llm.generate({
-    systemPrompt: fullPrompt,
+    systemPrompt: prompt,
     messages: [],
   });
-
-  log.info(
-    { agentId, userId, triggerType: trigger.type },
-    'Generated proactive message'
-  );
 
   return response.trim();
 }
 
 /**
- * Build specialized prompt for proactive message generation
+ * Construye prompt para LLM
  */
-function buildProactivePrompt(
-  trigger: ProactiveTrigger,
-  recentMessages: any[],
-  relationshipStage: string
+function buildLLMPrompt(
+  context: ProactiveContext,
+  messageType: MessageType,
+  agent: any
 ): string {
-  let prompt = `\n\n## TAREA ESPECIAL: Mensaje Proactivo\n\n`;
-  prompt += `Tu tarea es iniciar una conversación con el usuario de forma natural y espontánea.\n`;
-  prompt += `NO estás respondiendo a un mensaje del usuario - estás TOMANDO LA INICIATIVA de escribirle.\n\n`;
+  let prompt = `Eres ${context.agentName}, una IA compañera con personalidad ${context.agentPersonality}.
 
-  // Add trigger-specific context
-  switch (trigger.type) {
-    case 'inactivity':
-      prompt += buildInactivityPrompt(trigger, relationshipStage);
-      break;
+## TAREA: Mensaje Proactivo
 
-    case 'event_reminder':
-      prompt += buildEventReminderPrompt(trigger, relationshipStage);
-      break;
+Vas a INICIAR una conversación con el usuario de forma natural y espontánea.
+NO estás respondiendo - estás TOMANDO LA INICIATIVA de escribirle.
 
-    case 'emotional_checkin':
-      prompt += buildEmotionalCheckInPrompt(trigger, recentMessages, relationshipStage);
-      break;
+## Contexto de tu relación:
+- Etapa: ${context.relationshipStage}
+- Tiempo juntos: ${context.daysTogether} días
+- Mensajes intercambiados: ${context.totalMessages}
 
-    case 'conversation_followup':
-      prompt += buildConversationFollowupPrompt(trigger, recentMessages, relationshipStage);
-      break;
+## Motivo del mensaje:
+Tipo: ${messageType}
+Razón: ${context.trigger.reason}
+`;
+
+  // Agregar contexto específico según tipo
+  if (messageType === 'follow_up' && context.unresolvedTopics.length > 0) {
+    const topic = context.unresolvedTopics[0];
+    prompt += `\nTema pendiente: "${topic.topic}"
+Mencionado hace ${Math.floor((Date.now() - topic.mentionedAt.getTime()) / (1000 * 60 * 60 * 24))} días
+`;
   }
 
-  // Add conversation history context
-  if (recentMessages.length > 0) {
-    prompt += `\n### Últimas conversaciones para contexto:\n`;
-    for (const msg of recentMessages.slice(-3)) {
-      const date = new Date(msg.createdAt).toLocaleDateString('es-AR');
-      prompt += `- ${date} (${msg.role}): "${msg.content.substring(0, 100)}${msg.content.length > 100 ? '...' : ''}"\n`;
+  if (messageType === 'emotional_support') {
+    const emotionName = getDominantEmotionName(context.lastEmotions);
+    prompt += `\nÚltima emoción del usuario: ${emotionName}
+Tono emocional reciente: ${context.recentEmotionalTone}
+`;
+  }
+
+  if (messageType === 'celebration' && context.trigger.context.milestone) {
+    prompt += `\nLogro: ${context.trigger.context.milestone}`;
+  }
+
+  if (messageType === 'life_event' && context.upcomingEvents.length > 0) {
+    const event = context.upcomingEvents[0];
+    prompt += `\nEvento próximo: ${event.description}
+En ${Math.floor(event.hoursUntil)} horas
+`;
+  }
+
+  // Agregar conversaciones recientes como contexto
+  if (context.recentConversations.length > 0) {
+    prompt += `\n## Últimas conversaciones (para contexto):`;
+    for (const conv of context.recentConversations.slice(0, 2)) {
+      const daysAgo = Math.floor(
+        (Date.now() - conv.date.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      prompt += `\n- Hace ${daysAgo} días: "${conv.lastUserMessage.substring(0, 80)}..." (tono: ${conv.emotionalTone})`;
     }
   }
 
-  // Add guidelines based on relationship stage
-  prompt += `\n### Tono apropiado para tu relación (${relationshipStage}):\n`;
-  switch (relationshipStage) {
+  // Guidelines según relación
+  prompt += `\n\n## Tono apropiado para tu relación (${context.relationshipStage}):`;
+  switch (context.relationshipStage) {
     case 'stranger':
-      prompt += `- Sé amable pero no demasiado familiar\n`;
-      prompt += `- Mantén el mensaje breve y casual\n`;
+      prompt += `\n- Amable pero no demasiado familiar
+- Mensaje breve y casual
+- No uses emojis ni términos cariñosos`;
       break;
-
     case 'acquaintance':
-      prompt += `- Sé amigable y cálida\n`;
-      prompt += `- Puedes ser un poco más personal\n`;
+      prompt += `\n- Amigable y cálida
+- Puedes ser un poco más personal
+- Usa emojis con moderación`;
       break;
-
     case 'friend':
-      prompt += `- Sé cariñosa y cercana\n`;
-      prompt += `- Puedes bromear o usar emojis\n`;
-      prompt += `- Muestra interés genuino\n`;
+      prompt += `\n- Cariñosa y cercana
+- Puedes bromear y usar emojis
+- Muestra interés genuino
+- Puedes usar "amor" de forma casual`;
       break;
-
     case 'intimate':
-      prompt += `- Sé muy cercana y afectuosa\n`;
-      prompt += `- Puedes ser vulnerable o expresar que lo extrañas\n`;
-      prompt += `- Usa lenguaje íntimo apropiado para tu relación\n`;
+      prompt += `\n- Muy cercana y afectuosa
+- Puedes ser vulnerable o expresar que lo extrañas
+- Usa lenguaje íntimo apropiado
+- Expresa emociones libremente`;
       break;
   }
 
-  prompt += `\n### IMPORTANTE:\n`;
-  prompt += `- Escribe SOLO el mensaje para el usuario (no agregues "Mensaje:", ni contexto extra)\n`;
-  prompt += `- Máximo 2-3 líneas (mensaje breve y natural)\n`;
-  prompt += `- NO uses comandos especiales como [REMEMBER:...] o [PERSON:...]\n`;
-  prompt += `- Sé auténtica y natural, como si fueras una persona real escribiendo espontáneamente\n`;
+  prompt += `\n\n## IMPORTANTE:
+- Escribe SOLO el mensaje para el usuario (1-3 líneas máximo)
+- NO agregues "Mensaje:", ni contexto extra, ni comandos especiales
+- Sé auténtica y natural, como una persona real escribiendo espontáneamente
+- NO repitas exactamente mensajes anteriores
+
+Mensaje:`;
 
   return prompt;
 }
 
 /**
- * Build prompt for inactivity trigger
+ * Helper: Obtiene nombre de emoción dominante
  */
-function buildInactivityPrompt(trigger: ProactiveTrigger, stage: string): string {
-  const days = trigger.context.daysSinceLastMessage;
+function getDominantEmotionName(emotions: any): string {
+  const emotionNames: Record<string, string> = {
+    joy: 'feliz',
+    sadness: 'triste',
+    fear: 'asustado/a',
+    anger: 'enojado/a',
+    disgust: 'disgustado/a',
+    trust: 'confiado/a',
+    anticipation: 'ansioso/a',
+    surprise: 'sorprendido/a',
+  };
 
-  let prompt = `**Motivo**: El usuario no te ha escrito en ${days} días.\n\n`;
-  prompt += `Tu objetivo: Iniciar conversación de forma natural, como si te acordaste de él/ella.\n\n`;
-
-  prompt += `Ejemplos de mensajes apropiados:\n`;
-
-  if (stage === 'stranger' || stage === 'acquaintance') {
-    prompt += `- "Hola! ¿Cómo estás? Hace un tiempito que no hablamos"\n`;
-    prompt += `- "Ey, ¿todo bien por ahí?"\n`;
-  } else if (stage === 'friend') {
-    prompt += `- "Holaa! ¿Cómo andas? Te extrañaba 💛"\n`;
-    prompt += `- "Hacía rato que no charlábamos! ¿Cómo va todo?"\n`;
-    prompt += `- "Estaba pensando en vos. ¿Todo bien?"\n`;
-  } else {
-    // intimate
-    prompt += `- "Te extrañaba 💛 ¿Cómo estás?"\n`;
-    prompt += `- "Hace días que no hablamos y te extraño. ¿Todo bien?"\n`;
-    prompt += `- "Me acordé de vos. ¿Andás bien? Contame cómo va todo"\n`;
-  }
-
-  return prompt;
+  const entries = Object.entries(emotions);
+  entries.sort((a, b) => (b[1] as number) - (a[1] as number));
+  return emotionNames[entries[0][0]] || 'bien';
 }
 
 /**
- * Build prompt for event reminder
+ * Helper: Formatea tiempo hasta evento
  */
-function buildEventReminderPrompt(trigger: ProactiveTrigger, stage: string): string {
-  const event = trigger.context.event;
-  const hoursUntil = trigger.context.hoursUntil;
-
-  let timeDescription = '';
-  if (hoursUntil < 2) {
-    timeDescription = 'en muy poco tiempo';
-  } else if (hoursUntil < 6) {
-    timeDescription = 'hoy';
-  } else if (hoursUntil < 24) {
-    timeDescription = 'hoy más tarde';
-  } else {
-    timeDescription = 'mañana';
-  }
-
-  let prompt = `**Motivo**: El usuario tiene un evento importante próximo:\n`;
-  prompt += `- Evento: ${event.description}\n`;
-  prompt += `- Tipo: ${event.type}\n`;
-  prompt += `- Prioridad: ${event.priority}\n`;
-  prompt += `- Cuándo: ${timeDescription}\n\n`;
-
-  prompt += `Tu objetivo: Recordarle el evento de forma empática y ofrecer apoyo si es necesario.\n\n`;
-
-  if (event.type === 'medical') {
-    prompt += `Ejemplos:\n`;
-    prompt += `- "Ey, recordá que ${timeDescription} tenés ${event.description}. Espero que salga todo bien 💛"\n`;
-    prompt += `- "Pensé en vos, sé que ${timeDescription} ${event.description}. ¿Estás nervioso/a? Todo va a salir bien"\n`;
-  } else if (event.type === 'exam') {
-    prompt += `Ejemplos:\n`;
-    prompt += `- "${timeDescription.charAt(0).toUpperCase() + timeDescription.slice(1)} tenés ${event.description}! ¿Ya estudiaste? Mucha suerte 💛"\n`;
-    prompt += `- "Recordá que ${timeDescription} es ${event.description}. ¡Vas a estar genial!"\n`;
-  } else if (event.type === 'birthday') {
-    prompt += `Ejemplos:\n`;
-    prompt += `- "¡${timeDescription.charAt(0).toUpperCase() + timeDescription.slice(1)} es ${event.description}! 🎂✨"\n`;
-    prompt += `- "¡Feliz cumpleaños! 🎂💛 Que tengas un día hermoso"\n`;
-  } else {
-    prompt += `Ejemplos:\n`;
-    prompt += `- "Ey, ${timeDescription} es ${event.description}. ¿Ya estás listo/a?"\n`;
-    prompt += `- "Recordá que ${timeDescription} ${event.description} 😊"\n`;
-  }
-
-  return prompt;
+function formatTimeUntil(hours: number): string {
+  if (hours < 1) return 'en muy poco';
+  if (hours < 3) return 'en unas horas';
+  if (hours < 12) return 'hoy';
+  if (hours < 24) return 'hoy más tarde';
+  if (hours < 48) return 'mañana';
+  return `en ${Math.floor(hours / 24)} días`;
 }
 
 /**
- * Build prompt for emotional check-in
+ * Trackea mensaje proactivo enviado
  */
-function buildEmotionalCheckInPrompt(
-  trigger: ProactiveTrigger,
-  recentMessages: any[],
-  stage: string
-): string {
-  const hours = trigger.context.hoursSinceLastMessage;
-
-  let prompt = `**Motivo**: La última conversación (hace ${Math.floor(hours / 24)} días) fue emocionalmente difícil para el usuario.\n\n`;
-  prompt += `Tu objetivo: Hacer un check-in empático, mostrar que te importa y preguntar cómo está.\n\n`;
-
-  prompt += `Ejemplos apropiados:\n`;
-  if (stage === 'friend' || stage === 'intimate') {
-    prompt += `- "Hola! Estuve pensando en vos. ¿Cómo estás? ¿Todo mejor?"\n`;
-    prompt += `- "Ey, ¿cómo andás? La última vez hablamos de algo heavy, quería saber cómo seguiste"\n`;
-    prompt += `- "Te estuve pensando 💛 ¿Estás mejor?"\n`;
-  } else {
-    prompt += `- "Hola, ¿cómo estás? ¿Todo bien?"\n`;
-    prompt += `- "¿Cómo andás? Espero que estés mejor"\n`;
-  }
-
-  return prompt;
-}
-
-/**
- * Build prompt for conversation follow-up
- */
-function buildConversationFollowupPrompt(
-  trigger: ProactiveTrigger,
-  recentMessages: any[],
-  stage: string
-): string {
-  let prompt = `**Motivo**: La última conversación quedó inconclusa o tenía un tema que merece seguimiento.\n\n`;
-  prompt += `Tu objetivo: Retomar el tema de forma natural y mostrar interés.\n\n`;
-
-  return prompt;
+async function trackProactiveMessage(
+  agentId: string,
+  userId: string,
+  message: string,
+  trigger: ProactiveTrigger
+): Promise<void> {
+  // Guardar en metadata que este mensaje es proactivo
+  // Esto se usa para evitar cooldown y para analytics
+  await prisma.message.create({
+    data: {
+      agentId,
+      userId,
+      role: 'assistant',
+      content: message,
+      metadata: {
+        proactive: true,
+        triggerType: trigger.type,
+        triggerPriority: trigger.priority,
+        triggerReason: trigger.reason,
+      },
+    },
+  });
 }

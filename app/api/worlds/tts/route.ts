@@ -9,6 +9,8 @@ import { getElevenLabsClient } from '@/lib/voice-system/elevenlabs-client';
 import { cleanTextForTTS, hasSpokenContent } from '@/lib/voice-system/text-cleaner';
 import { getVoiceConfig, getVoiceSettings } from '@/lib/voice-system/voice-config';
 import { createLogger } from '@/lib/logger';
+import { canSendVoiceMessage, trackVoiceMessageUsage } from '@/lib/usage/daily-limits';
+import { checkCooldown, trackCooldown } from '@/lib/usage/cooldown-tracker';
 
 const log = createLogger('API/Worlds/TTS');
 
@@ -18,6 +20,68 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const userPlan = (session.user as any).plan || 'free';
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // COOLDOWN CHECK for Voice (Anti-Bot Protection)
+    // Free: N/A (sin acceso), Plus: 3s, Ultra: 5s
+    // Voice es COSTOSO ($0.17/msg), cooldown crítico para prevenir bots
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const voiceCooldownCheck = await checkCooldown(userId, "voice", userPlan);
+
+    if (!voiceCooldownCheck.allowed) {
+      log.warn({
+        userId,
+        userPlan,
+        waitMs: voiceCooldownCheck.waitMs,
+      }, 'Voice message blocked by cooldown');
+
+      return NextResponse.json({
+        error: voiceCooldownCheck.message || "Por favor espera antes de generar otro mensaje de voz",
+        code: "COOLDOWN_ACTIVE",
+        waitMs: voiceCooldownCheck.waitMs,
+        retryAfter: new Date(Date.now() + voiceCooldownCheck.waitMs).toISOString(),
+      }, {
+        status: 429,
+        headers: {
+          "Retry-After": Math.ceil(voiceCooldownCheck.waitMs / 1000).toString(),
+          "X-Cooldown-Type": "voice",
+          "X-Cooldown-Wait-Ms": voiceCooldownCheck.waitMs.toString(),
+        },
+      });
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // ANTI-ABUSE: Verificar límites de mensajes de voz ANTES de generar
+    // Voice es COSTOSO ($0.17/mensaje), protección crítica
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const voiceCheck = await canSendVoiceMessage(userId, userPlan);
+
+    if (!voiceCheck.allowed) {
+      log.warn({
+        userId,
+        userPlan,
+        currentDaily: voiceCheck.currentDaily,
+        dailyLimit: voiceCheck.dailyLimit,
+        currentMonthly: voiceCheck.currentMonthly,
+        monthlyLimit: voiceCheck.monthlyLimit,
+        reason: voiceCheck.reason,
+      }, 'Voice message limit exceeded');
+
+      return NextResponse.json(
+        {
+          error: voiceCheck.reason || 'Límite de mensajes de voz alcanzado',
+          currentDaily: voiceCheck.currentDaily,
+          dailyLimit: voiceCheck.dailyLimit,
+          currentMonthly: voiceCheck.currentMonthly,
+          monthlyLimit: voiceCheck.monthlyLimit,
+          upgradeUrl: '/pricing',
+        },
+        { status: 429 }
+      );
     }
 
     const { text, voiceId, emotion } = await req.json();
@@ -76,6 +140,18 @@ export async function POST(req: NextRequest) {
       speed: voiceConfig.speed,
     }, 'TTS generated successfully');
 
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // ANTI-ABUSE: Registrar uso de mensaje de voz (después de éxito)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    await trackVoiceMessageUsage(userId);
+    log.info({ userId, userPlan }, 'Voice message usage tracked');
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // COOLDOWN TRACKING (after successful generation)
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    await trackCooldown(userId, "voice", userPlan);
+    log.info({ userId, userPlan }, 'Voice cooldown tracked successfully');
+
     return NextResponse.json({
       success: true,
       audioBase64,
@@ -83,6 +159,13 @@ export async function POST(req: NextRequest) {
       speed: voiceConfig.speed,   // Para aplicar velocidad en el cliente
       volume: voiceConfig.volume,  // Para aplicar volumen en el cliente
       cleanedText, // Para debug
+      // Incluir info de uso para mostrar al usuario
+      usage: {
+        currentDaily: voiceCheck.currentDaily + 1, // +1 porque ya se registró
+        dailyLimit: voiceCheck.dailyLimit,
+        currentMonthly: voiceCheck.currentMonthly + 1,
+        monthlyLimit: voiceCheck.monthlyLimit,
+      },
     });
   } catch (error) {
     log.error({ error }, 'Error generating TTS');

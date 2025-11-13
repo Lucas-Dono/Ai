@@ -32,7 +32,7 @@ export function useTyping(options: UseTypingOptions = {}): UseTypingReturn {
   } = options;
 
   const [isTyping, setIsTyping] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear timeout on unmount
   useEffect(() => {
@@ -88,7 +88,7 @@ export function useTyping(options: UseTypingOptions = {}): UseTypingReturn {
  */
 export function useRemoteTyping() {
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
-  const timeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const timeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
     // Clear all timeouts on unmount

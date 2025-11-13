@@ -8,7 +8,7 @@ import { NotificationService } from '@/lib/services/notification.service';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,7 +16,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const notification = await NotificationService.markAsRead(params.id, session.user.id);
+    const notification = await NotificationService.markAsRead((await params).id, session.user.id);
     return NextResponse.json(notification);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -28,7 +28,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -36,7 +36,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await NotificationService.deleteNotification(params.id, session.user.id);
+    const result = await NotificationService.deleteNotification((await params).id, session.user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

@@ -47,7 +47,7 @@ export function StatCard({
     >
       <Card className="p-6 hover:shadow-lg transition-shadow">
         <div className="flex items-center justify-between mb-4">
-          <div className={`p-3 rounded-lg ${colorClass}`}>
+          <div className={`p-3 rounded-2xl ${colorClass}`}>
             <Icon className="h-5 w-5" />
           </div>
           {trend && (

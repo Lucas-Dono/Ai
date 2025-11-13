@@ -57,7 +57,7 @@ export function AgentRatingSection({
 
   if (loading) {
     return (
-      <div className="animate-pulse bg-gray-800/30 rounded-xl p-6">
+      <div className="animate-pulse bg-gray-800/30 rounded-2xl p-6">
         <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
         <div className="h-4 bg-gray-700 rounded w-2/3"></div>
       </div>
@@ -96,7 +96,7 @@ export function AgentRatingSection({
         {hasReviews && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Left: Average Rating */}
-            <div className="flex flex-col items-center justify-center p-6 bg-gray-800/50 rounded-xl border border-gray-700/30">
+            <div className="flex flex-col items-center justify-center p-6 bg-gray-800/50 rounded-2xl border border-gray-700/30">
               <div className="text-5xl font-bold text-white mb-2">
                 {stats.averageRating.toFixed(1)}
               </div>
@@ -158,7 +158,7 @@ export function AgentRatingSection({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/30"
+                  className="bg-gray-800/30 rounded-2xl p-4 border border-gray-700/30"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">

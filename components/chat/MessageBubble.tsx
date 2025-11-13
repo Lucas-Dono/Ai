@@ -7,6 +7,7 @@ import { getInitials, generateGradient } from "@/lib/utils";
 import Image from "next/image";
 import { Play, Pause } from "lucide-react";
 import { useState, useRef } from "react";
+import { MemoryHighlight } from "./MemoryHighlight";
 
 interface GeneratedMultimedia {
   type: "image" | "audio";
@@ -26,6 +27,13 @@ interface MessageMetadata {
   gifDescription?: string;
   audioDuration?: number;
   multimedia?: GeneratedMultimedia[];
+  memoryReferences?: Array<{
+    type: "conversation" | "fact" | "event" | "person";
+    content: string;
+    originalTimestamp?: string;
+    context?: string;
+    confidence: number;
+  }>;
 }
 
 interface Message {
@@ -114,6 +122,28 @@ export function MessageBubble({ message, agentName, isUser }: MessageBubbleProps
           {/* TEXT MESSAGE */}
           {messageType === "text" && (
             <div className="px-6 py-3">
+              {/* Memory Highlights - Show BEFORE message content */}
+              {!isUserMessage &&
+                message.metadata?.memoryReferences &&
+                message.metadata.memoryReferences.length > 0 && (
+                  <div className="mb-3 space-y-2">
+                    {message.metadata.memoryReferences.map((memRef, idx) => (
+                      <MemoryHighlight
+                        key={idx}
+                        memory={{
+                          type: memRef.type,
+                          content: memRef.content,
+                          originalTimestamp: memRef.originalTimestamp
+                            ? new Date(memRef.originalTimestamp)
+                            : undefined,
+                          context: memRef.context,
+                          confidence: memRef.confidence,
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+
               <div className="whitespace-pre-wrap">{message.content}</div>
 
               {/* GENERATED MULTIMEDIA (imágenes y audios generados por IA) */}
@@ -123,7 +153,7 @@ export function MessageBubble({ message, agentName, isUser }: MessageBubbleProps
                     {message.metadata.multimedia.map((media, idx) => (
                       <div key={idx}>
                         {media.type === "image" && (
-                          <div className="relative rounded-lg overflow-hidden border border-border">
+                          <div className="relative rounded-2xl overflow-hidden border border-border">
                             <Image
                               src={media.url}
                               alt={media.description}
@@ -140,7 +170,7 @@ export function MessageBubble({ message, agentName, isUser }: MessageBubbleProps
                         )}
 
                         {media.type === "audio" && (
-                          <div className="bg-muted/50 rounded-lg p-3 flex items-center gap-3">
+                          <div className="bg-muted/50 rounded-2xl p-3 flex items-center gap-3">
                             <audio
                               src={media.url}
                               controls

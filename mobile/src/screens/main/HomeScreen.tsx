@@ -160,7 +160,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         <View style={styles.headerTop}>
           <View style={styles.brandContainer}>
             <Ionicons name="sparkles" size={24} color={colors.primary[500]} />
-            <Text style={styles.brandText}> Creador IA</Text>
+            <Text style={styles.brandText}> Circuit Prompt AI</Text>
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity
@@ -306,7 +306,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <SectionHeader
             title="Para Ti"
             subtitle="Basado en tus intereses"
-            onViewAll={() => navigation.navigate('MainTabs', { screen: 'Marketplace' })}
+            onViewAll={() => navigation.navigate('MainTabs', { screen: 'Community' })}
           />
           <FlatList
             horizontal
@@ -328,7 +328,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <SectionHeader
             title="Tendencias"
             subtitle="Los más populares ahora"
-            onViewAll={() => navigation.navigate('MainTabs', { screen: 'Marketplace' })}
+            onViewAll={() => navigation.navigate('MainTabs', { screen: 'Community' })}
           />
           <FlatList
             horizontal

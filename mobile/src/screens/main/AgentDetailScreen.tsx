@@ -68,7 +68,7 @@ export default function AgentDetailScreen({ navigation, route }: AgentDetailScre
   const loadAgent = async () => {
     try {
       setLoading(true);
-      const response = await AgentsService.getById(agentId);
+      const response = await AgentsService.getById(agentId) as any;
 
       if (response) {
         setAgent({
@@ -108,8 +108,8 @@ export default function AgentDetailScreen({ navigation, route }: AgentDetailScre
 
   const handleEdit = () => {
     if (!agent) return;
-    // TODO: Navegar a la pantalla de edición cuando esté lista
-    Alert.alert('Próximamente', 'La funcionalidad de edición estará disponible pronto');
+    // Navigate to EditAgent screen
+    navigation.navigate('EditAgent', { agentId: agent.id });
   };
 
   if (loading) {
@@ -231,20 +231,20 @@ export default function AgentDetailScreen({ navigation, route }: AgentDetailScre
         <Text style={styles.name}>{agent.name}</Text>
 
         {/* Rating (solo si es público y tiene reviews) */}
-        {agent.isPublic && agent.reviewCount > 0 && agent.rating ? (
+        {agent.isPublic && (agent.reviewCount ?? 0) > 0 && agent.rating ? (
           <View style={styles.ratingContainer}>
             <Ionicons name="star" size={16} color={colors.warning.main} />
             <Text style={styles.rating}> {agent.rating.toFixed(1)}</Text>
-            <Text style={styles.reviews}> ({agent.reviewCount} reseñas)</Text>
+            <Text style={styles.reviews}> ({agent.reviewCount ?? 0} reseñas)</Text>
           </View>
         ) : null}
 
         {/* Stats */}
-        {agent.chatCount > 0 ? (
+        {(agent.chatCount ?? 0) > 0 ? (
           <View style={styles.statsContainer}>
             <View style={styles.stat}>
               <Ionicons name="chatbubbles" size={20} color={colors.primary[400]} />
-              <Text style={styles.statValue}> {agent.chatCount.toLocaleString()}</Text>
+              <Text style={styles.statValue}> {(agent.chatCount ?? 0).toLocaleString()}</Text>
               <Text style={styles.statLabel}> conversaciones</Text>
             </View>
           </View>

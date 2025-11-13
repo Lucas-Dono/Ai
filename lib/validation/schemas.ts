@@ -125,13 +125,16 @@ export function safeValidate<T extends z.ZodType>(
 /**
  * Format Zod errors for API responses
  */
-export function formatZodError(error: z.ZodError) {
+export function formatZodError(error: z.ZodError): {
+  message: string;
+  errors: Array<{ field: string; message: string; code: string }>;
+} {
   return {
     message: 'Validation failed',
-    errors: error.issues.map((err: any) => ({
-      field: err.path.join('.'),
-      message: err.message,
-      code: err.code,
+    errors: error.issues.map((issue) => ({
+      field: issue.path.join('.'),
+      message: issue.message,
+      code: issue.code,
     })),
   };
 }

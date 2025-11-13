@@ -99,7 +99,7 @@ export function RatingModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 hover:bg-gray-700 rounded-2xl transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
@@ -170,7 +170,7 @@ export function RatingModal({
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm"
+                  className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm"
                 >
                   {error}
                 </motion.div>

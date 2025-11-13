@@ -39,7 +39,7 @@ export function Step3TemplateSelection({
   onBack
 }: Step3Props) {
   const [sortBy, setSortBy] = useState<'popularity' | 'complexity' | 'name'>('popularity');
-  const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<(WorldTemplate & { subGenreName: string }) | null>(null);
 
   // Obtener género y templates
   const genre = WORLD_GENRES.find(g => g.id === genreId);
@@ -366,7 +366,7 @@ export function Step3TemplateSelection({
               {/* AI Prompt Preview */}
               <div>
                 <h4 className="text-sm font-semibold mb-2">Ejemplo de Generación</h4>
-                <div className="bg-muted/50 p-3 rounded-lg text-xs md-text-secondary">
+                <div className="bg-muted/50 p-3 rounded-2xl text-xs md-text-secondary">
                   {previewTemplate.aiPromptTemplate.replace(
                     '{characterCount}',
                     String(previewTemplate.suggestedCharacterCount)

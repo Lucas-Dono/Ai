@@ -11,8 +11,7 @@ export interface CreateProjectData {
   tags: string[];
   objectives: string;
   methodology: string;
-  isPublic: boolean;
-  lookingForCollaborators: boolean;
+  openForContributions: boolean;
   requiredSkills?: string[];
 }
 
@@ -25,43 +24,46 @@ export interface UpdateProjectData {
   methodology?: string;
   findings?: string;
   conclusions?: string;
-  isPublic?: boolean;
-  lookingForCollaborators?: boolean;
+  openForContributions?: boolean;
   requiredSkills?: string[];
-  status?: 'draft' | 'active' | 'completed' | 'archived';
+  status?: 'draft' | 'peer_review' | 'published' | 'archived';
 }
 
 export interface CreateDatasetData {
   name: string;
   description: string;
-  dataType: string;
   format: string;
-  url?: string;
-  size?: number;
-  license?: string;
+  fileUrl: string;
+  fileSize: number;
+  rowCount?: number;
+  columnCount?: number;
+  schema?: any;
 }
 
 export const ResearchService = {
   /**
    * Crear proyecto de investigación
    */
-  async createProject(leaderId: string, data: CreateProjectData) {
+  async createProject(leadAuthorId: string, data: CreateProjectData) {
+    // Generate slug from title
+    const slug = data.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .substring(0, 50) + '-' + Math.random().toString(36).substring(2, 8);
+
     const project = await prisma.researchProject.create({
       data: {
-        leaderId,
+        leadAuthorId,
         title: data.title,
-        description: data.description,
+        slug,
+        abstract: data.description || '',
         category: data.category,
-        tags: data.tags,
-        objectives: data.objectives,
-        methodology: data.methodology,
-        isPublic: data.isPublic,
-        lookingForCollaborators: data.lookingForCollaborators,
-        requiredSkills: data.requiredSkills || [],
+        sections: data.objectives ? { objectives: data.objectives, methodology: data.methodology } : {},
         status: 'draft',
       },
       include: {
-        leader: {
+        leadAuthor: {
           select: {
             id: true,
             name: true,
@@ -75,9 +77,8 @@ export const ResearchService = {
     await prisma.researchContributor.create({
       data: {
         projectId: project.id,
-        userId: leaderId,
+        userId: leadAuthorId,
         role: 'lead',
-        canEdit: true,
       },
     });
 
@@ -93,7 +94,6 @@ export const ResearchService = {
       where: {
         projectId,
         userId,
-        canEdit: true,
       },
     });
 
@@ -105,28 +105,32 @@ export const ResearchService = {
       where: { id: projectId },
       data,
       include: {
-        leader: {
+        leadAuthor: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        contributors: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
+        contributors: true,
       },
     });
 
-    return updated;
+    // Fetch user data for contributors separately
+    const contributorUserIds = updated.contributors.map(c => c.userId);
+    const users = await prisma.user.findMany({
+      where: { id: { in: contributorUserIds } },
+      select: { id: true, name: true, image: true },
+    });
+    const usersMap = new Map(users.map(u => [u.id, u]));
+
+    return {
+      ...updated,
+      contributors: updated.contributors.map(c => ({
+        ...c,
+        user: usersMap.get(c.userId) || null,
+      })),
+    };
   },
 
   /**
@@ -136,7 +140,7 @@ export const ResearchService = {
     const project = await prisma.researchProject.findUnique({
       where: { id: projectId },
       include: {
-        leader: {
+        leadAuthor: {
           select: {
             id: true,
             name: true,
@@ -144,30 +148,12 @@ export const ResearchService = {
           },
         },
         contributors: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-          orderBy: { joinedAt: 'asc' },
+          orderBy: { addedAt: 'asc' },
         },
         datasets: {
           orderBy: { uploadedAt: 'desc' },
         },
         reviews: {
-          include: {
-            reviewer: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
           orderBy: { createdAt: 'desc' },
         },
       },
@@ -178,14 +164,36 @@ export const ResearchService = {
     }
 
     // Verificar si es público o si el usuario es colaborador
-    if (!project.isPublic) {
+    // Los proyectos con status "published" son públicos
+    if (project.status !== 'published') {
       const isContributor = project.contributors.some(c => c.userId === userId);
       if (!isContributor) {
         throw new Error('Este proyecto es privado');
       }
     }
 
-    return project;
+    // Fetch user data for contributors and reviewers separately
+    const contributorUserIds = project.contributors.map(c => c.userId);
+    const reviewerUserIds = project.reviews.map(r => r.reviewerId);
+    const allUserIds = [...new Set([...contributorUserIds, ...reviewerUserIds])];
+
+    const users = await prisma.user.findMany({
+      where: { id: { in: allUserIds } },
+      select: { id: true, name: true, image: true },
+    });
+    const usersMap = new Map(users.map(u => [u.id, u]));
+
+    return {
+      ...project,
+      contributors: project.contributors.map(c => ({
+        ...c,
+        user: usersMap.get(c.userId) || null,
+      })),
+      reviews: project.reviews.map(r => ({
+        ...r,
+        reviewer: usersMap.get(r.reviewerId) || null,
+      })),
+    };
   },
 
   /**
@@ -194,14 +202,13 @@ export const ResearchService = {
   async listProjects(filters: {
     category?: string;
     tags?: string[];
-    leaderId?: string;
+    leadAuthorId?: string;
     status?: string;
     search?: string;
-    lookingForCollaborators?: boolean;
-    isPublic?: boolean;
+    openForContributions?: boolean;
   } = {}, page = 1, limit = 25) {
     const where: any = {
-      isPublic: true,
+      status: 'published', // Only show published projects by default
     };
 
     if (filters.category) {
@@ -214,27 +221,22 @@ export const ResearchService = {
       };
     }
 
-    if (filters.leaderId) {
-      where.leaderId = filters.leaderId;
+    if (filters.leadAuthorId) {
+      where.leadAuthorId = filters.leadAuthorId;
     }
 
     if (filters.status) {
       where.status = filters.status;
     }
 
-    if (filters.lookingForCollaborators !== undefined) {
-      where.lookingForCollaborators = filters.lookingForCollaborators;
-    }
-
-    if (filters.isPublic !== undefined) {
-      where.isPublic = filters.isPublic;
+    if (filters.openForContributions !== undefined) {
+      where.openForContributions = filters.openForContributions;
     }
 
     if (filters.search) {
       where.OR = [
         { title: { contains: filters.search, mode: 'insensitive' } },
-        { description: { contains: filters.search, mode: 'insensitive' } },
-        { objectives: { contains: filters.search, mode: 'insensitive' } },
+        { abstract: { contains: filters.search, mode: 'insensitive' } },
       ];
     }
 
@@ -245,7 +247,7 @@ export const ResearchService = {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
-          leader: {
+          leadAuthor: {
             select: {
               id: true,
               name: true,
@@ -284,7 +286,7 @@ export const ResearchService = {
       throw new Error('Proyecto no encontrado');
     }
 
-    if (!project.lookingForCollaborators) {
+    if (!project.openForContributions) {
       throw new Error('Este proyecto no está buscando colaboradores');
     }
 
@@ -309,31 +311,34 @@ export const ResearchService = {
         userId,
         role: 'pending',
         contribution: message,
-        canEdit: false,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
       },
     });
 
-    return contributor;
+    // Fetch user data separately
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+      },
+    });
+
+    return {
+      ...contributor,
+      user,
+    };
   },
 
   /**
    * Aceptar colaborador (solo líder)
    */
-  async acceptContributor(projectId: string, contributorUserId: string, leaderId: string, role: string = 'contributor') {
+  async acceptContributor(projectId: string, contributorUserId: string, leadAuthorId: string, role: string = 'contributor') {
     const project = await prisma.researchProject.findUnique({
       where: { id: projectId },
     });
 
-    if (!project || project.leaderId !== leaderId) {
+    if (!project || project.leadAuthorId !== leadAuthorId) {
       throw new Error('No tienes permisos para aceptar colaboradores');
     }
 
@@ -346,15 +351,6 @@ export const ResearchService = {
       },
       data: {
         role,
-        canEdit: role === 'co-lead',
-      },
-    });
-
-    // Incrementar contador
-    await prisma.researchProject.update({
-      where: { id: projectId },
-      data: {
-        contributorCount: { increment: 1 },
       },
     });
 
@@ -364,16 +360,16 @@ export const ResearchService = {
   /**
    * Rechazar/remover colaborador
    */
-  async removeContributor(projectId: string, contributorUserId: string, leaderId: string) {
+  async removeContributor(projectId: string, contributorUserId: string, leadAuthorId: string) {
     const project = await prisma.researchProject.findUnique({
       where: { id: projectId },
     });
 
-    if (!project || project.leaderId !== leaderId) {
+    if (!project || project.leadAuthorId !== leadAuthorId) {
       throw new Error('No tienes permisos para remover colaboradores');
     }
 
-    if (contributorUserId === leaderId) {
+    if (contributorUserId === leadAuthorId) {
       throw new Error('No puedes remover al líder del proyecto');
     }
 
@@ -383,14 +379,6 @@ export const ResearchService = {
           projectId,
           userId: contributorUserId,
         },
-      },
-    });
-
-    // Decrementar contador
-    await prisma.researchProject.update({
-      where: { id: projectId },
-      data: {
-        contributorCount: { decrement: 1 },
       },
     });
 
@@ -417,14 +405,15 @@ export const ResearchService = {
     const dataset = await prisma.researchDataset.create({
       data: {
         projectId,
-        uploadedById: userId,
+        uploaderId: userId,
         name: data.name,
         description: data.description,
-        dataType: data.dataType,
         format: data.format,
-        url: data.url,
-        size: data.size,
-        license: data.license,
+        fileUrl: data.fileUrl,
+        fileSize: data.fileSize,
+        rowCount: data.rowCount,
+        columnCount: data.columnCount,
+        schema: data.schema,
       },
     });
 
@@ -447,55 +436,53 @@ export const ResearchService = {
       throw new Error('Proyecto no encontrado');
     }
 
-    if (project.status !== 'completed') {
-      throw new Error('Solo puedes revisar proyectos completados');
+    if (project.status !== 'peer_review' && project.status !== 'published' && project.status !== 'archived') {
+      throw new Error('Solo puedes revisar proyectos en revisión o publicados');
     }
 
     // Crear o actualizar review
-    const projectReview = await prisma.researchReview.upsert({
+    const existing = await prisma.researchReview.findFirst({
       where: {
-        projectId_reviewerId: {
-          projectId,
-          reviewerId,
-        },
-      },
-      create: {
         projectId,
         reviewerId,
-        rating,
-        review,
       },
-      update: {
-        rating,
-        review,
-      },
-      include: {
-        reviewer: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+    });
+
+    const projectReview = existing
+      ? await prisma.researchReview.update({
+          where: { id: existing.id },
+          data: {
+            rating,
+            comments: review,
           },
-        },
+        })
+      : await prisma.researchReview.create({
+          data: {
+            projectId,
+            reviewerId,
+            rating,
+            comments: review,
+            decision: 'approve',
+          },
+        });
+
+    // Note: averageRating and reviewCount fields don't exist in schema
+    // They would need to be calculated on-the-fly when querying
+
+    // Fetch reviewer data separately
+    const reviewer = await prisma.user.findUnique({
+      where: { id: reviewerId },
+      select: {
+        id: true,
+        name: true,
+        image: true,
       },
     });
 
-    // Recalcular promedio
-    const reviews = await prisma.researchReview.aggregate({
-      where: { projectId },
-      _avg: { rating: true },
-      _count: true,
-    });
-
-    await prisma.researchProject.update({
-      where: { id: projectId },
-      data: {
-        averageRating: reviews._avg.rating || 0,
-        reviewCount: reviews._count,
-      },
-    });
-
-    return projectReview;
+    return {
+      ...projectReview,
+      reviewer,
+    };
   },
 
   /**
@@ -510,14 +497,14 @@ export const ResearchService = {
       throw new Error('Proyecto no encontrado');
     }
 
-    if (project.leaderId !== userId) {
+    if (project.leadAuthorId !== userId) {
       throw new Error('Solo el líder puede publicar el proyecto');
     }
 
     const published = await prisma.researchProject.update({
       where: { id: projectId },
       data: {
-        status: 'active',
+        status: 'published',
         publishedAt: new Date(),
       },
     });
@@ -537,14 +524,14 @@ export const ResearchService = {
       throw new Error('Proyecto no encontrado');
     }
 
-    if (project.leaderId !== userId) {
+    if (project.leadAuthorId !== userId) {
       throw new Error('Solo el líder puede completar el proyecto');
     }
 
     const completed = await prisma.researchProject.update({
       where: { id: projectId },
       data: {
-        status: 'completed',
+        status: 'archived',
       },
     });
 

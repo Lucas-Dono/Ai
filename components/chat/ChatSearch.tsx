@@ -77,7 +77,7 @@ export function ChatSearch({
     <div className="bg-[#1f1f1f] border-b border-[#2a2a2a] px-4 py-2 space-y-2">
       {/* Barra de búsqueda principal */}
       <div className="flex items-center gap-2">
-        <div className="flex-1 flex items-center gap-2 bg-[#2a2a2a] rounded-lg px-3 py-2">
+        <div className="flex-1 flex items-center gap-2 bg-[#2a2a2a] rounded-2xl px-3 py-2">
           <Search className="h-4 w-4 text-gray-400" />
           <input
             type="text"

@@ -149,7 +149,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
                   gif.media_formats.gif.url,
                   gif.content_description || "GIF animado"
                 )}
-                className="relative aspect-square overflow-hidden rounded-lg hover:opacity-80 transition-opacity bg-muted group"
+                className="relative aspect-square overflow-hidden rounded-2xl hover:opacity-80 transition-opacity bg-muted group"
                 title={gif.content_description || "GIF"}
               >
                 <Image

@@ -7,21 +7,23 @@ import { motion } from "framer-motion";
 import { Sparkles, Sliders, ArrowLeft, Zap, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function WorldCreatorSelectionPage() {
   const router = useRouter();
+  const t = useTranslations("worlds.creator");
 
   const modes = [
     {
       id: "simple",
-      name: "Modo Simple",
+      name: t("modes.simple.name"),
       icon: Sparkles,
-      description: "Asistido por IA - Perfecto para comenzar",
+      description: t("modes.simple.description"),
       features: [
-        "Generación automática con IA",
-        "Templates predefinidos",
-        "Proceso guiado paso a paso",
-        "Ideal para principiantes",
+        t("modes.simple.features.0"),
+        t("modes.simple.features.1"),
+        t("modes.simple.features.2"),
+        t("modes.simple.features.3"),
       ],
       color: "from-primary to-secondary",
       route: "/dashboard/mundos/crear/simple",
@@ -29,14 +31,14 @@ export default function WorldCreatorSelectionPage() {
     },
     {
       id: "advanced",
-      name: "Modo Avanzado",
+      name: t("modes.advanced.name"),
       icon: Sliders,
-      description: "Control total - Para usuarios experimentados",
+      description: t("modes.advanced.description"),
       features: [
-        "Configuración manual completa",
-        "Sin límites de IA",
-        "Control total sobre prompts",
-        "Máxima personalización",
+        t("modes.advanced.features.0"),
+        t("modes.advanced.features.1"),
+        t("modes.advanced.features.2"),
+        t("modes.advanced.features.3"),
       ],
       color: "from-purple-500 to-pink-500",
       route: "/dashboard/mundos/crear/avanzado",
@@ -51,18 +53,18 @@ export default function WorldCreatorSelectionPage() {
         <Link href="/dashboard/mundos">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver a mundos
+            {t("backToWorlds")}
           </Button>
         </Link>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
             <Zap className="h-7 w-7 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold md-text-primary">Crear Nuevo Mundo</h1>
+            <h1 className="text-3xl font-bold md-text-primary">{t("title")}</h1>
             <p className="text-lg md-text-secondary">
-              Elige el modo que mejor se adapte a tu experiencia
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -94,7 +96,7 @@ export default function WorldCreatorSelectionPage() {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${mode.color} flex items-center justify-center`}>
+                        <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${mode.color} flex items-center justify-center`}>
                           <Icon className="h-6 w-6 text-white" />
                         </div>
                         <div>
@@ -103,7 +105,7 @@ export default function WorldCreatorSelectionPage() {
                           </h3>
                           {mode.recommended && (
                             <Badge variant="default" className="text-xs mt-1">
-                              Recomendado
+                              {t("recommended")}
                             </Badge>
                           )}
                         </div>
@@ -130,12 +132,12 @@ export default function WorldCreatorSelectionPage() {
                       {mode.recommended ? (
                         <>
                           <Sparkles className="h-4 w-4 mr-2" />
-                          Empezar con IA
+                          {t("cta.simple")}
                         </>
                       ) : (
                         <>
                           <Wrench className="h-4 w-4 mr-2" />
-                          Modo Experto
+                          {t("cta.advanced")}
                         </>
                       )}
                     </Button>
@@ -147,19 +149,19 @@ export default function WorldCreatorSelectionPage() {
         </div>
 
         {/* Info Section */}
-        <div className="mt-8 max-w-3xl mx-auto p-6 rounded-xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 border border-blue-500/20">
+        <div className="mt-8 max-w-3xl mx-auto p-6 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 border border-blue-500/20">
           <div className="flex items-start gap-4">
             <div className="text-3xl">💡</div>
             <div className="flex-1">
               <h3 className="font-semibold md-text-primary mb-2">
-                ¿Cuál modo elegir?
+                {t("help.title")}
               </h3>
               <div className="space-y-2 text-sm md-text-secondary">
                 <p>
-                  <strong className="text-primary">Modo Simple:</strong> Si es tu primera vez creando mundos o prefieres que la IA te ayude con sugerencias inteligentes. Perfecto para explorar rápidamente ideas.
+                  <strong className="text-primary">{t("help.simple.title")}</strong> {t("help.simple.description")}
                 </p>
                 <p>
-                  <strong className="text-purple-500">Modo Avanzado:</strong> Si tienes experiencia y quieres escribir tus propios system prompts, configurar cada detalle manualmente y tener control total sobre cada aspecto del mundo.
+                  <strong className="text-purple-500">{t("help.advanced.title")}</strong> {t("help.advanced.description")}
                 </p>
               </div>
             </div>

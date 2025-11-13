@@ -1,3 +1,6 @@
+import { llmLogger as log } from "@/lib/logging/loggers";
+import { createTimer } from "@/lib/logging";
+
 export interface Message {
   role: "user" | "assistant" | "system";
   content: string;
@@ -8,6 +11,24 @@ export interface GenerateOptions {
   messages: Message[];
   temperature?: number;
   maxTokens?: number;
+}
+
+interface ProfileGenerationResult {
+  profile: {
+    basicIdentity?: Record<string, unknown>;
+    family?: Record<string, unknown>;
+    occupation?: Record<string, unknown>;
+    socialCircle?: Record<string, unknown>;
+    interests?: Record<string, unknown>;
+    dailyRoutine?: Record<string, unknown>;
+    lifeExperiences?: Record<string, unknown>;
+    mundaneDetails?: Record<string, unknown>;
+    innerWorld?: Record<string, unknown>;
+    personality?: Record<string, unknown>;
+    communication?: Record<string, unknown>;
+    presentTense?: Record<string, unknown>;
+  };
+  systemPrompt: string;
 }
 
 export class LLMProvider {
@@ -30,11 +51,14 @@ export class LLMProvider {
       throw new Error("No se encontraron API keys de Google AI. Configure GOOGLE_AI_API_KEY o GOOGLE_AI_API_KEY_1, GOOGLE_AI_API_KEY_2, etc.");
     }
 
-    console.log('[LLM] Inicializando Google AI (Gemini 2.5)...');
-    console.log('[LLM] API Keys disponibles:', this.apiKeys.length);
-    console.log('[LLM] API Key activa: #1');
-    console.log('[LLM] Modelo para prompts:', this.modelLite, '($0.40/M tokens)');
-    console.log('[LLM] Modelo para profiles:', this.modelFull, '($2.50/M tokens)');
+    log.info({
+      keysAvailable: this.apiKeys.length,
+      activeKey: 1,
+      modelLite: this.modelLite,
+      modelFull: this.modelFull,
+      costLite: '$0.40/M tokens',
+      costFull: '$2.50/M tokens'
+    }, 'Google AI (Gemini 2.5) initialized');
   }
 
   /**
@@ -77,11 +101,11 @@ export class LLMProvider {
 
     // Si volvimos al inicio, significa que probamos todas las keys
     if (this.currentKeyIndex === 0) {
-      console.error('[LLM] ⚠️  Todas las API keys de Gemini han sido intentadas');
+      log.error('All Gemini API keys have been attempted');
       return false;
     }
 
-    console.log(`[LLM] 🔄 Rotando a API key #${this.currentKeyIndex + 1}`);
+    log.info({ newKeyIndex: this.currentKeyIndex + 1 }, 'Rotating to next API key');
     return true;
   }
 
@@ -92,6 +116,7 @@ export class LLMProvider {
    */
   async generate(options: GenerateOptions): Promise<string> {
     const { systemPrompt, messages, temperature = 0.9, maxTokens = 1000 } = options;
+    const timer = createTimer(log, 'LLM generation');
 
     let lastError: Error | null = null;
     const maxRetries = this.apiKeys.length;
@@ -134,7 +159,13 @@ export class LLMProvider {
         }
 
         const currentKey = this.getCurrentApiKey();
-        console.log(`[LLM] Usando modelo: ${this.modelLite} con API key #${this.currentKeyIndex + 1}`);
+        log.debug({
+          model: this.modelLite,
+          keyIndex: this.currentKeyIndex + 1,
+          temperature,
+          maxTokens,
+          messageCount: messages.length
+        }, 'Calling Gemini API');
 
         const response = await fetch(
           `${this.baseURL}/models/${this.modelLite}:generateContent?key=${currentKey}`,
@@ -173,8 +204,13 @@ export class LLMProvider {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('[LLM] Gemini Flash-Lite HTTP error:', response.status);
-          console.error('[LLM] Gemini Flash-Lite error response:', errorText);
+
+          log.error({
+            status: response.status,
+            model: this.modelLite,
+            keyIndex: this.currentKeyIndex + 1,
+            errorText: errorText.substring(0, 200)
+          }, 'Gemini API error');
 
           // Detectar errores de cuota (429, 403, o mensajes de quota)
           const isQuotaError = response.status === 429 ||
@@ -183,7 +219,7 @@ export class LLMProvider {
                                errorText.toLowerCase().includes('rate limit');
 
           if (isQuotaError && this.rotateApiKey()) {
-            console.log('[LLM] Error de cuota detectado, intentando con siguiente API key...');
+            log.warn('Quota error detected, trying next API key');
             lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
             continue; // Reintentar con siguiente key
           }
@@ -192,39 +228,40 @@ export class LLMProvider {
         }
 
         const data = await response.json();
-        console.log('[LLM] Gemini Flash-Lite response received');
 
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
         if (!text) {
-          console.error('[LLM] Gemini Flash-Lite response sin texto:', JSON.stringify(data, null, 2));
-
           // Verificar si fue bloqueado por safety filters
           const finishReason = data.candidates?.[0]?.finishReason;
           const safetyRatings = data.candidates?.[0]?.safetyRatings;
 
           if (finishReason === 'SAFETY') {
-            console.error('[LLM] Respuesta bloqueada por filtros de seguridad:', safetyRatings);
+            log.error({ finishReason, safetyRatings }, 'Response blocked by safety filters');
             throw new Error("Gemini bloqueó la respuesta por filtros de seguridad. Verifica safetySettings.");
           }
 
+          log.error({ finishReason }, 'Gemini returned no text');
           throw new Error(`Gemini no retornó texto (finishReason: ${finishReason})`);
         }
 
+        timer.end({ model: this.modelLite, textLength: text.length });
         return text;
       } catch (error) {
         lastError = error as Error;
 
         // Si no es error de cuota, lanzar inmediatamente
         if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
-          console.error("[LLM] Error al generar respuesta:", error);
+          log.error({ err: error }, 'Error generating LLM response');
+          timer.fail(error);
           throw new Error("No se pudo generar una respuesta de la IA");
         }
       }
     }
 
     // Si llegamos aquí, todas las keys fallaron
-    console.error('[LLM] ❌ Todas las API keys de Gemini agotaron su cuota');
+    log.error('All Gemini API keys quota exhausted');
+    timer.fail(new Error('All API keys quota exhausted'));
     throw new Error("Todas las API keys de Gemini han agotado su cuota. Por favor, agregue más keys o espere a que se renueven.");
   }
 
@@ -235,18 +272,21 @@ export class LLMProvider {
    * Se ejecuta solo 1 vez por agente, por lo que el costo es mínimo.
    * Implementa rotación automática de API keys en caso de error de cuota.
    */
-  async generateProfile(rawData: Record<string, unknown>): Promise<{
-    profile: Record<string, unknown>;
-    systemPrompt: string;
-  }> {
+  async generateProfile(rawData: Record<string, unknown>): Promise<ProfileGenerationResult> {
     // ═══════════════════════════════════════════════════════════════════
     // NUEVO: INVESTIGACIÓN AUTOMÁTICA DE PERSONAJES PÚBLICOS
     // ═══════════════════════════════════════════════════════════════════
-    let researchData: {
-      detection: any;
-      biography: any | null;
+    interface CharacterResearchData {
+      detection: {
+        isPublicFigure: boolean;
+        confidence: number;
+        category?: string;
+      };
+      biography: any | null; // CharacterBiography type from character-research
       enhancedPrompt: string | null;
-    } | null = null;
+    }
+
+    let researchData: CharacterResearchData | null = null;
 
     try {
       const { researchCharacter } = await import('@/lib/profile/character-research');
@@ -257,12 +297,12 @@ export class LLMProvider {
       );
 
       if (researchData.enhancedPrompt) {
-        console.log('[LLM] ✅ Personaje público detectado, usando información verificada de web');
+        log.info('Public figure detected, using verified web information');
       } else {
-        console.log('[LLM] ℹ️ Personaje original o no público, usando generación estándar');
+        log.debug('Original or non-public character, using standard generation');
       }
     } catch (error) {
-      console.error('[LLM] ⚠️ Error en investigación de personaje, continuando con generación estándar:', error);
+      log.warn({ err: error }, 'Error researching character, continuing with standard generation');
       researchData = null;
     }
     // ═══════════════════════════════════════════════════════════════════
@@ -602,7 +642,11 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const currentKey = this.getCurrentApiKey();
-        console.log(`[LLM] Generando perfil con Gemini 2.5 Flash usando API key #${this.currentKeyIndex + 1}...`);
+        log.info({
+          model: this.modelFull,
+          keyIndex: this.currentKeyIndex + 1,
+          characterName: rawData.name
+        }, 'Generating character profile');
 
         const response = await fetch(
           `${this.baseURL}/models/${this.modelFull}:generateContent?key=${currentKey}`,
@@ -644,8 +688,13 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('[LLM] Gemini Flash HTTP error:', response.status);
-          console.error('[LLM] Gemini Flash error response:', errorText);
+
+          log.error({
+            status: response.status,
+            model: this.modelFull,
+            keyIndex: this.currentKeyIndex + 1,
+            errorText: errorText.substring(0, 200)
+          }, 'Gemini profile generation error');
 
           // Detectar errores de cuota (429, 403, o mensajes de quota)
           const isQuotaError = response.status === 429 ||
@@ -654,7 +703,7 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
                                errorText.toLowerCase().includes('rate limit');
 
           if (isQuotaError && this.rotateApiKey()) {
-            console.log('[LLM] Error de cuota detectado en generateProfile, intentando con siguiente API key...');
+            log.warn('Quota error in profile generation, trying next API key');
             lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
             continue; // Reintentar con siguiente key
           }
@@ -663,31 +712,30 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
         }
 
         const data = await response.json();
-        console.log('[LLM] Gemini Flash response received');
+        log.debug('Profile generation response received');
 
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!text) {
-          console.error('[LLM] Gemini Flash response sin texto:', JSON.stringify(data, null, 2));
-
           // Verificar si fue bloqueado por safety filters
           const finishReason = data.candidates?.[0]?.finishReason;
           const safetyRatings = data.candidates?.[0]?.safetyRatings;
 
           if (finishReason === 'SAFETY') {
-            console.error('[LLM] Respuesta bloqueada por filtros de seguridad:', safetyRatings);
+            log.error({ finishReason, safetyRatings }, 'Profile response blocked by safety filters');
             throw new Error("Gemini bloqueó la respuesta por filtros de seguridad. Verifica safetySettings.");
           }
 
+          log.error({ finishReason }, 'Gemini returned no text for profile');
           throw new Error(`Gemini no retornó texto (finishReason: ${finishReason})`);
         }
 
-        console.log('[LLM] Raw response text (first 1000 chars):', text.substring(0, 1000));
+        log.debug({ textLength: text.length }, 'Parsing profile JSON');
 
         // Estrategia 1: Intentar parsear directamente (si ya es JSON puro)
         try {
           const parsed = JSON.parse(text);
-          console.log('[LLM] JSON parseado directamente');
+          log.info('Profile JSON parsed successfully (direct)');
           return parsed;
         } catch (e) {
           // No es JSON puro, continuar con extracción
@@ -701,14 +749,14 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
           const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
           if (codeBlockMatch) {
             jsonText = codeBlockMatch[1];
-            console.log('[LLM] JSON extraído de code block');
+            log.debug('JSON extracted from code block');
           }
         }
 
         // Estrategia 3: Buscar el primer { y el último } balanceado
         const firstBrace = jsonText.indexOf('{');
         if (firstBrace === -1) {
-          console.error('[LLM] No se encontró { en la respuesta');
+          log.error('No opening brace found in response');
           throw new Error("No se pudo extraer JSON de la respuesta");
         }
 
@@ -727,20 +775,22 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
         }
 
         if (lastBrace === -1) {
-          console.error('[LLM] No se encontró } balanceado en la respuesta');
+          log.error('No balanced closing brace found in response');
           throw new Error("No se pudo extraer JSON de la respuesta");
         }
 
         const extractedJson = jsonText.substring(firstBrace, lastBrace + 1);
-        console.log('[LLM] JSON extraído con búsqueda de llaves balanceadas');
+        log.debug('JSON extracted with balanced brace search');
 
-        return JSON.parse(extractedJson);
+        const parsed = JSON.parse(extractedJson);
+        log.info({ characterName: rawData.name }, 'Profile generated successfully');
+        return parsed;
       } catch (error) {
         lastError = error as Error;
 
         // Si no es error de cuota, intentar con fallback
         if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
-          console.error("[LLM] Error al generar perfil, usando fallback:", error);
+          log.warn({ err: error, characterName: rawData.name }, 'Error generating profile, using fallback');
 
           // Fallback: devolver datos básicos pero con estructura completa
           const fallback = {
@@ -781,15 +831,14 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
             },
             systemPrompt: `${rawData.name} es una persona ${rawData.personality || "amigable y conversacional"}. ${rawData.kind === 'companion' ? 'Le gusta conectar emocionalmente con las personas' : 'Le gusta ayudar y ser útil'}. Su forma de comunicarse es ${rawData.tone || "cálida y accesible"}. ${rawData.purpose ? `Se dedica a ${rawData.purpose}.` : ''} Vive en Buenos Aires y tiene una personalidad equilibrada y empática. Aunque es reservado/a con desconocidos, se abre más a medida que genera confianza con las personas.`,
           };
-          console.log('[LLM] Usando perfil fallback con estructura mejorada');
+          log.info({ characterName: rawData.name }, 'Using enhanced fallback profile');
           return fallback;
         }
       }
     }
 
     // Si llegamos aquí, todas las keys fallaron por cuota
-    console.error('[LLM] ❌ Todas las API keys de Gemini agotaron su cuota en generateProfile');
-    console.error('[LLM] Usando fallback debido a agotamiento de cuota');
+    log.error({ characterName: rawData.name }, 'All Gemini API keys quota exhausted in profile generation');
 
     // En caso de agotamiento total, usar fallback en vez de fallar
     const fallback = {
@@ -830,7 +879,7 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
       },
       systemPrompt: `${rawData.name} es una persona ${rawData.personality || "amigable y conversacional"}. ${rawData.kind === 'companion' ? 'Le gusta conectar emocionalmente con las personas' : 'Le gusta ayudar y ser útil'}. Su forma de comunicarse es ${rawData.tone || "cálida y accesible"}. ${rawData.purpose ? `Se dedica a ${rawData.purpose}.` : ''} Vive en Buenos Aires y tiene una personalidad equilibrada y empática. Aunque es reservado/a con desconocidos, se abre más a medida que genera confianza con las personas.`,
     };
-    console.log('[LLM] Usando perfil fallback con estructura mejorada');
+    log.warn({ characterName: rawData.name }, 'Using quota exhaustion fallback profile');
     return fallback;
   }
 }

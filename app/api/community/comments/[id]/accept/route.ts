@@ -8,7 +8,7 @@ import { CommentService } from '@/lib/services/comment.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,7 +16,7 @@ export async function POST(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const comment = await CommentService.markAsAccepted(params.id, session.user.id);
+    const comment = await CommentService.markAsAccepted((await params).id, session.user.id);
     return NextResponse.json(comment);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

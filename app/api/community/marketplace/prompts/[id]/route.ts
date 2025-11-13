@@ -8,11 +8,11 @@ import { MarketplacePromptService } from '@/lib/services/marketplace-prompt.serv
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
-    const prompt = await MarketplacePromptService.getPrompt(params.id, session?.user?.id);
+    const prompt = await MarketplacePromptService.getPrompt((await params).id, session?.user?.id);
     return NextResponse.json(prompt);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 404 });
@@ -24,7 +24,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -34,7 +34,7 @@ export async function PATCH(
 
     const data = await request.json();
     const prompt = await MarketplacePromptService.updatePrompt(
-      params.id,
+      (await params).id,
       session.user.id,
       data
     );
@@ -50,7 +50,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -58,7 +58,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await MarketplacePromptService.deletePrompt(params.id, session.user.id);
+    const result = await MarketplacePromptService.deletePrompt((await params).id, session.user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

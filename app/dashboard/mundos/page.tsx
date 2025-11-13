@@ -10,7 +10,6 @@ import {
   Plus,
   Users,
   MessageCircle,
-  Loader2,
   Globe,
   Star,
   Copy,
@@ -47,6 +46,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslations } from "next-intl";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 interface Agent {
   id: string;
@@ -85,14 +88,15 @@ const categoryColors = {
   educacion: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
 };
 
-const difficultyLabels = {
-  beginner: { label: "Principiante", color: "bg-green-500" },
-  intermediate: { label: "Intermedio", color: "bg-yellow-500" },
-  advanced: { label: "Avanzado", color: "bg-red-500" },
-};
-
 export default function MundosPage() {
   const router = useRouter();
+  const t = useTranslations("worlds");
+
+  const difficultyLabels = {
+    beginner: { label: t("difficulty.beginner"), color: "bg-green-500" },
+    intermediate: { label: t("difficulty.intermediate"), color: "bg-yellow-500" },
+    advanced: { label: t("difficulty.advanced"), color: "bg-red-500" },
+  };
   const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -164,7 +168,7 @@ export default function MundosPage() {
           });
         }
 
-        alert(`Mundo "${newWorld.name}" creado exitosamente`);
+        alert(t("create.successMessage", { name: newWorld.name }));
         setDialogOpen(false);
         setNewWorldName("");
         setNewWorldDescription("");
@@ -173,7 +177,7 @@ export default function MundosPage() {
       }
     } catch (error) {
       console.error("Error creating world:", error);
-      alert("No se pudo crear el mundo");
+      alert(t("create.errorMessage"));
     } finally {
       setCreating(false);
     }
@@ -186,19 +190,19 @@ export default function MundosPage() {
       });
 
       if (res.ok) {
-        alert(`Se ha creado una copia de "${worldName}" en tus mundos`);
+        alert(t("actions.cloneSuccess", { name: worldName }));
         fetchWorlds();
       } else {
         throw new Error("Failed to clone");
       }
     } catch (error) {
       console.error("Error cloning world:", error);
-      alert("No se pudo clonar el mundo");
+      alert(t("actions.cloneError"));
     }
   };
 
   const handleDeleteWorld = async (worldId: string, worldName: string) => {
-    if (!confirm(`¿Estás seguro de eliminar "${worldName}"?`)) return;
+    if (!confirm(t("actions.deleteConfirm", { name: worldName }))) return;
 
     try {
       const res = await fetch(`/api/worlds/${worldId}`, {
@@ -206,14 +210,14 @@ export default function MundosPage() {
       });
 
       if (res.ok) {
-        alert(`Mundo "${worldName}" eliminado`);
+        alert(t("actions.deleteSuccess", { name: worldName }));
         fetchWorlds();
       } else {
         throw new Error("Failed to delete");
       }
     } catch (error) {
       console.error("Error deleting world:", error);
-      alert("No se pudo eliminar el mundo");
+      alert(t("actions.deleteError"));
     }
   };
 
@@ -264,13 +268,13 @@ export default function MundosPage() {
         }}
         className="md-animate-slide-up"
       >
-        <div className="md-card p-6 group relative">
+        <div className="md-card p-6 group relative hover-lift-glow">
           {/* Featured badge */}
           {world.featured && (
             <div className="absolute top-4 right-4 z-10">
               <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 text-xs px-2 py-1">
                 <Crown className="h-3 w-3 mr-1" />
-                Destacado
+                {t("card.featured")}
               </Badge>
             </div>
           )}
@@ -278,7 +282,7 @@ export default function MundosPage() {
           {/* Header */}
           <div className="flex items-start gap-4 mb-4">
             <div
-              className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0 md-shape-lg"
+              className="h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 md-shape-lg"
               style={{ background: generateGradient(world.name) }}
             >
               <Network className="h-7 w-7 text-white" />
@@ -287,7 +291,7 @@ export default function MundosPage() {
             <div className="flex-1 min-w-0">
               <h3 className="text-lg font-semibold md-text-primary truncate mb-1">{world.name}</h3>
               <p className="text-sm md-text-secondary line-clamp-2">
-                {world.description || "Mundo virtual sin descripción"}
+                {world.description || t("card.noDescription")}
               </p>
 
               {/* Badges */}
@@ -297,7 +301,7 @@ export default function MundosPage() {
                     variant="outline"
                     className={`text-xs ${categoryColors[world.category as keyof typeof categoryColors] || ""}`}
                   >
-                    {world.category}
+                    {t(`categories.${world.category}`)}
                   </Badge>
                 )}
                 {world.difficulty && (
@@ -356,7 +360,7 @@ export default function MundosPage() {
               <Link href={`/dashboard/mundos/${world.id}`} className="flex-1">
                 <Button variant="outline" className="w-full md-button-tonal py-2.5">
                   <Play className="h-4 w-4 mr-2" />
-                  Ver mundo
+                  {t("card.viewWorld")}
                 </Button>
               </Link>
               <Button
@@ -364,7 +368,7 @@ export default function MundosPage() {
                 onClick={() => handleCloneWorld(world.id, world.name)}
               >
                 <Copy className="h-4 w-4 mr-2" />
-                Clonar
+                {t("card.clone")}
               </Button>
             </div>
           ) : (
@@ -372,12 +376,12 @@ export default function MundosPage() {
               <Link href={`/dashboard/mundos/${world.id}`} className="flex-1">
                 <Button className="w-full md-button md-button-tonal py-2.5">
                   <Play className="h-4 w-4 mr-2" />
-                  Entrar
+                  {t("card.enter")}
                 </Button>
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="md-list-item p-2.5 rounded-lg h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors">
+                  <button className="md-list-item p-2.5 rounded-2xl h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors">
                     <MoreVertical className="h-4 w-4 md-text-secondary" />
                   </button>
                 </DropdownMenuTrigger>
@@ -387,14 +391,14 @@ export default function MundosPage() {
                     onClick={() => router.push(`/dashboard/mundos/${world.id}`)}
                   >
                     <Play className="h-4 w-4 mr-2" />
-                    Abrir
+                    {t("card.open")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="md-list-item cursor-pointer"
                     onClick={() => router.push(`/dashboard/mundos/${world.id}/settings`)}
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    Configurar
+                    {t("card.configure")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -402,7 +406,7 @@ export default function MundosPage() {
                     onClick={() => handleDeleteWorld(world.id, world.name)}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Eliminar
+                    {t("card.delete")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -414,21 +418,22 @@ export default function MundosPage() {
   };
 
   return (
+    <ErrorBoundary variant="page">
     <div className="min-h-screen">
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold md-text-primary mb-2">Mundos Virtuales</h1>
+            <h1 className="text-3xl font-bold md-text-primary mb-2">{t("title")}</h1>
             <p className="text-lg md-text-secondary">
-              Espacios donde múltiples IAs conviven e interactúan
+              {t("subtitle")}
             </p>
           </div>
 
-          <Link href="/dashboard/mundos/crear">
+          <Link href="/dashboard/mundos/crear" data-tour="create-world-button">
             <Button className="md-button md-button-filled px-6 py-2.5">
               <Plus className="h-5 w-5 mr-2" />
-              Crear Mundo
+              {t("createButton")}
             </Button>
           </Link>
 
@@ -437,48 +442,48 @@ export default function MundosPage() {
             <DialogTrigger asChild className="hidden">
               <Button className="md-button md-button-filled px-6 py-2.5">
                 <Plus className="h-5 w-5 mr-2" />
-                Crear Mundo (Viejo)
+                {t("create.buttonOld")}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl md-card">
               <DialogHeader>
-                <DialogTitle>Crear Nuevo Mundo</DialogTitle>
+                <DialogTitle>{t("create.dialogTitle")}</DialogTitle>
                 <DialogDescription>
-                  Un mundo es un espacio compartido donde múltiples IAs pueden interactuar entre sí
+                  {t("create.dialogDescription")}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 py-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Nombre del Mundo</label>
+                  <label className="text-sm font-medium mb-2 block">{t("create.nameLabel")}</label>
                   <Input
                     value={newWorldName}
                     onChange={(e) => setNewWorldName(e.target.value)}
-                    placeholder="Ej: Oficina Virtual, Familia Digital..."
+                    placeholder={t("create.namePlaceholder")}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Descripción (opcional)</label>
+                  <label className="text-sm font-medium mb-2 block">{t("create.descriptionLabel")}</label>
                   <Textarea
                     value={newWorldDescription}
                     onChange={(e) => setNewWorldDescription(e.target.value)}
-                    placeholder="Describe el propósito de este mundo..."
+                    placeholder={t("create.descriptionPlaceholder")}
                     rows={3}
                   />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-3 block">
-                    Selecciona las IAs que habitarán este mundo (mínimo 1)
+                    {t("create.selectAgentsLabel")}
                   </label>
                   {availableAgents.length === 0 ? (
-                    <div className="text-center py-8 border-2 border-dashed rounded-lg">
-                      <p className="text-sm md-text-secondary mb-3">No tienes IAs creadas aún</p>
+                    <div className="text-center py-8 border-2 border-dashed rounded-2xl">
+                      <p className="text-sm md-text-secondary mb-3">{t("create.noAgentsYet")}</p>
                       <Link href="/constructor">
                         <Button variant="outline" size="sm">
                           <Plus className="h-4 w-4 mr-2" />
-                          Crear tu primera IA
+                          {t("create.createFirstAgent")}
                         </Button>
                       </Link>
                     </div>
@@ -488,7 +493,7 @@ export default function MundosPage() {
                         <div
                           key={agent.id}
                           onClick={() => toggleAgent(agent.id)}
-                          className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                          className={`flex items-center gap-3 p-3 rounded-2xl border-2 cursor-pointer transition-all ${
                             selectedAgents.includes(agent.id)
                               ? "border-primary bg-primary/10"
                               : "border-border hover:border-primary/50"
@@ -505,7 +510,7 @@ export default function MundosPage() {
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-sm truncate">{agent.name}</div>
                             <Badge variant={agent.kind === "companion" ? "secondary" : "default"} className="text-xs">
-                              {agent.kind === "companion" ? "Compañero" : "Asistente"}
+                              {agent.kind === "companion" ? t("create.companion") : t("create.assistant")}
                             </Badge>
                           </div>
                         </div>
@@ -515,25 +520,18 @@ export default function MundosPage() {
                 </div>
 
                 <div className="flex gap-2 pt-4">
-                  <Button
+                  <LoadingButton
                     onClick={handleCreateWorld}
-                    disabled={!newWorldName.trim() || selectedAgents.length === 0 || creating}
+                    disabled={!newWorldName.trim() || selectedAgents.length === 0}
+                    loading={creating}
+                    loadingText={t("create.creating")}
                     className="flex-1 md-button md-button-filled"
                   >
-                    {creating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Creando...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Crear Mundo
-                      </>
-                    )}
-                  </Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t("create.createButton")}
+                  </LoadingButton>
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancelar
+                    {t("create.cancel")}
                   </Button>
                 </div>
               </div>
@@ -547,7 +545,7 @@ export default function MundosPage() {
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md-text-secondary" />
-            <Input placeholder="Buscar mundos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
+            <Input placeholder={t("search")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
           </div>
 
           {categories.length > 0 && (
@@ -557,7 +555,7 @@ export default function MundosPage() {
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
               >
-                Todos
+                {t("filters.all")}
               </Button>
               {categories.map((category) => (
                 <Button
@@ -569,7 +567,7 @@ export default function MundosPage() {
                     selectedCategory === category ? "" : categoryColors[category as keyof typeof categoryColors]
                   }
                 >
-                  {category}
+                  {t(`categories.${category}`)}
                 </Button>
               ))}
             </div>
@@ -580,7 +578,11 @@ export default function MundosPage() {
       {/* Main Content */}
       {loading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="h-10 w-10 animate-spin md-text-secondary" />
+          <LoadingIndicator
+            variant="inline"
+            size="lg"
+            message={t("loading.worlds")}
+          />
         </div>
       ) : worlds.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
@@ -588,32 +590,32 @@ export default function MundosPage() {
             <div className="h-20 w-20 rounded-full md-surface-container-highest flex items-center justify-center mx-auto mb-6">
               <Globe className="h-10 w-10 md-text-secondary" />
             </div>
-            <h2 className="text-xl font-semibold md-text-primary mb-2">No hay mundos disponibles</h2>
+            <h2 className="text-xl font-semibold md-text-primary mb-2">{t("empty.title")}</h2>
             <p className="md-text-secondary mb-6">
-              Parece que aún no se han creado mundos predefinidos. Crea tu primer mundo personalizado.
+              {t("empty.description")}
             </p>
             <Button onClick={() => setDialogOpen(true)} className="md-button md-button-filled px-6 py-2.5">
               <Plus className="h-5 w-5 mr-2" />
-              Crear tu primer mundo
+              {t("empty.createButton")}
             </Button>
           </div>
         </div>
       ) : (
         <Tabs defaultValue="predefined" className="space-y-6">
-          <TabsList className="md-surface-container-high p-1 rounded-xl">
+          <TabsList className="md-surface-container-high p-1 rounded-2xl">
             <TabsTrigger
               value="predefined"
-              className="px-6 py-2.5 rounded-lg data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm"
+              className="px-6 py-2.5 rounded-2xl data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm"
             >
               <Star className="h-4 w-4 mr-2" />
-              Explorar ({predefinedWorlds.length})
+              {t("tabs.explore")} ({predefinedWorlds.length})
             </TabsTrigger>
             <TabsTrigger
               value="my-worlds"
-              className="px-6 py-2.5 rounded-lg data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm"
+              className="px-6 py-2.5 rounded-2xl data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm"
             >
               <Users className="h-4 w-4 mr-2" />
-              Mis Mundos ({userWorlds.length})
+              {t("tabs.myWorlds")} ({userWorlds.length})
             </TabsTrigger>
           </TabsList>
 
@@ -623,7 +625,7 @@ export default function MundosPage() {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Crown className="h-5 w-5 text-yellow-500" />
-                  <h2 className="text-2xl font-bold md-text-primary">Mundos Destacados</h2>
+                  <h2 className="text-2xl font-bold md-text-primary">{t("sections.featured")}</h2>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {featuredWorlds.map((world) => (
@@ -635,7 +637,7 @@ export default function MundosPage() {
 
             {filteredPredefined.length > 0 ? (
               <div>
-                <h2 className="text-2xl font-bold md-text-primary mb-4">Todos los Mundos</h2>
+                <h2 className="text-2xl font-bold md-text-primary mb-4">{t("sections.allWorlds")}</h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <AnimatePresence mode="popLayout">
                     {filteredPredefined.map((world) => (
@@ -646,7 +648,7 @@ export default function MundosPage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="md-text-secondary">No se encontraron mundos con esos criterios</p>
+                <p className="md-text-secondary">{t("sections.noResults")}</p>
               </div>
             )}
           </TabsContent>
@@ -658,11 +660,11 @@ export default function MundosPage() {
                 <div className="h-16 w-16 rounded-full md-surface-container-highest flex items-center justify-center mx-auto mb-4">
                   <Plus className="h-8 w-8 md-text-secondary" />
                 </div>
-                <h3 className="text-xl font-bold md-text-primary mb-2">Aún no tienes mundos propios</h3>
-                <p className="md-text-secondary mb-4">Crea un mundo personalizado o clona uno de los predefinidos</p>
+                <h3 className="text-xl font-bold md-text-primary mb-2">{t("sections.noOwnWorlds")}</h3>
+                <p className="md-text-secondary mb-4">{t("sections.noOwnWorldsDescription")}</p>
                 <Button onClick={() => setDialogOpen(true)} className="md-button md-button-filled">
                   <Plus className="h-4 w-4 mr-2" />
-                  Crear Mundo
+                  {t("createButton")}
                 </Button>
               </div>
             ) : (
@@ -682,12 +684,13 @@ export default function MundosPage() {
       <Link href="/dashboard/mundos/crear">
         <button
           className="md-fab md-fab-extended"
-          title="Crear nuevo mundo"
+          title={t("fab.title")}
         >
           <Plus className="h-6 w-6" />
-          <span className="font-medium">Nuevo Mundo</span>
+          <span className="font-medium">{t("fab.label")}</span>
         </button>
       </Link>
     </div>
+    </ErrorBoundary>
   );
 }

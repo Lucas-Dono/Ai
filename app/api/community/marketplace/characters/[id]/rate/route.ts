@@ -8,7 +8,7 @@ import { MarketplaceCharacterService } from '@/lib/services/marketplace-characte
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -18,7 +18,7 @@ export async function POST(
 
     const { rating, review } = await request.json();
     const result = await MarketplaceCharacterService.rateCharacter(
-      params.id,
+      (await params).id,
       session.user.id,
       rating,
       review

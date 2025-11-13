@@ -113,7 +113,8 @@ export const NotificationsScreen = () => {
         const conversationId = url.split('/').pop();
         navigation.navigate('Conversation', { conversationId });
       } else if (url === '/profile') {
-        navigation.navigate('Profile');
+        // Navigate to Profile tab in MainTabs
+        navigation.navigate('MainTabs', { screen: 'Profile' });
       }
     }
   };

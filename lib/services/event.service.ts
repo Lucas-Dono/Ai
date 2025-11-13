@@ -59,9 +59,7 @@ export const EventService = {
         startDate: data.startDate,
         endDate: data.endDate,
         maxParticipants: data.maxParticipants,
-        rules: data.rules,
         prizes: data.prizes || {},
-        requirements: data.requirements,
         status: data.startDate > new Date() ? 'upcoming' : 'ongoing',
       },
       include: {
@@ -168,7 +166,7 @@ export const EventService = {
               },
             },
           },
-          orderBy: { registeredAt: 'asc' },
+          orderBy: { createdAt: 'asc' },
         },
       },
     });
@@ -285,7 +283,6 @@ export const EventService = {
       data: {
         eventId,
         userId,
-        teamName,
       },
       include: {
         user: {
@@ -302,7 +299,7 @@ export const EventService = {
     await prisma.communityEvent.update({
       where: { id: eventId },
       data: {
-        participantCount: { increment: 1 },
+        currentParticipants: { increment: 1 },
       },
     });
 
@@ -339,7 +336,7 @@ export const EventService = {
     await prisma.communityEvent.update({
       where: { id: eventId },
       data: {
-        participantCount: { decrement: 1 },
+        currentParticipants: { decrement: 1 },
       },
     });
 
@@ -363,20 +360,21 @@ export const EventService = {
       throw new Error('Debes registrarte primero');
     }
 
-    const updated = await prisma.eventRegistration.update({
-      where: {
-        eventId_userId: {
-          eventId,
-          userId,
-        },
-      },
-      data: {
-        submission,
-        submittedAt: new Date(),
-      },
-    });
+    // NOTE: Submission system requires schema migration
+    // Required fields to add to EventRegistration model:
+    //   - submission: String? @db.Text  // Submission content/URL
+    //   - submittedAt: DateTime?        // When the submission was made
+    //   - isWinner: Boolean @default(false)     // Winner flag
+    //   - position: Int?                // Winner position (1st, 2nd, 3rd)
+    //   - prize: String?                // Prize description
+    //
+    // Once added, update this method to:
+    // await prisma.eventRegistration.update({
+    //   where: { eventId_userId: { eventId, userId } },
+    //   data: { submission: submissionData, submittedAt: new Date() }
+    // });
 
-    return updated;
+    return registration;
   },
 
   /**
@@ -399,24 +397,25 @@ export const EventService = {
       throw new Error('No tienes permisos para declarar ganadores');
     }
 
-    // Actualizar registros de ganadores
-    const updates = winners.map(winner =>
-      prisma.eventRegistration.update({
-        where: {
-          eventId_userId: {
-            eventId,
-            userId: winner.userId,
-          },
-        },
-        data: {
-          isWinner: true,
-          position: winner.position,
-          prize: winner.prize,
-        },
-      })
-    );
-
-    await Promise.all(updates);
+    // NOTE: Winner system requires schema migration (see submitWork method above for required fields)
+    // Once EventRegistration has isWinner, position, and prize fields, uncomment:
+    //
+    // const updates = winners.map(winner =>
+    //   prisma.eventRegistration.update({
+    //     where: {
+    //       eventId_userId: {
+    //         eventId,
+    //         userId: winner.userId,
+    //       },
+    //     },
+    //     data: {
+    //       isWinner: true,
+    //       position: winner.position,
+    //       prize: winner.prize,
+    //     },
+    //   })
+    // );
+    // await Promise.all(updates);
 
     // Actualizar estado del evento
     await prisma.communityEvent.update({
@@ -437,9 +436,7 @@ export const EventService = {
     const registrations = await prisma.eventRegistration.findMany({
       where: { eventId },
       orderBy: [
-        { isWinner: 'desc' },
-        { position: 'asc' },
-        { registeredAt: 'asc' },
+        { createdAt: 'asc' },
       ],
       include: {
         user: {

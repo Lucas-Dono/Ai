@@ -30,7 +30,7 @@ export function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
@@ -222,7 +222,7 @@ export function VoiceRecorder({ onSend, onCancel }: VoiceRecorderProps) {
           ref={canvasRef}
           width={600}
           height={80}
-          className="w-full h-20 rounded-lg"
+          className="w-full h-20 rounded-2xl"
         />
         <div className={cn(
           "absolute top-2 right-2 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1",

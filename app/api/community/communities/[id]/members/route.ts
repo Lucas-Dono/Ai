@@ -6,10 +6,10 @@ import { CommunityService } from '@/lib/services/community.service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const members = await CommunityService.getMembers(params.id);
+    const members = await CommunityService.getMembers((await params).id);
     return NextResponse.json(members);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 404 });

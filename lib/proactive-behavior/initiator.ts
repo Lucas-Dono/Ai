@@ -131,14 +131,8 @@ async function detectRelationshipStage(
   // Contar mensajes del usuario
   const messageCount = await prisma.message.count({
     where: {
-      conversationId: {
-        in: (
-          await prisma.conversation.findMany({
-            where: { agentId, userId },
-            select: { id: true },
-          })
-        ).map((c) => c.id),
-      },
+      agentId,
+      userId,
       role: "user",
     },
   });
@@ -146,14 +140,8 @@ async function detectRelationshipStage(
   // Obtener primer mensaje
   const firstMessage = await prisma.message.findFirst({
     where: {
-      conversationId: {
-        in: (
-          await prisma.conversation.findMany({
-            where: { agentId, userId },
-            select: { id: true },
-          })
-        ).map((c) => c.id),
-      },
+      agentId,
+      userId,
       role: "user",
     },
     orderBy: { createdAt: "asc" },
@@ -192,14 +180,11 @@ async function getHoursSinceLastMessage(
 ): Promise<number> {
   const lastMessage = await prisma.message.findFirst({
     where: {
-      conversationId: {
-        in: (
-          await prisma.conversation.findMany({
-            where: { agentId, userId },
-            select: { id: true },
-          })
-        ).map((c) => c.id),
-      },
+      agentId,
+      OR: [
+        { userId, role: "user" },
+        { role: "assistant" }
+      ]
     },
     orderBy: { createdAt: "desc" },
   });
@@ -237,7 +222,7 @@ export class ConversationInitiator {
       return { shouldInitiate: false, priority: 0 };
     }
 
-    const emotionalState = internalState.currentEmotions as PlutchikEmotionState;
+    const emotionalState = internalState.currentEmotions as unknown as PlutchikEmotionState;
 
     // Verificar si hay topics sin resolver
     const unresolvedTopics = (internalState.conversationBuffer as any[]) || [];

@@ -20,6 +20,7 @@ import {
   PanelRightClose,
   PanelRightOpen,
   MoreVertical,
+  Brain,
 } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import { Button } from "@/components/ui/button";
 interface ChatHeaderProps {
   agentName: string;
   agentAvatar?: string;
+  agentId?: string;
   isTyping?: boolean;
   isOnline?: boolean;
   sidebarOpen?: boolean;
@@ -40,6 +42,7 @@ interface ChatHeaderProps {
 export function ChatHeader({
   agentName,
   agentAvatar,
+  agentId,
   isTyping = false,
   isOnline = true,
   sidebarOpen = true,
@@ -58,21 +61,22 @@ export function ChatHeader({
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={cn(
         "relative z-10",
-        "px-6 py-4",
-        "flex items-center gap-4",
+        "px-3 md:px-6 py-3 md:py-4",
+        "flex items-center gap-2 md:gap-4",
         // Glassmorphism effect
         "bg-gradient-to-r from-white/80 via-white/70 to-white/80",
         "dark:from-gray-900/80 dark:via-gray-800/70 dark:to-gray-900/80",
         "backdrop-blur-xl",
         "border-b border-white/20 dark:border-gray-700/50",
-        "shadow-lg"
+        "shadow-lg",
+        "safe-area-inset-top"
       )}
     >
       {/* Animated gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5 animate-gradient-x" />
 
       {/* Avatar and Info */}
-      <div className="relative z-10 flex items-center gap-3 flex-1 min-w-0">
+      <div className="relative z-10 flex items-center gap-2 md:gap-3 flex-1 min-w-0">
         <Avatar
           src={agentAvatar}
           alt={agentName}
@@ -86,7 +90,7 @@ export function ChatHeader({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent truncate"
+            className="text-base md:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent truncate"
           >
             {agentName}
           </motion.h1>
@@ -142,19 +146,21 @@ export function ChatHeader({
         transition={{ delay: 0.3 }}
         className="relative z-10 flex items-center gap-2"
       >
-        {/* Toggle Sidebar Button (always visible on desktop) */}
+        {/* Toggle Sidebar Button (desktop only) */}
         {onToggleSidebar && (
-          <ActionButton
-            icon={
-              sidebarOpen ? (
-                <PanelRightClose className="w-4 h-4" />
-              ) : (
-                <PanelRightOpen className="w-4 h-4" />
-              )
-            }
-            onClick={onToggleSidebar}
-            label="Toggle Sidebar"
-          />
+          <div className="hidden lg:block">
+            <ActionButton
+              icon={
+                sidebarOpen ? (
+                  <PanelRightClose className="w-4 h-4" />
+                ) : (
+                  <PanelRightOpen className="w-4 h-4" />
+                )
+              }
+              onClick={onToggleSidebar}
+              label="Toggle Sidebar"
+            />
+          </div>
         )}
 
         {/* More Options Menu */}
@@ -181,8 +187,18 @@ export function ChatHeader({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-56 z-40 rounded-xl overflow-hidden shadow-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/50"
+                  className="absolute right-0 mt-2 w-56 z-40 rounded-2xl overflow-hidden shadow-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/50"
                 >
+                  {agentId && (
+                    <MenuItem
+                      icon={<Brain className="w-4 h-4" />}
+                      label="Gestionar Memoria"
+                      onClick={() => {
+                        window.location.href = `/agentes/${agentId}/memory`;
+                      }}
+                    />
+                  )}
+
                   {onSearch && (
                     <MenuItem
                       icon={<Search className="w-4 h-4" />}
@@ -261,12 +277,13 @@ function ActionButton({
       onClick={onClick}
       title={label}
       className={cn(
-        "p-2.5 rounded-xl",
+        "p-2 md:p-2.5 rounded-2xl md:rounded-xl",
         "backdrop-blur-md",
         "border",
         "shadow-md",
         "transition-all duration-200",
         "hover:shadow-lg",
+        "min-w-[44px] min-h-[44px] flex items-center justify-center md:min-w-0 md:min-h-0",
         variant === "danger"
           ? [
               "bg-red-500/10 hover:bg-red-500/20",

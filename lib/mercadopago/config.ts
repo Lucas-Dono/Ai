@@ -191,7 +191,7 @@ export function getPlanLimit(
   planId: PlanId,
   resource: keyof (typeof PLANS)[PlanId]["limits"]
 ): number {
-  return PLANS[planId].limits[resource];
+  return PLANS[planId].limits[resource] as number;
 }
 
 export function canCreateResource(
@@ -216,8 +216,8 @@ export function formatPrice(
 }
 
 export const MERCADOPAGO_URLS = {
-  success: `${process.env.NEXTAUTH_URL}/dashboard/billing/success`,
-  failure: `${process.env.NEXTAUTH_URL}/dashboard/billing/failure`,
-  pending: `${process.env.NEXTAUTH_URL}/dashboard/billing/pending`,
-  notification: `${process.env.NEXTAUTH_URL}/api/webhooks/mercadopago`,
+  success: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/dashboard/billing/success`,
+  failure: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/dashboard/billing/failure`,
+  pending: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/dashboard/billing/pending`,
+  notification: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/api/webhooks/mercadopago`,
 };

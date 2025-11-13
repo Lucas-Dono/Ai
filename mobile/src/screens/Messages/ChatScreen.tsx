@@ -17,11 +17,18 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { messagingApi, Message } from '../../services/api/messaging.api';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { ProactiveMessagesContainer } from '../../components/chat/ProactiveMessagesContainer';
 
 export const ChatScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { conversationId } = route.params as { conversationId: string };
+  const { user } = useAuth(); // Get authenticated user from context
+  const { conversationId, agentId, agentName } = route.params as {
+    conversationId: string;
+    agentId?: string;
+    agentName?: string;
+  };
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +106,7 @@ export const ChatScreen = () => {
   };
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => {
-    const isCurrentUser = item.senderId === 'current-user-id'; // TODO: Get from auth context
+    const isCurrentUser = item.senderId === user?.id; // Get from auth context
     const showAvatar = index === 0 || messages[index - 1].senderId !== item.senderId;
 
     return (
@@ -165,6 +172,27 @@ export const ChatScreen = () => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesList}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+        />
+      )}
+
+      {/* Proactive Messages - Mensajes iniciados por la IA */}
+      {agentId && (
+        <ProactiveMessagesContainer
+          agentId={agentId}
+          agentName={agentName}
+          onMessageRead={(message) => {
+            console.log('[ChatScreen] Usuario leyó mensaje proactivo:', message.id);
+            // Opcional: Agregar mensaje al chat
+            // setMessages([...messages, { ...convertToMessage(message) }]);
+          }}
+          onMessageDismissed={(message) => {
+            console.log('[ChatScreen] Usuario descartó mensaje proactivo:', message.id);
+          }}
+          onMessageResponse={(message, response) => {
+            console.log('[ChatScreen] Usuario respondió a mensaje proactivo:', response);
+            // Agregar respuesta al chat
+            handleSend(); // O enviar la respuesta directamente
+          }}
         />
       )}
 

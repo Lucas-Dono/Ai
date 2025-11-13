@@ -1137,7 +1137,7 @@ export function WhatsAppChat({
             onClick={() => !isResetting && setShowResetConfirm(false)}
           >
             <div
-              className="bg-[#1f1f1f] rounded-lg p-6 max-w-md w-full animate-in zoom-in-95 duration-200"
+              className="bg-[#1f1f1f] rounded-2xl p-6 max-w-md w-full animate-in zoom-in-95 duration-200"
               style={{
                 backgroundColor: theme.colors.bgSecondary,
                 borderColor: theme.colors.borderColor,

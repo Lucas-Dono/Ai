@@ -218,7 +218,7 @@ export function RecommendedForYou() {
                 </div>
 
                 {/* Reason (Why recommended) */}
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3 mb-3">
+                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-3 mb-3">
                   <p className="text-xs text-purple-300 flex items-start gap-2">
                     <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" />
                     <span className="line-clamp-2">{rec.reason}</span>
@@ -226,7 +226,7 @@ export function RecommendedForYou() {
                 </div>
 
                 {/* Action Button */}
-                <Button className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-500/30 text-white py-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm">
+                <Button className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-500/30 text-white py-2 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 text-sm">
                   <MessageCircle className="w-4 h-4" />
                   {rec.itemType === "agent" ? "Chatear" : "Explorar"}
                 </Button>

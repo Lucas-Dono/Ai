@@ -1,0 +1,332 @@
+/**
+ * EJEMPLOS DE USO - Sistema de Comportamiento Proactivo V2
+ *
+ * Este archivo muestra diferentes casos de uso del sistema proactivo.
+ */
+
+import { proactiveBehavior, type ProactiveTrigger } from '@/lib/proactive-behavior';
+
+// ============================================
+// EJEMPLO 1: Uso Simple - Check & Send
+// ============================================
+
+async function example1_simpleUsage(agentId: string, userId: string) {
+  console.log('\n=== EJEMPLO 1: Uso Simple ===\n');
+
+  // API más simple - hace todo automáticamente
+  const result = await proactiveBehavior.checkAndSend(
+    agentId,
+    userId,
+    'America/Argentina/Buenos_Aires'
+  );
+
+  if (result.sent) {
+    console.log('✅ Mensaje enviado!');
+    console.log('Mensaje:', result.message);
+    console.log('Trigger:', result.trigger?.type);
+    console.log('Prioridad:', result.trigger?.priority);
+  } else {
+    console.log('❌ No enviado:', result.reason);
+
+    if (result.scheduledFor) {
+      console.log('📅 Programado para:', result.scheduledFor);
+    }
+
+    if (result.trigger) {
+      console.log('🎯 Trigger detectado pero no enviado:', {
+        type: result.trigger.type,
+        reason: result.trigger.reason,
+      });
+    }
+  }
+}
+
+// ============================================
+// EJEMPLO 2: Control Avanzado
+// ============================================
+
+async function example2_advancedControl(agentId: string, userId: string) {
+  console.log('\n=== EJEMPLO 2: Control Avanzado ===\n');
+
+  // 1. Detectar todos los triggers disponibles
+  const triggers = await proactiveBehavior.detectTriggers(agentId, userId);
+
+  console.log(`🔍 Triggers detectados: ${triggers.length}`);
+
+  for (const trigger of triggers) {
+    console.log(`\n  - Tipo: ${trigger.type}`);
+    console.log(`    Prioridad: ${trigger.priority.toFixed(2)}`);
+    console.log(`    Razón: ${trigger.reason}`);
+  }
+
+  if (triggers.length === 0) {
+    console.log('  (ninguno)');
+    return;
+  }
+
+  // 2. Seleccionar el trigger de mayor prioridad
+  const topTrigger = triggers[0];
+
+  // 3. Verificar si es buen momento para enviar
+  const canSend = await proactiveBehavior.shouldSendNow(
+    agentId,
+    userId,
+    'America/Argentina/Buenos_Aires'
+  );
+
+  console.log(`\n⏰ ¿Puede enviarse ahora? ${canSend.shouldSend ? 'Sí' : 'No'}`);
+  console.log(`   Razón: ${canSend.reason}`);
+
+  if (canSend.suggestedTime) {
+    console.log(`   Sugerido para: ${canSend.suggestedTime}`);
+  }
+
+  // 4. Si no puede enviarse ahora, programar para después
+  if (!canSend.shouldSend) {
+    const bestTime = await proactiveBehavior.getBestSendTime(
+      agentId,
+      userId,
+      'America/Argentina/Buenos_Aires'
+    );
+
+    console.log(`\n📅 Mejor momento calculado: ${bestTime}`);
+    // Aquí podrías programar un cron job o similar
+  }
+
+  // 5. Generar mensaje (preview sin enviar)
+  const message = await proactiveBehavior.generateMessage(
+    agentId,
+    userId,
+    topTrigger
+  );
+
+  console.log(`\n💬 Mensaje generado (preview):`);
+  console.log(`   "${message}"`);
+}
+
+// ============================================
+// EJEMPLO 3: Analytics y Optimización
+// ============================================
+
+async function example3_analytics(agentId: string, userId?: string) {
+  console.log('\n=== EJEMPLO 3: Analytics ===\n');
+
+  // Obtener métricas de últimos 30 días
+  const metrics = await proactiveBehavior.getMetrics(agentId, userId, 30);
+
+  console.log('📊 Métricas Generales:');
+  console.log(`   Total enviados: ${metrics.totalSent}`);
+  console.log(`   Total con respuesta: ${metrics.totalResponded}`);
+  console.log(`   Tasa de respuesta: ${metrics.responseRate.toFixed(1)}%`);
+  console.log(`   Tiempo promedio: ${metrics.avgResponseTimeMinutes.toFixed(0)} min`);
+  console.log(
+    `   Tendencia: ${metrics.lastWeekTrend === 'up' ? '📈 Al alza' : metrics.lastWeekTrend === 'down' ? '📉 A la baja' : '➡️ Estable'}`
+  );
+
+  // Performance por tipo
+  console.log('\n📈 Performance por Tipo:');
+  const sortedTypes = Object.entries(metrics.byType).sort(
+    (a, b) => b[1].responseRate - a[1].responseRate
+  );
+
+  for (const [type, data] of sortedTypes) {
+    console.log(`\n   ${type}:`);
+    console.log(`     Enviados: ${data.sent}`);
+    console.log(`     Tasa respuesta: ${data.responseRate.toFixed(1)}%`);
+    console.log(`     Tiempo promedio: ${data.avgResponseTimeMinutes.toFixed(0)} min`);
+  }
+
+  // Mejores horarios
+  console.log('\n⏰ Mejores Horarios:');
+  const hoursByResponseRate = Object.entries(metrics.byHour)
+    .filter(([_, data]) => data.sent > 0)
+    .map(([hour, data]) => ({
+      hour: parseInt(hour),
+      responseRate: (data.responded / data.sent) * 100,
+      sent: data.sent,
+    }))
+    .sort((a, b) => b.responseRate - a.responseRate)
+    .slice(0, 5);
+
+  for (const { hour, responseRate, sent } of hoursByResponseRate) {
+    console.log(`   ${hour}:00 - ${responseRate.toFixed(1)}% (${sent} enviados)`);
+  }
+
+  // Obtener insights
+  console.log('\n💡 Insights:');
+  const insights = await proactiveBehavior.getInsights(agentId, userId);
+
+  if (insights.length === 0) {
+    console.log('   (sin insights disponibles)');
+  } else {
+    for (const insight of insights) {
+      const emoji = insight.type === 'success' ? '✅' : insight.type === 'warning' ? '⚠️' : 'ℹ️';
+      console.log(`   ${emoji} ${insight.message}`);
+    }
+  }
+
+  // Generar reporte completo
+  console.log('\n📄 Reporte Completo:');
+  const report = await proactiveBehavior.generateReport(agentId, userId, 30);
+  console.log(report);
+}
+
+// ============================================
+// EJEMPLO 4: Uso en Cron Job
+// ============================================
+
+async function example4_cronJob() {
+  console.log('\n=== EJEMPLO 4: Uso en Cron Job ===\n');
+
+  // Este código podría ejecutarse cada hora via cron
+
+  // Obtener todos los agentes activos
+  const activeAgents = await getActiveAgents(); // función ficticia
+
+  for (const agent of activeAgents) {
+    console.log(`\nChecking agent ${agent.id}...`);
+
+    // Obtener usuarios del agente
+    const users = await getAgentUsers(agent.id); // función ficticia
+
+    for (const user of users) {
+      try {
+        // Intentar enviar mensaje proactivo
+        const result = await proactiveBehavior.checkAndSend(
+          agent.id,
+          user.id,
+          user.timezone
+        );
+
+        if (result.sent) {
+          console.log(`  ✅ Mensaje enviado a usuario ${user.id}`);
+          console.log(`     Tipo: ${result.trigger?.type}`);
+
+          // Opcional: Notificar al usuario (push notification, email, etc.)
+          await notifyUser(user.id, result.message); // función ficticia
+        } else {
+          console.log(`  ⏭️ No enviado a usuario ${user.id}: ${result.reason}`);
+        }
+      } catch (error) {
+        console.error(`  ❌ Error con usuario ${user.id}:`, error);
+      }
+    }
+  }
+
+  console.log('\nCron job completado!');
+}
+
+// ============================================
+// EJEMPLO 5: Filtrar por Tipo de Trigger
+// ============================================
+
+async function example5_filterByType(agentId: string, userId: string) {
+  console.log('\n=== EJEMPLO 5: Filtrar por Tipo ===\n');
+
+  // Detectar todos los triggers
+  const triggers = await proactiveBehavior.detectTriggers(agentId, userId);
+
+  // Filtrar solo follow-ups
+  const followUpTriggers = triggers.filter((t) => t.type === 'follow_up');
+
+  console.log(`📝 Follow-ups pendientes: ${followUpTriggers.length}`);
+
+  for (const trigger of followUpTriggers) {
+    console.log(`\n  Topic: ${trigger.context.unresolvedTopic?.topic}`);
+    console.log(`  Prioridad: ${trigger.priority.toFixed(2)}`);
+    console.log(`  Razón: ${trigger.reason}`);
+
+    // Generar mensaje preview
+    const message = await proactiveBehavior.generateMessage(agentId, userId, trigger);
+    console.log(`  Mensaje: "${message}"`);
+  }
+
+  // Filtrar solo celebraciones
+  const celebrationTriggers = triggers.filter((t) => t.type === 'celebration');
+
+  console.log(`\n🎉 Celebraciones disponibles: ${celebrationTriggers.length}`);
+
+  for (const trigger of celebrationTriggers) {
+    console.log(`\n  Milestone: ${trigger.context.milestone}`);
+    console.log(`  Prioridad: ${trigger.priority.toFixed(2)}`);
+
+    const message = await proactiveBehavior.generateMessage(agentId, userId, trigger);
+    console.log(`  Mensaje: "${message}"`);
+  }
+}
+
+// ============================================
+// EJEMPLO 6: Monitoreo en Tiempo Real
+// ============================================
+
+async function example6_realTimeMonitoring(agentId: string) {
+  console.log('\n=== EJEMPLO 6: Monitoreo en Tiempo Real ===\n');
+
+  // Dashboard de métricas en tiempo real
+  setInterval(async () => {
+    const metrics = await proactiveBehavior.getMetrics(agentId, undefined, 7); // última semana
+
+    console.clear();
+    console.log('🎯 Dashboard de Mensajes Proactivos');
+    console.log('=====================================\n');
+
+    console.log(`📊 Última Semana:`);
+    console.log(`   Enviados: ${metrics.totalSent}`);
+    console.log(`   Con respuesta: ${metrics.totalResponded} (${metrics.responseRate.toFixed(1)}%)`);
+    console.log(
+      `   Tendencia: ${metrics.lastWeekTrend === 'up' ? '📈 Mejorando' : metrics.lastWeekTrend === 'down' ? '📉 Bajando' : '➡️ Estable'}`
+    );
+
+    console.log(`\n⏱️ Tiempos:`);
+    console.log(`   Promedio: ${metrics.avgResponseTimeMinutes.toFixed(0)} min`);
+    console.log(`   Más rápido: ${metrics.fastestResponseMinutes.toFixed(0)} min`);
+    console.log(`   Más lento: ${metrics.slowestResponseMinutes.toFixed(0)} min`);
+
+    // Obtener insights
+    const insights = await proactiveBehavior.getInsights(agentId);
+
+    if (insights.length > 0) {
+      console.log(`\n💡 Insights:`);
+      for (const insight of insights) {
+        const emoji =
+          insight.type === 'success' ? '✅' : insight.type === 'warning' ? '⚠️' : 'ℹ️';
+        console.log(`   ${emoji} ${insight.message}`);
+      }
+    }
+
+    console.log(`\n(actualizando cada 60s...)`);
+  }, 60000); // Actualizar cada minuto
+}
+
+// ============================================
+// Funciones auxiliares (ficticias)
+// ============================================
+
+async function getActiveAgents() {
+  // Implementar: obtener agentes activos de la DB
+  return [];
+}
+
+async function getAgentUsers(agentId: string) {
+  // Implementar: obtener usuarios de un agente
+  return [];
+}
+
+async function notifyUser(userId: string, message: string) {
+  // Implementar: enviar push notification o email
+  console.log(`Notificación enviada a ${userId}: ${message}`);
+}
+
+// ============================================
+// Ejecutar ejemplos
+// ============================================
+
+export async function runExamples(agentId: string, userId: string) {
+  // Descomentar el ejemplo que quieras probar
+  await example1_simpleUsage(agentId, userId);
+  // await example2_advancedControl(agentId, userId);
+  // await example3_analytics(agentId, userId);
+  // await example4_cronJob();
+  // await example5_filterByType(agentId, userId);
+  // await example6_realTimeMonitoring(agentId);
+}

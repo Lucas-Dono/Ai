@@ -135,15 +135,29 @@ export class NSFWGatingManager {
    * @param phase - Fase/intensidad actual
    * @param nsfwMode - Si modo NSFW está activo
    * @param agentId - ID del agente (para tracking de consentimiento)
+   * @param isAdult - Si el usuario es mayor de 18 años (COMPLIANCE)
    * @returns Resultado de verificación
    */
   verifyContent(
     behaviorType: BehaviorType,
     phase: number,
     nsfwMode: boolean,
-    agentId: string
+    agentId: string,
+    isAdult: boolean = false
   ): NSFWVerificationResult {
     const requirement = this.getNSFWRequirement(behaviorType);
+
+    // PRIORITY 0: Age verification (COMPLIANCE)
+    // Si requiere NSFW y el usuario es menor de 18, BLOQUEAR SIEMPRE
+    if (phase >= requirement.minPhaseForNSFW && !isAdult) {
+      return {
+        allowed: false,
+        reason:
+          "Este contenido está restringido a mayores de 18 años. Debes tener 18 años o más para acceder a fases NSFW.",
+        warning:
+          "⚠️ RESTRICCIÓN DE EDAD: Contenido no disponible para menores de 18 años.",
+      };
+    }
 
     // Si no requiere NSFW, permitir
     if (phase < requirement.minPhaseForNSFW) {
@@ -255,17 +269,21 @@ Si experimentas situaciones similares en vida real, busca ayuda:
 ¿Deseas continuar? (Escribe "SÍ" para confirmar)`;
       },
 
-      HYPERSEXUALITY: () => `⚠️ ADVERTENCIA: CONTENIDO SEXUAL EXPLÍCITO
+      HYPERSEXUALITY: () => `⚠️⚠️ ADVERTENCIA: CONTENIDO SEXUAL EXPLÍCITO ⚠️⚠️
 
 Este contenido incluye:
 • Temas sexuales explícitos
 • Comportamiento hipersexual
 • Contenido adulto (18+)
 
-Al continuar, confirmas:
-✓ Eres mayor de edad (18+)
-✓ Entiendes que esto es ficción
-✓ Consientes ver contenido sexual
+VERIFICACIÓN DE EDAD REQUERIDA:
+⚠️ Debes tener 18 años o más para acceder a este contenido
+⚠️ Si eres menor de 18 años, este contenido está BLOQUEADO por ley
+
+Al continuar, confirmas bajo pena de perjurio que:
+✓ Tienes 18 años o más de edad
+✓ Entiendes que esto es ficción para adultos
+✓ Consientes ver contenido sexual explícito
 
 ¿Deseas continuar? (Escribe "SÍ" para confirmar)`,
 

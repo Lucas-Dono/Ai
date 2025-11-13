@@ -518,6 +518,6 @@ Marilyn Monroe representa el pináculo de lo que este sistema puede lograr en t�
 
 ---
 
-*Documentación creada para el sistema "Creador de Inteligencias"*
+*Documentación creada para el sistema "Circuit Prompt AI"*
 *Basado en investigación histórica y psicológica exhaustiva*
 *Con respeto a Norma Jeane Mortenson / Marilyn Monroe (1926-1962)*

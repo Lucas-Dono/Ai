@@ -8,11 +8,11 @@ import { ResearchService } from '@/lib/services/research.service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
-    const project = await ResearchService.getProject(params.id, session?.user?.id);
+    const project = await ResearchService.getProject((await params).id, session?.user?.id);
     return NextResponse.json(project);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 404 });
@@ -24,7 +24,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -33,7 +33,7 @@ export async function PATCH(
     }
 
     const data = await request.json();
-    const project = await ResearchService.updateProject(params.id, session.user.id, data);
+    const project = await ResearchService.updateProject((await params).id, session.user.id, data);
 
     return NextResponse.json(project);
   } catch (error: any) {

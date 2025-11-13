@@ -76,7 +76,10 @@ export const ConversationsScreen = () => {
     return (
       <TouchableOpacity
         style={styles.conversationCard}
-        onPress={() => navigation.navigate('Chat', { conversationId: item.id })}
+        onPress={() => {
+          // Navigate to Conversation screen with conversationId
+          navigation.navigate('Conversation', { conversationId: item.id });
+        }}
       >
         {/* Avatar */}
         {otherParticipant?.image ? (
@@ -130,7 +133,10 @@ export const ConversationsScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mensajes</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('NewConversation')}>
+        <TouchableOpacity onPress={() => {
+          // Navigate to StartConversation screen
+          navigation.navigate('StartConversation', { userId: undefined });
+        }}>
           <Ionicons name="create-outline" size={28} color="#3b82f6" />
         </TouchableOpacity>
       </View>
@@ -155,7 +161,10 @@ export const ConversationsScreen = () => {
               <Text style={styles.emptyText}>No tienes conversaciones</Text>
               <TouchableOpacity
                 style={styles.startButton}
-                onPress={() => navigation.navigate('NewConversation')}
+                onPress={() => {
+                  // Navigate to StartConversation screen
+                  navigation.navigate('StartConversation', { userId: undefined });
+                }}
               >
                 <Text style={styles.startButtonText}>Iniciar conversación</Text>
               </TouchableOpacity>

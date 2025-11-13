@@ -12,7 +12,7 @@
  */
 
 import { PrimaryEmotion, PlutchikEmotionState, createNeutralState } from "@/lib/emotions/plutchik";
-import { EmotionType, EmotionState } from "../types";
+import { EmotionType, EmotionState } from "./types";
 
 /**
  * Reglas de mapeo OCC → Plutchik

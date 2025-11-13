@@ -8,7 +8,7 @@ import { PostService } from '@/lib/services/post.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -17,7 +17,7 @@ export async function POST(
     }
 
     const { awardType } = await request.json();
-    const award = await PostService.awardPost(params.id, session.user.id, awardType);
+    const award = await PostService.awardPost((await params).id, session.user.id, awardType);
 
     return NextResponse.json(award, { status: 201 });
   } catch (error: any) {

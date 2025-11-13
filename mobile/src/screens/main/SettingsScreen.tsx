@@ -145,6 +145,17 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
             <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
           </View>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('AccessibilitySettings')}
+        >
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="eye-outline" size={20} color={colors.info.main} />
+            <Text style={styles.menuItemText}>Accesibilidad Visual</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
       </View>
 
       {/* Datos */}
@@ -155,6 +166,44 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
           <View style={styles.menuItemLeft}>
             <Ionicons name="trash-outline" size={20} color={colors.error.main} />
             <Text style={styles.menuItemText}>Limpiar Caché</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Legal */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Legal y Soporte</Text>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Help')}
+        >
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="help-circle-outline" size={20} color={colors.info.main} />
+            <Text style={styles.menuItemText}>Centro de Ayuda</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Terms')}
+        >
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="document-text-outline" size={20} color={colors.info.main} />
+            <Text style={styles.menuItemText}>Términos y Condiciones</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Privacy')}
+        >
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="shield-checkmark-outline" size={20} color={colors.info.main} />
+            <Text style={styles.menuItemText}>Política de Privacidad</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
         </TouchableOpacity>

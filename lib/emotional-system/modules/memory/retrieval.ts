@@ -10,6 +10,10 @@
 
 import { EpisodicMemory, EmotionState } from "../../types";
 import { prisma } from "@/lib/prisma";
+import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("MemoryRetrieval");
 
 export interface MemoryQuery {
   query: string;
@@ -257,7 +261,7 @@ export class MemoryRetrievalSystem {
   }
 
   /**
-   * Almacena una nueva memoria episódica
+   * Almacena una nueva memoria episódica con embedding opcional
    */
   async storeMemory(params: {
     agentId: string;
@@ -268,11 +272,21 @@ export class MemoryRetrievalSystem {
     importance: number;
     metadata?: Record<string, any>;
   }): Promise<EpisodicMemory> {
-    console.log(`[MemoryRetrieval] Storing new memory for agent ${params.agentId}...`);
+    log.info({ agentId: params.agentId }, "Storing new memory...");
 
     try {
-      // TODO: Generar embedding cuando tengamos servicio de embeddings
-      // const embedding = await this.generateEmbedding(params.event);
+      // Intentar generar embedding (no crítico - continuar si falla)
+      let embeddingArray: number[] | null = null;
+      try {
+        embeddingArray = await generateQwenEmbedding(params.event);
+        log.debug({ embeddingDim: embeddingArray.length }, "Embedding generated successfully");
+      } catch (embeddingError) {
+        log.warn(
+          { error: embeddingError },
+          "Failed to generate embedding, storing memory without it"
+        );
+        // Continuar sin embedding - no es bloqueante
+      }
 
       const memory = await prisma.episodicMemory.create({
         data: {
@@ -283,38 +297,170 @@ export class MemoryRetrievalSystem {
           emotionalValence: params.emotionalValence,
           importance: params.importance,
           decayFactor: 1.0,
-          embedding: null as any, // TODO: Agregar embedding cuando esté disponible
+          embedding: embeddingArray ? (embeddingArray as any) : null,
           metadata: (params.metadata || {}) as any,
         },
       });
 
-      console.log(`[MemoryRetrieval] Memory stored with ID: ${memory.id}`);
+      log.info({ memoryId: memory.id, hasEmbedding: !!embeddingArray }, "Memory stored successfully");
 
       return memory as EpisodicMemory;
     } catch (error) {
-      console.error("[MemoryRetrieval] Error storing memory:", error);
+      log.error({ error }, "Error storing memory");
       throw error;
     }
   }
 
   /**
    * Consolida memorias relacionadas (reduce redundancia)
+   *
+   * NOTA: Implementación básica - mejoras futuras:
+   * - Usar embeddings para agrupar semánticamente
+   * - Generar resúmenes inteligentes con LLM
+   * - Mantener metadata de consolidación
    */
   async consolidateMemories(agentId: string): Promise<void> {
-    // TODO: Implementar consolidación
-    // - Agrupar memorias muy similares
-    // - Crear memoria "resumen" con mayor importance
-    // - Marcar memorias originales como "consolidated"
-    console.log(`[MemoryRetrieval] Memory consolidation for agent ${agentId} - TODO`);
+    log.info({ agentId }, "Starting memory consolidation...");
+
+    try {
+      // Obtener memorias del agente ordenadas por importancia
+      const memories = await prisma.episodicMemory.findMany({
+        where: { agentId },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (memories.length < 10) {
+        log.debug("Not enough memories to consolidate");
+        return;
+      }
+
+      // Agrupar memorias por similitud temporal (mismo día)
+      const memoryGroups = new Map<string, any[]>();
+
+      for (const memory of memories) {
+        const dateKey = memory.createdAt.toISOString().split("T")[0];
+        if (!memoryGroups.has(dateKey)) {
+          memoryGroups.set(dateKey, []);
+        }
+        memoryGroups.get(dateKey)!.push(memory);
+      }
+
+      // Consolidar grupos con múltiples memorias de baja importancia
+      for (const [dateKey, groupMemories] of Array.from(memoryGroups.entries())) {
+        if (groupMemories.length >= 3) {
+          const lowImportanceMemories = groupMemories.filter(m => m.importance < 0.5);
+
+          if (lowImportanceMemories.length >= 3) {
+            log.debug(
+              { dateKey, count: lowImportanceMemories.length },
+              "Consolidating low-importance memories"
+            );
+
+            // Por ahora, solo reducimos el decayFactor de las memorias menos importantes
+            // En una implementación completa, crearíamos una memoria resumen
+            for (const memory of lowImportanceMemories.slice(3)) {
+              await prisma.episodicMemory.update({
+                where: { id: memory.id },
+                data: { decayFactor: memory.decayFactor * 0.8 },
+              });
+            }
+          }
+        }
+      }
+
+      log.info({ agentId }, "Memory consolidation completed");
+    } catch (error) {
+      log.error({ error, agentId }, "Error during memory consolidation");
+    }
   }
 
   /**
-   * Genera embedding para texto
-   * TODO: Integrar con Voyage AI o OpenAI embeddings
+   * Genera embedding para texto usando Qwen3-Embedding-0.6B
    */
   private async generateEmbedding(text: string): Promise<number[]> {
-    // Placeholder - implementar cuando tengamos servicio de embeddings
-    console.warn("[MemoryRetrieval] Embedding generation not implemented yet");
-    return [];
+    try {
+      return await generateQwenEmbedding(text);
+    } catch (error) {
+      log.error({ error }, "Error generating embedding");
+      throw error;
+    }
+  }
+
+  /**
+   * Busca memorias similares usando embeddings (búsqueda vectorial)
+   *
+   * NOTA: Esta implementación hace búsqueda en memoria (in-memory).
+   * Para producción, considerar usar pgvector para búsqueda vectorial eficiente en Postgres.
+   */
+  async retrieveSimilarMemories(
+    agentId: string,
+    query: string,
+    limit: number = 5,
+    minSimilarity: number = 0.5
+  ): Promise<Array<{ memory: EpisodicMemory; similarity: number }>> {
+    log.info({ agentId, query }, "Retrieving similar memories using embeddings...");
+
+    try {
+      // Generar embedding del query
+      const queryEmbedding = await generateQwenEmbedding(query);
+
+      // Obtener todas las memorias del agente
+      // Filtraremos las que tienen embedding después de cargarlas
+      const memories = await prisma.episodicMemory.findMany({
+        where: {
+          agentId,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 100, // Limitar para no cargar demasiadas en memoria
+      });
+
+      // Filtrar solo memorias con embeddings válidos
+      const memoriesWithEmbeddings = memories.filter(
+        m => m.embedding !== null && Array.isArray(m.embedding) && (m.embedding as any[]).length > 0
+      );
+
+      if (memoriesWithEmbeddings.length === 0) {
+        log.warn("No memories with embeddings found");
+        return [];
+      }
+
+      // Calcular similitud coseno con cada memoria
+      const memoriesWithSimilarity = memoriesWithEmbeddings
+        .map(memory => {
+          const memoryEmbedding = memory.embedding as any;
+
+          // Verificar que el embedding sea válido
+          if (!Array.isArray(memoryEmbedding) || memoryEmbedding.length === 0) {
+            return null;
+          }
+
+          const similarity = cosineSimilarity(queryEmbedding, memoryEmbedding);
+
+          return {
+            memory: memory as EpisodicMemory,
+            similarity,
+          };
+        })
+        .filter(item => item !== null && item.similarity >= minSimilarity) as Array<{
+          memory: EpisodicMemory;
+          similarity: number;
+        }>;
+
+      // Ordenar por similitud descendente
+      memoriesWithSimilarity.sort((a, b) => b.similarity - a.similarity);
+
+      // Tomar top N
+      const topMemories = memoriesWithSimilarity.slice(0, limit);
+
+      log.info(
+        { found: topMemories.length, avgSimilarity: topMemories.reduce((sum, m) => sum + m.similarity, 0) / topMemories.length },
+        "Similar memories retrieved"
+      );
+
+      return topMemories;
+    } catch (error) {
+      log.error({ error }, "Error retrieving similar memories");
+      return [];
+    }
   }
 }

@@ -96,7 +96,7 @@ export function CriticalTriggers({ triggers, maxDisplay = 5 }: CriticalTriggersP
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-12 bg-green-500/10 rounded-xl border-2 border-green-500/30">
+          <div className="text-center py-12 bg-green-500/10 rounded-2xl border-2 border-green-500/30">
             <div className="text-5xl mb-3">✓</div>
             <p className="font-bold text-green-400 text-lg">No se detectaron triggers críticos recientemente</p>
             <p className="text-sm text-green-400/80 mt-2 font-medium">
@@ -128,11 +128,11 @@ export function CriticalTriggers({ triggers, maxDisplay = 5 }: CriticalTriggersP
             return (
               <div
                 key={trigger.id}
-                className="bg-muted/20 border-2 border-border rounded-xl p-4 hover:border-border/60 hover:bg-muted/30 transition-all"
+                className="bg-muted/20 border-2 border-border rounded-2xl p-4 hover:border-border/60 hover:bg-muted/30 transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-3 flex-1">
-                    <div className="text-2xl bg-muted/50 p-2 rounded-lg">{emoji}</div>
+                    <div className="text-2xl bg-muted/50 p-2 rounded-2xl">{emoji}</div>
                     <span className="font-bold text-foreground text-sm">
                       {label}
                     </span>
@@ -142,7 +142,7 @@ export function CriticalTriggers({ triggers, maxDisplay = 5 }: CriticalTriggersP
                   </Badge>
                 </div>
 
-                <p className="text-sm text-muted-foreground italic ml-1 mb-3 bg-muted/30 p-3 rounded-lg border border-border/50">
+                <p className="text-sm text-muted-foreground italic ml-1 mb-3 bg-muted/30 p-3 rounded-2xl border border-border/50">
                   "{trigger.detectedText || trigger.message.content.substring(0, 100)}..."
                 </p>
 
@@ -166,7 +166,7 @@ export function CriticalTriggers({ triggers, maxDisplay = 5 }: CriticalTriggersP
         </div>
 
         {triggers.filter((t) => t.weight > 0.6).length > maxDisplay && (
-          <div className="mt-4 text-center text-sm text-muted-foreground font-semibold bg-muted/30 py-2 rounded-lg">
+          <div className="mt-4 text-center text-sm text-muted-foreground font-semibold bg-muted/30 py-2 rounded-2xl">
             + {triggers.filter((t) => t.weight > 0.6).length - maxDisplay} triggers críticos más
           </div>
         )}

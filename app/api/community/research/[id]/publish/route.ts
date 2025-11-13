@@ -8,7 +8,7 @@ import { ResearchService } from '@/lib/services/research.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,7 +16,7 @@ export async function POST(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const project = await ResearchService.publishProject(params.id, session.user.id);
+    const project = await ResearchService.publishProject((await params).id, session.user.id);
     return NextResponse.json(project);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

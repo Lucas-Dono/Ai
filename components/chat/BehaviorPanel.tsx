@@ -154,7 +154,7 @@ export function BehaviorPanel({ agentId, behaviorData, intensity = 0 }: Behavior
 
           {/* Warning Message */}
           {(behaviorData.safetyLevel === "CRITICAL" || behaviorData.safetyLevel === "EXTREME_DANGER") && (
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-3">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5" />
                 <div className="text-xs text-orange-700 dark:text-orange-300">

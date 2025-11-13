@@ -88,26 +88,23 @@ export function ImageUploader({
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      // TODO: Implementar endpoint de upload
-      // Por ahora, convertir a base64 (temporal)
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string;
-        onImageUploaded(dataUrl);
-        setIsUploading(false);
-      };
-      reader.readAsDataURL(selectedFile);
+      // Upload al servidor
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // En producción, esto sería:
-      // const response = await fetch('/api/upload/avatar', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-      // const { url } = await response.json();
-      // onImageUploaded(url);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al subir la imagen');
+      }
+
+      const { url } = await response.json();
+      onImageUploaded(url);
+      setIsUploading(false);
     } catch (err) {
       console.error('Error uploading image:', err);
-      setError('Error al subir la imagen. Intenta de nuevo.');
+      setError(err instanceof Error ? err.message : 'Error al subir la imagen. Intenta de nuevo.');
       setIsUploading(false);
     }
   };
@@ -134,7 +131,7 @@ export function ImageUploader({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all',
+          'border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all',
           isDragging
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
@@ -152,7 +149,7 @@ export function ImageUploader({
         <div className="flex flex-col items-center gap-3">
           {previewUrl ? (
             <>
-              <div className="relative w-48 h-48 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+              <div className="relative w-48 h-48 rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700">
                 <img
                   src={previewUrl}
                   alt="Preview"
@@ -216,14 +213,14 @@ export function ImageUploader({
 
       {/* Error */}
       {error && (
-        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
           <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
         </div>
       )}
 
       {/* Info */}
       {!selectedFile && !error && (
-        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl">
           <p className="text-xs text-gray-600 dark:text-gray-400">
             <strong>Consejo:</strong> Para mejores resultados, usa imágenes cuadradas o verticales
             de al menos 512x512 píxeles.

@@ -131,13 +131,13 @@ export function VoiceRecorder({ onSend, onCancel, isHoldMode = false }: VoiceRec
           }
           return newDuration;
         });
-      }, 1000);
+      }, 1000) as unknown as NodeJS.Timeout;
 
       // Actualizar niveles de audio simulados
       levelUpdateInterval.current = setInterval(() => {
         const randomLevel = Math.random() * 0.8 + 0.2;
         updateAudioLevels(randomLevel);
-      }, 100);
+      }, 100) as unknown as NodeJS.Timeout;
     } catch (error) {
       console.error('Error al iniciar grabación:', error);
       onCancel();

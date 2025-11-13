@@ -259,14 +259,14 @@ export class KnowledgeAutoDetector {
     userMessage: string
   ): Promise<KnowledgeDetectionResult[]> {
     // Obtener todos los knowledge groups del agente
-    const agent = await prisma.agent.findUnique({
-      where: { id: agentId },
-      include: {
-        knowledge: true,
+    const knowledgeGroups = await prisma.knowledgeGroup.findMany({
+      where: {
+        agentId,
+        isActive: true
       },
     });
 
-    if (!agent || !agent.knowledge || agent.knowledge.length === 0) {
+    if (!knowledgeGroups || knowledgeGroups.length === 0) {
       return [];
     }
 
@@ -274,7 +274,7 @@ export class KnowledgeAutoDetector {
     const lowerMessage = userMessage.toLowerCase();
 
     // Analizar cada knowledge group
-    for (const knowledgeGroup of agent.knowledge) {
+    for (const knowledgeGroup of knowledgeGroups) {
       const detection = this.analyzeKnowledgeGroup(
         knowledgeGroup,
         userMessage,
@@ -415,7 +415,7 @@ export class KnowledgeAutoDetector {
     const contents: string[] = [];
 
     for (const detection of topDetections) {
-      const knowledgeGroup = await prisma.knowledge.findUnique({
+      const knowledgeGroup = await prisma.knowledgeGroup.findUnique({
         where: { id: detection.groupId },
       });
 

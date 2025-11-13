@@ -180,7 +180,7 @@ export function Step1FormatSelection({ selectedFormat, userTier, onSelect }: Ste
 
       {/* Info para usuarios FREE */}
       {userTier === 'free' && (
-        <div className="max-w-2xl mx-auto mt-8 p-6 rounded-xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 border border-blue-500/20">
+        <div className="max-w-2xl mx-auto mt-8 p-6 rounded-2xl bg-gradient-to-br from-blue-500/5 to-purple-500/5 border border-blue-500/20">
           <div className="flex items-start gap-4">
             <div className="text-3xl">💡</div>
             <div className="flex-1">

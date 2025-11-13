@@ -9,6 +9,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/logger';
 import { detectTriggers, updateLastProactiveMessage } from './trigger-detector';
 import { generateProactiveMessage } from './message-generator';
+import type { ProactiveTrigger } from '@/lib/proactive-behavior/trigger-detector';
 
 const log = createLogger('ProactiveService');
 
@@ -84,7 +85,7 @@ export async function processAgent(
     );
 
     // Generate message
-    const messageContent = await generateProactiveMessage(agentId, userId, trigger);
+    const messageContent = await generateProactiveMessage(agentId, userId, trigger as unknown as ProactiveTrigger);
 
     // Save proactive message record
     const proactiveMessage = await prisma.proactiveMessage.create({

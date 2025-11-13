@@ -206,7 +206,7 @@ export default function SimpleWorldCreatorPage() {
         </Link>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
             <Sparkles className="h-7 w-7 text-white" />
           </div>
           <div>
@@ -265,7 +265,7 @@ export default function SimpleWorldCreatorPage() {
       {/* Loading overlay para creación */}
       {creating && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-card p-8 rounded-xl shadow-2xl text-center max-w-md">
+          <div className="bg-card p-8 rounded-2xl shadow-2xl text-center max-w-md">
             <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
             <h3 className="text-xl font-bold md-text-primary mb-2">
               Creando tu mundo...

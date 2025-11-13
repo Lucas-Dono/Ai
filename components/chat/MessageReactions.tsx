@@ -120,7 +120,7 @@ export function MessageReactions({
 
       {/* Emoji picker */}
       {showPicker && (
-        <div className="absolute left-0 top-full mt-2 bg-[#1f1f1f] border border-[#2a2a2a] rounded-lg p-3 shadow-xl z-50 max-w-sm">
+        <div className="absolute left-0 top-full mt-2 bg-[#1f1f1f] border border-[#2a2a2a] rounded-2xl p-3 shadow-xl z-50 max-w-sm">
           <div className="max-h-60 overflow-y-auto space-y-3">
             {Object.entries(EMOJI_CATEGORIES).map(([category, emojis]) => (
               <div key={category}>

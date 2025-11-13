@@ -4,15 +4,28 @@ import { getAuthSession } from '@/lib/middleware/auth-helper';
 import { CommunityService } from '@/lib/services/community.service';
 
 /**
- * GET /api/community/communities/[id] - Obtener comunidad
+ * GET /api/community/communities/[id] - Obtener comunidad por ID o slug
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const community = await CommunityService.getCommunity(params.id);
-    return NextResponse.json(community);
+    const session = await getAuthSession(request);
+    const identifier = (await params).id;
+
+    // Intentar obtener por slug primero, luego por ID
+    let community = await CommunityService.getCommunityBySlug(identifier, session?.user?.id);
+
+    if (!community) {
+      community = await CommunityService.getCommunity(identifier, session?.user?.id);
+    }
+
+    if (!community) {
+      return NextResponse.json({ error: 'Comunidad no encontrada' }, { status: 404 });
+    }
+
+    return NextResponse.json({ community });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 404 });
   }
@@ -23,7 +36,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -33,7 +46,7 @@ export async function PATCH(
 
     const data = await request.json();
     const community = await CommunityService.updateCommunity(
-      params.id,
+      (await params).id,
       session.user.id,
       data
     );
@@ -49,7 +62,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -57,7 +70,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await CommunityService.deleteCommunity(params.id, session.user.id);
+    const result = await CommunityService.deleteCommunity((await params).id, session.user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

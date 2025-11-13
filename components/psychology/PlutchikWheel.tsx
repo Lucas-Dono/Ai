@@ -283,7 +283,7 @@ export function PlutchikWheel({ emotions, size = 400 }: PlutchikWheelProps) {
           {petalPaths.map((petal) => (
             <div
               key={petal.key}
-              className="flex items-center gap-3 bg-muted/30 rounded-lg p-2.5 border border-border hover:border-border/60 hover:bg-muted/50 transition-all"
+              className="flex items-center gap-3 bg-muted/30 rounded-2xl p-2.5 border border-border hover:border-border/60 hover:bg-muted/50 transition-all"
             >
               <div
                 className="w-5 h-5 rounded-full border-2 border-background shadow-md flex-shrink-0"

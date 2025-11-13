@@ -5,10 +5,10 @@ import { prisma } from "@/lib/prisma";
 // GET /api/agents/[id]/reviews - Obtener reviews de un agente
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const agentId = params.id;
+    const { id: agentId } = await params;
 
     // Obtener reviews con información del usuario
     const reviews = await prisma.review.findMany({
@@ -70,7 +70,7 @@ export async function GET(
 // POST /api/agents/[id]/reviews - Crear o actualizar review
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -79,7 +79,7 @@ export async function POST(
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const agentId = params.id;
+    const { id: agentId } = await params;
     const body = await request.json();
     const { rating, comment } = body;
 
@@ -182,7 +182,7 @@ export async function POST(
 // DELETE /api/agents/[id]/reviews - Eliminar review del usuario actual
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -191,7 +191,7 @@ export async function DELETE(
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const agentId = params.id;
+    const { id: agentId } = await params;
 
     // Obtener usuario
     const user = await prisma.user.findUnique({

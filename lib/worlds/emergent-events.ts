@@ -12,8 +12,11 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/logger';
 import type { NarrativeMetrics, NarrativeWarning } from './narrative-analyzer';
+import { getEventApplicationService } from './event-application.service';
+import { EventType, type HealthEventData, type EmotionEventData } from './event-types';
 
 const log = createLogger('EmergentEvents');
 
@@ -39,6 +42,12 @@ export interface EmergentEventTemplate {
   involvedCharactersCount: number; // Cuántos personajes involucrar
   prompt: string; // Prompt especial para el evento
   priority: number; // 0-1, mayor = más urgente
+  // Efectos en el estado de los agentes (opcional)
+  stateEffects?: {
+    eventType: EventType;
+    applyToAll?: boolean; // Si aplica a todos los involucrados
+    applyToFirst?: boolean; // Si aplica solo al primero
+  };
 }
 
 export interface GeneratedEvent {
@@ -82,6 +91,12 @@ export class EmergentEventsGenerator {
 
     if (!world || !world.storyMode) {
       return null; // Solo en story mode
+    }
+
+    // OPTIMIZATION: No generar eventos si el mundo está pausado
+    if (world.isPaused) {
+      log.debug({ worldId: this.worldId }, 'Skipping event generation: world is paused');
+      return null;
     }
 
     // Evaluar templates disponibles
@@ -406,15 +421,141 @@ Reacciona al cambio de ubicación.`,
       },
     });
 
+    // ========================================
+    // APLICAR EFECTOS DE ESTADO A AGENTES
+    // ========================================
+    if (event.template.stateEffects) {
+      await this.applyStateEffects(event);
+    }
+
     log.info(
       {
         worldId: this.worldId,
         eventName: event.template.name,
         charactersCount: event.involvedCharacters.length,
         turn: currentTurn,
+        hasStateEffects: !!event.template.stateEffects,
       },
       '🎪 Emergent event applied to world'
     );
+  }
+
+  /**
+   * Aplica efectos de estado a los agentes involucrados en un evento
+   */
+  private async applyStateEffects(event: GeneratedEvent): Promise<void> {
+    if (!event.template.stateEffects) return;
+
+    const eventService = getEventApplicationService(this.worldId);
+    const { eventType, applyToAll, applyToFirst } = event.template.stateEffects;
+
+    const agentsToAffect = applyToAll
+      ? event.involvedCharacters
+      : applyToFirst && event.involvedCharacters.length > 0
+      ? [event.involvedCharacters[0]]
+      : [];
+
+    for (const agentId of agentsToAffect) {
+      try {
+        // Crear event data según el tipo
+        const eventData = this.createEventDataForType(eventType, event);
+
+        // Aplicar evento
+        const result = await eventService.applyEvent({
+          worldId: this.worldId,
+          agentId,
+          eventType,
+          eventData,
+          reason: `Emergent event: ${event.template.name}`,
+        });
+
+        log.info(
+          {
+            worldId: this.worldId,
+            agentId,
+            eventType,
+            changes: result.stateChanges,
+          },
+          '✅ State effects applied to agent'
+        );
+      } catch (error) {
+        log.error(
+          {
+            worldId: this.worldId,
+            agentId,
+            eventType,
+            error,
+          },
+          '❌ Failed to apply state effects'
+        );
+      }
+    }
+  }
+
+  /**
+   * Crea event data apropiado según el tipo de evento
+   */
+  private createEventDataForType(eventType: EventType, event: GeneratedEvent): any {
+    // Health events
+    if (eventType === EventType.ILLNESS) {
+      return {
+        healthDelta: -0.3,
+        energyDelta: -0.4,
+        duration: 5,
+        description: `Enfermó durante el evento: ${event.template.name}`,
+      } as HealthEventData;
+    }
+
+    if (eventType === EventType.INJURY) {
+      return {
+        healthDelta: -0.4,
+        energyDelta: -0.3,
+        duration: 7,
+        description: `Se lesionó durante el evento: ${event.template.name}`,
+      } as HealthEventData;
+    }
+
+    if (eventType === EventType.EXHAUSTION) {
+      return {
+        healthDelta: -0.1,
+        energyDelta: -0.5,
+        duration: 2,
+        description: `Quedó exhausto tras el evento: ${event.template.name}`,
+      } as HealthEventData;
+    }
+
+    // Emotion events
+    if (eventType === EventType.HAPPINESS) {
+      return {
+        emotionType: 'joy' as const,
+        intensity: 0.7,
+        duration: 7,
+        description: `Se sintió muy feliz durante el evento: ${event.template.name}`,
+      } as EmotionEventData;
+    }
+
+    if (eventType === EventType.ANXIETY) {
+      return {
+        emotionType: 'fear' as const,
+        intensity: 0.6,
+        duration: 5,
+        description: `Sintió ansiedad durante el evento: ${event.template.name}`,
+      } as EmotionEventData;
+    }
+
+    if (eventType === EventType.TRAUMA) {
+      return {
+        emotionType: 'fear' as const,
+        intensity: 0.9,
+        duration: 30,
+        description: `Sufrió un trauma durante el evento: ${event.template.name}`,
+      } as EmotionEventData;
+    }
+
+    // Default
+    return {
+      description: `Afectado por evento: ${event.template.name}`,
+    };
   }
 
   /**
@@ -424,7 +565,7 @@ Reacciona al cambio de ubicación.`,
     await prisma.world.update({
       where: { id: this.worldId },
       data: {
-        currentEmergentEvent: prisma.JsonNull,
+        currentEmergentEvent: Prisma.JsonNull,
       },
     });
   }

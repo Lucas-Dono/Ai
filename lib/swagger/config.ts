@@ -3,10 +3,10 @@ import type { SwaggerDefinition } from "swagger-jsdoc";
 export const swaggerDefinition: SwaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Creador de Inteligencias API",
+    title: "Circuit Prompt AI API",
     version: "1.0.0",
     description: `
-# Creador de Inteligencias API
+# Circuit Prompt AI API
 
 API REST completa para crear y gestionar agentes de IA emocionales y administrativos.
 

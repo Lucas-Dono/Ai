@@ -4,8 +4,9 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, Copy, Heart } from "lucide-react";
+import { Star, Copy, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
+import { ShareAgentDialog } from "@/components/share/ShareAgentDialog";
 
 interface AgentCardProps {
   agent: {
@@ -32,6 +33,7 @@ interface AgentCardProps {
 
 export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
   const [isCloning, setIsCloning] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const tags = Array.isArray(agent.tags) ? agent.tags : [];
 
   const handleClone = async (e: React.MouseEvent) => {
@@ -68,7 +70,7 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
 
   return (
     <Card
-      className="cursor-pointer hover:border-primary transition-all group"
+      className="cursor-pointer hover:border-primary transition-all group hover-lift-glow"
       onClick={() => onViewDetails(agent.id)}
     >
       {agent.featured && (
@@ -127,17 +129,42 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
           </div>
         </div>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleClone}
-          disabled={isCloning}
-          className="group-hover:bg-primary group-hover:text-primary-foreground"
-        >
-          <Copy className="w-3 h-3 mr-1" />
-          {isCloning ? "Cloning..." : "Clone"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowShareDialog(true);
+            }}
+            className="px-2"
+          >
+            <Share2 className="w-3 h-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClone}
+            disabled={isCloning}
+            className="group-hover:bg-primary group-hover:text-primary-foreground"
+          >
+            <Copy className="w-3 h-3 mr-1" />
+            {isCloning ? "Cloning..." : "Clone"}
+          </Button>
+        </div>
       </CardFooter>
+
+      {/* Share Dialog */}
+      <ShareAgentDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        agent={{
+          id: agent.id,
+          name: agent.name,
+          avatar: agent.avatar,
+          description: agent.description,
+        }}
+      />
     </Card>
   );
 }

@@ -1,0 +1,481 @@
+/**
+ * Feature Flags System - Usage Examples
+ *
+ * Este archivo muestra ejemplos prácticos de cómo usar el sistema de feature flags
+ * en diferentes contextos.
+ */
+
+// ============================================================================
+// BACKEND EXAMPLES
+// ============================================================================
+
+// Example 1: Protect API route with requireFeature
+// -------------------------------------------------
+import { NextRequest, NextResponse } from "next/server";
+import { requireFeature } from "@/lib/feature-flags/middleware";
+import { Feature } from "@/lib/feature-flags/types";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export async function createWorldExample(req: NextRequest) {
+  // This will throw FeatureAccessError if user doesn't have WORLDS feature
+  await requireFeature(req, Feature.WORLD_CREATION);
+
+  const session = await auth();
+  const userId = session!.user!.id;
+  const body = await req.json();
+
+  const world = await prisma.world.create({
+    data: {
+      userId,
+      name: body.name,
+      description: body.description,
+    },
+  });
+
+  return NextResponse.json(world);
+}
+
+// Example 2: Use withFeature wrapper
+// -----------------------------------
+import { withFeature } from "@/lib/feature-flags/middleware";
+
+export const POST_createWorld = withFeature(
+  Feature.WORLD_CREATION,
+  async (req: NextRequest) => {
+    // User already validated - has WORLD_CREATION feature
+    const body = await req.json();
+    const session = await auth();
+    const userId = session!.user!.id;
+
+    const world = await prisma.world.create({
+      data: { userId, name: body.name },
+    });
+
+    return NextResponse.json(world);
+  }
+);
+
+// Example 3: Feature with usage limits
+// -------------------------------------
+import { requireFeatureWithLimit } from "@/lib/feature-flags/middleware";
+import { trackFeatureUsage } from "@/lib/feature-flags";
+
+export async function generateImageExample(req: NextRequest) {
+  const session = await auth();
+  const userId = session!.user!.id;
+
+  // Check feature access AND daily usage limit
+  await requireFeatureWithLimit(req, Feature.IMAGE_GENERATION);
+
+  const body = await req.json();
+
+  // Generate image (mock)
+  const imageUrl = await generateImageWithAI(body.prompt);
+
+  // Track usage (increments daily counter)
+  await trackFeatureUsage(userId, Feature.IMAGE_GENERATION, 1);
+
+  return NextResponse.json({ imageUrl });
+}
+
+// Example 4: Non-blocking feature check
+// --------------------------------------
+import { checkFeatureAccess } from "@/lib/feature-flags/middleware";
+
+export async function getAPISettingsExample(req: NextRequest) {
+  const session = await auth();
+  const hasAPI = await checkFeatureAccess(req, Feature.API_ACCESS);
+
+  if (!hasAPI) {
+    return NextResponse.json({
+      message: "API access requires Ultra plan",
+      upgradeUrl: "/pricing?upgrade=ultra",
+    });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session!.user!.id },
+    select: { apiKey: true },
+  });
+
+  return NextResponse.json({ apiKey: user?.apiKey });
+}
+
+// Example 5: Direct service usage
+// --------------------------------
+import {
+  hasFeature,
+  getUserTier,
+  getFeatureLimits,
+  checkLimit,
+} from "@/lib/feature-flags";
+
+export async function backgroundJobExample(userId: string) {
+  // Simple feature check
+  const hasEarlyAccess = await hasFeature(userId, Feature.EARLY_ACCESS);
+  if (hasEarlyAccess) {
+    console.log("User has early access - enable beta features");
+  }
+
+  // Get user tier
+  const tier = await getUserTier(userId);
+  console.log(`User tier: ${tier}`);
+
+  // Get all limits
+  const limits = await getFeatureLimits(userId);
+  console.log(`Max agents: ${limits.maxAgents}`);
+  console.log(`Max worlds: ${limits.maxActiveWorlds}`);
+
+  // Check specific limit with current usage
+  const currentAgents = await prisma.agent.count({ where: { userId } });
+  const agentCheck = await checkLimit(userId, "maxAgents", currentAgents);
+
+  if (!agentCheck.withinLimit) {
+    console.log(`User has reached agent limit: ${agentCheck.limit}`);
+  } else {
+    console.log(`User can create ${agentCheck.remaining} more agents`);
+  }
+}
+
+// Example 6: Error handling
+// --------------------------
+import {
+  FeatureAccessError,
+  FeatureUsageLimitError,
+  handleFeatureError,
+} from "@/lib/feature-flags/middleware";
+
+export async function errorHandlingExample(req: NextRequest) {
+  try {
+    await requireFeature(req, Feature.WORLDS);
+    // ... feature logic
+  } catch (error) {
+    if (error instanceof FeatureAccessError) {
+      return NextResponse.json(
+        {
+          error: "Feature not available",
+          message: error.message,
+          requiredTier: error.featureCheck.requiredTier,
+          upgradeUrl: error.featureCheck.upgradeUrl,
+        },
+        { status: 403 }
+      );
+    }
+
+    // Or use auto-handler
+    return handleFeatureError(error);
+  }
+}
+
+// Example 7: Invalidate cache on plan change
+// -------------------------------------------
+import { invalidateUserTierCache } from "@/lib/feature-flags";
+
+export async function webhookSubscriptionExample(req: Request) {
+  const event = await req.json();
+
+  if (event.type === "subscription.updated") {
+    const userId = event.data.userId;
+    const newPlan = event.data.plan; // "plus" | "ultra"
+
+    // Update plan in database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { plan: newPlan },
+    });
+
+    // Invalidate cache so next request gets fresh tier
+    await invalidateUserTierCache(userId);
+
+    console.log(`User ${userId} upgraded to ${newPlan}`);
+  }
+
+  return new Response("OK");
+}
+
+// ============================================================================
+// FRONTEND EXAMPLES (React/Next.js)
+// ============================================================================
+
+// Example 8: useFeatures hook
+// ---------------------------
+import { useFeatures } from "@/hooks/useFeatures";
+
+function DashboardExample() {
+  const {
+    hasFeature,
+    canCreateWorlds,
+    canGenerateImages,
+    limits,
+    userTier,
+    isLoading,
+  } = useFeatures();
+
+  if (isLoading) {
+    return <div>Loading features...</div>;
+  }
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <p>Your plan: {userTier}</p>
+      <p>Max agents: {limits?.maxAgents}</p>
+
+      {hasFeature(Feature.WORLDS) ? (
+        <button>Create World</button>
+      ) : (
+        <UpgradePrompt feature={Feature.WORLDS} />
+      )}
+
+      {canGenerateImages && (
+        <button>Generate Image</button>
+      )}
+
+      {hasFeature(Feature.API_ACCESS) && (
+        <APISettings />
+      )}
+    </div>
+  );
+}
+
+// Example 9: FeatureGate component
+// ---------------------------------
+import { FeatureGate } from "@/components/features/FeatureGate";
+
+function AppLayoutExample() {
+  return (
+    <div>
+      {/* Always visible */}
+      <AgentsSection />
+
+      {/* Only visible if user has WORLDS */}
+      <FeatureGate feature={Feature.WORLDS}>
+        <WorldsSection />
+      </FeatureGate>
+
+      {/* With custom fallback */}
+      <FeatureGate
+        feature={Feature.API_ACCESS}
+        fallback={<div>Upgrade to Ultra for API access</div>}
+      >
+        <APIDocumentation />
+      </FeatureGate>
+
+      {/* No upgrade prompt */}
+      <FeatureGate feature={Feature.EARLY_ACCESS} showUpgradePrompt={false}>
+        <BetaFeatures />
+      </FeatureGate>
+    </div>
+  );
+}
+
+// Example 10: UpgradePrompt variants
+// -----------------------------------
+import { UpgradePrompt, TierBadge, UpgradeCTA } from "@/components/features/UpgradePrompt";
+
+function UpgradePromptsExample() {
+  const { userTier } = useFeatures();
+
+  return (
+    <div>
+      {/* Alert variant (default) */}
+      <UpgradePrompt feature={Feature.WORLDS} />
+
+      {/* Card variant */}
+      <UpgradePrompt feature={Feature.IMAGE_GENERATION} variant="card" />
+
+      {/* Inline variant */}
+      <UpgradePrompt feature={Feature.API_ACCESS} variant="inline" />
+
+      {/* Tier badge */}
+      <TierBadge tier={userTier} />
+
+      {/* Upgrade CTA */}
+      <UpgradeCTA feature={Feature.WORLDS} />
+    </div>
+  );
+}
+
+// Example 11: Feature with usage limits check
+// --------------------------------------------
+function ImageGeneratorExample() {
+  const { canUseFeature, trackFeatureUsage } = useFeatures();
+
+  const generateImage = async () => {
+    // Check if can use (considers daily limits)
+    const check = await canUseFeature(Feature.IMAGE_GENERATION);
+
+    if (!check.canUse) {
+      toast.error(check.reason);
+      if (check.upgradeUrl) {
+        router.push(check.upgradeUrl);
+      }
+      return;
+    }
+
+    // Show usage info
+    console.log(
+      `Usage: ${check.usage?.count}/${check.usage?.limit} (resets at ${check.usage?.resetAt})`
+    );
+
+    // Generate image
+    const result = await fetch("/api/images/generate", {
+      method: "POST",
+      body: JSON.stringify({ prompt: "..." }),
+    });
+
+    if (result.ok) {
+      // Track usage
+      await trackFeatureUsage(Feature.IMAGE_GENERATION, 1);
+      toast.success("Image generated!");
+    }
+  };
+
+  return <button onClick={generateImage}>Generate Image</button>;
+}
+
+// Example 12: useUserTier hook
+// -----------------------------
+import { useUserTier } from "@/hooks/useFeatures";
+
+function PricingBannerExample() {
+  const { tier, isFree, isPlus, isUltra } = useUserTier();
+
+  // Don't show banner for Ultra users
+  if (isUltra) return null;
+
+  return (
+    <div className="banner">
+      {isFree && (
+        <div>
+          <p>Upgrade to Plus for Worlds and Image Generation!</p>
+          <Link href="/pricing">View Plans</Link>
+        </div>
+      )}
+
+      {isPlus && (
+        <div>
+          <p>Upgrade to Ultra for unlimited features and API access!</p>
+          <Link href="/pricing">View Plans</Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Example 13: Conditional rendering patterns
+// -------------------------------------------
+function SettingsPageExample() {
+  const { hasFeature, limits, getLimit } = useFeatures();
+
+  const maxAgents = getLimit("maxAgents");
+
+  return (
+    <div>
+      <h1>Settings</h1>
+
+      {/* Agents */}
+      <section>
+        <h2>Agents ({limits?.maxAgents} max)</h2>
+        <p>You can create up to {maxAgents} agents</p>
+      </section>
+
+      {/* Worlds - gated */}
+      {hasFeature(Feature.WORLDS) ? (
+        <section>
+          <h2>Worlds ({limits?.maxActiveWorlds} max)</h2>
+          <button>Create World</button>
+        </section>
+      ) : (
+        <UpgradePrompt feature={Feature.WORLDS} variant="card" />
+      )}
+
+      {/* API - gated */}
+      {hasFeature(Feature.API_ACCESS) ? (
+        <section>
+          <h2>API Access</h2>
+          <APIKeyGenerator />
+        </section>
+      ) : (
+        <div>
+          <h2>API Access</h2>
+          <p>Requires Ultra plan</p>
+          <UpgradePrompt feature={Feature.API_ACCESS} variant="inline" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Example 14: FeatureLocked component
+// ------------------------------------
+import { FeatureLocked } from "@/components/features/UpgradePrompt";
+
+function ButtonsExample() {
+  const { hasFeature } = useFeatures();
+
+  return (
+    <div>
+      {/* Regular button */}
+      {hasFeature(Feature.WORLDS) ? (
+        <button>Create World</button>
+      ) : (
+        <FeatureLocked feature={Feature.WORLDS}>
+          <button>Create World</button>
+        </FeatureLocked>
+      )}
+
+      {/* API key button */}
+      {!hasFeature(Feature.API_ACCESS) && (
+        <FeatureLocked feature={Feature.API_ACCESS}>
+          <button>Generate API Key</button>
+        </FeatureLocked>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// MOCK FUNCTIONS (for examples)
+// ============================================================================
+
+async function generateImageWithAI(prompt: string): Promise<string> {
+  // Mock implementation
+  return "https://example.com/image.png";
+}
+
+function AgentsSection() {
+  return <div>Agents Section</div>;
+}
+
+function WorldsSection() {
+  return <div>Worlds Section</div>;
+}
+
+function APISettings() {
+  return <div>API Settings</div>;
+}
+
+function APIDocumentation() {
+  return <div>API Documentation</div>;
+}
+
+function BetaFeatures() {
+  return <div>Beta Features</div>;
+}
+
+function APIKeyGenerator() {
+  return <div>API Key Generator</div>;
+}
+
+const toast = {
+  error: (msg: string) => console.error(msg),
+  success: (msg: string) => console.log(msg),
+};
+
+const router = {
+  push: (path: string) => console.log(`Navigate to ${path}`),
+};
+
+export {};

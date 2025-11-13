@@ -327,7 +327,7 @@ RESPONDE SOLO CON UN JSON VÁLIDO en el siguiente formato:
       "backstory": "Historia de fondo del personaje (50-100 palabras)"
     }
   ],
-  ${worldType === 'story' || worldType === 'roleplay' ? `"suggestedEvents": [
+  ${request.worldType === 'story' || request.worldType === 'roleplay' ? `"suggestedEvents": [
     {
       "name": "Nombre del evento",
       "description": "Descripción del evento y su importancia",

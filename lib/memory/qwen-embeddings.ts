@@ -9,6 +9,8 @@
 
 import { createLogger } from '@/lib/logger';
 import path from 'path';
+import { trackEmbedding } from '@/lib/cost-tracking/tracker';
+import { estimateTokens } from '@/lib/cost-tracking/calculator';
 
 const log = createLogger('QwenEmbeddings');
 
@@ -103,13 +105,27 @@ export async function generateQwenEmbedding(text: string): Promise<number[]> {
 
     // Convertir LlamaEmbedding a array de números
     // En v3, el vector está directamente en la propiedad 'vector'
-    const embeddingArray = Array.from(embedding.vector);
+    const embeddingArray = Array.from(embedding.vector) as number[];
 
     const genTime = Date.now() - startTime;
     log.debug(
       { textLength: text.length, embeddingDim: embeddingArray.length, timeMs: genTime },
       'Embedding generado'
     );
+
+    // Track embedding cost (local model, cost is 0 but we track for monitoring)
+    const tokens = estimateTokens(text);
+    trackEmbedding({
+      provider: 'qwen-local',
+      model: 'qwen3-embedding-0.6b-q8',
+      tokens,
+      cost: 0, // Local model, no API cost
+      metadata: {
+        textLength: text.length,
+        embeddingDim: embeddingArray.length,
+        timeMs: genTime,
+      },
+    }).catch(err => log.warn({ error: err.message }, 'Failed to track embedding cost'));
 
     return embeddingArray;
   } catch (error) {

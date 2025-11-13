@@ -102,7 +102,7 @@ export function usePresence(options: UsePresenceOptions = {}): UsePresenceReturn
   useEffect(() => {
     if (!userId) return;
 
-    let activityTimer: NodeJS.Timeout;
+    let activityTimer: ReturnType<typeof setTimeout>;
     let isAway = false;
 
     const resetActivityTimer = () => {

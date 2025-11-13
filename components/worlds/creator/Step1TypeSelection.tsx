@@ -88,7 +88,7 @@ export function Step1TypeSelection({ selectedType, onSelect }: Step1Props) {
       </div>
 
       {/* Help text */}
-      <div className="mt-8 p-4 rounded-lg bg-muted/50 border border-border">
+      <div className="mt-8 p-4 rounded-2xl bg-muted/50 border border-border">
         <p className="text-sm md-text-secondary">
           💡 <strong>Consejo:</strong> Si no estás seguro, empieza con "Chat Social" para
           familiarizarte con el sistema. Luego puedes crear mundos más complejos.

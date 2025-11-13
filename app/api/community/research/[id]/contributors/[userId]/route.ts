@@ -8,7 +8,7 @@ import { ResearchService } from '@/lib/services/research.service';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -16,10 +16,11 @@ export async function PATCH(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const { id, userId } = await params;
     const { role } = await request.json();
     const contributor = await ResearchService.acceptContributor(
-      params.id,
-      params.userId,
+      id,
+      userId,
       session.user.id,
       role
     );
@@ -35,7 +36,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -43,9 +44,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const { id, userId } = await params;
     const result = await ResearchService.removeContributor(
-      params.id,
-      params.userId,
+      id,
+      userId,
       session.user.id
     );
 

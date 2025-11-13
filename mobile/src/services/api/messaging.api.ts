@@ -47,7 +47,7 @@ export const messagingApi = {
    * Obtener conversaciones
    */
   async getConversations() {
-    const response = await apiClient.get('/api/messages/conversations') as any;
+    const response: any = await apiClient.get('/api/messages/conversations');
     return response.data as Conversation[];
   },
 
@@ -55,7 +55,7 @@ export const messagingApi = {
    * Crear o obtener conversación
    */
   async createConversation(participants: string[], title?: string) {
-    const response = await apiClient.post('/api/messages/conversations', {
+    const response: any = await apiClient.post('/api/messages/conversations', {
       participants,
       title,
     });
@@ -66,17 +66,17 @@ export const messagingApi = {
    * Obtener mensajes de una conversación
    */
   async getMessages(conversationId: string, params?: { page?: number; limit?: number }) {
-    const response = await apiClient.get(`/messages/conversations/${conversationId}`, {
+    const response: any = await apiClient.get(`/messages/conversations/${conversationId}`, {
       params,
     });
-    return response.data;
+    return response.data as any;
   },
 
   /**
    * Enviar mensaje
    */
   async sendMessage(conversationId: string, content: string, attachments?: any) {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/messages/conversations/${conversationId}/send`,
       {
         content,
@@ -90,23 +90,23 @@ export const messagingApi = {
    * Marcar conversación como leída
    */
   async markAsRead(conversationId: string) {
-    const response = await apiClient.post(`/messages/conversations/${conversationId}/read`) as any;
-    return response.data;
+    const response: any = await apiClient.post(`/messages/conversations/${conversationId}/read`);
+    return response.data as any;
   },
 
   /**
    * Eliminar mensaje
    */
   async deleteMessage(messageId: string) {
-    const response = await apiClient.delete(`/messages/${messageId}`) as any;
-    return response.data;
+    const response: any = await apiClient.delete(`/messages/${messageId}`);
+    return response.data as any;
   },
 
   /**
    * Buscar mensajes
    */
   async searchMessages(query: string, limit?: number) {
-    const response = await apiClient.get('/api/messages/search', {
+    const response: any = await apiClient.get('/api/messages/search', {
       params: { q: query, limit },
     });
     return response.data as Message[];

@@ -26,6 +26,7 @@ import { InternalReasoningEngine } from "./modules/cognition/reasoning";
 import { ActionDecisionEngine } from "./modules/cognition/action-decision";
 import { ResponseGenerator } from "./modules/response/generator";
 import { CharacterGrowthSystem } from "./modules/growth/character-growth";
+import { intelligentStorageSystem } from "./modules/memory/intelligent-storage";
 
 export class EmotionalSystemOrchestrator {
   private appraisalEngine = new AppraisalEngine();
@@ -176,17 +177,41 @@ export class EmotionalSystemOrchestrator {
       });
 
       // ============================================
-      // FASE 8: MEMORY STORAGE
+      // FASE 8: MEMORY STORAGE (INTELLIGENT)
       // ============================================
       console.log("[Phase 8] 💾 Memory Storage...");
-      await this.memorySystem.storeMemory({
-        agentId,
-        event: response.newMemory.event!,
-        userEmotion: response.newMemory.userEmotion,
-        characterEmotion: response.newMemory.characterEmotion,
-        emotionalValence: response.newMemory.emotionalValence!,
-        importance: response.newMemory.importance!,
-      });
+
+      // Obtener decisión de storage del ResponseGenerator
+      const storageDecision = this.responseGenerator.lastStorageDecision;
+
+      if (storageDecision?.shouldStore) {
+        console.log(`[Phase 8] ✅ Storing memory (score: ${storageDecision.finalScore})`);
+
+        // Guardar memoria episódica
+        await this.memorySystem.storeMemory({
+          agentId,
+          event: response.newMemory.event!,
+          userEmotion: response.newMemory.userEmotion,
+          characterEmotion: response.newMemory.characterEmotion,
+          emotionalValence: response.newMemory.emotionalValence!,
+          importance: response.newMemory.importance!,
+          metadata: response.newMemory.metadata,
+        });
+
+        // Persistir entidades detectadas (eventos, personas)
+        if (storageDecision.detectedEntities) {
+          console.log("[Phase 8] 📝 Persisting detected entities...");
+          await intelligentStorageSystem.persistDetectedEntities({
+            agentId,
+            userId: params.userId,
+            detectedEntities: storageDecision.detectedEntities,
+          });
+        }
+      } else {
+        console.log(
+          `[Phase 8] ⏭️  Skipping memory storage (score: ${storageDecision?.finalScore || 0} < threshold)`
+        );
+      }
 
       // ============================================
       // FASE 9: CHARACTER GROWTH (Async)

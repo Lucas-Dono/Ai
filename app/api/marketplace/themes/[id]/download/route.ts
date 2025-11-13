@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthenticatedUser(request);
@@ -28,7 +28,7 @@ export async function POST(
     const platform = body.platform || 'web';
 
     const theme = await MarketplaceThemeService.downloadTheme(
-      params.id,
+      (await params).id,
       user.id,
       platform
     );

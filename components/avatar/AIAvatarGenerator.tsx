@@ -139,7 +139,7 @@ export function AIAvatarGenerator({
 
         <div>
           <Label>Personalidad (referencia)</Label>
-          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm text-gray-700 dark:text-gray-300 max-h-24 overflow-y-auto">
+          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl text-sm text-gray-700 dark:text-gray-300 max-h-24 overflow-y-auto">
             {personality || 'No especificada'}
           </div>
           <p className="text-xs text-gray-500 mt-1">
@@ -192,7 +192,7 @@ export function AIAvatarGenerator({
             </span>
           </div>
 
-          <div className="relative rounded-lg overflow-hidden border-2 border-green-500/50">
+          <div className="relative rounded-2xl overflow-hidden border-2 border-green-500/50">
             <img
               src={generatedImage}
               alt="Avatar generado"
@@ -208,7 +208,7 @@ export function AIAvatarGenerator({
 
       {/* Error */}
       {error && (
-        <div className="flex items-start gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="flex items-start gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
           <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
@@ -222,7 +222,7 @@ export function AIAvatarGenerator({
       )}
 
       {/* Info sobre AI Horde */}
-      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
         <p className="text-xs text-blue-800 dark:text-blue-200">
           <strong>Nota:</strong> La generación usa AI Horde, un servicio gratuito.
           El tiempo de generación puede variar (30s - 5min) según la carga del sistema.

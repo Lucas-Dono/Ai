@@ -1,12 +1,13 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   MessageCircle,
-  Loader2,
   Plus,
   MoreVertical,
   Edit,
@@ -39,6 +40,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TrendingWorldsCarousel } from "@/components/worlds/TrendingWorldsCarousel";
 import { RecommendedForYou } from "@/components/recommendations/RecommendedForYou";
+import { SpecialEventBanner } from "@/components/upgrade/SpecialEventBanner";
+import { PullToRefresh } from "@/components/mobile/PullToRefresh";
+import { EmptyState } from "@/components/ui/empty-states/EmptyState";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { useTranslations } from "next-intl";
+import { ProactiveMessagesWidget } from "@/components/dashboard/ProactiveMessagesWidget";
 
 interface Agent {
   id: string;
@@ -82,39 +90,40 @@ const getCategoryColor = (index: number) => {
 };
 
 // Helper to extract tags from description or name
-const extractTags = (agent: Agent): string[] => {
+const extractTags = (agent: Agent, t: any): string[] => {
   const tags: string[] = [];
 
   // Common patterns
   if (agent.description?.toLowerCase().includes("científico") || agent.description?.toLowerCase().includes("ciencia")) {
-    tags.push("Ciencia");
+    tags.push(t("tags.science"));
   }
   if (agent.description?.toLowerCase().includes("físic")) {
-    tags.push("Física");
+    tags.push(t("tags.physics"));
   }
   if (agent.description?.toLowerCase().includes("arte") || agent.description?.toLowerCase().includes("artista")) {
-    tags.push("Arte");
+    tags.push(t("tags.art"));
   }
   if (agent.description?.toLowerCase().includes("historia") || agent.description?.toLowerCase().includes("históric")) {
-    tags.push("Historia");
+    tags.push(t("tags.history"));
   }
   if (agent.description?.toLowerCase().includes("genio") || agent.description?.toLowerCase().includes("inteligente")) {
-    tags.push("Genio");
+    tags.push(t("tags.genius"));
   }
   if (agent.description?.toLowerCase().includes("cine") || agent.description?.toLowerCase().includes("actor")) {
-    tags.push("Cine");
+    tags.push(t("tags.cinema"));
   }
 
   // If no tags found, add generic ones
   if (tags.length === 0) {
-    if (agent.featured) tags.push("Premium");
-    tags.push("Compañero");
+    if (agent.featured) tags.push(t("tags.premium"));
+    tags.push(t("tags.companion"));
   }
 
   return tags.slice(0, 3);
 };
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -151,6 +160,11 @@ export default function DashboardPage() {
     }
   };
 
+  // Pull-to-refresh handler
+  const handleRefresh = async () => {
+    await Promise.all([fetchAgents(), fetchWorlds()]);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -161,7 +175,7 @@ export default function DashboardPage() {
   }, []);
 
   const handleDeleteAgent = async (agentId: string, agentName: string) => {
-    if (!confirm(`¿Estás seguro de que quieres eliminar a "${agentName}"? Esta acción no se puede deshacer.`)) {
+    if (!confirm(t("actions.deleteConfirm", { name: agentName }))) {
       return;
     }
 
@@ -175,11 +189,11 @@ export default function DashboardPage() {
         setAgents(agents.filter((a) => a.id !== agentId));
       } else {
         const error = await res.json();
-        alert(error.error || "Error al eliminar el compañero");
+        alert(error.error || t("actions.deleteError"));
       }
     } catch (error) {
       console.error("Error deleting agent:", error);
-      alert("Error al eliminar el compañero");
+      alert(t("actions.deleteError"));
     } finally {
       setDeleting(null);
     }
@@ -192,14 +206,14 @@ export default function DashboardPage() {
       });
 
       if (res.ok) {
-        alert(`Se ha creado una copia de "${worldName}" en tus mundos`);
+        alert(t("actions.cloneSuccess", { name: worldName }));
         fetchWorlds();
       } else {
         throw new Error("Failed to clone");
       }
     } catch (error) {
       console.error("Error cloning world:", error);
-      alert("No se pudo clonar el mundo");
+      alert(t("actions.cloneError"));
     }
   };
 
@@ -231,135 +245,147 @@ export default function DashboardPage() {
   const userWorlds = worlds.filter((w) => !w.isPredefined);
 
   const stats = [
-    { icon: Heart, label: `${totalCompanions} compañeros`, color: 'text-pink-400' },
-    { icon: Globe, label: `${worlds.length} mundos`, color: 'text-blue-400' },
-    { icon: MessageCircle, label: `${totalConversations}+ conversaciones`, color: 'text-purple-400' }
+    { icon: Heart, label: t("stats.companions", { count: totalCompanions }), color: 'text-pink-400' },
+    { icon: Globe, label: t("stats.worlds", { count: worlds.length }), color: 'text-blue-400' },
+    { icon: MessageCircle, label: t("stats.conversations", { count: totalConversations }), color: 'text-purple-400' }
   ];
 
   return (
-    <div className="min-h-screen">
+    <ErrorBoundary variant="page">
+    <div className="min-h-screen" data-tour="dashboard-main">
+      {/* Special Event Banner (if active) */}
+      <SpecialEventBanner />
+
       {/* Enhanced Header with Gradient */}
-      <header className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-purple-900/40 p-8 border border-purple-500/20">
+      <header className="mb-6 md:mb-8 relative overflow-hidden rounded-2xl md:rounded-2xl bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-purple-900/40 p-4 md:p-6 lg:p-8 border border-purple-500/20">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 animate-pulse"></div>
         <div className="relative">
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-            Inicio
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+            {t("header.title")}
           </h1>
-          <p className="text-gray-300 mb-6">Gestiona tus compañeros IA y mundos virtuales</p>
+          <p className="text-gray-300 text-sm md:text-base mb-4 md:mb-6">{t("header.subtitle")}</p>
 
           {/* Stats */}
-          <div className="flex gap-6 flex-wrap">
+          <div className="flex gap-2 md:gap-4 lg:gap-6 flex-wrap">
             {stats.map((stat, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-3 bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-700/50"
+                className="flex items-center gap-2 md:gap-3 bg-gray-800/50 backdrop-blur-sm px-3 md:px-4 py-2 rounded-2xl md:rounded-2xl border border-gray-700/50"
               >
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                <span className="text-sm font-medium">{stat.label}</span>
+                <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
+                <span className="text-xs md:text-sm font-medium">{stat.label}</span>
               </motion.div>
             ))}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <Loader2 className="h-10 w-10 animate-spin md-text-secondary" />
-        </div>
-      ) : (
-        <Tabs defaultValue={initialTab} className="space-y-6">
-          <TabsList className="md-surface-container-high p-1 rounded-xl">
+      {/* Proactive Messages Widget - PROMINENT DISPLAY */}
+      <ProactiveMessagesWidget />
+
+      {/* Main Content with Pull-to-Refresh */}
+      <PullToRefresh onRefresh={handleRefresh} className="lg:h-auto">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <LoadingIndicator
+              variant="inline"
+              size="lg"
+              message={t("loading.dashboard")}
+            />
+          </div>
+        ) : (
+          <Tabs defaultValue={initialTab} className="space-y-4 md:space-y-6">
+          <TabsList className="md-surface-container-high p-1 rounded-2xl w-full md:w-auto overflow-x-auto">
             <TabsTrigger
               value="companions"
-              className="px-6 py-2.5 rounded-lg data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm"
+              className="px-4 md:px-6 py-2.5 rounded-2xl data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm whitespace-nowrap flex-1 md:flex-none"
             >
-              <Heart className="h-4 w-4 mr-2" />
-              Compañeros ({companions.length})
+              <Heart className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">{t("tabs.companions", { count: companions.length })}</span>
+              <span className="md:hidden text-xs ml-1">{companions.length}</span>
             </TabsTrigger>
             <TabsTrigger
               value="worlds"
-              className="px-6 py-2.5 rounded-lg data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm"
+              className="px-4 md:px-6 py-2.5 rounded-2xl data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm whitespace-nowrap flex-1 md:flex-none"
             >
-              <Network className="h-4 w-4 mr-2" />
-              Mundos ({worlds.length})
+              <Network className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">{t("tabs.worlds", { count: worlds.length })}</span>
+              <span className="md:hidden text-xs ml-1">{worlds.length}</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Companions Tab */}
-          <TabsContent value="companions" className="space-y-8">
+          <TabsContent value="companions" className="space-y-6 md:space-y-8">
             {/* AI Recommendations */}
             <RecommendedForYou />
 
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Buscar compañeros por nombre, época, personalidad..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl pl-12 pr-32 py-4 focus:outline-none focus:border-purple-500 transition-all duration-300 text-white placeholder:text-gray-400"
-              />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300">
-                <Filter className="w-4 h-4" />
-                Filtros
-              </button>
+            {/* Search Bar - STICKY ON MOBILE */}
+            <div className="lg:relative sticky top-0 lg:top-auto z-30 lg:z-auto -mx-4 lg:mx-0 px-4 lg:px-0 py-3 lg:py-0 bg-[#0B0F1A]/95 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border-b lg:border-b-0 border-gray-800/50 lg:border-transparent">
+              <div className="relative">
+                <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder={t("search.placeholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl md:rounded-2xl pl-10 md:pl-12 pr-20 md:pr-32 py-3 md:py-4 focus:outline-none focus:border-purple-500 transition-all duration-300 text-white placeholder:text-gray-400 text-sm md:text-base"
+                />
+                <button className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 bg-purple-600 hover:bg-purple-700 px-3 md:px-4 py-1.5 md:py-2 rounded-2xl flex items-center gap-1 md:gap-2 transition-all duration-300 min-h-[44px] md:min-h-0">
+                  <Filter className="w-4 h-4" />
+                  <span className="hidden md:inline">{t("search.filters")}</span>
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h2 className="text-2xl font-semibold md-text-primary">Compañeros</h2>
-                <p className="text-sm md-text-secondary mt-1">
-                  {filteredCompanions.length} {filteredCompanions.length === 1 ? "compañero disponible" : "compañeros disponibles"}
+                <h2 className="text-xl md:text-2xl font-semibold md-text-primary">{t("sections.companions.title")}</h2>
+                <p className="text-xs md:text-sm md-text-secondary mt-1">
+                  {t("sections.companions.count", {
+                    count: filteredCompanions.length,
+                    companion: filteredCompanions.length === 1 ? t("sections.companions.companionSingular") : t("sections.companions.companionPlural")
+                  })}
                 </p>
               </div>
-              <Link href="/constructor">
-                <Button className="md-button md-button-filled px-6 py-2.5">
+              <Link href="/constructor" className="hidden md:block">
+                <Button className="md-button md-button-filled px-4 md:px-6 py-2.5">
                   <Plus className="h-5 w-5 mr-2" />
-                  Nuevo Compañero
+                  <span className="hidden sm:inline">{t("actions.newCompanion")}</span>
+                  <span className="sm:hidden">{t("actions.new")}</span>
                 </Button>
               </Link>
             </div>
 
             {companions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="md-card md-card-outlined p-12 text-center max-w-md">
-                  <div className="h-20 w-20 rounded-full md-surface-container-highest flex items-center justify-center mx-auto mb-6">
-                    <Heart className="h-10 w-10 md-text-secondary" />
-                  </div>
-                  <h2 className="text-xl font-semibold md-text-primary mb-2">
-                    Crea tu primer compañero
-                  </h2>
-                  <p className="md-text-secondary mb-6">
-                    Los compañeros IA tienen emociones, memoria y desarrollan relaciones únicas contigo
-                  </p>
-                  <Link href="/constructor">
-                    <Button className="md-button md-button-filled px-6 py-2.5">
-                      <Plus className="h-5 w-5 mr-2" />
-                      Comenzar
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+              <EmptyState
+                icon={Heart}
+                iconColor="text-pink-400 dark:text-pink-500"
+                gradientFrom="from-pink-100"
+                gradientTo="to-rose-100"
+                title={t("empty.companions.title")}
+                description={t("empty.companions.description")}
+                actionLabel={t("empty.companions.action")}
+                onAction={() => router.push("/constructor")}
+              />
             ) : (
               <>
                 {/* Recomendados Section - Enhanced */}
                 {recommendedCompanions.length > 0 && (
                   <div>
-                    <div className="flex items-center gap-3 mb-6">
-                      <Crown className="w-6 h-6 text-yellow-400" />
-                      <h2 className="text-2xl font-bold">Recomendados</h2>
-                      <span className="text-sm text-gray-400 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
-                        Personajes premium con personalidades avanzadas
+                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-wrap">
+                      <Crown className="w-5 h-5 md:w-6 md:h-6 text-yellow-400" />
+                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.recommended.title")}</h2>
+                      <span className="text-xs md:text-sm text-gray-400 bg-yellow-500/10 px-2 md:px-3 py-1 rounded-full border border-yellow-500/20">
+                        <span className="hidden md:inline">{t("sections.recommended.subtitle")}</span>
+                        <span className="md:hidden">{t("tags.premium")}</span>
                       </span>
                     </div>
-                    <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
                       {recommendedCompanions.map((agent, idx) => {
-                        const tags = extractTags(agent);
+                        const tags = extractTags(agent, t);
                         return (
                           <motion.div
                             key={agent.id}
@@ -371,18 +397,18 @@ export default function DashboardPage() {
                               ease: [0.4, 0, 0.2, 1],
                             }}
                           >
-                            <div className="group relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/20">
+                            <div data-tour={idx === 0 ? "agent-card" : undefined} className="group relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/20">
                               {/* Premium badge */}
                               <div className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
                                 <Crown className="w-3 h-3" />
-                                PREMIUM
+                                {t("tags.premium").toUpperCase()}
                               </div>
 
                               {/* Trending badge */}
                               {(agent.cloneCount || 0) > 5 && (
                                 <div className="absolute top-3 right-3 bg-pink-500/20 backdrop-blur-sm text-pink-400 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                                   <TrendingUp className="w-3 h-3" />
-                                  Trending
+                                  {t("tags.trending")}
                                 </div>
                               )}
 
@@ -434,7 +460,7 @@ export default function DashboardPage() {
                               <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
                                 <div className="flex items-center gap-1">
                                   <MessageCircle className="w-4 h-4" />
-                                  {((agent.cloneCount || 0) * 10).toLocaleString()} interacciones
+                                  {t("sections.recommended.interactions", { count: (agent.cloneCount || 0) * 10 })}
                                 </div>
                                 {agent.rating && agent.rating > 0 ? (
                                   <div className="flex items-center gap-1">
@@ -445,24 +471,24 @@ export default function DashboardPage() {
                                 ) : (
                                   <div className="flex items-center gap-1 text-gray-500">
                                     <Star className="w-4 h-4" />
-                                    Sin calificaciones
+                                    {t("sections.recommended.noRatings")}
                                   </div>
                                 )}
                               </div>
 
                               {/* Reason why recommended */}
-                              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3 mb-4">
+                              <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-3 mb-4">
                                 <p className="text-xs text-purple-300 flex items-center gap-2">
                                   <Sparkles className="w-3 h-3" />
-                                  Popular en conversaciones sobre {tags[0]?.toLowerCase() || 'temas diversos'}
+                                  {t("sections.recommended.popularIn", { topic: tags[0]?.toLowerCase() || t("sections.recommended.diverseTopics") })}
                                 </p>
                               </div>
 
                               {/* Button */}
                               <Link href={`/agentes/${agent.id}`} className="block">
-                                <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-gray-900 font-semibold py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-yellow-500/30 border-0">
+                                <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-gray-900 font-semibold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-yellow-500/30 border-0">
                                   <MessageCircle className="h-5 w-5" />
-                                  Chatear ahora
+                                  {t("actions.chatNow")}
                                 </Button>
                               </Link>
                             </div>
@@ -476,27 +502,27 @@ export default function DashboardPage() {
                 {/* Creados por ti Section - Enhanced */}
                 {myCompanions.length > 0 && (
                   <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <Heart className="w-6 h-6 text-pink-400" />
-                        <h2 className="text-2xl font-bold">Creados por ti</h2>
-                        <span className="text-sm text-gray-400">{myCompanions.length}</span>
+                    <div className="flex items-center justify-between mb-4 md:mb-6 flex-wrap gap-3">
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <Heart className="w-5 h-5 md:w-6 md:h-6 text-pink-400" />
+                        <h2 className="text-xl md:text-2xl font-bold">{t("sections.myCompanions.title")}</h2>
+                        <span className="text-xs md:text-sm text-gray-400">{myCompanions.length}</span>
                       </div>
-                      <Link href="/constructor">
-                        <Button className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300">
+                      <Link href="/constructor" className="hidden md:block">
+                        <Button className="bg-purple-600 hover:bg-purple-700 px-3 md:px-4 py-2 rounded-2xl flex items-center gap-2 transition-all duration-300 text-sm md:text-base">
                           <Plus className="w-4 h-4" />
-                          Nuevo Compañero
+                          <span className="hidden sm:inline">{t("actions.newCompanion")}</span>
                         </Button>
                       </Link>
                     </div>
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {myCompanions.map((agent, idx) => {
                         const hoursSinceCreated = agent.createdAt
                           ? Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / (1000 * 60 * 60))
                           : 0;
                         const displayTime = hoursSinceCreated < 24
-                          ? `Hace ${hoursSinceCreated}h`
-                          : `Hace ${Math.floor(hoursSinceCreated / 24)}d`;
+                          ? t("sections.myCompanions.hoursAgo", { hours: hoursSinceCreated })
+                          : t("sections.myCompanions.daysAgo", { days: Math.floor(hoursSinceCreated / 24) });
 
                         return (
                           <motion.div
@@ -550,7 +576,7 @@ export default function DashboardPage() {
                                     <Link href={`/agentes/${agent.id}/edit`}>
                                       <DropdownMenuItem className="md-list-item cursor-pointer">
                                         <Edit className="h-4 w-4 mr-2" />
-                                        Editar
+                                        {t("actions.edit")}
                                       </DropdownMenuItem>
                                     </Link>
                                     <DropdownMenuSeparator className="my-1" />
@@ -563,11 +589,11 @@ export default function DashboardPage() {
                                       disabled={deleting === agent.id}
                                     >
                                       {deleting === agent.id ? (
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        <LoadingIndicator variant="spinner" size="sm" className="mr-2" />
                                       ) : (
                                         <Trash2 className="h-4 w-4 mr-2" />
                                       )}
-                                      Eliminar
+                                      {t("actions.delete")}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -580,14 +606,14 @@ export default function DashboardPage() {
                               <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
                                 <span className="flex items-center gap-1">
                                   <MessageCircle className="w-3 h-3" />
-                                  {(agent.cloneCount || 0) * 2} mensajes
+                                  {t("sections.myCompanions.messages", { count: (agent.cloneCount || 0) * 2 })}
                                 </span>
                               </div>
 
                               <Link href={`/agentes/${agent.id}`} className="block">
-                                <Button className="w-full bg-gray-700/50 hover:bg-purple-600 text-white py-2 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+                                <Button className="w-full bg-gray-700/50 hover:bg-purple-600 text-white py-2 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
                                   <MessageCircle className="w-4 h-4" />
-                                  Abrir chat
+                                  {t("actions.openChat")}
                                 </Button>
                               </Link>
                             </div>
@@ -601,14 +627,14 @@ export default function DashboardPage() {
                 {/* Más vistos Section - Enhanced */}
                 {popularCompanions.length > 0 && (
                   <div>
-                    <div className="flex items-center gap-3 mb-6">
-                      <Users className="w-6 h-6 text-blue-400" />
-                      <h2 className="text-2xl font-bold">Más vistos</h2>
-                      <span className="text-sm text-gray-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
-                        Popular
+                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                      <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-400" />
+                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.popular.title")}</h2>
+                      <span className="text-xs md:text-sm text-gray-400 bg-blue-500/10 px-2 md:px-3 py-1 rounded-full border border-blue-500/20">
+                        {t("tags.popular")}
                       </span>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+                    <div className="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                       {popularCompanions.slice(0, 6).map((agent, idx) => {
                         const isNew = agent.createdAt &&
                           (Date.now() - new Date(agent.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
@@ -625,14 +651,14 @@ export default function DashboardPage() {
                             }}
                           >
                             <Link href={`/agentes/${agent.id}`}>
-                              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-4 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-110 cursor-pointer group relative">
+                              <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-110 cursor-pointer group relative">
                                 {isNew && (
                                   <div className="absolute -top-2 -right-2 bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-bold z-10">
-                                    NEW
+                                    {t("tags.new").toUpperCase()}
                                   </div>
                                 )}
                                 {agent.avatar ? (
-                                  <div className="text-4xl mb-2 group-hover:scale-110 transition-transform duration-300 h-16 w-16 mx-auto rounded-xl overflow-hidden">
+                                  <div className="text-4xl mb-2 group-hover:scale-110 transition-transform duration-300 h-16 w-16 mx-auto rounded-2xl overflow-hidden">
                                     <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
                                   </div>
                                 ) : (
@@ -648,7 +674,7 @@ export default function DashboardPage() {
                                   </div>
                                 )}
                                 <h4 className="text-sm font-semibold mb-1 truncate text-center">{agent.name}</h4>
-                                <p className="text-xs text-gray-400 mb-2 text-center">{extractTags(agent)[0] || 'Compañero'}</p>
+                                <p className="text-xs text-gray-400 mb-2 text-center">{extractTags(agent, t)[0] || t("tags.companion")}</p>
                                 <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
                                   <MessageCircle className="w-3 h-3" />
                                   {agent.cloneCount}
@@ -668,9 +694,9 @@ export default function DashboardPage() {
                     <summary className="flex items-center gap-2 mb-4 cursor-pointer list-none">
                       <div className="flex items-center gap-2 flex-1">
                         <Network className="h-5 w-5 md-text-secondary" />
-                        <h3 className="text-xl font-semibold md-text-primary">Todos los compañeros</h3>
+                        <h3 className="text-xl font-semibold md-text-primary">{t("sections.all.title")}</h3>
                         <span className="text-xs md-text-secondary bg-muted px-2 py-1 rounded-full">
-                          {otherCompanions.length} más
+                          {t("sections.all.more", { count: otherCompanions.length })}
                         </span>
                       </div>
                       <span className="text-sm md-text-secondary group-open:rotate-180 transition-transform">▼</span>
@@ -687,7 +713,7 @@ export default function DashboardPage() {
                             ease: [0.4, 0, 0.2, 1],
                           }}
                         >
-                          <div className="md-card p-6 group">
+                          <div className="md-card p-6 group hover-lift-glow">
                             <div className="flex items-start gap-4 mb-4">
                               <Link href={`/agentes/${agent.id}`} className="flex-shrink-0">
                                 <Avatar
@@ -717,7 +743,7 @@ export default function DashboardPage() {
                             <Link href={`/agentes/${agent.id}`} className="block">
                               <Button className="w-full md-button md-button-tonal py-2.5 mt-2">
                                 <MessageCircle className="h-4 w-4 mr-2" />
-                                Abrir chat
+                                {t("actions.openChat")}
                               </Button>
                             </Link>
                           </div>
@@ -734,14 +760,14 @@ export default function DashboardPage() {
           <TabsContent value="worlds" className="space-y-8">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-semibold md-text-primary">Mundos</h2>
+                <h2 className="text-2xl font-semibold md-text-primary">{t("worlds.title")}</h2>
                 <p className="text-sm md-text-secondary mt-1">
-                  Explora mundos predefinidos o crea los tuyos propios
+                  {t("worlds.subtitle")}
                 </p>
               </div>
               <Link href="/dashboard/mundos">
                 <Button variant="outline" className="px-6 py-2.5">
-                  Ver todos los mundos
+                  {t("worlds.viewAll")}
                 </Button>
               </Link>
             </div>
@@ -754,9 +780,9 @@ export default function DashboardPage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Crown className="h-6 w-6 text-yellow-400" />
-                  <h2 className="text-2xl font-bold">Mundo Destacado</h2>
+                  <h2 className="text-2xl font-bold">{t("worlds.featured.title")}</h2>
                   <span className="text-sm text-gray-400 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
-                    Recomendación del equipo
+                    {t("worlds.featured.badge")}
                   </span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -777,7 +803,7 @@ export default function DashboardPage() {
                         <div className="md-card p-6 group">
                           <div className="flex items-start gap-4 mb-4">
                             <div
-                              className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0"
+                              className="h-14 w-14 rounded-2xl flex items-center justify-center shrink-0"
                               style={{ background: generateGradient(world.name) }}
                             >
                               <Network className="h-7 w-7 text-white" />
@@ -787,7 +813,7 @@ export default function DashboardPage() {
                                 {world.name}
                               </h3>
                               <p className="text-sm md-text-secondary line-clamp-2 mt-1">
-                                {world.description || "Mundo virtual sin descripción"}
+                                {world.description || t("worlds.noDescription")}
                               </p>
                             </div>
                           </div>
@@ -807,7 +833,7 @@ export default function DashboardPage() {
                             <Link href={`/dashboard/mundos/${world.id}`} className="flex-1">
                               <Button variant="outline" className="w-full md-button-tonal py-2.5">
                                 <Play className="h-4 w-4 mr-2" />
-                                Ver
+                                {t("actions.view")}
                               </Button>
                             </Link>
                             <Button
@@ -815,7 +841,7 @@ export default function DashboardPage() {
                               onClick={() => handleCloneWorld(world.id, world.name)}
                             >
                               <Copy className="h-4 w-4 mr-2" />
-                              Clonar
+                              {t("actions.clone")}
                             </Button>
                           </div>
                         </div>
@@ -828,7 +854,7 @@ export default function DashboardPage() {
             {/* User Worlds */}
             {userWorlds.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold md-text-primary mb-4">Mis Mundos</h3>
+                <h3 className="text-xl font-semibold md-text-primary mb-4">{t("worlds.myWorlds")}</h3>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {userWorlds.slice(0, 3).map((world, idx) => (
                     <motion.div
@@ -841,10 +867,10 @@ export default function DashboardPage() {
                         ease: [0.4, 0, 0.2, 1],
                       }}
                     >
-                      <div className="md-card p-6">
+                      <div className="md-card p-6 hover-lift-glow">
                         <div className="flex items-start gap-4 mb-4">
                           <div
-                            className="h-14 w-14 rounded-xl flex items-center justify-center shrink-0"
+                            className="h-14 w-14 rounded-2xl flex items-center justify-center shrink-0"
                             style={{ background: generateGradient(world.name) }}
                           >
                             <Network className="h-7 w-7 text-white" />
@@ -854,7 +880,7 @@ export default function DashboardPage() {
                               {world.name}
                             </h3>
                             <p className="text-sm md-text-secondary line-clamp-2 mt-1">
-                              {world.description || "Mundo virtual sin descripción"}
+                              {world.description || t("worlds.noDescription")}
                             </p>
                           </div>
                         </div>
@@ -862,7 +888,7 @@ export default function DashboardPage() {
                         <Link href={`/dashboard/mundos/${world.id}`} className="block">
                           <Button className="w-full md-button md-button-tonal py-2.5">
                             <Play className="h-4 w-4 mr-2" />
-                            Abrir mundo
+                            {t("worlds.openWorld")}
                           </Button>
                         </Link>
                       </div>
@@ -873,37 +899,30 @@ export default function DashboardPage() {
             )}
 
             {worlds.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="md-card md-card-outlined p-12 text-center max-w-md">
-                  <div className="h-20 w-20 rounded-full md-surface-container-highest flex items-center justify-center mx-auto mb-6">
-                    <Network className="h-10 w-10 md-text-secondary" />
-                  </div>
-                  <h2 className="text-xl font-semibold md-text-primary mb-2">
-                    Explora mundos virtuales
-                  </h2>
-                  <p className="md-text-secondary mb-6">
-                    Descubre mundos donde múltiples IAs interactúan entre sí
-                  </p>
-                  <Link href="/dashboard/mundos">
-                    <Button className="md-button md-button-filled px-6 py-2.5">
-                      <Network className="h-5 w-5 mr-2" />
-                      Ver mundos
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+              <EmptyState
+                icon={Network}
+                iconColor="text-blue-400 dark:text-blue-500"
+                gradientFrom="from-blue-100"
+                gradientTo="to-cyan-100"
+                title={t("empty.worlds.title")}
+                description={t("empty.worlds.description")}
+                actionLabel={t("empty.worlds.action")}
+                onAction={() => router.push("/dashboard/mundos")}
+              />
             )}
           </TabsContent>
         </Tabs>
-      )}
+        )}
+      </PullToRefresh>
 
       {/* FAB - Floating Action Button */}
-      <Link href="/constructor">
-        <button className="md-fab md-fab-extended" title="Crear nueva IA">
+      <Link href="/constructor" data-tour="create-ai-button-fab">
+        <button className="md-fab md-fab-extended" title={t("actions.createNewAI")}>
           <Plus className="h-6 w-6" />
-          <span className="font-medium">Nueva IA</span>
+          <span className="font-medium">{t("actions.newAI")}</span>
         </button>
       </Link>
     </div>
+    </ErrorBoundary>
   );
 }

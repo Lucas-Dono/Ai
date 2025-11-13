@@ -60,14 +60,14 @@ export const MarketplaceThemeService = {
         userBubbleColor: themeData.userBubbleColor,
         agentBubbleColor: themeData.agentBubbleColor,
         backgroundColor: themeData.backgroundColor,
-        backgroundGradient: themeData.backgroundGradient as Prisma.JsonValue,
+        backgroundGradient: themeData.backgroundGradient || undefined,
         accentColor: themeData.accentColor,
         textColor: themeData.textColor,
         backgroundImage: themeData.backgroundImage,
         category: themeData.category,
-        tags: themeData.tags as Prisma.JsonValue,
-        previewImages: (themeData.previewImages || []) as Prisma.JsonValue,
-        exportData: exportData as Prisma.JsonValue,
+        tags: themeData.tags || [],
+        previewImages: themeData.previewImages || [],
+        exportData: exportData,
         status: 'approved', // Auto-aprobar por ahora, podemos agregar moderación después
       },
       include: {
@@ -477,12 +477,7 @@ export const MarketplaceThemeService = {
 
     const updated = await prisma.marketplaceTheme.update({
       where: { id: themeId },
-      data: {
-        ...updates,
-        tags: updates.tags as Prisma.JsonValue | undefined,
-        backgroundGradient: updates.backgroundGradient as Prisma.JsonValue | undefined,
-        previewImages: updates.previewImages as Prisma.JsonValue | undefined,
-      },
+      data: updates,
     });
 
     return updated;

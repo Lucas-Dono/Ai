@@ -23,10 +23,18 @@ import { getUserWeather, buildWeatherPrompt } from '@/lib/context/weather';
 import { markProactiveMessageResponded } from '@/lib/proactive/proactive-service';
 import { interceptSearchCommand } from '@/lib/memory/search-interceptor';
 import { storeMessageSelectively } from '@/lib/memory/selective-storage';
+import { memoryQueryHandler } from '@/lib/memory/memory-query-handler';
 import type { StagePrompts } from '@/lib/relationship/prompt-generator';
 import type { RelationshipStage } from '@/lib/relationship/stages';
 import type { PlutchikEmotionState } from '@/lib/emotions/plutchik';
 import { createLogger, startTimer } from '@/lib/logger';
+import { getContextLimit } from '@/lib/usage/context-limits';
+import { trackLLMCall } from '@/lib/cost-tracking/tracker';
+import { estimateTokens } from '@/lib/cost-tracking/calculator';
+import { compressContext } from '@/lib/memory/context-compression';
+import { detectMemoryReferences } from '@/lib/memory/memory-reference-detector';
+
+type EmotionType = 'joy' | 'trust' | 'fear' | 'surprise' | 'sadness' | 'disgust' | 'anger' | 'anticipation';
 
 const log = createLogger('MessageService');
 
@@ -36,6 +44,7 @@ interface ProcessMessageInput {
   content: string;
   messageType?: 'text' | 'audio' | 'gif' | 'image';
   metadata?: Record<string, unknown>;
+  userPlan?: string; // Plan del usuario para determinar límite de contexto
 }
 
 interface ProcessMessageOutput {
@@ -88,9 +97,13 @@ export class MessageService {
    */
   async processMessage(input: ProcessMessageInput): Promise<ProcessMessageOutput> {
     const timer = startTimer();
-    const { agentId, userId, content, messageType = 'text', metadata = {} } = input;
+    const { agentId, userId, content, messageType = 'text', metadata = {}, userPlan = 'free' } = input;
 
-    log.info({ agentId, userId, messageType }, 'Processing message');
+    log.info({ agentId, userId, messageType, userPlan }, 'Processing message');
+
+    // Obtener límite de contexto dinámico basado en tier
+    const contextLimit = getContextLimit(userPlan);
+    log.debug({ userPlan, contextLimit }, 'Dynamic context limit applied');
 
     try {
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -115,13 +128,16 @@ export class MessageService {
         prisma.message.findMany({
           where: { agentId },
           orderBy: { createdAt: 'desc' },
-          take: 10,
+          take: contextLimit, // 🔥 DYNAMIC: 10 (free) | 30 (plus) | 100 (ultra)
           select: {
             id: true,
             role: true,
             content: true,
             createdAt: true,
             metadata: true,
+            userId: true,
+            worldId: true,
+            agentId: true,
           },
         }),
       ]);
@@ -166,7 +182,7 @@ export class MessageService {
             userId,
             role: 'user',
             content: contentForUser,
-            metadata: messageMetadata,
+            metadata: messageMetadata as any,
           },
         }),
         this.getOrCreateRelation(agentId, userId),
@@ -240,7 +256,7 @@ export class MessageService {
         agent,
         userMessage,
         recentMessages,
-        dominantEmotion: (emotionalSummary.dominant[0] || 'joy') as EmotionType,
+        dominantEmotion: (emotionalSummary.dominant[0] || 'joy') as any,
         emotionalState: {
           valence: emotionalSummary.pad.valence,
           arousal: emotionalSummary.pad.arousal,
@@ -275,7 +291,7 @@ export class MessageService {
       // Emotional context with dyads
       const emotionalContext = this.buildEmotionalContext(
         emotionalSummary,
-        activeDyads,
+        activeDyads as any,
         hybridResult.metadata
       );
 
@@ -340,6 +356,43 @@ export class MessageService {
         // No fallar el mensaje completo si falla la detección
       }
 
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // MEMORY QUERY DETECTION (Semantic Search)
+      // Detecta preguntas sobre el pasado ("¿recuerdas cuando...?")
+      // y recupera memorias relevantes ANTES de generar respuesta
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      try {
+        const memoryQueryResult = await memoryQueryHandler.handleQuery(
+          content,
+          agentId,
+          userId,
+          {
+            maxMemories: 5,
+            minSimilarity: 0.5,
+            maxTokens: 1000,
+            useSemanticSearch: true,
+          }
+        );
+
+        if (memoryQueryResult.detected && memoryQueryResult.contextPrompt) {
+          log.info(
+            {
+              queryType: memoryQueryResult.detection.queryType,
+              confidence: memoryQueryResult.detection.confidence,
+              memoriesFound: memoryQueryResult.metadata.memoriesFound,
+              searchTimeMs: memoryQueryResult.metadata.searchTimeMs,
+            },
+            'Memory query detected - adding memory context'
+          );
+
+          // Agregar contexto de memorias al prompt
+          enhancedPrompt += '\n\n' + memoryQueryResult.contextPrompt;
+        }
+      } catch (error) {
+        log.warn({ error }, 'Error en memory query detection, continuando sin ella');
+        // No fallar el mensaje completo si falla la detección
+      }
+
       // RAG: Build enhanced prompt with memory context
       const memoryManager = createMemoryManager(agentId, userId);
       const finalPrompt = await memoryManager.buildEnhancedPrompt(
@@ -353,21 +406,57 @@ export class MessageService {
       const llm = getLLMProvider();
 
       // Construir array de mensajes: mensajes recientes + mensaje actual del usuario
-      const conversationMessages = [
+      const allMessages = [
         ...recentMessages.reverse().map(m => ({
           role: m.role as 'user' | 'assistant',
           content: m.content,
+          id: m.id,
+          createdAt: m.createdAt,
         })),
         {
           role: 'user' as const,
           content: contentForAI,
+          id: userMessage.id,
+          createdAt: userMessage.createdAt,
         }
       ];
+
+      // Apply context compression (optimizes old messages)
+      const compressionResult = await compressContext(allMessages, contextLimit);
+
+      if (compressionResult.compressionApplied) {
+        log.info({
+          originalCount: compressionResult.originalCount,
+          compressedCount: compressionResult.compressedCount,
+          contextLimit,
+        }, 'Context compression applied');
+      }
+
+      // Use compressed messages for LLM
+      const conversationMessages = compressionResult.messages.map(m => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+      }));
 
       let response = await llm.generate({
         systemPrompt: finalPrompt,
         messages: conversationMessages,
       });
+
+      // Track LLM cost (async, non-blocking)
+      const inputTokensFirst = estimateTokens(
+        finalPrompt + '\n' + conversationMessages.map(m => m.content).join('\n')
+      );
+      const outputTokensFirst = estimateTokens(response);
+      trackLLMCall({
+        userId,
+        agentId,
+        provider: 'google',
+        model: 'gemini-2.5-flash-lite',
+        inputTokens: inputTokensFirst,
+        outputTokens: outputTokensFirst,
+        metadata: { messageType, stage: 'initial-generation' },
+      }).catch(err => log.warn({ error: err.message }, 'Failed to track LLM cost'));
 
       // Knowledge command interception
       const interceptResult = await interceptKnowledgeCommand(agentId, response);
@@ -391,6 +480,21 @@ export class MessageService {
           systemPrompt: expandedPrompt,
           messages: conversationMessages,
         });
+
+        // Track knowledge expansion LLM cost
+        const inputTokensExpanded = estimateTokens(
+          expandedPrompt + '\n' + conversationMessages.map(m => m.content).join('\n')
+        );
+        const outputTokensExpanded = estimateTokens(response);
+        trackLLMCall({
+          userId,
+          agentId,
+          provider: 'google',
+          model: 'gemini-2.5-flash-lite',
+          inputTokens: inputTokensExpanded,
+          outputTokens: outputTokensExpanded,
+          metadata: { messageType, stage: 'knowledge-expansion', command: interceptResult.command },
+        }).catch(err => log.warn({ error: err.message }, 'Failed to track LLM cost'));
 
         // Limpiar tags de conocimiento de la nueva respuesta
         const finalInterceptResult = await interceptKnowledgeCommand(agentId, response);
@@ -416,6 +520,21 @@ export class MessageService {
           systemPrompt: expandedPromptWithMemory,
           messages: conversationMessages,
         });
+
+        // Track memory search LLM cost
+        const inputTokensSearch = estimateTokens(
+          expandedPromptWithMemory + '\n' + conversationMessages.map(m => m.content).join('\n')
+        );
+        const outputTokensSearch = estimateTokens(response);
+        trackLLMCall({
+          userId,
+          agentId,
+          provider: 'google',
+          model: 'gemini-2.5-flash-lite',
+          inputTokens: inputTokensSearch,
+          outputTokens: outputTokensSearch,
+          metadata: { messageType, stage: 'memory-search', searchQuery: searchResult.searchQuery },
+        }).catch(err => log.warn({ error: err.message }, 'Failed to track LLM cost'));
 
         // Limpiar el response en caso de que la IA siga teniendo [SEARCH:...]
         response = searchResult.cleanResponse;
@@ -495,14 +614,40 @@ export class MessageService {
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // MULTIMEDIA PROCESSING
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      const { multimedia, finalResponse } = await this.processMultimedia(
+      const { multimedia, finalResponse, isAsync } = await this.processMultimedia(
         response,
         agentId,
-        agent,
-        userId
+        {
+          name: agent.name,
+          personality: agent.personality,
+          description: agent.description,
+          referenceImageUrl: agent.referenceImageUrl,
+          voiceId: agent.voiceId,
+          systemPrompt: agent.systemPrompt,
+        },
+        userId,
+        userPlan  // Pasar tier para aplicar límites
       );
 
+      // Si la generación es asíncrona, el mensaje ya fue enviado
+      // y el finalResponse contiene el mensaje de espera
+      if (isAsync) {
+        log.info({ agentId, userId }, 'Async image generation started - returning waiting message');
+      }
+
       const estimatedTokens = Math.ceil((content.length + finalResponse.length) / 4);
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // MEMORY REFERENCE DETECTION (🆕 Memory Highlights Feature)
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const memoryReferences = detectMemoryReferences(finalResponse, memoryContext);
+
+      if (memoryReferences.length > 0) {
+        log.info(
+          { agentId, userId, referenceCount: memoryReferences.length },
+          'Memory references detected in agent response'
+        );
+      }
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // PARALLEL EXECUTION 2: Save all data + Track usage
@@ -531,7 +676,17 @@ export class MessageService {
                 safetyLevel: behaviorOrchestration.metadata.safetyLevel,
                 triggers: behaviorOrchestration.metadata.triggers,
               },
-            },
+              // 🆕 Memory Highlights: Add detected memory references
+              memoryReferences: memoryReferences.length > 0
+                ? memoryReferences.map(ref => ({
+                    type: ref.type,
+                    content: ref.content,
+                    originalTimestamp: ref.originalTimestamp?.toISOString(),
+                    context: ref.context,
+                    confidence: ref.confidence,
+                  }))
+                : undefined,
+            } as any,
           },
         }),
         // Update relation
@@ -674,9 +829,20 @@ export class MessageService {
    * Build emotional context string for prompt
    */
   private buildEmotionalContext(
-    emotionalSummary: any,
-    activeDyads: any[],
-    metadata: any
+    emotionalSummary: {
+      dominant: string[];
+      mood: string;
+      pad: { valence: number; arousal: number; dominance: number };
+    },
+    activeDyads: Array<{
+      label: string;
+      intensity: number;
+      components: [string, string, string];
+    }>,
+    metadata: {
+      emotionalStability: number;
+      path: string;
+    }
   ): string {
     let context = `\nEstado emocional actual:\n- Emociones primarias: ${emotionalSummary.dominant.join(', ')}\n`;
 
@@ -700,15 +866,27 @@ export class MessageService {
 
   /**
    * Process multimedia tags in response
+   *
+   * Detecta si hay tags [IMAGE:] y decide si generar síncronamente (rápido)
+   * o asíncronamente (AI Horde con tiempos largos)
+   *
+   * IMPORTANTE: Aplica límites configurables según tier y estrategia (.env)
    */
   private async processMultimedia(
     response: string,
     agentId: string,
-    agent: any,
-    userId: string
-  ): Promise<{ multimedia: any[]; finalResponse: string }> {
+    agent: {
+      name: string;
+      personality: string | null;
+      description: string | null;
+      referenceImageUrl: string | null;
+      voiceId: string | null;
+      systemPrompt?: string;
+    },
+    userId: string,
+    userPlan: string = 'free'
+  ): Promise<{ multimedia: Array<Record<string, unknown>>; finalResponse: string; isAsync?: boolean }> {
     const { parseMultimediaTags, validateMultimediaUsage } = await import('@/lib/multimedia/parser');
-    const { MultimediaGenerator } = await import('@/lib/multimedia/generator');
 
     const parsedResponse = parseMultimediaTags(response);
     const multimediaValidation = validateMultimediaUsage(parsedResponse);
@@ -717,25 +895,111 @@ export class MessageService {
       return { multimedia: [], finalResponse: response };
     }
 
-    log.debug({ count: parsedResponse.multimediaTags.length }, 'Generating multimedia');
+    // Detectar si hay imágenes (que requieren generación asíncrona)
+    const imageTags = parsedResponse.multimediaTags.filter((tag) => tag.type === 'image');
+    const audioTags = parsedResponse.multimediaTags.filter((tag) => tag.type === 'audio');
 
-    const generator = new MultimediaGenerator();
-    const multimedia = await generator.generateMultimediaContent(
-      parsedResponse.multimediaTags,
-      {
+    // Si hay imágenes, verificar límites y usar generación ASÍNCRONA
+    if (imageTags.length > 0) {
+      log.info({ count: imageTags.length, userPlan }, 'Detected image tags - checking limits');
+
+      // Verificar límites para usuarios FREE
+      const { canUseFreeMultimedia } = await import('@/lib/multimedia/limits');
+      const limitCheck = await canUseFreeMultimedia(userId, 'image', userPlan);
+
+      if (!limitCheck.allowed) {
+        log.warn(
+          { userId, userPlan, reason: limitCheck.reason },
+          'Image generation blocked by limits'
+        );
+
+        // Retornar mensaje de upgrade en lugar de la imagen
+        return {
+          multimedia: [],
+          finalResponse: limitCheck.upgradeMessage || 'Actualiza a Plus para usar generación de imágenes.',
+          isAsync: false,
+        };
+      }
+
+      // Si está permitido, generar
+      const { asyncImageGenerator } = await import('@/lib/multimedia/async-image-generator');
+
+      // Generar solo la PRIMERA imagen de forma asíncrona
+      const firstImageTag = imageTags[0];
+
+      const result = await asyncImageGenerator.startAsyncGeneration({
+        agentId,
+        agentName: agent.name,
+        agentPersonality: agent.personality || agent.description || '',
+        agentSystemPrompt: agent.systemPrompt,
+        userId,
+        referenceImageUrl: agent.referenceImageUrl || undefined,
+        description: firstImageTag.description,
+      });
+
+      // Si es trial lifetime, agregar información al mensaje de espera
+      if (limitCheck.current !== undefined && limitCheck.limit !== undefined) {
+        const remaining = limitCheck.limit - limitCheck.current - 1; // -1 porque ya se está usando una
+        result.waitingMessage.content += ` (Fotos restantes: ${remaining}/${limitCheck.limit})`;
+      }
+
+      // Retornar el mensaje de espera (sin multimedia aún)
+      return {
+        multimedia: [],
+        finalResponse: result.waitingMessage.content,
+        isAsync: true,
+      };
+    }
+
+    // Si solo hay audio, verificar límites y generar síncronamente (es rápido con ElevenLabs)
+    if (audioTags.length > 0) {
+      log.debug({ count: audioTags.length, userPlan }, 'Detected audio tags - checking limits');
+
+      // Verificar límites para usuarios FREE
+      const { canUseFreeMultimedia } = await import('@/lib/multimedia/limits');
+      const limitCheck = await canUseFreeMultimedia(userId, 'voice', userPlan);
+
+      if (!limitCheck.allowed) {
+        log.warn(
+          { userId, userPlan, reason: limitCheck.reason },
+          'Voice generation blocked by limits'
+        );
+
+        // Retornar mensaje de upgrade en lugar del audio
+        return {
+          multimedia: [],
+          finalResponse: limitCheck.upgradeMessage || 'Actualiza a Plus para usar mensajes de voz.',
+          isAsync: false,
+        };
+      }
+
+      // Si está permitido, generar
+      const { MultimediaGenerator } = await import('@/lib/multimedia/generator');
+      const generator = new MultimediaGenerator();
+
+      const multimedia = await generator.generateMultimediaContent(audioTags, {
         agentId,
         agentName: agent.name,
         agentPersonality: agent.personality || agent.description || '',
         referenceImageUrl: agent.referenceImageUrl || undefined,
         voiceId: agent.voiceId || undefined,
         userId,
-      }
-    );
+      });
 
-    return {
-      multimedia,
-      finalResponse: parsedResponse.textContent,
-    };
+      // Si es trial lifetime, agregar información al response
+      let finalResponse = parsedResponse.textContent;
+      if (limitCheck.current !== undefined && limitCheck.limit !== undefined) {
+        const remaining = limitCheck.limit - limitCheck.current - 1;
+        finalResponse += ` (Mensajes de voz restantes: ${remaining}/${limitCheck.limit})`;
+      }
+
+      return {
+        multimedia: multimedia as unknown as Array<Record<string, unknown>>,
+        finalResponse,
+      };
+    }
+
+    return { multimedia: [], finalResponse: response };
   }
 }
 

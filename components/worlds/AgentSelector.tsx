@@ -135,10 +135,11 @@ export function AgentSelector({
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {agents.map((agent) => {
           const isSelected = selectedAgentIds.includes(agent.id);
-          const isDisabled =
+          const isDisabled = Boolean(
             maxSelection &&
             selectedAgentIds.length >= maxSelection &&
-            !isSelected;
+            !isSelected
+          );
 
           return (
             <Card
