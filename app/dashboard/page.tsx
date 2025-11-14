@@ -21,11 +21,7 @@ import {
   Search,
   Filter,
   Sparkles,
-  TrendingUp,
   Clock,
-  Star,
-  Zap,
-  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
@@ -241,52 +237,12 @@ export default function DashboardPage() {
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) === 0
   );
 
-  // Calculate stats
-  const totalConversations = companions.reduce((acc, c) => acc + (c.cloneCount || 0) * 10, 0);
-  const totalCompanions = companions.length;
-
   const predefinedWorlds = worlds.filter((w) => w.isPredefined);
   const userWorlds = worlds.filter((w) => !w.isPredefined);
-
-  const stats = [
-    { icon: Heart, label: t("stats.companions", { count: totalCompanions }), color: 'text-pink-400' },
-    { icon: Globe, label: t("stats.worlds", { count: worlds.length }), color: 'text-blue-400' },
-    { icon: MessageCircle, label: t("stats.conversations", { count: totalConversations }), color: 'text-purple-400' }
-  ];
 
   return (
     <ErrorBoundary variant="page">
     <div className="min-h-screen" data-tour="dashboard-main">
-      {/* Special Event Banner (if active) */}
-      <SpecialEventBanner />
-
-      {/* Enhanced Header with Gradient */}
-      <header className="mb-6 md:mb-8 relative overflow-hidden rounded-2xl md:rounded-2xl bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-purple-900/40 p-4 md:p-6 lg:p-8 border border-purple-500/20">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 animate-pulse"></div>
-        <div className="relative">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-            {t("header.title")}
-          </h1>
-          <p className="text-gray-300 text-sm md:text-base mb-4 md:mb-6">{t("header.subtitle")}</p>
-
-          {/* Stats */}
-          <div className="flex gap-2 md:gap-4 lg:gap-6 flex-wrap">
-            {stats.map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-2 md:gap-3 bg-gray-800/50 backdrop-blur-sm px-3 md:px-4 py-2 rounded-2xl md:rounded-2xl border border-gray-700/50"
-              >
-                <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
-                <span className="text-xs md:text-sm font-medium">{stat.label}</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </header>
-
       {/* Proactive Messages Widget - PROMINENT DISPLAY (only for authenticated users) */}
       {isAuthenticated && <ProactiveMessagesWidget />}
 
