@@ -80,6 +80,12 @@ model User {
   shareEvents              ShareEvent[]
   notificationPreferences  NotificationPreferences?
 
+  // Gamification System
+  bondBadges           BondBadge[]
+  userRewards          UserRewards?
+  rewardActions        RewardAction[]
+  retentionLeaderboard RetentionLeaderboard[]
+
   @@index([email])
   @@index([mercadopagoCustomerId])
   @@index([apiKey])
@@ -137,6 +143,10 @@ model Agent {
   tone         String? // DEPRECATED: usar internalState
   purpose      String? // DEPRECATED: usar personalityCore.goals
   profile      Json // JSON con toda la configuración del agente (DEPRECATED)
+
+  // Sistema de Prompts Modulares
+  personalityVariant String? // submissive, dominant, introverted, extroverted, playful, serious, romantic, pragmatic
+
   systemPrompt String  @db.Text
   visibility   String  @default("private") // private, world, public, team
   nsfwMode     Boolean @default(false) // Permitir contenido NSFW/adulto
@@ -2972,4 +2982,119 @@ model NotificationPreferences {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ============================================
+// SISTEMA DE GAMIFICACIÓN - BADGES Y RECOMPENSAS
+// ============================================
+
+// Badges que pueden ganar los usuarios por mantener bonds
+model BondBadge {
+  id          String   @id @default(cuid())
+  userId      String
+  badgeType   String   // "loyal_companion", "quick_responder", "streak_master", "bond_collector", etc
+  tier        String   // "bronze", "silver", "gold", "platinum", "diamond"
+  name        String   // "Compañero Leal", "Respondedor Rápido", etc
+  description String
+  iconUrl     String?  // URL del icono del badge
+
+  // Metadata específica del badge
+  metadata    Json     // { bondsCount: 5, daysStreak: 30, etc }
+
+  // Recompensas asociadas
+  rewardPoints Int     @default(0) // Puntos ganados por este badge
+
+  earnedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([badgeType])
+  @@index([tier])
+  @@unique([userId, badgeType, tier]) // Un usuario no puede tener el mismo badge del mismo tier dos veces
+}
+
+// Sistema de puntos y recompensas
+model UserRewards {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Puntos totales
+  totalPoints           Int @default(0)
+  availablePoints       Int @default(0) // Puntos disponibles para gastar
+  lifetimePointsEarned  Int @default(0) // Total histórico ganado
+
+  // Estadísticas de bonds
+  totalBondsCreated     Int @default(0)
+  totalBondsActive      Int @default(0)
+  longestStreak         Int @default(0) // Días consecutivos interactuando
+  currentStreak         Int @default(0)
+  lastInteractionDate   DateTime?
+
+  // Estadísticas de notificaciones
+  notificationsResponded   Int @default(0) // Cuántas veces respondió a notificaciones
+  averageResponseTime      Float @default(0) // Tiempo promedio de respuesta en horas
+
+  // Niveles
+  level     Int @default(1)
+  xp        Int @default(0)
+  xpToNext  Int @default(100)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([totalPoints])
+  @@index([level])
+}
+
+// Historial de acciones que otorgan recompensas
+model RewardAction {
+  id          String   @id @default(cuid())
+  userId      String
+  actionType  String   // "bond_created", "responded_to_notification", "streak_milestone", etc
+  pointsEarned Int
+  description String
+  metadata    Json?    // Información adicional sobre la acción
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([actionType])
+  @@index([createdAt])
+}
+
+// Leaderboard de retention
+model RetentionLeaderboard {
+  id              String @id @default(cuid())
+  userId          String
+
+  // Métricas de retention
+  activeBondsCount       Int
+  averageBondDuration    Float // Días promedio que mantiene bonds activos
+  totalInteractions      Int
+  consistencyScore       Float // Score de 0-100 basado en regularidad de interacciones
+
+  // Rankings
+  globalRank      Int?
+  weeklyRank      Int?
+  monthlyRank     Int?
+
+  // Período de cálculo
+  periodStart DateTime
+  periodEnd   DateTime
+
+  lastUpdated DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, periodStart, periodEnd])
+  @@index([userId])
+  @@index([globalRank])
+  @@index([consistencyScore])
+  @@index([lastUpdated])
 }

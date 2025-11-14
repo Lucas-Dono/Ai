@@ -799,6 +799,13 @@
       "ultra": "Ultra"
     }
   },
+  "userMenu": {
+    "profile": "My Profile",
+    "billing": "Billing",
+    "settings": "Settings",
+    "logout": "Log out",
+    "loggingOut": "Logging out..."
+  },
   "constructor": {
     "header": {
       "title": "Profile under construction",

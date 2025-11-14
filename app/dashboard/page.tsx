@@ -47,6 +47,7 @@ import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useTranslations } from "next-intl";
 import { ProactiveMessagesWidget } from "@/components/dashboard/ProactiveMessagesWidget";
+import { useSession } from "next-auth/react";
 
 interface Agent {
   id: string;
@@ -126,11 +127,14 @@ export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session, status: sessionStatus } = useSession();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const isAuthenticated = sessionStatus === "authenticated";
 
   // Check URL params for initial tab
   const filterParam = searchParams?.get('filter');
@@ -283,8 +287,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Proactive Messages Widget - PROMINENT DISPLAY */}
-      <ProactiveMessagesWidget />
+      {/* Proactive Messages Widget - PROMINENT DISPLAY (only for authenticated users) */}
+      {isAuthenticated && <ProactiveMessagesWidget />}
 
       {/* Main Content with Pull-to-Refresh */}
       <PullToRefresh onRefresh={handleRefresh} className="lg:h-auto">
@@ -372,135 +376,10 @@ export default function DashboardPage() {
               />
             ) : (
               <>
-                {/* Recomendados Section - Enhanced */}
-                {recommendedCompanions.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-wrap">
-                      <Crown className="w-5 h-5 md:w-6 md:h-6 text-yellow-400" />
-                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.recommended.title")}</h2>
-                      <span className="text-xs md:text-sm text-gray-400 bg-yellow-500/10 px-2 md:px-3 py-1 rounded-full border border-yellow-500/20">
-                        <span className="hidden md:inline">{t("sections.recommended.subtitle")}</span>
-                        <span className="md:hidden">{t("tags.premium")}</span>
-                      </span>
-                    </div>
-                    <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
-                      {recommendedCompanions.map((agent, idx) => {
-                        const tags = extractTags(agent, t);
-                        return (
-                          <motion.div
-                            key={agent.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              duration: 0.3,
-                              delay: idx * 0.05,
-                              ease: [0.4, 0, 0.2, 1],
-                            }}
-                          >
-                            <div data-tour={idx === 0 ? "agent-card" : undefined} className="group relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/20">
-                              {/* Premium badge */}
-                              <div className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
-                                <Crown className="w-3 h-3" />
-                                {t("tags.premium").toUpperCase()}
-                              </div>
+                {/* NOTE: Recomendados Section removed - Now handled by RecommendedForYou component above with category system */}
 
-                              {/* Trending badge */}
-                              {(agent.cloneCount || 0) > 5 && (
-                                <div className="absolute top-3 right-3 bg-pink-500/20 backdrop-blur-sm text-pink-400 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                                  <TrendingUp className="w-3 h-3" />
-                                  {t("tags.trending")}
-                                </div>
-                              )}
-
-                              <div className="flex items-start gap-4 mb-4">
-                                <Link href={`/agentes/${agent.id}`} className="flex-shrink-0">
-                                  {agent.avatar ? (
-                                    <div className="h-16 w-16 rounded-2xl overflow-hidden border-2 border-yellow-500/30 hover:border-yellow-500/50 transition-all">
-                                      <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
-                                    </div>
-                                  ) : (
-                                    <Avatar
-                                      className="h-16 w-16 border-2 border-yellow-500/30 hover:border-yellow-500/50 transition-all cursor-pointer rounded-2xl"
-                                      style={{ background: generateGradient(agent.name) }}
-                                    >
-                                      <AvatarFallback className="text-white text-xl font-semibold bg-transparent">
-                                        {getInitials(agent.name)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                  )}
-                                </Link>
-
-                                <div className="flex-1 min-w-0">
-                                  <Link href={`/agentes/${agent.id}`}>
-                                    <h3 className="text-xl font-bold md-text-primary hover:underline cursor-pointer mb-1">
-                                      {agent.name}
-                                    </h3>
-                                  </Link>
-                                  {agent.description && (
-                                    <p className="text-sm text-gray-300 leading-relaxed line-clamp-2">
-                                      {agent.description}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Tags */}
-                              <div className="flex flex-wrap gap-2 mb-4">
-                                {tags.map((tag, i) => (
-                                  <span
-                                    key={i}
-                                    className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(i)}`}
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-
-                              {/* Stats */}
-                              <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
-                                <div className="flex items-center gap-1">
-                                  <MessageCircle className="w-4 h-4" />
-                                  {t("sections.recommended.interactions", { count: (agent.cloneCount || 0) * 10 })}
-                                </div>
-                                {agent.rating && agent.rating > 0 ? (
-                                  <div className="flex items-center gap-1">
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                    {agent.rating.toFixed(1)}
-                                    <span className="text-xs">({agent._count?.reviews || 0})</span>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-1 text-gray-500">
-                                    <Star className="w-4 h-4" />
-                                    {t("sections.recommended.noRatings")}
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Reason why recommended */}
-                              <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-3 mb-4">
-                                <p className="text-xs text-purple-300 flex items-center gap-2">
-                                  <Sparkles className="w-3 h-3" />
-                                  {t("sections.recommended.popularIn", { topic: tags[0]?.toLowerCase() || t("sections.recommended.diverseTopics") })}
-                                </p>
-                              </div>
-
-                              {/* Button */}
-                              <Link href={`/agentes/${agent.id}`} className="block">
-                                <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-gray-900 font-semibold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-yellow-500/30 border-0">
-                                  <MessageCircle className="h-5 w-5" />
-                                  {t("actions.chatNow")}
-                                </Button>
-                              </Link>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Creados por ti Section - Enhanced */}
-                {myCompanions.length > 0 && (
+                {/* Creados por ti Section - Enhanced (only for authenticated users) */}
+                {isAuthenticated && myCompanions.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-4 md:mb-6 flex-wrap gap-3">
                       <div className="flex items-center gap-2 md:gap-3">

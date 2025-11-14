@@ -86,7 +86,10 @@
       "Bash(node scripts/standardize-border-radius.js:*)",
       "Bash(test:*)",
       "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"Sí, resetea la base de datos de desarrollo\" npx prisma migrate reset:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat(unrestricted-nsfw): Implementar funcionalidad NSFW sin restricciones\n\n- Implementar sistema de consentimiento NSFW\n- Agregar verificación de edad\n- Actualizar configuración de límites y moderación\n- Integrar sistema de comportamientos proactivos mejorado\n- Agregar documentación completa del sistema\n- Actualizar dependencias y configuración del proyecto\n- Mejorar sistema de análisis y estadísticas personales\n- Implementar mejoras en el sistema de comunidad\n- Agregar sistema de gamificación completo\n- Actualizar interfaz móvil y web\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []

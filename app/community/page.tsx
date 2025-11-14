@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
@@ -21,6 +22,7 @@ import {
   HelpCircle,
   BookOpen,
   Filter,
+  UserCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +41,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 export default function CommunityPage() {
   const t = useTranslations('community');
   const router = useRouter();
+  const { data: session, status: sessionStatus } = useSession();
+  const isAuthenticated = sessionStatus === "authenticated";
   const [feedFilter, setFeedFilter] = useState<FeedFilter>('hot');
   const [postType, setPostType] = useState<PostType>('all');
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,21 +87,49 @@ export default function CommunityPage() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Link href="/community/share">
+              <Link href={isAuthenticated ? "/community/share" : "/login?callbackUrl=/community/share"}>
                 <Button variant="outline" size="lg" className="gap-2 min-h-[44px] md:min-h-0">
                   <Sparkles className="h-4 md:h-5 w-4 md:w-5" />
                   <span className="hidden sm:inline">{t('header.shareHub')}</span>
                 </Button>
               </Link>
-              <Link href="/community/create">
+              <Link href={isAuthenticated ? "/community/create" : "/login?callbackUrl=/community/create"}>
                 <Button size="lg" className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 min-h-[44px] md:min-h-0" data-tour="create-post-button">
                   <Plus className="h-4 md:h-5 w-4 md:w-5" />
-                  <span className="hidden sm:inline">{t('header.createPost')}</span>
-                  <span className="sm:hidden">{t('header.createPostShort')}</span>
+                  <span className="hidden sm:inline">
+                    {isAuthenticated ? t('header.createPost') : 'Registrarse para crear'}
+                  </span>
+                  <span className="sm:hidden">
+                    {isAuthenticated ? t('header.createPostShort') : 'Registro'}
+                  </span>
                 </Button>
               </Link>
             </div>
           </div>
+
+          {/* Anonymous User Banner */}
+          {!isAuthenticated && (
+            <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-3 md:p-4 mb-3 md:mb-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <UserCircle2 className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">
+                    Navegando como invitado
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Regístrate para crear posts, comentar y votar
+                  </p>
+                </div>
+                <Link href="/login?callbackUrl=/community">
+                  <Button size="sm" variant="outline" className="hidden sm:flex">
+                    Iniciar sesión
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* Search Bar */}
           <div className="relative mb-3 md:mb-4">

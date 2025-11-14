@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingMenu } from "@/components/onboarding/OnboardingMenu";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { useClientLocale } from "@/hooks/useClientLocale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -148,17 +149,11 @@ export function DashboardNav() {
           <LanguageSwitcher variant="compact" />
         </div>
 
-        <div className="flex items-center gap-3 px-3">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-gradient-to-br from-secondary/20 to-primary/20 text-primary font-semibold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-sm truncate">{displayName}</div>
-            <div className="text-xs text-muted-foreground">Plan {planLabels[userPlan]}</div>
-          </div>
-        </div>
+        <UserMenu
+          displayName={displayName}
+          initials={initials}
+          userPlan={userPlan}
+        />
       </div>
     </nav>
   );

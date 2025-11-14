@@ -104,6 +104,8 @@ export default auth(async (req) => {
     "/login",
     "/registro",
     "/landing",
+    "/dashboard", // GROWTH: Permitir ver personajes sin registro (solo para explorar, no para chatear)
+    "/community", // GROWTH: Comunidad pública - comentar como anónimo (Discord-style)
     "/docs",
     "/legal",
     "/api/auth/signin",
@@ -114,6 +116,8 @@ export default auth(async (req) => {
     "/api/auth/csrf",
     "/api/auth/register", // IMPORTANTE: Endpoint de registro debe ser público
     "/api/webhooks/mercadopago",
+    "/api/community", // GROWTH: API pública de comunidad (read + anonymous post)
+    "/api/worlds", // GROWTH: API pública de mundos (read-only)
   ];
 
   // SECURITY FIX #5: Verificar coincidencia exacta o que sea subruta válida

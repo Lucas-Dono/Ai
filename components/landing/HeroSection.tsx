@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export function HeroSection() {
   const [videoOpen, setVideoOpen] = useState(false);
@@ -55,13 +56,15 @@ export function HeroSection() {
 
             {/* CTAs - UN SOLO CTA */}
             <div className="flex flex-col gap-3 pt-2">
-              <Button
-                size="lg"
-                className="h-14 px-8 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
-              >
-                {t("ctaPrimary")}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="h-14 px-8 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+                >
+                  {t("ctaPrimary")}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
 
               <p className="text-sm text-muted-foreground">
                 {t("trustLine")}

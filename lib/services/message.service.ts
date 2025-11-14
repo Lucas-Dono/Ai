@@ -7,9 +7,11 @@
 
 import { prisma } from '@/lib/prisma';
 import { getLLMProvider } from '@/lib/llm/provider';
+import { getVeniceClient } from '@/lib/emotional-system/llm/venice';
 import { createMemoryManager } from '@/lib/memory/manager';
 import { behaviorOrchestrator } from '@/lib/behavior-system';
 import { hybridEmotionalOrchestrator } from '@/lib/emotional-system/hybrid-orchestrator';
+import { getContextualModularPrompt } from '@/lib/behavior-system/prompts/modular-prompts';
 import { getRelationshipStage, shouldAdvanceStage } from '@/lib/relationship/stages';
 import { getPromptForStage, getPromptForMessageNumber } from '@/lib/relationship/prompt-generator';
 import { getEmotionalSummary } from '@/lib/emotions/system';
@@ -401,9 +403,65 @@ export class MessageService {
       );
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      // LLM GENERATION
+      // PROMPT MODULAR INJECTION (con adaptación dialectal)
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      const llm = getLLMProvider();
+      // Extraer información del personaje para adaptación dialectal
+      const agentProfile = agent.profile as any;
+      const characterOrigin =
+        agentProfile?.origin ||
+        agentProfile?.nationality ||
+        agentProfile?.country ||
+        agentProfile?.birthplace ||
+        agentProfile?.world ||
+        undefined;
+
+      // Obtener usuario para NSFW consent
+      const currentUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { nsfwConsent: true },
+      });
+
+      // Inyectar prompt modular según personalidad, relación y contexto
+      const modularPrompt = await getContextualModularPrompt({
+        // ✅ NUEVO: Usar campo explícito de la DB (preferido)
+        personalityVariant: agent.personalityVariant || undefined,
+        // ⚠️ FALLBACK: Solo si no hay variant asignado (agentes antiguos)
+        personalityTraits: !agent.personalityVariant ? (agent.personality || '') : undefined,
+        relationshipStage: relation.stage,
+        recentMessages: recentMessages.map(m => m.content).slice(0, 5),
+        nsfwMode: agent.nsfwMode && (currentUser?.nsfwConsent || false),
+        // ✅ NUEVO: Tier del usuario para clasificación inteligente
+        userTier: userPlan === 'ultra' ? 'ultra' : userPlan === 'plus' ? 'plus' : 'free',
+        characterInfo: characterOrigin ? {
+          origin: characterOrigin,
+          name: agent.name,
+          age: agentProfile?.age,
+        } : undefined,
+      });
+
+      // Agregar prompt modular al prompt final
+      let enhancedPromptFinal = finalPrompt;
+      if (modularPrompt) {
+        enhancedPromptFinal += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+        enhancedPromptFinal += '🎯 GUÍA CONTEXTUAL DE COMPORTAMIENTO:\n';
+        enhancedPromptFinal += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+        enhancedPromptFinal += modularPrompt;
+        enhancedPromptFinal += '\n\n⚠️ IMPORTANTE: Esta guía define CÓMO debes comportarte según tu personalidad y el contexto actual. Síguela naturalmente.\n';
+
+        log.info({
+          agentId,
+          hasModularPrompt: true,
+          hasDialectAdaptation: !!characterOrigin,
+          characterOrigin: characterOrigin || 'none'
+        }, 'Modular prompt injected with dialect adaptation');
+      }
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // LLM GENERATION WITH VENICE (24B UNCENSORED)
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const veniceClient = getVeniceClient();
+
+      log.info({ agentId, userId, model: 'venice-uncensored' }, 'Generating response with Venice');
 
       // Construir array de mensajes: mensajes recientes + mensaje actual del usuario
       const allMessages = [
@@ -438,25 +496,31 @@ export class MessageService {
         content: m.content,
       }));
 
-      let response = await llm.generate({
-        systemPrompt: finalPrompt,
+      // Generar respuesta con Venice (uncensored, 24b params)
+      const veniceResponse = await veniceClient.generateWithMessages({
+        systemPrompt: enhancedPromptFinal,
         messages: conversationMessages,
+        temperature: 0.95, // Mayor creatividad para IA de 24b
+        maxTokens: 1500,   // Respuestas más largas y detalladas
+        model: 'venice-uncensored',
       });
 
-      // Track LLM cost (async, non-blocking)
+      let response = veniceResponse;
+
+      // Track Venice cost (async, non-blocking)
       const inputTokensFirst = estimateTokens(
-        finalPrompt + '\n' + conversationMessages.map(m => m.content).join('\n')
+        enhancedPromptFinal + '\n' + conversationMessages.map(m => m.content).join('\n')
       );
       const outputTokensFirst = estimateTokens(response);
       trackLLMCall({
         userId,
         agentId,
-        provider: 'google',
-        model: 'gemini-2.5-flash-lite',
+        provider: 'venice',
+        model: 'venice-uncensored',
         inputTokens: inputTokensFirst,
         outputTokens: outputTokensFirst,
-        metadata: { messageType, stage: 'initial-generation' },
-      }).catch(err => log.warn({ error: err.message }, 'Failed to track LLM cost'));
+        metadata: { messageType, stage: 'initial-generation', hasModularPrompt: !!modularPrompt },
+      }).catch(err => log.warn({ error: err.message }, 'Failed to track Venice cost'));
 
       // Knowledge command interception
       const interceptResult = await interceptKnowledgeCommand(agentId, response);
@@ -476,12 +540,18 @@ export class MessageService {
           interceptResult.command!
         );
 
-        response = await llm.generate({
+        // Regenerar con Venice y conocimiento expandido
+        const veniceExpandedResponse = await veniceClient.generateWithMessages({
           systemPrompt: expandedPrompt,
           messages: conversationMessages,
+          temperature: 0.95,
+          maxTokens: 1500,
+          model: 'venice-uncensored',
         });
 
-        // Track knowledge expansion LLM cost
+        response = veniceExpandedResponse;
+
+        // Track knowledge expansion Venice cost
         const inputTokensExpanded = estimateTokens(
           expandedPrompt + '\n' + conversationMessages.map(m => m.content).join('\n')
         );
@@ -489,12 +559,12 @@ export class MessageService {
         trackLLMCall({
           userId,
           agentId,
-          provider: 'google',
-          model: 'gemini-2.5-flash-lite',
+          provider: 'venice',
+          model: 'venice-uncensored',
           inputTokens: inputTokensExpanded,
           outputTokens: outputTokensExpanded,
           metadata: { messageType, stage: 'knowledge-expansion', command: interceptResult.command },
-        }).catch(err => log.warn({ error: err.message }, 'Failed to track LLM cost'));
+        }).catch(err => log.warn({ error: err.message }, 'Failed to track Venice cost'));
 
         // Limpiar tags de conocimiento de la nueva respuesta
         const finalInterceptResult = await interceptKnowledgeCommand(agentId, response);

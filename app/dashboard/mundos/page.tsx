@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ import {
   Crown,
   Search,
   MoreVertical,
+  UserCircle2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -91,6 +93,8 @@ const categoryColors = {
 export default function MundosPage() {
   const router = useRouter();
   const t = useTranslations("worlds");
+  const { data: session, status: sessionStatus } = useSession();
+  const isAuthenticated = sessionStatus === "authenticated";
 
   const difficultyLabels = {
     beginner: { label: t("difficulty.beginner"), color: "bg-green-500" },
@@ -357,59 +361,70 @@ export default function MundosPage() {
           {/* Actions */}
           {showClone ? (
             <div className="flex gap-2">
-              <Link href={`/dashboard/mundos/${world.id}`} className="flex-1">
+              <Link href={isAuthenticated ? `/dashboard/mundos/${world.id}` : `/login?callbackUrl=/dashboard/mundos/${world.id}`} className="flex-1">
                 <Button variant="outline" className="w-full md-button-tonal py-2.5">
                   <Play className="h-4 w-4 mr-2" />
                   {t("card.viewWorld")}
                 </Button>
               </Link>
-              <Button
-                className="flex-1 md-button md-button-filled py-2.5"
-                onClick={() => handleCloneWorld(world.id, world.name)}
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                {t("card.clone")}
-              </Button>
+              {isAuthenticated ? (
+                <Button
+                  className="flex-1 md-button md-button-filled py-2.5"
+                  onClick={() => handleCloneWorld(world.id, world.name)}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  {t("card.clone")}
+                </Button>
+              ) : (
+                <Link href="/login?callbackUrl=/dashboard/mundos" className="flex-1">
+                  <Button className="w-full md-button md-button-filled py-2.5">
+                    <Copy className="h-4 w-4 mr-2" />
+                    Registrarse para clonar
+                  </Button>
+                </Link>
+              )}
             </div>
           ) : (
             <div className="flex gap-2">
-              <Link href={`/dashboard/mundos/${world.id}`} className="flex-1">
+              <Link href={isAuthenticated ? `/dashboard/mundos/${world.id}` : `/login?callbackUrl=/dashboard/mundos/${world.id}`} className="flex-1">
                 <Button className="w-full md-button md-button-tonal py-2.5">
                   <Play className="h-4 w-4 mr-2" />
-                  {t("card.enter")}
+                  {isAuthenticated ? t("card.enter") : "Registrarse para entrar"}
                 </Button>
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="md-list-item p-2.5 rounded-2xl h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors">
-                    <MoreVertical className="h-4 w-4 md-text-secondary" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="md-card p-1">
-                  <DropdownMenuItem
-                    className="md-list-item cursor-pointer"
-                    onClick={() => router.push(`/dashboard/mundos/${world.id}`)}
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    {t("card.open")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="md-list-item cursor-pointer"
-                    onClick={() => router.push(`/dashboard/mundos/${world.id}/settings`)}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    {t("card.configure")}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="md-list-item cursor-pointer text-destructive"
-                    onClick={() => handleDeleteWorld(world.id, world.name)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    {t("card.delete")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {isAuthenticated && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="md-list-item p-2.5 rounded-2xl h-10 w-10 flex items-center justify-center hover:bg-accent transition-colors">
+                      <MoreVertical className="h-4 w-4 md-text-secondary" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="md-card p-1">
+                    <DropdownMenuItem
+                      className="md-list-item cursor-pointer"
+                      onClick={() => router.push(`/dashboard/mundos/${world.id}`)}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      {t("card.open")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="md-list-item cursor-pointer"
+                      onClick={() => router.push(`/dashboard/mundos/${world.id}/settings`)}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      {t("card.configure")}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="md-list-item cursor-pointer text-destructive"
+                      onClick={() => handleDeleteWorld(world.id, world.name)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {t("card.delete")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           )}
         </div>
@@ -430,10 +445,10 @@ export default function MundosPage() {
             </p>
           </div>
 
-          <Link href="/dashboard/mundos/crear" data-tour="create-world-button">
+          <Link href={isAuthenticated ? "/dashboard/mundos/crear" : "/login?callbackUrl=/dashboard/mundos/crear"} data-tour="create-world-button">
             <Button className="md-button md-button-filled px-6 py-2.5">
               <Plus className="h-5 w-5 mr-2" />
-              {t("createButton")}
+              {isAuthenticated ? t("createButton") : "Registrarse para crear"}
             </Button>
           </Link>
 
@@ -538,6 +553,30 @@ export default function MundosPage() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Anonymous User Banner */}
+        {!isAuthenticated && (
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-4 mt-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center">
+                <UserCircle2 className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">
+                  Explorando mundos como invitado
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Regístrate para crear y participar en mundos
+                </p>
+              </div>
+              <Link href="/login?callbackUrl=/dashboard/mundos">
+                <Button size="sm" variant="outline" className="hidden sm:flex">
+                  Iniciar sesión
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Search and Filters */}
@@ -681,15 +720,17 @@ export default function MundosPage() {
       )}
 
       {/* FAB - Floating Action Button */}
-      <Link href="/dashboard/mundos/crear">
-        <button
-          className="md-fab md-fab-extended"
-          title={t("fab.title")}
-        >
-          <Plus className="h-6 w-6" />
-          <span className="font-medium">{t("fab.label")}</span>
-        </button>
-      </Link>
+      {isAuthenticated && (
+        <Link href="/dashboard/mundos/crear">
+          <button
+            className="md-fab md-fab-extended"
+            title={t("fab.title")}
+          >
+            <Plus className="h-6 w-6" />
+            <span className="font-medium">{t("fab.label")}</span>
+          </button>
+        </Link>
+      )}
     </div>
     </ErrorBoundary>
   );
