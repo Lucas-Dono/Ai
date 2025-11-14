@@ -1,0 +1,1613 @@
+/* Frame 2 */
+
+position: relative;
+width: 1920px;
+height: 3800px;
+
+background: #19212C;
+
+
+/* Rectangle 25 */
+
+position: absolute;
+width: 238px;
+height: 100px;
+left: 856px;
+top: 2369px;
+
+background: #FFDF68;
+
+
+/* Chatear ahora */
+
+position: absolute;
+width: 210px;
+height: 42px;
+left: 870px;
+top: 2398px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 32px;
+line-height: 42px;
+/* idéntica a la altura del cuadro */
+
+color: #000000;
+
+
+
+/* Rectangle 26 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 383px;
+height: 100px;
+left: 330px;
+top: 2369px;
+
+border-bottom: 1px solid #FFFFFF;
+
+
+/* Rectangle 12 */
+
+position: absolute;
+width: 249px;
+height: 443px;
+left: 330px;
+top: 1112px;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+visibility: hidden;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 5 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 250px;
+height: 3800px;
+left: 0px;
+top: 0px;
+
+background: #D9D9D9;
+border: 1px solid #000000;
+
+
+/* Rectangle 6 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 1670px;
+height: 400px;
+left: 250px;
+top: 3400px;
+
+background: #D9D9D9;
+border: 1px solid #000000;
+
+
+/* ¿Con quien quieres hablar hoy {user}? */
+
+position: absolute;
+width: 1123px;
+height: 83px;
+left: 330px;
+top: 76px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 64px;
+line-height: 83px;
+
+color: #FFFFFF;
+
+
+
+/* Personajes que TODOS aman */
+
+position: absolute;
+width: 527px;
+height: 52px;
+left: 330px;
+top: 283px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 52px;
+
+color: #FFFFFF;
+
+
+
+/* Mundos populares */
+
+position: absolute;
+width: 339px;
+height: 52px;
+left: 365px;
+top: 2661px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 52px;
+
+color: #FFFFFF;
+
+
+
+/* Personas vueltas a la vida */
+
+position: absolute;
+width: 475px;
+height: 52px;
+left: 330px;
+top: 937px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 52px;
+
+color: #FFFFFF;
+
+
+
+/* Personaje más popular de esta semana */
+
+position: absolute;
+width: 708px;
+height: 52px;
+left: 340px;
+top: 1741px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 52px;
+
+color: #FFFFFF;
+
+
+
+/* Una chica que causa furor ganandose los corazones de todos sus fans con su perfección y belleza únicos en el mundo. Conocida en las redes y en la plataforma, está lista para conocerte a ti en este momento. */
+
+position: absolute;
+width: 754px;
+height: 282px;
+left: 340px;
+top: 1941px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 36px;
+line-height: 47px;
+
+color: #FFFFFF;
+
+
+
+/* Katya Volkov */
+
+position: absolute;
+width: 708px;
+height: 60px;
+left: 340px;
+top: 1843px;
+
+font-family: 'Hammersmith One';
+font-style: normal;
+font-weight: 400;
+font-size: 48px;
+line-height: 60px;
+/* idéntica a la altura del cuadro */
+
+color: #FFFFFF;
+
+
+
+/* Querrás más y más */
+
+position: absolute;
+width: 212px;
+height: 31px;
+left: 330px;
+top: 335px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 24px;
+line-height: 31px;
+
+color: #DFDEDE;
+
+
+
+/* Vive las historias más destacadas del momento */
+
+position: absolute;
+width: 521px;
+height: 31px;
+left: 365px;
+top: 2713px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 24px;
+line-height: 31px;
+
+color: #DFDEDE;
+
+
+
+/* Habla con representaciones realistas de personas que pertenecieron a otra época ⚠️Cuidado, el sistema usa estudios clínicos de cada persona, abstenerse al uso en caso de no estar preparado */
+
+position: absolute;
+width: 1000px;
+height: 62px;
+left: 330px;
+top: 989px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* 5M de usuarios hablaron con ella */
+
+position: absolute;
+width: 364px;
+height: 31px;
+left: 340px;
+top: 2403px;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 24px;
+line-height: 31px;
+
+color: #DFDEDE;
+
+
+
+/* Group 7 */
+
+position: absolute;
+width: 726px;
+height: 999px;
+left: 1155px;
+top: 1601px;
+
+
+
+/* imagen 3 */
+
+position: absolute;
+width: 499px;
+height: 749px;
+left: 1256px;
+top: 1732px;
+
+background: url(imagen.png);
+
+
+/* imagen 4 */
+
+position: absolute;
+width: 726px;
+height: 999px;
+left: 1155px;
+top: 1601px;
+
+background: url(imagen.png);
+
+
+/* Component 2 */
+
+position: absolute;
+width: 2324px;
+height: 443px;
+left: 330px;
+top: 464px;
+
+
+
+/* Rectangle 9 */
+
+position: absolute;
+left: 79.82%;
+right: 9.47%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 15 */
+
+position: absolute;
+left: 63.86%;
+right: 25.43%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 14 */
+
+position: absolute;
+left: 47.89%;
+right: 41.39%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 13 */
+
+position: absolute;
+left: 31.93%;
+right: 57.36%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 12 */
+
+position: absolute;
+left: 15.96%;
+right: 73.32%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 11 */
+
+position: absolute;
+left: 0%;
+right: 89.29%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Component 5 */
+
+position: absolute;
+width: 2324px;
+height: 443px;
+left: 330px;
+top: 1113px;
+
+
+
+/* Rectangle 9 */
+
+position: absolute;
+left: 79.82%;
+right: 9.47%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 15 */
+
+position: absolute;
+left: 63.86%;
+right: 25.43%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 14 */
+
+position: absolute;
+left: 47.89%;
+right: 41.39%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 13 */
+
+position: absolute;
+left: 31.93%;
+right: 57.36%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 12 */
+
+position: absolute;
+left: 15.96%;
+right: 73.32%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 11 */
+
+position: absolute;
+left: 0%;
+right: 89.29%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 8.84%;
+right: 55.02%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 8.84%;
+right: 9.24%;
+top: 74.72%;
+bottom: 15.8%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Component 4 */
+
+position: absolute;
+width: 4433px;
+height: 443px;
+left: 330px;
+top: 2805px;
+
+
+
+/* Rectangle 9 */
+
+position: absolute;
+left: 0%;
+right: 90.01%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 43.79%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 4.97%;
+right: 74.72%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 4.97%;
+right: 0%;
+top: 74.72%;
+bottom: 11.06%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 12 */
+
+position: absolute;
+left: 12.75%;
+right: 77.26%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 43.79%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 4.97%;
+right: 74.72%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 4.97%;
+right: 0%;
+top: 74.72%;
+bottom: 11.06%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 13 */
+
+position: absolute;
+left: 25.49%;
+right: 64.52%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 43.79%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 4.97%;
+right: 74.72%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 4.97%;
+right: 0%;
+top: 74.72%;
+bottom: 11.06%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 14 */
+
+position: absolute;
+left: 38.24%;
+right: 51.77%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 43.79%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 4.97%;
+right: 74.72%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 4.97%;
+right: 0%;
+top: 74.72%;
+bottom: 11.06%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 15 */
+
+position: absolute;
+left: 50.98%;
+right: 39.03%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 43.79%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 4.97%;
+right: 74.72%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 4.97%;
+right: 0%;
+top: 74.72%;
+bottom: 11.06%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+
+
+
+/* Rectangle 16 */
+
+position: absolute;
+left: 63.73%;
+right: 26.28%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle */
+
+position: absolute;
+left: 0%;
+right: 43.79%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Rectangle 27 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 43.79%;
+
+background: url(Checker.png);
+
+
+/* Nombre */
+
+position: absolute;
+left: 4.97%;
+right: 74.72%;
+top: 60.95%;
+bottom: 32.05%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 31px;
+
+color: #FFFFFF;
+
+
+
+/* Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum */
+
+position: absolute;
+left: 4.97%;
+right: 0%;
+top: 74.72%;
+bottom: 11.06%;
+
+font-family: 'Inika';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 21px;
+
+color: #EEEEEE;
+

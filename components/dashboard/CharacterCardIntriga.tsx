@@ -8,12 +8,14 @@ interface CharacterCardIntrigaProps {
   character: CharacterData;
   onSelect: (characterId: string) => void;
   index?: number;
+  showBadges?: boolean; // Para sección premium
 }
 
 export function CharacterCardIntriga({
   character,
   onSelect,
   index = 0,
+  showBadges = false,
 }: CharacterCardIntrigaProps) {
   const firstName = character.name.split(' ')[0];
 
@@ -73,17 +75,12 @@ export function CharacterCardIntriga({
           ))}
         </div>
 
-        {/* Warning badge (solo para personajes intensos) */}
-        {character.experienceLevel && (
-          <div className="mb-4 p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
-            <div className="flex items-center gap-2">
-              <span className="text-base flex-shrink-0">
-                {character.experienceLevel.badge.icon}
-              </span>
-              <span className="text-xs text-orange-400 font-medium">
-                {character.experienceLevel.badge.text}
-              </span>
-            </div>
+        {/* Badges (solo si showBadges=true para sección premium) */}
+        {showBadges && character.experienceLevel && (
+          <div className="mb-4 flex gap-2 flex-wrap">
+            <span className="px-3 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-xs font-semibold text-orange-400">
+              {character.experienceLevel.badge.icon} {character.experienceLevel.badge.text}
+            </span>
           </div>
         )}
 
