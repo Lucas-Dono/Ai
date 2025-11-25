@@ -12,7 +12,7 @@ import ChatScreen from '../screens/main/ChatScreen';
 import ChatDetailScreen from '../screens/main/ChatDetailScreen';
 import AgentDetailScreen from '../screens/main/AgentDetailScreen';
 import WorldDetailScreen from '../screens/main/WorldDetailScreen';
-import CreateAgentScreen from '../screens/main/CreateAgentScreen';
+import { SmartStartStack } from './SmartStartStack';
 import EditAgentScreen from '../screens/main/EditAgentScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import AccessibilitySettingsScreen from '../screens/main/AccessibilitySettingsScreen';
@@ -66,7 +66,7 @@ export function MainStack() {
       />
       <Stack.Screen
         name="CreateAgent"
-        component={CreateAgentScreen}
+        component={SmartStartStack}
         options={{ headerShown: false }}
       />
       <Stack.Screen

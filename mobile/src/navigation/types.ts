@@ -3,6 +3,7 @@
  */
 
 import { NavigatorScreenParams } from '@react-navigation/native';
+import { SmartStartStackParamList } from './SmartStartStack';
 
 // Parámetros del Auth Stack
 export type AuthStackParamList = {
@@ -18,7 +19,7 @@ export type MainStackParamList = {
   ChatDetail: { worldId: string; agentName: string; agentAvatar?: string };
   AgentDetail: { agentId: string };
   WorldDetail: { worldId: string };
-  CreateAgent: undefined;
+  CreateAgent: NavigatorScreenParams<SmartStartStackParamList> | undefined;
   CreateWorld: { agentId?: string } | undefined;
   EditAgent: { agentId: string };
   Settings: undefined;
