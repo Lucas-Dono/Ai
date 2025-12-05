@@ -96,7 +96,7 @@ export class HybridLLMProvider {
       // Convertir a formato LLMResponse
       return {
         text: responseText,
-        model: 'gemini-2.5-flash-lite',
+        model: process.env.GEMINI_MODEL_LITE || 'gemini-2.5-flash-lite',
         usage: {
           promptTokens: 0,  // Gemini no devuelve usage
           completionTokens: 0,
@@ -146,7 +146,7 @@ export class HybridLLMProvider {
       // Convertir a formato LLMResponse
       return {
         text: responseText,
-        model: 'gemini-2.5-flash-lite',
+        model: process.env.GEMINI_MODEL_LITE || 'gemini-2.5-flash-lite',
         usage: {
           promptTokens: 0,
           completionTokens: 0,

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { ImportantPeopleService } from '@/lib/services/important-people.service';
 
 /**
@@ -16,13 +16,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id: agentId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Query params
     const searchParams = req.nextUrl.searchParams;
@@ -31,6 +31,7 @@ export async function GET(
     const sortBy = searchParams.get('sortBy') as any;
     const order = searchParams.get('order') as 'asc' | 'desc';
     const upcomingBirthdays = searchParams.get('upcomingBirthdays');
+    const includeAgentPeople = searchParams.get('includeAgentPeople') === 'true'; // Nuevo parámetro
 
     if (upcomingBirthdays === 'true') {
       const daysAhead = parseInt(searchParams.get('daysAhead') || '30', 10);
@@ -47,6 +48,7 @@ export async function GET(
     if (importance) filters.importance = importance;
     if (sortBy) filters.sortBy = sortBy;
     if (order) filters.order = order;
+    if (includeAgentPeople) filters.includeAgentPeople = true; // Incluir personas del agente
 
     const people = await ImportantPeopleService.getImportantPeople(
       agentId,
@@ -73,13 +75,13 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id: agentId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
 
     // Validaciones

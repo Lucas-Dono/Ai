@@ -14,7 +14,7 @@ module.exports = function (api) {
           allowUndefined: true,
         },
       ],
-      'react-native-reanimated/plugin', // MUST be last
+      'react-native-worklets/plugin', // MUST be last (moved from reanimated/plugin)
     ],
   };
 };

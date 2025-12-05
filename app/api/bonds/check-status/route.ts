@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -9,7 +8,7 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -27,7 +26,7 @@ export async function GET(request: NextRequest) {
     // Check if user has an active bond with this agent
     const existingBond = await prisma.symbolicBond.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         agentId,
         status: { in: ["active", "dormant", "fragile", "at_risk"] },
       },
@@ -99,7 +98,7 @@ export async function GET(request: NextRequest) {
     // Check if user is in queue
     const queuePosition = await prisma.bondQueuePosition.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         agentId,
       },
       select: {

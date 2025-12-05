@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -7,12 +7,12 @@ import { MessagingService } from '@/lib/services/messaging.service';
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const conversations = await MessagingService.getUserConversations(session.user.id);
+    const conversations = await MessagingService.getUserConversations(user.id);
     return NextResponse.json(conversations);
   } catch (error: any) {
     console.error('Error getting conversations:', error);
@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     const conversation = await MessagingService.getOrCreateConversation(
-      session.user.id,
+      user.id,
       participants,
       { name, icon, type }
     );

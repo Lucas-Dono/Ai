@@ -48,47 +48,67 @@ export function useAnalytics() {
  * Debe ser usado en el componente raíz (App.tsx)
  */
 export function useAppLifecycleTracking() {
-  const { user } = useAuth();
+  const authContext = useAuth();
   const appState = useRef(AppState.currentState);
   const sessionStartTime = useRef(Date.now());
   const hasSentMobileSession = useRef(false);
 
   useEffect(() => {
-    // Trackear app opened cuando el componente se monta
-    trackAppOpened(user?.id);
+    // Verificación de seguridad: asegurar que el contexto está disponible
+    if (!authContext) {
+      console.warn('[Analytics] Auth context not ready, skipping lifecycle tracking');
+      return;
+    }
 
-    // Trackear mobile session (solo una vez por sesión)
-    if (user?.id && !hasSentMobileSession.current) {
-      trackMobileSession(user.id);
-      hasSentMobileSession.current = true;
+    const { user } = authContext;
+
+    // Trackear app opened cuando el componente se monta
+    try {
+      trackAppOpened(user?.id);
+
+      // Trackear mobile session (solo una vez por sesión)
+      if (user?.id && !hasSentMobileSession.current) {
+        trackMobileSession(user.id);
+        hasSentMobileSession.current = true;
+      }
+    } catch (error) {
+      console.error('[Analytics] Error tracking app opened:', error);
     }
 
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        // App volvió al foreground
-        console.log('[Analytics] App has come to the foreground');
-        trackAppOpened(user?.id);
-        sessionStartTime.current = Date.now();
-      } else if (
-        appState.current === 'active' &&
-        nextAppState.match(/inactive|background/)
-      ) {
-        // App fue a background
-        const sessionDuration = Math.round((Date.now() - sessionStartTime.current) / 1000);
-        console.log(`[Analytics] App has gone to the background (${sessionDuration}s session)`);
-        trackAppBackgrounded(user?.id, sessionDuration);
-      }
+      try {
+        if (
+          appState.current.match(/inactive|background/) &&
+          nextAppState === 'active'
+        ) {
+          // App volvió al foreground
+          console.log('[Analytics] App has come to the foreground');
+          trackAppOpened(user?.id);
+          sessionStartTime.current = Date.now();
+        } else if (
+          appState.current === 'active' &&
+          nextAppState.match(/inactive|background/)
+        ) {
+          // App fue a background
+          const sessionDuration = Math.round((Date.now() - sessionStartTime.current) / 1000);
+          console.log(`[Analytics] App has gone to the background (${sessionDuration}s session)`);
+          trackAppBackgrounded(user?.id, sessionDuration);
+        }
 
-      appState.current = nextAppState;
+        appState.current = nextAppState;
+      } catch (error) {
+        console.error('[Analytics] Error in AppState change handler:', error);
+      }
     });
 
     return () => {
-      subscription.remove();
+      try {
+        subscription.remove();
+      } catch (error) {
+        console.error('[Analytics] Error removing AppState listener:', error);
+      }
     };
-  }, [user?.id]);
+  }, [authContext?.user?.id]);
 }
 
 /**

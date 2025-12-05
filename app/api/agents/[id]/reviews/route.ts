@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/agents/[id]/reviews - Obtener reviews de un agente
@@ -73,9 +73,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
@@ -93,7 +93,7 @@ export async function POST(
 
     // Obtener usuario
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
     });
 
     if (!user) {
@@ -185,9 +185,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
@@ -195,7 +195,7 @@ export async function DELETE(
 
     // Obtener usuario
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
     });
 
     if (!user) {

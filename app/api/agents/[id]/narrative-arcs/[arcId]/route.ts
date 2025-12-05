@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { LifeEventsTimelineService } from '@/lib/life-events/timeline.service';
 
 /**
@@ -16,13 +16,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string; arcId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { arcId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     const arc = await LifeEventsTimelineService.getArc(arcId, userId);
 
@@ -49,13 +49,13 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string; arcId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { arcId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
 
     const arc = await LifeEventsTimelineService.updateArc(arcId, userId, {
@@ -82,13 +82,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; arcId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { arcId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     await LifeEventsTimelineService.markAsAbandoned(arcId, userId);
 

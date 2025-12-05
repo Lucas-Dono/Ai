@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from '@/lib/prisma';
 import { worldSimulationEngine } from '@/lib/worlds/simulation-engine';
 import { createLogger } from '@/lib/logger';
@@ -20,13 +20,13 @@ export async function POST(
 ) {
   try {
     const { id: worldId } = await params;
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     log.info({ userId, worldId }, 'Resetting world status');
 
     // Verify ownership or predefined world

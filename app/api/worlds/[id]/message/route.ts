@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
 import { EmotionalEngine } from "@/lib/relations/engine";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { worldMessageBodySchema, formatValidationError } from "@/lib/validation/api-schemas";
 import type { RelationPrivateState } from "@/types/prisma-json";
 import { getContextLimit } from "@/lib/usage/context-limits";
@@ -43,8 +43,8 @@ export async function POST(
 
     // SECURITY FIX #3: Verificar autenticación y obtener userId de la sesión
     // NUNCA confiar en el userId del body - previene suplantación de identidad
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

@@ -7,8 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 
 export const dynamic = "force-dynamic";
 
@@ -21,15 +20,15 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    // Get session using Next-Auth v5
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const params = await context.params;
     const agentId = params.id;
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Verificar que el agente existe
     const agent = await prisma.agent.findUnique({
@@ -41,19 +40,12 @@ export async function GET(
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    // Obtener mensajes proactivos pendientes o programados
-    const now = new Date();
+    // Obtener mensajes proactivos pendientes
     const messages = await prisma.proactiveMessage.findMany({
       where: {
         agentId,
         userId,
-        status: {
-          in: ["pending", "scheduled"],
-        },
-        OR: [
-          { scheduledFor: null },
-          { scheduledFor: { lte: now } }, // Solo mensajes cuya hora de envío ya pasó
-        ],
+        status: "pending",
       },
       orderBy: {
         createdAt: "desc",
@@ -61,7 +53,7 @@ export async function GET(
       take: 10, // Limitar a 10 mensajes para no sobrecargar
     });
 
-    // Si hay mensajes, marcarlos como entregados
+    // Si hay mensajes, marcarlos como sent
     if (messages.length > 0) {
       await prisma.proactiveMessage.updateMany({
         where: {
@@ -69,8 +61,8 @@ export async function GET(
           status: "pending",
         },
         data: {
-          status: "delivered",
-          deliveredAt: new Date(),
+          status: "sent",
+          sentAt: new Date(),
         },
       });
     }
@@ -82,7 +74,6 @@ export async function GET(
         content: msg.content,
         triggerType: msg.triggerType,
         createdAt: msg.createdAt,
-        scheduledFor: msg.scheduledFor,
         context: msg.context,
       })),
       count: messages.length,
@@ -108,15 +99,15 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    // Get session using Next-Auth v5
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const params = await context.params;
     const agentId = params.id;
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await request.json();
     const { messageId, status, userResponse } = body;
 

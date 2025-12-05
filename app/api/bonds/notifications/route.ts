@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import {
   getUserBondNotifications,
   getUnreadBondNotificationsCount,
@@ -12,7 +11,7 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -22,12 +21,12 @@ export async function GET(request: NextRequest) {
     const unreadOnly = searchParams.get("unreadOnly") === "true";
 
     const notifications = await getUserBondNotifications(
-      session.user.id,
+      user.id,
       limit,
       unreadOnly
     );
 
-    const unreadCount = await getUnreadBondNotificationsCount(session.user.id);
+    const unreadCount = await getUnreadBondNotificationsCount(user.id);
 
     return NextResponse.json({
       notifications,

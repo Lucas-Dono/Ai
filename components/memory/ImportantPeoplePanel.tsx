@@ -29,6 +29,7 @@ interface ImportantPerson {
   lastMentioned?: string;
   mentionCount: number;
   importance: "low" | "medium" | "high";
+  source?: "agent" | "user"; // Identificador de origen
 }
 
 interface ImportantPeoplePanelProps {
@@ -78,7 +79,7 @@ export function ImportantPeoplePanel({ agentId }: ImportantPeoplePanelProps) {
   const fetchPeople = async () => {
     try {
       setLoading(true);
-      let url = `/api/agents/${agentId}/people?`;
+      let url = `/api/agents/${agentId}/people?includeAgentPeople=true&`; // ← Incluir personas del agente
       if (filterRelationship !== "all")
         url += `relationship=${filterRelationship}&`;
       if (filterImportance !== "all") url += `importance=${filterImportance}&`;
@@ -454,8 +455,21 @@ export function ImportantPeoplePanel({ agentId }: ImportantPeoplePanelProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {people.map((person) => {
+        <div className="space-y-8">
+          {/* Personas del Agente */}
+          {people.filter(p => p.source === 'agent').length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Personas del Personaje
+                </h3>
+                <span className="text-sm text-gray-500">
+                  ({people.filter(p => p.source === 'agent').length})
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {people.filter(p => p.source === 'agent').map((person) => {
             const birthdayInfo = getUpcomingBirthday(person.birthday);
             const isBirthdaySoon =
               birthdayInfo && birthdayInfo.daysUntil <= 30;
@@ -565,6 +579,136 @@ export function ImportantPeoplePanel({ agentId }: ImportantPeoplePanelProps) {
               </div>
             );
           })}
+              </div>
+            </div>
+          )}
+
+          {/* Personas del Usuario */}
+          {people.filter(p => p.source === 'user').length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Personas del Usuario
+                </h3>
+                <span className="text-sm text-gray-500">
+                  ({people.filter(p => p.source === 'user').length})
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {people.filter(p => p.source === 'user').map((person) => {
+            const birthdayInfo = getUpcomingBirthday(person.birthday);
+            const isBirthdaySoon =
+              birthdayInfo && birthdayInfo.daysUntil <= 30;
+
+            return (
+              <div
+                key={person.id}
+                className={`bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border-2 transition-all ${
+                  isBirthdaySoon
+                    ? "border-pink-400 bg-pink-50 dark:bg-pink-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      {person.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                        {person.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {person.relationship}
+                        {person.age && ` • ${person.age} años`}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEdit(person)}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
+                      title="Editar"
+                    >
+                      <Edit2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(person.id)}
+                      className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-2xl transition-colors"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    </button>
+                  </div>
+                </div>
+
+                {person.description && (
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                    {person.description}
+                  </p>
+                )}
+
+                {isBirthdaySoon && birthdayInfo && (
+                  <div className="mb-3 flex items-center gap-2 p-2 bg-pink-100 dark:bg-pink-900/30 rounded-2xl">
+                    <Cake className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+                    <span className="text-sm font-medium text-pink-700 dark:text-pink-300">
+                      Cumpleaños en {birthdayInfo.daysUntil} días
+                    </span>
+                  </div>
+                )}
+
+                {person.interests && (
+                  <div className="mb-3">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Intereses:
+                    </span>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                      {person.interests}
+                    </p>
+                  </div>
+                )}
+
+                {person.healthInfo && (
+                  <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl">
+                    <Heart className="w-4 h-4 text-yellow-600 inline mr-2" />
+                    <span className="text-sm text-yellow-700 dark:text-yellow-300">
+                      {person.healthInfo}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        importanceColors[person.importance]
+                      }`}
+                    >
+                      {importanceLabels[person.importance]}
+                    </span>
+                    <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{person.mentionCount} menciones</span>
+                    </div>
+                  </div>
+
+                  {person.lastMentioned && (
+                    <span className="text-xs text-gray-500">
+                      Última vez:{" "}
+                      {format(new Date(person.lastMentioned), "d MMM", {
+                        locale: es,
+                      })}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

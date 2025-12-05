@@ -3,7 +3,49 @@
  *
  * Complete TypeScript types for the Smart Start intelligent character creation system.
  * These types define the entire data structure and flow of the system.
+ *
+ * Note: CharacterDraft and GeneratedProfile are now imported from the unified
+ * character-creation module for consistency across Smart Start and Manual Wizard.
  */
+
+// Re-export unified types for convenience
+// Note: GeneratedProfile has a local definition below, so we don't re-export it
+export type {
+  CharacterDraft,
+  PersonalityCoreData,
+  CharacterAppearanceData,
+  ImportantPersonData,
+  ImportantEventData,
+  BigFiveTraits,
+  CoreValue,
+  MoralSchema,
+  BaselineEmotions,
+  PsychologicalNeeds,
+  SmartStartStep as SmartStartStepType,
+  // Re-export GeneratedProfile from unified types as a different name if needed
+  GeneratedProfile as UnifiedGeneratedProfile,
+} from '@/types/character-creation';
+
+export {
+  DEFAULT_BIG_FIVE,
+  DEFAULT_BASELINE_EMOTIONS,
+  DEFAULT_PERSONALITY_CORE,
+  validateCharacterDraft,
+  validatePersonalityCore,
+  validateCharacterAppearance,
+} from '@/types/character-creation';
+
+// SubGenreId and ArchetypeId are string IDs (aliases for clarity)
+export type SubGenreId = string;
+export type ArchetypeId = string;
+
+// Re-export depth customization types from smart-start-core package
+export type {
+  DepthLevelId,
+  UserTier,
+  DepthLevel,
+  DepthFeature,
+} from '@circuitpromptai/smart-start-core';
 
 // ============================================================================
 // GENRE TAXONOMY TYPES
@@ -119,22 +161,27 @@ export interface SearchSource {
 export interface SearchResult {
   id: string;
   source: SearchSourceId;
+  externalId?: string;
   name: string;
+  alternateName?: string;
   nameNative?: string;
   nameKanji?: string;
-  image?: string;
-  description: string;
+  image?: string; // Legacy field, use imageUrl instead
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  description?: string;
   age?: string | number;
   gender?: string;
   nicknames?: string[];
   sourceUrl: string;
   actorName?: string;
   species?: string;
+  confidence?: number;
 
   metadata: {
     favorites?: number;
     animeAppearances?: string[] | number;
-    popularity?: string;
+    popularity?: string | number;
     show?: string;
     games?: string[];
     year?: number | string;
@@ -215,15 +262,11 @@ export interface GenerationResult {
 // ============================================================================
 
 export type SmartStartStep =
-  | 'welcome'
-  | 'source'
+  | 'type'
   | 'search'
-  | 'search-results'
-  | 'genre'
-  | 'subgenre'
-  | 'traits'
-  | 'generation'
-  | 'review';
+  | 'customize'
+  | 'review'
+  | 'genre'; // Optional - accessed from customize when changing genre
 
 export interface SmartStartState {
   step: SmartStartStep;

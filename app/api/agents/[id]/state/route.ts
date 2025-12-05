@@ -55,9 +55,9 @@ export async function GET(
     // Format emotional data
     const emotionalData = internalState ? {
       state: {
-        trust: relationship?.trust || 0.5,
-        affinity: relationship?.affinity || 0.5,
-        respect: relationship?.respect || 0.5,
+        trust: relationship?.trust ?? 0,
+        affinity: relationship?.affinity ?? 0,
+        respect: relationship?.respect ?? 0,
         valence: internalState.moodValence,
         arousal: internalState.moodArousal,
         dominance: internalState.moodDominance,
@@ -103,9 +103,9 @@ export async function GET(
       behavior: behaviorData,
       relationship: {
         stage: relationship?.stage || 'stranger',
-        trust: relationship?.trust || 0.5,
-        affinity: relationship?.affinity || 0.5,
-        respect: relationship?.respect || 0.5,
+        trust: relationship?.trust ?? 0,
+        affinity: relationship?.affinity ?? 0,
+        respect: relationship?.respect ?? 0,
         totalInteractions: relationship?.totalInteractions || 0,
       }
     });

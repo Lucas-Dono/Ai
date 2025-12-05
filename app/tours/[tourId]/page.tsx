@@ -9,7 +9,7 @@ interface TourPageProps {
 // Mapeo de tours a sus páginas objetivo
 const TOUR_ROUTES: Record<string, string> = {
   "welcome": "/dashboard",
-  "first-agent": "/constructor",
+  "first-agent": "/create-character",
   "community-interaction": "/community",
   "community-tour": "/community",
   "worlds-intro": "/dashboard/mundos",

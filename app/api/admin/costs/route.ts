@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import {
   getCostSummary,
   getDailyCosts,
@@ -15,15 +15,15 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if user is admin (you can add admin field to User model)
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       select: { id: true, email: true },
     });
 

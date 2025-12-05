@@ -113,11 +113,14 @@ export const ImportantEventsService = {
       priority?: string;
       eventHappened?: boolean;
       isRecurring?: boolean;
+      includeAgentEvents?: boolean; // Incluir eventos del pasado del agente
     } = {}
   ) {
     const where: any = {
       agentId,
-      userId,
+      userId: filters.includeAgentEvents
+        ? { in: [userId, agentId] } // Ambos grupos
+        : userId, // Solo usuario
     };
 
     if (filters.type) where.type = filters.type;
@@ -132,7 +135,11 @@ export const ImportantEventsService = {
       },
     });
 
-    return events;
+    // Agregar metadata para identificar el source
+    return events.map((event) => ({
+      ...event,
+      source: event.userId === agentId ? 'agent' : 'user',
+    }));
   },
 
   /**

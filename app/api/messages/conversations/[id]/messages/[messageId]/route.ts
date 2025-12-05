@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -10,8 +10,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string; messageId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -24,7 +24,7 @@ export async function PATCH(
 
     const updated = await MessagingService.editMessage(
       messageId,
-      session.user.id,
+      user.id,
       content.trim()
     );
 
@@ -43,13 +43,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; messageId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     const { messageId } = await params;
-    const result = await MessagingService.deleteMessage(messageId, session.user.id);
+    const result = await MessagingService.deleteMessage(messageId, user.id);
 
     return NextResponse.json(result);
   } catch (error: any) {

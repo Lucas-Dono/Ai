@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import LeaderboardsView from "@/components/bonds/LeaderboardsView";
 
 export const metadata: Metadata = {
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LeaderboardsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">

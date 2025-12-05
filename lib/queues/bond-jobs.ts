@@ -7,6 +7,8 @@
  * - Actualización de rankings (cada hora)
  * - Envío de notificaciones batch
  * - Limpieza de datos antiguos
+ *
+ * NOTA: Requiere Redis configurado. Si Redis no está disponible, los jobs no se ejecutarán.
  */
 
 import { Queue, Worker, QueueEvents } from "bullmq";
@@ -16,6 +18,9 @@ import {
   updateBondRarity,
 } from "@/lib/services/symbolic-bonds.service";
 import { prisma } from "@/lib/prisma";
+
+// Check if Redis is configured for BullMQ
+const isRedisConfigured = !!(process.env.REDIS_URL || (process.env.REDIS_HOST && process.env.REDIS_PORT));
 
 // Connection config para BullMQ (usa el mismo Redis)
 const connection = {
@@ -28,7 +33,8 @@ const connection = {
 // QUEUE DEFINITIONS
 // ============================================================================
 
-export const bondsQueue = new Queue("bonds", { connection });
+// Only create queue if Redis is configured
+export const bondsQueue = isRedisConfigured ? new Queue("bonds", { connection }) : null;
 
 export const BondJobTypes = {
   CALCULATE_RARITY: "calculate-rarity",
@@ -48,6 +54,11 @@ export const BondJobTypes = {
  * Calcula rareza de un bond específico
  */
 export async function scheduleRarityCalculation(bondId: string) {
+  if (!bondsQueue) {
+    console.warn("[BondJobs] Redis not configured, skipping rarity calculation job");
+    return;
+  }
+
   await bondsQueue.add(
     BondJobTypes.CALCULATE_RARITY,
     { bondId },
@@ -65,6 +76,11 @@ export async function scheduleRarityCalculation(bondId: string) {
  * Procesa decay de todos los bonds (ejecutar diariamente)
  */
 export async function scheduleDecayProcessing() {
+  if (!bondsQueue) {
+    console.warn("[BondJobs] Redis not configured, skipping decay processing job");
+    return;
+  }
+
   await bondsQueue.add(
     BondJobTypes.PROCESS_DECAY,
     {},
@@ -81,6 +97,11 @@ export async function scheduleDecayProcessing() {
  * Actualiza rankings globales (ejecutar cada hora)
  */
 export async function scheduleRankingsUpdate() {
+  if (!bondsQueue) {
+    console.warn("[BondJobs] Redis not configured, skipping rankings update job");
+    return;
+  }
+
   await bondsQueue.add(
     BondJobTypes.UPDATE_RANKINGS,
     {},
@@ -96,6 +117,11 @@ export async function scheduleRankingsUpdate() {
  * Recalcula rareza de todos los bonds activos (ejecutar cada 6 horas)
  */
 export async function scheduleRarityRecalculation() {
+  if (!bondsQueue) {
+    console.warn("[BondJobs] Redis not configured, skipping rarity recalculation job");
+    return;
+  }
+
   await bondsQueue.add(
     BondJobTypes.RECALCULATE_ALL_RARITIES,
     {},
@@ -112,6 +138,11 @@ export async function scheduleRarityRecalculation() {
  * Procesa ofertas de slots en cola (cada 15 minutos)
  */
 export async function scheduleQueueProcessing() {
+  if (!bondsQueue) {
+    console.warn("[BondJobs] Redis not configured, skipping queue processing job");
+    return;
+  }
+
   await bondsQueue.add(
     BondJobTypes.PROCESS_QUEUE_OFFERS,
     {},
@@ -127,6 +158,11 @@ export async function scheduleQueueProcessing() {
  * Limpieza de notificaciones antiguas y datos obsoletos (semanal)
  */
 export async function scheduleDataCleanup() {
+  if (!bondsQueue) {
+    console.warn("[BondJobs] Redis not configured, skipping data cleanup job");
+    return;
+  }
+
   await bondsQueue.add(
     BondJobTypes.CLEANUP_OLD_DATA,
     {},
@@ -144,8 +180,9 @@ export async function scheduleDataCleanup() {
 
 /**
  * Worker que procesa los jobs
+ * Solo se inicializa si Redis está configurado
  */
-export const bondsWorker = new Worker(
+export const bondsWorker = isRedisConfigured ? new Worker(
   "bonds",
   async (job) => {
     console.log(`[BondWorker] Processing job: ${job.name}`);
@@ -182,7 +219,7 @@ export const bondsWorker = new Worker(
     }
   },
   { connection }
-);
+) : null;
 
 // ============================================================================
 // JOB IMPLEMENTATIONS
@@ -383,19 +420,22 @@ async function sendNotifications(data: { notifications: any[] }) {
 // EVENT LISTENERS
 // ============================================================================
 
-const queueEvents = new QueueEvents("bonds", { connection });
+// Only create event listeners if Redis is configured
+const queueEvents = isRedisConfigured ? new QueueEvents("bonds", { connection }) : null;
 
-queueEvents.on("completed", ({ jobId, returnvalue }) => {
-  console.log(`[BondQueue] Job ${jobId} completed:`, returnvalue);
-});
+if (queueEvents) {
+  queueEvents.on("completed", ({ jobId, returnvalue }) => {
+    console.log(`[BondQueue] Job ${jobId} completed:`, returnvalue);
+  });
 
-queueEvents.on("failed", ({ jobId, failedReason }) => {
-  console.error(`[BondQueue] Job ${jobId} failed:`, failedReason);
-});
+  queueEvents.on("failed", ({ jobId, failedReason }) => {
+    console.error(`[BondQueue] Job ${jobId} failed:`, failedReason);
+  });
 
-queueEvents.on("progress", ({ jobId, data }) => {
-  console.log(`[BondQueue] Job ${jobId} progress:`, data);
-});
+  queueEvents.on("progress", ({ jobId, data }) => {
+    console.log(`[BondQueue] Job ${jobId} progress:`, data);
+  });
+}
 
 // ============================================================================
 // INITIALIZATION
@@ -405,6 +445,12 @@ queueEvents.on("progress", ({ jobId, data }) => {
  * Inicializar todos los jobs recurrentes
  */
 export async function initializeBondJobs() {
+  if (!bondsQueue) {
+    console.warn("⚠️  [BondJobs] Redis not configured - background jobs disabled.");
+    console.warn("   Set REDIS_URL or REDIS_HOST/REDIS_PORT to enable bond jobs.");
+    return;
+  }
+
   console.log("🚀 Initializing Bond background jobs...");
 
   // Eliminar jobs repetidos antiguos (para evitar duplicados)
@@ -442,10 +488,22 @@ export async function initializeBondJobs() {
  * Cerrar workers y queues
  */
 export async function closeBondJobs() {
-  await bondsWorker.close();
-  await bondsQueue.close();
-  await queueEvents.close();
+  if (bondsWorker) {
+    await bondsWorker.close();
+  }
+  if (bondsQueue) {
+    await bondsQueue.close();
+  }
+  if (queueEvents) {
+    await queueEvents.close();
+  }
   console.log("Bond jobs closed");
+}
+
+// Log warning if Redis is not configured
+if (!isRedisConfigured) {
+  console.warn("[BondJobs] ⚠️  Redis not configured - background jobs disabled.");
+  console.warn("[BondJobs] Set REDIS_URL or REDIS_HOST/REDIS_PORT environment variables to enable.");
 }
 
 // Exportar para uso externo

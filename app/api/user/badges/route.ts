@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { log } from "@/lib/logging/logger";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { checkAndAwardBadges } from "@/lib/gamification/badge-system";
 
 /**
@@ -11,9 +10,9 @@ import { checkAndAwardBadges } from "@/lib/gamification/badge-system";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }
@@ -22,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener badges del usuario
     const badges = await prisma.bondBadge.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       orderBy: [
         { earnedAt: "desc" },
       ],
@@ -30,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener rewards
     const rewards = await prisma.userRewards.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     return NextResponse.json({
@@ -60,16 +59,16 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }
       );
     }
 
-    const awardedBadges = await checkAndAwardBadges(session.user.id);
+    const awardedBadges = await checkAndAwardBadges(user.id);
 
     return NextResponse.json({
       success: true,

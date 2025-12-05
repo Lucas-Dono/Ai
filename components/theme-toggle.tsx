@@ -6,15 +6,16 @@ import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, forcedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return <div className="h-10 w-10" />;
+  // Si el tema está forzado, no mostramos el toggle
+  if (forcedTheme || !mounted) {
+    return null;
   }
 
   return (

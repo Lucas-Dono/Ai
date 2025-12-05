@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { generateRecommendations } from "@/lib/recommendations/engine";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/recommendations - Obtener recomendaciones personalizadas
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
     });
 
     if (!user) {
@@ -43,14 +43,14 @@ export async function GET(request: NextRequest) {
 // POST /api/recommendations/regenerate - Forzar regeneración
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
     });
 
     if (!user) {

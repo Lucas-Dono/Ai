@@ -88,6 +88,12 @@ export const LLM_PRICING = {
     input: 0.24,
     output: 0.24,
   },
+
+  // Venice AI
+  'venice-uncensored': {
+    input: 0.20,
+    output: 0.90,
+  },
 } as const;
 
 // Embedding pricing per 1M tokens

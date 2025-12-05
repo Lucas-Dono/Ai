@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBondSocket } from "@/hooks/useBondSocket";
-import { BondEventType } from "@/lib/websocket/bonds-events";
+import { BondEventType } from "@/lib/websocket/bond-event-types";
 import {
   Card,
   CardContent,

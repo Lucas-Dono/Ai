@@ -17,8 +17,8 @@ export function ProactiveMessageBadge({
   variant = "compact",
 }: ProactiveMessageBadgeProps) {
   const { messages, hasMessages } = useProactiveMessages(agentId, {
-    pollingInterval: 60000, // 1 minute
-    enabled: true,
+    pollingInterval: 600000, // 10 minutos (compartido con todas las instancias del mismo agentId)
+    enabled: true, // Ahora usa sistema singleton - seguro para múltiples instancias
   });
 
   if (!hasMessages) {
@@ -119,8 +119,8 @@ export function ProactiveMessageDot({
   className?: string;
 }) {
   const { hasMessages } = useProactiveMessages(agentId, {
-    pollingInterval: 60000,
-    enabled: true,
+    pollingInterval: 600000, // 10 minutos (compartido con todas las instancias del mismo agentId)
+    enabled: true, // Ahora usa sistema singleton - seguro para múltiples instancias
   });
 
   if (!hasMessages) {

@@ -22,7 +22,10 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { optimizedVectorSearch } from "@/lib/memory/optimized-vector-search";
+import { optimizedVectorSearch, cosineSimilarity } from "@/lib/memory/optimized-vector-search";
+
+// Re-export for convenience
+export { cosineSimilarity };
 
 export interface MemoryChunk {
   id: string;

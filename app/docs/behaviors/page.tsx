@@ -362,7 +362,7 @@ export default function BehaviorsDocs() {
             Now you understand how behaviors work. Create unique companion dynamics safely.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/constructor" className="text-sm font-medium hover:underline">
+            <Link href="/create-character" className="text-sm font-medium hover:underline">
               Create a Companion →
             </Link>
             <Link href="/docs/worlds" className="text-sm font-medium hover:underline">

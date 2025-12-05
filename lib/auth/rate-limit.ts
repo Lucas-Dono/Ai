@@ -5,6 +5,7 @@ import { Redis } from "@upstash/redis";
 let redis: Redis | null = null;
 let loginRatelimit: Ratelimit | null = null;
 let registerRatelimit: Ratelimit | null = null;
+let aiGenerationRatelimit: Ratelimit | null = null;
 
 if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
   redis = new Redis({
@@ -26,6 +27,14 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     limiter: Ratelimit.slidingWindow(3, "1 h"),
     analytics: true,
     prefix: "ratelimit:register",
+  });
+
+  // Rate limit para AI generation: 20 requests por minuto por usuario
+  aiGenerationRatelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(20, "1 m"),
+    analytics: true,
+    prefix: "ratelimit:ai-generation",
   });
 }
 
@@ -59,6 +68,29 @@ export async function checkRegisterRateLimit(identifier: string): Promise<{
   }
 
   const result = await registerRatelimit.limit(identifier);
+
+  return {
+    success: result.success,
+    remaining: result.remaining,
+    reset: result.reset,
+  };
+}
+
+/**
+ * Check AI generation rate limit (20 requests per minute per user)
+ * Used for Smart Start and character creation AI endpoints
+ */
+export async function checkAIGenerationRateLimit(userId: string): Promise<{
+  success: boolean;
+  remaining: number;
+  reset: number;
+}> {
+  // Si no hay rate limiter configurado, permitir siempre
+  if (!aiGenerationRatelimit) {
+    return { success: true, remaining: 999, reset: 0 };
+  }
+
+  const result = await aiGenerationRatelimit.limit(userId);
 
   return {
     success: result.success,

@@ -76,6 +76,12 @@ async function flushBuffer() {
   costBuffer.length = 0; // Clear buffer
 
   try {
+    // Check if costTracking model exists
+    if (!prisma.costTracking) {
+      console.warn('[CostTracker] CostTracking model not found in Prisma schema - skipping flush');
+      return;
+    }
+
     await prisma.costTracking.createMany({
       data: entries.map(entry => ({
         userId: entry.userId,
@@ -441,13 +447,31 @@ if (typeof window === 'undefined') {
 
 // Graceful shutdown handler
 if (typeof process !== 'undefined') {
-  process.on('SIGTERM', async () => {
-    console.log('[CostTracker] SIGTERM received, flushing buffer...');
-    await forceFlush();
-  });
+  let isShuttingDown = false;
 
-  process.on('SIGINT', async () => {
-    console.log('[CostTracker] SIGINT received, flushing buffer...');
-    await forceFlush();
-  });
+  const handleShutdown = async (signal: string) => {
+    // Evitar múltiples shutdowns simultáneos
+    if (isShuttingDown) {
+      return;
+    }
+    isShuttingDown = true;
+
+    console.log(`[CostTracker] ${signal} received, flushing buffer...`);
+
+    try {
+      await Promise.race([
+        forceFlush(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Flush timeout')), 2000))
+      ]);
+      console.log('[CostTracker] Buffer flushed successfully');
+    } catch (error) {
+      console.error('[CostTracker] Error during shutdown flush:', error);
+    } finally {
+      // Siempre terminar el proceso, incluso si el flush falla
+      process.exit(0);
+    }
+  };
+
+  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+  process.on('SIGINT', () => handleShutdown('SIGINT'));
 }

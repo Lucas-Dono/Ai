@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useBondSocket } from "@/hooks/useBondSocket";
-import { BondEventType } from "@/lib/websocket/bonds-events";
+import { BondEventType } from "@/lib/websocket/bond-event-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";

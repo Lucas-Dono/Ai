@@ -1,76 +1,62 @@
-/**
- * Script to fix Next.js 15 params async API
- * Converts: { params }: { params: { id: string } }
- * To: { params }: { params: Promise<{ id: string }> }
- * And adds await params
- */
+#!/usr/bin/env node
 
 const fs = require('fs');
-const path = require('path');
-const { glob } = require('glob');
+const { execSync } = require('child_process');
 
-async function fixFile(filePath) {
-  let content = fs.readFileSync(filePath, 'utf8');
-  let modified = false;
+console.log('🔍 Buscando archivos con params antiguos...\n');
 
-  // Pattern 1: Fix function signature with single param (id, slug, etc.)
-  const pattern1 = /\{\s*params\s*\}:\s*\{\s*params:\s*\{\s*(\w+):\s*string\s*\}\s*\}/g;
-  if (pattern1.test(content)) {
-    content = content.replace(
-      pattern1,
-      '{ params }: { params: Promise<{ $1: string }> }'
-    );
-    modified = true;
-  }
-
-  // Pattern 2: Fix params usage - find const { id } = params; or params.id
-  // Replace with: const { id } = await params;
-  const usagePattern1 = /const\s+\{\s*(\w+)\s*\}\s*=\s*params;/g;
-  if (usagePattern1.test(content)) {
-    content = content.replace(
-      usagePattern1,
-      'const { $1 } = await params;'
-    );
-    modified = true;
-  }
-
-  // Pattern 3: Direct params.id access
-  const usagePattern2 = /const\s+(\w+)\s*=\s*params\.(\w+);/g;
-  if (usagePattern2.test(content)) {
-    content = content.replace(
-      usagePattern2,
-      'const { $2: $1 } = await params;'
-    );
-    modified = true;
-  }
-
-  if (modified) {
-    fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`✅ Fixed: ${filePath}`);
-    return true;
-  }
-
-  return false;
+let files;
+try {
+  const output = execSync(
+    'grep -r "params: { id: string }" app/api --include="*.ts" -l | grep -v "Promise"',
+    { encoding: 'utf-8' }
+  );
+  files = output.trim().split('\n').filter(Boolean);
+} catch (error) {
+  console.log('✅ No se encontraron archivos para corregir');
+  process.exit(0);
 }
 
-async function main() {
-  console.log('🔍 Finding route files with dynamic params...\n');
-
-  const files = await glob('app/api/**/*\\[*\\]*/route.ts', {
-    ignore: ['node_modules/**', '.next/**'],
-    absolute: true,
-    cwd: process.cwd()
-  });
-
-  console.log(`Found ${files.length} route files\n`);
-
-  let fixedCount = 0;
-  for (const file of files) {
-    const fixed = await fixFile(file);
-    if (fixed) fixedCount++;
-  }
-
-  console.log(`\n✨ Fixed ${fixedCount} files`);
+if (files.length === 0) {
+  console.log('✅ No se encontraron archivos para corregir');
+  process.exit(0);
 }
 
-main().catch(console.error);
+console.log(`📁 Archivos encontrados: ${files.length}\n`);
+
+let totalFixed = 0;
+
+files.forEach(file => {
+  console.log(`📝 ${file}`);
+  
+  try {
+    let content = fs.readFileSync(file, 'utf-8');
+    const original = content;
+    
+    // Cambiar tipo de params
+    content = content.replace(
+      /\{ params \}: \{ params: \{ id: string \} \}/g,
+      '{ params }: { params: Promise<{ id: string }> }'
+    );
+    
+    // Agregar await params después de la firma de función
+    content = content.replace(
+      /(export async function (?:GET|POST|PUT|DELETE|PATCH)\([^)]+\) \{)\n/g,
+      '$1\n  const { id } = await params;\n\n'
+    );
+    
+    // Reemplazar params.id por id
+    content = content.replace(/params\.id/g, 'id');
+    
+    if (content !== original) {
+      fs.writeFileSync(file + '.bak', original);
+      fs.writeFileSync(file, content);
+      console.log(`  ✅ Corregido\n`);
+      totalFixed++;
+    }
+  } catch (error) {
+    console.error(`  ❌ Error: ${error.message}\n`);
+  }
+});
+
+console.log(`\n✨ Completado! ${totalFixed}/${files.length} archivos corregidos\n`);

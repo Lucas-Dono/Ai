@@ -44,6 +44,9 @@ const isTest = process.env.NODE_ENV === 'test';
 const pinoConfig: pino.LoggerOptions = {
   level: process.env.LOG_LEVEL || (isDevelopment ? 'debug' : 'info'),
 
+  // IMPORTANT: Disable worker threads to avoid webpack bundling issues in Next.js
+  sync: true,
+
   // Redactar datos sensibles
   redact: {
     paths: redactPaths,
@@ -76,7 +79,7 @@ const pinoConfig: pino.LoggerOptions = {
   timestamp: pino.stdTimeFunctions.isoTime,
 };
 
-// Configuración de transporte (pretty print en desarrollo)
+// Configuración de logger (transport disabled to avoid worker issues)
 let logger: Logger;
 
 if (isTest) {
@@ -85,23 +88,9 @@ if (isTest) {
     ...pinoConfig,
     level: 'silent',
   });
-} else if (isDevelopment) {
-  // En desarrollo, usar pretty print
-  logger = pino({
-    ...pinoConfig,
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'HH:MM:ss.l',
-        ignore: 'pid,hostname,env',
-        singleLine: false,
-        messageFormat: '{module} {msg}',
-      },
-    },
-  });
 } else {
-  // En producción, JSON estructurado
+  // Usar JSON estructurado en todos los entornos
+  // (pino-pretty transport disabled to avoid worker thread issues)
   logger = pino(pinoConfig);
 }
 

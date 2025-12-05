@@ -6,8 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { attemptEstablishBond } from "@/lib/services/symbolic-bonds.service";
 import { BondTier } from "@prisma/client";
 import { z } from "zod";
@@ -26,9 +25,9 @@ const establishBondSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }

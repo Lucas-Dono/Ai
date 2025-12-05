@@ -86,6 +86,15 @@ model User {
   rewardActions        RewardAction[]
   retentionLeaderboard RetentionLeaderboard[]
 
+  // Sistema de rutinas dinámicas
+  characterRoutines CharacterRoutine[]
+
+  // Special Events System
+  tempTierGrants TempTierGrant[] @relation("UserTempTierGrants")
+
+  // Smart Start System
+  smartStartSessions SmartStartSession[] @relation("UserSmartStartSessions")
+
   @@index([email])
   @@index([mercadopagoCustomerId])
   @@index([apiKey])
@@ -136,6 +145,7 @@ model Agent {
   userId       String? // Null para agentes predefinidos del sistema
   teamId       String? // ID del equipo propietario (opcional)
   kind         String // companion (emocional) o assistant (administrativo)
+  generationTier String @default("free") // free, plus, ultra - tier usado para generar este agente
   name         String
   description  String?
   gender       String?
@@ -150,6 +160,19 @@ model Agent {
   systemPrompt String  @db.Text
   visibility   String  @default("private") // private, world, public, team
   nsfwMode     Boolean @default(false) // Permitir contenido NSFW/adulto
+  nsfwLevel    String? // sfw, romantic, suggestive, explicit, unrestricted
+
+  // God Mode - Advanced character customization for private characters
+  godModeEnabled      Boolean @default(false)
+  initialRelationship String? // stranger, friend, dating, married, ex_feelings, fwb, etc.
+  sharedMemories      Json?   // Array of SharedMemory objects
+  characterFeelings   String? // neutral, crushing, in_love, obsessed, devoted, etc.
+  feelingIntensity    Float?  // 0-1 intensity override
+  powerDynamic        String? // balanced, devoted_to_you, you_pursue, hard_to_get, etc.
+  startingScenario    String? // trapped_elevator, fake_dating, snowed_in, etc.
+  customScenario      String? @db.Text // Custom scenario description
+  firstMessageFrom    String? // user, character
+
   avatar       String? // URL o identificador de avatar
   tags         Json? // Tags/categorías para el marketplace
   featured     Boolean @default(false) // Destacado en el marketplace
@@ -163,6 +186,23 @@ model Agent {
   // Sistema de consistencia multimedia
   referenceImageUrl String? // URL de la imagen de referencia del personaje (para img2img)
   voiceId           String? // ID de voz de ElevenLabs asignado al personaje
+
+  // Sistema de clima en tiempo real
+  locationCity    String? // Ciudad donde vive el personaje (para clima real)
+  locationCountry String? // País donde vive el personaje (para clima real)
+
+  // Smart Start System
+  createdViaSmartStart Boolean @default(false)
+  smartStartSessionId  String? @unique
+  smartStartSession    SmartStartSession? @relation("SmartStartResultAgent")
+  genreId              String?
+  subgenreId           String?
+  archetypeId          String?
+  externalSourceId     String?
+  externalSourceType   String?
+  externalSourceUrl    String?
+  aiGeneratedFields    Json?
+  userEditedFields     Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -211,6 +251,20 @@ model Agent {
 
   // Analytics and Tracking
   shareEvents ShareEvent[]
+
+  // Sistema de rutinas dinámicas
+  characterRoutine        CharacterRoutine?
+  routineInstances        RoutineInstance[]
+  routineSimulationState  RoutineSimulationState?
+
+  // Ultra tier exclusive profiles
+  psychologicalProfile    PsychologicalProfile?
+  deepRelationalPatterns  DeepRelationalPatterns?
+  philosophicalFramework  PhilosophicalFramework?
+
+  // Living AI system
+  personalGoals           PersonalGoal[]
+  scheduledEvents         ScheduledEvent[]
 
   @@index([userId])
   @@index([teamId])
@@ -415,6 +469,220 @@ model CharacterGrowth {
   lastUpdated DateTime @default(now())
 
   agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// ============================================
+// SISTEMA DE RUTINAS DINÁMICAS (PREMIUM)
+// ============================================
+
+// Configuración principal de rutina de un personaje
+model CharacterRoutine {
+  id      String @id @default(cuid())
+  agentId String @unique
+  userId  String // Para validar plan premium
+
+  // Configuración de zona horaria
+  timezone String @default("America/Argentina/Buenos_Aires") // Zona horaria DEL PERSONAJE, no del usuario
+
+  // Control de funcionalidad
+  enabled Boolean @default(true) // Toggle on/off de rutinas
+
+  // Nivel de realismo (impacto en conversaciones)
+  // "subtle" - Solo contexto conversacional, siempre responde normal
+  // "moderate" - Afecta tono y velocidad de respuesta
+  // "immersive" - Afecta disponibilidad, puede no responder si duerme
+  realismLevel String @default("moderate") // subtle, moderate, immersive
+
+  // Configuración de generación
+  autoGenerateVariations Boolean @default(true) // Generar variaciones basadas en personalidad
+  variationIntensity     Float   @default(0.5) // 0-1, qué tan extremas son las variaciones
+
+  // Metadatos de generación
+  generatedByAI     Boolean   @default(false) // Fue generada por IA o creada manualmente
+  generationPrompt  String?   @db.Text // Prompt usado para generar (para regenerar)
+  lastRegenerated   DateTime? // Última vez que se regeneró completamente
+  manuallyModified  Boolean   @default(false) // Usuario editó manualmente
+
+  // Estado de simulación
+  lastSimulated DateTime? // Última vez que se simuló
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  templates RoutineTemplate[] // Eventos recurrentes estáticos
+  instances RoutineInstance[] // Instancias con variaciones
+  state     RoutineSimulationState? // Estado actual
+
+  @@index([agentId])
+  @@index([userId])
+}
+
+// Plantilla de evento recurrente (evento estático)
+model RoutineTemplate {
+  id        String @id @default(cuid())
+  routineId String
+
+  // Identificación
+  name        String // Ej: "Trabajo", "Almuerzo", "Gym"
+  description String? @db.Text
+
+  // Tipo de actividad
+  // Afecta cómo el personaje responde durante esta actividad
+  type String // sleep, work, meal, exercise, social, personal, hobby, commute, other
+
+  // Programación temporal
+  startTime  String // Formato HH:MM (24h), ej: "09:00"
+  endTime    String // Formato HH:MM (24h), ej: "17:00"
+  daysOfWeek Json   @default("[1,2,3,4,5]") // Array de días [0=domingo, 1=lunes, ..., 6=sábado]
+
+  // Prioridad y flexibilidad
+  priority String @default("medium") // low, medium, high, critical
+  // Priority afecta:
+  // - low: Muy flexible, fácil de cancelar/modificar
+  // - medium: Normal, puede variar ocasionalmente
+  // - high: Importante, raramente varía
+  // - critical: Inflexible (ej: dormir, trabajo obligatorio)
+  isFlexible Boolean @default(true) // Puede variar en horarios
+
+  // Configuración de variaciones
+  allowVariations Boolean @default(true) // Permitir que este evento tenga variaciones
+  // Parámetros para generar variaciones (JSON):
+  // {
+  //   "arrivalTimeVariance": 15, // minutos de variación en llegada
+  //   "durationVariance": 30, // minutos de variación en duración
+  //   "skipProbability": 0.05, // probabilidad de saltarse (5%)
+  //   "lateProbability": 0.2, // probabilidad de llegar tarde (20%)
+  //   "personalityFactors": ["conscientiousness", "neuroticism"] // traits que afectan
+  // }
+  variationParameters Json?
+
+  // Impacto en estado del personaje
+  // Cómo afecta el mood/energía durante y después del evento
+  // { "energy": -20, "stress": +10, "satisfaction": +15 }
+  moodImpact Json?
+
+  // Ubicación (opcional, para contexto)
+  location String? // Ej: "Oficina", "Casa", "Gimnasio"
+
+  // Metadatos
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  routine   CharacterRoutine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  instances RoutineInstance[] // Instancias específicas generadas
+
+  @@index([routineId])
+}
+
+// Instancia específica de un evento (con variaciones aplicadas)
+model RoutineInstance {
+  id         String  @id @default(cuid())
+  templateId String? // Null si es un evento one-off (no recurrente)
+  routineId  String
+  agentId    String
+
+  // Identificación
+  name String // Copiado del template o personalizado
+  type String // Tipo de actividad
+
+  // Programación temporal
+  date          DateTime // Fecha del evento
+  scheduledStart DateTime // Inicio programado (del template)
+  scheduledEnd   DateTime // Fin programado (del template)
+
+  // Tiempos reales (con variaciones aplicadas)
+  actualStart DateTime? // Inicio real (puede diferir)
+  actualEnd   DateTime? // Fin real (puede diferir)
+
+  // Estado
+  status String @default("scheduled") // scheduled, in_progress, completed, cancelled, skipped
+
+  // Variaciones aplicadas (JSON)
+  // Qué varió respecto al plan original y por qué
+  // {
+  //   "arrivedLate": true,
+  //   "lateMinutes": 12,
+  //   "reason": "Traffic was heavy this morning",
+  //   "leftEarly": false,
+  //   "moodDuringEvent": "slightly_stressed",
+  //   "personalityInfluence": {
+  //     "conscientiousness": "Medium conscientiousness led to moderate concern about being late"
+  //   }
+  // }
+  variations Json?
+
+  // Impacto en estado del personaje
+  // Cómo afectó realmente el mood/energía (puede diferir del template si hubo variaciones)
+  actualMoodImpact Json?
+
+  // Notas generadas por IA
+  // Descripción narrativa de qué pasó durante el evento
+  notes String? @db.Text
+
+  // Interacción con usuario
+  // Si el usuario interactuó durante este evento, afecta las respuestas
+  userInteractedDuring Boolean @default(false)
+
+  // Metadatos
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  routine  CharacterRoutine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  template RoutineTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  agent    Agent             @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([routineId])
+  @@index([agentId])
+  @@index([date])
+  @@index([status])
+}
+
+// Estado actual de simulación (para optimizar queries)
+model RoutineSimulationState {
+  id        String @id @default(cuid())
+  routineId String @unique
+  agentId   String @unique
+
+  // Actividad actual
+  // {
+  //   "instanceId": "clxx...",
+  //   "name": "Trabajando",
+  //   "type": "work",
+  //   "startedAt": "2025-01-15T09:00:00Z",
+  //   "expectedEnd": "2025-01-15T17:00:00Z",
+  //   "status": "in_progress",
+  //   "canRespond": true,
+  //   "responseStyle": "brief_professional"
+  // }
+  currentActivity Json?
+
+  // Próxima actividad
+  // {
+  //   "instanceId": "clxx...",
+  //   "name": "Cena",
+  //   "type": "meal",
+  //   "scheduledStart": "2025-01-15T20:00:00Z"
+  // }
+  nextActivity Json?
+
+  // Cache de contexto para system prompt
+  // Pre-generado para insertar directamente en el system prompt
+  contextForPrompt String? @db.Text
+
+  // Control de cache
+  lastSimulatedAt    DateTime @default(now())
+  simulationVersion  Int      @default(1) // Incrementar para invalidar cache
+  needsResimulation  Boolean  @default(false) // Flag para forzar resimulación
+
+  updatedAt DateTime @updatedAt
+
+  routine CharacterRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  agent   Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
 }
@@ -656,9 +924,9 @@ model Relation {
   subjectId    String // ID del agente que siente la relación
   targetId     String // ID del agente o usuario objetivo
   targetType   String // "agent" o "user" - indica el tipo de objetivo
-  trust        Float  @default(0.5) // Confianza (0-1)
-  affinity     Float  @default(0.5) // Afinidad (0-1)
-  respect      Float  @default(0.5) // Respeto (0-1)
+  trust        Float  @default(0) // Confianza (0-1) - Comienza en 0 y crece con interacciones
+  affinity     Float  @default(0) // Afinidad (0-1) - Comienza en 0 y crece con interacciones
+  respect      Float  @default(0) // Respeto (0-1) - Comienza en 0 y crece con interacciones
   privateState Json // Estados ocultos: love, curiosity, etc.
   visibleState Json // Estados visibles para el usuario
 
@@ -3097,4 +3365,614 @@ model RetentionLeaderboard {
   @@index([globalRank])
   @@index([consistencyScore])
   @@index([lastUpdated])
+}
+
+// ============================================================================
+// ULTRA TIER EXCLUSIVE MODELS
+// ============================================================================
+
+// PSYCHOLOGICAL PROFILE (Ultra tier only)
+// Proporciona análisis psicológico profundo del personaje
+model PsychologicalProfile {
+  id      String @id @default(cuid())
+  agentId String @unique
+
+  // Attachment Style
+  attachmentStyle String // secure, anxious, avoidant, fearful-avoidant
+  attachmentDescription String? @db.Text
+
+  // Coping Mechanisms (JSON arrays)
+  primaryCopingMechanisms Json // ["exercise", "journaling", "talking to friends"]
+  unhealthyCopingMechanisms Json // ["avoidance", "overworking", "substance use"]
+  copingTriggers Json // ["criticism", "abandonment fears", "uncertainty"]
+
+  // Emotional Regulation
+  emotionalRegulationBaseline String @default("estable") // estable, volátil, reprimido
+  emotionalExplosiveness Int @default(30) // 0-100, qué tan explosivo emocionalmente
+  emotionalRecoverySpeed String @default("moderado") // rápido, moderado, lento
+
+  // Mental Health
+  mentalHealthConditions Json @default("[]") // ["ansiedad generalizada", "depresión leve"]
+  therapyStatus String? // "en terapia", "terapia pasada", "nunca", "considera comenzar"
+  medicationUse Boolean @default(false)
+  mentalHealthStigma String? // Cómo ve el personaje la salud mental
+
+  // Defense Mechanisms (JSON)
+  defenseMethanisms Json // {primary: ["intellectualization", "humor"], situational: {...}}
+
+  // Trauma & Resilience
+  traumaHistory Json? // [{event: "...", age: 14, impact: "high", processed: false}]
+  resilienceFactors Json // ["strong support system", "sense of purpose", "creativity"]
+
+  // Self-Awareness
+  selfAwarenessLevel Int @default(50) // 0-100
+  blindSpots Json // ["tiende a proyectar", "minimiza sus logros"]
+  insightAreas Json // ["consciente de sus patrones", "entiende sus triggers"]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// DEEP RELATIONAL PATTERNS (Ultra tier only)
+// Analiza patrones profundos en relaciones del personaje
+model DeepRelationalPatterns {
+  id      String @id @default(cuid())
+  agentId String @unique
+
+  // Love Languages
+  givingLoveLanguages Json // ["acts of service", "quality time"]
+  receivingLoveLanguages Json // ["words of affirmation", "physical touch"]
+  loveLanguageIntensities Json // {wordsOfAffirmation: 90, physicalTouch: 70, ...}
+
+  // Relationship Patterns
+  repeatingPatterns Json // ["atrae a personas emocionalmente no disponibles"]
+  whyRepeats String? @db.Text // Análisis de por qué repite estos patrones
+  awarenessOfPatterns String @default("inconsciente") // consciente, parcialmente_consciente, inconsciente
+
+  // Boundaries
+  personalBoundaryStyle String @default("saludable") // rígido, saludable, difuso, ausente
+  professionalBoundaryStyle String @default("saludable")
+  boundaryEnforcement Int @default(50) // 0-100, qué tan bien mantiene límites
+  boundaryGuilty Boolean @default(false) // Siente culpa al poner límites
+
+  // Conflict Resolution
+  conflictStyle String // evitativo, acomodador, competitivo, colaborativo, comprometedor
+  conflictTriggers Json // ["sentirse criticado", "falta de control"]
+  healthyConflictSkills Json // ["escucha activa", "usa 'yo' statements"]
+  unhealthyConflictPatterns Json // ["silent treatment", "explosiones"]
+
+  // Trust & Vulnerability
+  trustBaseline Int @default(50) // 0-100, qué tan confiado es por defecto
+  vulnerabilityComfort Int @default(50) // 0-100, comodidad siendo vulnerable
+  trustRepairAbility Int @default(50) // 0-100, puede reconstruir confianza rota
+
+  // Intimacy Patterns
+  intimacyComfort Json // {emotional: 70, physical: 50, intellectual: 90, experiential: 60}
+  intimacyFears Json // ["abandono", "pérdida de identidad", "ser una carga"]
+  intimacyNeeds Json // ["conexión emocional profunda", "espacio personal", "afirmación"]
+
+  // Social Dynamics
+  socialMaskLevel Int @default(30) // 0-100, cuánto esconde su verdadero yo
+  authenticityByContext Json // {work: 40, friends: 80, family: 60, strangers: 20}
+  socialEnergy String // renovador, neutral, agotador (cómo le afecta socializar)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// PHILOSOPHICAL FRAMEWORK (Ultra tier only)
+// Cosmovisión, política, ética y filosofía de vida
+model PhilosophicalFramework {
+  id      String @id @default(cuid())
+  agentId String @unique
+
+  // Worldview
+  optimismLevel Int @default(50) // 0-100 (pesimista a optimista)
+  worldviewType String? // "realista", "idealista", "cínico", "esperanzado"
+  meaningSource String? @db.Text // De dónde saca sentido a la vida
+  existentialStance String? // "absurdista", "nihilista", "existencialista", "esencialista"
+
+  // Politics & Social Views
+  politicalLeanings String? @db.Text // Posiciones políticas matizadas
+  politicalEngagement Int @default(30) // 0-100, qué tan involucrado políticamente
+  activismLevel Int @default(20) // 0-100
+  socialJusticeStance String? @db.Text
+
+  // Ethics & Morality
+  ethicalFramework String? // "utilitarista", "deontológica", "ética de virtudes", "relativista"
+  moralComplexity Int @default(50) // 0-100, capacidad para gris moral
+  moralRigidity Int @default(50) // 0-100, qué tan rígido moralmente
+  moralDilemmas Json? // [{situación: "...", stance: "...", reasoning: "..."}]
+
+  // Religion & Spirituality
+  religiousBackground String? // "católico", "agnóstico", "ateo", "espiritual no religioso"
+  currentBeliefs String? @db.Text
+  spiritualPractices Json // ["meditación", "oración", "ninguna"]
+  faithImportance Int @default(30) // 0-100
+
+  // Philosophy of Life
+  lifePhilosophy String? @db.Text // Su filosofía personal de vida
+  coreBeliefs Json // ["La honestidad es fundamental", "Hay que ayudar a otros"]
+  dealbreakers Json // ["deshonestidad", "crueldad animal"]
+  personalMotto String? // "Lema de vida si tiene uno"
+
+  // Knowledge & Truth
+  epistomologyStance String? // Cómo determina qué es verdad
+  scienceTrustLevel Int @default(70) // 0-100
+  intuitionVsLogic Int @default(50) // 0=todo lógica, 100=todo intuición
+
+  // Change & Growth
+  growthMindset Int @default(60) // 0-100
+  opennessToChange Int @default(50) // 0-100
+  philosophicalEvolution String? @db.Text // Cómo han cambiado sus creencias
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+}
+
+// ============================================================================
+// LIVING AI SYSTEM MODELS
+// ============================================================================
+
+// PERSONAL GOALS
+// Sistema de metas que el personaje quiere lograr
+model PersonalGoal {
+  id      String @id @default(cuid())
+  agentId String
+
+  // Goal Info
+  title String
+  description String @db.Text
+
+  // Category & Time
+  category String // career, personal, relationship, health, creative, financial, learning, social
+  timeScale String // short (días/semanas), medium (meses), long (años)
+
+  // Progress
+  progress Int @default(0) // 0-100
+  status String @default("active") // active, paused, completed, abandoned, failed
+
+  // Importance & Motivation
+  importance Int // 0-100, qué tan importante es esta meta
+  emotionalInvestment Int // 0-100, cuánto le importa emocionalmente
+  stressLevel Int @default(0) // 0-100, cuánto estrés genera
+  intrinsic Boolean @default(true) // Motivación intrínseca vs extrínseca
+  motivation String @db.Text // Por qué quiere lograr esto
+
+  // Challenges
+  obstacles Json @default("[]") // [{obstacle: "falta de tiempo", severity: 70}]
+  lastSetback String? // Último contratiempo
+  lastSetbackDate DateTime?
+
+  // Milestones
+  milestones Json @default("[]") // [{title: "...", target: 25, completed: false, date: null}]
+  nextMilestone String? // Próximo hito a lograr
+
+  // Activity Tracking
+  daysSinceProgress Int @default(0) // Días sin progreso
+  progressHistory Json @default("[]") // [{date: "...", progress: 40, note: "..."}]
+  lastProgressUpdate DateTime?
+
+  // Deadline
+  targetCompletionDate DateTime?
+  isOverdue Boolean @default(false)
+
+  // Proactive Behavior
+  shouldShareProgress Boolean @default(false) // El personaje quiere compartir avances
+  lastSharedAt DateTime? // Última vez que compartió sobre esta meta
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([status])
+  @@index([category])
+  @@index([shouldShareProgress])
+}
+
+// SCHEDULED EVENTS
+// Sistema de eventos probabilísticos para el personaje
+model ScheduledEvent {
+  id      String @id @default(cuid())
+  agentId String
+
+  // Timing
+  scheduledFor DateTime // Cuándo debe resolverse el evento
+  resolvedAt DateTime? // Cuándo se resolvió
+
+  // Event Info
+  title String
+  description String @db.Text
+  category String // external_random, skill_based, social, routine_based, goal_related
+
+  // Probability & Outcome
+  successProbability Float? // 0-100 (null si es external_random con prob fija)
+  probabilityFactors Json? // [{factor: "alta inteligencia", impact: +15}, ...]
+
+  // Possible Outcomes (JSON array)
+  // [{type: "success", description: "...", emotionalImpact: {...}, consequences: {...}}]
+  possibleOutcomes Json
+
+  // Resolution
+  resolved Boolean @default(false)
+  actualOutcome Json? // El outcome que realmente ocurrió
+  wasSuccess Boolean? // Si fue exitoso o no
+
+  // Impact Tracking
+  relatedGoalId String? // Si está relacionado con una meta
+  emotionalImpactApplied Boolean @default(false) // Si ya se aplicó el impacto emocional
+  memoryCreated Boolean @default(false) // Si se creó memoria del evento
+
+  // AI Reasoning (para debugging)
+  aiReasoning String? @db.Text // Por qué la IA estimó cierta probabilidad
+  probabilityBaseline Float? // Probabilidad base antes de ajustes
+  probabilityAdjustments Json? // [{adjustment: +10, reason: "..."}]
+
+  // Metadata
+  eventType String // lottery, exam, job_interview, social_event, accident, discovery, etc
+  isRecurring Boolean @default(false)
+  recurringPattern String? // "weekly", "monthly", etc
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([scheduledFor])
+  @@index([resolved])
+  @@index([category])
+  @@index([relatedGoalId])
+}
+
+// ============================================================================
+// ENERGY & MESSAGE LIMITS SYSTEM
+// Sistema de energía y límites de mensajes por tier
+// ============================================================================
+
+model AgentEnergyState {
+  id      String @id @default(cuid())
+  agentId String @unique
+
+  // Energy tracking
+  current Float @default(100) // 0-100
+  max     Float @default(100)
+
+  // Temporal tracking
+  lastDecayAt           DateTime @default(now())
+  conversationStartedAt DateTime @default(now())
+  messagesSinceReset    Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+}
+
+model MessageTracking {
+  id      String @id @default(cuid())
+  userId  String
+  agentId String
+
+  // Tracking por día
+  date DateTime // Fecha (sin hora)
+
+  // Contadores
+  dailyCount   Int      @default(0) // Mensajes enviados hoy
+  sessionCount Int      @default(0) // Mensajes en la sesión actual
+
+  // Session timing
+  sessionStartedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, agentId, date])
+  @@index([userId])
+  @@index([agentId])
+  @@index([date])
+}
+
+model AgentAvailability {
+  id      String @id @default(cuid())
+  agentId String @unique
+
+  // Availability state
+  available  Boolean  @default(true)
+  blockedUntil DateTime?
+
+  // Current activity causing unavailability
+  currentActivity String?
+
+  // Spaced response configuration
+  allowSpacedResponses   Boolean @default(false)
+  spacedIntervalMinutes  Int     @default(0)
+  lastSpacedResponseAt   DateTime?
+
+  // Tracking
+  lastUnavailableAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([available])
+}
+
+// ============================================================================
+// CROSS-CONTEXT MEMORY SYSTEM
+// Sistema de memoria compartida entre chats individuales y groups
+// ============================================================================
+
+model CrossContextMemory {
+  id      String @id @default(cuid())
+  agentId String // El agente que tiene esta memoria
+
+  // Contexto de origen
+  sourceType    String // "individual_chat", "world_interaction", "proactive"
+  sourceWorldId String? // Si viene de un mundo/grupo
+  sourceUserId  String? // Si viene de chat individual
+
+  // Contenido de la memoria
+  summary       String  @db.Text // Resumen de la interacción memorable
+  involvedAgents Json? // Array de {agentId, agentName} de otros personajes involucrados
+  emotionalTone String? // "positive", "negative", "neutral", "intense", "casual"
+
+  // Metadata temporal
+  happenedAt DateTime // Cuándo ocurrió el evento
+  lastReferencedAt DateTime? // Última vez que se referenció esta memoria
+
+  // Relevancia y decay
+  importance    Float   @default(0.5) // 0-1, qué tan importante es esta memoria
+  decayFactor   Float   @default(1.0) // Disminuye con el tiempo
+  referenceCount Int    @default(0) // Cuántas veces se ha referenciado
+
+  // Embeddings para búsqueda semántica
+  embedding Json? // Vector embedding del resumen
+
+  // Metadata adicional
+  topics   Json? // Temas discutidos
+  metadata Json? // Datos adicionales
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([sourceType])
+  @@index([sourceWorldId])
+  @@index([happenedAt])
+  @@index([importance])
+}
+
+model TemporalContext {
+  id      String @id @default(cuid())
+  agentId String
+  userId  String
+
+  // Última interacción por contexto
+  lastIndividualChatAt DateTime?
+  lastWorldInteractionAt DateTime?
+  lastWorldId String? // Último mundo donde interactuó
+
+  // Tracking de frecuencia
+  individualChatCount Int @default(0)
+  worldInteractionCount Int @default(0)
+
+  // Awareness temporal
+  typicalResponseTime Int? // Minutos típicos de respuesta (para simular realismo)
+  lastSeenAt DateTime? // Última vez que el agente "vio" un mensaje del usuario
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agentId, userId])
+  @@index([agentId])
+  @@index([userId])
+  @@index([lastWorldId])
+}
+
+model TopicFatigue {
+  id      String @id @default(cuid())
+  agentId String
+  userId  String
+  topic   String // Tema normalizado (lowercase)
+
+  // Tracking
+  mentions        Int      @default(1)
+  lastMentionedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agentId, userId, topic])
+  @@index([agentId, userId])
+  @@index([mentions])
+  @@index([lastMentionedAt])
+}
+
+// ============================================================================
+// CONTEXT MANAGEMENT SYSTEM
+// Sistema de gestión de contexto y memoria optimizada
+// ============================================================================
+
+model ConversationSummary {
+  id      String @id @default(cuid())
+  agentId String
+  userId  String? // Null para conversaciones globales
+
+  // Resumen generado
+  summary String @db.Text
+
+  // Metadata del período resumido
+  messagesCount Int // Cuántos mensajes cubre este resumen
+  periodStart   DateTime // Primer mensaje incluido
+  periodEnd     DateTime // Último mensaje incluido
+
+  // Tokens estimados
+  estimatedTokens Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([userId])
+  @@index([agentId, userId, messagesCount])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// SPECIAL EVENTS SYSTEM
+// Sistema de eventos especiales y upgrades temporales de tier
+// ============================================================================
+
+model TempTierGrant {
+  id      String @id @default(cuid())
+  userId  String
+  eventId String // ID del evento especial (ej: "black_friday_2024")
+
+  // Tier change
+  fromTier String // Tier original del usuario
+  toTier   String // Tier temporal (plus, ultra)
+
+  // Validity
+  active    Boolean  @default(true)
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation("UserTempTierGrants", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([eventId])
+  @@index([active])
+  @@index([expiresAt])
+  @@index([userId, active, expiresAt])
+}
+
+// ============================================================================
+// SMART START SYSTEM
+// Sistema inteligente de creación de personajes con búsqueda y extracción IA
+// ============================================================================
+
+model SmartStartSession {
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation("UserSmartStartSessions", fields: [userId], references: [id], onDelete: Cascade)
+
+  currentStep String // genre, type, search, customize, review, completed, abandoned
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  abandonedAt DateTime?
+
+  // Genre selection
+  selectedGenre     String?
+  selectedSubgenre  String?
+  selectedArchetype String?
+
+  // Character type
+  characterType String? // existing, original
+
+  // Search data
+  searchQuery   String?
+  searchResults Json? // Array of search results
+  selectedResultId String?
+  externalData  Json? // Extracted character data from search
+
+  // Generation data
+  aiGeneratedFields Json? // Fields generated by AI
+  userModifications Json? // User customizations
+
+  // Analytics
+  timeSpentPerStep  Json? // { genre: 45000, search: 120000, ... } in ms
+  interactionEvents Json[] // [{ type, timestamp, data }]
+
+  // Result
+  resultCharacterId String? @unique
+  resultCharacter   Agent?  @relation("SmartStartResultAgent", fields: [resultCharacterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, startedAt])
+  @@index([completedAt])
+  @@index([currentStep])
+}
+
+model SmartStartAnalytics {
+  id    String   @id @default(cuid())
+  date  DateTime @unique @db.Date
+
+  // Session metrics
+  sessionsStarted   Int
+  sessionsCompleted Int
+  sessionsAbandoned Int
+
+  // Time metrics (average in milliseconds)
+  avgCompletionTime Float
+  avgStepsCompleted Float
+
+  // Genre distribution
+  genreDistribution Json // { romance: 45, gaming: 30, ... }
+
+  // Conversion metrics
+  charactersCreated Int
+  firstMessageRate  Float // % of characters that got at least 1 message
+
+  // Search metrics
+  searchesPerformed Int
+  searchSuccessRate Float // % of searches that yielded results
+  avgSearchTime     Float // ms
+
+  // AI metrics
+  aiFieldsGenerated Int // Total AI-generated fields
+  aiFieldsEdited    Int // How many were edited by users
+  editRate          Float // Percentage of AI fields that were edited
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+}
+
+// ============================================================================
+// GENRE DETECTION FEEDBACK
+// Sistema de feedback para mejorar la precisión de detección de género
+// ============================================================================
+
+model GenreDetectionFeedback {
+  id        String   @id @default(cuid())
+  
+  // Reference
+  sessionId      String
+  searchResultId String?
+  
+  // Detection info
+  detectedGenre String
+  actualGenre   String?  // If user corrected it
+  confidence    Float
+  isCorrect     Boolean
+  
+  // Metadata
+  metadata  Json?
+  timestamp DateTime @default(now())
+  
+  @@index([sessionId])
+  @@index([detectedGenre])
+  @@index([isCorrect])
+  @@index([timestamp])
 }

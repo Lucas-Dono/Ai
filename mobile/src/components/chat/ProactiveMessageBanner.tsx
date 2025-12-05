@@ -39,21 +39,22 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
  * Obtener icono según tipo de trigger
  */
 function getTriggerIcon(triggerType: ProactiveMessage["triggerType"]) {
-  const iconProps = { size: 20, color: "#FFFFFF" };
+  const iconSize = 20;
+  const iconColor = "white";
 
   switch (triggerType) {
     case "inactivity":
-      return <Clock {...iconProps} />;
+      return <Clock size={iconSize} color={iconColor} />;
     case "follow_up":
-      return <MessageCircle {...iconProps} />;
+      return <MessageCircle size={iconSize} color={iconColor} />;
     case "emotional_checkin":
-      return <Heart {...iconProps} />;
+      return <Heart size={iconSize} color={iconColor} />;
     case "celebration":
-      return <Sparkles {...iconProps} />;
+      return <Sparkles size={iconSize} color={iconColor} />;
     case "life_event":
-      return <Sparkles {...iconProps} />;
+      return <Sparkles size={iconSize} color={iconColor} />;
     default:
-      return <Sparkles {...iconProps} />;
+      return <Sparkles size={iconSize} color={iconColor} />;
   }
 }
 
@@ -220,7 +221,7 @@ export function ProactiveMessageBanner({
               onPress={handleDismiss}
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
-              <X size={20} color="#FFFFFF" />
+              <X size={20} color="white" />
             </TouchableOpacity>
           </View>
 

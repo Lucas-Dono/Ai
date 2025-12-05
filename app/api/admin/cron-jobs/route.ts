@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { cronManager } from '@/lib/worlds/jobs/cron-manager';
 import { worldStateManager } from '@/lib/worlds/world-state-manager';
 import { createLogger } from '@/lib/logger';
@@ -18,10 +18,10 @@ const log = createLogger('CronJobsAPI');
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
     // Solo admins pueden acceder
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || (user as any).role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Unauthorized - Admin access required' },
         { status: 403 }
@@ -60,10 +60,10 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
     // Solo admins pueden acceder
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || (user as any).role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Unauthorized - Admin access required' },
         { status: 403 }

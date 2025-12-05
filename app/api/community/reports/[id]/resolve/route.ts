@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -44,7 +44,7 @@ export async function POST(
 
     if (type === 'post') {
       const report = await prisma.postReport.findUnique({
-        where: { id: params.id },
+        where: { id: id },
         include: {
           post: {
             select: { communityId: true },
@@ -62,7 +62,7 @@ export async function POST(
       communityId = report.post.communityId;
     } else if (type === 'comment') {
       const report = await prisma.commentReport.findUnique({
-        where: { id: params.id },
+        where: { id: id },
         include: {
           comment: {
             select: {
@@ -113,14 +113,14 @@ export async function POST(
     let result;
     if (type === 'post') {
       result = await ReportService.resolvePostReport({
-        reportId: params.id,
+        reportId: id,
         reviewerId: session.user.id,
         action,
         resolution,
       });
     } else {
       result = await ReportService.resolveCommentReport({
-        reportId: params.id,
+        reportId: id,
         reviewerId: session.user.id,
         action,
         resolution,

@@ -7,7 +7,7 @@
  * - Generación de expresiones faciales específicas
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { executeWithRetry } from "@/lib/ai/gemini-client";
 
 export interface ImageGenerationParams {
   prompt: string;
@@ -25,18 +25,8 @@ export interface ImageGenerationResult {
 }
 
 export class GeminiImagenClient {
-  private client: GoogleGenerativeAI;
-  private apiKey: string;
-
-  constructor(apiKey?: string) {
-    this.apiKey = apiKey || process.env.GEMINI_API_KEY || "";
-
-    if (!this.apiKey) {
-      throw new Error("Gemini API key not found");
-    }
-
-    this.client = new GoogleGenerativeAI(this.apiKey);
-    console.log("[GeminiImagen] Client initialized");
+  constructor() {
+    console.log("[GeminiImagen] Client initialized with centralized Gemini client");
   }
 
   /**
@@ -58,22 +48,24 @@ export class GeminiImagenClient {
 
       // Implementación futura cuando API esté disponible:
       /*
-      const model = this.client.getGenerativeModel({
-        model: "imagen-3.0-generate-001", // Fast mode
-      });
+      const result = await executeWithRetry(async (client) => {
+        const model = client.getGenerativeModel({
+          model: "imagen-3.0-generate-001", // Fast mode
+        });
 
-      const result = await model.generateContent({
-        contents: [{
-          role: "user",
-          parts: [{ text: params.prompt }],
-        }],
-        generationConfig: {
-          prompt: params.prompt,
-          number_of_images: params.numberOfImages || 1,
-          aspect_ratio: params.aspectRatio || "1:1",
-          negative_prompt: params.negativePrompt,
-          seed: params.seed,
-        },
+        return await model.generateContent({
+          contents: [{
+            role: "user",
+            parts: [{ text: params.prompt }],
+          }],
+          generationConfig: {
+            prompt: params.prompt,
+            number_of_images: params.numberOfImages || 1,
+            aspect_ratio: params.aspectRatio || "1:1",
+            negative_prompt: params.negativePrompt,
+            seed: params.seed,
+          },
+        });
       });
 
       const imageData = result.response.candidates?.[0]?.content?.parts?.[0];

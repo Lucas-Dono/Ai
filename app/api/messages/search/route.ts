@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -7,8 +7,8 @@ import { MessagingService } from '@/lib/services/messaging.service';
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     const messages = await MessagingService.searchMessages(
-      session.user.id,
+      user.id,
       query,
       limit
     );

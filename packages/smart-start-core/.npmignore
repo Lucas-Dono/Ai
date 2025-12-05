@@ -1,0 +1,21 @@
+# Source files (only ship compiled)
+src/
+tsconfig.json
+
+# Development
+.gitignore
+.eslintrc*
+.prettierrc*
+
+# Testing
+coverage/
+*.test.ts
+*.spec.ts
+__tests__/
+
+# Documentation (optional, remove if you want to include)
+# README.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml

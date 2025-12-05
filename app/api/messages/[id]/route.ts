@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 import { prisma } from '@/lib/prisma';
 
@@ -11,8 +11,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -34,7 +34,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Mensaje no encontrado' }, { status: 404 });
     }
 
-    if (message.senderId !== session.user.id) {
+    if (message.senderId !== user.id) {
       return NextResponse.json(
         { error: 'No tienes permiso para editar este mensaje' },
         { status: 403 }
@@ -68,12 +68,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await MessagingService.deleteMessage((await params).id, session.user.id);
+    const result = await MessagingService.deleteMessage((await params).id, user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Error deleting message:', error);

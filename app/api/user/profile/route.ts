@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/user/profile - Get user profile
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    const userProfile = await prisma.user.findUnique({
+      where: { id: user.id },
       select: {
         id: true,
         name: true,
@@ -29,12 +29,12 @@ export async function GET() {
 
     // Get agents count
     const agentsCount = await prisma.agent.count({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     // Get worlds count
     const worldsCount = await prisma.world.count({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     // Get messages count for this month
@@ -42,7 +42,7 @@ export async function GET() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const messagesThisMonth = await prisma.message.count({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         role: "user", // Only count user's messages, not AI responses
         createdAt: {
           gte: startOfMonth,
@@ -51,7 +51,7 @@ export async function GET() {
     });
 
     return NextResponse.json({
-      user,
+      user: userProfile,
       stats: {
         agentsCount,
         worldsCount,
@@ -68,19 +68,19 @@ export async function GET() {
 }
 
 // PATCH /api/user/profile - Update user profile
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
     const { name } = body;
 
-    const user = await prisma.user.update({
-      where: { id: session.user.id },
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
       data: {
         ...(name !== undefined && { name }),
       },
@@ -93,7 +93,7 @@ export async function PATCH(req: Request) {
       },
     });
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ user: updatedUser });
   } catch (error) {
     console.error("Error updating user profile:", error);
     return NextResponse.json(

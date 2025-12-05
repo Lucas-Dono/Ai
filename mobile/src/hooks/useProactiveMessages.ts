@@ -17,7 +17,7 @@ import type {
   UseProactiveMessagesOptions,
   UseProactiveMessagesReturn,
   ProactiveMessageAnalytics,
-} from "../../../types/proactive-messages";
+} from "../../types/proactive-messages";
 
 // Configurar handler de notificaciones
 Notifications.setNotificationHandler({
@@ -25,6 +25,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 

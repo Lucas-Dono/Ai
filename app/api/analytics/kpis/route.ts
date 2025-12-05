@@ -10,14 +10,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getAllKPIs, checkAlerts } from "@/lib/analytics/kpi-tracker";
 
 export async function GET(req: NextRequest) {
   try {
     // Verificar autenticación
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(req);
     if (!session?.user) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -67,7 +66,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(req);
     if (!session?.user) {
       return NextResponse.json(
         { error: "Unauthorized" },

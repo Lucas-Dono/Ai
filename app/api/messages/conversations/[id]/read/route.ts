@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -10,12 +10,12 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await MessagingService.markAsRead((await params).id, session.user.id);
+    const result = await MessagingService.markAsRead((await params).id, user.id);
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Error marking as read:', error);

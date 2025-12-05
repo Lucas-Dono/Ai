@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { getFastSDLocalClient } from "@/lib/visual-system/fastsd-local-client";
 
@@ -16,13 +16,13 @@ import { getFastSDLocalClient } from "@/lib/visual-system/fastsd-local-client";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.email) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { fastsdInstallation: true },
     });
 
@@ -75,13 +75,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.email) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { fastsdInstallation: true },
     });
 
@@ -153,10 +153,10 @@ export async function POST(request: NextRequest) {
     console.error("[FastSD Install API] Installation error:", error);
 
     // Registrar error en BD
-    const session = await auth();
-    if (session?.user?.email) {
+    const user = await getAuthenticatedUser(request);
+    if (user?.email) {
       const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
+        where: { email: user.email },
       });
 
       if (user) {
@@ -181,13 +181,13 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.email) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
     });
 
     if (!user) {

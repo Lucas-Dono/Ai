@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBondSocket } from "@/hooks/useBondSocket";
-import { BondEventType } from "@/lib/websocket/bonds-events";
+import { BondEventType } from "@/lib/websocket/bond-event-types";
 import BondCard from "./BondCard";
 import LegacyCard from "./LegacyCard";
 import { Button } from "@/components/ui/button";

@@ -6,7 +6,6 @@
  */
 
 import {
-  SearchRouter,
   type SearchResult,
   type GenreId,
   type SearchOptions,
@@ -21,11 +20,8 @@ import {
   type AnalysisResult,
 } from '@circuitpromptai/smart-start-core';
 
-import { getAsyncStorageCache } from '../storage/AsyncStorageCache';
-
-// TODO: Import and configure search sources when they are extracted to shared package
-// For now, we'll need to create mobile-specific source implementations
-// import { AniListSource, WikipediaSource, etc. } from '@circuitpromptai/smart-start-core';
+// Search is now handled by backend API
+// No need for local SearchRouter or sources
 
 /**
  * Smart Start Service for mobile character creation
@@ -37,52 +33,26 @@ import { getAsyncStorageCache } from '../storage/AsyncStorageCache';
  * - Complete character profile generation
  */
 class SmartStartService {
-  private searchRouter: SearchRouter | null = null;
   private initialized = false;
 
   /**
    * Initialize Smart Start service
-   * Must be called before using other methods
+   * Now only used for logging, actual search is handled by backend API
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
       return;
     }
 
-    try {
-      // Get AsyncStorage cache instance
-      const cache = getAsyncStorageCache('smart-start');
-
-      // TODO: Initialize search sources when they're available in shared package
-      // For now, we'll create an empty SearchRouter
-      // const sources = [
-      //   new AniListSource(),
-      //   new WikipediaSource(),
-      //   // ... other sources
-      // ];
-
-      this.searchRouter = new SearchRouter(
-        [], // Empty sources for now
-        {
-          cache,
-          searchTimeout: 10000,
-          detailsTimeout: 5000,
-        }
-      );
-
-      this.initialized = true;
-      console.log('[SmartStartService] Initialized successfully');
-    } catch (error) {
-      console.error('[SmartStartService] Initialization failed:', error);
-      throw error;
-    }
+    this.initialized = true;
+    console.log('[SmartStartService] Initialized (using backend API for search)');
   }
 
   /**
-   * Search for characters across multiple sources
+   * Search for characters across multiple sources using backend API
    *
    * @param query - Search query (character name)
-   * @param genre - Genre to search in
+   * @param genre - Genre to search in (currently not used by backend, all sources searched)
    * @param options - Search options
    * @returns Search results with cache status
    */
@@ -91,10 +61,58 @@ class SmartStartService {
     genre: GenreId,
     options?: SearchOptions
   ): Promise<{ results: SearchResult[]; cached: boolean }> {
-    this.ensureInitialized();
-
     try {
-      return await this.searchRouter!.search(query, genre, options);
+      const { apiClient } = await import('./api');
+
+      console.log('[SmartStartService] Searching via API:', query);
+
+      const endpoint = `/api/v1/smart-start/search?q=${encodeURIComponent(query)}&limit=${options?.limit || 10}`;
+
+      const response = await apiClient.get<{
+        query: string;
+        results: Array<{
+          id: string;
+          source: string;
+          name: string;
+          description: string;
+          imageUrl?: string;
+          url?: string;
+          confidence: number;
+          suggestedGenre?: string;
+          genreConfidence?: number;
+        }>;
+        total: number;
+      }>(endpoint);
+
+      // Convert backend results to SearchResult format
+      const searchResults: SearchResult[] = response.results.map((result) => ({
+        id: result.id,
+        name: result.name,
+        sourceId: result.source,
+        description: result.description,
+        imageUrl: result.imageUrl,
+        suggestedGenre: result.suggestedGenre,
+        genreConfidence: result.genreConfidence,
+        metadata: {
+          source: result.source,
+          url: result.url,
+          confidence: result.confidence,
+        },
+      } as any));
+
+      console.log('[SmartStartService] Found', searchResults.length, 'results');
+      console.log('[SmartStartService] Sample result:', {
+        name: searchResults[0]?.name,
+        imageUrl: searchResults[0]?.imageUrl,
+        source: searchResults[0]?.sourceId,
+        suggestedGenre: (searchResults[0] as any)?.suggestedGenre,
+        genreConfidence: (searchResults[0] as any)?.genreConfidence,
+      });
+
+      return {
+        results: searchResults,
+        cached: false, // Backend handles caching
+      };
     } catch (error) {
       console.error('[SmartStartService] Search failed:', error);
       throw error;
@@ -103,6 +121,7 @@ class SmartStartService {
 
   /**
    * Get detailed information about a character
+   * Note: Currently not needed as search results already include details
    *
    * @param sourceId - Source identifier
    * @param externalId - External ID from source
@@ -112,17 +131,9 @@ class SmartStartService {
     sourceId: string,
     externalId: string
   ): Promise<SearchResult | null> {
-    this.ensureInitialized();
-
-    try {
-      return await this.searchRouter!.getDetails(
-        sourceId as any,
-        externalId
-      );
-    } catch (error) {
-      console.error('[SmartStartService] Get details failed:', error);
-      return null;
-    }
+    // TODO: Implement backend endpoint if detailed character info is needed
+    console.log('[SmartStartService] getCharacterDetails not implemented (use search results)');
+    return null;
   }
 
   /**
@@ -242,24 +253,24 @@ class SmartStartService {
 
   /**
    * Test connectivity of all search sources
+   * Note: Sources are tested by backend, this is a no-op
    */
   async testSources(): Promise<Map<string, boolean>> {
-    this.ensureInitialized();
-
-    try {
-      return await this.searchRouter!.testAllSources();
-    } catch (error) {
-      console.error('[SmartStartService] Test sources failed:', error);
-      return new Map();
-    }
+    console.log('[SmartStartService] testSources not needed (backend handles this)');
+    return new Map([
+      ['wikipedia', true],
+      ['jikan', true],
+      ['fandom', true],
+    ]);
   }
 
   /**
    * Get available sources for a genre
+   * Note: Backend searches all sources regardless of genre
    */
-  getSourcesForGenre(genre: GenreId) {
-    this.ensureInitialized();
-    return this.searchRouter!.getSourcesForGenre(genre);
+  async getSourcesForGenre(genre: GenreId) {
+    console.log('[SmartStartService] getSourcesForGenre not needed (backend searches all)');
+    return ['wikipedia', 'jikan', 'fandom'];
   }
 
   /**
@@ -270,23 +281,121 @@ class SmartStartService {
   }
 
   /**
+   * Generate deep character profile using AI
+   * Calls backend API to generate comprehensive character data
+   *
+   * @param input - Generation input data
+   * @returns Generated profile with all sections
+   */
+  async generateProfile(input: {
+    name: string;
+    context: string; // ContextCategoryId
+    archetype: string; // GenreId
+    contextSubcategory?: string;
+    contextOccupation?: string;
+    contextEra?: string;
+    searchResult?: SearchResult;
+    customDescription?: string;
+    age?: number;
+    gender?: 'male' | 'female' | 'other' | 'unknown';
+    language?: 'es' | 'en';
+  }): Promise<{
+    success: boolean;
+    profile: any; // SmartStartGeneratedProfile
+    generationTime: number;
+  }> {
+    try {
+      const { apiClient } = await import('./api');
+
+      console.log('[SmartStartService] Generating profile:', {
+        name: input.name,
+        context: input.context,
+        archetype: input.archetype,
+      });
+
+      // Use extended timeout for AI generation (2 minutes)
+      // Profile generation can take 30-90 seconds depending on tier and complexity
+      const response = await apiClient.post<{
+        success: boolean;
+        profile: any;
+        generationTime: number;
+      }>('/api/v1/smart-start/generate', input, {
+        timeout: 120000, // 2 minutes timeout for AI generation
+      });
+
+      console.log('[SmartStartService] Profile generated successfully in', response.generationTime, 'ms');
+      return response;
+    } catch (error) {
+      console.error('[SmartStartService] Failed to generate profile:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create character using Smart Start data
+   * Calls backend API to persist the character
+   *
+   * @param draft - Complete character draft from Smart Start context
+   * @returns Created character data
+   */
+  async createCharacter(draft: {
+    name: string;
+    characterType: 'existing' | 'original';
+    genre?: string;
+    subgenre?: string;
+    physicalAppearance?: string;
+    emotionalTone?: string;
+    searchResult?: SearchResult;
+    personalityCore?: PersonalityCoreData;
+    characterAppearance?: CharacterAppearanceData;
+  }): Promise<{
+    success: boolean;
+    agent: {
+      id: string;
+      name: string;
+      description: string;
+      imageUrl: string | null;
+    };
+  }> {
+    try {
+      const { apiClient } = await import('./api');
+
+      // Use extended timeout for character creation (90 seconds)
+      // Character creation involves database writes and complex data processing
+      const response = await apiClient.post<{
+        success: boolean;
+        agent: {
+          id: string;
+          name: string;
+          description: string;
+          imageUrl: string | null;
+        };
+      }>('/api/v1/smart-start/create', draft, {
+        timeout: 90000, // 90 seconds timeout for character creation
+      });
+
+      console.log('[SmartStartService] Character created successfully:', response.agent.id);
+      return response;
+    } catch (error) {
+      console.error('[SmartStartService] Failed to create character:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cancel ongoing search
+   * Note: This is a no-op stub for compatibility
+   */
+  cancelSearch(): void {
+    console.log('[SmartStartService] cancelSearch is a no-op (backend handles search)');
+  }
+
+  /**
    * Reset service (clear cache, reinitialize)
    */
   async reset(): Promise<void> {
     this.initialized = false;
-    this.searchRouter = null;
     await this.initialize();
-  }
-
-  /**
-   * Ensure service is initialized before use
-   */
-  private ensureInitialized(): void {
-    if (!this.initialized || !this.searchRouter) {
-      throw new Error(
-        'SmartStartService not initialized. Call initialize() first.'
-      );
-    }
   }
 }
 

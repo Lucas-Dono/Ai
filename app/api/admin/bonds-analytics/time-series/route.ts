@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { getTimeSeriesData } from "@/lib/services/bond-analytics.service";
 
@@ -11,7 +10,7 @@ import { getTimeSeriesData } from "@/lib/services/bond-analytics.service";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -19,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { role: true },
     });
 

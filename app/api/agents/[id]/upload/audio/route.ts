@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
 
@@ -24,8 +24,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -52,7 +52,7 @@ export async function POST(
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    if (agent.userId !== session.user.id) {
+    if (agent.userId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -130,7 +130,7 @@ Responde SOLO con un JSON válido en este formato exacto:
     const message = await prisma.message.create({
       data: {
         agentId,
-        userId: session.user.id,
+        userId: user.id,
         content: transcribedText,
         role: "user",
         metadata: {

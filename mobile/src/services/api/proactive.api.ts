@@ -8,6 +8,7 @@
  */
 
 import { API_BASE_URL } from "@/config/api.config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type {
   ProactiveMessage,
   GetProactiveMessagesResponse,
@@ -34,8 +35,6 @@ class ProactiveAPIError extends Error {
  */
 async function getAuthToken(): Promise<string | null> {
   try {
-    // En producción, usa AsyncStorage o SecureStore
-    const { AsyncStorage } = await import("@react-native-async-storage/async-storage");
     const token = await AsyncStorage.getItem("@auth_token");
     return token;
   } catch (error) {

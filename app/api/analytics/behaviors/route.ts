@@ -12,13 +12,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 
 export async function GET(req: NextRequest) {
   try {
     // Obtener usuario autenticado
-    const session = await auth();
-    const userId = session?.user?.id || "default-user";
+    const user = await getAuthenticatedUser(req);
+    const userId = user?.id || "default-user";
 
     // Obtener todos los agentes del usuario
     const agents = await prisma.agent.findMany({

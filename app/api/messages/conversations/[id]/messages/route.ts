@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -10,8 +10,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -21,7 +21,7 @@ export async function GET(
 
     const result = await MessagingService.getMessages(
       (await params).id,
-      session.user.id,
+      user.id,
       page,
       limit
     );
@@ -41,8 +41,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -58,7 +58,7 @@ export async function POST(
 
     const message = await MessagingService.sendMessage({
       conversationId: (await params).id,
-      senderId: session.user.id,
+      senderId: user.id,
       recipientId,
       content: content.trim(),
       contentType,

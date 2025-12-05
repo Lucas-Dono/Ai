@@ -9,7 +9,7 @@ import { SavedPostService } from '@/lib/services/saved-post.service';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -25,7 +25,7 @@ export async function POST(
 
     const savedPost = await SavedPostService.savePost(
       session.user.id,
-      params.id,
+      id,
       collectionName
     );
 
@@ -41,7 +41,7 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -52,7 +52,7 @@ export async function DELETE(
       );
     }
 
-    await SavedPostService.unsavePost(session.user.id, params.id);
+    await SavedPostService.unsavePost(session.user.id, id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

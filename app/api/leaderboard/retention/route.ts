@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { log } from "@/lib/logging/logger";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import {
   getRetentionLeaderboard,
   getUserLeaderboardPosition,
@@ -17,7 +16,7 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     const searchParams = request.nextUrl.searchParams;
 
     const type = (searchParams.get("type") || "global") as "global" | "weekly" | "monthly";
@@ -27,13 +26,13 @@ export async function GET(request: NextRequest) {
     const leaderboard = await getRetentionLeaderboard({
       type,
       limit,
-      userId: session?.user?.id,
+      userId: user?.id,
     });
 
     // Si el usuario está autenticado, incluir su posición
     let userPosition = null;
-    if (session?.user?.id) {
-      userPosition = await getUserLeaderboardPosition(session.user.id);
+    if (user?.id) {
+      userPosition = await getUserLeaderboardPosition(user.id);
     }
 
     return NextResponse.json({

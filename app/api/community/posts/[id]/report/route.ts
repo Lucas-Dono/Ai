@@ -8,7 +8,7 @@ import { ReportService } from '@/lib/services/report.service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -50,7 +50,7 @@ export async function POST(
     }
 
     const report = await ReportService.reportPost({
-      postId: params.id,
+      postId: id,
       reporterId: session.user.id,
       reason,
       description,

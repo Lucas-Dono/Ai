@@ -113,9 +113,9 @@ export function EmotionalStateDisplay({
                 <Users className="h-3 w-3" />
                 Confianza
               </span>
-              <span className="font-medium">{Math.round((state.trust || 0.5) * 100)}%</span>
+              <span className="font-medium">{Math.round((state.trust || 0) * 100)}%</span>
             </div>
-            <Progress value={(state.trust || 0.5) * 100} className="h-1.5" />
+            <Progress value={(state.trust || 0) * 100} className="h-1.5" />
           </div>
 
           <div className="space-y-1">
@@ -124,9 +124,9 @@ export function EmotionalStateDisplay({
                 <Heart className="h-3 w-3" />
                 Afecto
               </span>
-              <span className="font-medium">{Math.round((state.affinity || 0.5) * 100)}%</span>
+              <span className="font-medium">{Math.round((state.affinity || 0) * 100)}%</span>
             </div>
-            <Progress value={(state.affinity || 0.5) * 100} className="h-1.5" />
+            <Progress value={(state.affinity || 0) * 100} className="h-1.5" />
           </div>
 
           <div className="space-y-1">
@@ -135,9 +135,9 @@ export function EmotionalStateDisplay({
                 <Award className="h-3 w-3" />
                 Respeto
               </span>
-              <span className="font-medium">{Math.round((state.respect || 0.5) * 100)}%</span>
+              <span className="font-medium">{Math.round((state.respect || 0) * 100)}%</span>
             </div>
-            <Progress value={(state.respect || 0.5) * 100} className="h-1.5" />
+            <Progress value={(state.respect || 0) * 100} className="h-1.5" />
           </div>
         </div>
 

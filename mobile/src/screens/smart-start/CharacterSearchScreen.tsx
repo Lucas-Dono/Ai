@@ -1,17 +1,20 @@
 /**
+ * @deprecated This screen is deprecated. Use SmartStartWizardScreen with SearchStep instead.
+ * Kept for reference only. Do not use in active navigation.
+ *
  * Character Search Screen
  *
  * Third step in Smart Start wizard (for existing characters only)
- * Features: Real-time search, infinite scroll, pull-to-refresh, loading states
+ * Features: Vibrant gradients, professional search UI, delightful animations, glassmorphism
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
-  FlatList,
+  SectionList,
   Pressable,
   ActivityIndicator,
   Image,
@@ -20,6 +23,9 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import { Feather } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,6 +36,7 @@ import { SmartStartStackParamList } from '../../navigation/SmartStartStack';
 import { useSmartStartContext } from '../../contexts/SmartStartContext';
 import { smartStartService } from '../../services/smart-start.service';
 import type { SearchResult } from '@circuitpromptai/smart-start-core';
+import { colors, spacing, typography, borderRadius } from '../../theme';
 
 // ============================================================================
 // TYPES
@@ -46,6 +53,26 @@ interface Props {
   navigation: CharacterSearchScreenNavigationProp;
   route: CharacterSearchScreenRouteProp;
 }
+
+interface SearchResultSection {
+  title: string;
+  data: SearchResult[];
+  sourceId: string;
+}
+
+// Source ID to friendly name mapping
+const SOURCE_NAMES: Record<string, string> = {
+  wikipedia: 'Wikipedia',
+  anilist: 'Anime (AniList)',
+  myanimelist: 'MyAnimeList',
+  vndb: 'Visual Novels',
+  tvdb: 'TV Shows',
+  tmdb: 'Movies',
+  rawg: 'Games',
+  igdb: 'Games (IGDB)',
+  comicvine: 'Comics',
+  bookapi: 'Books',
+};
 
 // ============================================================================
 // COMPONENT
@@ -64,7 +91,7 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   // Refs
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Animation
   const fadeIn = useSharedValue(0);
@@ -121,7 +148,7 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
     [genre]
   );
 
-  // Debounced search
+  // Debounced search - 1 second delay
   useEffect(() => {
     // Clear previous timeout
     if (searchTimeoutRef.current) {
@@ -131,7 +158,7 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
     // Set new timeout
     searchTimeoutRef.current = setTimeout(() => {
       performSearch(searchQuery);
-    }, 500); // 500ms debounce
+    }, 1000); // 1000ms debounce (1 second)
 
     return () => {
       if (searchTimeoutRef.current) {
@@ -139,6 +166,37 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
       }
     };
   }, [searchQuery, performSearch]);
+
+  // ============================================================================
+  // GROUP AND SORT RESULTS BY CATEGORY
+  // ============================================================================
+
+  const groupedResults = useMemo(() => {
+    if (results.length === 0) {
+      return [];
+    }
+
+    // Group results by sourceId
+    const grouped = results.reduce((acc, result) => {
+      const sourceId = result.sourceId || 'unknown';
+      if (!acc[sourceId]) {
+        acc[sourceId] = [];
+      }
+      acc[sourceId].push(result);
+      return acc;
+    }, {} as Record<string, SearchResult[]>);
+
+    // Convert to array of sections and sort by count (descending)
+    const sections: SearchResultSection[] = Object.entries(grouped)
+      .map(([sourceId, data]) => ({
+        sourceId,
+        title: SOURCE_NAMES[sourceId] || sourceId.toUpperCase(),
+        data,
+      }))
+      .sort((a, b) => b.data.length - a.data.length); // More results first
+
+    return sections;
+  }, [results]);
 
   // ============================================================================
   // HANDLERS
@@ -190,6 +248,18 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
     [handleSelectCharacter]
   );
 
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: SearchResultSection }) => (
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{section.title}</Text>
+        <View style={styles.sectionCount}>
+          <Text style={styles.sectionCountText}>{section.data.length}</Text>
+        </View>
+      </View>
+    ),
+    []
+  );
+
   const renderEmptyState = () => {
     if (isSearching) {
       return null;
@@ -198,8 +268,15 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
     if (!hasSearched) {
       return (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyStateIcon}>🔍</Text>
-          <Text style={styles.emptyStateTitle}>Search for a character</Text>
+          <LinearGradient
+            colors={['#06b6d4', '#22d3ee']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.emptyStateIconGradient}
+          >
+            <Feather name="search" size={40} color="#ffffff" />
+          </LinearGradient>
+          <Text style={styles.emptyStateTitle}>Start Your Search</Text>
           <Text style={styles.emptyStateText}>
             Type the name of your favorite character from {genre}
           </Text>
@@ -210,7 +287,14 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
     if (error) {
       return (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyStateIcon}>❌</Text>
+          <LinearGradient
+            colors={['#ef4444', '#f87171']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.emptyStateIconGradient}
+          >
+            <Feather name="alert-circle" size={40} color="#ffffff" />
+          </LinearGradient>
           <Text style={styles.emptyStateTitle}>Search Error</Text>
           <Text style={styles.emptyStateText}>{error}</Text>
         </View>
@@ -219,13 +303,28 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
 
     return (
       <View style={styles.emptyState}>
-        <Text style={styles.emptyStateIcon}>😔</Text>
+        <LinearGradient
+          colors={['#f59e0b', '#fbbf24']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.emptyStateIconGradient}
+        >
+          <Feather name="meh" size={40} color="#ffffff" />
+        </LinearGradient>
         <Text style={styles.emptyStateTitle}>No results found</Text>
         <Text style={styles.emptyStateText}>
           Try a different search term or create an original character
         </Text>
         <Pressable style={styles.skipButton} onPress={handleSkipSearch}>
-          <Text style={styles.skipButtonText}>Create Original Instead</Text>
+          <LinearGradient
+            colors={['#ec4899', '#f472b6']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.skipButtonGradient}
+          >
+            <Feather name="edit" size={20} color="#ffffff" />
+            <Text style={styles.skipButtonText}>Create Original Instead</Text>
+          </LinearGradient>
         </Pressable>
       </View>
     );
@@ -246,30 +345,48 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      {/* Gradient Background */}
+      <LinearGradient
+        colors={['#1a0b2e', '#2d1b4e', '#4a2472']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+
       <Animated.View style={[styles.content, containerAnimatedStyle]}>
-        {/* Search Bar */}
-        <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder={`Search ${genre} characters...`}
-            placeholderTextColor="#6b7280"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus
-            returnKeyType="search"
-          />
-          {searchQuery.length > 0 && (
-            <Pressable onPress={() => setSearchQuery('')} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>✕</Text>
-            </Pressable>
-          )}
+        {/* Search Bar - Redesigned */}
+        <View style={styles.searchBarContainer}>
+          <LinearGradient
+            colors={['rgba(167, 139, 250, 0.15)', 'rgba(124, 58, 237, 0.1)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.searchBarGradient}
+          >
+            <BlurView intensity={20} tint="dark" style={styles.searchBarBlur}>
+              <Feather name="search" size={22} color="#a78bfa" />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={`Search ${genre} characters...`}
+                placeholderTextColor="#94a3b8"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus
+                returnKeyType="search"
+              />
+              {searchQuery.length > 0 && (
+                <Pressable onPress={() => setSearchQuery('')} style={styles.clearButton}>
+                  <Feather name="x-circle" size={20} color="#64748b" />
+                </Pressable>
+              )}
+            </BlurView>
+          </LinearGradient>
         </View>
 
-        {/* Results List */}
-        <FlatList
-          data={results}
+        {/* Results List - Grouped by Category */}
+        <SectionList
+          sections={groupedResults}
           renderItem={renderSearchResult}
+          renderSectionHeader={renderSectionHeader}
           keyExtractor={(item, index) => `${item.sourceId}-${item.id}-${index}`}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={renderEmptyState}
@@ -282,21 +399,32 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
             />
           }
           showsVerticalScrollIndicator={false}
+          stickySectionHeadersEnabled={true}
           removeClippedSubviews
           maxToRenderPerBatch={10}
           windowSize={10}
         />
 
-        {/* Skip Button (bottom) */}
+        {/* Skip Button (bottom) - Redesigned */}
         {results.length > 0 && (
           <View style={styles.skipContainer}>
             <Pressable
               style={({ pressed }) => [styles.skipFloatingButton, pressed && { opacity: 0.8 }]}
               onPress={handleSkipSearch}
             >
-              <Text style={styles.skipFloatingButtonText}>
-                Or create an original character
-              </Text>
+              <LinearGradient
+                colors={['rgba(236, 72, 153, 0.15)', 'rgba(244, 114, 182, 0.1)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.skipButtonGradient}
+              >
+                <BlurView intensity={20} tint="dark" style={styles.skipButtonBlur}>
+                  <Feather name="edit" size={18} color="#f472b6" />
+                  <Text style={styles.skipFloatingButtonText}>
+                    Or create an original character
+                  </Text>
+                </BlurView>
+              </LinearGradient>
             </Pressable>
           </View>
         )}
@@ -306,7 +434,7 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
 }
 
 // ============================================================================
-// SEARCH RESULT CARD COMPONENT
+// SEARCH RESULT CARD COMPONENT - Redesigned
 // ============================================================================
 
 interface SearchResultCardProps {
@@ -317,46 +445,73 @@ interface SearchResultCardProps {
 function SearchResultCard({ character, onPress }: SearchResultCardProps) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.resultCard, pressed && styles.resultCardPressed]}
+      style={({ pressed }) => [styles.resultCardPressable, pressed && styles.resultCardPressed]}
       onPress={onPress}
     >
-      {/* Image */}
-      {character.imageUrl ? (
-        <Image source={{ uri: character.imageUrl }} style={styles.resultImage} />
-      ) : (
-        <View style={[styles.resultImage, styles.resultImagePlaceholder]}>
-          <Text style={styles.resultImagePlaceholderText}>
-            {character.name.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-      )}
-
-      {/* Content */}
-      <View style={styles.resultContent}>
-        <Text style={styles.resultName} numberOfLines={1}>
-          {character.name}
-        </Text>
-        {character.sourceTitle && (
-          <Text style={styles.resultSource} numberOfLines={1}>
-            From: {character.sourceTitle}
-          </Text>
-        )}
-        {character.description && (
-          <Text style={styles.resultDescription} numberOfLines={2}>
-            {character.description}
-          </Text>
-        )}
-
-        {/* Metadata */}
-        <View style={styles.resultMeta}>
-          <View style={styles.sourceTag}>
-            <Text style={styles.sourceTagText}>{character.sourceId}</Text>
-          </View>
-          {character.confidence !== undefined && (
-            <Text style={styles.confidenceText}>{Math.round(character.confidence * 100)}%</Text>
+      <LinearGradient
+        colors={['rgba(167, 139, 250, 0.1)', 'rgba(124, 58, 237, 0.05)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.resultCardGradient}
+      >
+        <BlurView intensity={15} tint="dark" style={styles.resultCardBlur}>
+          {/* Image */}
+          {character.imageUrl ? (
+            <Image source={{ uri: character.imageUrl }} style={styles.resultImage} />
+          ) : (
+            <LinearGradient
+              colors={['#8b5cf6', '#7c3aed']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.resultImage, styles.resultImagePlaceholder]}
+            >
+              <Text style={styles.resultImagePlaceholderText}>
+                {character.name.charAt(0).toUpperCase()}
+              </Text>
+            </LinearGradient>
           )}
-        </View>
-      </View>
+
+          {/* Content */}
+          <View style={styles.resultContent}>
+            <Text style={styles.resultName} numberOfLines={1}>
+              {character.name}
+            </Text>
+            {character.sourceTitle && (
+              <View style={styles.resultSourceContainer}>
+                <Feather name="book-open" size={14} color="#94a3b8" />
+                <Text style={styles.resultSource} numberOfLines={1}>
+                  {character.sourceTitle}
+                </Text>
+              </View>
+            )}
+            {character.description && (
+              <Text style={styles.resultDescription} numberOfLines={2}>
+                {character.description}
+              </Text>
+            )}
+
+            {/* Metadata */}
+            <View style={styles.resultMeta}>
+              <LinearGradient
+                colors={['rgba(6, 182, 212, 0.2)', 'rgba(34, 211, 238, 0.1)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.sourceTag}
+              >
+                <Text style={styles.sourceTagText}>{character.sourceId}</Text>
+              </LinearGradient>
+              {character.confidence !== undefined && (
+                <View style={styles.confidenceContainer}>
+                  <Feather name="check-circle" size={14} color="#10b981" />
+                  <Text style={styles.confidenceText}>
+                    {Math.round(character.confidence * 100)}%
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </BlurView>
+      </LinearGradient>
     </Pressable>
   );
 }
@@ -370,75 +525,112 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f1e',
+    backgroundColor: '#1a0b2e',
   },
   content: {
     flex: 1,
   },
 
-  // Search Bar
-  searchBar: {
+  // Search Bar - Redesigned
+  searchBarContainer: {
+    marginHorizontal: 24,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  searchBarGradient: {
+    borderRadius: 18,
+    padding: 2,
+  },
+  searchBarBlur: {
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
     gap: 12,
-  },
-  searchIcon: {
-    fontSize: 20,
+    overflow: 'hidden',
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#fff',
+    color: '#ffffff',
+    fontWeight: '500',
   },
   clearButton: {
     padding: 4,
   },
-  clearButtonText: {
-    fontSize: 18,
-    color: '#6b7280',
+
+  // Section Headers - Redesigned
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(167, 139, 250, 0.1)',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.5,
+  },
+  sectionCount: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    minWidth: 28,
+    alignItems: 'center',
+  },
+  sectionCountText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#ffffff',
   },
 
   // List
   listContent: {
     flexGrow: 1,
-    paddingHorizontal: 16,
-    paddingBottom: 100,
+    paddingHorizontal: 24,
+    paddingBottom: 120,
   },
 
-  // Result Card
-  resultCard: {
+  // Result Card - Redesigned
+  resultCardPressable: {
+    marginBottom: 14,
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  resultCardGradient: {
+    borderRadius: 18,
+    padding: 2,
+  },
+  resultCardBlur: {
+    borderRadius: 16,
+    padding: 16,
     flexDirection: 'row',
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    gap: 12,
+    gap: 14,
+    overflow: 'hidden',
   },
   resultCardPressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.98 }],
+    opacity: 0.75,
+    transform: [{ scale: 0.97 }],
   },
   resultImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: 90,
+    height: 90,
+    borderRadius: 16,
   },
   resultImagePlaceholder: {
-    backgroundColor: '#374151',
     justifyContent: 'center',
     alignItems: 'center',
   },
   resultImagePlaceholderText: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '700',
-    color: '#9ca3af',
+    color: '#ffffff',
   },
   resultContent: {
     flex: 1,
@@ -447,44 +639,58 @@ const styles = StyleSheet.create({
   resultName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
+    color: '#ffffff',
+    marginBottom: 6,
+    letterSpacing: 0.2,
+  },
+  resultSourceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
   },
   resultSource: {
-    fontSize: 13,
-    color: '#9ca3af',
-    marginBottom: 4,
+    fontSize: 14,
+    color: '#94a3b8',
+    flex: 1,
+    fontWeight: '500',
   },
   resultDescription: {
-    fontSize: 13,
-    color: '#d1d5db',
-    lineHeight: 18,
-    marginBottom: 8,
+    fontSize: 14,
+    color: '#cbd5e1',
+    lineHeight: 20,
+    marginBottom: 10,
+    fontWeight: '400',
   },
   resultMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   sourceTag: {
-    backgroundColor: '#374151',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
   sourceTagText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#9ca3af',
+    fontWeight: '700',
+    color: '#06b6d4',
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  confidenceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   confidenceText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '600',
     color: '#10b981',
   },
 
-  // Empty State
+  // Empty State - Redesigned
   emptyState: {
     flex: 1,
     justifyContent: 'center',
@@ -492,65 +698,86 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     paddingTop: 60,
   },
-  emptyStateIcon: {
-    fontSize: 64,
-    marginBottom: 16,
+  emptyStateIconGradient: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 28,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
   },
   emptyStateTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
+    color: '#ffffff',
+    marginBottom: 12,
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
   emptyStateText: {
-    fontSize: 15,
-    color: '#9ca3af',
+    fontSize: 16,
+    color: '#cbd5e1',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+    fontWeight: '400',
   },
 
   // Loading
   loadingFooter: {
-    paddingVertical: 20,
+    paddingVertical: 24,
     alignItems: 'center',
   },
 
-  // Skip Buttons
+  // Skip Buttons - Redesigned
   skipButton: {
-    marginTop: 24,
-    backgroundColor: '#8b5cf6',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
+    marginTop: 32,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  skipButtonGradient: {
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
   skipButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.3,
   },
   skipContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 16,
-    backgroundColor: '#0f0f1e',
-    borderTopWidth: 1,
-    borderTopColor: '#1a1a2e',
+    padding: 24,
+    backgroundColor: 'rgba(26, 11, 46, 0.95)',
   },
   skipFloatingButton: {
-    backgroundColor: '#1a1a2e',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  skipButtonBlur: {
     paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#374151',
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    overflow: 'hidden',
   },
   skipFloatingButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#9ca3af',
-    textAlign: 'center',
+    color: '#ffffff',
+    letterSpacing: 0.2,
   },
 });

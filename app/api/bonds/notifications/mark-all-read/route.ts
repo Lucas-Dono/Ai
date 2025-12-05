@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { markAllBondNotificationsAsRead } from "@/lib/services/bond-notifications.service";
 
 /**
@@ -9,12 +8,12 @@ import { markAllBondNotificationsAsRead } from "@/lib/services/bond-notification
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await markAllBondNotificationsAsRead(session.user.id);
+    await markAllBondNotificationsAsRead(user.id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

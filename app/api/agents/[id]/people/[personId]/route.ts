@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { ImportantPeopleService } from '@/lib/services/important-people.service';
 
 /**
@@ -16,13 +16,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string; personId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { personId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     const person = await ImportantPeopleService.getPerson(personId, userId);
 
@@ -49,13 +49,13 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string; personId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { personId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
 
     // Convertir birthday si existe
@@ -88,13 +88,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; personId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { personId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     await ImportantPeopleService.deletePerson(personId, userId);
 

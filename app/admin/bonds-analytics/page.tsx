@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import BondsAnalyticsDashboard from "@/components/admin/BondsAnalyticsDashboard";
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BondsAnalyticsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user) {
     redirect("/login?callbackUrl=/admin/bonds-analytics");

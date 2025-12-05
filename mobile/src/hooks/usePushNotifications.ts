@@ -31,7 +31,7 @@ export const usePushNotifications = () => {
 
     // Listener para cuando el usuario toca una notificación
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      handleNotificationNavigation(response, navigation);
+      handleNotificationNavigation(response.notification);
     });
 
     return () => {
@@ -47,7 +47,7 @@ export const usePushNotifications = () => {
 
   const registerForPushNotificationsAsync = async () => {
     try {
-      const token = await pushNotificationService.registerForPushNotifications();
+      const token = await pushNotificationService.registerForPushNotifications('default-user');
       setExpoPushToken(token);
     } catch (error) {
       console.error('Error registrando push notifications:', error);

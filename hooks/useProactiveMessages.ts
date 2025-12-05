@@ -1,13 +1,12 @@
 /**
- * Hook para manejar mensajes proactivos de la IA
+ * Hook mejorado para mensajes proactivos (V2)
  *
- * Este hook hace polling al servidor para obtener mensajes proactivos
- * y proporciona funciones para marcarlos como leídos o respondidos.
- *
- * Uso:
- * ```tsx
- * const { messages, markAsRead, markAsDismissed, isLoading } = useProactiveMessages(agentId);
- * ```
+ * Mejoras:
+ * - Sistema singleton: Solo UNA instancia de polling por agentId
+ * - Estado compartido entre todos los componentes
+ * - Sin bucles infinitos
+ * - Deduplicación automática
+ * - Limpieza automática cuando no hay suscriptores
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -22,62 +21,170 @@ export interface ProactiveMessage {
 }
 
 interface UseProactiveMessagesOptions {
-  /**
-   * Intervalo de polling en milisegundos
-   * @default 60000 (1 minuto)
-   */
   pollingInterval?: number;
-
-  /**
-   * Si debe hacer polling automáticamente
-   * @default true
-   */
   enabled?: boolean;
-
-  /**
-   * Callback cuando se recibe un nuevo mensaje
-   */
   onNewMessage?: (message: ProactiveMessage) => void;
-
-  /**
-   * Callback cuando hay un error
-   */
   onError?: (error: Error) => void;
 }
 
-export function useProactiveMessages(
-  agentId: string | null | undefined,
-  options: UseProactiveMessagesOptions = {}
-) {
-  const {
-    pollingInterval = 60000, // 1 minuto por defecto
-    enabled = true,
-    onNewMessage,
-    onError,
-  } = options;
+// ============================================
+// SINGLETON STATE MANAGER
+// ============================================
 
-  const [messages, setMessages] = useState<ProactiveMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+interface PollingInstance {
+  agentId: string;
+  messages: ProactiveMessage[];
+  isLoading: boolean;
+  error: Error | null;
+  seenMessageIds: Set<string>;
+  subscribers: Set<SubscriberCallback>;
+  pollingIntervalId: NodeJS.Timeout | null;
+  pollingInterval: number;
+  lastFetch: number;
+}
 
-  // Ref para mantener track de mensajes ya vistos
-  const seenMessageIds = useRef<Set<string>>(new Set());
-  const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+type SubscriberCallback = (state: {
+  messages: ProactiveMessage[];
+  isLoading: boolean;
+  error: Error | null;
+}) => void;
+
+class ProactiveMessagesManager {
+  private instances = new Map<string, PollingInstance>();
 
   /**
-   * Fetch mensajes proactivos del servidor
+   * Obtener o crear instancia para un agentId
    */
-  const fetchMessages = useCallback(async () => {
-    if (!agentId || !enabled) return;
+  private getInstance(agentId: string, pollingInterval: number): PollingInstance {
+    if (!this.instances.has(agentId)) {
+      this.instances.set(agentId, {
+        agentId,
+        messages: [],
+        isLoading: false,
+        error: null,
+        seenMessageIds: new Set(),
+        subscribers: new Set(),
+        pollingIntervalId: null,
+        pollingInterval,
+        lastFetch: 0,
+      });
+    }
+    return this.instances.get(agentId)!;
+  }
+
+  /**
+   * Suscribirse a mensajes de un agente
+   */
+  subscribe(
+    agentId: string,
+    callback: SubscriberCallback,
+    options: {
+      pollingInterval: number;
+      enabled: boolean;
+      onNewMessage?: (message: ProactiveMessage) => void;
+      onError?: (error: Error) => void;
+    }
+  ) {
+    const instance = this.getInstance(agentId, options.pollingInterval);
+
+    // Agregar suscriptor
+    instance.subscribers.add(callback);
+
+    // Notificar estado inicial
+    callback({
+      messages: instance.messages,
+      isLoading: instance.isLoading,
+      error: instance.error,
+    });
+
+    // Si está habilitado y no hay polling activo, iniciarlo
+    if (options.enabled && !instance.pollingIntervalId) {
+      this.startPolling(agentId, options);
+    }
+
+    // Retornar función de limpieza
+    return () => {
+      instance.subscribers.delete(callback);
+
+      // Si no quedan suscriptores, detener polling y limpiar
+      if (instance.subscribers.size === 0) {
+        this.stopPolling(agentId);
+        this.instances.delete(agentId);
+      }
+    };
+  }
+
+  /**
+   * Iniciar polling para un agente
+   */
+  private startPolling(
+    agentId: string,
+    options: {
+      pollingInterval: number;
+      onNewMessage?: (message: ProactiveMessage) => void;
+      onError?: (error: Error) => void;
+    }
+  ) {
+    const instance = this.instances.get(agentId);
+    if (!instance) return;
+
+    // Fetch inicial
+    this.fetchMessages(agentId, options);
+
+    // Setup interval
+    instance.pollingIntervalId = setInterval(() => {
+      this.fetchMessages(agentId, options);
+    }, options.pollingInterval);
+
+    console.log(`[ProactiveMessages] Started polling for agent ${agentId} (interval: ${options.pollingInterval}ms)`);
+  }
+
+  /**
+   * Detener polling para un agente
+   */
+  private stopPolling(agentId: string) {
+    const instance = this.instances.get(agentId);
+    if (!instance) return;
+
+    if (instance.pollingIntervalId) {
+      clearInterval(instance.pollingIntervalId);
+      instance.pollingIntervalId = null;
+      console.log(`[ProactiveMessages] Stopped polling for agent ${agentId}`);
+    }
+  }
+
+  /**
+   * Fetch mensajes del servidor
+   */
+  private async fetchMessages(
+    agentId: string,
+    options: {
+      onNewMessage?: (message: ProactiveMessage) => void;
+      onError?: (error: Error) => void;
+    }
+  ) {
+    const instance = this.instances.get(agentId);
+    if (!instance) return;
+
+    // Evitar fetches simultáneos
+    if (instance.isLoading) return;
+
+    // Rate limiting: No hacer fetch si ya se hizo hace menos de 30 segundos
+    const now = Date.now();
+    if (now - instance.lastFetch < 30000) {
+      return;
+    }
 
     try {
-      setIsLoading(true);
-      setError(null);
+      // Update loading state
+      instance.isLoading = true;
+      instance.error = null;
+      this.notifySubscribers(agentId);
 
       const response = await fetch(`/api/agents/${agentId}/proactive-messages`);
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch proactive messages: ${response.statusText}`);
+        throw new Error(`Failed to fetch: ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -87,172 +194,235 @@ export function useProactiveMessages(
 
         // Detectar mensajes nuevos
         const unseenMessages = newMessages.filter(
-          (msg) => !seenMessageIds.current.has(msg.id)
+          (msg) => !instance.seenMessageIds.has(msg.id)
         );
 
         // Agregar a la lista de vistos
         unseenMessages.forEach((msg) => {
-          seenMessageIds.current.add(msg.id);
+          instance.seenMessageIds.add(msg.id);
         });
 
         // Notificar sobre mensajes nuevos
-        if (unseenMessages.length > 0 && onNewMessage) {
-          unseenMessages.forEach((msg) => onNewMessage(msg));
+        if (unseenMessages.length > 0 && options.onNewMessage) {
+          unseenMessages.forEach((msg) => options.onNewMessage!(msg));
         }
 
-        setMessages(newMessages);
+        instance.messages = newMessages;
+        instance.lastFetch = now;
       }
     } catch (err) {
       const error = err instanceof Error ? err : new Error("Unknown error");
-      setError(error);
-      if (onError) {
-        onError(error);
+      instance.error = error;
+
+      if (options.onError) {
+        options.onError(error);
       }
-      console.error("[useProactiveMessages] Error fetching messages:", error);
+
+      console.error(`[ProactiveMessages] Error fetching for agent ${agentId}:`, error);
     } finally {
-      setIsLoading(false);
+      instance.isLoading = false;
+      this.notifySubscribers(agentId);
     }
-  }, [agentId, enabled, onNewMessage, onError]);
+  }
+
+  /**
+   * Notificar a todos los suscriptores de cambios
+   */
+  private notifySubscribers(agentId: string) {
+    const instance = this.instances.get(agentId);
+    if (!instance) return;
+
+    const state = {
+      messages: instance.messages,
+      isLoading: instance.isLoading,
+      error: instance.error,
+    };
+
+    instance.subscribers.forEach((callback) => {
+      callback(state);
+    });
+  }
 
   /**
    * Marcar mensaje como leído
    */
-  const markAsRead = useCallback(
-    async (messageId: string) => {
-      if (!agentId) return;
+  async markAsRead(agentId: string, messageId: string) {
+    try {
+      const response = await fetch(`/api/agents/${agentId}/proactive-messages`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, status: "read" }),
+      });
 
-      try {
-        const response = await fetch(`/api/agents/${agentId}/proactive-messages`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messageId,
-            status: "read",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to mark message as read");
-        }
-
-        // Remover mensaje de la lista local
-        setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
-      } catch (err) {
-        console.error("[useProactiveMessages] Error marking message as read:", err);
-        throw err;
+      if (!response.ok) {
+        throw new Error("Failed to mark as read");
       }
-    },
-    [agentId]
-  );
+
+      // Remover mensaje del estado local
+      const instance = this.instances.get(agentId);
+      if (instance) {
+        instance.messages = instance.messages.filter((msg) => msg.id !== messageId);
+        this.notifySubscribers(agentId);
+      }
+    } catch (err) {
+      console.error(`[ProactiveMessages] Error marking as read:`, err);
+      throw err;
+    }
+  }
 
   /**
    * Marcar mensaje como descartado
    */
-  const markAsDismissed = useCallback(
-    async (messageId: string) => {
-      if (!agentId) return;
+  async markAsDismissed(agentId: string, messageId: string) {
+    try {
+      const response = await fetch(`/api/agents/${agentId}/proactive-messages`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, status: "dismissed" }),
+      });
 
-      try {
-        const response = await fetch(`/api/agents/${agentId}/proactive-messages`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messageId,
-            status: "dismissed",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to dismiss message");
-        }
-
-        // Remover mensaje de la lista local
-        setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
-      } catch (err) {
-        console.error("[useProactiveMessages] Error dismissing message:", err);
-        throw err;
+      if (!response.ok) {
+        throw new Error("Failed to dismiss");
       }
-    },
-    [agentId]
-  );
+
+      // Remover mensaje del estado local
+      const instance = this.instances.get(agentId);
+      if (instance) {
+        instance.messages = instance.messages.filter((msg) => msg.id !== messageId);
+        this.notifySubscribers(agentId);
+      }
+    } catch (err) {
+      console.error(`[ProactiveMessages] Error dismissing:`, err);
+      throw err;
+    }
+  }
 
   /**
-   * Responder a un mensaje proactivo
+   * Responder a mensaje
    */
-  const respondToMessage = useCallback(
-    async (messageId: string, userResponse: string) => {
-      if (!agentId) return;
+  async respondToMessage(agentId: string, messageId: string, userResponse: string) {
+    try {
+      const response = await fetch(`/api/agents/${agentId}/proactive-messages`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, status: "read", userResponse }),
+      });
 
-      try {
-        const response = await fetch(`/api/agents/${agentId}/proactive-messages`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            messageId,
-            status: "read",
-            userResponse,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to respond to message");
-        }
-
-        // Remover mensaje de la lista local
-        setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
-
-        return true;
-      } catch (err) {
-        console.error("[useProactiveMessages] Error responding to message:", err);
-        throw err;
+      if (!response.ok) {
+        throw new Error("Failed to respond");
       }
-    },
-    [agentId]
-  );
+
+      // Remover mensaje del estado local
+      const instance = this.instances.get(agentId);
+      if (instance) {
+        instance.messages = instance.messages.filter((msg) => msg.id !== messageId);
+        this.notifySubscribers(agentId);
+      }
+
+      return true;
+    } catch (err) {
+      console.error(`[ProactiveMessages] Error responding:`, err);
+      throw err;
+    }
+  }
 
   /**
    * Refrescar mensajes manualmente
    */
-  const refresh = useCallback(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+  refresh(agentId: string, options: { onNewMessage?: (message: ProactiveMessage) => void; onError?: (error: Error) => void }) {
+    this.fetchMessages(agentId, options);
+  }
+}
 
-  /**
-   * Setup polling
-   */
+// Instancia singleton global
+const manager = new ProactiveMessagesManager();
+
+// ============================================
+// REACT HOOK
+// ============================================
+
+export function useProactiveMessages(
+  agentId: string | null | undefined,
+  options: UseProactiveMessagesOptions = {}
+) {
+  const {
+    pollingInterval = 900000, // 15 minutos por defecto
+    enabled = true,
+    onNewMessage,
+    onError,
+  } = options;
+
+  const [messages, setMessages] = useState<ProactiveMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Refs para callbacks estables
+  const onNewMessageRef = useRef(onNewMessage);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onNewMessageRef.current = onNewMessage;
+    onErrorRef.current = onError;
+  }, [onNewMessage, onError]);
+
+  // Suscripción al manager
   useEffect(() => {
     if (!agentId || !enabled) {
+      setMessages([]);
+      setIsLoading(false);
+      setError(null);
       return;
     }
 
-    // Fetch inicial
-    fetchMessages();
-
-    // Setup polling interval
-    pollingTimeoutRef.current = setInterval(() => {
-      fetchMessages();
-    }, pollingInterval);
-
-    // Cleanup
-    return () => {
-      if (pollingTimeoutRef.current) {
-        clearInterval(pollingTimeoutRef.current);
+    const unsubscribe = manager.subscribe(
+      agentId,
+      (state) => {
+        setMessages(state.messages);
+        setIsLoading(state.isLoading);
+        setError(state.error);
+      },
+      {
+        pollingInterval,
+        enabled,
+        onNewMessage: onNewMessageRef.current,
+        onError: onErrorRef.current,
       }
-    };
-  }, [agentId, enabled, pollingInterval, fetchMessages]);
+    );
 
-  /**
-   * Limpiar cuando cambia el agente
-   */
-  useEffect(() => {
-    setMessages([]);
-    seenMessageIds.current.clear();
+    return unsubscribe;
+  }, [agentId, enabled, pollingInterval]);
+
+  // Funciones de acción
+  const markAsRead = useCallback(
+    async (messageId: string) => {
+      if (!agentId) return;
+      await manager.markAsRead(agentId, messageId);
+    },
+    [agentId]
+  );
+
+  const markAsDismissed = useCallback(
+    async (messageId: string) => {
+      if (!agentId) return;
+      await manager.markAsDismissed(agentId, messageId);
+    },
+    [agentId]
+  );
+
+  const respondToMessage = useCallback(
+    async (messageId: string, userResponse: string) => {
+      if (!agentId) return false;
+      return await manager.respondToMessage(agentId, messageId, userResponse);
+    },
+    [agentId]
+  );
+
+  const refresh = useCallback(() => {
+    if (!agentId) return;
+    manager.refresh(agentId, {
+      onNewMessage: onNewMessageRef.current,
+      onError: onErrorRef.current,
+    });
   }, [agentId]);
 
   return {

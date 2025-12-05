@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { log } from "@/lib/logging/logger";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-
+import { getAuthenticatedUser } from "@/lib/auth-server";
 /**
  * GET /api/user/notification-preferences
  * Obtener preferencias de notificaciones del usuario actual
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }
@@ -21,14 +19,14 @@ export async function GET(request: NextRequest) {
 
     // Obtener o crear preferencias
     let preferences = await prisma.notificationPreferences.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     // Si no existen, crear con valores por defecto
     if (!preferences) {
       preferences = await prisma.notificationPreferences.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
         },
       });
     }
@@ -49,9 +47,9 @@ export async function GET(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }
@@ -102,16 +100,16 @@ export async function PUT(request: NextRequest) {
 
     // Actualizar preferencias (upsert)
     const preferences = await prisma.notificationPreferences.upsert({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       update: body,
       create: {
-        userId: session.user.id,
+        userId: user.id,
         ...body,
       },
     });
 
     log.info(
-      { userId: session.user.id, updates: Object.keys(body) },
+      { userId: user.id, updates: Object.keys(body) },
       "Notification preferences updated"
     );
 
@@ -131,9 +129,9 @@ export async function PUT(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }
@@ -154,7 +152,7 @@ export async function POST(request: NextRequest) {
     const bond = await prisma.symbolicBond.findFirst({
       where: {
         id: bondId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -167,12 +165,12 @@ export async function POST(request: NextRequest) {
 
     // Obtener preferencias actuales
     let preferences = await prisma.notificationPreferences.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     if (!preferences) {
       preferences = await prisma.notificationPreferences.create({
-        data: { userId: session.user.id },
+        data: { userId: user.id },
       });
     }
 
@@ -192,14 +190,14 @@ export async function POST(request: NextRequest) {
 
     // Actualizar
     const updated = await prisma.notificationPreferences.update({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       data: {
         mutedBonds: newMutedBonds,
       },
     });
 
     log.info(
-      { userId: session.user.id, bondId, action: unmute ? "unmute" : "mute" },
+      { userId: user.id, bondId, action: unmute ? "unmute" : "mute" },
       "Bond notification preferences updated"
     );
 

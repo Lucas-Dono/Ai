@@ -102,11 +102,16 @@ export const ImportantPeopleService = {
       importance?: string;
       sortBy?: 'name' | 'lastMentioned' | 'mentionCount' | 'importance';
       order?: 'asc' | 'desc';
+      includeAgentPeople?: boolean; // Incluir personas del mundo del agente
     } = {}
   ) {
+    // Si includeAgentPeople = true, traer personas del agente Y del usuario
+    // Si false (default), solo traer personas del usuario
     const where: any = {
       agentId,
-      userId,
+      userId: filters.includeAgentPeople
+        ? { in: [userId, agentId] } // Ambos grupos
+        : userId, // Solo usuario
     };
 
     if (filters.relationship) where.relationship = filters.relationship;
@@ -124,7 +129,11 @@ export const ImportantPeopleService = {
       orderBy,
     });
 
-    return people;
+    // Agregar metadata para identificar el source
+    return people.map((person) => ({
+      ...person,
+      source: person.userId === agentId ? 'agent' : 'user',
+    }));
   },
 
   /**

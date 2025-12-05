@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getUserUsageStats } from "@/lib/billing/usage-stats";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

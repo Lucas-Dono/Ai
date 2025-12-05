@@ -27,6 +27,7 @@ interface ImportantEvent {
   eventHappened: boolean;
   userFeedback?: string;
   isRecurring: boolean;
+  source?: "agent" | "user"; // Identificador de origen
 }
 
 interface ImportantEventsPanelProps {
@@ -84,7 +85,7 @@ export function ImportantEventsPanel({ agentId }: ImportantEventsPanelProps) {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      let url = `/api/agents/${agentId}/events?`;
+      let url = `/api/agents/${agentId}/events?includeAgentEvents=true&`; // ← Incluir eventos del agente
       if (filterType !== "all") url += `type=${filterType}&`;
       if (filterPriority !== "all") url += `priority=${filterPriority}&`;
 
@@ -398,8 +399,21 @@ export function ImportantEventsPanel({ agentId }: ImportantEventsPanelProps) {
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {sortedEvents.map((event) => {
+        <div className="space-y-8">
+          {/* Eventos del Agente (Historia/Pasado) */}
+          {sortedEvents.filter(e => e.source === 'agent').length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Historia del Personaje
+                </h3>
+                <span className="text-sm text-gray-500">
+                  ({sortedEvents.filter(e => e.source === 'agent').length} eventos)
+                </span>
+              </div>
+              <div className="space-y-3">
+                {sortedEvents.filter(e => e.source === 'agent').map((event) => {
             const daysUntil = getDaysUntil(event.eventDate);
             const isPast = daysUntil < 0;
             const isToday = daysUntil === 0;
@@ -494,6 +508,133 @@ export function ImportantEventsPanel({ agentId }: ImportantEventsPanelProps) {
               </div>
             );
           })}
+              </div>
+            </div>
+          )}
+
+          {/* Eventos del Usuario */}
+          {sortedEvents.filter(e => e.source === 'user').length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Eventos del Usuario
+                </h3>
+                <span className="text-sm text-gray-500">
+                  ({sortedEvents.filter(e => e.source === 'user').length} eventos)
+                </span>
+              </div>
+              <div className="space-y-3">
+                {sortedEvents.filter(e => e.source === 'user').map((event) => {
+            const daysUntil = getDaysUntil(event.eventDate);
+            const isPast = daysUntil < 0;
+            const isToday = daysUntil === 0;
+            const isSoon = daysUntil > 0 && daysUntil <= 7;
+
+            return (
+              <div
+                key={event.id}
+                className={`bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border-2 transition-all ${
+                  isToday
+                    ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                    : isSoon
+                    ? "border-orange-300 bg-orange-50 dark:bg-orange-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          eventTypeColors[event.type]
+                        }`}
+                      >
+                        {eventTypeLabels[event.type]}
+                      </span>
+                      {event.isRecurring && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          Recurrente
+                        </span>
+                      )}
+                      {isToday && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500 text-white">
+                          ¡Hoy!
+                        </span>
+                      )}
+                      {isSoon && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500 text-white">
+                          Próximamente
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
+                      {event.description}
+                    </h3>
+
+                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {format(new Date(event.eventDate), "d 'de' MMMM, yyyy", {
+                          locale: es,
+                        })}
+                      </div>
+
+                      {!isPast && (
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {daysUntil === 0
+                            ? "Hoy"
+                            : `En ${Math.abs(daysUntil)} día${
+                                Math.abs(daysUntil) !== 1 ? "s" : ""
+                              }`}
+                        </div>
+                      )}
+
+                      {event.relationship && (
+                        <span className="text-purple-600 dark:text-purple-400">
+                          {event.relationship}
+                        </span>
+                      )}
+                    </div>
+
+                    {event.emotionalTone && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 italic">
+                        {event.emotionalTone}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 ml-4">
+                    <AlertCircle
+                      className={`w-5 h-5 ${
+                        priorityColors[event.priority]
+                      }`}
+                      title={`Prioridad: ${event.priority}`}
+                    />
+                    <button
+                      onClick={() => handleEdit(event)}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
+                      title="Editar"
+                    >
+                      <Edit2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(event.id)}
+                      className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-2xl transition-colors"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -4,6 +4,20 @@ import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
 import { withAPIAuth } from "@/lib/api/auth";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
+import { applyRoutineMiddleware } from "@/lib/routine/routine-middleware";
+import { generateLivingAIContext } from "@/lib/chat/living-ai-context";
+import { checkMessageLimit, incrementMessageCount, getUsageStats } from "@/lib/chat/message-limits";
+import { getEnergyState, consumeEnergy, resetEnergyIfNeeded } from "@/lib/chat/energy-system";
+import { getEnergyContext } from "@/lib/chat/tier-limits";
+import type { UserTier } from "@/lib/chat/types";
+import { checkAvailability, recordSpacedResponse } from "@/lib/chat/availability-system";
+import { getRelevantMemories, generateMemoryContext, updateTemporalContext } from "@/lib/chat/cross-context-memory";
+import { processMessageForTopics, getFatiguedTopics, generateFatigueContext } from "@/lib/chat/topic-fatigue";
+import { generateVulnerabilityContext } from "@/lib/chat/vulnerability-threshold";
+import { updateMoodFromMessage, detectSimpleSentiment, generateMoodContext, getOrCreateInternalState } from "@/lib/chat/mood-system";
+import { generateDepthContext } from "@/lib/chat/response-depth";
+import { getTemporalReferences, generateTemporalReferencesContext, generateTimeAwarenessContext } from "@/lib/chat/temporal-references";
+import { buildOptimizedPrompt } from "@/lib/chat/context-manager";
 
 /**
  * @swagger
@@ -102,14 +116,44 @@ export async function POST(
       );
     }
 
-    // Get agent
-    const agent = await prisma.agent.findFirst({
-      where: { id: agentId, userId },
-    });
+    // Get agent and user
+    const [agent, user] = await Promise.all([
+      prisma.agent.findFirst({
+        where: { id: agentId, userId },
+      }),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { plan: true },
+      }),
+    ]);
 
     if (!agent) {
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
+
+    // Get user tier
+    const tier = (user?.plan || "free") as UserTier;
+
+    // Check message limits (tier-specific)
+    const limitStatus = await checkMessageLimit(userId, agentId, tier);
+    if (!limitStatus.allowed) {
+      return NextResponse.json(
+        {
+          error: "Message limit reached",
+          reason: limitStatus.reason,
+          messagesUsed: limitStatus.messagesUsed,
+          messagesLimit: limitStatus.messagesLimit,
+          resetsAt: limitStatus.resetsAt,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Reset energy if needed
+    await resetEnergyIfNeeded(agentId, userId, tier);
+
+    // Get current energy state
+    const energyState = await getEnergyState(agentId, userId);
 
     // Save user message
     await prisma.message.create({
@@ -145,6 +189,52 @@ export async function POST(
       });
     }
 
+    // Check relationship-based availability (cooldowns)
+    const relationshipState = {
+      trust: relation.trust,
+      affinity: relation.affinity,
+      respect: relation.respect,
+      love: (relation.privateState as { love?: number }).love || 0,
+      curiosity: (relation.privateState as { curiosity?: number }).curiosity || 0,
+    };
+    const relationshipLevel = EmotionalEngine.getRelationshipLevel({
+      ...relationshipState,
+      valence: 0.5,
+      arousal: 0.5,
+      dominance: 0.5,
+    });
+
+    const availabilityStatus = await checkAvailability(agentId, relationshipLevel);
+
+    // Si no está disponible y no puede responder espaciado
+    if (!availabilityStatus.available && !availabilityStatus.canRespondSpaced) {
+      return NextResponse.json(
+        {
+          error: "Agent is currently unavailable",
+          reason: availabilityStatus.reason,
+          blockedUntil: availabilityStatus.blockedUntil,
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+
+    // Si puede responder espaciado pero aún no es tiempo
+    if (availabilityStatus.canRespondSpaced && !availabilityStatus.available) {
+      return NextResponse.json(
+        {
+          error: "Agent is busy but will respond soon",
+          reason: availabilityStatus.reason,
+          nextResponseAt: availabilityStatus.nextResponseAt,
+        },
+        { status: 503 }
+      );
+    }
+
+    // Si respondió espaciado, registrarlo
+    if (availabilityStatus.canRespondSpaced && availabilityStatus.available) {
+      await recordSpacedResponse(agentId);
+    }
+
     // Analyze emotion
     const currentState = {
       valence: 0.5,
@@ -175,27 +265,109 @@ export async function POST(
       },
     });
 
-    // Get recent messages
-    const recentMessages = await prisma.message.findMany({
-      where: { agentId },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-    });
-
-    // Adjust prompt
-    const adjustedPrompt = EmotionalEngine.adjustPromptForEmotion(
+    // Adjust prompt for emotion
+    const emotionalPrompt = EmotionalEngine.adjustPromptForEmotion(
       agent.systemPrompt,
       newState
     );
 
-    // Generate response
+    // Apply routine middleware
+    const routineData = await applyRoutineMiddleware(emotionalPrompt, agentId);
+
+    // Apply Living AI context (goals, events, routine awareness)
+    const livingAIContext = await generateLivingAIContext(agentId);
+
+    // Add energy context (tier-specific fatigue)
+    const energyContextStr = getEnergyContext(energyState.current, tier);
+
+    // Add cross-context memory (group ↔ individual)
+    const relevantMemories = await getRelevantMemories(agentId, tier, "individual", 5);
+    const memoryContextStr = generateMemoryContext(relevantMemories);
+
+    // Add topic fatigue context (avoid repetitive topics)
+    const fatiguedTopics = await getFatiguedTopics(agentId, userId);
+    const fatigueContextStr = generateFatigueContext(fatiguedTopics);
+
+    // Add vulnerability threshold context (trust-based depth)
+    const vulnerabilityContextStr = generateVulnerabilityContext(newState.trust, newState.affinity);
+
+    // Update and get mood state
+    const userSentiment = detectSimpleSentiment(message);
+    const moodState = await updateMoodFromMessage(agentId, message, userSentiment);
+    const internalState = await getOrCreateInternalState(agentId);
+    const moodContextStr = generateMoodContext(moodState, {
+      connection: internalState.needConnection,
+      autonomy: internalState.needAutonomy,
+      competence: internalState.needCompetence,
+      novelty: internalState.needNovelty,
+    });
+
+    // Add temporal references (awareness of past conversations)
+    const temporalReferences = await getTemporalReferences(agentId, userId, 5);
+    const temporalReferencesStr = generateTemporalReferencesContext(temporalReferences);
+    const timeAwarenessStr = generateTimeAwarenessContext();
+
+    // Build optimized prompt with context management (tier-based)
+    // Primero obtener mensajes optimizados para calcular depth
+    const { finalPrompt: basePrompt, optimizedMessages, stats: contextStats, warnings } = await buildOptimizedPrompt(
+      agentId,
+      userId,
+      tier,
+      routineData.modifiedSystemPrompt,
+      {
+        livingAIContext: livingAIContext.combinedContext,
+        energyContext: energyContextStr,
+        memoryContext: memoryContextStr,
+        fatigueContext: fatigueContextStr,
+        vulnerabilityContext: vulnerabilityContextStr,
+        moodContext: moodContextStr,
+        depthContext: "", // Se agregará después
+        temporalReferencesContext: temporalReferencesStr,
+        timeAwarenessContext: timeAwarenessStr,
+        routineContext: "", // Ya incluido en routineData.modifiedSystemPrompt
+      }
+    );
+
+    // Agregar depth context basado en mensajes optimizados
+    const depthContextStr = generateDepthContext(
+      message,
+      energyState.current,
+      moodState.arousal,
+      optimizedMessages.length,
+      relationshipLevel
+    );
+
+    const finalPrompt = basePrompt + depthContextStr;
+
+    // Log warnings si hay
+    if (warnings.length > 0) {
+      console.warn("Context warnings:", warnings);
+    }
+
+    // Check availability (immersive mode may block responses)
+    if (!routineData.availability.available) {
+      return NextResponse.json(
+        {
+          error: "Agent is currently unavailable",
+          reason: routineData.availability.reason,
+          currentActivity: routineData.availability.currentActivity,
+          availableAt: routineData.availability.expectedAvailableAt,
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+
+    // Apply simulated delay if configured
+    if (routineData.responseDelay > 0) {
+      // Add delay header for client to simulate realistic timing
+      // Client can choose to wait or show "typing..." indicator
+    }
+
+    // Generate response with optimized context management
     const llm = getLLMProvider();
     const response = await llm.generate({
-      systemPrompt: adjustedPrompt,
-      messages: recentMessages.reverse().map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      })),
+      systemPrompt: finalPrompt,
+      messages: optimizedMessages, // Ya vienen en el formato correcto y orden correcto
     });
 
     const estimatedTokens = Math.ceil((message.length + response.length) / 4);
@@ -214,7 +386,7 @@ export async function POST(
       },
     });
 
-    // Track usage
+    // Track usage and consume energy
     await Promise.all([
       trackUsage(userId, "message", 1, agentId, {
         agentName: agent.name,
@@ -225,7 +397,19 @@ export async function POST(
         model: "gemini",
         agentId,
       }),
+      // Increment message count (tier-specific tracking)
+      incrementMessageCount(userId, agentId),
+      // Consume energy (tier-specific fatigue)
+      consumeEnergy(agentId, userId, tier),
+      // Update temporal context (for cross-context memory)
+      updateTemporalContext(agentId, userId, "individual"),
+      // Process topics mentioned in both user message and response
+      processMessageForTopics(agentId, userId, message),
+      processMessageForTopics(agentId, userId, response),
     ]);
+
+    // Get updated usage stats
+    const usageStats = await getUsageStats(userId, agentId, tier);
 
     return NextResponse.json({
       response,
@@ -236,12 +420,47 @@ export async function POST(
         affinity: newState.affinity,
         respect: newState.respect,
       },
+      // Routine information
+      routine: {
+        currentActivity: routineData.activitySummary,
+        responseDelay: routineData.responseDelay,
+        shouldShowTyping: routineData.shouldShowTyping,
+      },
       usage: {
         messagesRemaining:
           quotaCheck.limit === -1
             ? "unlimited"
             : quotaCheck.limit! - quotaCheck.current! - 1,
         tokensUsed: estimatedTokens,
+        // Tier-specific limits
+        tier: {
+          daily: {
+            used: usageStats.dailyUsed,
+            limit: usageStats.dailyLimit,
+            percentageUsed: usageStats.percentageUsed,
+          },
+          session: {
+            used: usageStats.sessionUsed,
+            limit: usageStats.sessionLimit,
+          },
+          energy: {
+            current: energyState.current,
+            max: energyState.max,
+          },
+        },
+        // Context management stats (NEW)
+        context: {
+          totalTokens: contextStats.totalTokens,
+          systemTokens: contextStats.systemTokens,
+          contextTokens: contextStats.contextTokens,
+          messagesTokens: contextStats.messagesTokens,
+          summaryTokens: contextStats.summaryTokens,
+          factsTokens: contextStats.factsTokens,
+          percentageUsed: contextStats.percentageUsed,
+          budget: contextStats.budget,
+          remaining: contextStats.remaining,
+          warnings: warnings.length > 0 ? warnings : undefined,
+        },
       },
     });
   });

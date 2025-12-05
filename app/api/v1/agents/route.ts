@@ -168,7 +168,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate profile with LLM
+    // Get user's plan/tier
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true }
+    });
+
+    // Map user plan to generation tier
+    const tier = (user?.plan || 'free') as 'free' | 'plus' | 'ultra';
+
+    // Generate profile with LLM using user's tier
     const llm = getLLMProvider();
     const { profile, systemPrompt } = await llm.generateProfile({
       name,
@@ -176,13 +185,28 @@ export async function POST(req: NextRequest) {
       personality,
       purpose,
       tone,
-    });
+    }, tier);
 
-    // Create agent
+    // Extract location from profile (for real-time weather system)
+    let locationCity = null;
+    let locationCountry = null;
+
+    if (profile.currentLocation) {
+      // LLM generates currentLocation in the profile
+      locationCity = profile.currentLocation.city;
+      locationCountry = profile.currentLocation.country;
+    } else if (profile.background?.birthplace) {
+      // Fallback to birthplace if no current location
+      locationCity = profile.background.birthplace.city;
+      locationCountry = profile.background.birthplace.country;
+    }
+
+    // Create agent with tier information
     const agent = await prisma.agent.create({
       data: {
         userId,
         kind,
+        generationTier: tier, // Store which tier was used to generate this agent
         name,
         description: personality || purpose,
         personality,
@@ -191,8 +215,102 @@ export async function POST(req: NextRequest) {
         profile: profile as Record<string, string | number | boolean | null>,
         systemPrompt,
         visibility: "private",
+        locationCity, // For real-time weather system
+        locationCountry, // For real-time weather system
       },
     });
+
+    // For ULTRA tier: Create the exclusive psychological profiles
+    if (tier === 'ultra' && profile.psychologicalProfile) {
+      await prisma.psychologicalProfile.create({
+        data: {
+          agentId: agent.id,
+          attachmentStyle: profile.psychologicalProfile.attachmentStyle || 'secure',
+          attachmentDescription: profile.psychologicalProfile.attachmentDescription,
+          primaryCopingMechanisms: profile.psychologicalProfile.primaryCopingMechanisms || [],
+          unhealthyCopingMechanisms: profile.psychologicalProfile.unhealthyCopingMechanisms || [],
+          copingTriggers: profile.psychologicalProfile.copingTriggers || [],
+          emotionalRegulationBaseline: profile.psychologicalProfile.emotionalRegulationBaseline || 'estable',
+          emotionalExplosiveness: profile.psychologicalProfile.emotionalExplosiveness || 30,
+          emotionalRecoverySpeed: profile.psychologicalProfile.emotionalRecoverySpeed || 'moderado',
+          mentalHealthConditions: profile.psychologicalProfile.mentalHealthConditions || [],
+          therapyStatus: profile.psychologicalProfile.therapyStatus,
+          medicationUse: profile.psychologicalProfile.medicationUse || false,
+          mentalHealthStigma: profile.psychologicalProfile.mentalHealthStigma,
+          defenseMethanisms: profile.psychologicalProfile.defenseMethanisms || {},
+          traumaHistory: profile.psychologicalProfile.traumaHistory,
+          resilienceFactors: profile.psychologicalProfile.resilienceFactors || [],
+          selfAwarenessLevel: profile.psychologicalProfile.selfAwarenessLevel || 50,
+          blindSpots: profile.psychologicalProfile.blindSpots || [],
+          insightAreas: profile.psychologicalProfile.insightAreas || [],
+        },
+      });
+    }
+
+    if (tier === 'ultra' && profile.deepRelationalPatterns) {
+      await prisma.deepRelationalPatterns.create({
+        data: {
+          agentId: agent.id,
+          givingLoveLanguages: profile.deepRelationalPatterns.givingLoveLanguages || [],
+          receivingLoveLanguages: profile.deepRelationalPatterns.receivingLoveLanguages || [],
+          loveLanguageIntensities: profile.deepRelationalPatterns.loveLanguageIntensities || {},
+          repeatingPatterns: profile.deepRelationalPatterns.repeatingPatterns || [],
+          whyRepeats: profile.deepRelationalPatterns.whyRepeats,
+          awarenessOfPatterns: profile.deepRelationalPatterns.awarenessOfPatterns || 'inconsciente',
+          personalBoundaryStyle: profile.deepRelationalPatterns.personalBoundaryStyle || 'saludable',
+          professionalBoundaryStyle: profile.deepRelationalPatterns.professionalBoundaryStyle || 'saludable',
+          boundaryEnforcement: profile.deepRelationalPatterns.boundaryEnforcement || 50,
+          boundaryGuilty: profile.deepRelationalPatterns.boundaryGuilty || false,
+          conflictStyle: profile.deepRelationalPatterns.conflictStyle || 'colaborativo',
+          conflictTriggers: profile.deepRelationalPatterns.conflictTriggers || [],
+          healthyConflictSkills: profile.deepRelationalPatterns.healthyConflictSkills || [],
+          unhealthyConflictPatterns: profile.deepRelationalPatterns.unhealthyConflictPatterns || [],
+          trustBaseline: profile.deepRelationalPatterns.trustBaseline || 50,
+          vulnerabilityComfort: profile.deepRelationalPatterns.vulnerabilityComfort || 50,
+          trustRepairAbility: profile.deepRelationalPatterns.trustRepairAbility || 50,
+          intimacyComfort: profile.deepRelationalPatterns.intimacyComfort || {},
+          intimacyFears: profile.deepRelationalPatterns.intimacyFears || [],
+          intimacyNeeds: profile.deepRelationalPatterns.intimacyNeeds || [],
+          socialMaskLevel: profile.deepRelationalPatterns.socialMaskLevel || 30,
+          authenticityByContext: profile.deepRelationalPatterns.authenticityByContext || {},
+          socialEnergy: profile.deepRelationalPatterns.socialEnergy || 'neutral',
+        },
+      });
+    }
+
+    if (tier === 'ultra' && profile.philosophicalFramework) {
+      await prisma.philosophicalFramework.create({
+        data: {
+          agentId: agent.id,
+          optimismLevel: profile.philosophicalFramework.optimismLevel || 50,
+          worldviewType: profile.philosophicalFramework.worldviewType,
+          meaningSource: profile.philosophicalFramework.meaningSource,
+          existentialStance: profile.philosophicalFramework.existentialStance,
+          politicalLeanings: profile.philosophicalFramework.politicalLeanings,
+          politicalEngagement: profile.philosophicalFramework.politicalEngagement || 30,
+          activismLevel: profile.philosophicalFramework.activismLevel || 20,
+          socialJusticeStance: profile.philosophicalFramework.socialJusticeStance,
+          ethicalFramework: profile.philosophicalFramework.ethicalFramework,
+          moralComplexity: profile.philosophicalFramework.moralComplexity || 50,
+          moralRigidity: profile.philosophicalFramework.moralRigidity || 50,
+          moralDilemmas: profile.philosophicalFramework.moralDilemmas,
+          religiousBackground: profile.philosophicalFramework.religiousBackground,
+          currentBeliefs: profile.philosophicalFramework.currentBeliefs,
+          spiritualPractices: profile.philosophicalFramework.spiritualPractices || [],
+          faithImportance: profile.philosophicalFramework.faithImportance || 30,
+          lifePhilosophy: profile.philosophicalFramework.lifePhilosophy,
+          coreBeliefs: profile.philosophicalFramework.coreBeliefs || [],
+          dealbreakers: profile.philosophicalFramework.dealbreakers || [],
+          personalMotto: profile.philosophicalFramework.personalMotto,
+          epistomologyStance: profile.philosophicalFramework.epistomologyStance,
+          scienceTrustLevel: profile.philosophicalFramework.scienceTrustLevel || 70,
+          intuitionVsLogic: profile.philosophicalFramework.intuitionVsLogic || 50,
+          growthMindset: profile.philosophicalFramework.growthMindset || 60,
+          opennessToChange: profile.philosophicalFramework.opennessToChange || 50,
+          philosophicalEvolution: profile.philosophicalFramework.philosophicalEvolution,
+        },
+      });
+    }
 
     // Create initial relation
     await prisma.relation.create({

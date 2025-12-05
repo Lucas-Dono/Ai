@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 
 /**
@@ -10,8 +10,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -21,7 +21,7 @@ export async function GET(
 
     const result = await MessagingService.getMessages(
       (await params).id,
-      session.user.id,
+      user.id,
       page,
       limit
     );
@@ -41,8 +41,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -50,7 +50,7 @@ export async function PATCH(
 
     const updated = await MessagingService.updateConversation(
       (await params).id,
-      session.user.id,
+      user.id,
       data
     );
 
@@ -69,12 +69,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const result = await MessagingService.deleteConversation((await params).id, session.user.id);
+    const result = await MessagingService.deleteConversation((await params).id, user.id);
 
     return NextResponse.json(result);
   } catch (error: any) {

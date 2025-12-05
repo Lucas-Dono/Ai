@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/logger';
 import { z } from 'zod';
@@ -23,13 +23,13 @@ export async function POST(
 ) {
   try {
     const { id: worldId } = await params;
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
 
     const validation = addAgentSchema.safeParse(body);
@@ -146,13 +146,13 @@ export async function DELETE(
 ) {
   try {
     const { id: worldId } = await params;
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const agentId = req.nextUrl.searchParams.get('agentId');
 
     if (!agentId) {

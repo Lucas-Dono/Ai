@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
-import { auth } from "@/lib/auth";
-import { getAuthenticatedUser } from "@/lib/auth-helper";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { createAgentBodySchema, formatValidationError } from "@/lib/validation/api-schemas";
 import { saveDataUrlAsFile, isDataUrl } from "@/lib/utils/image-helpers";
@@ -14,14 +13,14 @@ export async function POST(req: NextRequest) {
   try {
     console.log('[API] Iniciando creación de agente...');
 
-    // Get authenticated user
-    const session = await auth();
-    if (!session?.user?.id) {
+    // Get authenticated user (supports web and mobile)
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       console.log('[API] No hay sesión de usuario');
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     console.log('[API] Usuario autenticado:', userId);
 
     // Check agent creation quota

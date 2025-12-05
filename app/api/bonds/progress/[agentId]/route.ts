@@ -45,12 +45,10 @@ export async function GET(
     const { agentId } = await params;
 
     // Check if bond exists
-    const bond = await prisma.symbolicBond.findUnique({
+    const bond = await prisma.symbolicBond.findFirst({
       where: {
-        userId_agentId: {
-          userId: session.user.id,
-          agentId,
-        },
+        userId: session.user.id,
+        agentId,
       },
       include: {
         agent: {
@@ -60,6 +58,9 @@ export async function GET(
             avatar: true,
           },
         },
+      },
+      orderBy: {
+        affinityLevel: 'desc', // Get the highest affinity bond if multiple exist
       },
     });
 

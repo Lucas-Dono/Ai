@@ -519,7 +519,7 @@ export async function POST(
       // Check if this is the user's first message ever
       const messageCount = await prisma.message.count({
         where: {
-          senderId: userId,
+          userId: userId,
           role: "user",
         },
       });

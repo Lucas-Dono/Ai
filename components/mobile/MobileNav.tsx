@@ -53,10 +53,10 @@ const navItemsConfig: NavItem[] = [
     matchPaths: ["/community"],
   },
   {
-    href: "/constructor",
+    href: "/create-character",
     labelKey: "create",
     icon: PlusCircle,
-    matchPaths: ["/constructor"],
+    matchPaths: ["/create-character"],
   },
   {
     href: "/notifications",

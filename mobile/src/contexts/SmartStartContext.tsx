@@ -10,10 +10,19 @@ import type {
   CharacterDraft,
   SearchResult,
   GenreId,
-  PersonalityCoreData,
-  CharacterAppearanceData,
+  DepthLevelId,
+  UserTier,
+  // ContextCategoryId, // Temporalmente comentado hasta que se compile smart-start-core
+  // PersonalityCoreData, // Temporalmente comentado
+  // CharacterAppearanceData, // Temporalmente comentado
 } from '@circuitpromptai/smart-start-core';
 import { getAsyncStorageCache } from '../storage/AsyncStorageCache';
+import { getDefaultDepthForTier } from '@circuitpromptai/smart-start-core';
+
+// TEMPORAL: Tipos locales hasta que se compile smart-start-core
+type ContextCategoryId = 'historical' | 'cultural-icon' | 'fictional' | 'real-person' | 'original';
+type PersonalityCoreData = any;
+type CharacterAppearanceData = any;
 
 // ============================================================================
 // TYPES
@@ -24,7 +33,7 @@ interface SmartStartState {
   draft: CharacterDraft;
 
   // Wizard progress
-  currentStep: 'type' | 'genre' | 'search' | 'customize' | 'review';
+  currentStep: 'type' | 'context' | 'genre' | 'search' | 'depth' | 'generation' | 'review';
   completedSteps: string[];
 
   // Auto-save status
@@ -33,6 +42,10 @@ interface SmartStartState {
 
   // Generation status
   isGenerating: boolean;
+  generatedProfile: any | null; // SmartStartGeneratedProfile
+
+  // User tier for depth customization
+  userTier: UserTier;
 }
 
 interface SmartStartContextValue extends SmartStartState {
@@ -48,11 +61,16 @@ interface SmartStartContextValue extends SmartStartState {
 
   // Generation
   setGenerating: (isGenerating: boolean) => void;
+  setGeneratedProfile: (profile: any) => void;
 
   // Character data
   setSearchResult: (result: SearchResult) => void;
   setPersonality: (personality: PersonalityCoreData) => void;
   setAppearance: (appearance: CharacterAppearanceData) => void;
+  setDepthLevel: (depthLevel: DepthLevelId) => void;
+
+  // User tier
+  setUserTier: (tier: UserTier) => void;
 }
 
 // ============================================================================
@@ -76,6 +94,8 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
     isSaving: false,
     lastSaved: null,
     isGenerating: false,
+    generatedProfile: null,
+    userTier: 'free', // Default to free tier (should be fetched from user profile)
   });
 
   // Auto-save draft to AsyncStorage
@@ -158,6 +178,7 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
       isSaving: false,
       lastSaved: null,
       isGenerating: false,
+      generatedProfile: null,
     });
 
     // Clear saved draft
@@ -209,14 +230,42 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   /**
+   * Set generated profile from AI
+   */
+  const setGeneratedProfile = useCallback((profile: any) => {
+    setState(prev => ({ ...prev, generatedProfile: profile }));
+  }, []);
+
+  /**
    * Set search result
+   * Automatically sets context and archetype if detected by backend
    */
   const setSearchResult = useCallback((result: SearchResult) => {
-    updateDraft({
+    const updates: any = {
       name: result.name,
-      searchResult: result as any, // TODO: fix type
+      searchResult: result,
       physicalAppearance: result.description,
-    });
+    };
+
+    // Auto-set context if detected by backend
+    if ((result as any).suggestedContext) {
+      updates.context = (result as any).suggestedContext;
+      updates.contextSubcategory = (result as any).contextSubcategory;
+      updates.contextOccupation = (result as any).contextOccupation;
+      updates.contextEra = (result as any).contextEra;
+      console.log('[SmartStart] Auto-detected context:', (result as any).suggestedContext,
+        'subcategory:', (result as any).contextSubcategory,
+        'confidence:', (result as any).contextConfidence);
+    }
+
+    // Auto-set archetype (genre) if detected by backend
+    if ((result as any).suggestedArchetype || (result as any).suggestedGenre) {
+      updates.genre = (result as any).suggestedArchetype || (result as any).suggestedGenre;
+      console.log('[SmartStart] Auto-detected archetype:', updates.genre,
+        'confidence:', (result as any).archetypeConfidence || (result as any).genreConfidence);
+    }
+
+    updateDraft(updates);
   }, [updateDraft]);
 
   /**
@@ -224,7 +273,7 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
    */
   const setPersonality = useCallback((personality: PersonalityCoreData) => {
     updateDraft({
-      personalityCore: personality as any, // TODO: fix type after extracting types
+      personality: personality as any, // Usando 'personality' que es el campo correcto en CharacterDraft
     });
   }, [updateDraft]);
 
@@ -233,9 +282,24 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
    */
   const setAppearance = useCallback((appearance: CharacterAppearanceData) => {
     updateDraft({
-      characterAppearance: appearance as any, // TODO: fix type
-    });
+      physicalAppearance: JSON.stringify(appearance), // CharacterDraft uses physicalAppearance as string
+    } as any);
   }, [updateDraft]);
+
+  /**
+   * Set depth level for character generation
+   */
+  const setDepthLevel = useCallback((depthLevel: DepthLevelId) => {
+    updateDraft({ depthLevel });
+  }, [updateDraft]);
+
+  /**
+   * Set user tier (free, plus, ultra)
+   * This should typically be called when user profile is loaded
+   */
+  const setUserTier = useCallback((tier: UserTier) => {
+    setState(prev => ({ ...prev, userTier: tier }));
+  }, []);
 
   const value: SmartStartContextValue = {
     ...state,
@@ -246,9 +310,12 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
     markStepComplete,
     isStepComplete,
     setGenerating,
+    setGeneratedProfile,
     setSearchResult,
     setPersonality,
     setAppearance,
+    setDepthLevel,
+    setUserTier,
   };
 
   return (

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { markBondNotificationAsRead } from "@/lib/services/bond-notifications.service";
 import { prisma } from "@/lib/prisma";
 
@@ -14,7 +13,7 @@ type Params = {
  */
 export async function POST(request: NextRequest, { params }: Params) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -34,7 +33,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       );
     }
 
-    if (notification.userId !== session.user.id) {
+    if (notification.userId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { MessagingService } from '@/lib/services/messaging.service';
 import { prisma } from '@/lib/prisma';
 
@@ -12,8 +12,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -32,7 +32,7 @@ export async function POST(
 
       if (conversation) {
         const participants = conversation.participants as string[];
-        targetRecipientId = participants.find(p => p !== session.user.id) || participants[0];
+        targetRecipientId = participants.find(p => p !== user.id) || participants[0];
       }
     }
 
@@ -42,7 +42,7 @@ export async function POST(
 
     const message = await MessagingService.sendMessage({
       conversationId: (await params).id,
-      senderId: session.user.id,
+      senderId: user.id,
       recipientId: targetRecipientId,
       content: content.trim(),
       contentType,

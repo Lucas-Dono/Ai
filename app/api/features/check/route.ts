@@ -4,14 +4,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { canUseFeature } from "@/lib/feature-flags";
 import { Feature } from "@/lib/feature-flags/types";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-    const userId = session?.user?.id;
+    const user = await getAuthenticatedUser(req);
+    const userId = user?.id;
 
     if (!userId) {
       return NextResponse.json(

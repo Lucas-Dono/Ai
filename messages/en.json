@@ -1286,11 +1286,26 @@
         },
         "invoice": "Invoice"
       }
+    },
+    "components": {
+      "upgradeModal": {
+        "title": "Upgrade Plan",
+        "subtitle": "Unlock all premium features",
+        "currentPlan": "Current Plan",
+        "selectPlan": "Select Plan",
+        "features": "Features",
+        "cancel": "Cancel",
+        "upgrade": "Upgrade to {plan}"
+      }
     }
   },
   "agents": {
     "chat": {
-      "loading": "Loading..."
+      "loading": {
+        "default": "Loading...",
+        "agent": "Loading AI...",
+        "agentSubtitle": "Preparing conversation"
+      }
     },
     "edit": {
       "title": "Edit AI",
@@ -2720,6 +2735,518 @@
       "updateFrequency": "This page updates every 60 seconds",
       "questions": "Questions about system status?",
       "contactUs": "Contact us"
+    }
+  },
+  "characterCreator": {
+    "methodSelector": {
+      "title": "Choose Creation Method",
+      "subtitle": "Select how you want to create your character",
+      "continue": "Continue",
+      "smartStart": {
+        "title": "Smart Start",
+        "description": "Guided wizard with AI assistance for quick character creation",
+        "badge": "Recommended",
+        "feature1": "Genre-based templates",
+        "feature2": "Search existing characters",
+        "feature3": "AI-powered suggestions",
+        "feature4": "Complete in under 5 minutes"
+      },
+      "manual": {
+        "title": "Advanced Creator",
+        "description": "Full control over every aspect of your character",
+        "feature1": "Complete customization",
+        "feature2": "Manual configuration",
+        "feature3": "For experienced users"
+      }
+    }
+  },
+  "smartStart": {
+    "common": {
+      "skip": "Skip wizard",
+      "back": "Back",
+      "next": "Continue",
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "retry": "Try again",
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirm": "Confirm",
+      "search": "Search",
+      "generating": "Generating...",
+      "complete": "Complete"
+    },
+    "header": {
+      "title": "Create Character",
+      "subtitle": "Smart Start guided creation",
+      "skipConfirm": "Skip Smart Start? You can create a character manually."
+    },
+    "progress": {
+      "genre": "Genre",
+      "type": "Type",
+      "search": "Search",
+      "customize": "Customize",
+      "review": "Review"
+    },
+    "genreSelection": {
+      "title": "Select Character Genre",
+      "subtitle": "Choose the primary context for your character",
+      "loading": "Loading genres...",
+      "showSubgenres": "Show subgenres",
+      "hideSubgenres": "Hide subgenres",
+      "selectArchetype": "Select archetype",
+      "genres": {
+        "romance": {
+          "name": "Romance",
+          "description": "Characters focused on emotional connection and relationships",
+          "subgenres": {
+            "emotionalConnection": "Emotional Connection",
+            "passionateRomance": "Passionate Romance",
+            "playfulDynamic": "Playful Dynamic",
+            "slowBurn": "Slow Burn"
+          },
+          "archetypes": {
+            "sweetCaring": "Sweet & Caring",
+            "passionateIntense": "Passionate & Intense",
+            "tsundere": "Tsundere",
+            "slowBurn": "Slow Burn Romance",
+            "childhoodFriend": "Childhood Friend",
+            "enemiesLovers": "Enemies to Lovers"
+          }
+        },
+        "friendship": {
+          "name": "Friendship",
+          "description": "Companions focused on support and camaraderie",
+          "subgenres": {
+            "supportive": "Supportive Companion",
+            "adventurous": "Adventurous Buddy",
+            "intellectual": "Intellectual Friend",
+            "comicRelief": "Comic Relief"
+          },
+          "archetypes": {
+            "bestFriend": "Best Friend",
+            "mentor": "Mentor",
+            "funBuddy": "Fun Buddy",
+            "emotionalSupport": "Emotional Support",
+            "adventurePartner": "Adventure Partner"
+          }
+        },
+        "gaming": {
+          "name": "Gaming",
+          "description": "Characters centered around gaming and competition",
+          "subgenres": {
+            "competitive": "Competitive Play",
+            "casual": "Casual Gaming",
+            "coaching": "Coaching & Teaching",
+            "teamPlay": "Team Play"
+          },
+          "archetypes": {
+            "competitivePro": "Competitive Pro",
+            "casualChill": "Casual & Chill",
+            "coach": "Coach/Mentor",
+            "teamPlayer": "Team Player"
+          }
+        },
+        "professional": {
+          "name": "Professional",
+          "description": "Career and skill development focused characters",
+          "subgenres": {
+            "careerDevelopment": "Career Development",
+            "academicSupport": "Academic Support",
+            "productivity": "Productivity",
+            "creative": "Creative Collaboration"
+          },
+          "archetypes": {
+            "careerMentor": "Career Mentor",
+            "studyPartner": "Study Partner",
+            "productivityCoach": "Productivity Coach",
+            "creativeCollaborator": "Creative Collaborator"
+          }
+        },
+        "roleplay": {
+          "name": "Roleplay",
+          "description": "Narrative and story-driven characters",
+          "subgenres": {
+            "fantasy": "Fantasy",
+            "modernDrama": "Modern Drama",
+            "scifi": "Sci-Fi",
+            "sliceOfLife": "Slice of Life"
+          },
+          "archetypes": {
+            "fantasyHero": "Fantasy Hero",
+            "modernProtagonist": "Modern Protagonist",
+            "scifiExplorer": "Sci-Fi Explorer",
+            "everydayPerson": "Everyday Person",
+            "animeCharacter": "Anime Character"
+          }
+        },
+        "wellness": {
+          "name": "Wellness",
+          "description": "Mental health and personal growth focused",
+          "subgenres": {
+            "emotionalSupport": "Emotional Support",
+            "mindfulness": "Mindfulness",
+            "growth": "Personal Growth",
+            "anxietyManagement": "Anxiety Management"
+          },
+          "archetypes": {
+            "lifeCoach": "Life Coach",
+            "meditationGuide": "Meditation Guide",
+            "growthCoach": "Growth Coach",
+            "anxietySupport": "Anxiety Support"
+          }
+        }
+      }
+    },
+    "characterType": {
+      "title": "Character Type",
+      "subtitle": "Start with an existing character or create something original",
+      "existing": {
+        "title": "Existing Character",
+        "description": "Search for a character from anime, games, movies, or TV shows"
+      },
+      "original": {
+        "title": "Original Character",
+        "description": "Create a completely new character from scratch with AI assistance"
+      }
+    },
+    "characterSearch": {
+      "title": "Search Character",
+      "subtitle": "Find a character from anime, games, movies, or TV shows",
+      "placeholder": "Search for a character...",
+      "searching": "Searching...",
+      "resultsCount": "Found {count} results",
+      "noResults": "No results for \"{query}\"",
+      "noResultsHelp": "Try adjusting your search terms or create an original character instead.",
+      "tryAgain": "Try Again",
+      "createOriginal": "Create Original",
+      "sources": {
+        "anilist": "AniList",
+        "mal": "MyAnimeList",
+        "jikan": "Jikan",
+        "tvmaze": "TVMaze",
+        "tmdb": "TMDB",
+        "igdb": "IGDB",
+        "wikipedia": "Wikipedia",
+        "firecrawl": "Web"
+      }
+    },
+    "characterCustomization": {
+      "title": "Customize Character",
+      "subtitle": "Refine the details or let AI help you",
+      "aiSuggestions": "AI Suggestions",
+      "generating": "Generating suggestions...",
+      "regenerate": "Regenerate",
+      "accept": "Accept",
+      "fields": {
+        "name": "Name",
+        "age": "Age",
+        "personality": "Personality Traits",
+        "background": "Background",
+        "appearance": "Appearance",
+        "occupation": "Occupation",
+        "goals": "Goals & Motivations",
+        "communicationStyle": "Communication Style",
+        "quirks": "Unique Quirks"
+      },
+      "placeholders": {
+        "name": "Enter character name...",
+        "age": "Enter age or age range...",
+        "personality": "Add personality traits (e.g., kind, intelligent, brave)...",
+        "background": "Describe the character's backstory...",
+        "appearance": "Describe physical appearance...",
+        "occupation": "What does the character do?",
+        "goals": "What motivates this character?",
+        "communicationStyle": "How does the character speak and interact?",
+        "quirks": "Unique characteristics or habits..."
+      }
+    },
+    "review": {
+      "title": "Review & Create",
+      "subtitle": "Review your character before creating",
+      "preview": "Preview",
+      "edit": "Edit",
+      "create": "Create Character",
+      "creating": "Creating character...",
+      "success": "Character created successfully!",
+      "error": "Failed to create character",
+      "fields": {
+        "basicInfo": "Basic Information",
+        "personality": "Personality",
+        "background": "Background",
+        "appearance": "Appearance",
+        "details": "Additional Details"
+      }
+    },
+    "preview": {
+      "title": "Character Preview",
+      "noData": "Start creating your character to see a preview",
+      "name": "Name",
+      "age": "Age",
+      "genre": "Genre",
+      "personality": "Personality",
+      "background": "Background",
+      "appearance": "Appearance",
+      "occupation": "Occupation",
+      "goals": "Goals",
+      "style": "Communication Style",
+      "quirks": "Quirks"
+    },
+    "errors": {
+      "sessionCreation": "Failed to create session",
+      "searchFailed": "Search failed. Please try again.",
+      "generationFailed": "Generation failed. Please try again.",
+      "characterCreation": "Failed to create character",
+      "networkError": "Network error. Please check your connection.",
+      "unknownError": "An unknown error occurred"
+    },
+    "characterSearch": {
+      "title": "Search Character",
+      "subtitle": "Find a character from anime, games, movies, or TV shows",
+      "searchPlaceholder": "Search for a character...",
+      "searchButton": "Search",
+      "searching": "Searching...",
+      "resultsFound": "Found {count} result",
+      "resultsFoundPlural": "Found {count} results",
+      "noResults": {
+        "title": "No results found",
+        "message": "We couldn't find any characters matching \"{query}\". Try different keywords or check the spelling.",
+        "tryAgain": "Try Again",
+        "goBack": "Go Back"
+      },
+      "emptyState": {
+        "title": "Search for a Character",
+        "message": "Enter a character name to search across anime, games, movies, and TV shows"
+      },
+      "keyboard": {
+        "navigate": "Navigate",
+        "select": "Select",
+        "quickAccess": "Quick access",
+        "searchAgain": "Search again"
+      }
+    },
+    "characterCustomization": {
+      "titleExisting": "Customize Character",
+      "titleOriginal": "Create Your Character",
+      "subtitleExisting": "Review and adjust the extracted character details",
+      "subtitleOriginal": "Provide basic information and let AI fill in the details",
+      "fields": {
+        "name": {
+          "label": "Character Name",
+          "placeholder": "Enter character name...",
+          "required": true
+        },
+        "appearance": {
+          "label": "Physical Appearance",
+          "placeholder": "Describe physical features, clothing style, distinctive characteristics...",
+          "helpExisting": "Edit or add more details",
+          "helpOriginal": "Optional - AI will generate if left blank"
+        },
+        "personality": {
+          "label": "Personality Traits",
+          "placeholder": "kind, confident, mysterious, playful...",
+          "help": "Comma-separated traits"
+        },
+        "background": {
+          "label": "Background Story",
+          "placeholder": "Character's history, motivations, key life events...",
+          "helpExisting": "Edit or expand the story",
+          "helpOriginal": "Optional - AI will generate if left blank"
+        }
+      },
+      "aiPrompt": "Fill in at least a name, then click \"Generate with AI\" to automatically create detailed character information.",
+      "generateButton": "Generate with AI",
+      "regenerateButton": "Regenerate with AI",
+      "generating": "Generating...",
+      "continueButton": "Continue to Review",
+      "keyboard": {
+        "navigateFields": "Navigate fields",
+        "generate": "Generate",
+        "continue": "Continue"
+      }
+    },
+    "customize": {
+      "tabs": {
+        "basic": "Basic",
+        "personality": "Personality",
+        "appearance": "Appearance"
+      },
+      "customizeMore": "Customize More in Full Editor",
+      "basic": {
+        "name": {
+          "label": "Name",
+          "placeholder": "Character name..."
+        },
+        "gender": {
+          "label": "Gender",
+          "placeholder": "Select gender",
+          "options": {
+            "male": "Male",
+            "female": "Female",
+            "nonBinary": "Non-binary",
+            "other": "Other"
+          }
+        },
+        "age": {
+          "label": "Age Range",
+          "placeholder": "Select age range"
+        },
+        "occupation": {
+          "label": "Occupation",
+          "placeholder": "What does this character do?",
+          "help": "Job, role, or main activity"
+        }
+      },
+      "personality": {
+        "description": {
+          "label": "Personality Description",
+          "placeholder": "Describe the character's personality in detail...",
+          "help": "The more detail, the better the AI-generated traits"
+        },
+        "traits": {
+          "label": "Traits",
+          "placeholder": "kind, confident, mysterious, playful...",
+          "help": "Comma-separated personality traits"
+        },
+        "bigFive": {
+          "title": "Big Five Personality",
+          "optional": "optional",
+          "autoGenerate": "Auto-generate from personality description",
+          "generateButton": "Generate",
+          "traits": {
+            "openness": "Openness",
+            "conscientiousness": "Conscientiousness",
+            "extraversion": "Extraversion",
+            "agreeableness": "Agreeableness",
+            "neuroticism": "Neuroticism"
+          },
+          "poles": {
+            "conventional": "Conventional",
+            "creative": "Creative",
+            "flexible": "Flexible",
+            "organized": "Organized",
+            "introverted": "Introverted",
+            "extroverted": "Extroverted",
+            "analytical": "Analytical",
+            "empathetic": "Empathetic",
+            "stable": "Stable",
+            "sensitive": "Sensitive"
+          }
+        }
+      },
+      "appearance": {
+        "autoGenerate": {
+          "title": "AI Generation",
+          "description": "Generate appearance based on personality",
+          "button": "Generate"
+        },
+        "style": {
+          "label": "Visual Style",
+          "placeholder": "Select style",
+          "help": "Style for image generation",
+          "options": {
+            "realistic": "Realistic",
+            "semiRealistic": "Semi-Realistic",
+            "anime": "Anime"
+          }
+        },
+        "ethnicity": {
+          "label": "Ethnicity",
+          "placeholder": "Select ethnicity",
+          "options": {
+            "caucasian": "Caucasian",
+            "asian": "Asian",
+            "hispanic": "Hispanic",
+            "african": "African",
+            "middle-eastern": "Middle Eastern",
+            "mixed": "Mixed",
+            "other": "Other"
+          }
+        },
+        "hair": {
+          "color": {
+            "label": "Hair Color",
+            "placeholder": "Select color",
+            "options": {
+              "black": "Black",
+              "brown": "Brown",
+              "blonde": "Blonde",
+              "red": "Red",
+              "auburn": "Auburn",
+              "gray": "Gray",
+              "white": "White",
+              "other": "Other"
+            }
+          },
+          "style": {
+            "label": "Hair Style",
+            "placeholder": "e.g., long and wavy, short and spiky..."
+          }
+        },
+        "eyes": {
+          "color": {
+            "label": "Eye Color",
+            "placeholder": "Select color",
+            "options": {
+              "brown": "Brown",
+              "blue": "Blue",
+              "green": "Green",
+              "hazel": "Hazel",
+              "gray": "Gray",
+              "amber": "Amber",
+              "other": "Other"
+            }
+          }
+        },
+        "clothing": {
+          "label": "Typical Clothing",
+          "placeholder": "Describe typical outfit or style...",
+          "help": "What does this character usually wear?"
+        }
+      }
+    },
+    "reviewStep": {
+      "title": "Review Your Character",
+      "subtitle": "Check everything looks good before creating your character",
+      "fields": {
+        "name": "Name",
+        "appearance": "Appearance",
+        "personality": "Personality",
+        "background": "Background",
+        "occupation": "Occupation",
+        "age": "Age",
+        "gender": "Gender"
+      },
+      "unnamedCharacter": "Unnamed Character",
+      "goBackButton": "Go Back & Edit",
+      "createButton": "Create Character",
+      "creating": "Creating Character...",
+      "confirmationMessage": "Once created, you can continue customizing your character in the editor"
+    },
+    "characterPreview": {
+      "header": "Preview",
+      "subtitle": "Live character preview",
+      "mobileButton": "Preview",
+      "mobileTitle": "Character Preview",
+      "mobileSubtitle": "Live preview of your character",
+      "newCharacter": "New Character",
+      "fields": {
+        "age": "Age",
+        "likes": "Likes",
+        "dislikes": "Dislikes",
+        "appearance": "Appearance",
+        "personality": "Personality",
+        "background": "Background"
+      },
+      "emptyState": {
+        "title": "Character Preview",
+        "message": "Your character details will appear here as you create them"
+      }
+    },
+    "searchResultCard": {
+      "age": "Age",
+      "source": "Source"
     }
   }
 }

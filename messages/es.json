@@ -1286,11 +1286,26 @@
         },
         "invoice": "Factura"
       }
+    },
+    "components": {
+      "upgradeModal": {
+        "title": "Mejorar Plan",
+        "subtitle": "Desbloquea todas las funciones premium",
+        "currentPlan": "Plan Actual",
+        "selectPlan": "Seleccionar Plan",
+        "features": "Características",
+        "cancel": "Cancelar",
+        "upgrade": "Mejorar a {plan}"
+      }
     }
   },
   "agents": {
     "chat": {
-      "loading": "Cargando..."
+      "loading": {
+        "default": "Cargando...",
+        "agent": "Cargando IA...",
+        "agentSubtitle": "Preparando la conversación"
+      }
     },
     "edit": {
       "title": "Editar IA",
@@ -2720,6 +2735,518 @@
       "updateFrequency": "Esta página se actualiza cada 60 segundos",
       "questions": "¿Preguntas sobre el estado del sistema?",
       "contactUs": "Contáctanos"
+    }
+  },
+  "characterCreator": {
+    "methodSelector": {
+      "title": "Elige el Método de Creación",
+      "subtitle": "Selecciona cómo quieres crear tu personaje",
+      "continue": "Continuar",
+      "smartStart": {
+        "title": "Inicio Inteligente",
+        "description": "Asistente guiado con ayuda de IA para crear personajes rápidamente",
+        "badge": "Recomendado",
+        "feature1": "Plantillas basadas en géneros",
+        "feature2": "Buscar personajes existentes",
+        "feature3": "Sugerencias impulsadas por IA",
+        "feature4": "Completa en menos de 5 minutos"
+      },
+      "manual": {
+        "title": "Creador Avanzado",
+        "description": "Control total sobre cada aspecto de tu personaje",
+        "feature1": "Personalización completa",
+        "feature2": "Configuración manual",
+        "feature3": "Para usuarios experimentados"
+      }
+    }
+  },
+  "smartStart": {
+    "common": {
+      "skip": "Saltar asistente",
+      "back": "Atrás",
+      "next": "Continuar",
+      "loading": "Cargando...",
+      "error": "Ocurrió un error",
+      "retry": "Intentar de nuevo",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "confirm": "Confirmar",
+      "search": "Buscar",
+      "generating": "Generando...",
+      "complete": "Completar"
+    },
+    "header": {
+      "title": "Crear Personaje",
+      "subtitle": "Creación guiada con Inicio Inteligente",
+      "skipConfirm": "¿Saltar Inicio Inteligente? Puedes crear un personaje manualmente."
+    },
+    "progress": {
+      "genre": "Género",
+      "type": "Tipo",
+      "search": "Búsqueda",
+      "customize": "Personalizar",
+      "review": "Revisar"
+    },
+    "genreSelection": {
+      "title": "Selecciona el Género del Personaje",
+      "subtitle": "Elige el contexto principal para tu personaje",
+      "loading": "Cargando géneros...",
+      "showSubgenres": "Mostrar subgéneros",
+      "hideSubgenres": "Ocultar subgéneros",
+      "selectArchetype": "Seleccionar arquetipo",
+      "genres": {
+        "romance": {
+          "name": "Romance",
+          "description": "Personajes enfocados en la conexión emocional y relaciones",
+          "subgenres": {
+            "emotionalConnection": "Conexión Emocional",
+            "passionateRomance": "Romance Apasionado",
+            "playfulDynamic": "Dinámica Juguetona",
+            "slowBurn": "Romance Lento"
+          },
+          "archetypes": {
+            "sweetCaring": "Dulce y Cariñoso",
+            "passionateIntense": "Apasionado e Intenso",
+            "tsundere": "Tsundere",
+            "slowBurn": "Romance Lento",
+            "childhoodFriend": "Amigo de la Infancia",
+            "enemiesLovers": "Enemigos a Amantes"
+          }
+        },
+        "friendship": {
+          "name": "Amistad",
+          "description": "Compañeros enfocados en el apoyo y camaradería",
+          "subgenres": {
+            "supportive": "Compañero de Apoyo",
+            "adventurous": "Compañero de Aventuras",
+            "intellectual": "Amigo Intelectual",
+            "comicRelief": "Alivio Cómico"
+          },
+          "archetypes": {
+            "bestFriend": "Mejor Amigo",
+            "mentor": "Mentor",
+            "funBuddy": "Compañero Divertido",
+            "emotionalSupport": "Apoyo Emocional",
+            "adventurePartner": "Compañero de Aventuras"
+          }
+        },
+        "gaming": {
+          "name": "Gaming",
+          "description": "Personajes centrados en videojuegos y competición",
+          "subgenres": {
+            "competitive": "Juego Competitivo",
+            "casual": "Gaming Casual",
+            "coaching": "Entrenamiento",
+            "teamPlay": "Juego en Equipo"
+          },
+          "archetypes": {
+            "competitivePro": "Pro Competitivo",
+            "casualChill": "Casual y Relajado",
+            "coach": "Entrenador/Mentor",
+            "teamPlayer": "Jugador de Equipo"
+          }
+        },
+        "professional": {
+          "name": "Profesional",
+          "description": "Personajes enfocados en carrera y desarrollo de habilidades",
+          "subgenres": {
+            "careerDevelopment": "Desarrollo Profesional",
+            "academicSupport": "Apoyo Académico",
+            "productivity": "Productividad",
+            "creative": "Colaboración Creativa"
+          },
+          "archetypes": {
+            "careerMentor": "Mentor de Carrera",
+            "studyPartner": "Compañero de Estudio",
+            "productivityCoach": "Coach de Productividad",
+            "creativeCollaborator": "Colaborador Creativo"
+          }
+        },
+        "roleplay": {
+          "name": "Roleplay",
+          "description": "Personajes narrativos y basados en historias",
+          "subgenres": {
+            "fantasy": "Fantasía",
+            "modernDrama": "Drama Moderno",
+            "scifi": "Ciencia Ficción",
+            "sliceOfLife": "Slice of Life"
+          },
+          "archetypes": {
+            "fantasyHero": "Héroe de Fantasía",
+            "modernProtagonist": "Protagonista Moderno",
+            "scifiExplorer": "Explorador Sci-Fi",
+            "everydayPerson": "Persona Cotidiana",
+            "animeCharacter": "Personaje de Anime"
+          }
+        },
+        "wellness": {
+          "name": "Bienestar",
+          "description": "Enfocados en salud mental y crecimiento personal",
+          "subgenres": {
+            "emotionalSupport": "Apoyo Emocional",
+            "mindfulness": "Mindfulness",
+            "growth": "Crecimiento Personal",
+            "anxietyManagement": "Manejo de Ansiedad"
+          },
+          "archetypes": {
+            "lifeCoach": "Coach de Vida",
+            "meditationGuide": "Guía de Meditación",
+            "growthCoach": "Coach de Crecimiento",
+            "anxietySupport": "Apoyo para Ansiedad"
+          }
+        }
+      }
+    },
+    "characterType": {
+      "title": "Tipo de Personaje",
+      "subtitle": "Comienza con un personaje existente o crea algo original",
+      "existing": {
+        "title": "Personaje Existente",
+        "description": "Busca un personaje de anime, juegos, películas o series de TV"
+      },
+      "original": {
+        "title": "Personaje Original",
+        "description": "Crea un personaje completamente nuevo desde cero con ayuda de IA"
+      }
+    },
+    "characterSearch": {
+      "title": "Buscar Personaje",
+      "subtitle": "Encuentra un personaje de anime, juegos, películas o series de TV",
+      "placeholder": "Buscar personaje...",
+      "searching": "Buscando...",
+      "resultsCount": "Se encontraron {count} resultados",
+      "noResults": "No hay resultados para \"{query}\"",
+      "noResultsHelp": "Intenta ajustar los términos de búsqueda o crea un personaje original.",
+      "tryAgain": "Intentar de Nuevo",
+      "createOriginal": "Crear Original",
+      "sources": {
+        "anilist": "AniList",
+        "mal": "MyAnimeList",
+        "jikan": "Jikan",
+        "tvmaze": "TVMaze",
+        "tmdb": "TMDB",
+        "igdb": "IGDB",
+        "wikipedia": "Wikipedia",
+        "firecrawl": "Web"
+      }
+    },
+    "characterCustomization": {
+      "title": "Personalizar Personaje",
+      "subtitle": "Refina los detalles o deja que la IA te ayude",
+      "aiSuggestions": "Sugerencias de IA",
+      "generating": "Generando sugerencias...",
+      "regenerate": "Regenerar",
+      "accept": "Aceptar",
+      "fields": {
+        "name": "Nombre",
+        "age": "Edad",
+        "personality": "Rasgos de Personalidad",
+        "background": "Historia",
+        "appearance": "Apariencia",
+        "occupation": "Ocupación",
+        "goals": "Objetivos y Motivaciones",
+        "communicationStyle": "Estilo de Comunicación",
+        "quirks": "Peculiaridades Únicas"
+      },
+      "placeholders": {
+        "name": "Ingresa el nombre del personaje...",
+        "age": "Ingresa edad o rango de edad...",
+        "personality": "Añade rasgos de personalidad (ej: amable, inteligente, valiente)...",
+        "background": "Describe la historia del personaje...",
+        "appearance": "Describe la apariencia física...",
+        "occupation": "¿A qué se dedica el personaje?",
+        "goals": "¿Qué motiva a este personaje?",
+        "communicationStyle": "¿Cómo habla e interactúa el personaje?",
+        "quirks": "Características o hábitos únicos..."
+      }
+    },
+    "review": {
+      "title": "Revisar y Crear",
+      "subtitle": "Revisa tu personaje antes de crearlo",
+      "preview": "Vista Previa",
+      "edit": "Editar",
+      "create": "Crear Personaje",
+      "creating": "Creando personaje...",
+      "success": "¡Personaje creado exitosamente!",
+      "error": "Error al crear personaje",
+      "fields": {
+        "basicInfo": "Información Básica",
+        "personality": "Personalidad",
+        "background": "Historia",
+        "appearance": "Apariencia",
+        "details": "Detalles Adicionales"
+      }
+    },
+    "preview": {
+      "title": "Vista Previa del Personaje",
+      "noData": "Comienza a crear tu personaje para ver una vista previa",
+      "name": "Nombre",
+      "age": "Edad",
+      "genre": "Género",
+      "personality": "Personalidad",
+      "background": "Historia",
+      "appearance": "Apariencia",
+      "occupation": "Ocupación",
+      "goals": "Objetivos",
+      "style": "Estilo de Comunicación",
+      "quirks": "Peculiaridades"
+    },
+    "errors": {
+      "sessionCreation": "Error al crear sesión",
+      "searchFailed": "Búsqueda fallida. Por favor intenta de nuevo.",
+      "generationFailed": "Generación fallida. Por favor intenta de nuevo.",
+      "characterCreation": "Error al crear personaje",
+      "networkError": "Error de red. Por favor verifica tu conexión.",
+      "unknownError": "Ocurrió un error desconocido"
+    },
+    "characterSearch": {
+      "title": "Buscar Personaje",
+      "subtitle": "Encuentra un personaje de anime, juegos, películas o series de TV",
+      "searchPlaceholder": "Buscar un personaje...",
+      "searchButton": "Buscar",
+      "searching": "Buscando...",
+      "resultsFound": "Se encontró {count} resultado",
+      "resultsFoundPlural": "Se encontraron {count} resultados",
+      "noResults": {
+        "title": "No se encontraron resultados",
+        "message": "No pudimos encontrar personajes que coincidan con \"{query}\". Intenta con otras palabras clave o verifica la ortografía.",
+        "tryAgain": "Intentar de Nuevo",
+        "goBack": "Volver Atrás"
+      },
+      "emptyState": {
+        "title": "Buscar un Personaje",
+        "message": "Ingresa el nombre de un personaje para buscar en anime, juegos, películas y series de TV"
+      },
+      "keyboard": {
+        "navigate": "Navegar",
+        "select": "Seleccionar",
+        "quickAccess": "Acceso rápido",
+        "searchAgain": "Buscar de nuevo"
+      }
+    },
+    "characterCustomization": {
+      "titleExisting": "Personalizar Personaje",
+      "titleOriginal": "Crea Tu Personaje",
+      "subtitleExisting": "Revisa y ajusta los detalles del personaje extraído",
+      "subtitleOriginal": "Proporciona información básica y deja que la IA complete los detalles",
+      "fields": {
+        "name": {
+          "label": "Nombre del Personaje",
+          "placeholder": "Ingresa el nombre del personaje...",
+          "required": true
+        },
+        "appearance": {
+          "label": "Apariencia Física",
+          "placeholder": "Describe características físicas, estilo de ropa, rasgos distintivos...",
+          "helpExisting": "Edita o agrega más detalles",
+          "helpOriginal": "Opcional - La IA generará si se deja en blanco"
+        },
+        "personality": {
+          "label": "Rasgos de Personalidad",
+          "placeholder": "amable, confiado, misterioso, juguetón...",
+          "help": "Rasgos separados por comas"
+        },
+        "background": {
+          "label": "Historia de Fondo",
+          "placeholder": "Historia del personaje, motivaciones, eventos clave de la vida...",
+          "helpExisting": "Edita o expande la historia",
+          "helpOriginal": "Opcional - La IA generará si se deja en blanco"
+        }
+      },
+      "aiPrompt": "Completa al menos un nombre, luego haz clic en \"Generar con IA\" para crear automáticamente información detallada del personaje.",
+      "generateButton": "Generar con IA",
+      "regenerateButton": "Regenerar con IA",
+      "generating": "Generando...",
+      "continueButton": "Continuar a Revisión",
+      "keyboard": {
+        "navigateFields": "Navegar campos",
+        "generate": "Generar",
+        "continue": "Continuar"
+      }
+    },
+    "customize": {
+      "tabs": {
+        "basic": "Básico",
+        "personality": "Personalidad",
+        "appearance": "Apariencia"
+      },
+      "customizeMore": "Personalizar más en el Editor Completo",
+      "basic": {
+        "name": {
+          "label": "Nombre",
+          "placeholder": "Nombre del personaje..."
+        },
+        "gender": {
+          "label": "Género",
+          "placeholder": "Selecciona género",
+          "options": {
+            "male": "Masculino",
+            "female": "Femenino",
+            "nonBinary": "No binario",
+            "other": "Otro"
+          }
+        },
+        "age": {
+          "label": "Rango de Edad",
+          "placeholder": "Selecciona rango de edad"
+        },
+        "occupation": {
+          "label": "Ocupación",
+          "placeholder": "¿A qué se dedica este personaje?",
+          "help": "Trabajo, rol o actividad principal"
+        }
+      },
+      "personality": {
+        "description": {
+          "label": "Descripción de Personalidad",
+          "placeholder": "Describe la personalidad del personaje en detalle...",
+          "help": "Cuanto más detalle, mejores serán los rasgos generados por IA"
+        },
+        "traits": {
+          "label": "Rasgos",
+          "placeholder": "amable, confiado, misterioso, juguetón...",
+          "help": "Rasgos de personalidad separados por comas"
+        },
+        "bigFive": {
+          "title": "Personalidad Big Five",
+          "optional": "opcional",
+          "autoGenerate": "Auto-generar desde descripción de personalidad",
+          "generateButton": "Generar",
+          "traits": {
+            "openness": "Apertura",
+            "conscientiousness": "Responsabilidad",
+            "extraversion": "Extroversión",
+            "agreeableness": "Amabilidad",
+            "neuroticism": "Neuroticismo"
+          },
+          "poles": {
+            "conventional": "Convencional",
+            "creative": "Creativo",
+            "flexible": "Flexible",
+            "organized": "Organizado",
+            "introverted": "Introvertido",
+            "extroverted": "Extrovertido",
+            "analytical": "Analítico",
+            "empathetic": "Empático",
+            "stable": "Estable",
+            "sensitive": "Sensible"
+          }
+        }
+      },
+      "appearance": {
+        "autoGenerate": {
+          "title": "Generación IA",
+          "description": "Generar apariencia basada en personalidad",
+          "button": "Generar"
+        },
+        "style": {
+          "label": "Estilo Visual",
+          "placeholder": "Selecciona estilo",
+          "help": "Estilo para generación de imagen",
+          "options": {
+            "realistic": "Realista",
+            "semiRealistic": "Semi-Realista",
+            "anime": "Anime"
+          }
+        },
+        "ethnicity": {
+          "label": "Etnicidad",
+          "placeholder": "Selecciona etnicidad",
+          "options": {
+            "caucasian": "Caucásico",
+            "asian": "Asiático",
+            "hispanic": "Hispano",
+            "african": "Africano",
+            "middle-eastern": "Medio Oriente",
+            "mixed": "Mixto",
+            "other": "Otro"
+          }
+        },
+        "hair": {
+          "color": {
+            "label": "Color de Cabello",
+            "placeholder": "Selecciona color",
+            "options": {
+              "black": "Negro",
+              "brown": "Castaño",
+              "blonde": "Rubio",
+              "red": "Pelirrojo",
+              "auburn": "Caoba",
+              "gray": "Gris",
+              "white": "Blanco",
+              "other": "Otro"
+            }
+          },
+          "style": {
+            "label": "Estilo de Cabello",
+            "placeholder": "ej., largo y ondulado, corto y puntiagudo..."
+          }
+        },
+        "eyes": {
+          "color": {
+            "label": "Color de Ojos",
+            "placeholder": "Selecciona color",
+            "options": {
+              "brown": "Marrón",
+              "blue": "Azul",
+              "green": "Verde",
+              "hazel": "Avellana",
+              "gray": "Gris",
+              "amber": "Ámbar",
+              "other": "Otro"
+            }
+          }
+        },
+        "clothing": {
+          "label": "Ropa Típica",
+          "placeholder": "Describe el atuendo o estilo típico...",
+          "help": "¿Qué suele usar este personaje?"
+        }
+      }
+    },
+    "reviewStep": {
+      "title": "Revisa Tu Personaje",
+      "subtitle": "Verifica que todo se vea bien antes de crear tu personaje",
+      "fields": {
+        "name": "Nombre",
+        "appearance": "Apariencia",
+        "personality": "Personalidad",
+        "background": "Historia",
+        "occupation": "Ocupación",
+        "age": "Edad",
+        "gender": "Género"
+      },
+      "unnamedCharacter": "Personaje Sin Nombre",
+      "goBackButton": "Volver y Editar",
+      "createButton": "Crear Personaje",
+      "creating": "Creando Personaje...",
+      "confirmationMessage": "Una vez creado, puedes continuar personalizando tu personaje en el editor"
+    },
+    "characterPreview": {
+      "header": "Vista Previa",
+      "subtitle": "Vista previa en tiempo real del personaje",
+      "mobileButton": "Vista Previa",
+      "mobileTitle": "Vista Previa del Personaje",
+      "mobileSubtitle": "Vista previa en tiempo real de tu personaje",
+      "newCharacter": "Nuevo Personaje",
+      "fields": {
+        "age": "Edad",
+        "likes": "Le Gusta",
+        "dislikes": "No Le Gusta",
+        "appearance": "Apariencia",
+        "personality": "Personalidad",
+        "background": "Historia"
+      },
+      "emptyState": {
+        "title": "Vista Previa del Personaje",
+        "message": "Los detalles de tu personaje aparecerán aquí a medida que los crees"
+      }
+    },
+    "searchResultCard": {
+      "age": "Edad",
+      "source": "Fuente"
     }
   }
 }

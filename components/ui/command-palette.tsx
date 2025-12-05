@@ -200,7 +200,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         icon: Sparkles,
         category: "creation",
         action: () => {
-          router.push("/constructor");
+          router.push("/create-character");
           onOpenChange(false);
         },
         shortcut: ["c", "a"],

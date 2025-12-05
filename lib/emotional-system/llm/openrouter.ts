@@ -356,25 +356,43 @@ export function getOpenRouterClient(): OpenRouterClient {
 }
 
 /**
+ * Helper function to get OpenRouter Gemini model from environment variable
+ * Converts GEMINI_MODEL_LITE to OpenRouter format (google/MODEL:free)
+ */
+function getOpenRouterGeminiModel(): string {
+  const geminiModel = process.env.GEMINI_MODEL_LITE;
+  if (geminiModel) {
+    // If model already has google/ prefix, use as is
+    if (geminiModel.startsWith('google/')) {
+      return geminiModel.includes(':free') ? geminiModel : `${geminiModel}:free`;
+    }
+    // Otherwise, add google/ prefix and :free suffix
+    return `google/${geminiModel}:free`;
+  }
+  // Fallback to default
+  return "google/gemini-2.5-flash-exp:free";
+}
+
+/**
  * Modelos recomendados para diferentes tareas
  */
 export const RECOMMENDED_MODELS = {
   // Para appraisal rápido (barato y rápido)
-  APPRAISAL: "google/gemini-2.0-flash-exp:free",
+  APPRAISAL: getOpenRouterGeminiModel(),
 
   // Para generación de emociones (barato)
-  EMOTION: "google/gemini-2.0-flash-exp:free",
+  EMOTION: getOpenRouterGeminiModel(),
 
   // Para razonamiento interno (sin censura, emocional)
   REASONING: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
 
   // Para decisión de acción (rápido)
-  ACTION: "google/gemini-2.0-flash-exp:free",
+  ACTION: getOpenRouterGeminiModel(),
 
   // Para respuesta final (sin censura, expresivo)
   RESPONSE: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
 
   // Para JSON estructurado (si hay budget, usar Claude)
   JSON: "anthropic/claude-3.5-sonnet:beta", // Mejor para JSON, pero caro
-  JSON_CHEAP: "google/gemini-2.0-flash-exp:free", // Alternativa económica
+  JSON_CHEAP: getOpenRouterGeminiModel(), // Alternativa económica
 };

@@ -15,19 +15,11 @@ import { Server as HTTPServer } from "http";
 import { getSession } from "next-auth/react";
 import type { Session } from "next-auth";
 
-let io: SocketServer | null = null;
+// Re-export types from shared file (safe for client-side imports)
+export * from "./bond-event-types";
+import { BondEventType } from "./bond-event-types";
 
-// Tipos de eventos
-export enum BondEventType {
-  BOND_UPDATED = "bond_updated",
-  SLOT_AVAILABLE = "slot_available",
-  RANK_CHANGED = "rank_changed",
-  QUEUE_POSITION_CHANGED = "queue_position_changed",
-  MILESTONE_REACHED = "milestone_reached",
-  BOND_AT_RISK = "bond_at_risk",
-  BOND_RELEASED = "bond_released",
-  BOND_ESTABLISHED = "bond_established",
-}
+let io: SocketServer | null = null;
 
 export interface BondEvent {
   type: BondEventType;

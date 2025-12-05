@@ -136,7 +136,7 @@ export function DashboardNav() {
       </div>
 
       <div className="p-4 border-t border-border space-y-4">
-        <Link href="/constructor" data-tour="create-ai-button">
+        <Link href="/create-character" data-tour="create-ai-button">
           <Button className="w-full" size="sm">
             <Plus className="h-4 w-4 mr-2" />
             {t("navigation.newAI")}

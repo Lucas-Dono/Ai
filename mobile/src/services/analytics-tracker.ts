@@ -8,7 +8,7 @@
  * consistencia con la versión web y poder monitorear KPIs de manera unificada.
  */
 
-import apiClient from './api/client';
+import { apiClient } from './api';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import NetInfo from '@react-native-community/netinfo';

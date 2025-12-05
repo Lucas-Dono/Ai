@@ -26,6 +26,7 @@ import { markProactiveMessageResponded } from '@/lib/proactive/proactive-service
 import { interceptSearchCommand } from '@/lib/memory/search-interceptor';
 import { storeMessageSelectively } from '@/lib/memory/selective-storage';
 import { memoryQueryHandler } from '@/lib/memory/memory-query-handler';
+import { processInteractionForBond } from '@/lib/bonds/bond-progression-service';
 import type { StagePrompts } from '@/lib/relationship/prompt-generator';
 import type { RelationshipStage } from '@/lib/relationship/stages';
 import type { PlutchikEmotionState } from '@/lib/emotions/plutchik';
@@ -576,8 +577,10 @@ export class MessageService {
 
       // SEARCH command interception (memoria inteligente)
       const searchResult = await interceptSearchCommand(agentId, userId, response);
+      let memoryContext = ''; // Initialize memory context variable
 
       if (searchResult.shouldIntercept && searchResult.memoryContext) {
+        memoryContext = searchResult.memoryContext; // Capture memory context for later use
         log.debug(
           { searchQuery: searchResult.searchQuery },
           'SEARCH command detected, executing memory search'
@@ -600,7 +603,7 @@ export class MessageService {
           userId,
           agentId,
           provider: 'google',
-          model: 'gemini-2.5-flash-lite',
+          model: process.env.GEMINI_MODEL_LITE || 'gemini-2.5-flash-lite',
           inputTokens: inputTokensSearch,
           outputTokens: outputTokensSearch,
           metadata: { messageType, stage: 'memory-search', searchQuery: searchResult.searchQuery },
@@ -811,6 +814,40 @@ export class MessageService {
         log.warn({ error: err.message }, 'Failed to store assistant message embedding')
       );
 
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // BOND PROGRESSION: Update symbolic bond (non-blocking)
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      this.getOrCreateBond(agentId, userId)
+        .then(bond => {
+          return processInteractionForBond(
+            bond.id,
+            content, // user message
+            finalResponse, // agent response
+            {
+              conversationId: userMessage.conversationId || undefined,
+              emotionalState: {
+                intensity: Math.max(
+                  emotionalSummary.pad.valence,
+                  emotionalSummary.pad.arousal
+                ),
+                valence: emotionalSummary.pad.valence,
+              },
+              memoryCreated: memoryReferences.length > 0,
+            }
+          );
+        })
+        .then(result => {
+          if (result.success && result.milestone) {
+            log.info(
+              { bondId: result, milestone: result.milestone, affinityChange: result.affinityChange },
+              'Bond milestone reached'
+            );
+          }
+        })
+        .catch(err =>
+          log.warn({ error: err.message }, 'Failed to process bond progression')
+        );
+
       log.info({ duration: timer(), agentId, userId }, 'Message processed successfully');
 
       return {
@@ -891,6 +928,36 @@ export class MessageService {
         visibleState: { trust: 0.5, affinity: 0.5, respect: 0.5 },
         stage: 'stranger',
         totalInteractions: 0,
+      },
+    });
+  }
+
+  /**
+   * Get or create symbolic bond between agent and user
+   * Bonds track the deeper relationship progression beyond basic stats
+   */
+  private async getOrCreateBond(agentId: string, userId: string) {
+    const existing = await prisma.symbolicBond.findFirst({
+      where: {
+        agentId,
+        userId,
+      },
+    });
+
+    if (existing) return existing;
+
+    // Create new bond starting as ACQUAINTANCE
+    return prisma.symbolicBond.create({
+      data: {
+        agentId,
+        userId,
+        tier: 'ACQUAINTANCE',
+        status: 'active',
+        affinityLevel: 0,
+        totalInteractions: 0,
+        durationDays: 0,
+        rarityScore: 0.1,
+        rarityTier: 'Common',
       },
     });
   }

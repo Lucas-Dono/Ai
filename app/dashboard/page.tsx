@@ -44,6 +44,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { useTranslations } from "next-intl";
 import { ProactiveMessagesWidget } from "@/components/dashboard/ProactiveMessagesWidget";
 import { useSession } from "next-auth/react";
+import { FilterBar, type FilterState } from "@/components/dashboard/FilterBar";
 
 interface Agent {
   id: string;
@@ -56,6 +57,11 @@ interface Agent {
   avatar?: string | null;
   createdAt?: string;
   rating?: number | null;
+  visibility?: string | null;
+  nsfwMode?: boolean | null;
+  nsfwLevel?: string | null;
+  generationTier?: string | null;
+  tags?: string[] | null;
   _count?: {
     reviews: number;
   };
@@ -128,7 +134,15 @@ export default function DashboardPage() {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    categories: [],
+    kind: 'all',
+    visibility: 'all',
+    tier: 'all',
+    nsfw: 'all',
+    sortBy: 'newest',
+  });
 
   const isAuthenticated = sessionStatus === "authenticated";
 
@@ -217,23 +231,92 @@ export default function DashboardPage() {
     }
   };
 
+  // Apply all filters
   const companions = agents.filter((a) => a.kind === "companion");
 
-  // Filter by search query
-  const filteredCompanions = companions.filter((companion) =>
-    companion.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (companion.description?.toLowerCase() || "").includes(searchQuery.toLowerCase())
-  );
+  const filteredCompanions = companions.filter((companion) => {
+    // Search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      const matchesName = companion.name.toLowerCase().includes(searchLower);
+      const matchesDesc = (companion.description?.toLowerCase() || '').includes(searchLower);
+      if (!matchesName && !matchesDesc) return false;
+    }
 
-  // Categorizar compañeros
-  const recommendedCompanions = filteredCompanions.filter(
+    // Kind filter (already filtered by companion above, but keeping for consistency)
+    if (filters.kind !== 'all' && companion.kind !== filters.kind) {
+      return false;
+    }
+
+    // Visibility filter
+    if (filters.visibility !== 'all') {
+      if (filters.visibility === 'private' && companion.visibility !== 'private') {
+        return false;
+      }
+      if (filters.visibility === 'public' && companion.visibility !== 'public') {
+        return false;
+      }
+    }
+
+    // Tier filter
+    if (filters.tier !== 'all') {
+      if (companion.generationTier !== filters.tier) {
+        return false;
+      }
+    }
+
+    // NSFW filter
+    if (filters.nsfw !== 'all') {
+      const isNSFW = companion.nsfwMode || (companion.nsfwLevel && companion.nsfwLevel !== 'sfw');
+      if (filters.nsfw === 'sfw' && isNSFW) {
+        return false;
+      }
+      if (filters.nsfw === 'nsfw' && !isNSFW) {
+        return false;
+      }
+    }
+
+    // Categories filter
+    if (filters.categories.length > 0) {
+      const agentTags = Array.isArray(companion.tags) ? companion.tags : [];
+      const hasMatchingCategory = filters.categories.some(cat =>
+        agentTags.some(tag => tag.toLowerCase().includes(cat.toLowerCase()))
+      );
+      if (!hasMatchingCategory) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  // Sort companions
+  const sortedCompanions = [...filteredCompanions].sort((a, b) => {
+    switch (filters.sortBy) {
+      case 'newest':
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      case 'oldest':
+        return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+      case 'mostUsed':
+        return (b.cloneCount || 0) - (a.cloneCount || 0);
+      case 'nameAZ':
+        return a.name.localeCompare(b.name);
+      case 'nameZA':
+        return b.name.localeCompare(a.name);
+      default:
+        return 0;
+    }
+  });
+
+  // Categorizar compañeros (usando sortedCompanions)
+  const recommendedCompanions = sortedCompanions.filter(
     (a) => a.userId === null && a.featured === true
   );
-  const myCompanions = filteredCompanions.filter((a) => a.userId !== null);
-  const popularCompanions = filteredCompanions.filter(
+  const myCompanions = sortedCompanions.filter((a) => a.userId !== null);
+  const popularCompanions = sortedCompanions.filter(
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) > 0
-  ).sort((a, b) => (b.cloneCount || 0) - (a.cloneCount || 0));
-  const otherCompanions = filteredCompanions.filter(
+  );
+  const otherCompanions = sortedCompanions.filter(
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) === 0
   );
 
@@ -282,22 +365,9 @@ export default function DashboardPage() {
             {/* AI Recommendations */}
             <RecommendedForYou />
 
-            {/* Search Bar - STICKY ON MOBILE */}
+            {/* Filter Bar */}
             <div className="lg:relative sticky top-0 lg:top-auto z-30 lg:z-auto -mx-4 lg:mx-0 px-4 lg:px-0 py-3 lg:py-0 bg-[#0B0F1A]/95 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border-b lg:border-b-0 border-gray-800/50 lg:border-transparent">
-              <div className="relative">
-                <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder={t("search.placeholder")}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl md:rounded-2xl pl-10 md:pl-12 pr-20 md:pr-32 py-3 md:py-4 focus:outline-none focus:border-purple-500 transition-all duration-300 text-white placeholder:text-gray-400 text-sm md:text-base"
-                />
-                <button className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 bg-purple-600 hover:bg-purple-700 px-3 md:px-4 py-1.5 md:py-2 rounded-2xl flex items-center gap-1 md:gap-2 transition-all duration-300 min-h-[44px] md:min-h-0">
-                  <Filter className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("search.filters")}</span>
-                </button>
-              </div>
+              <FilterBar filters={filters} onFiltersChange={setFilters} />
             </div>
 
             <div className="flex items-center justify-between flex-wrap gap-3">
@@ -305,12 +375,12 @@ export default function DashboardPage() {
                 <h2 className="text-xl md:text-2xl font-semibold md-text-primary">{t("sections.companions.title")}</h2>
                 <p className="text-xs md:text-sm md-text-secondary mt-1">
                   {t("sections.companions.count", {
-                    count: filteredCompanions.length,
-                    companion: filteredCompanions.length === 1 ? t("sections.companions.companionSingular") : t("sections.companions.companionPlural")
+                    count: sortedCompanions.length,
+                    companion: sortedCompanions.length === 1 ? t("sections.companions.companionSingular") : t("sections.companions.companionPlural")
                   })}
                 </p>
               </div>
-              <Link href="/constructor" className="hidden md:block">
+              <Link href="/create-character" className="hidden md:block">
                 <Button className="md-button md-button-filled px-4 md:px-6 py-2.5">
                   <Plus className="h-5 w-5 mr-2" />
                   <span className="hidden sm:inline">{t("actions.newCompanion")}</span>
@@ -328,7 +398,7 @@ export default function DashboardPage() {
                 title={t("empty.companions.title")}
                 description={t("empty.companions.description")}
                 actionLabel={t("empty.companions.action")}
-                onAction={() => router.push("/constructor")}
+                onAction={() => router.push("/create-character")}
               />
             ) : (
               <>
@@ -343,7 +413,7 @@ export default function DashboardPage() {
                         <h2 className="text-xl md:text-2xl font-bold">{t("sections.myCompanions.title")}</h2>
                         <span className="text-xs md:text-sm text-gray-400">{myCompanions.length}</span>
                       </div>
-                      <Link href="/constructor" className="hidden md:block">
+                      <Link href="/create-character" className="hidden md:block">
                         <Button className="bg-purple-600 hover:bg-purple-700 px-3 md:px-4 py-2 rounded-2xl flex items-center gap-2 transition-all duration-300 text-sm md:text-base">
                           <Plus className="w-4 h-4" />
                           <span className="hidden sm:inline">{t("actions.newCompanion")}</span>
@@ -751,7 +821,7 @@ export default function DashboardPage() {
       </PullToRefresh>
 
       {/* FAB - Floating Action Button */}
-      <Link href="/constructor" data-tour="create-ai-button-fab">
+      <Link href="/create-character" data-tour="create-ai-button-fab">
         <button className="md-fab md-fab-extended" title={t("actions.createNewAI")}>
           <Plus className="h-6 w-6" />
           <span className="font-medium">{t("actions.newAI")}</span>

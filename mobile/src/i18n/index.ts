@@ -13,33 +13,38 @@ const resources = {
   es: { translation: es },
 };
 
-const initI18n = async () => {
-  let savedLanguage = await AsyncStorage.getItem(LANGUAGE_KEY);
+// Inicialización sincrónica con idioma por defecto
+// Esto previene errores de "context not ready" durante el startup
+const deviceLanguage = Localization.getLocales()[0]?.languageCode || 'en';
+const defaultLanguage = ['en', 'es'].includes(deviceLanguage) ? deviceLanguage : 'en';
 
-  if (!savedLanguage) {
-    // Detectar idioma del dispositivo
-    const deviceLanguage = Localization.getLocales()[0]?.languageCode || 'en';
-    savedLanguage = ['en', 'es'].includes(deviceLanguage) ? deviceLanguage : 'en';
-  }
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: defaultLanguage, // Idioma por defecto basado en el dispositivo
+    fallbackLng: 'en',
+    interpolation: {
+      escapeValue: false,
+    },
+    compatibilityJSON: 'v4',
+  });
 
-  await i18n
-    .use(initReactI18next)
-    .init({
-      resources,
-      lng: savedLanguage,
-      fallbackLng: 'en',
-      interpolation: {
-        escapeValue: false,
-      },
-      compatibilityJSON: 'v4',
-    });
-};
+// Cargar idioma guardado en segundo plano (después de que React Native esté listo)
+// Esto no bloquea la inicialización de la app
+AsyncStorage.getItem(LANGUAGE_KEY)
+  .then(savedLanguage => {
+    if (savedLanguage && savedLanguage !== i18n.language) {
+      i18n.changeLanguage(savedLanguage);
+    }
+  })
+  .catch(error => {
+    console.warn('[i18n] Error loading saved language:', error);
+  });
 
 export const changeLanguage = async (lang: string) => {
   await AsyncStorage.setItem(LANGUAGE_KEY, lang);
   i18n.changeLanguage(lang);
 };
-
-initI18n();
 
 export default i18n;

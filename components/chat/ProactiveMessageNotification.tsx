@@ -39,7 +39,8 @@ export function ProactiveMessageNotification({
   const { messages, markAsRead, markAsDismissed, isLoading } = useProactiveMessages(
     agentId,
     {
-      pollingInterval: 60000, // 1 minuto
+      enabled: true, // Ahora usa sistema singleton - seguro para múltiples instancias
+      pollingInterval: 600000, // 10 minutos (compartido entre todas las instancias del mismo agentId)
       onNewMessage: (message) => {
         // Reproducir sonido de notificación (opcional)
         playNotificationSound();

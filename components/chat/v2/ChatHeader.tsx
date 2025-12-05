@@ -10,7 +10,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -53,39 +54,63 @@ export function ChatHeader({
   onDelete,
 }: ChatHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
+  const [mounted, setMounted] = useState(false);
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Calculate menu position when it opens
+  useEffect(() => {
+    if (showMenu && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 8, // 8px below the button
+        right: window.innerWidth - rect.right, // Align right edge
+      });
+    }
+  }, [showMenu]);
 
   return (
+    <>
     <motion.header
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={cn(
         "relative z-10",
-        "px-3 md:px-6 py-3 md:py-4",
-        "flex items-center gap-2 md:gap-4",
+        "px-4 py-3",
+        "flex items-center justify-between gap-3",
         // Glassmorphism effect
         "bg-gradient-to-r from-white/80 via-white/70 to-white/80",
         "dark:from-gray-900/80 dark:via-gray-800/70 dark:to-gray-900/80",
         "backdrop-blur-xl",
         "border-b border-white/20 dark:border-gray-700/50",
         "shadow-lg",
-        "safe-area-inset-top"
+        "safe-area-inset-top",
+        "min-h-[72px]",
+        "max-w-full overflow-hidden"
       )}
     >
       {/* Animated gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5 animate-gradient-x" />
 
       {/* Avatar and Info */}
-      <div className="relative z-10 flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-        <Avatar
-          src={agentAvatar}
-          alt={agentName}
-          size="lg"
-          status={isTyping ? "typing" : isOnline ? "online" : "offline"}
-          showStatus
-        />
+      <div className="relative z-10 flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
+        <div className="flex-shrink-0">
+          <Avatar
+            src={agentAvatar}
+            alt={agentName}
+            size="md"
+            status={isTyping ? "typing" : isOnline ? "online" : "offline"}
+            showStatus
+          />
+        </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-hidden py-1">
           <motion.h1
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -144,7 +169,7 @@ export function ChatHeader({
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
-        className="relative z-10 flex items-center gap-2"
+        className="relative z-10 flex items-center gap-2 flex-shrink-0"
       >
         {/* Toggle Sidebar Button (desktop only) */}
         {onToggleSidebar && (
@@ -164,97 +189,105 @@ export function ChatHeader({
         )}
 
         {/* More Options Menu */}
-        <div className="relative">
+        <div className="relative" ref={buttonRef}>
           <ActionButton
             icon={<MoreVertical className="w-4 h-4" />}
             onClick={() => setShowMenu(!showMenu)}
             label="Más opciones"
           />
-
-          {/* Dropdown Menu */}
-          <AnimatePresence>
-            {showMenu && (
-              <>
-                {/* Backdrop */}
-                <div
-                  className="fixed inset-0 z-30 cursor-pointer"
-                  onClick={() => setShowMenu(false)}
-                />
-
-                {/* Menu */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-56 z-40 rounded-2xl overflow-hidden shadow-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/50"
-                >
-                  {agentId && (
-                    <MenuItem
-                      icon={<Brain className="w-4 h-4" />}
-                      label="Gestionar Memoria"
-                      onClick={() => {
-                        window.location.href = `/agentes/${agentId}/memory`;
-                      }}
-                    />
-                  )}
-
-                  {onSearch && (
-                    <MenuItem
-                      icon={<Search className="w-4 h-4" />}
-                      label="Buscar en conversación"
-                      onClick={() => {
-                        onSearch();
-                        setShowMenu(false);
-                      }}
-                    />
-                  )}
-
-                  {onExport && (
-                    <MenuItem
-                      icon={<Download className="w-4 h-4" />}
-                      label="Exportar a PDF"
-                      onClick={() => {
-                        onExport();
-                        setShowMenu(false);
-                      }}
-                    />
-                  )}
-
-                  {(onReset || onDelete) && (
-                    <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
-                  )}
-
-                  {onReset && (
-                    <MenuItem
-                      icon={<Trash2 className="w-4 h-4" />}
-                      label="Resetear conversación"
-                      onClick={() => {
-                        onReset();
-                        setShowMenu(false);
-                      }}
-                      variant="danger"
-                    />
-                  )}
-
-                  {onDelete && (
-                    <MenuItem
-                      icon={<Trash2 className="w-4 h-4" />}
-                      label="Eliminar agente"
-                      onClick={() => {
-                        onDelete();
-                        setShowMenu(false);
-                      }}
-                      variant="danger"
-                    />
-                  )}
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
         </div>
       </motion.div>
     </motion.header>
+
+    {/* Dropdown Menu rendered as Portal */}
+    {mounted && showMenu && createPortal(
+      <AnimatePresence>
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-[9998] cursor-pointer"
+            onClick={() => setShowMenu(false)}
+          />
+
+          {/* Menu */}
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            style={{
+              position: 'fixed',
+              top: `${menuPosition.top}px`,
+              right: `${menuPosition.right}px`,
+              zIndex: 9999,
+            }}
+            className="w-56 rounded-2xl overflow-hidden shadow-2xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/50"
+          >
+            {agentId && (
+              <MenuItem
+                icon={<Brain className="w-4 h-4" />}
+                label="Gestionar Memoria"
+                onClick={() => {
+                  window.location.href = `/agentes/${agentId}/memory`;
+                }}
+              />
+            )}
+
+            {onSearch && (
+              <MenuItem
+                icon={<Search className="w-4 h-4" />}
+                label="Buscar en conversación"
+                onClick={() => {
+                  onSearch();
+                  setShowMenu(false);
+                }}
+              />
+            )}
+
+            {onExport && (
+              <MenuItem
+                icon={<Download className="w-4 h-4" />}
+                label="Exportar a PDF"
+                onClick={() => {
+                  onExport();
+                  setShowMenu(false);
+                }}
+              />
+            )}
+
+            {(onReset || onDelete) && (
+              <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+            )}
+
+            {onReset && (
+              <MenuItem
+                icon={<Trash2 className="w-4 h-4" />}
+                label="Resetear conversación"
+                onClick={() => {
+                  onReset();
+                  setShowMenu(false);
+                }}
+                variant="danger"
+              />
+            )}
+
+            {onDelete && (
+              <MenuItem
+                icon={<Trash2 className="w-4 h-4" />}
+                label="Eliminar agente"
+                onClick={() => {
+                  onDelete();
+                  setShowMenu(false);
+                }}
+                variant="danger"
+              />
+            )}
+          </motion.div>
+        </>
+      </AnimatePresence>,
+      document.body
+    )}
+  </>
   );
 }
 
@@ -277,13 +310,13 @@ function ActionButton({
       onClick={onClick}
       title={label}
       className={cn(
-        "p-2 md:p-2.5 rounded-2xl md:rounded-xl",
+        "p-2.5 rounded-xl",
         "backdrop-blur-md",
         "border",
         "shadow-md",
         "transition-all duration-200",
         "hover:shadow-lg",
-        "min-w-[44px] min-h-[44px] flex items-center justify-center md:min-w-0 md:min-h-0",
+        "w-10 h-10 flex items-center justify-center",
         variant === "danger"
           ? [
               "bg-red-500/10 hover:bg-red-500/20",

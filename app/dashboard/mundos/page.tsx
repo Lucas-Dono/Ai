@@ -495,7 +495,7 @@ export default function MundosPage() {
                   {availableAgents.length === 0 ? (
                     <div className="text-center py-8 border-2 border-dashed rounded-2xl">
                       <p className="text-sm md-text-secondary mb-3">{t("create.noAgentsYet")}</p>
-                      <Link href="/constructor">
+                      <Link href="/create-character">
                         <Button variant="outline" size="sm">
                           <Plus className="h-4 w-4 mr-2" />
                           {t("create.createFirstAgent")}

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/logger';
 
@@ -16,13 +16,13 @@ export async function GET(
 ) {
   try {
     const { id: worldId } = await params;
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Parse query parameters
     const limit = parseInt(req.nextUrl.searchParams.get('limit') || '50');

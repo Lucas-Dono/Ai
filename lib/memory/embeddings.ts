@@ -1,76 +1,40 @@
 /**
- * Embedding Generation Service
- * Generates vector embeddings for text using Xenova Transformers
- * Runs locally without requiring external API keys
+ * Embedding Generation Service - OpenAI Edition
+ * Generates vector embeddings for text using OpenAI's text-embedding-3-small model
+ * Runs in the cloud via OpenAI API
  *
- * IMPORTANT: This module uses dynamic imports to avoid bundling native binaries
- * in the client-side code. It should only be used in server-side contexts.
+ * IMPORTANT: This module should only be used in server-side contexts.
  */
 
-// Model configuration
-const EMBEDDING_MODEL = "Xenova/all-MiniLM-L6-v2"; // 384 dimensions
-const EMBEDDING_DIMENSIONS = 384;
+import OpenAI from "openai";
 
-// Singleton pattern for the embedding pipeline
-let embeddingPipeline: any = null;
-let initializationPromise: Promise<any> | null = null;
+// Model configuration from environment variables
+const EMBEDDING_MODEL = process.env.embedding_model || "text-embedding-3-small";
+const EMBEDDING_DIMENSIONS = 1536; // text-embedding-3-small dimensions
+
+// Singleton OpenAI client
+let openaiClient: OpenAI | null = null;
 
 /**
- * Initialize the embedding pipeline (lazy loading with dynamic import)
+ * Get or initialize the OpenAI client
  */
-async function getEmbeddingPipeline() {
-  // Verificar que estamos en el servidor
-  if (typeof window !== "undefined") {
-    throw new Error("Embeddings can only be generated on the server side");
+function getOpenAIClient(): OpenAI {
+  if (openaiClient) {
+    return openaiClient;
   }
 
-  if (embeddingPipeline) {
-    return embeddingPipeline;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY environment variable is not set");
   }
 
-  if (initializationPromise) {
-    return initializationPromise;
-  }
-
-  initializationPromise = (async () => {
-    console.log("[Embeddings] Initializing embedding model...");
-
-    // Importación dinámica para evitar que Webpack lo incluya en el bundle del cliente
-    const { pipeline, env } = await import("@xenova/transformers");
-
-    // Configure Xenova to use local cache
-    env.cacheDir = "./.cache/transformers";
-    env.allowLocalModels = false;
-
-    /**
-     * CONFIGURACIÓN IMPORTANTE - NO USAR WEB WORKERS:
-     *
-     * Este módulo NO USA WEB WORKERS porque:
-     * 1. Ejecuta solo en servidor (Node.js API routes)
-     * 2. Workers de navegador no aplican en Node.js runtime
-     * 3. Thread único es más eficiente para embeddings individuales
-     * 4. Ya tenemos Redis queues para concurrencia a nivel aplicación
-     * 5. Evita errores "Cannot find module worker.js" en build
-     *
-     * Performance con thread único: ~50-200ms por embedding (suficiente para MVP)
-     * Cuando escalemos: migraremos a OpenAI embeddings (cloud)
-     */
-    env.backends.onnx.wasm.proxy = false;      // Sin WASM proxy (no necesita workers)
-    env.useBrowserCache = false;               // Caché en servidor, no navegador
-    env.backends.onnx.wasm.numThreads = 1;     // Thread único (óptimo para Node.js)
-    (env as any).useWorker = false;            // Deshabilitar workers explícitamente
-
-    const pipe = await pipeline("feature-extraction", EMBEDDING_MODEL);
-    embeddingPipeline = pipe;
-    console.log("[Embeddings] Model ready");
-    return pipe;
-  })();
-
-  return initializationPromise;
+  openaiClient = new OpenAI({ apiKey });
+  console.log("[Embeddings] OpenAI client initialized");
+  return openaiClient;
 }
 
 /**
- * Generate embedding for a single text
+ * Generate embedding for a single text using OpenAI
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   if (!text || text.trim().length === 0) {
@@ -78,26 +42,34 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   }
 
   try {
-    const pipe = await getEmbeddingPipeline();
+    const client = getOpenAIClient();
 
-    // Generate embedding
-    const output = await pipe(text, {
-      pooling: "mean",
-      normalize: true,
+    const response = await client.embeddings.create({
+      model: EMBEDDING_MODEL,
+      input: text,
+      encoding_format: "float",
     });
 
-    // Extract the embedding array
-    const embedding = Array.from(output.data) as number[];
+    if (!response.data || response.data.length === 0) {
+      throw new Error("No embedding returned from OpenAI");
+    }
 
-    return embedding;
-  } catch (error) {
-    console.error("[Embeddings] Error generating embedding:", error);
-    throw new Error(`Failed to generate embedding: ${error}`);
+    return response.data[0].embedding;
+  } catch (error: any) {
+    console.error("[Embeddings] Error generating embedding:", error?.message || error);
+
+    // Si es un error de API key inválida, loguear más detalles
+    if (error?.status === 401) {
+      console.error("[Embeddings] Invalid OpenAI API key - check OPENAI_API_KEY environment variable");
+    }
+
+    throw new Error(`Failed to generate embedding: ${error?.message || error}`);
   }
 }
 
 /**
  * Generate embeddings for multiple texts (batch processing)
+ * OpenAI API supports batch embedding requests
  */
 export async function generateEmbeddings(
   texts: string[]
@@ -107,21 +79,37 @@ export async function generateEmbeddings(
   }
 
   try {
-    // Process in parallel with reasonable concurrency
-    const batchSize = 5;
+    const client = getOpenAIClient();
+
+    // OpenAI API supports batch requests (up to 2048 inputs)
+    // We'll batch in groups of 100 to be safe
+    const batchSize = 100;
     const results: number[][] = [];
 
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize);
-      const batchEmbeddings = await Promise.all(
-        batch.map((text) => generateEmbedding(text))
-      );
-      results.push(...batchEmbeddings);
+
+      const response = await client.embeddings.create({
+        model: EMBEDDING_MODEL,
+        input: batch,
+        encoding_format: "float",
+      });
+
+      if (!response.data || response.data.length === 0) {
+        throw new Error("No embeddings returned from OpenAI");
+      }
+
+      // Sort by index to maintain order (API may return out of order)
+      const sortedEmbeddings = response.data
+        .sort((a, b) => a.index - b.index)
+        .map((item) => item.embedding);
+
+      results.push(...sortedEmbeddings);
     }
 
     return results;
-  } catch (error) {
-    console.error("[Embeddings] Error generating batch embeddings:", error);
+  } catch (error: any) {
+    console.error("[Embeddings] Error generating batch embeddings:", error?.message || error);
     throw error;
   }
 }
@@ -177,10 +165,11 @@ export function findMostSimilar(
 
 /**
  * Prepare text for embedding (chunking for long texts)
+ * OpenAI's text-embedding-3-small supports up to 8191 tokens
  */
 export function prepareTextForEmbedding(
   text: string,
-  maxLength: number = 512
+  maxLength: number = 8000 // Conservative limit to account for tokenization
 ): string[] {
   if (text.length <= maxLength) {
     return [text];
@@ -217,8 +206,38 @@ export function getEmbeddingDimensions(): number {
 }
 
 /**
- * Preload the embedding model (optional, for faster first use)
+ * Preload the embedding model (no-op for OpenAI, kept for API compatibility)
  */
 export async function preloadEmbeddingModel(): Promise<void> {
-  await getEmbeddingPipeline();
+  // No need to preload with OpenAI API
+  // Just verify the client can be initialized
+  try {
+    getOpenAIClient();
+    console.log("[Embeddings] OpenAI embeddings ready");
+  } catch (error) {
+    console.warn("[Embeddings] Failed to initialize OpenAI client:", error);
+  }
+}
+
+/**
+ * Check if embeddings are currently available
+ */
+export function areEmbeddingsAvailable(): boolean {
+  try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    return !!apiKey;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get the reason why embeddings are disabled (if applicable)
+ */
+export function getDisableReason(): string | null {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return "OPENAI_API_KEY not configured";
+  }
+  return null;
 }

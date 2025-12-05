@@ -115,6 +115,7 @@ export default auth(async (req) => {
     "/api/auth/providers",
     "/api/auth/csrf",
     "/api/auth/register", // IMPORTANTE: Endpoint de registro debe ser público
+    "/api/auth/login", // IMPORTANTE: Endpoint de login debe ser público
     "/api/webhooks/mercadopago",
     "/api/community", // GROWTH: API pública de comunidad (read + anonymous post)
     "/api/worlds", // GROWTH: API pública de mundos (read-only)

@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { getEmotionalSystemOrchestrator } from "@/lib/emotional-system/orchestrator";
@@ -28,8 +28,8 @@ export async function POST(
 ) {
   const { id } = await params;
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(request);
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -57,7 +57,7 @@ export async function POST(
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    if (agent.userId !== session.user.id) {
+    if (agent.userId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -82,7 +82,7 @@ export async function POST(
     console.log(`[MultimodalAPI] Agent emotion:`, agentResponse.emotion);
 
     // 4. Obtener tier del usuario
-    const userTier = await getUserTier(session.user.id);
+    const userTier = await getUserTier(user.id);
     console.log(`[MultimodalAPI] User tier:`, userTier);
 
     // 5. Decidir qué modalidades incluir
@@ -160,7 +160,7 @@ export async function POST(
     const conversation = await prisma.conversation.findFirst({
       where: {
         agentId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 

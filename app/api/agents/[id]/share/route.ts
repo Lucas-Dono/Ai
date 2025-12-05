@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { log } from "@/lib/logging/logger";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-
+import { getAuthenticatedUser } from "@/lib/auth-server";
 /**
  * POST /api/agents/[id]/share
  * Track when an agent is shared
@@ -21,8 +19,8 @@ export async function POST(
     const { method } = body;
 
     // Get user session (optional - can track anonymous shares too)
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
+    const user = await getAuthenticatedUser(request);
+    const userId = user?.id;
 
     // Validate share method
     const validMethods = ["copy_link", "community", "twitter", "facebook", "linkedin", "whatsapp"];

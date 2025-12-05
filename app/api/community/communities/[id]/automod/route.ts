@@ -9,7 +9,7 @@ import { ReportService } from '@/lib/services/report.service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -23,7 +23,7 @@ export async function GET(
     // Verificar permisos de moderación
     const canModerate = await ReportService.canModerate(
       session.user.id,
-      params.id
+      id
     );
 
     if (!canModerate) {
@@ -34,8 +34,8 @@ export async function GET(
     }
 
     // Obtener reglas y estadísticas
-    const rules = await AutoModService.getRules(params.id);
-    const stats = await AutoModService.getStats(params.id);
+    const rules = await AutoModService.getRules(id);
+    const stats = await AutoModService.getStats(id);
 
     return NextResponse.json({ rules, stats });
   } catch (error: any) {
@@ -53,7 +53,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -67,7 +67,7 @@ export async function POST(
     // Verificar que es owner o co-owner (solo ellos pueden crear reglas)
     const { prisma } = await import('@/lib/prisma');
     const community = await prisma.community.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: {
         ownerId: true,
         coOwnerIds: true,
@@ -133,7 +133,7 @@ export async function POST(
     }
 
     const rule = await AutoModService.createRule({
-      communityId: params.id,
+      communityId: id,
       name,
       description,
       type,

@@ -48,6 +48,10 @@ export function VoiceRecorder({ onSend, onCancel, isHoldMode = false }: VoiceRec
       linearPCMIsBigEndian: false,
       linearPCMIsFloat: false,
     },
+    web: {
+      mimeType: 'audio/webm',
+      bitsPerSecond: 128000,
+    },
   });
   const [duration, setDuration] = useState(0);
   const [audioLevels, setAudioLevels] = useState<number[]>(

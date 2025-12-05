@@ -8,7 +8,7 @@ import { ReportService } from '@/lib/services/report.service';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession(request);
@@ -22,7 +22,7 @@ export async function GET(
     // Verificar permisos de moderación
     const canModerate = await ReportService.canModerate(
       session.user.id,
-      params.id
+      id
     );
 
     if (!canModerate) {
@@ -40,7 +40,7 @@ export async function GET(
     const limit = parseInt(searchParams.get('limit') || '25');
 
     // Obtener reportes
-    const reports = await ReportService.getReportQueue(params.id, {
+    const reports = await ReportService.getReportQueue(id, {
       status,
       type,
       page,
@@ -48,7 +48,7 @@ export async function GET(
     });
 
     // Obtener estadísticas
-    const stats = await ReportService.getReportStats(params.id);
+    const stats = await ReportService.getReportStats(id);
 
     return NextResponse.json({
       reports,

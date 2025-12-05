@@ -32,6 +32,7 @@ export enum EventType {
   FIRST_MESSAGE_SENT = "first_message_sent",
   PAGE_VIEW = "page_view",
   MOBILE_SESSION = "mobile_session",
+  APP_OPENED = "app_opened",
 
   // Engagement
   SESSION_STARTED = "session_started",

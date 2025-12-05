@@ -1,7 +1,8 @@
 /**
- * Genres and Subgenres Data
+ * Archetype Taxonomy Data
  *
- * Comprehensive genre taxonomy for Smart Start character creation
+ * Defines relational archetypes - the TYPE OF RELATIONSHIP between user and character
+ * This replaces media-based genres (anime, movies, etc.) with relationship dynamics
  */
 
 import type { GenreId } from '@circuitpromptai/smart-start-core';
@@ -26,83 +27,51 @@ export interface SubgenreOption {
 }
 
 // ============================================================================
-// GENRES DATA
+// ARCHETYPES DATA (Relational, not media-based)
 // ============================================================================
 
 export const GENRES: GenreOption[] = [
   {
-    id: 'anime',
-    name: 'Anime',
-    icon: '🎌',
+    id: 'romance',
+    name: 'Romance',
+    icon: '💕',
     color: '#f43f5e',
-    description: 'Characters from Japanese animation',
+    description: 'Conexión romántica e íntima',
     subgenres: [
-      { id: 'shonen', name: 'Shonen', description: 'Action, adventure, friendship' },
-      { id: 'shojo', name: 'Shojo', description: 'Romance, drama, slice of life' },
-      { id: 'seinen', name: 'Seinen', description: 'Mature, psychological, complex' },
-      { id: 'isekai', name: 'Isekai', description: 'Another world, fantasy' },
-      { id: 'mecha', name: 'Mecha', description: 'Giant robots, sci-fi' },
-      { id: 'slice-of-life', name: 'Slice of Life', description: 'Everyday life, relatable' },
+      { id: 'sweet', name: 'Sweet & Caring', description: 'Dulce, cariñoso, protector' },
+      { id: 'passionate', name: 'Passionate & Intense', description: 'Apasionado, intenso, ardiente' },
+      { id: 'tsundere', name: 'Tsundere', description: 'Frío al inicio, cálido después' },
+      { id: 'slow-burn', name: 'Slow Burn', description: 'Amistad que se vuelve romance' },
+      { id: 'flirty', name: 'Flirty & Playful', description: 'Juguetón, coqueto, divertido' },
     ],
   },
   {
-    id: 'gaming',
-    name: 'Gaming',
-    icon: '🎮',
-    color: '#8b5cf6',
-    description: 'Characters from video games',
-    subgenres: [
-      { id: 'rpg', name: 'RPG', description: 'Role-playing games' },
-      { id: 'action', name: 'Action', description: 'Fast-paced combat' },
-      { id: 'moba', name: 'MOBA', description: 'Multiplayer online battle arena' },
-      { id: 'mmorpg', name: 'MMORPG', description: 'Massively multiplayer online' },
-      { id: 'fighting', name: 'Fighting', description: 'Combat-focused games' },
-      { id: 'visual-novel', name: 'Visual Novel', description: 'Story-driven games' },
-    ],
-  },
-  {
-    id: 'movies',
-    name: 'Movies',
-    icon: '🎬',
-    color: '#eab308',
-    description: 'Characters from films',
-    subgenres: [
-      { id: 'action', name: 'Action', description: 'High-octane, thrilling' },
-      { id: 'sci-fi', name: 'Sci-Fi', description: 'Science fiction, futuristic' },
-      { id: 'fantasy', name: 'Fantasy', description: 'Magic, mythical worlds' },
-      { id: 'horror', name: 'Horror', description: 'Scary, suspenseful' },
-      { id: 'comedy', name: 'Comedy', description: 'Funny, light-hearted' },
-      { id: 'drama', name: 'Drama', description: 'Emotional, character-driven' },
-    ],
-  },
-  {
-    id: 'tv',
-    name: 'TV Shows',
-    icon: '📺',
-    color: '#06b6d4',
-    description: 'Characters from television series',
-    subgenres: [
-      { id: 'drama', name: 'Drama', description: 'Serialized storytelling' },
-      { id: 'sitcom', name: 'Sitcom', description: 'Situational comedy' },
-      { id: 'crime', name: 'Crime', description: 'Mystery, detective stories' },
-      { id: 'supernatural', name: 'Supernatural', description: 'Paranormal, unexplained' },
-      { id: 'sci-fi', name: 'Sci-Fi', description: 'Futuristic, space opera' },
-      { id: 'reality', name: 'Reality', description: 'Reality TV personalities' },
-    ],
-  },
-  {
-    id: 'books',
-    name: 'Books',
-    icon: '📚',
+    id: 'friendship',
+    name: 'Amistad',
+    icon: '🤝',
     color: '#10b981',
-    description: 'Characters from literature',
+    description: 'Compañía y apoyo mutuo',
     subgenres: [
-      { id: 'fantasy', name: 'Fantasy', description: 'Epic fantasy, magic' },
-      { id: 'sci-fi', name: 'Sci-Fi', description: 'Science fiction novels' },
-      { id: 'mystery', name: 'Mystery', description: 'Detectives, whodunits' },
-      { id: 'romance', name: 'Romance', description: 'Love stories' },
-      { id: 'horror', name: 'Horror', description: 'Scary, gothic' },
-      { id: 'literary', name: 'Literary', description: 'Classic literature' },
+      { id: 'supportive', name: 'Supportive Listener', description: 'Escucha activa, apoyo emocional' },
+      { id: 'adventurous', name: 'Adventurous Companion', description: 'Aventuras juntos, exploración' },
+      { id: 'intellectual', name: 'Intellectual Peer', description: 'Debates, conversaciones profundas' },
+      { id: 'playful', name: 'Playful Buddy', description: 'Diversión, juegos, risas' },
+      { id: 'comfort', name: 'Comfort Friend', description: 'Comodidad, confianza, paz' },
+    ],
+  },
+  {
+    id: 'professional',
+    name: 'Mentor/Profesional',
+    icon: '🎓',
+    color: '#8b5cf6',
+    description: 'Guía, aprendizaje y crecimiento',
+    subgenres: [
+      { id: 'wise-teacher', name: 'Wise Teacher', description: 'Enseñanza formal, sabiduría' },
+      { id: 'life-coach', name: 'Life Coach', description: 'Motivación, objetivos de vida' },
+      { id: 'therapist', name: 'Therapist/Counselor', description: 'Salud mental, sanación' },
+      { id: 'spiritual', name: 'Spiritual Guide', description: 'Reflexión filosófica, espiritualidad' },
+      { id: 'skill-trainer', name: 'Skill Trainer', description: 'Habilidades específicas, práctica' },
+      { id: 'business', name: 'Business Partner', description: 'Trabajo, carrera, productividad' },
     ],
   },
   {
@@ -110,14 +79,28 @@ export const GENRES: GenreOption[] = [
     name: 'Roleplay',
     icon: '🎭',
     color: '#ec4899',
-    description: 'Create original roleplay characters',
+    description: 'Narrativa e historia interactiva',
     subgenres: [
-      { id: 'fantasy', name: 'Fantasy', description: 'Medieval, magic, dragons' },
-      { id: 'modern', name: 'Modern', description: 'Contemporary setting' },
-      { id: 'sci-fi', name: 'Sci-Fi', description: 'Futuristic, space' },
-      { id: 'historical', name: 'Historical', description: 'Period settings' },
-      { id: 'supernatural', name: 'Supernatural', description: 'Vampires, werewolves, etc' },
-      { id: 'slice-of-life', name: 'Slice of Life', description: 'Everyday scenarios' },
+      { id: 'fantasy', name: 'Fantasy Adventure', description: 'Medieval, magia, dragones' },
+      { id: 'modern', name: 'Modern Drama', description: 'Mundo actual, realista' },
+      { id: 'historical', name: 'Historical Setting', description: 'Época histórica, period piece' },
+      { id: 'sci-fi', name: 'Sci-Fi Exploration', description: 'Futurista, espacio, tecnología' },
+      { id: 'mystery', name: 'Mystery/Thriller', description: 'Misterio, suspenso, detective' },
+      { id: 'slice-of-life', name: 'Slice of Life', description: 'Vida cotidiana, momentos simples' },
+    ],
+  },
+  {
+    id: 'wellness',
+    name: 'Bienestar',
+    icon: '🌱',
+    color: '#06b6d4',
+    description: 'Salud mental y autocuidado',
+    subgenres: [
+      { id: 'mindfulness', name: 'Mindfulness Coach', description: 'Atención plena, presente' },
+      { id: 'therapeutic', name: 'Therapeutic Companion', description: 'Sanación emocional, apoyo' },
+      { id: 'motivational', name: 'Motivational Friend', description: 'Inspiración, energía positiva' },
+      { id: 'meditation', name: 'Meditation Guide', description: 'Meditación, respiración, calma' },
+      { id: 'self-care', name: 'Self-Care Buddy', description: 'Cuidado personal, amor propio' },
     ],
   },
 ];

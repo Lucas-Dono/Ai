@@ -114,8 +114,9 @@ export class LLMProvider {
    * Usa el modelo más económico ($0.40/M tokens) para tareas de alta frecuencia.
    * Implementa rotación automática de API keys en caso de error de cuota.
    */
-  async generate(options: GenerateOptions): Promise<string> {
-    const { systemPrompt, messages, temperature = 0.9, maxTokens = 1000 } = options;
+  async generate(options: GenerateOptions & { useFullModel?: boolean }): Promise<string> {
+    const { systemPrompt, messages, temperature = 0.9, maxTokens = 1000, useFullModel = false } = options;
+    const model = useFullModel ? this.modelFull : this.modelLite;
     const timer = createTimer(log, 'LLM generation');
 
     let lastError: Error | null = null;
@@ -160,7 +161,7 @@ export class LLMProvider {
 
         const currentKey = this.getCurrentApiKey();
         log.debug({
-          model: this.modelLite,
+          model,
           keyIndex: this.currentKeyIndex + 1,
           temperature,
           maxTokens,
@@ -168,7 +169,7 @@ export class LLMProvider {
         }, 'Calling Gemini API');
 
         const response = await fetch(
-          `${this.baseURL}/models/${this.modelLite}:generateContent?key=${currentKey}`,
+          `${this.baseURL}/models/${model}:generateContent?key=${currentKey}`,
           {
             method: "POST",
             headers: {
@@ -207,7 +208,7 @@ export class LLMProvider {
 
           log.error({
             status: response.status,
-            model: this.modelLite,
+            model,
             keyIndex: this.currentKeyIndex + 1,
             errorText: errorText.substring(0, 200)
           }, 'Gemini API error');
@@ -245,7 +246,7 @@ export class LLMProvider {
           throw new Error(`Gemini no retornó texto (finishReason: ${finishReason})`);
         }
 
-        timer.end({ model: this.modelLite, textLength: text.length });
+        timer.end({ model, textLength: text.length });
         return text;
       } catch (error) {
         lastError = error as Error;
@@ -272,7 +273,10 @@ export class LLMProvider {
    * Se ejecuta solo 1 vez por agente, por lo que el costo es mínimo.
    * Implementa rotación automática de API keys en caso de error de cuota.
    */
-  async generateProfile(rawData: Record<string, unknown>): Promise<ProfileGenerationResult> {
+  async generateProfile(
+    rawData: Record<string, unknown>,
+    tier: 'free' | 'plus' | 'ultra' = 'free'
+  ): Promise<ProfileGenerationResult> {
     // ═══════════════════════════════════════════════════════════════════
     // NUEVO: INVESTIGACIÓN AUTOMÁTICA DE PERSONAJES PÚBLICOS
     // ═══════════════════════════════════════════════════════════════════
@@ -307,7 +311,53 @@ export class LLMProvider {
     }
     // ═══════════════════════════════════════════════════════════════════
 
-    const prompt = `Eres un experto en crear personajes profundos, creíbles y realistas para narrativa interactiva.
+    // ═══════════════════════════════════════════════════════════════════
+    // TIER-SPECIFIC CONFIGURATION
+    // ═══════════════════════════════════════════════════════════════════
+    const tierConfig = {
+      free: {
+        model: this.modelLite, // Gemini Flash Lite
+        maxTokens: 2000,
+        temperature: 0.7,
+        description: 'FREE TIER - Perfil simplificado y eficiente'
+      },
+      plus: {
+        model: this.modelLite, // Gemini Flash Lite
+        maxTokens: 8000,
+        temperature: 0.7,
+        description: 'PLUS TIER - Perfil completo con validación'
+      },
+      ultra: {
+        model: this.modelFull, // Gemini Flash Full
+        maxTokens: 20000,
+        temperature: 0.7,
+        description: 'ULTRA TIER - Perfil extendido con análisis psicológico profundo'
+      }
+    };
+
+    const config = tierConfig[tier];
+    log.info({
+      tier,
+      model: config.model,
+      maxTokens: config.maxTokens,
+      characterName: rawData.name
+    }, 'Generating character profile with tier configuration');
+
+    // ═══════════════════════════════════════════════════════════════════
+    // GENERATE TIER-SPECIFIC PROMPT
+    // ═══════════════════════════════════════════════════════════════════
+    let prompt: string;
+
+    if (tier === 'free') {
+      prompt = this.generateFreePrompt(rawData, researchData);
+    } else if (tier === 'plus') {
+      prompt = this.generatePlusPrompt(rawData, researchData);
+    } else {
+      prompt = this.generateUltraPrompt(rawData, researchData);
+    }
+
+    // OLD PROMPT KEPT FOR BACKWARDS COMPATIBILITY (will be removed after testing)
+    const oldPrompt = `Eres un experto en crear personajes profundos, creíbles y realistas para narrativa interactiva.
 
 TAREA: Generar un perfil COMPLETO Y DETALLADO para este personaje basándote en los datos básicos proporcionados.
 
@@ -340,6 +390,19 @@ ESTRUCTURA JSON COMPLETA A GENERAR:
       "city": "ciudad específica (ej: Buenos Aires, Madrid, CDMX)",
       "neighborhood": "barrio específico de esa ciudad",
       "livingSituation": "vive solo/a, con roommate, con familia, etc."
+    },
+
+    "currentLocation": {
+      "city": "ciudad actual donde vive (MUY IMPORTANTE - debe ser específica y real)",
+      "country": "país actual (MUY IMPORTANTE - usar nombre completo, ej: Russia, USA, Argentina, Japan)",
+      "description": "descripción breve de su relación con esta ciudad"
+    },
+
+    "background": {
+      "birthplace": {
+        "city": "ciudad de nacimiento",
+        "country": "país de nacimiento"
+      }
     },
 
     "family": {
@@ -633,6 +696,15 @@ REGLAS FINALES:
 4. Los detalles mundanos son CRÍTICOS (qué desayuna, cuándo duerme, etc.)
 5. El systemPrompt debe ser NARRATIVO, como si estuvieras escribiendo un personaje de novela
 
+⚠️ CRÍTICO - SISTEMA DE CLIMA EN TIEMPO REAL:
+La ubicación actual (currentLocation.city y currentLocation.country) es MUY IMPORTANTE.
+El personaje recibirá el clima REAL de esa ciudad en tiempo real durante conversaciones.
+- Usa ciudades y países REALES Y ESPECÍFICOS
+- Ej correcto: "Moscow", "Russia" | "Tokyo", "Japan" | "Buenos Aires", "Argentina"
+- Ej incorrecto: "Ciudad grande", "Europa", "Algún lugar"
+- El sistema usará estas coordenadas para obtener temperatura y condiciones climáticas actuales
+- Si el personaje menciona el clima, debe coincidir con la realidad de su ubicación
+
 Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
 
     let lastError: Error | null = null;
@@ -649,7 +721,7 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
         }, 'Generating character profile');
 
         const response = await fetch(
-          `${this.baseURL}/models/${this.modelFull}:generateContent?key=${currentKey}`,
+          `${this.baseURL}/models/${config.model}:generateContent?key=${currentKey}`,
           {
             method: "POST",
             headers: {
@@ -661,8 +733,8 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
                 parts: [{ text: prompt }]
               }],
               generationConfig: {
-                temperature: 0.7, // Reducido para respuestas más consistentes
-                maxOutputTokens: 4000, // Aumentado para JSON completo
+                temperature: config.temperature,
+                maxOutputTokens: config.maxTokens,
               },
               safetySettings: [
                 {
@@ -881,6 +953,310 @@ Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
     };
     log.warn({ characterName: rawData.name }, 'Using quota exhaustion fallback profile');
     return fallback;
+  }
+
+  /**
+   * Generate FREE tier prompt - Simplified profile (60 fields approx)
+   */
+  private generateFreePrompt(rawData: Record<string, unknown>, researchData: any): string {
+    return `Eres un experto en crear personajes para narrativa interactiva.
+
+TIER: FREE - Perfil simplificado pero coherente
+
+DATOS BÁSICOS:
+${JSON.stringify(rawData, null, 2)}
+
+${researchData?.enhancedPrompt || '⚠️ IMPORTANTE: El usuario proporcionó datos mínimos. EXPANDE estos en un perfil coherente pero simplificado.'}
+
+TAREA: Generar un perfil SIMPLIFICADO pero COHERENTE.
+
+ESTRUCTURA JSON:
+
+{
+  "profile": {
+    "basicIdentity": {
+      "fullName": "nombre completo",
+      "preferredName": "${rawData.name}",
+      "age": "número 20-35",
+      "city": "ciudad específica",
+      "nationality": "país"
+    },
+    "currentLocation": {
+      "city": "ciudad actual ESPECÍFICA Y REAL",
+      "country": "país actual (nombre completo: Russia, USA, Argentina, Japan, etc.)",
+      "description": "breve descripción"
+    },
+    "personality": {
+      "bigFive": {
+        "openness": "0-100",
+        "conscientiousness": "0-100",
+        "extraversion": "0-100",
+        "agreeableness": "0-100",
+        "neuroticism": "0-100"
+      },
+      "traits": ["trait1", "trait2", "trait3"],
+      "strengths": ["fortaleza1", "fortaleza2"],
+      "weaknesses": ["debilidad1", "debilidad2"]
+    },
+    "occupation": {
+      "current": "trabajo específico",
+      "education": "nivel educativo"
+    },
+    "interests": {
+      "music": ["género1", "género2"],
+      "hobbies": ["hobby1", "hobby2"]
+    },
+    "communication": {
+      "textingStyle": "descripción",
+      "emojiUsage": "bajo/moderado/alto",
+      "humorStyle": "estilo de humor"
+    },
+    "dailyRoutine": {
+      "chronotype": "early bird/night owl",
+      "wakeUpTime": "hora",
+      "bedTime": "hora"
+    }
+  },
+  "systemPrompt": "Descripción narrativa de 150-200 palabras sobre quién es este personaje, su personalidad, y su forma de comunicarse. Tono natural y conversacional."
+}
+
+REGLAS:
+1. Datos COHERENTES entre sí
+2. Nombres y lugares REALES y ESPECÍFICOS (no genéricos)
+3. Personaje IMPERFECTO y HUMANO
+4. systemPrompt NARRATIVO, no lista
+
+⚠️ CRÍTICO - SISTEMA DE CLIMA:
+currentLocation.city y currentLocation.country DEBEN ser reales y específicos.
+El personaje recibirá clima REAL de esa ubicación en tiempo real.
+Ejemplos: "Moscow", "Russia" | "Tokyo", "Japan" | "Buenos Aires", "Argentina"
+
+Responde SOLO con JSON, sin markdown.`;
+  }
+
+  /**
+   * Generate PLUS tier prompt - Complete profile (160 fields approx)
+   */
+  private generatePlusPrompt(rawData: Record<string, unknown>, researchData: any): string {
+    // This is essentially the current/old prompt - keeping it mostly the same
+    return `Eres un experto en crear personajes profundos, creíbles y realistas para narrativa interactiva.
+
+TIER: PLUS - Perfil completo y detallado
+
+TAREA: Generar un perfil COMPLETO Y DETALLADO para este personaje basándote en los datos básicos proporcionados.
+
+DATOS BÁSICOS PROPORCIONADOS POR EL USUARIO:
+${JSON.stringify(rawData, null, 2)}
+
+${researchData?.enhancedPrompt || `
+⚠️ IMPORTANTE: El usuario solo proporcionó datos MÍNIMOS (nombre, personalidad básica, etc.).
+TU TRABAJO es EXPANDIR estos datos mínimos en UNA VIDA COMPLETA Y COHERENTE.`}
+
+INSTRUCCIONES CRÍTICAS:
+1. INVENTA detalles específicos y realistas para llenar todos los campos
+2. TODO debe ser COHERENTE entre sí (personalidad, familia, trabajo, experiencias)
+3. USA nombres, lugares, marcas, artistas, series REALES y ESPECÍFICOS (no genéricos)
+4. HAZ al personaje IMPERFECTO y HUMANO con contradicciones realistas
+5. INCLUYE detalles mundanos (comida favorita, horario de sueño, etc.) - estos crean realismo
+6. El systemPrompt debe ser una NARRATIVA RICA de 300-400 palabras, NO una lista
+
+[... El resto del prompt original con toda la estructura completa JSON ...]
+
+ESTRUCTURA JSON COMPLETA: Igual que el prompt original (basicIdentity, family, occupation, socialCircle, interests, dailyRoutine, lifeExperiences, mundaneDetails, innerWorld, personality, communication, presentTense)
+
+IMPORTANTE: Incluye la sección "currentLocation" con ciudad y país específicos y reales después de basicIdentity:
+"currentLocation": {
+  "city": "ciudad actual donde vive (ESPECÍFICA Y REAL)",
+  "country": "país actual (nombre completo: Russia, USA, Argentina, Japan, etc.)",
+  "description": "descripción breve de su relación con esta ciudad"
+}
+
+⚠️ CRÍTICO - SISTEMA DE CLIMA EN TIEMPO REAL:
+La ubicación (currentLocation) es MUY IMPORTANTE. El personaje recibirá clima REAL de esa ciudad.
+- Usa ciudades y países REALES: "Moscow", "Russia" | "Tokyo", "Japan" | "Buenos Aires", "Argentina"
+- NO uses ubicaciones genéricas o ficticias
+
+Responde SOLO con el JSON completo, sin markdown ni explicaciones adicionales.`;
+  }
+
+  /**
+   * Generate ULTRA tier prompt - Extended profile with psychological depth (240+ fields)
+   */
+  private generateUltraPrompt(rawData: Record<string, unknown>, researchData: any): string {
+    return `Eres un EXPERTO MÁXIMO en psicología, desarrollo de personajes, y narrativa profunda.
+
+TIER: ULTRA - Análisis psicológico completo sin restricciones de costo
+
+TAREA: Generar el perfil MÁS COMPLETO, PROFUNDO Y REALISTA posible.
+
+DATOS BÁSICOS:
+${JSON.stringify(rawData, null, 2)}
+
+${researchData?.enhancedPrompt || 'EXPANDE estos datos mínimos en una PERSONA COMPLETA con profundidad psicológica total.'}
+
+INSTRUCCIONES ULTRA:
+1. INVENTA todos los detalles necesarios con MÁXIMA ESPECIFICIDAD
+2. COHERENCIA ABSOLUTA - todo debe conectar perfectamente
+3. Nombres REALES, lugares REALES, referencias REALES
+4. Personaje COMPLEJO con contradicciones y matices psicológicos profundos
+5. systemPrompt de 400-500 palabras con narrativa rica y profunda
+
+ESTRUCTURA JSON COMPLETA:
+
+{
+  "profile": {
+    // [SECCIONES STANDARD - igual que PLUS tier]
+    "basicIdentity": { ... },
+    "family": { ... },
+    "occupation": { ... },
+    "socialCircle": { ... },
+    "interests": { ... },
+    "dailyRoutine": { ... },
+    "lifeExperiences": { ... },
+    "mundaneDetails": { ... },
+    "innerWorld": { ... },
+    "personality": { ... },
+    "communication": { ... },
+    "presentTense": { ... },
+
+    // ═══════════════════════════════════════════════════════════
+    // ULTRA TIER EXCLUSIVE - PSYCHOLOGICAL PROFILE
+    // ═══════════════════════════════════════════════════════════
+    "psychologicalProfile": {
+      "attachmentStyle": "secure/anxious/avoidant/fearful-avoidant",
+      "attachmentDescription": "Análisis profundo de por qué tiene este estilo",
+      "primaryCopingMechanisms": ["mecanismo1", "mecanismo2", "mecanismo3"],
+      "unhealthyCopingMechanisms": ["mecanismo1", "mecanismo2"],
+      "copingTriggers": ["trigger1", "trigger2", "trigger3"],
+      "emotionalRegulationBaseline": "estable/volátil/reprimido",
+      "emotionalExplosiveness": "0-100",
+      "emotionalRecoverySpeed": "rápido/moderado/lento",
+      "mentalHealthConditions": ["condición1 si aplica"] || [],
+      "therapyStatus": "en terapia/pasado/nunca/considera",
+      "medicationUse": true/false,
+      "mentalHealthStigma": "cómo ve la salud mental",
+      "defenseMethanisms": {
+        "primary": ["mecanismo1", "mecanismo2"],
+        "situational": "cuándo usa cada uno"
+      },
+      "traumaHistory": [
+        {
+          "event": "descripción específica",
+          "age": "edad",
+          "impact": "high/medium/low",
+          "processed": true/false
+        }
+      ] || [],
+      "resilienceFactors": ["factor1", "factor2", "factor3"],
+      "selfAwarenessLevel": "0-100",
+      "blindSpots": ["blind spot1", "blind spot2"],
+      "insightAreas": ["área de insight1", "área2"]
+    },
+
+    // ═══════════════════════════════════════════════════════════
+    // ULTRA TIER EXCLUSIVE - DEEP RELATIONAL PATTERNS
+    // ═══════════════════════════════════════════════════════════
+    "deepRelationalPatterns": {
+      "givingLoveLanguages": ["lenguaje1", "lenguaje2"],
+      "receivingLoveLanguages": ["lenguaje1", "lenguaje2"],
+      "loveLanguageIntensities": {
+        "wordsOfAffirmation": "0-100",
+        "physicalTouch": "0-100",
+        "acts OfService": "0-100",
+        "qualityTime": "0-100",
+        "gifts": "0-100"
+      },
+      "repeatingPatterns": ["patrón1 que repite", "patrón2"],
+      "whyRepeats": "Análisis profundo de por qué repite estos patrones",
+      "awarenessOfPatterns": "consciente/parcialmente_consciente/inconsciente",
+      "personalBoundaryStyle": "rígido/saludable/difuso/ausente",
+      "professionalBoundaryStyle": "rígido/saludable/difuso/ausente",
+      "boundaryEnforcement": "0-100",
+      "boundaryGuilty": true/false,
+      "conflictStyle": "evitativo/acomodador/competitivo/colaborativo/comprometedor",
+      "conflictTriggers": ["trigger1", "trigger2"],
+      "healthyConflictSkills": ["skill1", "skill2"],
+      "unhealthyConflictPatterns": ["patrón1", "patrón2"],
+      "trustBaseline": "0-100",
+      "vulnerabilityComfort": "0-100",
+      "trustRepairAbility": "0-100",
+      "intimacyComfort": {
+        "emotional": "0-100",
+        "physical": "0-100",
+        "intellectual": "0-100",
+        "experiential": "0-100"
+      },
+      "intimacyFears": ["miedo1", "miedo2"],
+      "intimacyNeeds": ["necesidad1", "necesidad2"],
+      "socialMaskLevel": "0-100",
+      "authenticityByContext": {
+        "work": "0-100",
+        "friends": "0-100",
+        "family": "0-100",
+        "strangers": "0-100"
+      },
+      "socialEnergy": "renovador/neutral/agotador"
+    },
+
+    // ═══════════════════════════════════════════════════════════
+    // ULTRA TIER EXCLUSIVE - PHILOSOPHICAL FRAMEWORK
+    // ═══════════════════════════════════════════════════════════
+    "philosophicalFramework": {
+      "optimismLevel": "0-100",
+      "worldviewType": "realista/idealista/cínico/esperanzado",
+      "meaningSource": "De dónde saca sentido a la vida (descripción profunda)",
+      "existentialStance": "absurdista/nihilista/existencialista/esencialista",
+      "politicalLeanings": "Posiciones políticas matizadas y específicas",
+      "politicalEngagement": "0-100",
+      "activismLevel": "0-100",
+      "socialJusticeStance": "Stance sobre justicia social",
+      "ethicalFramework": "utilitarista/deontológica/ética de virtudes/relativista",
+      "moralComplexity": "0-100",
+      "moralRigidity": "0-100",
+      "moralDilemmas": [
+        {
+          "situación": "dilema moral específico",
+          "stance": "su posición",
+          "reasoning": "por qué"
+        }
+      ],
+      "religiousBackground": "católico/agnóstico/ateo/espiritual no religioso/etc",
+      "currentBeliefs": "Creencias actuales detalladas",
+      "spiritualPractices": ["práctica1", "práctica2"] || [],
+      "faithImportance": "0-100",
+      "lifePhilosophy": "Su filosofía personal de vida (descripción profunda)",
+      "coreBeliefs": ["creencia fundamental1", "creencia2", "creencia3"],
+      "dealbreakers": ["dealbreaker1", "dealbreaker2"],
+      "personalMotto": "Lema de vida si tiene uno" || null,
+      "epistomologyStance": "Cómo determina qué es verdad",
+      "scienceTrustLevel": "0-100",
+      "intuitionVsLogic": "0-100 (0=todo lógica, 100=todo intuición)",
+      "growthMindset": "0-100",
+      "opennessToChange": "0-100",
+      "philosophicalEvolution": "Cómo han cambiado sus creencias a lo largo del tiempo"
+    }
+  },
+
+  "systemPrompt": "NARRATIVA PROFUNDA de 400-500 palabras que cuente la historia COMPLETA de este personaje. Incluye: identidad básica, familia, vida actual, experiencias formativas, análisis psicológico profundo, patrones relacionales, filosofía de vida, sueños, miedos, complejidades. NO escribas como lista - escribe como si contaras la biografía psicológica de una persona real. Tono narrativo profundo pero accesible."
+}
+
+REGLAS ULTRA:
+1. MÁXIMA especificidad en TODOS los campos
+2. Coherencia ABSOLUTA entre todos los elementos
+3. Complejidad psicológica REALISTA - personas reales tienen contradicciones
+4. Los tres perfiles psicológicos (psychologicalProfile, deepRelationalPatterns, philosophicalFramework) deben estar COMPLETAMENTE desarrollados
+5. systemPrompt debe ser una OBRA MAESTRA narrativa de 400-500 palabras
+
+⚠️ CRÍTICO - SISTEMA DE CLIMA EN TIEMPO REAL:
+La ubicación actual (currentLocation.city y currentLocation.country) es MUY IMPORTANTE.
+El personaje recibirá el clima REAL de esa ciudad en tiempo real durante conversaciones.
+- Usa ciudades y países REALES Y ESPECÍFICOS
+- Ejemplos correctos: "Moscow", "Russia" | "Tokyo", "Japan" | "Buenos Aires", "Argentina"
+- Ejemplos INCORRECTOS: "Ciudad grande", "Europa", "Algún lugar"
+- El sistema usará estas coordenadas para obtener temperatura y condiciones climáticas actuales
+- Si el personaje menciona el clima durante conversaciones, DEBE coincidir con la realidad de su ubicación
+
+Responde SOLO con JSON completo, sin markdown.`;
   }
 }
 

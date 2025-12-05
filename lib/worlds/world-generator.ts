@@ -1,11 +1,11 @@
 /**
  * WORLD GENERATOR - Servicio de generación de mundos con Gemini
  *
- * Usa Gemini 2.0 Flash para generar configuraciones de mundos
+ * Usa Gemini 2.5 Flash para generar configuraciones de mundos
  * basadas en descripciones en lenguaje natural
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { executeWithRetry } from "@/lib/ai/gemini-client";
 import type {
   GenerateWorldRequest,
   AIWorldGeneration,
@@ -14,27 +14,8 @@ import type {
 import { getTemplateById } from "./templates";
 
 export class WorldGeneratorService {
-  private client: GoogleGenerativeAI;
-  private apiKey: string;
-
-  constructor(apiKey?: string) {
-    // Usar GOOGLE_AI_API_KEY para consistencia con el resto de la app
-    // Intentar múltiples keys (_1, _2, _3, _4) o la key sin sufijo
-    this.apiKey = apiKey ||
-      process.env.GOOGLE_AI_API_KEY ||
-      process.env.GOOGLE_AI_API_KEY_1 ||
-      process.env.GOOGLE_AI_API_KEY_2 ||
-      process.env.GOOGLE_AI_API_KEY_3 ||
-      process.env.GOOGLE_AI_API_KEY_4 ||
-      process.env.GEMINI_API_KEY ||
-      "";
-
-    if (!this.apiKey) {
-      throw new Error("Google AI API key not found. Please set GOOGLE_AI_API_KEY in .env");
-    }
-
-    this.client = new GoogleGenerativeAI(this.apiKey);
-    console.log("[WorldGenerator] Service initialized with API key");
+  constructor() {
+    console.log("[WorldGenerator] Service initialized with centralized Gemini client");
   }
 
   /**
@@ -53,13 +34,15 @@ export class WorldGeneratorService {
       }
 
       // Modo automático estándar
-      const model = this.client.getGenerativeModel({
-        model: "gemini-2.0-flash-exp",
-      });
-
       const prompt = this.buildPrompt(request);
 
-      const result = await model.generateContent(prompt);
+      const result = await executeWithRetry(async (client) => {
+        const model = client.getGenerativeModel({
+          model: process.env.GEMINI_MODEL_FULL || "gemini-2.5-flash",
+        });
+        return await model.generateContent(prompt);
+      });
+
       const response = result.response;
       const text = response.text();
 
@@ -94,10 +77,6 @@ export class WorldGeneratorService {
   private async generateWorldDetailed(request: GenerateWorldRequest): Promise<AIWorldGeneration> {
     console.log("[WorldGenerator] DETAILED MODE - Two-step generation");
 
-    const model = this.client.getGenerativeModel({
-      model: "gemini-2.0-flash-exp",
-    });
-
     const template = request.templateId ? getTemplateById(request.templateId) : null;
     const characterDescs = request.characterDescriptions || [];
 
@@ -105,7 +84,13 @@ export class WorldGeneratorService {
     console.log("[WorldGenerator] Step 1: Planning world structure...");
     const planningPrompt = this.buildPlanningPrompt(request, template);
 
-    const planResult = await model.generateContent(planningPrompt);
+    const planResult = await executeWithRetry(async (client) => {
+      const model = client.getGenerativeModel({
+        model: process.env.GEMINI_MODEL_FULL || "gemini-2.5-flash",
+      });
+      return await model.generateContent(planningPrompt);
+    });
+
     const planText = planResult.response.text();
 
     console.log("[WorldGenerator] Planning response:", planText.substring(0, 200));
@@ -157,10 +142,6 @@ export class WorldGeneratorService {
     request: GenerateWorldRequest,
     template: any
   ): Promise<any> {
-    const model = this.client.getGenerativeModel({
-      model: "gemini-2.0-flash-exp",
-    });
-
     const prompt = `Eres un diseñador de personajes experto para mundos virtuales.
 
 CONTEXTO DEL MUNDO:
@@ -194,7 +175,13 @@ RESPONDE SOLO CON UN JSON VÁLIDO:
 }
 \`\`\``;
 
-    const result = await model.generateContent(prompt);
+    const result = await executeWithRetry(async (client) => {
+      const model = client.getGenerativeModel({
+        model: process.env.GEMINI_MODEL_FULL || "gemini-2.5-flash",
+      });
+      return await model.generateContent(prompt);
+    });
+
     const text = result.response.text();
 
     const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);

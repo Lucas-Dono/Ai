@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { DatabaseBackupService } from '@/lib/services/database-backup.service';
 import { createLogger } from '@/lib/logging/logger';
 import { prisma } from '@/lib/prisma';
@@ -22,15 +22,15 @@ const log = createLogger('AdminBackups');
 
 // Helper: Verificar autenticación de admin
 async function verifyAdminAuth(req: NextRequest) {
-  const session = await auth();
+  const user = await getAuthenticatedUser(req);
 
-  if (!session?.user?.email) {
+  if (!user?.email) {
     return { authorized: false, error: 'Unauthorized' };
   }
 
   // Verificar que el usuario existe
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: user.email },
     select: { id: true, email: true },
   });
 

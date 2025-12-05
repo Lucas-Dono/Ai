@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { updateBondMetrics } from "@/lib/services/symbolic-bonds.service";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -21,21 +20,23 @@ const updateMetricsSchema = z.object({
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "No autenticado" },
         { status: 401 }
       );
     }
 
+    const { id } = await params;
+
     // Verificar que el bond pertenece al usuario
     const bond = await prisma.symbolicBond.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!bond) {
@@ -55,7 +56,7 @@ export async function PUT(
     const body = await req.json();
     const validatedData = updateMetricsSchema.parse(body);
 
-    const updatedBond = await updateBondMetrics(params.id, validatedData);
+    const updatedBond = await updateBondMetrics(id, validatedData);
 
     return NextResponse.json({
       success: true,

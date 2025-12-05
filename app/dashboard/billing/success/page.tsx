@@ -123,7 +123,7 @@ export default function CheckoutSuccessPage() {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => router.push("/constructor")}
+            onClick={() => router.push("/create-character")}
           >
             Create Your First Agent
           </Button>

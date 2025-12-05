@@ -10,8 +10,11 @@
  * - Ultra: 1 segundo mensajes, 5 segundos imágenes/voz
  */
 
-import { redis } from "@/lib/redis/config";
+import { redis, isRedisConfigured } from "@/lib/redis/config";
 import { getTierLimits } from "./tier-limits";
+
+// In-memory fallback when Redis is not configured
+const memoryCache = new Map<string, number>();
 
 export type CooldownAction = "message" | "voice" | "image" | "world_message";
 
@@ -39,9 +42,21 @@ export async function checkCooldown(
       return { allowed: true, waitMs: 0 };
     }
 
-    // Buscar última acción en Redis
     const key = buildCooldownKey(userId, action);
-    const lastActionStr = await redis.get(key);
+    let lastActionStr: string | number | null = null;
+
+    // Usar Redis si está configurado, sino usar memoria
+    if (isRedisConfigured()) {
+      try {
+        lastActionStr = await redis.get(key);
+      } catch (error) {
+        console.warn("[CooldownTracker] Redis get failed, falling back to memory:", error);
+        lastActionStr = memoryCache.get(key) || null;
+      }
+    } else {
+      // Fallback a memoria
+      lastActionStr = memoryCache.get(key) || null;
+    }
 
     if (!lastActionStr) {
       // Primera vez o cooldown ya expiró
@@ -49,7 +64,7 @@ export async function checkCooldown(
     }
 
     // Calcular tiempo transcurrido
-    const lastAction = parseInt(lastActionStr);
+    const lastAction = typeof lastActionStr === 'string' ? parseInt(lastActionStr) : lastActionStr;
     const elapsed = Date.now() - lastAction;
 
     if (elapsed < cooldownMs) {
@@ -88,10 +103,25 @@ export async function trackCooldown(
     }
 
     const key = buildCooldownKey(userId, action);
+    const timestamp = Date.now();
     const expireSeconds = Math.ceil(cooldownMs / 1000) + 1; // +1 segundo de margen
 
-    // Guardar timestamp actual con expiración automática
-    await redis.set(key, Date.now().toString(), "EX", expireSeconds);
+    // Usar Redis si está configurado, sino usar memoria
+    if (isRedisConfigured()) {
+      try {
+        await redis.set(key, timestamp.toString(), "EX", expireSeconds);
+      } catch (error) {
+        console.warn("[CooldownTracker] Redis set failed, falling back to memory:", error);
+        memoryCache.set(key, timestamp);
+        // Auto-cleanup de memoria después del cooldown
+        setTimeout(() => memoryCache.delete(key), cooldownMs);
+      }
+    } else {
+      // Fallback a memoria
+      memoryCache.set(key, timestamp);
+      // Auto-cleanup de memoria después del cooldown
+      setTimeout(() => memoryCache.delete(key), cooldownMs);
+    }
   } catch (error) {
     console.error("[CooldownTracker] Error tracking cooldown:", error);
     // No lanzar error, solo loguear
@@ -106,16 +136,32 @@ export async function resetCooldown(
   action?: CooldownAction
 ): Promise<void> {
   try {
+    if (isRedisConfigured()) {
+      if (action) {
+        // Resetear acción específica
+        const key = buildCooldownKey(userId, action);
+        await redis.del(key);
+      } else {
+        // Resetear todos los cooldowns del usuario
+        const pattern = `cooldown:${userId}:*`;
+        const keys = await redis.keys(pattern);
+        if (keys.length > 0) {
+          await redis.del(...keys);
+        }
+      }
+    }
+
+    // Limpiar también del cache en memoria
     if (action) {
-      // Resetear acción específica
       const key = buildCooldownKey(userId, action);
-      await redis.del(key);
+      memoryCache.delete(key);
     } else {
-      // Resetear todos los cooldowns del usuario
-      const pattern = `cooldown:${userId}:*`;
-      const keys = await redis.keys(pattern);
-      if (keys.length > 0) {
-        await redis.del(...keys);
+      // Limpiar todas las keys del usuario de memoria
+      const prefix = `cooldown:${userId}:`;
+      for (const key of memoryCache.keys()) {
+        if (key.startsWith(prefix)) {
+          memoryCache.delete(key);
+        }
       }
     }
   } catch (error) {
@@ -134,12 +180,23 @@ export async function getUserCooldowns(
 
   for (const action of actions) {
     const key = buildCooldownKey(userId, action);
-    const lastActionStr = await redis.get(key);
+    let lastActionStr: string | number | null = null;
+
+    // Usar Redis si está configurado, sino usar memoria
+    if (isRedisConfigured()) {
+      try {
+        lastActionStr = await redis.get(key);
+      } catch (error) {
+        lastActionStr = memoryCache.get(key) || null;
+      }
+    } else {
+      lastActionStr = memoryCache.get(key) || null;
+    }
 
     if (!lastActionStr) {
       result[action] = { active: false, remainingMs: 0 };
     } else {
-      const lastAction = parseInt(lastActionStr);
+      const lastAction = typeof lastActionStr === 'string' ? parseInt(lastActionStr) : lastActionStr;
       const elapsed = Date.now() - lastAction;
       // Asumir cooldown de 5 segundos por defecto para estimación
       const remainingMs = Math.max(0, 5000 - elapsed);

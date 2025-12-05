@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 const NSFW_CONSENT_VERSION = "v1.0";
@@ -10,9 +10,9 @@ const NSFW_CONSENT_VERSION = "v1.0";
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json(
         { error: "No autenticado" },
         {
@@ -127,9 +127,9 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json(
         { error: "No autenticado" },
         {
@@ -204,9 +204,9 @@ export async function DELETE(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.email) {
+    if (!user?.email) {
       return NextResponse.json(
         { error: "No autenticado" },
         {

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { Toaster } from "@/components/ui/toast";
@@ -14,6 +15,10 @@ interface RootLayoutWrapperProps {
 
 export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+
+  // Hide footer in chat pages (agentes/[id])
+  const isChat = pathname?.startsWith('/agentes/') && !pathname.includes('/edit') && !pathname.includes('/behaviors') && !pathname.includes('/memory');
 
   // ANALYTICS TRACKING: Mobile Session Detection (Fase 6 - User Experience)
   useEffect(() => {
@@ -67,7 +72,7 @@ export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
       <div className="flex flex-col min-h-screen">
         <OfflineBanner />
         <div className="flex-1">{children}</div>
-        <Footer />
+        {!isChat && <Footer />}
         <AccessibilityIndicator />
       </div>
       <Toaster

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getElevenLabsClient } from '@/lib/voice-system/elevenlabs-client';
 import { cleanTextForTTS, hasSpokenContent } from '@/lib/voice-system/text-cleaner';
 import { getVoiceConfig, getVoiceSettings } from '@/lib/voice-system/voice-config';
@@ -16,14 +16,14 @@ const log = createLogger('API/Worlds/TTS');
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
-    const userPlan = (session.user as any).plan || 'free';
+    const userId = user.id;
+    const userPlan = (user as any).plan || 'free';
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // COOLDOWN CHECK for Voice (Anti-Bot Protection)

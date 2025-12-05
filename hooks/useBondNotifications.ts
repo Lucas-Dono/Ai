@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useBondSocket } from "./useBondSocket";
-import { BondEventType } from "@/lib/websocket/bonds-events";
+import { BondEventType } from "@/lib/websocket/bond-event-types";
 import { toast } from "sonner"; // Using sonner for toast notifications
 
 interface BondNotification {

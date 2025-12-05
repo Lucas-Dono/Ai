@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     "sharp",
     "onnxruntime-node",
-    "@xenova/transformers",
     "hnswlib-node",
     "node-llama-cpp",
   ],
@@ -32,7 +31,6 @@ const nextConfig: NextConfig = {
         "onnxruntime-node": false,
         "hnswlib-node": false,
         "node-llama-cpp": false,
-        "@xenova/transformers": false,
       };
 
       // Ignorar archivos .node en el cliente

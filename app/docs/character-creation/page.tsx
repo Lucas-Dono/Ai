@@ -298,7 +298,7 @@ export default function CharacterCreationDocs() {
             Now that you understand character creation, start building your companion!
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/constructor" className="text-sm font-medium hover:underline">
+            <Link href="/create-character" className="text-sm font-medium hover:underline">
               Open Character Creator →
             </Link>
             <Link href="/docs/memory-relationships" className="text-sm font-medium hover:underline">
