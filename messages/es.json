@@ -7,7 +7,7 @@
       "ogDescription": "Compañeros virtuales con emociones reales, memoria de largo plazo y mundos interactivos. Sin censura, sin límites."
     },
     "nav": {
-      "logo": "Circuit Prompt AI",
+      "logo": "Blaniel",
       "features": "Características",
       "demo": "Demo",
       "pricing": "Precios",
@@ -111,7 +111,7 @@
       }
     },
     "footer": {
-      "brand": "Circuit Prompt AI",
+      "brand": "Blaniel",
       "description": "Plataforma líder para crear compañeros virtuales con emociones reales y memoria de largo plazo.",
       "product": "Producto",
       "community": "Comunidad",
@@ -126,7 +126,7 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "cookies": "Cookie Policy",
-      "copyright": "© 2025 Circuit Prompt AI. All rights reserved.",
+      "copyright": "© 2025 Blaniel. All rights reserved.",
       "github": "GitHub"
     },
     "liveDemo": {
@@ -585,12 +585,12 @@
         "form": {
           "name": {
             "label": "Nombre de la Comunidad",
-            "placeholder": "Ej: Fans de Circuit Prompt",
+            "placeholder": "Ej: Fans de Blaniel",
             "hint": "El nombre público de tu comunidad"
           },
           "slug": {
             "label": "Identificador URL",
-            "placeholder": "fans-circuit-prompt",
+            "placeholder": "fans-blaniel",
             "hint": "URL de tu comunidad:"
           },
           "description": {
@@ -790,7 +790,7 @@
     "kpis": "Métricas",
     "settings": "Configuración",
     "admin": "Admin",
-    "brand": "Circuit Prompt AI",
+    "brand": "Blaniel",
     "newAI": "Nueva IA",
     "plan": "Plan",
     "planLabels": {
@@ -1173,121 +1173,6 @@
       "footer": "Se ha enviado un correo de confirmación a tu bandeja de entrada con tu recibo y detalles de suscripción."
     },
     "components": {
-      "planCard": {
-        "free": "Gratis",
-        "perMonth": "/mes",
-        "perYear": "/año",
-        "saveAnnual": "Ahorra 20% con plan anual",
-        "currentPlan": "Plan Actual",
-        "getStarted": "Comenzar",
-        "upgradeTo": "Mejorar a {plan}",
-        "loading": "Cargando...",
-        "mostPopular": "Más Popular"
-      },
-      "upgradeDialog": {
-        "title": "Mejora Tu Plan",
-        "subtitle": "Elige el plan que se adapte a tus necesidades. Cambia en cualquier momento, sin compromiso.",
-        "recommended": "Recomendado",
-        "currentPlan": "Plan Actual",
-        "processing": "Procesando...",
-        "upgradeTo": "Mejorar a {plan}",
-        "features": {
-          "plus": {
-            "description": "Perfecto para usuarios regulares",
-            "feature1": "10 Agentes IA",
-            "feature2": "Mensajes de texto ilimitados",
-            "feature3": "100 mensajes de voz/mes",
-            "feature4": "5 Mundos Virtuales",
-            "feature5": "Contenido NSFW habilitado",
-            "feature6": "Sin anuncios"
-          },
-          "ultra": {
-            "description": "Experiencia completa sin límites",
-            "feature1": "Agentes IA ilimitados",
-            "feature2": "Mensajes de texto ilimitados",
-            "feature3": "500 mensajes de voz/mes",
-            "feature4": "Mundos Virtuales ilimitados",
-            "feature5": "Generación de imágenes prioritaria",
-            "feature6": "Clonación de voz",
-            "feature7": "Acceso API",
-            "feature8": "Soporte prioritario 24/7"
-          }
-        },
-        "trial": "Todos los planes incluyen una prueba gratuita de 14 días. Cancela en cualquier momento.",
-        "maybeLater": "Tal Vez Después"
-      },
-      "cancelDialog": {
-        "confirm": {
-          "title": "¿Cancelar Suscripción?",
-          "message": "¡Lamentamos verte partir! Antes de cancelar, esto es lo que perderás:",
-          "remainActive": "Tu suscripción permanecerá activa hasta",
-          "downgrade": ". Después de eso, serás degradado al plan Gratuito.",
-          "loseAccess": "Perderás acceso a:",
-          "features": {
-            "feature1": "Agentes IA y mensajes ilimitados",
-            "feature2": "Comportamientos emocionales avanzados",
-            "feature3": "Contenido NSFW",
-            "feature4": "Mensajes de voz",
-            "feature5": "Soporte prioritario",
-            "feature6": "Y más funciones premium..."
-          },
-          "beforeYouGo": "Antes de irte...",
-          "improveMessage": "¿Hay algo que podamos hacer para mejorar tu experiencia? Estamos trabajando constantemente para mejorar nuestra plataforma.",
-          "keepSubscription": "Mantener Suscripción",
-          "continueCancellation": "Continuar Cancelación"
-        },
-        "survey": {
-          "title": "Ayúdanos a Mejorar",
-          "message": "Nos encantaría saber por qué estás cancelando. Tus comentarios nos ayudan a mejorar.",
-          "reasonLabel": "¿Por qué estás cancelando?",
-          "reasons": {
-            "tooExpensive": "Demasiado caro",
-            "notUsing": "No lo uso lo suficiente",
-            "missingFeatures": "Faltan funciones que necesito",
-            "technicalIssues": "Problemas técnicos",
-            "foundAlternative": "Encontré una mejor alternativa",
-            "temporary": "Solo necesito un descanso",
-            "other": "Otra razón"
-          },
-          "feedbackLabel": "Comentarios adicionales (opcional)",
-          "feedbackPlaceholder": "Cuéntanos más sobre tu experiencia...",
-          "selectReason": "Por favor selecciona una razón para cancelar",
-          "back": "Atrás",
-          "cancel": "Cancelar Suscripción"
-        },
-        "processing": {
-          "title": "Procesando...",
-          "message": "Por favor espera mientras procesamos tu cancelación."
-        },
-        "done": {
-          "title": "Suscripción Cancelada",
-          "message": "Tu suscripción ha sido cancelada exitosamente.",
-          "remainActive": "Tu suscripción permanecerá activa hasta ",
-          "reactivate": ". Puedes reactivarla en cualquier momento antes de esa fecha.",
-          "thankYou": "¡Gracias por tus comentarios!",
-          "improve": "Apreciamos que compartas tus pensamientos. Usaremos esto para mejorar nuestra plataforma. ¡Siempre eres bienvenido de regreso!",
-          "close": "Cerrar"
-        }
-      },
-      "usageMetrics": {
-        "title": "Uso Actual",
-        "unlimited": "∞",
-        "nearLimit": "Acercándose al límite. Considera mejorar.",
-        "atLimit": "Límite alcanzado. Mejora para continuar."
-      },
-      "paymentHistory": {
-        "title": "Historial de Pagos",
-        "noHistory": "Aún no hay historial de pagos",
-        "noHistoryMessage": "Tus facturas aparecerán aquí una vez que realices un pago",
-        "status": {
-          "paid": "Pagado",
-          "pending": "Pendiente",
-          "failed": "Fallido"
-        },
-        "invoice": "Factura"
-      }
-    },
-    "components": {
       "upgradeModal": {
         "title": "Mejorar Plan",
         "subtitle": "Desbloquea todas las funciones premium",
@@ -1617,7 +1502,7 @@
   },
   "mobileHeader": {
     "defaultUser": "Usuario",
-    "brand": "Circuit Prompt AI",
+    "brand": "Blaniel",
     "viewProfile": "Ver perfil",
     "menu": {
       "home": "Inicio",
@@ -2169,10 +2054,10 @@
   "tours": {
     "welcome": {
       "name": "Tour de Bienvenida",
-      "description": "Aprende lo básico de Circuit Prompt AI",
+      "description": "Aprende lo básico de Blaniel",
       "steps": {
         "intro": {
-          "title": "¡Bienvenido a Circuit Prompt AI!",
+          "title": "¡Bienvenido a Blaniel!",
           "description": "Esta plataforma te permite crear y gestionar compañeros AI con personalidad y memoria. ¡Empecemos con un tour rápido!"
         },
         "dashboard": {
@@ -2368,12 +2253,12 @@
       "updateDate": "1 de Enero, 2025",
       "introduction": {
         "title": "Introducción",
-        "content": "Bienvenido a Circuit Prompt AI. Al acceder y utilizar nuestra plataforma, aceptas estar sujeto a estos términos y condiciones. Por favor, léelos cuidadosamente antes de usar nuestros servicios."
+        "content": "Bienvenido a Blaniel. Al acceder y utilizar nuestra plataforma, aceptas estar sujeto a estos términos y condiciones. Por favor, léelos cuidadosamente antes de usar nuestros servicios."
       },
       "sections": {
         "acceptance": {
           "title": "Aceptación de Términos",
-          "content": "Al crear una cuenta y utilizar Circuit Prompt AI, confirmas que:\n\n• Tienes al menos 18 años de edad o cuentas con el consentimiento de un tutor legal\n• Has leído y comprendes estos términos de servicio\n• Aceptas cumplir con todas las políticas y directrices de la plataforma\n• Proporcionas información veraz y precisa durante el registro"
+          "content": "Al crear una cuenta y utilizar Blaniel, confirmas que:\n\n• Tienes al menos 18 años de edad o cuentas con el consentimiento de un tutor legal\n• Has leído y comprendes estos términos de servicio\n• Aceptas cumplir con todas las políticas y directrices de la plataforma\n• Proporcionas información veraz y precisa durante el registro"
         },
         "userAccounts": {
           "title": "Cuentas de Usuario",
@@ -2389,7 +2274,7 @@
         },
         "intellectualProperty": {
           "title": "Propiedad Intelectual",
-          "content": "Derechos de la plataforma:\n• Circuit Prompt AI y todo su contenido, características y funcionalidad son propiedad de CircuitPrompt\n• Nuestra tecnología, diseño y código están protegidos por derechos de autor y otras leyes\n\nDerechos del usuario:\n• Conservas todos los derechos sobre el contenido que creas (personajes, conversaciones, mundos)\n• Nos otorgas una licencia limitada para procesar y mostrar tu contenido según sea necesario para operar el servicio\n• Puedes exportar, compartir o eliminar tu contenido en cualquier momento"
+          "content": "Derechos de la plataforma:\n• Blaniel y todo su contenido, características y funcionalidad son propiedad de CircuitPrompt\n• Nuestra tecnología, diseño y código están protegidos por derechos de autor y otras leyes\n\nDerechos del usuario:\n• Conservas todos los derechos sobre el contenido que creas (personajes, conversaciones, mundos)\n• Nos otorgas una licencia limitada para procesar y mostrar tu contenido según sea necesario para operar el servicio\n• Puedes exportar, compartir o eliminar tu contenido en cualquier momento"
         },
         "modifications": {
           "title": "Modificaciones del Servicio",
@@ -2409,7 +2294,7 @@
       "updateDate": "1 de Enero, 2025",
       "introduction": {
         "title": "Compromiso con tu Privacidad",
-        "content": "En Circuit Prompt AI, tu privacidad es nuestra prioridad. Esta política explica qué información recopilamos, cómo la utilizamos y tus derechos respecto a tus datos personales."
+        "content": "En Blaniel, tu privacidad es nuestra prioridad. Esta política explica qué información recopilamos, cómo la utilizamos y tus derechos respecto a tus datos personales."
       },
       "sections": {
         "dataCollection": {
@@ -2544,9 +2429,9 @@
       },
       "story": {
         "title": "Nuestra Historia",
-        "paragraph1": "Circuit Prompt AI nació de una pregunta simple: ¿por qué las IAs conversacionales se sienten tan... mecánicas? En 2024, un equipo de investigadores de IA, desarrolladores y diseñadores se unieron con la visión de crear algo diferente.",
+        "paragraph1": "Blaniel nació de una pregunta simple: ¿por qué las IAs conversacionales se sienten tan... mecánicas? En 2024, un equipo de investigadores de IA, desarrolladores y diseñadores se unieron con la visión de crear algo diferente.",
         "paragraph2": "En lugar de chatbots con respuestas predefinidas, imaginamos compañeros virtuales con emociones reales que evolucionan, memorias de largo plazo que persisten, y personalidades que se sienten auténticas. Queríamos construir una plataforma donde los usuarios tuvieran control total sobre sus experiencias, sin censura arbitraria ni limitaciones artificiales.",
-        "paragraph3": "Hoy, Circuit Prompt AI sirve a miles de usuarios en todo el mundo, desde escritores que desarrollan personajes, hasta personas que buscan compañía significativa, hasta desarrolladores que exploran las fronteras de la IA emocional. Y apenas estamos comenzando."
+        "paragraph3": "Hoy, Blaniel sirve a miles de usuarios en todo el mundo, desde escritores que desarrollan personajes, hasta personas que buscan compañía significativa, hasta desarrolladores que exploran las fronteras de la IA emocional. Y apenas estamos comenzando."
       },
       "values": {
         "title": "Nuestros Valores",
@@ -2677,7 +2562,7 @@
     "madeWith": "Hecho con",
     "language": "Idioma",
     "region": "Región",
-    "copyright": "© {year} Circuit Prompt AI. Todos los derechos reservados.",
+    "copyright": "© {year} Blaniel. Todos los derechos reservados.",
     "allRightsReserved": "Todos los derechos reservados",
     "socialLinks": {
       "github": "Visita nuestro GitHub",
@@ -2914,96 +2799,6 @@
     "characterSearch": {
       "title": "Buscar Personaje",
       "subtitle": "Encuentra un personaje de anime, juegos, películas o series de TV",
-      "placeholder": "Buscar personaje...",
-      "searching": "Buscando...",
-      "resultsCount": "Se encontraron {count} resultados",
-      "noResults": "No hay resultados para \"{query}\"",
-      "noResultsHelp": "Intenta ajustar los términos de búsqueda o crea un personaje original.",
-      "tryAgain": "Intentar de Nuevo",
-      "createOriginal": "Crear Original",
-      "sources": {
-        "anilist": "AniList",
-        "mal": "MyAnimeList",
-        "jikan": "Jikan",
-        "tvmaze": "TVMaze",
-        "tmdb": "TMDB",
-        "igdb": "IGDB",
-        "wikipedia": "Wikipedia",
-        "firecrawl": "Web"
-      }
-    },
-    "characterCustomization": {
-      "title": "Personalizar Personaje",
-      "subtitle": "Refina los detalles o deja que la IA te ayude",
-      "aiSuggestions": "Sugerencias de IA",
-      "generating": "Generando sugerencias...",
-      "regenerate": "Regenerar",
-      "accept": "Aceptar",
-      "fields": {
-        "name": "Nombre",
-        "age": "Edad",
-        "personality": "Rasgos de Personalidad",
-        "background": "Historia",
-        "appearance": "Apariencia",
-        "occupation": "Ocupación",
-        "goals": "Objetivos y Motivaciones",
-        "communicationStyle": "Estilo de Comunicación",
-        "quirks": "Peculiaridades Únicas"
-      },
-      "placeholders": {
-        "name": "Ingresa el nombre del personaje...",
-        "age": "Ingresa edad o rango de edad...",
-        "personality": "Añade rasgos de personalidad (ej: amable, inteligente, valiente)...",
-        "background": "Describe la historia del personaje...",
-        "appearance": "Describe la apariencia física...",
-        "occupation": "¿A qué se dedica el personaje?",
-        "goals": "¿Qué motiva a este personaje?",
-        "communicationStyle": "¿Cómo habla e interactúa el personaje?",
-        "quirks": "Características o hábitos únicos..."
-      }
-    },
-    "review": {
-      "title": "Revisar y Crear",
-      "subtitle": "Revisa tu personaje antes de crearlo",
-      "preview": "Vista Previa",
-      "edit": "Editar",
-      "create": "Crear Personaje",
-      "creating": "Creando personaje...",
-      "success": "¡Personaje creado exitosamente!",
-      "error": "Error al crear personaje",
-      "fields": {
-        "basicInfo": "Información Básica",
-        "personality": "Personalidad",
-        "background": "Historia",
-        "appearance": "Apariencia",
-        "details": "Detalles Adicionales"
-      }
-    },
-    "preview": {
-      "title": "Vista Previa del Personaje",
-      "noData": "Comienza a crear tu personaje para ver una vista previa",
-      "name": "Nombre",
-      "age": "Edad",
-      "genre": "Género",
-      "personality": "Personalidad",
-      "background": "Historia",
-      "appearance": "Apariencia",
-      "occupation": "Ocupación",
-      "goals": "Objetivos",
-      "style": "Estilo de Comunicación",
-      "quirks": "Peculiaridades"
-    },
-    "errors": {
-      "sessionCreation": "Error al crear sesión",
-      "searchFailed": "Búsqueda fallida. Por favor intenta de nuevo.",
-      "generationFailed": "Generación fallida. Por favor intenta de nuevo.",
-      "characterCreation": "Error al crear personaje",
-      "networkError": "Error de red. Por favor verifica tu conexión.",
-      "unknownError": "Ocurrió un error desconocido"
-    },
-    "characterSearch": {
-      "title": "Buscar Personaje",
-      "subtitle": "Encuentra un personaje de anime, juegos, películas o series de TV",
       "searchPlaceholder": "Buscar un personaje...",
       "searchButton": "Buscar",
       "searching": "Buscando...",
@@ -3065,6 +2860,45 @@
         "generate": "Generar",
         "continue": "Continuar"
       }
+    },
+    "review": {
+      "title": "Revisar y Crear",
+      "subtitle": "Revisa tu personaje antes de crearlo",
+      "preview": "Vista Previa",
+      "edit": "Editar",
+      "create": "Crear Personaje",
+      "creating": "Creando personaje...",
+      "success": "¡Personaje creado exitosamente!",
+      "error": "Error al crear personaje",
+      "fields": {
+        "basicInfo": "Información Básica",
+        "personality": "Personalidad",
+        "background": "Historia",
+        "appearance": "Apariencia",
+        "details": "Detalles Adicionales"
+      }
+    },
+    "preview": {
+      "title": "Vista Previa del Personaje",
+      "noData": "Comienza a crear tu personaje para ver una vista previa",
+      "name": "Nombre",
+      "age": "Edad",
+      "genre": "Género",
+      "personality": "Personalidad",
+      "background": "Historia",
+      "appearance": "Apariencia",
+      "occupation": "Ocupación",
+      "goals": "Objetivos",
+      "style": "Estilo de Comunicación",
+      "quirks": "Peculiaridades"
+    },
+    "errors": {
+      "sessionCreation": "Error al crear sesión",
+      "searchFailed": "Búsqueda fallida. Por favor intenta de nuevo.",
+      "generationFailed": "Generación fallida. Por favor intenta de nuevo.",
+      "characterCreation": "Error al crear personaje",
+      "networkError": "Error de red. Por favor verifica tu conexión.",
+      "unknownError": "Ocurrió un error desconocido"
     },
     "customize": {
       "tabs": {
@@ -3247,6 +3081,126 @@
     "searchResultCard": {
       "age": "Edad",
       "source": "Fuente"
+    }
+  },
+  "careers": {
+    "hero": {
+      "badge": "Construyendo el futuro de las conexiones humanas",
+      "title": "Únete al Equipo",
+      "titleHighlight": "Blaniel",
+      "subtitle": "Estamos construyendo el futuro de las conexiones humanas con IA. Buscamos talento excepcional en desarrollo, diseño y community para crecer juntos."
+    },
+    "why": {
+      "title": "¿Por qué",
+      "titleHighlight": "Blaniel?",
+      "subtitle": "Beneficios y oportunidades que hacen especial trabajar en Blaniel",
+      "realImpact": {
+        "title": "Impacto Real",
+        "description": "Millones de conversaciones significativas. Construyes conexiones que realmente importan."
+      },
+      "cutting-edge": {
+        "title": "Tecnología de Punta",
+        "description": "IA emocional, vida paralela, grupos, memoria a largo plazo. Estado del arte en tecnología."
+      },
+      "autonomy": {
+        "title": "Autonomía Total",
+        "description": "Trabajo remoto flexible, ownership completo, decisiones directas. Tú diriges."
+      },
+      "compensation": {
+        "title": "Compensación Competitiva",
+        "description": "Salarios en USD, ajustados al mercado global. Pagamos por talento real."
+      },
+      "global": {
+        "title": "Equipo Global",
+        "description": "Talento de LATAM y USA. Diversidad de perspectivas, una visión compartida."
+      },
+      "community": {
+        "title": "Comunidad Vibrante",
+        "description": "Colaboración diaria, aprendizaje continuo, cultura de soporte mutuo."
+      }
+    },
+    "positions": {
+      "title": "Posiciones Abiertas",
+      "subtitle": "Busca la posición que mejor se ajuste a tu perfil",
+      "whatYouWillDo": "Lo que harás",
+      "whatWeLookingFor": "Lo que buscamos",
+      "requiredSkills": "Skills Requeridas",
+      "applyButton": "Aplicar Ahora",
+      "fullstack": {
+        "title": "Ingeniero Full-Stack (React Native + Node.js)",
+        "type": "Full-time",
+        "location": "Remoto",
+        "compensation": "$3,000-5,000 USD/mes",
+        "brief": "Desarrollador experimentado para construir la próxima generación de experiencias emocionales en IA.",
+        "description": "Buscamos un ingeniero full-stack con experiencia profunda en React Native y Node.js para construir la próxima generación de experiencias con IA emocional. Serás responsable de desarrollar features del sistema emocional avanzado, optimizar conversaciones en tiempo real e integrar nuevos modelos de IA.",
+        "resp1": "Desarrollar features del sistema emocional avanzado y comportamiento proactivo",
+        "resp2": "Optimizar performance de conversaciones y sincronización de datos en tiempo real",
+        "resp3": "Integrar nuevas APIs de IA (OpenAI, Anthropic, Claude)",
+        "resp4": "Colaborar estrechamente con diseño para perfeccionar la experiencia del usuario",
+        "req1": "3+ años de experiencia en desarrollo full-stack con React Native y Node.js",
+        "req2": "Portfolio de apps publicadas en App Store/Google Play",
+        "req3": "Pasión por IA, sistemas emocionales y tecnología de vanguardia",
+        "req4": "Excelente comunicación en español, mentalidad de ownership"
+      },
+      "designer": {
+        "title": "Diseñador UX/UI",
+        "type": "Part-time",
+        "location": "Remoto",
+        "compensation": "$2,000-3,000 USD/mes",
+        "brief": "Diseñador creativo para crear interfaces que transmitan emociones y conexión humana.",
+        "description": "Buscamos un diseñador UX/UI apasionado por crear interfaces hermosas que transmitan emociones y conecten genuinamente con los usuarios. Trabajarás en aplicaciones web y mobile que permiten a millones de personas crear y conectar con IAs emocionales.",
+        "resp1": "Diseñar interfaces para features emocionales avanzadas y comportamiento proactivo",
+        "resp2": "Crear y mantener el sistema de diseño de Blaniel",
+        "resp3": "Diseñar micro-interacciones que transmitan emociones",
+        "resp4": "Colaborar con developers en implementación de diseños",
+        "req1": "2+ años de experiencia en UX/UI para aplicaciones mobile y web",
+        "req2": "Dominio de Figma y design systems",
+        "req3": "Sensibilidad por emociones y psicología del usuario",
+        "req4": "Portfolio de proyectos con énfasis en micro-interacciones"
+      },
+      "community": {
+        "title": "Community Manager (ES + EN)",
+        "type": "Part-time",
+        "location": "Remoto",
+        "compensation": "$1,500-2,500 USD/mes",
+        "brief": "Community manager bilingüe para liderar comunidades de Blaniel en Discord y redes sociales.",
+        "description": "Buscamos un community manager entusiasta y bilingüe para liderar nuestras comunidades en Discord, Reddit y redes sociales. Serás la voz de Blaniel, cultivando una comunidad vibrante y apoyando a usuarios en su journey creativo.",
+        "resp1": "Moderar y animar comunidades en Discord, Reddit y redes sociales",
+        "resp2": "Crear contenido educativo y de entretenimiento sobre IAs y Blaniel",
+        "resp3": "Responder dudas y proporcionar soporte excelente a la comunidad",
+        "resp4": "Organizar eventos, concursos y iniciativas comunitarias",
+        "req1": "2+ años de experiencia en community management o social media",
+        "req2": "Fluidez en español e inglés (escrito y verbal)",
+        "req3": "Familiaridad con Discord, Reddit y plataformas de IA",
+        "req4": "Pasión por comunidades y capacidad de conexión auténtica"
+      }
+    },
+    "howToApply": {
+      "title": "Cómo Aplicar",
+      "subtitle": "Proceso simple en 3 pasos",
+      "step1": {
+        "title": "Envía tu CV",
+        "description": "Manda tu CV, portfolio o GitHub a jobs@blaniel.com con cualquier información que consideres relevante."
+      },
+      "step2": {
+        "title": "Cuéntanos tu historia",
+        "description": "Explica por qué te interesa Blaniel, qué te entusiasma del proyecto y qué esperas aprender."
+      },
+      "step3": {
+        "title": "Comparte tu mejor trabajo",
+        "description": "Enlaza a un proyecto del que estés muy orgulloso. Queremos ver tu mejor versión."
+      },
+      "noPosition": "No encontraste una posición que te interese? Envíanos un email igual. Siempre buscamos talento excepcional.",
+      "sendEmail": "Enviar Email",
+      "learnMore": "Conocer Más"
+    },
+    "finalCta": {
+      "badge": "Únete al equipo",
+      "title": "¿Listo para cambiar el mundo de las conexiones humanas?",
+      "subtitle": "Siempre buscamos talento excepcional. Contacta con nosotros para más información sobre oportunidades.",
+      "emailButton": "Enviar Email",
+      "learnMore": "Conocer Más",
+      "supportText": "¿Preguntas? Escribe a"
     }
   }
 }
