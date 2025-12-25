@@ -25,8 +25,8 @@ export const resend = new Proxy({} as Resend, {
 });
 
 // Default sender email
-export const DEFAULT_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@circuit-prompt-ai.com';
-export const DEFAULT_FROM_NAME = process.env.RESEND_FROM_NAME || 'Circuit Prompt AI';
+export const DEFAULT_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@blaniel.com';
+export const DEFAULT_FROM_NAME = process.env.RESEND_FROM_NAME || 'Blaniel';
 
 // Email configuration
 export const EMAIL_CONFIG = {

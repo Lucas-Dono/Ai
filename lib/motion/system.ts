@@ -1,6 +1,6 @@
 /**
  * MOTION SYSTEM
- * Circuit Prompt AI - Sistema de animaciones basado en Material Design 3 Motion
+ * Blaniel - Sistema de animaciones basado en Material Design 3 Motion
  *
  * Este sistema proporciona:
  * - Tokens de duración y easing

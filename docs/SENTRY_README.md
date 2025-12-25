@@ -19,7 +19,7 @@ Todo está configurado y listo. Solo necesitas crear una cuenta en Sentry (grati
 3. Crea tu organización (ej: "tu-nombre")
 4. Crea un proyecto:
    - Selecciona **"Next.js"** como plataforma
-   - Nombre: "circuit-prompt-ai"
+   - Nombre: "blaniel"
 5. Copia el **DSN** que te muestra (algo como: `https://abc123@o456.ingest.sentry.io/789`)
 
 ### Paso 2: Configurar variables (1 min)
@@ -29,7 +29,7 @@ Crea un archivo `.env.local` con:
 ```bash
 NEXT_PUBLIC_SENTRY_DSN="https://TU_KEY_AQUI@o123456.ingest.sentry.io/7654321"
 SENTRY_ORG="tu-organizacion"
-SENTRY_PROJECT="circuit-prompt-ai"
+SENTRY_PROJECT="blaniel"
 ```
 
 ### Paso 3: Probar (2 min)

@@ -2,7 +2,7 @@
 
 ## 📋 Resumen
 
-Sistema completo de suscripciones recurrentes integrado con MercadoPago para la plataforma Circuit Prompt AI.
+Sistema completo de suscripciones recurrentes integrado con MercadoPago para la plataforma Blaniel.
 
 ---
 

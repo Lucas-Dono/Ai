@@ -1,8 +1,8 @@
-# Circuit Prompt AI - Brand Quick Start
+# Blaniel - Brand Quick Start
 
 ## 🚀 Get Started in 5 Minutes
 
-This is a quick reference guide for developers and designers to start using the Circuit Prompt AI brand system immediately.
+This is a quick reference guide for developers and designers to start using the Blaniel brand system immediately.
 
 ---
 
@@ -10,9 +10,9 @@ This is a quick reference guide for developers and designers to start using the 
 
 ### Product Names
 ```
-Full Name:  Circuit Prompt AI
-Short Name: Circuit Prompt
-Slug:       circuit-prompt-ai
+Full Name:  Blaniel
+Short Name: Blaniel
+Slug:       blaniel
 Twitter:    @circuitpromptai
 ```
 
@@ -96,7 +96,7 @@ Caption:  12px (0.75rem)  font-weight: 500
 ### Hero Title
 ```tsx
 <h1 className="text-6xl font-extrabold brand-gradient-text">
-  Circuit Prompt AI
+  Blaniel
 </h1>
 ```
 
@@ -231,7 +231,7 @@ Or use:
 <section className="brand-gradient-bg py-20">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <h1 className="text-6xl font-extrabold brand-gradient-text mb-6">
-      Circuit Prompt AI
+      Blaniel
     </h1>
     <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
       Create emotional AI companions with real emotions and long-term memory
@@ -347,7 +347,7 @@ Colors automatically adjust:
 
 Before deploying any page:
 
-- [ ] Uses "Circuit Prompt AI" (not "Creador" or "AI Creator")
+- [ ] Uses "Blaniel" (not "Creador" or "AI Creator")
 - [ ] Brand colors used (Violet, Cyan, Amber)
 - [ ] Manrope font family applied
 - [ ] Responsive on mobile, tablet, desktop

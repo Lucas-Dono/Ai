@@ -38,7 +38,7 @@ messages/
 ```json
 {
   "common": {
-    "welcome": "Bienvenido a Circuit Prompt AI",
+    "welcome": "Bienvenido a Blaniel",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
     "loading": "Cargando...",
@@ -197,7 +197,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles = {
-    es: 'Circuit Prompt AI - IA Personalizada',
+    es: 'Blaniel - IA Personalizada',
     en: 'AI Creator - Personalized AI',
   };
 
@@ -482,7 +482,7 @@ import { MetadataRoute } from 'next';
 import { locales } from './lib/i18n/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://circuit-prompt-ai.vercel.app';
+  const baseUrl = 'https://blaniel.vercel.app';
 
   const routes = ['', '/dashboard', '/community', '/marketplace'];
 

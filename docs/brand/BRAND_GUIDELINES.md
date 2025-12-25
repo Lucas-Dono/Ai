@@ -1,15 +1,15 @@
-# Circuit Prompt AI - Brand Guidelines
+# Blaniel - Brand Guidelines
 
 ## 🎯 Brand Identity
 
 ### Product Name
-- **Primary Name:** Circuit Prompt AI
-- **Short Name:** Circuit Prompt
+- **Primary Name:** Blaniel
+- **Short Name:** Blaniel
 - **Tagline:** "Create emotional AIs with real memory"
-- **Slug:** circuit-prompt-ai
+- **Slug:** blaniel
 
 ### Brand Essence
-Circuit Prompt AI is the leading platform for creating emotional AI companions with genuine emotions, long-term memory, and interactive virtual worlds. We represent innovation, authenticity, freedom, and meaningful connection.
+Blaniel is the leading platform for creating emotional AI companions with genuine emotions, long-term memory, and interactive virtual worlds. We represent innovation, authenticity, freedom, and meaningful connection.
 
 ---
 
@@ -197,8 +197,8 @@ font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI',
 ## 🎯 Logo Usage
 
 ### Logo Variants
-1. **Full Logo:** "Circuit Prompt AI" with circuit icon
-2. **Short Logo:** "Circuit Prompt" with icon
+1. **Full Logo:** "Blaniel" with circuit icon
+2. **Short Logo:** "Blaniel" with icon
 3. **Icon Only:** Circuit icon mark
 4. **Wordmark:** Text only, no icon
 
@@ -287,7 +287,7 @@ Unlimited possibilities for personalization and world-building.
 ```html
 <div class="bg-gradient-to-br from-brand-primary-400 to-brand-secondary-500">
   <h1 class="text-display font-extrabold brand-gradient-text">
-    Circuit Prompt AI
+    Blaniel
   </h1>
   <p class="text-body-large">
     Create emotional AIs with real memory
@@ -322,7 +322,7 @@ Unlimited possibilities for personalization and world-building.
 ## ✅ Brand Checklist
 
 ### Every Design Should Include:
-- [ ] Circuit Prompt AI branding (not "Creador de Inteligencias")
+- [ ] Blaniel branding (not "Creador de Inteligencias")
 - [ ] Primary brand color (Electric Violet) in key elements
 - [ ] Manrope font family
 - [ ] Consistent spacing and elevation
@@ -350,4 +350,4 @@ For brand guidelines questions or asset requests:
 
 **Last Updated:** November 2025
 **Version:** 1.0.0
-**Maintained by:** Circuit Prompt Design Team
+**Maintained by:** Blaniel Design Team

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Users, Play, Settings, Eye } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Worlds Guide | Circuit Prompt Documentation",
+  title: "Worlds Guide | Blaniel Documentation",
   description: "Create multi-companion worlds where characters interact, develop relationships, and tell stories together.",
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/auth-client';
 import { useMessages } from '@/hooks/useMessages';
 import { MessageBubble } from './MessageBubble';
 import { MessageComposer } from './MessageComposer';

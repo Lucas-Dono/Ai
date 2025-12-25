@@ -42,7 +42,7 @@ SMTP_SECURE="false"
 
 # Datos del remitente
 ENVIALOSIMPLE_FROM_EMAIL="noreply@tudominio.com"
-ENVIALOSIMPLE_FROM_NAME="Circuit Prompt AI"
+ENVIALOSIMPLE_FROM_NAME="Blaniel"
 ```
 
 ### 3️⃣ Probar Configuración

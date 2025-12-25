@@ -17,7 +17,7 @@ export default function Welcome2(props: EmailTemplateData) {
       <Heading style={h1}>Hola {userName}, tips para conversaciones increíbles</Heading>
 
       <Text style={text}>
-        Ahora que ya iniciaste con Circuit Prompt AI, queremos compartir algunos tips
+        Ahora que ya iniciaste con Blaniel, queremos compartir algunos tips
         que harán tus conversaciones mucho más interesantes y profundas.
       </Text>
 
@@ -56,7 +56,7 @@ export default function Welcome2(props: EmailTemplateData) {
       <Text style={signature}>
         Felices conversaciones,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

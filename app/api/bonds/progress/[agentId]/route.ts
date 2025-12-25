@@ -65,7 +65,28 @@ export async function GET(
     });
 
     if (!bond) {
-      return NextResponse.json({ error: "Bond no encontrado" }, { status: 404 });
+      // No bond exists yet - return initial state
+      return NextResponse.json({
+        hasBond: false,
+        currentTier: null,
+        currentAffinityLevel: 0,
+        durationDays: 0,
+        totalInteractions: 0,
+        nextTier: {
+          tier: "ACQUAINTANCE",
+          requiredAffinity: DEFAULT_TIER_REQUIREMENTS.ACQUAINTANCE.minAffinity,
+          requiredDays: DEFAULT_TIER_REQUIREMENTS.ACQUAINTANCE.minDays,
+          requiredInteractions: DEFAULT_TIER_REQUIREMENTS.ACQUAINTANCE.minInteractions,
+          progress: {
+            affinity: 0,
+            days: 0,
+            interactions: 0,
+            overall: 0,
+          },
+        },
+        status: null,
+        rarityTier: null,
+      });
     }
 
     // Calculate duration

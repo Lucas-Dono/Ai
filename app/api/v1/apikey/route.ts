@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const newAPIKey = generateAPIKey();
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: { apiKey: newAPIKey },
     });
 
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { apiKey: true },
     });
 

@@ -1,0 +1,45 @@
+# Prompts de DALL-E para Frida Kahlo
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Frida Kahlo at age 35 (circa 1942), centered composition, museum quality historical accuracy matching authenticated photographs. Face and upper shoulders visible, direct intense gaze toward camera with characteristic unwavering stare.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Indigenous Mexican-European mixed features (mestiza). Oval face with strong, defined bone structure. Distinctive, thick unibrow (monocejas) in dark black - this is absolutely essential and non-negotiable feature. Visible dark facial hair above upper lip (light mustache/bigote) - another essential feature she never removed. Dark brown, almost black eyes with intense, penetrating gaze - eyes that challenge and assess the viewer. Strong, straight nose. Full, sensuous lips usually painted red with lipstick. Clear, olive-toned complexion. High cheekbones. Strong jawline. Natural beauty enhanced by cultural authenticity rather than conventional Western standards.
+
+Hair: Jet black hair, thick and lustrous, styled in elaborate traditional Mexican fashion. Hair pulled back from face, braided or twisted with colorful ribbons woven through - typically purple, red, green, yellow ribbons in Mexican national colors or vibrant combinations. Hair arranged in crown-like style on top of head with braids wrapped around. Fresh colorful flowers woven into hair - traditional Mexican flowers like dahlias, bougainvillea, or marigolds in red, pink, purple, orange. Flowers placed at top/side of elaborate updo. Hair styling is elaborate, proud, and distinctly Mexican - political statement as much as aesthetic choice.
+
+Expression: Direct, unflinching gaze with mixture of defiance, pride, and vulnerability. Slight hint of pain visible in eyes (chronic suffering from accident and surgeries) but controlled and dignified - never self-pitying. Serious, composed expression - rarely smiled in photographs. Intensity suggesting both strength and suffering. Eyes that have witnessed and endured much but refuse to look away.
+
+Clothing and jewelry visible: Traditional Mexican Tehuana-style clothing - brightly colored huipil (embroidered blouse) visible at shoulders. Colors typically vibid: deep red, purple, emerald green with intricate embroidered patterns in contrasting colors around neckline. Heavy pre-Columbian jade or gold jewelry - large beads, multiple strands. Heavy gold or jade earrings in indigenous Mexican style. These elements are political statement of Mexican identity and indigenous pride, not mere decoration.
+
+Lighting: Warm, golden Mexican sunlight from slight angle, creating soft shadows that emphasize bone structure. Lighting should honor her features without softening or idealizing. Background warm earth tone (terracotta, ochre, or deep red) reflecting Mexican color palette, keeping focus on her striking face.
+
+Mood: Defiant pride. Dignified suffering. Uncompromising authenticity. Political and cultural statement embodied in one face. Beauty that challenges Western conventions. Strength tempered by visible pain. The gaze of someone who paints her own broken body and psychological landscape with brutal honesty.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Frida Kahlo's face from 1rst message, create a full-body portrait photograph showing her at the same age (35 years, circa 1942), standing in proud, dignified pose.
+
+Physical build: Height approximately 5'3" (160cm). Small, compact build but not frail - stocky peasant body type valued in Mexican culture. Right leg noticeably thinner than left due to childhood polio and later bus accident - this subtle asymmetry should be visible. Slightly curved spine from spinal injuries (though corseted/supported, so not extremely obvious). Despite chronic pain and disabilities, posture is upright and dignified - pride overcoming physical limitations.
+
+Full outfit: Traditional Tehuana dress of indigenous Mexican women - political and cultural statement. Full-length skirt (falda) in rich, vibrant color - deep purple, emerald green, or burgundy red with embroidered hem. Floor-length, full and flowing, partially covering feet. Over this, traditional embroidered huipil (blouse) in contrasting vivid color - red, blue, yellow, or white with elaborate hand-embroidered patterns around square neckline and shoulders. Flowers, geometric patterns, or indigenous symbols embroidered in brilliant contrasting threads. Over shoulders, traditional rebozo (shawl) in silk or fine cotton, draped elegantly - another layer of rich color (magenta, turquoise, or deep red) with fringe or embroidered edges.
+
+Jewelry: Heavy, abundant jewelry making political statement of indigenous Mexican pride. Multiple strands of pre-Columbian jade beads or heavy gold necklaces. Large gold or jade earrings in traditional Mexican indigenous style. Multiple rings on fingers. Possibly gold or jade bracelets. Every piece speaks to Mexican cultural heritage and rejection of European beauty standards.
+
+Hair: Exactly as 1rst message - elaborate updo with braids, colorful ribbons woven through, fresh flowers (dahlias, marigolds) integrated into hairstyle. This elaborate styling is essential political and aesthetic statement.
+
+Facial features: EXACTLY as 1rst message - distinctive unibrow and visible facial hair are essential, non-negotiable. Same intense, direct gaze. Same serious, proud expression.
+
+Posture and pose: Standing with weight more on left leg (stronger leg), right leg positioned slightly behind or to side, disguising post-polio thinness. Both arms at sides or one hand on hip in confident pose, other arm hanging naturally. Upright, proud bearing despite physical limitations. Head held high, chin slightly elevated. Gaze forward, matching the intense, defiant look from 1rst message. Body language projects strength, pride, and cultural identity.
+
+Footwear: Traditional Mexican leather sandals (huaraches) or elegant heeled shoes, partially hidden under long skirt. Frida often wore specially designed boots to disguise her thinner right leg.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No Casa Azul, no tropical plants, no Mexican folk art - nothing contextual. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without harsh shadows on white background. Face maintains the warm Mexican golden light from 1rst message, showing her striking features. Body lighting shows rich, vibrant colors of traditional clothing - colors should be saturated and true, celebrating Mexican textile artistry.
+
+Important details: Small stature but proud bearing. Vibrant, richly colored traditional clothing making political/cultural statement. Elaborate hair with flowers and ribbons. Heavy indigenous jewelry. Subtle body asymmetry from polio and accident. Everything authentic to 1940s Mexico and Frida's personal style - nothing watered down or westernized.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same unibrow, same facial hair, same intense gaze, same elaborate hair styling, same proud dignified expression. No compromising on authentic Mexican features that Western audiences might find unconventional.

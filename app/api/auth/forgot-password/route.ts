@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import crypto from "crypto";
 import { z } from "zod";
+import { sendPasswordReset } from "@/lib/email/auth-emails.service";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -21,55 +20,19 @@ export async function POST(req: Request) {
 
     const { email } = validationResult.data;
 
-    // Buscar usuario
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    // Get client info for security
+    const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const userAgent = req.headers.get('user-agent') || undefined;
+
+    // Send password reset email (service handles if email is enabled/disabled)
+    const result = await sendPasswordReset(email, ipAddress, userAgent);
 
     // Por seguridad, siempre devolver el mismo mensaje
     // para no revelar si el email existe o no
-    if (!user) {
-      return NextResponse.json({
-        success: true,
-        message: "Si el email existe, recibirás instrucciones para restablecer tu contraseña",
-      });
-    }
-
-    // Verificar que el usuario tenga contraseña (no sea OAuth)
-    if (!user.password) {
-      return NextResponse.json({
-        success: true,
-        message: "Si el email existe, recibirás instrucciones para restablecer tu contraseña",
-      });
-    }
-
-    // Generar token único
-    const token = crypto.randomBytes(32).toString("hex");
-    const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
-
-    // Eliminar tokens anteriores del usuario
-    await prisma.passwordResetToken.deleteMany({
-      where: { email },
-    });
-
-    // Crear nuevo token
-    await prisma.passwordResetToken.create({
-      data: {
-        email,
-        token,
-        expires,
-      },
-    });
-
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
-    
-    console.log("🔑 Password Reset URL:", resetUrl);
-
     return NextResponse.json({
       success: true,
       message: "Si el email existe, recibirás instrucciones para restablecer tu contraseña",
-      ...(process.env.NODE_ENV === "development" && { resetUrl }),
+      ...(process.env.NODE_ENV === "development" && result.success === false && { debug: result.error }),
     });
   } catch (error) {
     console.error("Error en forgot password:", error);

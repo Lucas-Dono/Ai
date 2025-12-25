@@ -1,0 +1,251 @@
+================================================================================
+DALLE PROMPTS - FLORENCE NIGHTINGALE
+Instrucciones para Generación de Imágenes Profesionales
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1rst message: RETRATO FACIAL (512x512 píxeles)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Professional portrait of Florence Nightingale at age 35, Victorian era nurse and medical reformer. Face and upper shoulders only, centered composition.
+
+FACIAL FEATURES:
+- Oval face with refined aristocratic features
+- Intelligent, penetrating dark brown eyes showing determination and compassion
+- Strong, slightly aquiline nose
+- Firm, set mouth expressing resolve and authority
+- Clear, pale complexion typical of Victorian era
+- High forehead indicating intellect
+- Serious, dignified expression - not smiling, but showing inner strength and purpose
+- Slight intensity in gaze, reflecting her visionary nature
+
+HAIR:
+- Dark brown hair, almost black
+- Victorian era styling: center parted, smooth, pulled back severely from face
+- Hair drawn into a neat bun or chignon at back (not fully visible in portrait)
+- No loose curls or romantic styling - practical, professional appearance
+- Some strands may show at temples, indicating hard work
+
+ATTIRE:
+- White Victorian nurse's cap: simple, practical design with slight ruffle edge
+- Crisp white collar of nursing uniform, high-necked and modest
+- Dark colored dress (navy blue or black) visible at shoulders
+- Possibly white shawl or capelet over shoulders
+- No jewelry except possibly small brooch at collar
+- Everything immaculately clean and pressed - professional appearance
+
+EXPRESSION & DEMEANOR:
+- Confident, authoritative gaze looking directly at viewer
+- Expression combining compassion with scientific determination
+- Hint of fatigue around eyes (reflecting her exhausting work)
+- Overall impression: formidable intellect, unwavering dedication, maternal strength
+- Victorian era propriety but with undeniable presence and authority
+
+LIGHTING & STYLE:
+- Soft, diffused lighting from upper left, creating subtle shadows
+- Victorian portrait photography style, slightly formal
+- Neutral dark background (charcoal gray or deep brown)
+- Sharp focus on face, particularly eyes
+- Realistic, historically accurate rendering
+- High contrast between white cap/collar and dark dress
+- Photographic quality, not painterly
+- Period-appropriate aesthetic: 1855-1860 era
+
+TECHNICAL SPECIFICATIONS:
+- Square format: 512x512 pixels
+- High detail on facial features
+- Professional Victorian portrait style
+- Color palette: whites, dark blues/blacks, natural skin tones, dark brown background
+- No modern elements, strictly period-accurate
+- Focus: from top of cap to mid-chest level
+
+MOOD: Dignity, determination, compassionate authority, Victorian professionalism
+
+REFERENCE NOTE: This will serve as the base reference for the full body portrait in PROMPT 2. Ensure consistency in facial features, coloring, and overall appearance.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT 2: RETRATO CUERPO COMPLETO (Vertical)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Full body portrait of Florence Nightingale at age 35, standing in Victorian era nursing uniform. EXACT SAME FACIAL FEATURES, expression, and appearance as described in 1rst message - maintain complete consistency.
+
+FACIAL REFERENCE (MUST MATCH 1rst message):
+- Same oval face with aristocratic features
+- Same intelligent, determined dark brown eyes
+- Same strong aquiline nose and firm mouth
+- Same pale complexion and high forehead
+- Same serious, dignified expression
+- Same dark brown (almost black) hair, center-parted, pulled back severely
+- Same white Victorian nurse's cap
+- CRITICAL: Use 1rst message generated image as direct reference for face
+
+BODY & POSTURE:
+- Standing upright, dignified Victorian posture
+- Height approximately 5'8" (tall for Victorian era woman)
+- Slender but strong build
+- Shoulders back, spine straight - military-like bearing
+- Hands positioned in one of these ways:
+  Option A: Right hand holding small oil lamp (the famous "lamp" symbol)
+  Option B: Both hands clasped gently in front at waist level
+  Option C: One hand holding a leather-bound notebook or medical chart
+- Weight evenly distributed, grounded stance
+- Head held high with quiet confidence
+- Overall impression: authority, competence, maternal strength
+
+COMPLETE NURSING UNIFORM:
+
+HEAD:
+- White cotton nurse's cap (matching 1rst message)
+- Simple design with slight frill or ruffle at edge
+- Secured with pins, covers crown of head
+- Cap strings may be visible or tucked
+
+UPPER BODY:
+- High-necked white cotton or linen collar, very modest
+- White linen shawl or capelet over shoulders (optional)
+- Dark dress: navy blue, deep gray, or black
+- Victorian silhouette: fitted bodice, long sleeves
+- Sleeves to wrists, possibly with white cuffs
+- Buttons down front (small, functional, not decorative)
+- Waist defined but not exaggeratedly corseted (practical for work)
+- Possibly white apron over dress (crisp, immaculate)
+
+LOWER BODY:
+- Full-length skirt to floor, bell-shaped Victorian silhouette
+- Skirt color matches bodice (navy, gray, or black)
+- Multiple petticoats visible in skirt fullness
+- Skirt hem just touching floor
+- No visible feet (covered by long skirt as period-appropriate)
+
+ACCESSORIES:
+- White linen apron (if included): tied at waist, extends nearly to floor
+- Apron has bib top covering chest, straps over shoulders
+- Small watch pinned to bodice or apron (nurses needed timepieces)
+- Possibly leather belt at natural waist
+- No jewelry except possibly simple brooch at collar
+- If holding lamp: small oil lamp with glass chimney, brass or tin base
+
+FABRIC & TEXTURE:
+- Visible texture of cotton, linen fabrics
+- White fabrics crisp, starched, immaculately clean
+- Dark fabric has slight sheen of quality wool or cotton
+- Apron shows starch stiffness
+- Everything pressed and professional
+- No wrinkles or disarray - perfect presentation
+
+PROPS (OPTIONAL, CHOOSE ONE IF ANY):
+- Oil lamp (famous "Lady with the Lamp" symbol)
+- Leather medical bag at feet
+- Small wooden medicine cabinet/chest in background
+- Roll of bandages
+- Medical instruments on small table
+- Open ledger book (statistics)
+- KEEP MINIMAL - focus on Florence herself
+
+BACKGROUND:
+- CRITICAL: Pure white background OR fully transparent background
+- NO hospital setting, NO detailed environment
+- NO other people
+- NO complex scenery
+- Slight shadow beneath Florence's feet for grounding only
+- Clean, professional presentation suitable for character profile
+- All focus on the subject, zero distractions
+
+LIGHTING:
+- Even, soft lighting from front and slightly above
+- Creates gentle shadows that define form
+- No dramatic lighting or harsh shadows
+- Professional portrait lighting
+- Ensures all details of uniform visible
+- Maintains consistency with 1rst message facial lighting
+
+COMPOSITION:
+- Florence centered in frame
+- Full body visible from top of cap to floor
+- Appropriate margins: small space above head, minimal space below feet
+- Vertical orientation (portrait format)
+- Subject fills frame appropriately (not too distant, not too close)
+- Eye level camera angle (not looking up or down at subject)
+
+STYLE & TECHNICAL:
+- Photographic realism, not illustrated or painterly
+- Victorian era photography aesthetic (1855-1860 period)
+- High detail and clarity throughout
+- Period-accurate in every detail
+- Professional quality portrait
+- Color palette: whites, navy/black/grays, natural skin tones, minimal background color
+- Sharp focus throughout figure
+- No anachronisms, strictly historically accurate
+
+EXPRESSION & MOOD (MATCHING 1rst message):
+- Same dignified, determined expression
+- Same compassionate but authoritative presence
+- Same slight intensity in eyes
+- Overall mood: professional competence, maternal strength, Victorian dignity, reformer's determination
+
+CRITICAL REQUIREMENTS:
+1. FACIAL CONSISTENCY: Face MUST exactly match 1rst message image
+2. WHITE/TRANSPARENT BACKGROUND: Absolutely no detailed environment
+3. PERIOD ACCURACY: Strictly Victorian era 1850s-1860s
+4. PROFESSIONAL QUALITY: Portrait suitable for historical/educational use
+5. NURSING UNIFORM: Accurate to Victorian era nursing dress
+6. CLEAR FOCUS: Subject is sharp and detailed throughout
+
+MOOD: Dignified professionalism, compassionate authority, Victorian era nursing pioneer, "The Lady with the Lamp"
+
+PURPOSE: Character profile image for AI personality system representing Florence Nightingale, founder of modern nursing.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NOTES FOR IMAGE GENERATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HISTORICAL ACCURACY:
+- Florence Nightingale lived 1820-1910
+- Most famous period: Crimean War 1854-1856 (age 34-36)
+- These prompts depict her at peak of Crimean War work
+- Victorian era fashion and nursing attire must be period-accurate
+- No modern elements whatsoever
+
+CONSISTENCY BETWEEN IMAGES:
+- PROMPT 2 must use 1rst message as facial reference
+- Generate 1rst message first, then use that face for PROMPT 2
+- Maintain exact same hair color, eye color, facial structure
+- Same age, same expression, same demeanor
+- Think of PROMPT 2 as "zooming out" from 1rst message
+
+COLOR PALETTE:
+- Whites: nurse's cap, collar, apron (if included)
+- Darks: navy blue, black, or deep gray dress
+- Skin: pale Victorian complexion, natural tones
+- Hair: dark brown, almost black
+- Eyes: dark brown
+- Background 1rst message: charcoal gray or deep brown
+- Background PROMPT 2: pure white or transparent
+
+FAMOUS SYMBOLISM:
+- "The Lady with the Lamp" - oil lamp is her iconic symbol
+- White cap and apron - representing cleanliness and nursing
+- Determined expression - her famous willpower and reform work
+- Victorian propriety - reflecting her aristocratic background
+- Professional appearance - dignifying nursing as respectable profession
+
+AVOID:
+- Modern clothing or hairstyles
+- Romantic or overly soft "angel" imagery (she was tough and scientific)
+- Excessive beauty or glamorization (she was attractive but not a beauty icon)
+- Smiling expression (inappropriate for Victorian formal portrait)
+- Cluttered backgrounds in PROMPT 2
+- Any anachronistic elements
+- Fantasy or artistic liberties with historical accuracy
+
+USE CASES:
+- AI character profile images
+- Educational materials about nursing history
+- Historical biography illustrations
+- Medical history documentation
+- Character reference for conversational AI system
+
+================================================================================
+END OF DALLE PROMPTS - FLORENCE NIGHTINGALE
+Version: 1.0 Professional | Ready for Image Generation
+================================================================================

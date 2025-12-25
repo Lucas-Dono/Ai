@@ -22,6 +22,9 @@ import {
   Filter,
   Sparkles,
   Clock,
+  Zap,
+  Star,
+  Circle,
 } from "lucide-react";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
@@ -43,8 +46,11 @@ import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useTranslations } from "next-intl";
 import { ProactiveMessagesWidget } from "@/components/dashboard/ProactiveMessagesWidget";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { FilterBar, type FilterState } from "@/components/dashboard/FilterBar";
+import { CompanionCard } from "@/components/companions/CompanionCard";
+import type { CategoryKey } from "@/lib/categories";
+import { Carousel } from "@/components/ui/carousel";
 
 interface Agent {
   id: string;
@@ -62,6 +68,7 @@ interface Agent {
   nsfwLevel?: string | null;
   generationTier?: string | null;
   tags?: string[] | null;
+  categories?: CategoryKey[];
   _count?: {
     reviews: number;
   };
@@ -90,6 +97,34 @@ const getCategoryColor = (index: number) => {
     "bg-orange-500/20 text-orange-400 border-orange-500/30",
   ];
   return colors[index % colors.length];
+};
+
+// Helper function to get complexity badge info - Professional design without emojis
+const getComplexityBadge = (tier?: string | null) => {
+  switch (tier) {
+    case 'ultra':
+      return {
+        label: 'Ultra',
+        bgClass: 'bg-purple-500/10 border border-purple-500/30',
+        textClass: 'text-purple-400',
+        Icon: Zap
+      };
+    case 'plus':
+      return {
+        label: 'Plus',
+        bgClass: 'bg-blue-500/10 border border-blue-500/30',
+        textClass: 'text-blue-400',
+        Icon: Star
+      };
+    case 'free':
+    default:
+      return {
+        label: 'Free',
+        bgClass: 'bg-gray-500/10 border border-gray-500/30',
+        textClass: 'text-gray-400',
+        Icon: Circle
+      };
+  }
 };
 
 // Helper to extract tags from description or name
@@ -134,6 +169,7 @@ export default function DashboardPage() {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [forYouRecommendations, setForYouRecommendations] = useState<Agent[]>([]);
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     categories: [],
@@ -174,9 +210,23 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchForYouRecommendations = async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      const res = await fetch("/api/recommendations/for-you");
+      if (res.ok) {
+        const data = await res.json();
+        setForYouRecommendations(data.recommendations || []);
+      }
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    }
+  };
+
   // Pull-to-refresh handler
   const handleRefresh = async () => {
-    await Promise.all([fetchAgents(), fetchWorlds()]);
+    await Promise.all([fetchAgents(), fetchWorlds(), fetchForYouRecommendations()]);
   };
 
   useEffect(() => {
@@ -187,6 +237,13 @@ export default function DashboardPage() {
     };
     fetchData();
   }, []);
+
+  // Fetch personalized recommendations when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchForYouRecommendations();
+    }
+  }, [isAuthenticated]);
 
   const handleDeleteAgent = async (agentId: string, agentName: string) => {
     if (!confirm(t("actions.deleteConfirm", { name: agentName }))) {
@@ -309,13 +366,37 @@ export default function DashboardPage() {
   });
 
   // Categorizar compañeros (usando sortedCompanions)
-  const recommendedCompanions = sortedCompanions.filter(
+  const myCompanions = sortedCompanions.filter((a) => a.userId !== null);
+
+  // Personajes públicos featured (premium + históricos)
+  const featuredCompanions = sortedCompanions.filter(
     (a) => a.userId === null && a.featured === true
   );
-  const myCompanions = sortedCompanions.filter((a) => a.userId !== null);
+
+  // Separar históricos de premium
+  const historicalCompanions = featuredCompanions.filter(
+    (a) => Array.isArray(a.tags) && a.tags.some(tag => tag.toLowerCase().includes('historical'))
+  );
+
+  const premiumCompanions = featuredCompanions.filter(
+    (a) => Array.isArray(a.tags) && a.tags.some(tag => tag.toLowerCase().includes('premium')) &&
+          !a.tags.some(tag => tag.toLowerCase().includes('historical'))
+  );
+
+  // Para ti - Recomendaciones personalizadas del endpoint (con fallback automático)
+  // Si no hay recomendaciones del servidor, usar fallback local
+  const forYouCompanions = forYouRecommendations.length > 0
+    ? forYouRecommendations
+    : featuredCompanions.filter(
+        (a) => Array.isArray(a.tags) && (
+          a.tags.some(tag => ['nsfw', 'romantic', 'emotional', 'creative'].includes(tag.toLowerCase()))
+        )
+      ).slice(0, 4);
+
   const popularCompanions = sortedCompanions.filter(
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) > 0
   );
+
   const otherCompanions = sortedCompanions.filter(
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) === 0
   );
@@ -362,9 +443,6 @@ export default function DashboardPage() {
 
           {/* Companions Tab */}
           <TabsContent value="companions" className="space-y-6 md:space-y-8">
-            {/* AI Recommendations */}
-            <RecommendedForYou />
-
             {/* Filter Bar */}
             <div className="lg:relative sticky top-0 lg:top-auto z-30 lg:z-auto -mx-4 lg:mx-0 px-4 lg:px-0 py-3 lg:py-0 bg-[#0B0F1A]/95 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border-b lg:border-b-0 border-gray-800/50 lg:border-transparent">
               <FilterBar filters={filters} onFiltersChange={setFilters} />
@@ -402,7 +480,8 @@ export default function DashboardPage() {
               />
             ) : (
               <>
-                {/* NOTE: Recomendados Section removed - Now handled by RecommendedForYou component above with category system */}
+                {/* AI Recommendations */}
+                <RecommendedForYou />
 
                 {/* Creados por ti Section - Enhanced (only for authenticated users) */}
                 {isAuthenticated && myCompanions.length > 0 && (
@@ -539,57 +618,104 @@ export default function DashboardPage() {
                         {t("tags.popular")}
                       </span>
                     </div>
-                    <div className="grid gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                      {popularCompanions.slice(0, 6).map((agent, idx) => {
-                        const isNew = agent.createdAt &&
-                          (Date.now() - new Date(agent.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+                    <Carousel itemWidth={280} gap={24}>
+                      {popularCompanions.slice(0, 10).map((agent, idx) => (
+                        <CompanionCard
+                          key={agent.id}
+                          id={agent.id}
+                          name={agent.name}
+                          description={agent.description}
+                          avatar={agent.avatar}
+                          categories={agent.categories}
+                          generationTier={agent.generationTier}
+                          index={idx}
+                        />
+                      ))}
+                    </Carousel>
+                  </div>
+                )}
 
-                        return (
-                          <motion.div
-                            key={agent.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              duration: 0.3,
-                              delay: idx * 0.05,
-                              ease: [0.4, 0, 0.2, 1],
-                            }}
-                          >
-                            <Link href={`/agentes/${agent.id}`}>
-                              <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-110 cursor-pointer group relative">
-                                {isNew && (
-                                  <div className="absolute -top-2 -right-2 bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-bold z-10">
-                                    {t("tags.new").toUpperCase()}
-                                  </div>
-                                )}
-                                {agent.avatar ? (
-                                  <div className="text-4xl mb-2 group-hover:scale-110 transition-transform duration-300 h-16 w-16 mx-auto rounded-2xl overflow-hidden">
-                                    <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
-                                  </div>
-                                ) : (
-                                  <div className="mb-2 group-hover:scale-110 transition-transform duration-300">
-                                    <Avatar
-                                      className="h-16 w-16 mx-auto"
-                                      style={{ background: generateGradient(agent.name) }}
-                                    >
-                                      <AvatarFallback className="text-white text-xl font-semibold bg-transparent">
-                                        {getInitials(agent.name)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                  </div>
-                                )}
-                                <h4 className="text-sm font-semibold mb-1 truncate text-center">{agent.name}</h4>
-                                <p className="text-xs text-gray-400 mb-2 text-center">{extractTags(agent, t)[0] || t("tags.companion")}</p>
-                                <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
-                                  <MessageCircle className="w-3 h-3" />
-                                  {agent.cloneCount}
-                                </div>
-                              </div>
-                            </Link>
-                          </motion.div>
-                        );
-                      })}
+                {/* Para Ti Section - Personalized Recommendations */}
+                {forYouCompanions.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                      <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
+                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.forYou.title")}</h2>
+                      <span className="text-xs md:text-sm text-gray-400 bg-purple-500/10 px-2 md:px-3 py-1 rounded-full border border-purple-500/20">
+                        {t("sections.forYou.badge")}
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-400 mb-4">{t("sections.forYou.subtitle")}</p>
+                    <Carousel itemWidth={280} gap={24}>
+                      {forYouCompanions.map((agent, idx) => (
+                        <CompanionCard
+                          key={agent.id}
+                          id={agent.id}
+                          name={agent.name}
+                          description={agent.description}
+                          avatar={agent.avatar}
+                          categories={agent.categories}
+                          generationTier={agent.generationTier}
+                          index={idx}
+                        />
+                      ))}
+                    </Carousel>
+                  </div>
+                )}
+
+                {/* Personajes Históricos Section */}
+                {historicalCompanions.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                      <Clock className="w-5 h-5 md:w-6 md:h-6 text-amber-400" />
+                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.historical.title")}</h2>
+                      <span className="text-xs md:text-sm text-gray-400 bg-amber-500/10 px-2 md:px-3 py-1 rounded-full border border-amber-500/20">
+                        {t("sections.historical.badge")}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-4">{t("sections.historical.subtitle")}</p>
+                    <Carousel itemWidth={280} gap={24}>
+                      {historicalCompanions.map((agent, idx) => (
+                        <CompanionCard
+                          key={agent.id}
+                          id={agent.id}
+                          name={agent.name}
+                          description={agent.description}
+                          avatar={agent.avatar}
+                          categories={agent.categories}
+                          generationTier={agent.generationTier}
+                          index={idx}
+                        />
+                      ))}
+                    </Carousel>
+                  </div>
+                )}
+
+                {/* Featured Section (High Quality Characters - All Accessible) */}
+                {premiumCompanions.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                      <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
+                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.premium.title")}</h2>
+                      <span className="text-xs md:text-sm text-gray-400 bg-purple-500/10 px-2 md:px-3 py-1 rounded-full border border-purple-500/20">
+                        {t("sections.premium.badge")}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-4">{t("sections.premium.subtitle")}</p>
+                    <Carousel itemWidth={280} gap={24}>
+                      {premiumCompanions.map((agent, idx) => (
+                        <CompanionCard
+                          key={agent.id}
+                          id={agent.id}
+                          name={agent.name}
+                          description={agent.description}
+                          avatar={agent.avatar}
+                          categories={agent.categories}
+                          generationTier={agent.generationTier}
+                          index={idx}
+                        />
+                      ))}
+                    </Carousel>
                   </div>
                 )}
 
@@ -606,55 +732,20 @@ export default function DashboardPage() {
                       </div>
                       <span className="text-sm md-text-secondary group-open:rotate-180 transition-transform">▼</span>
                     </summary>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <Carousel itemWidth={280} gap={24}>
                       {otherCompanions.map((agent, idx) => (
-                        <motion.div
+                        <CompanionCard
                           key={agent.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: 0.3,
-                            delay: idx * 0.05,
-                            ease: [0.4, 0, 0.2, 1],
-                          }}
-                        >
-                          <div className="md-card p-6 group hover-lift-glow">
-                            <div className="flex items-start gap-4 mb-4">
-                              <Link href={`/agentes/${agent.id}`} className="flex-shrink-0">
-                                <Avatar
-                                  className="h-14 w-14 border-2 border-transparent hover:border-primary/20 transition-all cursor-pointer md-shape-lg"
-                                  style={{ background: generateGradient(agent.name) }}
-                                >
-                                  <AvatarFallback className="text-white text-lg font-semibold bg-transparent">
-                                    {getInitials(agent.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                              </Link>
-
-                              <div className="flex-1 min-w-0">
-                                <Link href={`/agentes/${agent.id}`}>
-                                  <h3 className="text-lg font-semibold md-text-primary truncate hover:underline cursor-pointer">
-                                    {agent.name}
-                                  </h3>
-                                </Link>
-                                {agent.description && (
-                                  <p className="text-sm md-text-secondary line-clamp-2 mt-1">
-                                    {agent.description}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-
-                            <Link href={`/agentes/${agent.id}`} className="block">
-                              <Button className="w-full md-button md-button-tonal py-2.5 mt-2">
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                {t("actions.openChat")}
-                              </Button>
-                            </Link>
-                          </div>
-                        </motion.div>
+                          id={agent.id}
+                          name={agent.name}
+                          description={agent.description}
+                          avatar={agent.avatar}
+                          categories={agent.categories}
+                          generationTier={agent.generationTier}
+                          index={idx}
+                        />
                       ))}
-                    </div>
+                    </Carousel>
                   </details>
                 )}
               </>

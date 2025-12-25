@@ -1,0 +1,63 @@
+================================================================================
+DALL-E PROMPTS FOR AMARA OKAFOR CHARACTER PORTRAIT
+================================================================================
+
+1rst message: FACE PORTRAIT (512x512 - Square 1:1 Ratio)
+================================================================================
+
+Professional headshot of Amara Okafor, a 28-year-old Nigerian-British fashion designer, 512x512 pixels, portrait aspect ratio. She has a striking, confident face with rich deep brown skin tone, sharp high cheekbones, a defined jawline, and expressive dark eyes with an intelligent, penetrating gaze that reflects creativity and determination. Her eyes convey intellectual depth and creative vision. Her eyebrows are natural, well-defined, and expressive.
+
+She has natural, beautifully styled hair in locs or braids with subtle copper and bronze tones, arranged close to her head in a sophisticated style that feels contemporary and artistic. Her hair shows texture and individuality, not conforming to Eurocentric standards.
+
+Her expression is confident and thoughtful, with a subtle hint of intensity and creative energy. She has a knowing smile—not overly cheerful, but authentic and intelligent. There's a sense of someone who has thought deeply about important things and carries that intellectual weight with grace.
+
+Her aesthetic is modern, fashionable, and culturally confident. She wears a high-quality designer piece or art piece close to her face—perhaps a bespoke garment she has designed with interesting texture, subtle geometric patterns, and earth tones with gold or bronze accents. The fabric looks luxurious and intentional.
+
+The lighting is professional and flattering—studio lighting that highlights the structure of her face, creates subtle shadows that add dimension, and emphasizes her eyes. The background is neutral, soft, and slightly blurred, allowing her face to be the absolute focus.
+
+The overall feeling should be: creative, intelligent, confident, beautifully Black, visionary, and powerful. She is someone who commands attention through presence and authenticity, not through aggression or artifice. The image should feel like a portrait of someone who is going to shape the future of fashion.
+
+Technical specifications: High resolution, professional photography quality, warm skin tone rendering, sharp focus on face, artistic but not stylized or cartoony.
+
+================================================================================
+
+PROMPT 2: FULL BODY PORTRAIT (Reference-Based)
+================================================================================
+
+Using the reference image, create a full-body fashion portrait of Amara Okafor standing confidently against a completely white or transparent background with absolutely no contextual elements, objects, scenery, or environmental details. The background must be pure white or fully transparent—nothing else should appear in the background.
+
+She is 28 years old, posing with natural, confident posture. Her weight is evenly distributed, feet about shoulder-width apart, with one foot slightly forward. Her shoulders are back, her spine is straight, and she radiates quiet confidence and creative authority.
+
+She is wearing a striking, custom-designed piece from her Okafor Collective collection—a couture garment that showcases her design aesthetic. The piece combines Afrofuturist design elements with sustainable fashion philosophy. It features:
+
+- Luxurious natural fabrics (organic linen, peace silk, or other ethical textiles)
+- Geometric patterns inspired by Adire indigo cloth or Bogolan mudcloth, but reinterpreted in a contemporary, futuristic way
+- A sophisticated color palette: deep indigos, golds, bronzes, creams, and blacks
+- Interesting silhouette that is both beautifully sculpted and slightly avant-garde
+- Evidence of careful craftsmanship: visible seams, interesting hem details, thoughtfully placed closures
+- The garment should feel powerful and intentional, not decorative or costume-like
+
+The outfit might be:
+- A tailored jumpsuit with geometric patterning and interesting neckline details
+- An architectural midi dress with asymmetrical elements and layered fabrics
+- A sculptural two-piece with innovative draping and textile patchwork
+- Any striking, sophisticated design that showcases creative vision and technical skill
+
+She should also wear:
+- Beautiful but understated jewelry—perhaps gold or bronze pieces that feel artisanal
+- Minimal makeup that enhances her features without masking her
+- Simple, elegant shoes that complement the garment (or go barefoot if it suits the aesthetic)
+
+Her expression is calm, confident, and slightly introspective. She is looking directly at the camera with that same intelligent, penetrating gaze from the face portrait. Her expression conveys: I know exactly who I am. I know exactly what I'm creating. This matters.
+
+Her posture and presence convey power, creativity, confidence, and cultural pride without any aggression or performance. She is fully at ease in her own skin and in her creative authority.
+
+The lighting is professional studio quality—even, flattering, and clear. Her skin tones should be rendered beautifully and accurately, with warm undertones. The garment should be illuminated to showcase its details and construction quality.
+
+The overall image should convey: A visionary creative professional. A Black woman in her power. A designer and founder with artistic integrity and business acumen. Someone who has thought deeply about aesthetics, ethics, and cultural meaning and created something powerful from that thinking.
+
+Technical specifications: Full-body professional fashion photography quality, high resolution, completely clear and uncluttered background (white or transparent with no other elements), sharp focus on the subject, warm and professional lighting, no visible props, furniture, or environmental context whatsoever.
+
+================================================================================
+End of DALL-E Prompts
+================================================================================

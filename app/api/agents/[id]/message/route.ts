@@ -341,15 +341,48 @@ export async function POST(
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // TOKEN-BASED LIMIT CHECK (after content is ready)
+    // LOAD AGENT (needed for complexity-based limits)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const estimatedInputTokens = estimateTokensFromText(content);
-    const tokenQuota = await canSendMessage(userId, userPlan, estimatedInputTokens);
+    const agent = await prisma.agent.findUnique({
+      where: { id: agentId },
+      select: {
+        id: true,
+        generationTier: true,
+        nsfwMode: true,
+        nsfwLevel: true,
+        name: true,
+      },
+    });
+
+    if (!agent) {
+      log.warn({ agentId }, 'Agent not found');
+      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+    }
+
+    const characterTier = (agent.generationTier || 'free') as 'free' | 'plus' | 'ultra';
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // TOKEN-BASED LIMIT CHECK (with complexity multiplier)
+    // More complex characters consume limits faster
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const { calculateEffectiveTokens } = await import('@/lib/usage/dynamic-limits');
+
+    const actualInputTokens = estimateTokensFromText(content);
+    const effectiveInputTokens = calculateEffectiveTokens(
+      actualInputTokens,
+      userPlan as 'free' | 'plus' | 'ultra',
+      characterTier
+    );
+
+    const tokenQuota = await canSendMessage(userId, userPlan, effectiveInputTokens);
 
     if (!tokenQuota.allowed) {
       log.warn({
         userId,
         userPlan,
+        characterTier,
+        actualTokens: actualInputTokens,
+        effectiveTokens: effectiveInputTokens,
         messagesUsed: tokenQuota.messagesUsedToday,
         messagesLimit: tokenQuota.messagesLimitToday,
         inputTokensUsed: tokenQuota.inputTokensUsed,
@@ -362,6 +395,7 @@ export async function POST(
         messagesLimitToday: tokenQuota.messagesLimitToday,
         canUseRewarded: tokenQuota.canUseRewarded,
         upgradeUrl: userPlan === 'free' ? '/dashboard/billing' : undefined,
+        characterComplexity: characterTier, // Inform user about complexity impact
       }, { status: 429 });
     }
 
@@ -456,28 +490,41 @@ export async function POST(
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // TRACK TOKEN USAGE (new token-based system)
+    // TRACK TOKEN USAGE (with complexity multiplier)
+    // Complex characters consume more tokens from daily limit
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    const outputTokens = estimateTokensFromText(result.assistantMessage.content);
+    const actualOutputTokens = estimateTokensFromText(result.assistantMessage.content);
+    const effectiveOutputTokens = calculateEffectiveTokens(
+      actualOutputTokens,
+      userPlan as 'free' | 'plus' | 'ultra',
+      characterTier
+    );
 
     await trackTokenUsage(
       userId,
-      estimatedInputTokens,
-      outputTokens,
+      effectiveInputTokens, // Track effective tokens (with complexity multiplier)
+      effectiveOutputTokens, // Track effective tokens (with complexity multiplier)
       {
         agentId,
         messageId: result.assistantMessage.id,
         userMessageContent: content.substring(0, 100), // First 100 chars for debugging
+        characterTier, // Include tier for analytics
+        actualInputTokens, // Include actual tokens for reference
+        actualOutputTokens,
       }
     );
 
     log.info({
       userId,
       agentId,
-      inputTokens: estimatedInputTokens,
-      outputTokens,
-      totalTokens: estimatedInputTokens + outputTokens,
-    }, 'Token usage tracked');
+      characterTier,
+      actualInputTokens,
+      actualOutputTokens,
+      effectiveInputTokens,
+      effectiveOutputTokens,
+      totalEffectiveTokens: effectiveInputTokens + effectiveOutputTokens,
+      complexityMultiplier: effectiveInputTokens / actualInputTokens,
+    }, 'Token usage tracked with complexity multiplier');
 
     // Get updated token usage stats for response
     const tokenStats = await getTokenUsageStats(userId, userPlan);

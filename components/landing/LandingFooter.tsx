@@ -9,9 +9,9 @@ export function LandingFooter() {
   return (
     <footer className="bg-muted/30 border-t border-border">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-7 h-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-sm">
                 AI
@@ -83,6 +83,28 @@ export function LandingFooter() {
                 >
                   {t("twitter")}
                 </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company (NEW) */}
+          <div>
+            <h4 className="font-semibold mb-4">Company</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link href="/careers" className="hover:text-foreground transition-colors">
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link href="/sponsors" className="hover:text-foreground transition-colors">
+                  Sponsors
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-foreground transition-colors">
+                  About
+                </Link>
               </li>
             </ul>
           </div>

@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
     }
 
     const [activeBonds, legacy] = await Promise.all([
-      getUserBonds(session.user.id),
-      getUserBondLegacy(session.user.id),
+      getUserBonds(user.id),
+      getUserBondLegacy(user.id),
     ]);
 
     return NextResponse.json({

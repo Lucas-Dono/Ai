@@ -51,8 +51,8 @@ export async function POST(
       );
     }
 
-    const userId = session.user.id;
-    const userPlan = session.user.plan || 'free';
+    const userId = user.id;
+    const userPlan = user.plan || 'free';
 
     // 🔒 TIER-BASED RATE LIMITING: API requests (all windows)
     const rateLimitResult = await checkTierRateLimit(userId, userPlan);

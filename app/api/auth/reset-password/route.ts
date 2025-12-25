@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import {
+  verifyPasswordResetToken,
+  deletePasswordResetToken,
+  sendPasswordChangedNotification,
+} from "@/lib/email/auth-emails.service";
 
 const resetPasswordSchema = z.object({
   token: z.string().min(1, "Token requerido"),
+  email: z.string().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 
@@ -20,34 +26,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const { token, password } = validationResult.data;
+    const { token, email, password } = validationResult.data;
 
-    // Buscar token válido
-    const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
-    });
-
-    if (!resetToken) {
+    // Verify token
+    const verifyResult = await verifyPasswordResetToken(email, token);
+    if (!verifyResult.success) {
       return NextResponse.json(
-        { error: "Token inválido o expirado" },
+        { error: verifyResult.error },
         { status: 400 }
       );
     }
 
-    // Verificar si el token ha expirado
-    if (resetToken.expires < new Date()) {
-      await prisma.passwordResetToken.delete({
-        where: { token },
-      });
-      return NextResponse.json(
-        { error: "Token expirado" },
-        { status: 400 }
-      );
-    }
-
-    // Buscar usuario
+    // Find user
     const user = await prisma.user.findUnique({
-      where: { email: resetToken.email },
+      where: { email },
     });
 
     if (!user) {
@@ -57,19 +49,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hash de la nueva contraseña
+    // Hash new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Actualizar contraseña
+    // Update password
     await prisma.user.update({
       where: { id: user.id },
       data: { password: hashedPassword },
     });
 
-    // Eliminar token usado
-    await prisma.passwordResetToken.delete({
-      where: { token },
-    });
+    // Delete used token
+    await deletePasswordResetToken(email, token);
+
+    // Get client IP for notification
+    const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined;
+
+    // Send password changed notification (works even if emails are disabled)
+    await sendPasswordChangedNotification(email, ipAddress);
 
     return NextResponse.json({
       success: true,

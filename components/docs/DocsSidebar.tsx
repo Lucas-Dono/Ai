@@ -99,7 +99,7 @@ export function DocsSidebar() {
       <div className="px-6 py-4 border-b border-border">
         <h2 className="text-lg font-semibold">Documentación</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          Aprende a usar Circuit Prompt
+          Aprende a usar Blaniel
         </p>
       </div>
 

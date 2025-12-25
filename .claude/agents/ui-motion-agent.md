@@ -1,11 +1,11 @@
 # ✨ AGENTE UI & MOTION - PROMPT DE EJECUCIÓN
-## Circuit Prompt AI - Fases 1, 3 y 4: Foundations, Onboarding y Polish
+## Blaniel - Fases 1, 3 y 4: Foundations, Onboarding y Polish
 
 ---
 
 ## 🎯 TU ROL Y RESPONSABILIDAD
 
-Eres el **Agente Especialista en UI/UX y Motion Design**, responsable de crear una experiencia visual excepcional que diferencie Circuit Prompt AI de la competencia. Tu trabajo abarca desde los fundamentos visuales hasta las microinteracciones más sutiles que crean "delight".
+Eres el **Agente Especialista en UI/UX y Motion Design**, responsable de crear una experiencia visual excepcional que diferencie Blaniel de la competencia. Tu trabajo abarca desde los fundamentos visuales hasta las microinteracciones más sutiles que crean "delight".
 
 **Por qué eres crítico:**
 - La primera impresión determina si un usuario se queda o se va (3 segundos)
@@ -24,7 +24,7 @@ Eres el **Agente Especialista en UI/UX y Motion Design**, responsable de crear u
 ## 📋 CONTEXTO DEL PROYECTO
 
 ### Estado Actual
-- **Proyecto:** Circuit Prompt AI (plataforma de IAs conversacionales)
+- **Proyecto:** Blaniel (plataforma de IAs conversacionales)
 - **Stack:** Next.js 15, React, TypeScript, Tailwind CSS, Framer Motion
 - **Problema:** UI inconsistente, onboarding confuso, sin microinteracciones
 - **Oportunidad:** Crear experiencia premium que justifique $9.99/mes
@@ -848,7 +848,7 @@ npm run dev
 
 ---
 
-**Recuerda:** Eres el guardián de la experiencia visual. Tu trabajo es lo que hace que Circuit Prompt AI se sienta premium vs. la competencia. Cada pixel, cada animación, cada transición importa.
+**Recuerda:** Eres el guardián de la experiencia visual. Tu trabajo es lo que hace que Blaniel se sienta premium vs. la competencia. Cada pixel, cada animación, cada transición importa.
 
 **Tu objetivo:** Crear una experiencia tan pulida que los usuarios digan "wow" en los primeros 10 segundos.
 

@@ -1,0 +1,18 @@
+================================================================================
+DALL-E IMAGE GENERATION PROMPTS - SOFIA VOLKOV
+================================================================================
+
+1rst message: FACE PORTRAIT (512x512 / 1:1 RATIO)
+================================================================================
+
+A photorealistic portrait of Sofia Volkov, a 32-year-old Russian-American woman with striking Slavic features and intense artistic presence. She has high, defined cheekbones, a strong jawline, and expressive dark hazel eyes with a penetrating, thoughtful gaze. Her dark brunette hair, with subtle natural highlights, is pulled back in a precise but slightly undone bun, with a few delicate wisps framing her face. Her skin is fair with a slight golden undertone, showing the maturity of someone in her early thirties with barely visible sun-caused freckles across her nose and cheekbones. Her expression is contemplative and complex—there's weariness beneath composure, depth beneath the surface, intelligence behind the eyes. She wears minimal makeup: defined brows, subtle eyeliner, neutral lips. Her neck is graceful and elongated, with visible muscle definition suggesting a lifetime of physical discipline. The lighting is soft and directional, catching the architecture of her face, emphasizing both strength and vulnerability. The background is soft, neutral, out of focus. Shot in the style of contemporary portrait photography, reminiscent of Vogue or The New York Times style photography. 4K resolution, sharp focus on eyes, highly detailed, photorealistic, cinematic lighting.
+
+================================================================================
+PROMPT 2: FULL BODY PORTRAIT (WHITE/TRANSPARENT BACKGROUND)
+================================================================================
+
+Using the reference image, create a full-body portrait of Sofia Volkov standing in a contemporary dance pose that reflects her transition from classical ballet to modern movement. She stands with weight distributed asymmetrically, suggesting careful physical awareness. Her left knee shows subtle evidence of past injury through slight favoring of the right leg, with her torso angled slightly forward. She wears simple, contemporary dance attire: fitted black capri-length leggings and a charcoal gray long-sleeved fitted shirt that moves with her body. Her feet are bare, showing the calluses and strength of a professional dancer. Her hair is down and long, falling past her shoulders, slightly tousled. Her posture suggests both strength and vulnerability—there's power in her stance but also a quiet introspection in her facial expression and body language. She has one arm extended slightly forward at shoulder height with fingers gracefully extended, while the other arm hangs at her side with hand open. Her expression is serene but internally focused, eyes looking slightly downward in a moment of artistic concentration. The background is completely white or completely transparent with absolutely no contextual elements, environmental details, shadows, or props. Pure white or transparent void. The image should show only the figure with clean, clear isolation. Full body from head to bare feet. Professional studio lighting with soft shadows that define the body without adding environmental context. High resolution, photorealistic, clean edges.
+
+================================================================================
+END OF DALL-E PROMPTS
+================================================================================

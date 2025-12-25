@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,

@@ -54,7 +54,7 @@ export async function GET(
     }
 
     const { id: agentId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Verify agent ownership
     const agent = await prisma.agent.findFirst({
@@ -112,7 +112,7 @@ export async function DELETE(
     }
 
     const { id: agentId } = await params;
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Verify agent ownership
     const agent = await prisma.agent.findFirst({

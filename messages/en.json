@@ -7,11 +7,13 @@
       "ogDescription": "Virtual companions with real emotions, long-term memory and interactive worlds. Uncensored, unlimited."
     },
     "nav": {
-      "logo": "Circuit Prompt AI",
+      "logo": "Blaniel",
       "features": "Features",
       "demo": "Demo",
       "pricing": "Pricing",
       "community": "Community",
+      "careers": "Careers",
+      "sponsors": "Sponsors",
       "login": "Sign in",
       "getStarted": "Start for free",
       "docs": "Docs"
@@ -111,7 +113,7 @@
       }
     },
     "footer": {
-      "brand": "Circuit Prompt AI",
+      "brand": "Blaniel",
       "description": "Leading platform to create virtual companions with real emotions and long-term memory.",
       "product": "Product",
       "community": "Community",
@@ -126,7 +128,7 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "cookies": "Cookie Policy",
-      "copyright": "© 2025 Circuit Prompt AI. All rights reserved.",
+      "copyright": "© 2025 Blaniel. All rights reserved.",
       "github": "GitHub"
     },
     "liveDemo": {
@@ -332,15 +334,15 @@
       },
       "recommended": {
         "title": "Recommended",
-        "badge": "Premium characters with advanced personalities",
-        "badgeShort": "Premium",
-        "premiumBadge": "PREMIUM",
+        "badge": "Featured characters with advanced personalities",
+        "badgeShort": "Featured",
+        "premiumBadge": "FEATURED",
         "trendingBadge": "Trending",
         "reason": "Popular in conversations about {topic}",
         "interactions": "{count} interactions",
         "noRating": "No ratings",
         "chatButton": "Chat now",
-        "subtitle": "Premium characters with advanced personalities",
+        "subtitle": "Featured characters with advanced personalities",
         "noRatings": "No ratings",
         "popularIn": "Popular in conversations about {topic}",
         "diverseTopics": "diverse topics"
@@ -358,6 +360,26 @@
         "title": "Most viewed",
         "badge": "Popular",
         "newBadge": "NEW"
+      },
+      "featured": {
+        "title": "Featured",
+        "badge": "Featured",
+        "subtitle": "Featured and historical characters with complex personalities"
+      },
+      "forYou": {
+        "title": "For You",
+        "badge": "Personalized",
+        "subtitle": "Personalized recommendations based on your interests"
+      },
+      "historical": {
+        "title": "Historical Characters",
+        "badge": "Historical",
+        "subtitle": "Iconic figures from history"
+      },
+      "premium": {
+        "title": "Featured",
+        "badge": "High Quality",
+        "subtitle": "Featured characters with deep and complex personalities (Accessible to all)"
       },
       "all": {
         "title": "All companions",
@@ -425,7 +447,7 @@
       "history": "History",
       "genius": "Genius",
       "cinema": "Cinema",
-      "premium": "Premium",
+      "premium": "Featured",
       "companion": "Companion",
       "trending": "Trending",
       "new": "New",
@@ -585,12 +607,12 @@
         "form": {
           "name": {
             "label": "Community Name",
-            "placeholder": "Ex: Circuit Prompt Fans",
+            "placeholder": "Ex: Blaniel Fans",
             "hint": "The public name of your community"
           },
           "slug": {
             "label": "URL Identifier",
-            "placeholder": "circuit-prompt-fans",
+            "placeholder": "blaniel-fans",
             "hint": "Your community URL:"
           },
           "description": {
@@ -790,7 +812,7 @@
     "kpis": "Analytics",
     "settings": "Settings",
     "admin": "Admin",
-    "brand": "Circuit Prompt AI",
+    "brand": "Blaniel",
     "newAI": "New AI",
     "plan": "Plan",
     "planLabels": {
@@ -1617,7 +1639,7 @@
   },
   "mobileHeader": {
     "defaultUser": "User",
-    "brand": "Circuit Prompt AI",
+    "brand": "Blaniel",
     "viewProfile": "View profile",
     "menu": {
       "home": "Home",
@@ -2392,7 +2414,7 @@
     "madeWith": "Made with",
     "language": "Language",
     "region": "Region",
-    "copyright": "© {year} Circuit Prompt AI. All rights reserved.",
+    "copyright": "© {year} Blaniel. All rights reserved.",
     "allRightsReserved": "All rights reserved",
     "socialLinks": {
       "github": "Visit our GitHub",
@@ -2409,12 +2431,12 @@
       "backToHome": "Back to home",
       "introduction": {
         "title": "Introduction",
-        "content": "Welcome to Circuit Prompt AI. By accessing and using our platform, you agree to be bound by these terms and conditions. Please read them carefully before using our services."
+        "content": "Welcome to Blaniel. By accessing and using our platform, you agree to be bound by these terms and conditions. Please read them carefully before using our services."
       },
       "sections": {
         "acceptance": {
           "title": "Acceptance of Terms",
-          "content": "By creating an account and using Circuit Prompt AI, you confirm that:\n\n• You are at least 18 years old or have the consent of a legal guardian\n• You have read and understand these terms of service\n• You agree to comply with all platform policies and guidelines\n• You provide truthful and accurate information during registration"
+          "content": "By creating an account and using Blaniel, you confirm that:\n\n• You are at least 18 years old or have the consent of a legal guardian\n• You have read and understand these terms of service\n• You agree to comply with all platform policies and guidelines\n• You provide truthful and accurate information during registration"
         },
         "userAccounts": {
           "title": "User Accounts",
@@ -2450,7 +2472,7 @@
       "backToHome": "Back to home",
       "introduction": {
         "title": "Our Commitment to Your Privacy",
-        "content": "At Circuit Prompt AI, your privacy is our priority. This policy explains what information we collect, how we use it, and your rights regarding your personal data."
+        "content": "At Blaniel, your privacy is our priority. This policy explains what information we collect, how we use it, and your rights regarding your personal data."
       },
       "sections": {
         "dataCollection": {

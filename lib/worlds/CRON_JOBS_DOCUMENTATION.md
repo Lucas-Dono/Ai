@@ -400,4 +400,4 @@ Para agregar un nuevo job:
 
 ## 📄 Licencia
 
-Parte del proyecto Circuit Prompt AI - Todos los derechos reservados
+Parte del proyecto Blaniel - Todos los derechos reservados

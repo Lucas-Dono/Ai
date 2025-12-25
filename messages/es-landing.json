@@ -1,17 +1,20 @@
 {
   "landing": {
     "meta": {
-      "title": "Compañeros virtuales que evolucionan contigo | Circuit Prompt",
+      "title": "Compañeros virtuales que evolucionan contigo | Blaniel",
       "description": "Memoria ilimitada. Emociones reales. Relaciones que crecen. No son chatbots, son compañeros que te conocen de verdad.",
       "ogTitle": "Compañeros virtuales que evolucionan contigo",
       "ogDescription": "Memoria ilimitada. Emociones reales basadas en psicología. Relaciones que crecen naturalmente."
     },
     "nav": {
-      "logo": "Circuit Prompt",
+      "logo": "Blaniel",
       "features": "Características",
       "demo": "Demo",
       "pricing": "Precios",
       "docs": "Documentación",
+      "community": "Comunidad",
+      "careers": "Carreras",
+      "sponsors": "Marcas",
       "login": "Iniciar sesión",
       "getStarted": "Empezar gratis"
     },
@@ -94,12 +97,12 @@
       "cta": "Empezar ahora - Gratis"
     },
     "comparison": {
-      "title": "¿Por qué Circuit Prompt es",
+      "title": "¿Por qué Blaniel es",
       "titleHighlight": "diferente?",
       "subtitle": "No todos los compañeros virtuales son iguales",
       "table": {
         "feature": "Característica",
-        "us": "Circuit Prompt",
+        "us": "Blaniel",
         "others": "Otros"
       },
       "features": {

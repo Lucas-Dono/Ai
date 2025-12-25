@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 
 /**
@@ -14,7 +14,7 @@ import { redirect } from "next/navigation";
  * 3. SEO optimizado con landing page dedicada
  */
 export default async function Home() {
-  const session = await auth();
+  const session = await getServerSession();
 
   // If user is logged in, redirect to dashboard
   // (Dashboard tours will handle onboarding for new users)

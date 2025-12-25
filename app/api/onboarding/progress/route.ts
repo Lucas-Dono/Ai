@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Get or create progress
     let progress = await prisma.onboardingProgress.findUnique({
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
 
     const {
@@ -190,7 +190,7 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Reset progress
     const progress = await prisma.onboardingProgress.upsert({

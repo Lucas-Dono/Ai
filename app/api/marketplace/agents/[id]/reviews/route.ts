@@ -39,11 +39,11 @@ export async function POST(
 
   const review = await prisma.review.upsert({
     where: {
-      agentId_userId: { agentId: id, userId: session.user.id },
+      agentId_userId: { agentId: id, userId: user.id },
     },
     create: {
       agentId: id,
-      userId: session.user.id,
+      userId: user.id,
       rating,
       comment,
     },

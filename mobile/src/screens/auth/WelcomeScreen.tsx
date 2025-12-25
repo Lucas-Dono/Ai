@@ -15,7 +15,7 @@ export default function WelcomeScreen({ navigation }: WelcomeScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Circuit Prompt AI</Text>
+        <Text style={styles.title}>Blaniel</Text>
         <Text style={styles.subtitle}>
           Crea y personaliza tus propios agentes de IA con personalidades únicas
         </Text>

@@ -1,0 +1,39 @@
+DALL-E IMAGE GENERATION PROMPTS FOR RAFAEL COSTA
+================================================
+
+1rst message - FACE PORTRAIT (512x512, Square 1:1 Ratio)
+=====================================================
+
+Create a professional portrait photograph of Rafael Costa, a 38-year-old Brazilian documentary filmmaker. Square 1:1 aspect ratio (512x512). Close-up headshot focusing on the face and upper shoulders.
+
+Subject: Male, late 30s, with olive-toned skin reflecting Portuguese and Afro-Brazilian heritage. Black hair with subtle gray at the temples. Intense, observant brown eyes with depth and intelligence. Weathered facial features from years of outdoor work and sun exposure in the Amazon rainforest. Strong bone structure. Well-defined jawline with subtle stubble. Serious expression with underlying intensity and thoughtfulness. Direct, engaging gaze that suggests someone who sees deeply.
+
+Style: Cinematic portrait photography with professional lighting. Natural, honest representation without excessive retouching. Warm, documentary-style lighting. Shot in the style of a professional photographer like Sebastião Salgado—capturing human dignity and depth. The expression should convey intensity, intelligence, and quiet determination. Eyes should be the focal point—penetrating and observant. Slight three-quarter angle for dimensionality.
+
+Clothing: Simple, quality worn shirt in neutral color (white, cream, or light gray). No visible logos or decorations. The focus should be entirely on the face and eyes.
+
+Background: Soft, neutral blurred background suggesting natural light. Not perfectly smooth—slight texture or warmth that suggests depth.
+
+Mood: Contemplative, intelligent, serious but not stern. Someone who has witnessed important things. Authentic and unguarded. The portrait of someone genuinely present in the moment.
+
+
+PROMPT 2 - FULL BODY PORTRAIT (1024x1024, Complete White/Transparent Background)
+===================================================================================
+
+Using the reference image, create a full-body portrait photograph of Rafael Costa in a clean, professional studio setting. Subject must have a COMPLETELY WHITE or COMPLETELY TRANSPARENT background with NO environmental elements, props, or contextual settings visible.
+
+Subject: Same individual as the reference portrait. Medium height (approximately 5'10"), athletic build from hiking and physical field work. Olive-toned skin. Black hair with gray at temples. Intense brown eyes. Weathered but healthy appearance.
+
+Clothing: Practical, quality casual attire reflecting a working filmmaker and activist. Fitted jeans or field pants in dark denim. Simple button-up shirt in natural color (white, cream, light gray, or soft blue) with rolled sleeves suggesting functionality and comfort with manual work. Practical boots suitable for rainforest fieldwork. Optional: Simple watch or silver ring on hand. No logos, no branding, no visible corporate alignment.
+
+Pose: Standing upright with confident posture. Slight weight on one leg, natural and relaxed rather than formal. Arms at sides or one hand in pocket, comfortable and authentic. Not a stiff "model" pose—rather the natural stance of someone comfortable in their own body. Turned slightly toward camera, three-quarter angle. Hands visible and natural-looking.
+
+Expression: Direct engagement with camera. The same intensity and intelligence visible in the face portrait. Serious, slightly thoughtful expression. Not smiling, but not stern. The expression of someone who is genuinely present and aware.
+
+Background: ABSOLUTELY CRITICAL - COMPLETELY WHITE or COMPLETELY TRANSPARENT background. Zero environmental context. No floor, no walls, no shadow, no gradient, no subtle atmospheric elements. Pure white or pure transparency only. This is essential for the character profile usage.
+
+Lighting: Professional studio lighting that is flattering and clear. Slight directional lighting creating dimension without dramatic shadows. The subject should be clearly visible and well-defined against the completely white/transparent background.
+
+Style: Professional studio portrait photography. Cinematic quality. Documentary-style honesty. The photograph of a working professional—clear, direct, authentic. Similar quality to Sebastião Salgado's portraiture work—dignified, intelligent, human.
+
+Mood: Presence, intelligence, authenticity. Someone who is engaged with the world. Capable, thoughtful, serious about their work. Professional without being cold or distant.

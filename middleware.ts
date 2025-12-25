@@ -1,5 +1,6 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 import { verifyToken, extractTokenFromHeader } from "@/lib/jwt";
 import { middlewareLogger as log } from "@/lib/logging/loggers";
 import {
@@ -39,7 +40,7 @@ function isOriginAllowed(origin: string | null): boolean {
   return ALLOWED_ORIGINS.includes(origin);
 }
 
-export default auth(async (req) => {
+export default async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   const origin = req.headers.get("origin");
   const requestId = generateRequestId();
@@ -108,14 +109,7 @@ export default auth(async (req) => {
     "/community", // GROWTH: Comunidad pública - comentar como anónimo (Discord-style)
     "/docs",
     "/legal",
-    "/api/auth/signin",
-    "/api/auth/signout",
-    "/api/auth/callback",
-    "/api/auth/session",
-    "/api/auth/providers",
-    "/api/auth/csrf",
-    "/api/auth/register", // IMPORTANTE: Endpoint de registro debe ser público
-    "/api/auth/login", // IMPORTANTE: Endpoint de login debe ser público
+    "/api/auth", // better-auth: Todas las rutas de autenticación (sign-in, sign-out, get-session, register, etc.)
     "/api/webhooks/mercadopago",
     "/api/community", // GROWTH: API pública de comunidad (read + anonymous post)
     "/api/worlds", // GROWTH: API pública de mundos (read-only)
@@ -179,28 +173,21 @@ export default auth(async (req) => {
     let isAuthenticated = false;
     let authMethod = 'none';
 
-    // Primero verificar sesión NextAuth (web)
-    // SECURITY: req.auth must have a valid user object
-    // If user was deleted from DB, the session callback returns null and req.auth.user will be undefined
-    if (req.auth?.user?.id) {
+    // Primero verificar sesión better-auth (web)
+    const session = await auth.api.getSession({ headers: req.headers });
+
+    if (session?.user?.id) {
       log.info({
-        userId: req.auth.user.id,
-        userEmail: req.auth.user?.email,
-        authMethod: 'NextAuth'
-      }, 'NextAuth session found and validated');
+        userId: session.user.id,
+        userEmail: session.user.email,
+        authMethod: 'better-auth'
+      }, 'better-auth session found and validated');
       isAuthenticated = true;
-      authMethod = 'NextAuth';
-    } else if (req.auth) {
-      // Session exists but user is invalid (deleted from DB)
-      log.warn({
-        pathname,
-        hasAuth: !!req.auth,
-        hasUser: !!req.auth.user
-      }, 'Invalid session detected - user may have been deleted');
-      isAuthenticated = false;
+      authMethod = 'better-auth';
     }
+
     // Si no hay sesión web, verificar JWT token (mobile)
-    else {
+    if (!isAuthenticated) {
       const authHeader = req.headers.get('Authorization');
       const token = extractTokenFromHeader(authHeader);
 
@@ -225,8 +212,24 @@ export default auth(async (req) => {
       }
     }
 
-    // Si no está autenticado por ningún método, redirigir a login
+    // Si no está autenticado por ningún método
     if (!isAuthenticated) {
+      // Para rutas de API, devolver 401 en lugar de redirect
+      // Esto previene loops infinitos en requests AJAX
+      if (pathname.startsWith('/api/')) {
+        log.warn({ pathname }, 'Unauthorized API request - returning 401');
+        return new NextResponse(
+          JSON.stringify({ error: 'Unauthorized' }),
+          {
+            status: 401,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      }
+
+      // Para rutas web, redirigir a login
       log.warn({ pathname }, 'Unauthorized access attempt - redirecting to login');
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
@@ -236,16 +239,12 @@ export default auth(async (req) => {
       // This prevents zombie sessions from persisting
       const isProduction = process.env.NODE_ENV === 'production';
       const cookiesToClear = [
-        'authjs.session-token',
-        'next-auth.session-token',
-        'authjs.csrf-token',
-        'next-auth.csrf-token',
+        'better-auth.session_token',
+        'better-auth.csrf_token',
         // __Secure- cookies only work in production (HTTPS)
         ...(isProduction ? [
-          '__Secure-authjs.session-token',
-          '__Secure-next-auth.session-token',
-          '__Secure-authjs.csrf-token',
-          '__Secure-next-auth.csrf-token',
+          '__Secure-better-auth.session_token',
+          '__Secure-better-auth.csrf_token',
         ] : []),
       ];
 
@@ -290,7 +289,7 @@ export default auth(async (req) => {
   }
 
   return response;
-});
+}
 
 export const config = {
   matcher: [

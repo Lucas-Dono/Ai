@@ -45,7 +45,7 @@ export default function TrialEnding1(props: EmailTemplateData) {
       <Text style={signature}>
         Esperamos que te quedes,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Agente no encontrado" }, { status: 404 });
     }
 
-    if (agent.userId !== session.user.id) {
+    if (agent.userId !== user.id) {
       return NextResponse.json(
         { error: "No tienes permiso para chatear con este agente" },
         { status: 403 }
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const response = await orchestrator.processMessage({
       agentId,
       userMessage: message,
-      userId: session.user.id,
+      userId: user.id,
     });
 
     console.log(`[API] ✅ Response generated successfully`);
@@ -115,7 +115,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Agente no encontrado" }, { status: 404 });
     }
 
-    if (agent.userId !== session.user.id) {
+    if (agent.userId !== user.id) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 

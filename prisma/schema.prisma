@@ -14,7 +14,7 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
-  emailVerified DateTime?
+  emailVerified Boolean   @default(false) // better-auth uses Boolean instead of DateTime
   name          String?
   image         String?
   birthDate     DateTime? // Fecha de nacimiento del usuario
@@ -44,6 +44,14 @@ model User {
 
   agents             Agent[]
   worlds             World[]
+
+  // Groups System Relations
+  groupsCreated      Group[]           @relation("GroupCreator")
+  groupMemberships   GroupMember[]     @relation("GroupMemberUser")
+  groupMessages      GroupMessage[]    @relation("GroupMessageUser")
+  groupInvitesSent   GroupInvitation[] @relation("GroupInviter")
+  groupInvitesReceived GroupInvitation[] @relation("GroupInvitee")
+
   accounts           Account[]
   sessions           Session[]
   subscriptions      Subscription[]
@@ -103,32 +111,39 @@ model User {
   @@index([nsfwConsent])
 }
 
-// NextAuth Models
+// better-auth Account Model
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  id            String   @id @default(cuid())
+  accountId     String   // OAuth provider account ID or user ID for credentials
+  providerId    String   // Provider name: "credential", "google", etc.
+  userId        String   // Reference to User
+  accessToken   String?  @db.Text
+  refreshToken  String?  @db.Text
+  idToken       String?  @db.Text
+  expiresAt     DateTime?
+  password      String?  @db.Text // For credential provider (hashed)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@unique([providerId, accountId])
+  @@index([userId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  token     String   @unique // better-auth uses "token" instead of "sessionToken"
+  userId    String
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -137,6 +152,18 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// better-auth Verification model (for OAuth and email verification)
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
 }
 
 // Modelo de Agente (IA)
@@ -174,7 +201,8 @@ model Agent {
   firstMessageFrom    String? // user, character
 
   avatar       String? // URL o identificador de avatar
-  tags         Json? // Tags/categorías para el marketplace
+  tags         Json? // DEPRECATED: usar categories en su lugar
+  categories   String[] @default([]) // Categorías predefinidas (máximo 2): philosophy, wisdom, science, etc.
   featured     Boolean @default(false) // Destacado en el marketplace
   rating       Float? // Rating promedio (0-5)
   cloneCount   Int     @default(0) // Número de veces clonado
@@ -216,6 +244,10 @@ model Agent {
   reviews           Review[]
   clones            AgentClone[]       @relation("OriginalAgent")
   worldInteractions WorldInteraction[] @relation("SpeakerInteractions")
+
+  // Groups System Relations
+  groupMemberships GroupMember[]  @relation("GroupMemberAgent")
+  groupMessages    GroupMessage[] @relation("GroupMessageAgent")
 
   // Sistema emocional avanzado
   personalityCore  PersonalityCore?
@@ -3723,14 +3755,16 @@ model CrossContextMemory {
   agentId String // El agente que tiene esta memoria
 
   // Contexto de origen
-  sourceType    String // "individual_chat", "world_interaction", "proactive"
-  sourceWorldId String? // Si viene de un mundo/grupo
+  sourceType    String // "individual_chat", "world_interaction", "group_interaction", "proactive"
+  sourceWorldId String? // Si viene de un mundo
+  sourceGroupId String? // Si viene de un grupo
   sourceUserId  String? // Si viene de chat individual
 
   // Contenido de la memoria
-  summary       String  @db.Text // Resumen de la interacción memorable
+  summary        String  @db.Text // Resumen de la interacción memorable
   involvedAgents Json? // Array de {agentId, agentName} de otros personajes involucrados
-  emotionalTone String? // "positive", "negative", "neutral", "intense", "casual"
+  involvedUsers  Json? // Array de {userId, userName} de usuarios involucrados
+  emotionalTone  String? // "positive", "negative", "neutral", "intense", "casual"
 
   // Metadata temporal
   happenedAt DateTime // Cuándo ocurrió el evento
@@ -3754,6 +3788,7 @@ model CrossContextMemory {
   @@index([agentId])
   @@index([sourceType])
   @@index([sourceWorldId])
+  @@index([sourceGroupId])
   @@index([happenedAt])
   @@index([importance])
 }
@@ -3975,4 +4010,208 @@ model GenreDetectionFeedback {
   @@index([detectedGenre])
   @@index([isCorrect])
   @@index([timestamp])
+}
+
+// ============================================================================
+// GROUPS SYSTEM
+// Sistema de grupos colaborativos con múltiples usuarios + IAs
+// ============================================================================
+
+model Group {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  creatorId   String
+  status      GroupStatus @default(ACTIVE)
+  visibility  String      @default("private") // private, invite_only, public
+
+  // Configuración
+  allowUserMessages Boolean @default(true)
+  autoAIResponses   Boolean @default(true)
+  responseDelay     Int     @default(2000) // ms entre respuestas de IAs
+
+  // Features avanzadas (heredadas de World)
+  storyMode             Boolean @default(false)
+  allowEmotionalBonds   Boolean @default(true)
+  allowConflicts        Boolean @default(false)
+  directorEnabled       Boolean @default(false) // PLUS/ULTRA
+  emergentEventsEnabled Boolean @default(false) // ULTRA
+
+  // Estado narrativo (si storyMode activo)
+  currentStoryBeat      String? @db.Text
+  storyProgress         Float   @default(0)
+  currentSceneDirection Json?
+  currentEmergentEvent  Json?
+
+  // Métricas
+  totalMessages    Int       @default(0)
+  totalMembers     Int       @default(1)
+  lastActivityAt   DateTime  @default(now())
+
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creator         User                  @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members         GroupMember[]
+  messages        GroupMessage[]
+  simulationState GroupSimulationState?
+  invitations     GroupInvitation[]
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([lastActivityAt])
+  @@index([visibility])
+}
+
+enum GroupStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+model GroupMember {
+  id      String @id @default(cuid())
+  groupId String
+
+  // Tipo de miembro
+  memberType String  // "user" o "agent"
+  userId     String?
+  agentId    String?
+
+  // Rol y permisos
+  role             String  @default("member") // owner, moderator, member
+  canInviteMembers Boolean @default(false)
+  canRemoveMembers Boolean @default(false)
+  canManageAIs     Boolean @default(false)
+  canEditSettings  Boolean @default(false)
+
+  // Estado
+  isActive Boolean @default(true)
+  isMuted  Boolean @default(false)
+
+  // Estadísticas
+  totalMessages Int       @default(0)
+  lastMessageAt DateTime?
+  lastSeenAt    DateTime  @default(now())
+  unreadCount   Int       @default(0)
+
+  // Para IAs: importancia narrativa (si storyMode activo)
+  importanceLevel String?   @default("secondary") // main, secondary, filler
+  screenTime      Int       @default(0)
+  isFocused       Boolean   @default(false)
+  focusedUntil    DateTime?
+
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User?  @relation("GroupMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+  agent Agent? @relation("GroupMemberAgent", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@unique([groupId, agentId])
+  @@index([groupId])
+  @@index([userId])
+  @@index([agentId])
+  @@index([memberType])
+  @@index([role])
+  @@index([isActive])
+}
+
+model GroupMessage {
+  id      String @id @default(cuid())
+  groupId String
+
+  // Autor
+  authorType String  // "user" o "agent"
+  userId     String?
+  agentId    String?
+
+  // Contenido
+  content     String @db.Text
+  contentType String @default("text") // text, image, audio, system
+  mediaUrl    String?
+  metadata    Json?
+
+  // Contexto emocional (para IAs)
+  agentEmotion Json?
+
+  // Numeración de turnos
+  turnNumber Int
+
+  // Threading
+  replyToId String?
+
+  // Estado de lectura
+  readBy Json @default("[]") // Array de userIds
+
+  isSystemMessage Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group   Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user    User?         @relation("GroupMessageUser", fields: [userId], references: [id], onDelete: Cascade)
+  agent   Agent?        @relation("GroupMessageAgent", fields: [agentId], references: [id], onDelete: Cascade)
+  replyTo GroupMessage? @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies GroupMessage[] @relation("MessageReplies")
+
+  @@index([groupId])
+  @@index([groupId, turnNumber])
+  @@index([userId])
+  @@index([agentId])
+  @@index([authorType])
+  @@index([createdAt])
+  @@index([replyToId])
+}
+
+model GroupSimulationState {
+  id      String @id @default(cuid())
+  groupId String @unique
+
+  currentTurn     Int     @default(0)
+  totalMessages   Int     @default(0)
+  lastSpeakerId   String?
+  lastSpeakerType String? // "user" o "agent"
+
+  recentTopics   Json @default("[]")
+  activeSpeakers Json @default("[]")
+
+  nextAITurn   DateTime?
+  aiQueueOrder Json @default("[]")
+
+  statistics  Json     @default("{}")
+  lastUpdated DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+}
+
+model GroupInvitation {
+  id         String @id @default(cuid())
+  groupId    String
+  inviterId  String
+  inviteeId  String?
+  inviteCode String @unique
+
+  status     String   @default("pending") // pending, accepted, declined, expired
+  expiresAt  DateTime
+  metadata   Json?
+
+  createdAt  DateTime  @default(now())
+  acceptedAt DateTime?
+
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  inviter User  @relation("GroupInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee User? @relation("GroupInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([inviterId])
+  @@index([inviteeId])
+  @@index([inviteCode])
+  @@index([status])
+  @@index([expiresAt])
 }

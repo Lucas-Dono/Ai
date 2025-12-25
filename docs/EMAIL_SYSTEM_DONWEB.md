@@ -95,7 +95,7 @@ SMTP_SECURE="false"
 
 # Remitente
 ENVIALOSIMPLE_FROM_EMAIL="noreply@tudominio.com"
-ENVIALOSIMPLE_FROM_NAME="Circuit Prompt AI"
+ENVIALOSIMPLE_FROM_NAME="Blaniel"
 ```
 
 #### Verificar configuración:
@@ -123,7 +123,7 @@ ENVIALOSIMPLE_API_KEY="tu_api_key_aquí"
 
 # Remitente (mismo que SMTP)
 ENVIALOSIMPLE_FROM_EMAIL="noreply@tudominio.com"
-ENVIALOSIMPLE_FROM_NAME="Circuit Prompt AI"
+ENVIALOSIMPLE_FROM_NAME="Blaniel"
 ```
 
 **¡Eso es todo!** El código es el mismo, solo cambias la variable `EMAIL_PROVIDER`.

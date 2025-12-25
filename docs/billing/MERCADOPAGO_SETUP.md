@@ -54,7 +54,7 @@ Access Token: TEST-2598983582339099-110619-d7c68ee9cdbfb503fa19ef046eb9d8f1-2572
 
 1. Ve a https://www.mercadopago.com.ar/developers/panel/app
 2. Crea una aplicación nueva:
-   - Nombre: "Circuit Prompt AI"
+   - Nombre: "Blaniel"
    - Tipo: Pagos online → Suscripciones
 3. En "Credenciales de Producción", activa las credenciales
 4. Copia el **Access Token** y **Public Key**
@@ -133,7 +133,7 @@ Si prefieres crear planes fijos en el panel:
 1. Ve a https://www.mercadopago.com.ar/subscription-plans
 2. Clic en "Crear nuevo plan"
 3. Crear plan **Plus**:
-   - Nombre: "Plan Plus - Circuit Prompt AI"
+   - Nombre: "Plan Plus - Blaniel"
    - Precio: $4,900 ARS
    - Frecuencia: Mensual
    - Clic en "Crear y compartir"

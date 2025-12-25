@@ -95,7 +95,7 @@ prisma/schema.prisma          # 6 modelos nuevos:
 
 | Email | Delay | Subject | Objetivo |
 |-------|-------|---------|----------|
-| Welcome 1 | Inmediato | "Bienvenido a Circuit Prompt AI, {{userName}}!" | Quick start guide |
+| Welcome 1 | Inmediato | "Bienvenido a Blaniel, {{userName}}!" | Quick start guide |
 | Welcome 2 | Día 1 | "Tips para conversaciones increíbles" | Best practices |
 | Welcome 3 | Día 3 | "Descubre los mundos virtuales" | Feature education |
 | Welcome 4 | Día 7 | "Únete a nuestra comunidad" | Community engagement |
@@ -175,7 +175,7 @@ npm install resend react-email @react-email/components
 ```bash
 RESEND_API_KEY="re_your_api_key"
 RESEND_FROM_EMAIL="noreply@tudominio.com"
-RESEND_FROM_NAME="Circuit Prompt AI"
+RESEND_FROM_NAME="Blaniel"
 ```
 
 ### 3. Actualizar base de datos

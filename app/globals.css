@@ -67,7 +67,7 @@
   --md-sys-color-surface-container-high: 235 235 235;
   --md-sys-color-surface-container-highest: 230 230 230;
 
-  /* Primary Color - Circuit Prompt AI Brand */
+  /* Primary Color - Blaniel Brand */
   --md-sys-color-primary: 192 132 252;               /* Electric Violet */
   --md-sys-color-primary-container: 233 213 255;     /* Light Violet */
   --md-sys-color-on-primary: 255 255 255;
@@ -92,7 +92,7 @@
   --md-sys-elevation-4: 0 6px 12px 0 rgb(0 0 0 / 0.10);
   --md-sys-elevation-5: 0 8px 16px 0 rgb(0 0 0 / 0.12);
 
-  /* Shape - Material Design 3 + Circuit Prompt AI Standard */
+  /* Shape - Material Design 3 + Blaniel Standard */
   --md-sys-shape-corner-none: 0px;
   --md-sys-shape-corner-extra-small: 4px;      /* rounded-sm - badges, tags */
   --md-sys-shape-corner-small: 8px;            /* rounded-lg - small buttons, tooltips */
@@ -101,7 +101,7 @@
   --md-sys-shape-corner-extra-large: 28px;     /* rounded-3xl - hero cards, featured */
   --md-sys-shape-corner-full: 9999px;          /* rounded-full - avatars, circular badges */
 
-  /* Legacy support - Updated with Circuit Prompt AI branding */
+  /* Legacy support - Updated with Blaniel branding */
   --background: 250 250 250;
   --foreground: 28 28 28;
   --card: 255 255 255;
@@ -136,7 +136,7 @@
   --md-sys-color-surface-container-high: 40 40 40;
   --md-sys-color-surface-container-highest: 48 48 48;
 
-  /* Primary Color - Circuit Prompt AI Brand (Dark Mode) */
+  /* Primary Color - Blaniel Brand (Dark Mode) */
   --md-sys-color-primary: 216 180 254;               /* Light Violet for dark */
   --md-sys-color-primary-container: 107 33 168;      /* Dark Violet container */
   --md-sys-color-on-primary: 28 28 28;
@@ -155,7 +155,7 @@
   --md-sys-elevation-4: 0 6px 12px 0 rgb(0 0 0 / 0.45);
   --md-sys-elevation-5: 0 8px 16px 0 rgb(0 0 0 / 0.5);
 
-  /* Legacy support - Updated with Circuit Prompt AI branding (Dark Mode) */
+  /* Legacy support - Updated with Blaniel branding (Dark Mode) */
   --background: 28 28 28;
   --foreground: 230 230 230;
   --card: 32 32 32;
@@ -558,10 +558,31 @@ body {
   background: rgb(var(--md-sys-color-on-surface-variant));
 }
 
-/* Text Selection */
+/* Text Selection - Improved visibility */
 ::selection {
-  background-color: rgba(var(--md-sys-color-primary), 0.3);
-  color: rgb(var(--md-sys-color-on-surface));
+  background-color: rgb(var(--brand-primary-400));
+  color: white;
+  text-shadow: none;
+}
+
+/* Dark mode selection - High contrast white background */
+.dark ::selection {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: rgb(28, 28, 28);
+  text-shadow: none;
+}
+
+/* Firefox compatibility */
+::-moz-selection {
+  background-color: rgb(var(--brand-primary-400));
+  color: white;
+  text-shadow: none;
+}
+
+.dark ::-moz-selection {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: rgb(28, 28, 28);
+  text-shadow: none;
 }
 
 /* Focus Visible */
@@ -1140,5 +1161,32 @@ body::before {
 
   .animate-shake-error {
     animation: shake-error 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  /* Accordion animations */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
   }
 }

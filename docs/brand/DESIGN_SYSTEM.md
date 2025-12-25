@@ -1,8 +1,8 @@
-# Circuit Prompt AI - Design System
+# Blaniel - Design System
 
 ## 📋 Overview
 
-This document outlines the complete design system for Circuit Prompt AI, including design tokens, component specifications, and implementation guidelines.
+This document outlines the complete design system for Blaniel, including design tokens, component specifications, and implementation guidelines.
 
 ---
 
@@ -243,7 +243,7 @@ This document outlines the complete design system for Circuit Prompt AI, includi
 #### Hero Title
 ```tsx
 <h1 className="text-6xl font-extrabold brand-gradient-text">
-  Circuit Prompt AI
+  Blaniel
 </h1>
 ```
 
@@ -398,7 +398,7 @@ Minimum touch target size: **44x44px** (iOS/Android guidelines)
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center">
       <h1 className="text-6xl font-extrabold brand-gradient-text mb-6">
-        Circuit Prompt AI
+        Blaniel
       </h1>
       <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
         Create emotional AI companions with real emotions and long-term memory
@@ -471,7 +471,7 @@ Minimum touch target size: **44x44px** (iOS/Android guidelines)
 
 ### With shadcn/ui
 
-Circuit Prompt AI design system works seamlessly with shadcn/ui components:
+Blaniel design system works seamlessly with shadcn/ui components:
 
 ```tsx
 import { Button } from "@/components/ui/button";
@@ -612,4 +612,4 @@ module.exports = {
 
 **Last Updated:** November 2025
 **Version:** 1.0.0
-**Maintained by:** Circuit Prompt Design Team
+**Maintained by:** Blaniel Design Team

@@ -9,7 +9,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Genera y envía mensajes proactivos de la IA a usuarios basándose en triggers inteligentes (inactividad, follow-ups, check-ins emocionales, etc.)
 
 ```bash
-0 * * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/proactive-messaging >> /var/www/circuit-prompt-ai/logs/proactive-messaging.log 2>&1
+0 * * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/proactive-messaging >> /var/www/blaniel/logs/proactive-messaging.log 2>&1
 ```
 
 ### 2. Auto-pausa de Mundos Inactivos
@@ -17,7 +17,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Pausa mundos virtuales que han estado inactivos para ahorrar recursos
 
 ```bash
-0 */6 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/auto-pause-worlds >> /var/www/circuit-prompt-ai/logs/auto-pause-worlds.log 2>&1
+0 */6 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/auto-pause-worlds >> /var/www/blaniel/logs/auto-pause-worlds.log 2>&1
 ```
 
 ### 3. Eliminar Mundos Programados
@@ -25,7 +25,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Elimina mundos que están marcados para eliminación programada
 
 ```bash
-0 3 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/delete-scheduled-worlds >> /var/www/circuit-prompt-ai/logs/delete-worlds.log 2>&1
+0 3 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/delete-scheduled-worlds >> /var/www/blaniel/logs/delete-worlds.log 2>&1
 ```
 
 ### 4. Backup de Base de Datos
@@ -33,7 +33,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Realiza backup automático de la base de datos PostgreSQL
 
 ```bash
-0 3 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/backup-database >> /var/www/circuit-prompt-ai/logs/backup-database.log 2>&1
+0 3 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/backup-database >> /var/www/blaniel/logs/backup-database.log 2>&1
 ```
 
 ### 5. Expirar Grants Temporales
@@ -41,7 +41,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Elimina permisos temporales que han expirado
 
 ```bash
-0 * * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/expire-temp-grants >> /var/www/circuit-prompt-ai/logs/expire-grants.log 2>&1
+0 * * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/expire-temp-grants >> /var/www/blaniel/logs/expire-grants.log 2>&1
 ```
 
 ### 6. Análisis ML de Moderación
@@ -49,7 +49,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Ejecuta análisis de embeddings para detección de contenido inapropiado
 
 ```bash
-0 3 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/ml-moderation-analysis >> /var/www/circuit-prompt-ai/logs/ml-analysis.log 2>&1
+0 3 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/ml-moderation-analysis >> /var/www/blaniel/logs/ml-analysis.log 2>&1
 ```
 
 ### 7. Limpieza de Caché
@@ -57,7 +57,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Limpia caché antiguo de Redis
 
 ```bash
-0 2 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/cache-cleanup >> /var/www/circuit-prompt-ai/logs/cache-cleanup.log 2>&1
+0 2 * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/cache-cleanup >> /var/www/blaniel/logs/cache-cleanup.log 2>&1
 ```
 
 ### 8. Verificación de Alertas
@@ -65,7 +65,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 **Descripción:** Verifica el sistema y envía alertas si hay problemas
 
 ```bash
-0 * * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/check-alerts >> /var/www/circuit-prompt-ai/logs/check-alerts.log 2>&1
+0 * * * * curl -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/check-alerts >> /var/www/blaniel/logs/check-alerts.log 2>&1
 ```
 
 ## 🔧 Instalación
@@ -75,7 +75,7 @@ Esta documentación describe todos los cron jobs necesarios para el funcionamien
 Ejecuta el script de instalación:
 
 ```bash
-cd /var/www/circuit-prompt-ai
+cd /var/www/blaniel
 chmod +x scripts/setup-cron-jobs.sh
 ./scripts/setup-cron-jobs.sh
 ```
@@ -114,16 +114,16 @@ APP_URL=http://localhost:3000  # o https://tudominio.com
 
 ```bash
 # Mensajes proactivos
-tail -f /var/www/circuit-prompt-ai/logs/proactive-messaging.log
+tail -f /var/www/blaniel/logs/proactive-messaging.log
 
 # Auto-pausa de mundos
-tail -f /var/www/circuit-prompt-ai/logs/auto-pause-worlds.log
+tail -f /var/www/blaniel/logs/auto-pause-worlds.log
 
 # Análisis ML
-tail -f /var/www/circuit-prompt-ai/logs/ml-analysis.log
+tail -f /var/www/blaniel/logs/ml-analysis.log
 
 # Ver todos los logs de cron
-tail -f /var/www/circuit-prompt-ai/logs/*.log
+tail -f /var/www/blaniel/logs/*.log
 ```
 
 ### Verificar ejecución de cron
@@ -174,20 +174,20 @@ sudo systemctl enable cron
 
 Verifica que el `CRON_SECRET` en `.env` coincida con el usado en el crontab:
 ```bash
-grep CRON_SECRET /var/www/circuit-prompt-ai/.env
+grep CRON_SECRET /var/www/blaniel/.env
 ```
 
 ### Logs no se generan
 
 1. Crea el directorio de logs si no existe:
 ```bash
-mkdir -p /var/www/circuit-prompt-ai/logs
-chmod 755 /var/www/circuit-prompt-ai/logs
+mkdir -p /var/www/blaniel/logs
+chmod 755 /var/www/blaniel/logs
 ```
 
 2. Verifica permisos:
 ```bash
-ls -la /var/www/circuit-prompt-ai/logs
+ls -la /var/www/blaniel/logs
 ```
 
 ## 📅 Calendario de Ejecución

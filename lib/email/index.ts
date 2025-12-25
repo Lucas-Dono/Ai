@@ -62,6 +62,23 @@ function applySubstitutions(html: string, substitutions?: Record<string, string>
  * Envía un email usando el proveedor configurado (SMTP o API)
  */
 export async function sendEmail(options: UnifiedEmailOptions): Promise<UnifiedEmailResponse> {
+  // Check if email system is enabled
+  const emailEnabled = process.env.EMAIL_ENABLED === 'true';
+
+  if (!emailEnabled) {
+    log.info(
+      {
+        to: options.to,
+        subject: options.subject,
+      },
+      "Email system disabled - skipping email send"
+    );
+    return {
+      success: true,
+      message: "Email system disabled - email not sent",
+    };
+  }
+
   const provider = process.env.EMAIL_PROVIDER || "smtp"; // Por defecto SMTP (más económico)
 
   log.info(
@@ -150,7 +167,7 @@ export async function sendTestEmail(recipientEmail: string): Promise<UnifiedEmai
         <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f9fafb;">
           <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h1 style="color: #6366f1; margin-top: 0;">✅ Configuración Correcta</h1>
-            <p>Este es un email de prueba enviado desde <strong>Circuit Prompt AI</strong>.</p>
+            <p>Este es un email de prueba enviado desde <strong>Blaniel</strong>.</p>
 
             <div style="background-color: #f0f9ff; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
               <strong>📋 Información de Configuración:</strong><br>
@@ -176,7 +193,7 @@ export async function sendTestEmail(recipientEmail: string): Promise<UnifiedEmai
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
 
             <p style="color: #6b7280; font-size: 14px; margin: 0;">
-              <em>Circuit Prompt AI © 2025</em><br>
+              <em>Blaniel © 2025</em><br>
               Powered by ${provider === "smtp" ? "DonWeb Mail Profesional" : "EnvíaloSimple Transaccional"}
             </p>
           </div>

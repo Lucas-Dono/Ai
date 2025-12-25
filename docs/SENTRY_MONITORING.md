@@ -30,7 +30,7 @@ Copia las variables de `.env.example` a tu `.env.local`:
 # Sentry Configuration
 NEXT_PUBLIC_SENTRY_DSN="https://your_key@o123456.ingest.sentry.io/7654321"
 SENTRY_ORG="tu-organizacion"
-SENTRY_PROJECT="circuit-prompt-ai"
+SENTRY_PROJECT="blaniel"
 SENTRY_AUTH_TOKEN="your_sentry_auth_token_here"  # Solo para build/CI
 NEXT_PUBLIC_SENTRY_RELEASE="${VERCEL_GIT_COMMIT_SHA}"  # Automático en Vercel
 ```

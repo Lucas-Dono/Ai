@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, MessageSquare, Heart, Zap, TrendingUp } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Best Practices | Circuit Prompt Documentation",
+  title: "Best Practices | Blaniel Documentation",
   description: "Tips and techniques for more natural, engaging, and meaningful conversations with your companions.",
 };
 

@@ -98,7 +98,7 @@ export default function CharacterTypeSelectionScreen({ navigation }: Props) {
       <View style={styles.appHeader}>
         <View style={styles.headerLeft}>
           <Ionicons name="sparkles" size={19} color="#8b5cf6" />
-          <Text style={styles.appTitle}>Circuit Prompt</Text>
+          <Text style={styles.appTitle}>Blaniel</Text>
         </View>
         <TouchableOpacity
           onPress={() => parentNavigation.goBack()}

@@ -148,7 +148,7 @@ export function PreviewPanel({
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
-                          className="text-2xl font-bold bg-gradient-to-r from-brand-primary-400 to-brand-secondary-500 bg-clip-text text-transparent"
+                          className="text-2xl font-bold text-foreground"
                         >
                           {character.name}
                         </motion.h2>

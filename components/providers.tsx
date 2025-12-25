@@ -1,6 +1,5 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { OnboardingProvider } from "@/contexts/OnboardingContext";
 import { SWRProvider } from "@/lib/swr/config";
@@ -21,24 +20,22 @@ function CommandPaletteWrapper() {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        forcedTheme="dark"
-        enableSystem={false}
-        disableTransitionOnChange={false}
-      >
-        <SWRProvider>
-          <OnboardingProvider>
-            {children}
-            <TourOverlay />
-            <OnboardingRewardHandler />
-            <CommandPaletteWrapper />
-            <Toaster position="top-right" richColors />
-          </OnboardingProvider>
-        </SWRProvider>
-      </ThemeProvider>
-    </SessionProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      forcedTheme="dark"
+      enableSystem={false}
+      disableTransitionOnChange={false}
+    >
+      <SWRProvider>
+        <OnboardingProvider>
+          {children}
+          <TourOverlay />
+          <OnboardingRewardHandler />
+          <CommandPaletteWrapper />
+          <Toaster position="top-right" richColors />
+        </OnboardingProvider>
+      </SWRProvider>
+    </ThemeProvider>
   );
 }

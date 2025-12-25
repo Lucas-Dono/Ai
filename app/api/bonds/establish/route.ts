@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const validatedData = establishBondSchema.parse(body);
 
     const result = await attemptEstablishBond(
-      session.user.id,
+      user.id,
       validatedData.agentId,
       validatedData.tier,
       validatedData.metrics

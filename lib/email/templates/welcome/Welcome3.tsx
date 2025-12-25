@@ -17,7 +17,7 @@ export default function Welcome3(props: EmailTemplateData) {
       <Heading style={h1}>Hola {userName}, descubre los mundos virtuales</Heading>
 
       <Text style={text}>
-        Además de chatear con personajes individuales, Circuit Prompt AI te ofrece
+        Además de chatear con personajes individuales, Blaniel te ofrece
         algo único: <strong>Mundos Virtuales</strong>.
       </Text>
 
@@ -55,7 +55,7 @@ export default function Welcome3(props: EmailTemplateData) {
       <Text style={signature}>
         Aventuras te esperan,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-Sistema de navegación lateral profesional para la documentación de Circuit Prompt, inspirado en Next.js, React, Stripe y otras aplicaciones líderes.
+Sistema de navegación lateral profesional para la documentación de Blaniel, inspirado en Next.js, React, Stripe y otras aplicaciones líderes.
 
 **Ubicación**: `/docs`
 
@@ -36,7 +36,7 @@ components/docs/
 │  Documentación  │   Content Area             │
 │                 │                            │
 │  Aprende a usar │                            │
-│  Circuit Prompt │                            │
+│  Blaniel │                            │
 │                 │                            │
 │  ─────────────  │                            │
 │                 │                            │
@@ -202,7 +202,7 @@ import { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Título | Circuit Prompt Documentation",
+  title: "Título | Blaniel Documentation",
   description: "Descripción para SEO",
 };
 

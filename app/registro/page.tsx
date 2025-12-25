@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -86,58 +86,43 @@ export default function RegisterPage() {
     }
 
     try {
-      // Registrar usuario
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          birthDate: formData.birthDate,
-        }),
-      });
-
-      // Verificar si la respuesta es JSON antes de parsear
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        console.error("Respuesta no es JSON:", await response.text());
-        setError("Error del servidor. Por favor, verifica que la aplicación esté corriendo correctamente.");
-        setLoading(false);
-        return;
-      }
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        console.error("Error al parsear JSON:", parseError);
-        setError("Error al procesar la respuesta del servidor. Por favor, intenta de nuevo.");
-        setLoading(false);
-        return;
-      }
-
-      if (!response.ok) {
-        setError(data.error || "Error al registrarse");
-        setLoading(false);
-        return;
-      }
-
-      // Login automático después del registro
-      const result = await signIn("credentials", {
+      // Registrar usuario con better-auth
+      const result = await signUp.email({
         email: formData.email,
         password: formData.password,
-        redirect: false,
+        name: formData.name,
+        // Note: better-auth doesn't support custom fields in signUp by default
+        // We'll need to update the user after registration with birthDate
       });
 
-      if (result?.ok) {
-        router.push("/dashboard");
-      } else {
-        setError("Usuario registrado, pero hubo un error al iniciar sesión. Por favor, inicia sesión manualmente.");
-        setTimeout(() => router.push("/login"), 3000);
+      if (result.error) {
+        setError(result.error.message || "Error al registrarse. Por favor, intenta de nuevo.");
+        setLoading(false);
+        return;
       }
+
+      // Update user with birthDate and age verification via our API
+      if (result.data?.user?.id) {
+        try {
+          await fetch("/api/user/update-profile", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: result.data.user.id,
+              birthDate: formData.birthDate,
+            }),
+          });
+        } catch (updateError) {
+          console.error("Error updating profile:", updateError);
+          // No bloqueamos el registro si falla la actualización del perfil
+        }
+      }
+
+      // Redirect to dashboard (user is already logged in after signUp)
+      router.push("/dashboard");
+      router.refresh();
     } catch (error) {
       console.error("Error en registro:", error);
       setError("Error al registrarse. Por favor, intenta de nuevo.");
@@ -148,7 +133,10 @@ export default function RegisterPage() {
 
   const handleGoogleRegister = async () => {
     setLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

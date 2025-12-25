@@ -53,7 +53,7 @@ export default function TrialEnding3(props: EmailTemplateData) {
       <Text style={signature}>
         Siempre bienvenido,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

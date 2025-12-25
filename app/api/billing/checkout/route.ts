@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     log.info(
-      { userId: session.user.id, planId, provider, billingInterval },
+      { userId: user.id, planId, provider, billingInterval },
       "Creating checkout session"
     );
 
@@ -36,23 +36,23 @@ export async function POST(req: NextRequest) {
     if (provider === "stripe") {
       // STRIPE CHECKOUT
       checkoutUrl = await createStripeCheckoutSession({
-        userId: session.user.id,
-        email: session.user.email!,
+        userId: user.id,
+        email: user.email!,
         planId: planId as "plus" | "ultra",
         billingInterval: billingInterval as "monthly" | "yearly",
       });
 
-      log.info({ userId: session.user.id, provider: "stripe" }, "Stripe checkout created");
+      log.info({ userId: user.id, provider: "stripe" }, "Stripe checkout created");
     } else {
       // MERCADOPAGO CHECKOUT
       checkoutUrl = await createSubscriptionPreference(
-        session.user.id,
-        session.user.email!,
+        user.id,
+        user.email!,
         planId,
-        session.user.name || undefined
+        user.name || undefined
       );
 
-      log.info({ userId: session.user.id, provider: "mercadopago" }, "MercadoPago checkout created");
+      log.info({ userId: user.id, provider: "mercadopago" }, "MercadoPago checkout created");
     }
 
     return NextResponse.json({

@@ -1,5 +1,5 @@
 /**
- * Aplicación móvil principal de Circuit Prompt AI
+ * Aplicación móvil principal de Blaniel
  */
 
 import React, { useState, useEffect } from 'react';

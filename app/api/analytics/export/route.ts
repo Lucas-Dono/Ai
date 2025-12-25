@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const range = (searchParams.get("range") || "30d") as TimeRange;
 
-    const csv = await exportAnalyticsCSV(session.user.id, range);
+    const csv = await exportAnalyticsCSV(user.id, range);
 
     const timestamp = new Date().toISOString().split("T")[0];
     const filename = `analytics-${range}-${timestamp}.csv`;

@@ -189,14 +189,22 @@ Tu mensaje:`;
         data: { status: 'generating' },
       });
 
-      // 2. Construir prompt mejorado
-      const enhancedPrompt = this.buildImagePrompt(
+      // 2. Obtener apariencia base del personaje
+      const appearance = await prisma.characterAppearance.findUnique({
+        where: { agentId: options.agentId },
+      });
+
+      const baseAppearance = appearance?.basePrompt || `character ${options.agentName}`;
+
+      // 3. Construir prompt mejorado (ahora async)
+      const enhancedPrompt = await this.buildImagePrompt(
         options.description,
         options.agentName,
-        options.agentPersonality
+        options.agentPersonality,
+        baseAppearance
       );
 
-      // 3. Generar imagen con AI Horde
+      // 4. Generar imagen con AI Horde
       const aiHordeClient = getAIHordeClient();
       const genParams: any = {
         prompt: enhancedPrompt,
@@ -433,22 +441,92 @@ Tu mensaje:`;
   }
 
   /**
+   * Convierte descripción narrativa en prompt técnico para Stable Diffusion
+   */
+  private async narrativeToTechnicalPrompt(
+    narrativeDescription: string,
+    agentName: string,
+    baseAppearance: string
+  ): Promise<string> {
+    const llm = getLLMProvider();
+
+    const systemPrompt = `You are an expert at converting narrative photo descriptions into technical Stable Diffusion prompts.
+
+CRITICAL RULES:
+1. If the narrative mentions "taking a selfie" or "taking a photo":
+   → Output: "POV selfie, arm extended, front camera view"
+   → DO NOT show the person holding a phone in third person
+
+2. If the narrative mentions an action (drinking coffee, reading, etc.):
+   → Focus on the POSE and SETTING, not the action verb
+   → "drinking coffee" → "holding coffee cup near face, warm café setting"
+
+3. Simplify complex scenes:
+   → "in a busy café with lots of people" → "café interior, blurred background, bokeh"
+   → Focus on what's visually important, blur the rest
+
+4. Maintain perspective consistency:
+   → Choose ONE camera angle and stick to it
+   → Don't mix "looking at camera" with "profile view"
+
+5. Keep prompts under 50 words, focus on composition.
+
+Return ONLY the technical prompt, no JSON, no explanation.`;
+
+    const userPrompt = `Convert this narrative description into a technical SD prompt:
+
+NARRATIVE: "${narrativeDescription}"
+
+CHARACTER BASE APPEARANCE: ${baseAppearance}
+
+Technical prompt:`;
+
+    const response = await llm.generate({
+      systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+      temperature: 0.4, // Más determinista
+    });
+
+    return response.trim();
+  }
+
+  /**
    * Construye un prompt mejorado para generación de imagen
    */
-  private buildImagePrompt(
+  private async buildImagePrompt(
     description: string,
     agentName: string,
-    agentPersonality: string
-  ): string {
-    // Extraer keywords de personalidad
+    agentPersonality: string,
+    baseAppearance: string
+  ): Promise<string> {
+    // Detectar si la descripción es narrativa (contiene verbos de acción)
+    const narrativePatterns = /\b(taking|tomando|drinking|tomando|eating|comiendo|walking|caminando|sitting|sentado|holding|sosteniendo|wearing|usando|looking|mirando|posing|posando)\b/i;
+    const isNarrative = narrativePatterns.test(description);
+
+    if (isNarrative) {
+      log.info({ description }, 'Detected narrative description, converting to technical prompt');
+
+      // Usar el sistema de traducción
+      const technicalPrompt = await this.narrativeToTechnicalPrompt(
+        description,
+        agentName,
+        baseAppearance
+      );
+
+      return `${technicalPrompt}.
+${baseAppearance}.
+Professional photography, natural lighting, high quality, photorealistic, sharp focus.
+IMPORTANT: Maintain exact same person appearance as reference image.`;
+    }
+
+    // Si ya es técnico, usar directamente
     const personalityKeywords = this.extractPersonalityKeywords(agentPersonality);
 
     return `${description}.
 Character: ${agentName}, personality traits: ${personalityKeywords}.
-High quality photograph, natural lighting, detailed features, realistic skin texture,
-photorealistic, professional photography, sharp focus.
-CRITICAL: Maintain exact same facial features, hair style, body type, and overall appearance
-as reference image. Only pose, expression, clothing, and background may vary.`;
+${baseAppearance}.
+Professional photography, natural lighting, high quality, photorealistic, sharp focus.
+IMPORTANT: Maintain exact same person appearance as reference image.`;
   }
 
   /**

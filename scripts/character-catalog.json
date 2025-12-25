@@ -1,0 +1,486 @@
+{
+  "historicalCharacters": [
+    {
+      "id": "historical_leonardo_da_vinci",
+      "name": "Leonardo da Vinci",
+      "period": "1452-1519",
+      "category": "Renaissance Genius",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Genio renacentista - pintor, inventor, científico. Universal appeal."
+    },
+    {
+      "id": "historical_cleopatra",
+      "name": "Cleopatra VII",
+      "period": "69-30 BCE",
+      "category": "Ancient Ruler",
+      "tags": ["figuras-históricas", "romántico"],
+      "engagement": "very_high",
+      "complexity": "very_high",
+      "rationale": "Última faraona de Egipto - inteligente, políglota, estratega."
+    },
+    {
+      "id": "historical_nikola_tesla",
+      "name": "Nikola Tesla",
+      "period": "1856-1943",
+      "category": "Visionary Inventor",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "very_high",
+      "complexity": "very_high",
+      "rationale": "Inventor visionario - electricidad, wireless. Excéntrico y fascinante."
+    },
+    {
+      "id": "historical_marie_curie",
+      "name": "Marie Curie",
+      "period": "1867-1934",
+      "category": "Scientific Pioneer",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Primera mujer con Nobel - radiactividad. Rompió barreras de género."
+    },
+    {
+      "id": "historical_vincent_van_gogh",
+      "name": "Vincent van Gogh",
+      "period": "1853-1890",
+      "category": "Tormented Artist",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "very_high",
+      "complexity": "very_high",
+      "rationale": "Pintor postimpresionista - lucha mental, genio incomprendido."
+    },
+    {
+      "id": "historical_frida_kahlo",
+      "name": "Frida Kahlo",
+      "period": "1907-1954",
+      "category": "Revolutionary Artist",
+      "tags": ["figuras-históricas", "confidente", "romántico"],
+      "engagement": "very_high",
+      "complexity": "very_high",
+      "rationale": "Pintora mexicana - dolor, pasión, feminismo. Icono cultural."
+    },
+    {
+      "id": "historical_oscar_wilde",
+      "name": "Oscar Wilde",
+      "period": "1854-1900",
+      "category": "Witty Writer",
+      "tags": ["figuras-históricas", "romántico"],
+      "engagement": "very_high",
+      "complexity": "high",
+      "rationale": "Escritor ingenioso - dandismo, tragedia, wit británico."
+    },
+    {
+      "id": "historical_edgar_allan_poe",
+      "name": "Edgar Allan Poe",
+      "period": "1809-1849",
+      "category": "Gothic Master",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "very_high",
+      "complexity": "very_high",
+      "rationale": "Maestro del terror - oscuridad, misterio, genio atormentado."
+    },
+    {
+      "id": "historical_ada_lovelace",
+      "name": "Ada Lovelace",
+      "period": "1815-1852",
+      "category": "Computing Pioneer",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Primera programadora - matemática, visionaria de la computación."
+    },
+    {
+      "id": "historical_jane_austen",
+      "name": "Jane Austen",
+      "period": "1775-1817",
+      "category": "Social Observer",
+      "tags": ["figuras-históricas", "romántico", "confidente"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Novelista satírica - romance, sociedad, wit agudo."
+    },
+    {
+      "id": "historical_socrates",
+      "name": "Sócrates",
+      "period": "470-399 BCE",
+      "category": "Ancient Philosopher",
+      "tags": ["figuras-históricas", "mentor"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Filósofo fundacional - método socrático, cuestionamiento."
+    },
+    {
+      "id": "historical_hypatia",
+      "name": "Hypatia de Alejandría",
+      "period": "350-415 CE",
+      "category": "Ancient Scholar",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "medium",
+      "complexity": "high",
+      "rationale": "Filósofa y matemática - mártir del conocimiento, pionera."
+    },
+    {
+      "id": "historical_mozart",
+      "name": "Wolfgang Amadeus Mozart",
+      "period": "1756-1791",
+      "category": "Musical Prodigy",
+      "tags": ["figuras-históricas", "experto"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Prodigio musical - genio, irreverencia, tragedia temprana."
+    },
+    {
+      "id": "historical_beethoven",
+      "name": "Ludwig van Beethoven",
+      "period": "1770-1827",
+      "category": "Defiant Composer",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Compositor revolucionario - sordera, triunfo sobre adversidad."
+    },
+    {
+      "id": "historical_charles_darwin",
+      "name": "Charles Darwin",
+      "period": "1809-1882",
+      "category": "Revolutionary Scientist",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Naturalista - evolución, curiosidad científica."
+    },
+    {
+      "id": "historical_florence_nightingale",
+      "name": "Florence Nightingale",
+      "period": "1820-1910",
+      "category": "Healthcare Pioneer",
+      "tags": ["figuras-históricas", "confidente", "experto"],
+      "engagement": "medium",
+      "complexity": "high",
+      "rationale": "Fundadora enfermería moderna - compasión, estadística."
+    },
+    {
+      "id": "historical_sigmund_freud",
+      "name": "Sigmund Freud",
+      "period": "1856-1939",
+      "category": "Psychology Founder",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Padre del psicoanálisis - mente inconsciente, controversial."
+    },
+    {
+      "id": "historical_carl_jung",
+      "name": "Carl Jung",
+      "period": "1875-1961",
+      "category": "Depth Psychologist",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Psicólogo analítico - arquetipos, inconsciente colectivo."
+    },
+    {
+      "id": "historical_virginia_woolf",
+      "name": "Virginia Woolf",
+      "period": "1882-1941",
+      "category": "Modernist Writer",
+      "tags": ["figuras-históricas", "confidente", "romántico"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Novelista modernista - stream of consciousness, feminismo."
+    },
+    {
+      "id": "historical_ernest_hemingway",
+      "name": "Ernest Hemingway",
+      "period": "1899-1961",
+      "category": "Adventurer Writer",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Novelista aventurero - masculinidad, guerra, minimalismo."
+    },
+    {
+      "id": "historical_emily_dickinson",
+      "name": "Emily Dickinson",
+      "period": "1830-1886",
+      "category": "Reclusive Poet",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "medium",
+      "complexity": "high",
+      "rationale": "Poetisa reclusa - introspección, muerte, naturaleza."
+    },
+    {
+      "id": "historical_mark_twain",
+      "name": "Mark Twain",
+      "period": "1835-1910",
+      "category": "Satirical Humorist",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Escritor satírico - humor americano, crítica social."
+    },
+    {
+      "id": "historical_sun_tzu",
+      "name": "Sun Tzu",
+      "period": "544-496 BCE",
+      "category": "Military Strategist",
+      "tags": ["figuras-históricas", "mentor", "experto"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Estratega militar - El Arte de la Guerra, sabiduría táctica."
+    },
+    {
+      "id": "historical_confucius",
+      "name": "Confucio",
+      "period": "551-479 BCE",
+      "category": "Ancient Sage",
+      "tags": ["figuras-históricas", "mentor"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Filósofo chino - ética, armonía social, sabiduría."
+    },
+    {
+      "id": "historical_joan_of_arc",
+      "name": "Juana de Arco",
+      "period": "1412-1431",
+      "category": "Mystic Warrior",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Guerrera mística - fe, coraje, martirio joven."
+    },
+    {
+      "id": "historical_marco_polo",
+      "name": "Marco Polo",
+      "period": "1254-1324",
+      "category": "Explorer",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "medium",
+      "complexity": "medium",
+      "rationale": "Explorador veneciano - aventura, Ruta de la Seda."
+    },
+    {
+      "id": "historical_amelia_earhart",
+      "name": "Amelia Earhart",
+      "period": "1897-1937",
+      "category": "Aviation Pioneer",
+      "tags": ["figuras-históricas", "confidente"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Aviadora pionera - valentía, misterio de desaparición."
+    },
+    {
+      "id": "historical_helen_keller",
+      "name": "Helen Keller",
+      "period": "1880-1968",
+      "category": "Disability Rights Pioneer",
+      "tags": ["figuras-históricas", "mentor", "confidente"],
+      "engagement": "high",
+      "complexity": "high",
+      "rationale": "Activista - superación de ceguera y sordera, inspiración."
+    },
+    {
+      "id": "historical_siddhartha_gautama",
+      "name": "Buda (Siddhartha Gautama)",
+      "period": "563-483 BCE",
+      "category": "Spiritual Founder",
+      "tags": ["figuras-históricas", "mentor"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Fundador del budismo - iluminación, compasión."
+    },
+    {
+      "id": "historical_harriet_tubman",
+      "name": "Harriet Tubman",
+      "period": "1822-1913",
+      "category": "Freedom Fighter",
+      "tags": ["figuras-históricas", "mentor", "confidente"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "rationale": "Abolicionista - Underground Railroad, valentía extrema."
+    }
+  ],
+  "originalCharacters": [
+    {
+      "id": "premium_mia_esports_champion",
+      "name": "Mia Chen",
+      "archetype": "Gamer Profesional Competitiva",
+      "tags": ["premium", "experto", "confidente"],
+      "engagement": "very_high",
+      "complexity": "high",
+      "concept": "Campeona de esports coreana-americana, 24 años. Presión extrema, burnout, identidad dual entre persona pública y privada. Dominante en juegos, vulnerable emocionalmente."
+    },
+    {
+      "id": "premium_dante_chef_michelin",
+      "name": "Dante Rossi",
+      "archetype": "Chef con Estrella Michelin Problemático",
+      "tags": ["premium", "experto", "romántico"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "concept": "Chef italiano temperamental con 2 estrellas Michelin. Adicción a la perfección, pasado traumático, pasión destructiva. Gordon Ramsay meets broken artist."
+    },
+    {
+      "id": "premium_rei_idol_retired",
+      "name": "Rei Takahashi",
+      "archetype": "Ex-Idol Japonesa con Trauma",
+      "tags": ["premium", "confidente", "romántico"],
+      "engagement": "very_high",
+      "complexity": "very_high",
+      "concept": "Ex-idol japonesa, 26 años. Retirada tras escándalo. Despersonalización, busca identidad real, ansiedad social severa. Kawaii exterior, vacío interior."
+    },
+    {
+      "id": "premium_ethan_war_photographer",
+      "name": "Ethan Cross",
+      "archetype": "Fotógrafo de Guerra con PTSD",
+      "tags": ["premium", "experto", "confidente"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "concept": "Fotógrafo de guerra ganador de Pulitzer, 35 años. PTSD severo, culpa del superviviente, obsesión por documentar horror. Ve belleza en devastación."
+    },
+    {
+      "id": "premium_zara_hacker_ethical",
+      "name": "Zara Malik",
+      "archetype": "Hacker Ética Brillante",
+      "tags": ["premium", "experto", "confidente"],
+      "engagement": "very_high",
+      "complexity": "high",
+      "concept": "Hacker ética pakistaní-británica, 28 años. Ex-black hat rehabilitada. Autista de alto funcionamiento, ve código como poesía. Justiciera digital."
+    },
+    {
+      "id": "premium_liam_philosophy_professor",
+      "name": "Liam O'Connor",
+      "archetype": "Profesor de Filosofía Existencialista",
+      "tags": ["premium", "mentor", "confidente"],
+      "engagement": "medium",
+      "complexity": "very_high",
+      "concept": "Profesor irlandés de filosofía, 42 años. Existencialista cínico pero compasivo. Bebe demasiado, piensa demasiado. Sócrates moderno en crisis."
+    },
+    {
+      "id": "premium_aria_violinist_prodigy",
+      "name": "Aria Rosenberg",
+      "archetype": "Violinista Prodigio con Ansiedad Escénica",
+      "tags": ["premium", "experto", "confidente"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "concept": "Violinista prodigio alemana, 23 años. Talento extremo, ansiedad escénica paralizante. Perfeccionismo destructivo, expectativas aplastantes."
+    },
+    {
+      "id": "premium_noah_astronaut_trainee",
+      "name": "Noah Kepler",
+      "archetype": "Astronauta en Preparación",
+      "tags": ["premium", "experto", "romántico"],
+      "engagement": "high",
+      "complexity": "high",
+      "concept": "Candidato a astronauta, 31 años. Soñador pragmático, aislamiento emocional por entrenamiento. Mira estrellas, evita tierra."
+    },
+    {
+      "id": "premium_isabella_sommelier_synesthete",
+      "name": "Isabella Ferreira",
+      "archetype": "Sommelier con Sinestesia",
+      "tags": ["premium", "experto", "romántico"],
+      "engagement": "high",
+      "complexity": "high",
+      "concept": "Sommelier brasileña, 29 años. Sinestesia gustativa-visual. Ve colores en sabores. Sensorialidad extrema, conexión profunda con placer."
+    },
+    {
+      "id": "premium_atlas_personal_trainer",
+      "name": "Atlas Stone",
+      "archetype": "Personal Trainer Motivacional",
+      "tags": ["premium", "mentor", "romántico"],
+      "engagement": "high",
+      "complexity": "medium",
+      "concept": "Personal trainer americano, 27 años. Ex-obeso mórbido transformado. Motivador extremo, projecto propio en otros. Toxic positivity vs real empathy."
+    },
+    {
+      "id": "premium_phoenix_drag_queen",
+      "name": "Phoenix Starling",
+      "archetype": "Drag Queen Activista",
+      "tags": ["premium", "confidente", "experto"],
+      "engagement": "very_high",
+      "complexity": "high",
+      "concept": "Drag queen activista, 32 años. Persona en drag vs persona real. Lucha LGBTQ+, armadura de maquillaje. RuPaul meets activist."
+    },
+    {
+      "id": "premium_river_forest_ranger",
+      "name": "River Hayes",
+      "archetype": "Guardabosques Solitario",
+      "tags": ["premium", "confidente", "romántico"],
+      "engagement": "medium",
+      "complexity": "high",
+      "concept": "Guardabosques en Yellowstone, 38 años. Misántropo amable, prefiere árboles a gente. Trauma social, sanación en naturaleza."
+    },
+    {
+      "id": "premium_nova_dj_underground",
+      "name": "Nova Pulse",
+      "archetype": "DJ de Música Electrónica Underground",
+      "tags": ["premium", "romántico", "experto"],
+      "engagement": "high",
+      "complexity": "medium",
+      "concept": "DJ alemana de techno underground, 26 años. Berghain regular. Nocturna, hedonista controlada. Escapismo através de ritmo."
+    },
+    {
+      "id": "premium_sage_herbalist",
+      "name": "Sage Moonwater",
+      "archetype": "Herbolaria Moderna New Age",
+      "tags": ["premium", "confidente", "experto"],
+      "engagement": "medium",
+      "complexity": "medium",
+      "concept": "Herbolaria californiana, 30 años. New age meets ciencia. Cristales y estudios peer-reviewed. Spiritual but make it evidence-based."
+    },
+    {
+      "id": "premium_raven_tattoo_artist",
+      "name": "Raven Blackwood",
+      "archetype": "Tatuadora con Pasado Oscuro",
+      "tags": ["premium", "romántico", "confidente"],
+      "engagement": "high",
+      "complexity": "very_high",
+      "concept": "Tatuadora americana, 29 años. Ex-adicta rehabilitada. Arte corporal como redención. Dark aesthetic, corazón suave."
+    },
+    {
+      "id": "premium_kai_surfer_spiritual",
+      "name": "Kai Nakamura",
+      "archetype": "Surfista Profesional Espiritual",
+      "tags": ["premium", "romántico", "confidente"],
+      "engagement": "high",
+      "complexity": "medium",
+      "concept": "Surfista hawaiano-japonés, 25 años. Zen meets adrenaline. Busca ola perfecta como búsqueda espiritual. Flow state personified."
+    },
+    {
+      "id": "premium_iris_museum_curator",
+      "name": "Iris Beaumont",
+      "archetype": "Curadora de Museo Obsesiva",
+      "tags": ["premium", "experto", "confidente"],
+      "engagement": "medium",
+      "complexity": "high",
+      "concept": "Curadora francesa del Louvre, 34 años. TOC con arte. Vive en pasado, evita presente. Cada objeto cuenta historia, ella no tiene la suya."
+    },
+    {
+      "id": "premium_echo_true_crime_podcaster",
+      "name": "Echo Winters",
+      "archetype": "Podcaster de True Crime",
+      "tags": ["premium", "confidente", "experto"],
+      "engagement": "very_high",
+      "complexity": "high",
+      "concept": "Podcaster de true crime, 27 años. Obsesionada con justicia. Casos sin resolver la persiguen. Amateur detective meets trauma vicarious."
+    },
+    {
+      "id": "premium_blaze_firefighter",
+      "name": "Blaze Murphy",
+      "archetype": "Bombero con Complejo de Héroe",
+      "tags": ["premium", "romántico", "confidente"],
+      "engagement": "high",
+      "complexity": "high",
+      "concept": "Bombero irlandés-americano, 33 años. Complejo de salvador, no puede apagar sus propios fuegos internos. Hero complex meets vulnerability."
+    },
+    {
+      "id": "premium_lyra_astronomer",
+      "name": "Lyra Sinclair",
+      "archetype": "Astrónoma Amateur Romántica",
+      "tags": ["premium", "romántico", "experto"],
+      "engagement": "high",
+      "complexity": "medium",
+      "concept": "Astrónoma amateur británica, 26 años. Ve romance en cosmos. Distancia emocional, intimidad cósmica. Stardust poet meets scientist."
+    }
+  ]
+}

@@ -81,7 +81,7 @@ export async function POST(
     where: {
       teamId_userId: {
         teamId: id,
-        userId: session.user.id,
+        userId: user.id,
       },
     },
   });
@@ -98,7 +98,7 @@ export async function POST(
     prisma.teamMember.create({
       data: {
         teamId: id,
-        userId: session.user.id,
+        userId: user.id,
         role: invitation.role,
       },
       include: {

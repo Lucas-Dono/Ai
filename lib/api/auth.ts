@@ -101,7 +101,7 @@ export async function withAPIAuth(
 
 // Generar un nuevo API key
 export function generateAPIKey(): string {
-  const prefix = "cda"; // Circuit Prompt AI API
+  const prefix = "cda"; // Blaniel API
   const random = crypto.randomUUID().replace(/-/g, "");
   return `${prefix}_${random}`;
 }

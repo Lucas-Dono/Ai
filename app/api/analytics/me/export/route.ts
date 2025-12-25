@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const format = searchParams.get("format") || "json";
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Fetch all analytics data
     const [overview, messagesPerDay, mostUsedAIs, emotional, relationships, insights, community] =

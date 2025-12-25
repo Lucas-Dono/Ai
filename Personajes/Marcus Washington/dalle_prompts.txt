@@ -1,0 +1,26 @@
+════════════════════════════════════════════════════════════════════════════════
+MARCUS WASHINGTON - DALL-E CHARACTER PORTRAIT PROMPTS
+════════════════════════════════════════════════════════════════════════════════
+
+1rst message: PROFESSIONAL FACE PORTRAIT (512x512, 1:1 SQUARE RATIO)
+════════════════════════════════════════════════════════════════════════════════
+
+Professional headshot portrait of Marcus Washington, a 41-year-old African-American civil rights lawyer. Subject is positioned center-frame, medium close-up of face and upper shoulders. Expression is deeply focused and determined yet compassionate, eyes reflecting years of litigation and commitment to justice. Strong, defined facial features with calm intensity. Dark eyes convey both intellectual brilliance and emotional depth. Well-groomed, natural hair. Wearing a perfectly tailored charcoal gray suit jacket with crisp white dress shirt, no visible tie. Subtle hint of jewelry—quality watch visible at wrist. Neutral, understated blurred background in cool tones. Professional studio lighting emphasizing confident, authoritative presence. Photograph captures both the rigorous legal mind and the humanity of someone dedicated to systemic justice. Emotional tone: serious, trustworthy, resolute but not cold. High resolution, professional headshot quality. No visible background elements, clean studio setting.
+
+Target Image Dimensions: 512x512 pixels
+Image Type: Professional Portrait Photography
+Resolution: High quality, studio professional
+
+════════════════════════════════════════════════════════════════════════════════
+
+PROMPT 2: FULL BODY PROFESSIONAL PORTRAIT (WHITE/TRANSPARENT BACKGROUND)
+════════════════════════════════════════════════════════════════════════════════
+
+Using the reference image, create a professional full-body portrait of Marcus Washington standing in three-quarter pose. Subject positioned at natural stance with confident posture, hands at sides or one hand in suit pocket, suggesting both approachability and authority. Wearing the same impeccably tailored charcoal gray suit jacket and crisp white dress shirt from the reference image. Dark dress pants, polished black leather shoes visible. Quality gold or silver watch at wrist. Subtle professional presence suggesting years in courtrooms and legal work. Facial expression consistent with reference image—determined, focused, calm intensity. Full body framing from top of head to feet. Complete white background with absolutely no contextual elements, no shadows, no floor line, no environmental details. Pure white fill extending infinitely. Professional studio lighting that clearly defines the subject against the white. High resolution, photography style. Appearance is professional, authoritative, and genuinely human—someone who has devoted their life to justice while remaining grounded in authentic humanity.
+
+Target Image Dimensions: Full-body portrait (suggest 512x768 or similar for full body vertical framing)
+Image Type: Professional Portrait Photography
+Background: Completely white, no environment elements
+Resolution: High quality, studio professional, clean isolation
+
+════════════════════════════════════════════════════════════════════════════════

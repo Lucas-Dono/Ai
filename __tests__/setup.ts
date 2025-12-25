@@ -205,6 +205,60 @@ export const mockPrismaClient = {
     count: vi.fn(),
     findFirst: vi.fn(),
   },
+  // Worlds system
+  world: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  worldAgent: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  worldEpisodicMemory: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    deleteMany: vi.fn(),
+    count: vi.fn(),
+  },
+  worldSemanticMemory: {
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  },
+  worldEvent: {
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  },
+  // Behavior system
+  behaviorProfile: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    upsert: vi.fn(),
+  },
+  behaviorProgressionState: {
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    upsert: vi.fn(),
+  },
+  behaviorIntensityHistory: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+  },
   $transaction: vi.fn((callback) => callback(mockPrismaClient)),
 } as unknown as PrismaClient;
 
@@ -214,7 +268,7 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 // ============================================
-// MOCK NEXTAUTH
+// MOCK NEXTAUTH & BETTER-AUTH
 // ============================================
 
 export const mockSession = {
@@ -228,6 +282,38 @@ export const mockSession = {
 
 vi.mock('next-auth/next', () => ({
   getServerSession: vi.fn(() => Promise.resolve(mockSession)),
+}));
+
+// Mock better-auth
+vi.mock('better-auth/next-js', () => ({
+  auth: vi.fn(() => Promise.resolve(mockSession)),
+}));
+
+vi.mock('@/lib/auth', () => ({
+  auth: {
+    api: {
+      getSession: vi.fn(() => Promise.resolve({ session: mockSession, user: mockSession.user })),
+    },
+  },
+}));
+
+vi.mock('@/lib/auth-server', () => ({
+  getServerSession: vi.fn(() => Promise.resolve(mockSession)),
+  getUserSession: vi.fn(() => Promise.resolve(mockSession.user)),
+}));
+
+// ============================================
+// MOCK NEXT-INTL
+// ============================================
+
+vi.mock('next-intl', () => ({
+  useTranslations: vi.fn(() => (key: string) => key),
+  useLocale: vi.fn(() => 'en'),
+}));
+
+vi.mock('next-intl/server', () => ({
+  getTranslations: vi.fn(() => Promise.resolve((key: string) => key)),
+  getLocale: vi.fn(() => Promise.resolve('en')),
 }));
 
 // ============================================

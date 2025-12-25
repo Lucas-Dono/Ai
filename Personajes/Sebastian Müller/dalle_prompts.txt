@@ -1,0 +1,23 @@
+================================================================================
+DALL-E IMAGE GENERATION PROMPTS FOR SEBASTIAN MÜLLER
+================================================================================
+
+1rst message: FACE PORTRAIT (Square 1:1 Ratio - 512x512)
+================================================================================
+
+Professional headshot portrait of Sebastian Müller, a 46-year-old German neuroscientist. Square composition, face-centered. Deep, intelligent eyes with contemplative calm presence. Sharp, angular Germanic features with high cheekbones and defined jawline. Light brown hair with subtle gray at temples, neatly styled. Subtle smile suggesting both intellectual confidence and inner peace. Warm but penetrating gaze. Clear, healthy complexion. Professional appearance combining quiet authority with accessible warmth. Soft, natural lighting emphasizing the calm wisdom in his expression. No glasses. Neutral shoulder visible suggesting professional attire. Background: subtle gradient, soft gray to white, minimalist, unobtrusive. Photorealistic, high quality, professional photography style. The overall impression: a brilliant scientist and contemplative practitioner—intellectual depth combined with meditative serenity. Authoritative yet approachable. Age 46, healthy, composed, thoughtful expression.
+
+Tags: professional headshot, neuroscientist, contemplative, intelligent eyes, German, calm presence, scholarly, wise, composed, 512x512 square
+
+================================================================================
+
+PROMPT 2: FULL BODY PORTRAIT (Complete White/Transparent Background)
+================================================================================
+
+Using the reference image, create a full-body portrait of Sebastian Müller standing naturally. Sebastian is a 46-year-old German neuroscientist of medium-tall height, lean but well-built physique suggesting regular physical activity and health consciousness. He wears casual professional attire: a simple long-sleeve shirt in neutral color (gray or light blue) with sleeves rolled up slightly, showing forearms. Dark comfortable trousers. No jacket. Bare neck, no tie—presenting accessible intellectualism rather than formal hierarchy. His posture is naturally upright but relaxed, suggesting both confidence and groundedness. His hands are gently positioned at his sides, palms partially visible, relaxed. His expression matches the face portrait: calm, intelligent, slightly warm. Full-body positioning shows him standing with weight equally distributed, suggesting stability and presence. His overall physical presence suggests: a scientist who is also physically active (hiking in nature), someone who practices meditation (physical composure), a contemplative person (grounded, present). Photorealistic, high-quality professional portrait photography. Absolutely completely white or completely transparent background with absolutely no environmental context, no shadows, no surroundings, no objects, no distractions whatsoever. Only Sebastian's figure against the pure white/transparent void. Full-body view from feet to head. Professional but warm and approachable presence.
+
+Tags: full-body portrait, neuroscientist, professional, contemplative, standing pose, clean background, complete white background, no context, isolated figure, German scholar
+
+================================================================================
+END OF DALL-E PROMPTS
+================================================================================

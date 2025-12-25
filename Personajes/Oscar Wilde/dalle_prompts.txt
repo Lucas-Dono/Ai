@@ -1,0 +1,45 @@
+# Prompts de DALL-E para Oscar Wilde
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Oscar Wilde at age 38 (circa 1892, during peak of his success), centered composition, museum quality historical accuracy matching authenticated Napoleon Sarony and W. & D. Downey photographs. Face and upper shoulders visible, gaze toward camera with characteristic languid intensity.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Large, fleshy Irish face with sensuous features. Round to oval face, fuller and fleshier than average. Pale Irish complexion with smooth texture - Wilde was known for his unusually soft, almost feminine skin. Blue-gray eyes (described as "slate blue") with heavy lids giving languid, half-closed appearance - simultaneously seductive and world-weary. Eyes convey intelligence, wit, and subtle mockery. Prominent, rounded nose. Full, sensuous lips with natural pout - Wilde's mouth was considered one of his most distinctive features, suggesting both sensuality and aesthetic refinement. Soft, slightly rounded jawline and chin - not sharply angular but genteel. Face showing beginning signs of indulgence - slight puffiness suggesting fine living (wine, good food). Expression of amused superiority mixed with seductive charm.
+
+Hair: Dark brown, thick and wavy, worn longer than conventional Victorian style - shoulder-length or nearly so. Hair has natural wave and body, styled with deliberate aesthetic effect rather than tightly controlled. Center part. Hair should suggest the Aesthetic Movement rejection of rigid Victorian grooming - artistic, flowing, slightly bohemian but still polished and intentional.
+
+Expression: Characteristic half-smile of amused disdain - the look of someone perpetually entertained by the absurdity of society. Lips curved in suggestion of wit about to be deployed. Eyes showing intelligence and mockery. Slight tilt of head suggesting languid elegance. This is the supreme aesthete and wit at peak confidence - before the fall.
+
+Clothing visible: Aesthetic Movement style challenging Victorian conventions. Rich velvet jacket in deep color - burgundy, forest green, or midnight blue. High Victorian collar with elaborate cravat or necktie. A green carnation (his symbol) in lapel if visible, or simply suggested by cut of jacket. Everything suggests refinement, artistry, and deliberate rejection of bourgeois respectability.
+
+Lighting: Soft Victorian studio lighting with slight halo effect popular in aesthetic photography of the period. Slightly diffused quality suggesting artistic rather than documentary approach. Lighting from slight angle creates gentle shadows emphasizing full features. Background soft neutral tone (pearl gray or warm beige) befitting aesthetic portrait.
+
+Mood: Languid superiority. Amused disdain for convention. Seductive charm. The witty aesthete who makes life itself a form of art. Beauty and indulgence. The look of someone who has conquered London society through charm and wit.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Oscar Wilde's face from 1rst message, create a full-body portrait photograph showing him at the same age (38 years, circa 1892), standing in characteristic aesthetic pose.
+
+Physical build: Height 6'3" (190cm) - very tall and imposing. Large, heavy build - approximately 200-220 pounds. Broad-shouldered but increasingly corpulent, showing the effects of fine living and indulgence. Not athletic but substantial - the body of someone who enjoys pleasures of the table and has begun to show it. Posture deliberately aesthetic - contrapposto stance (weight on one leg, hip jutted, creating S-curve in body line) inspired by Greek sculpture and aesthetic theory. Every element of pose is carefully constructed to be beautiful and interesting rather than conventionally "masculine."
+
+Full outfit: Complete Aesthetic Movement dandy costume. Long velvet or brocade frock coat in rich jewel tone - deep burgundy, forest green, purple, or midnight blue. Coat is tailored but flowing, emphasizing aesthetic ideal of beauty over conventional masculinity. Underneath, silk or satin waistcoat (vest) in contrasting color or pattern - possibly brocade with floral or aesthetic patterns. Cravat or elaborate silk necktie at throat, possibly with jeweled pin. White or ivory silk shirt with high collar. Trousers in dark velvet or fine wool, well-tailored. The entire ensemble is rich, colorful, and deliberately artistic - rejecting Victorian black-and-white severity for aesthetic richness.
+
+Accessories: Green carnation in lapel (his famous symbol, suggesting homosexuality to those "in the know"). Possibly holding walking stick with ornate handle - Wilde carried cane as fashionable accessory. Heavy signet ring or other jewelry visible on hands. White kid gloves held in one hand (sign of gentleman). Everything signals wealth, taste, and aesthetic refinement.
+
+Posture and pose: Full aesthetic contrapposto - weight on one leg, other leg positioned forward and to side, creating dramatic S-curve through body. One hand resting on hip or tucked into waistcoat in languid pose. Other hand holding cane or hanging at side holding gloves. Head tilted at aesthetic angle. Shoulders back but pose relaxed rather than military. Every element of body language signals: "I make my life a work of art."
+
+Hair: Exactly as 1rst message - dark brown, thick, wavy, worn longer than conventional, center part. Flowing aesthetic style.
+
+Facial expression: Exactly matching 1rst message - characteristic half-smile of amused disdain, intelligent mocking eyes, languid superiority.
+
+Footwear: Polished black leather shoes or boots, elegant and expensive.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No Victorian furnishings, no props, no peacock feathers, no lilies - nothing contextual. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without harsh shadows on white background. Face maintains the soft, flattering aesthetic lighting from 1rst message, creating slight halo effect. Body lighting shows rich textures and colors of elaborate costume - velvet, silk, brocade should all be visible in their full richness.
+
+Important details: Very tall, substantial build showing indulgent lifestyle. Rich, colorful aesthetic costume rejecting Victorian severity. Deliberately artistic pose (contrapposto). Green carnation. Everything signals wealth, wit, aesthetic refinement, and subtle sexual coding. The supreme dandy at peak of success - before prison destroyed him.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same languid half-smile, same mocking intelligent eyes, same full features and pale Irish complexion, same flowing dark hair. Height and substantial build essential - this is a large man who carried himself like art object.

@@ -11,16 +11,16 @@ import type { UserStats } from "@/lib/onboarding/experience-levels";
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(req);
+    const authUser = await getAuthenticatedUser(req);
 
-    if (!user?.id) {
+    if (!authUser?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
+    const userId = authUser.id;
 
     // Fetch all required data in parallel
     const [user, agentCount, worldCount, messageCount, communityActivity] = await Promise.all([

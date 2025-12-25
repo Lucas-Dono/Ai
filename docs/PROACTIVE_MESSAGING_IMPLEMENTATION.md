@@ -172,7 +172,7 @@ openssl rand -base64 32
 #### Opción A: Instalación Automática (Recomendado)
 
 ```bash
-cd /var/www/circuit-prompt-ai
+cd /var/www/blaniel
 chmod +x scripts/setup-cron-jobs.sh
 ./scripts/setup-cron-jobs.sh
 ```
@@ -187,7 +187,7 @@ Agregar estas líneas:
 
 ```bash
 # Mensajes Proactivos (cada hora)
-0 * * * * curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" http://localhost:3000/api/cron/proactive-messaging >> /var/www/circuit-prompt-ai/logs/proactive-messaging.log 2>&1
+0 * * * * curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" http://localhost:3000/api/cron/proactive-messaging >> /var/www/blaniel/logs/proactive-messaging.log 2>&1
 
 # Otros cron jobs...
 # (Ver docs/CLOUD_SERVER_CRON_JOBS.md para lista completa)
@@ -205,7 +205,7 @@ curl -X POST \
   http://localhost:3000/api/cron/proactive-messaging
 
 # Ver logs
-tail -f /var/www/circuit-prompt-ai/logs/proactive-messaging.log
+tail -f /var/www/blaniel/logs/proactive-messaging.log
 ```
 
 ---
@@ -669,10 +669,10 @@ GROUP BY status;
 
 ```bash
 # Logs del cron job
-tail -f /var/www/circuit-prompt-ai/logs/proactive-messaging.log
+tail -f /var/www/blaniel/logs/proactive-messaging.log
 
 # Logs de PM2 (aplicación)
-pm2 logs circuit-prompt-ai
+pm2 logs blaniel
 
 # Logs del sistema cron
 sudo tail -f /var/log/syslog | grep CRON
@@ -860,7 +860,7 @@ ORDER BY read_rate DESC;
 
 Para problemas o preguntas:
 
-1. Revisar logs: `tail -f /var/www/circuit-prompt-ai/logs/proactive-messaging.log`
+1. Revisar logs: `tail -f /var/www/blaniel/logs/proactive-messaging.log`
 2. Verificar documentación: `docs/CLOUD_SERVER_CRON_JOBS.md`
 3. Probar manualmente el endpoint
 4. Crear issue en GitHub

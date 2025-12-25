@@ -4,8 +4,8 @@ import { Card } from "@/components/ui/card";
 import { BookOpen, Sparkles, Users, Zap, Code, Lightbulb } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Documentation | Circuit Prompt",
-  description: "Learn how to create better companions, build deeper relationships, and get the most out of Circuit Prompt.",
+  title: "Documentation | Blaniel",
+  description: "Learn how to create better companions, build deeper relationships, and get the most out of Blaniel.",
 };
 
 export default function DocsPage() {
@@ -61,7 +61,7 @@ export default function DocsPage() {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-5xl font-bold mb-4">Documentation</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to create better companions, build deeper relationships, and master Circuit Prompt.
+            Everything you need to create better companions, build deeper relationships, and master Blaniel.
           </p>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function DocsPage() {
         {/* Quick Start */}
         <div className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-3">New to Circuit Prompt?</h2>
+            <h2 className="text-3xl font-bold mb-3">New to Blaniel?</h2>
             <p className="text-muted-foreground">Start here to create your first companion in minutes.</p>
           </div>
           <Link href="/docs/getting-started">
@@ -143,7 +143,7 @@ export default function DocsPage() {
               <div className="flex-1">
                 <h3 className="text-2xl font-semibold mb-2">API Reference</h3>
                 <p className="text-muted-foreground mb-4">
-                  Looking to integrate Circuit Prompt into your application? API documentation is coming soon for Enterprise users.
+                  Looking to integrate Blaniel into your application? API documentation is coming soon for Enterprise users.
                 </p>
                 <Link
                   href="/dashboard/billing"

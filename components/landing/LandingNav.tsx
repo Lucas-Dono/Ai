@@ -27,6 +27,8 @@ export function LandingNav() {
     { href: "/docs", labelKey: "docs" },
     { href: "/pricing", labelKey: "pricing" },
     { href: "/community", labelKey: "community" },
+    { href: "/careers", labelKey: "careers" },
+    { href: "/sponsors", labelKey: "sponsors" },
   ];
 
   return (

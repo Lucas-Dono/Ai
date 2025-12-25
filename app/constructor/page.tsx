@@ -31,7 +31,7 @@ import { SuccessCelebration } from "@/components/celebration/SuccessCelebration"
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useRouter as useNextRouter } from "next/navigation";
 
 interface Message {

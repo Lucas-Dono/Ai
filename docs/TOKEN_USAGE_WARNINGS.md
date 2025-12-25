@@ -193,7 +193,7 @@ import { TokenUsageBadge } from '@/components/upgrade/TokenUsageDisplay';
 **Anthropic Claude**: "High usage" (vago)
 **Character.AI**: Sin advertencias claras
 
-**Circuit Prompt**:
+**Blaniel**:
 - ✅ Advertencias progresivas claras
 - ✅ Números específicos cuando son relevantes
 - ✅ UX limpia cuando todo está bien

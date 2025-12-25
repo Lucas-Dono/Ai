@@ -23,7 +23,7 @@ export async function POST(
 
   const cloned = await prisma.agent.create({
     data: {
-      userId: session.user.id,
+      userId: user.id,
       name: `${original.name} (Clone)`,
       kind: original.kind,
       description: original.description,
@@ -48,7 +48,7 @@ export async function POST(
     prisma.agentClone.create({
       data: {
         originalAgentId: originalId,
-        clonedByUserId: session.user.id,
+        clonedByUserId: user.id,
         clonedAgentId: cloned.id,
       },
     }),

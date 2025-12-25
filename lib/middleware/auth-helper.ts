@@ -21,9 +21,9 @@ export interface AuthSession {
  * Intenta NextAuth primero (para web), luego JWT (para mobile)
  */
 export async function getAuthSession(request: NextRequest): Promise<AuthSession | null> {
-  // 1. Intentar NextAuth primero (para web)
+  // 1. Intentar better-auth primero (para web)
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: request.headers });
     if (session?.user?.id) {
       return {
         user: {
@@ -35,8 +35,8 @@ export async function getAuthSession(request: NextRequest): Promise<AuthSession 
       };
     }
   } catch (error) {
-    // NextAuth puede fallar, continuar con JWT
-    console.log('[AuthHelper] NextAuth failed, trying JWT');
+    // better-auth puede fallar, continuar con JWT
+    console.log('[AuthHelper] better-auth failed, trying JWT');
   }
 
   // 2. Intentar JWT Bearer token (para mobile)

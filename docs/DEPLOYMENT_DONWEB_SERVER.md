@@ -98,11 +98,11 @@ sudo apt install -y git
 
 ```bash
 cd /var/www  # o tu directorio preferido
-sudo mkdir -p circuit-prompt-ai
-sudo chown $USER:$USER circuit-prompt-ai
-cd circuit-prompt-ai
+sudo mkdir -p blaniel
+sudo chown $USER:$USER blaniel
+cd blaniel
 
-git clone https://github.com/tu-usuario/circuit-prompt-ai.git .
+git clone https://github.com/tu-usuario/blaniel.git .
 ```
 
 ### 2. Configurar Variables de Entorno
@@ -195,7 +195,7 @@ nano ecosystem.config.js
 module.exports = {
   apps: [
     {
-      name: 'circuit-prompt-ai',
+      name: 'blaniel',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -227,7 +227,7 @@ pm2 save
 
 # Verificar que esté corriendo
 pm2 status
-pm2 logs circuit-prompt-ai
+pm2 logs blaniel
 ```
 
 ### 3. Comandos Útiles PM2
@@ -237,13 +237,13 @@ pm2 logs circuit-prompt-ai
 pm2 logs
 
 # Reiniciar aplicación
-pm2 restart circuit-prompt-ai
+pm2 restart blaniel
 
 # Detener aplicación
-pm2 stop circuit-prompt-ai
+pm2 stop blaniel
 
 # Recargar (zero-downtime)
-pm2 reload circuit-prompt-ai
+pm2 reload blaniel
 
 # Ver estadísticas
 pm2 monit
@@ -263,13 +263,13 @@ crontab -e
 
 ```bash
 # Análisis ML de moderación (3 AM diario)
-0 3 * * * /var/www/circuit-prompt-ai/scripts/cron-ml-analysis.sh >> /var/www/circuit-prompt-ai/logs/cron.log 2>&1
+0 3 * * * /var/www/blaniel/scripts/cron-ml-analysis.sh >> /var/www/blaniel/logs/cron.log 2>&1
 
 # Health check cada hora
-0 * * * * /var/www/circuit-prompt-ai/scripts/health-check.sh >> /var/www/circuit-prompt-ai/logs/health-check.log 2>&1
+0 * * * * /var/www/blaniel/scripts/health-check.sh >> /var/www/blaniel/logs/health-check.log 2>&1
 
 # Limpiar logs antiguos (semanal, domingos a las 4 AM)
-0 4 * * 0 find /var/www/circuit-prompt-ai/logs -name "*.log" -mtime +30 -delete
+0 4 * * 0 find /var/www/blaniel/logs -name "*.log" -mtime +30 -delete
 ```
 
 **IMPORTANTE:** Ajusta las rutas según tu instalación.
@@ -293,7 +293,7 @@ sudo apt install -y nginx
 ### 2. Crear Configuración del Sitio
 
 ```bash
-sudo nano /etc/nginx/sites-available/circuit-prompt-ai
+sudo nano /etc/nginx/sites-available/blaniel
 ```
 
 **Contenido:**
@@ -342,15 +342,15 @@ server {
     }
 
     # Logs
-    access_log /var/log/nginx/circuit-prompt-ai-access.log;
-    error_log /var/log/nginx/circuit-prompt-ai-error.log;
+    access_log /var/log/nginx/blaniel-access.log;
+    error_log /var/log/nginx/blaniel-error.log;
 }
 ```
 
 ### 3. Habilitar Sitio
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/circuit-prompt-ai /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/blaniel /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
@@ -375,7 +375,7 @@ sudo certbot renew --dry-run
 ### 1. Health Check Manual
 
 ```bash
-cd /var/www/circuit-prompt-ai
+cd /var/www/blaniel
 ./scripts/health-check.sh
 ```
 
@@ -418,7 +418,7 @@ https://tudominio.com/dashboard/embeddings-monitor
 ### Para actualizar código:
 
 ```bash
-cd /var/www/circuit-prompt-ai
+cd /var/www/blaniel
 
 # 1. Pull cambios
 git pull origin main
@@ -433,7 +433,7 @@ npx prisma db push
 npm run build
 
 # 5. Reiniciar con PM2 (zero-downtime)
-pm2 reload circuit-prompt-ai
+pm2 reload blaniel
 
 # 6. Verificar
 pm2 logs
@@ -447,17 +447,17 @@ pm2 logs
 
 ```bash
 # Logs de PM2
-pm2 logs circuit-prompt-ai
+pm2 logs blaniel
 
 # Logs de cron ML
-tail -f /var/www/circuit-prompt-ai/logs/ml-analysis-$(date +%Y-%m-%d).log
+tail -f /var/www/blaniel/logs/ml-analysis-$(date +%Y-%m-%d).log
 
 # Logs de health check
-tail -f /var/www/circuit-prompt-ai/logs/health-check.log
+tail -f /var/www/blaniel/logs/health-check.log
 
 # Logs de Nginx
-sudo tail -f /var/log/nginx/circuit-prompt-ai-access.log
-sudo tail -f /var/log/nginx/circuit-prompt-ai-error.log
+sudo tail -f /var/log/nginx/blaniel-access.log
+sudo tail -f /var/log/nginx/blaniel-error.log
 ```
 
 ### Monitoreo de Recursos
@@ -494,13 +494,13 @@ pg_dump creador_inteligencias > backup-$(date +%Y-%m-%d).sql
 
 ```bash
 # Verificar logs de PM2
-pm2 logs circuit-prompt-ai --lines 100
+pm2 logs blaniel --lines 100
 
 # Verificar puerto 3000
 sudo netstat -tlnp | grep 3000
 
 # Reiniciar PM2
-pm2 restart circuit-prompt-ai
+pm2 restart blaniel
 ```
 
 ### Cron jobs no se ejecutan
@@ -513,7 +513,7 @@ crontab -l
 sudo tail -f /var/log/syslog | grep CRON
 
 # Probar script manualmente
-/var/www/circuit-prompt-ai/scripts/cron-ml-analysis.sh
+/var/www/blaniel/scripts/cron-ml-analysis.sh
 ```
 
 ### Embeddings lentos

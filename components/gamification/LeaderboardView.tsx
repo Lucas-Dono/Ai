@@ -46,7 +46,7 @@ export function LeaderboardView({ currentUserId }: LeaderboardViewProps) {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-foreground">
           Leaderboard
         </h1>
         <p className="text-muted-foreground">

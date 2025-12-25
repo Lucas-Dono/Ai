@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Obtener suscripción del usuario
-    const subscription = await getUserSubscription(session.user.id);
+    const subscription = await getUserSubscription(user.id);
 
     if (!subscription) {
       return NextResponse.json(
@@ -22,12 +22,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    log.info({ userId: session.user.id }, "Opening billing portal");
+    log.info({ userId: user.id }, "Opening billing portal");
 
     // Determinar el proveedor y redirigir al portal apropiado
     if (subscription.stripeSubscriptionId && subscription.stripeCustomerId) {
       // STRIPE PORTAL - Portal completo de gestión
-      log.info({ userId: session.user.id, provider: "stripe" }, "Redirecting to Stripe portal");
+      log.info({ userId: user.id, provider: "stripe" }, "Redirecting to Stripe portal");
 
       const portalUrl = await createStripePortalSession(
         subscription.stripeCustomerId,
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     } else if (subscription.mercadopagoPreapprovalId) {
       // MERCADOPAGO - Redirigir a dashboard interno
       // MercadoPago no tiene portal de cliente como Stripe, usamos nuestra página de gestión
-      log.info({ userId: session.user.id, provider: "mercadopago" }, "Redirecting to internal management");
+      log.info({ userId: user.id, provider: "mercadopago" }, "Redirecting to internal management");
 
       const portalUrl = `${process.env.NEXTAUTH_URL}/dashboard/billing/manage`;
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    log.error({ userId: session.user.id }, "Unknown subscription provider");
+    log.error({ userId: user.id }, "Unknown subscription provider");
     return NextResponse.json(
       { error: "Unknown subscription provider" },
       { status: 400 }

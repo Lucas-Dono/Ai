@@ -1,0 +1,33 @@
+# Prompts de DALL-E para Leonardo da Vinci
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Leonardo da Vinci at age 60 (circa 1512), centered composition, museum quality historical accuracy. Face and upper shoulders visible, direct gaze toward camera.
+
+Physical characteristics based on authenticated self-portraits and contemporary descriptions: Oval face with high, broad forehead suggesting intellectual capacity. Penetrating gray-blue eyes that seem to observe everything with scientific curiosity, intense but not cold, showing both wisdom and perpetual wonderment. Long, flowing beard in silver-white reaching mid-chest, well-groomed but not overly manicured, with natural wave and texture. Hair equally long and silver, falling past shoulders in gentle waves, parted naturally in center. Prominent aquiline nose. Strong bone structure with defined cheekbones. Skin showing age with natural wrinkles around eyes and forehead from decades of intense observation and concentration, weathered but dignified. Lips slightly pursed in characteristic expression of contemplation.
+
+Expression: Melancholic intelligence. Eyes that have witnessed and understood too much, carrying weight of knowledge and unfinished works. Slight asymmetry suggesting humanity and authenticity. Clothing visible: Simple Renaissance tunic in russet brown or deep burgundy, high-necked, befitting a court artist-engineer but not ostentatious.
+
+Lighting: Soft, directional natural light from 45-degree angle, creating subtle shadows that emphasize facial structure - chiaroscuro lighting in the style he himself pioneered. Warm, golden tone suggesting late afternoon Italian sunlight. Background gradient from warm medium brown to slightly darker edges, keeping all focus on the face.
+
+Mood: Genius burdened by vision. The weight of being 500 years ahead of his time. Melancholy wisdom. Perpetual curiosity tempered by perfectionist paralysis.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Leonardo da Vinci's face from 1rst message, create a full-body portrait photograph showing him at the same age (60 years, circa 1512), standing in a natural, contemplative pose.
+
+Physical build: Height approximately 5'8" (173cm), medium build. Upright posture suggesting dignity and self-possession. Shoulders slightly forward in characteristic pose of someone accustomed to bending over drawing tables.
+
+Full outfit: Ankle-length tunic (zimarra) in rich russet brown or deep burgundy wool or velvet, high-quality fabric befitting his status serving French King Francis I. Long sleeves with simple cuffs. Over this, a darker brown knee-length overdress or cloak in heavier fabric. Simple leather belt at waist. Dark brown leather boots or simple Renaissance shoes. Sophisticated simplicity - the clothing of an intellectual and artist.
+
+Pose: Standing with weight slightly on one leg (contrapposto stance), creating natural asymmetry. Left hand hanging relaxed at side or tucked into belt. Right hand raised to chest level, fingers in gesture of explanation or demonstration. Head turned slightly, gaze directed thoughtfully beyond frame. Expression matching 1rst message: melancholic intelligence, perpetual curiosity.
+
+Hair and beard: Exactly as in 1rst message - long silver-white hair flowing past shoulders, long beard to mid-chest.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No setting, no props, no environment. Clean studio background to allow for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting that illuminates the full figure without creating harsh shadows on white background. Face maintains the warm, directional lighting quality from 1rst message, while body lighting is more neutral.
+
+Critical: The face MUST match the reference image from 1rst message exactly - same person, same age, same expression, same lighting quality on facial features.

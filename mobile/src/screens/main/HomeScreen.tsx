@@ -160,7 +160,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         <View style={styles.headerTop}>
           <View style={styles.brandContainer}>
             <Ionicons name="sparkles" size={24} color={colors.primary[500]} />
-            <Text style={styles.brandText}> Circuit Prompt AI</Text>
+            <Text style={styles.brandText}> Blaniel</Text>
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity

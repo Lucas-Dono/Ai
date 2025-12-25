@@ -22,7 +22,7 @@ import { Menu, X, Sparkles, Settings, CreditCard, Shield } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useHaptic } from "@/hooks/useHaptic";
 import { fadeVariants, slideLeftVariants, TRANSITIONS } from "@/lib/motion/system";
 

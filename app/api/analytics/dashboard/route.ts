@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const range = (searchParams.get("range") || "30d") as TimeRange;
 
-    const stats = await getDashboardStats(session.user.id, range);
+    const stats = await getDashboardStats(user.id, range);
 
     return NextResponse.json(stats);
   } catch (error) {

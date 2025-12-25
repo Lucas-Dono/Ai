@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     // Obtener facturas del usuario (últimas 50)
     const invoices = await prisma.invoice.findMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
       },
       orderBy: {
         createdAt: "desc",
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     // También obtener pagos (para compatibilidad)
     const payments = await prisma.payment.findMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
       },
       orderBy: {
         createdAt: "desc",

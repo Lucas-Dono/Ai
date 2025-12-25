@@ -6,14 +6,14 @@ import { prisma } from "@/lib/prisma";
 // GET /api/recommendations - Obtener recomendaciones personalizadas
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const authUser = await getAuthenticatedUser(request);
 
-    if (!user?.email) {
+    if (!authUser?.email) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: user.email },
+      where: { email: authUser.email },
     });
 
     if (!user) {
@@ -43,14 +43,14 @@ export async function GET(request: NextRequest) {
 // POST /api/recommendations/regenerate - Forzar regeneración
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const authUser = await getAuthenticatedUser(request);
 
-    if (!user?.email) {
+    if (!authUser?.email) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: user.email },
+      where: { email: authUser.email },
     });
 
     if (!user) {

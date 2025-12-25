@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
 import {
   Search,
@@ -293,8 +293,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         icon: LogOut,
         category: "settings",
         action: async () => {
-          const { signOut } = await import("next-auth/react");
-          await signOut({ callbackUrl: "/login" });
+          const { signOut } = await import("@/lib/auth-client");
+          await signOut();
+          router.push("/login");
           onOpenChange(false);
         },
         keywords: ["logout", "sign out", "cerrar sesión", "salir"],

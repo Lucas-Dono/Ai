@@ -7,7 +7,7 @@ import { UserLevelBadge } from './UserLevelBadge';
 import { StreakFlame } from './StreakFlame';
 import { XPProgressBar } from './XPProgressBar';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/auth-client';
 
 export function GamificationWidget() {
   const { data: session } = useSession();

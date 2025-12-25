@@ -63,12 +63,47 @@ const billingApi = {
     return data;
   },
 
-  // Crear checkout session
-  async createCheckout(tier: 'plus' | 'ultra', provider: 'stripe' | 'mercadopago' = 'stripe') {
-    const data = await apiClient.post<{ url: string }>('/api/billing/checkout', {
-      tier,
-      provider,
+  // Crear checkout session unificado (auto-detecta proveedor por región)
+  async createCheckout(planId: 'plus' | 'ultra', interval: 'month' | 'year' = 'month') {
+    const data = await apiClient.post<{
+      provider: 'mercadopago' | 'paddle';
+      checkoutUrl?: string;
+      initPoint?: string;
+      preapprovalId?: string;
+      transactionId?: string;
+      countryCode: string;
+      pricing: {
+        amount: number;
+        currency: string;
+        displayPrice: string;
+      };
+    }>('/api/billing/checkout-unified', {
+      planId,
+      interval,
     });
+
+    // Retornar la URL de checkout dependiendo del proveedor
+    return {
+      ...data,
+      url: data.provider === 'mercadopago' ? data.initPoint! : data.checkoutUrl!,
+    };
+  },
+
+  // Obtener pricing sin crear checkout (útil para mostrar precios antes de iniciar pago)
+  async getPricing(planId: 'plus' | 'ultra', interval: 'month' | 'year' = 'month') {
+    const params = new URLSearchParams({ planId, interval });
+    const data = await apiClient.get<{
+      countryCode: string;
+      provider: 'mercadopago' | 'paddle';
+      planId: string;
+      interval: string;
+      pricing: {
+        amount: number;
+        currency: string;
+        displayPrice: string;
+        basePrice: number;
+      };
+    }>(`/api/billing/checkout-unified?${params}`);
     return data;
   },
 

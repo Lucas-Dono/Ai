@@ -46,7 +46,7 @@ export async function PUT(
       );
     }
 
-    if (bond.userId !== session.user.id) {
+    if (bond.userId !== user.id) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 403 }

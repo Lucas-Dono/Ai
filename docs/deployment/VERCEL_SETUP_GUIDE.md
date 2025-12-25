@@ -21,7 +21,7 @@ Sin la configuración correcta en Vercel:
 ### Paso 1: Acceder a Vercel Dashboard
 
 1. Ve a https://vercel.com/dashboard
-2. Selecciona tu proyecto "circuit-prompt-ai"
+2. Selecciona tu proyecto "blaniel"
 
 ### Paso 2: Agregar Variable de Entorno
 

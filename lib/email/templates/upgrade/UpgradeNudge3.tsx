@@ -54,7 +54,7 @@ export default function UpgradeNudge3(props: EmailTemplateData) {
       <Text style={signature}>
         Gracias por tu lealtad,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

@@ -290,7 +290,7 @@ El sistema usa polling cada 30s. Para notificaciones instantáneas:
 ## Estructura de Archivos Final
 
 ```
-/run/media/lucas/SSD/Proyectos/AI/circuit-prompt-ai/
+/run/media/lucas/SSD/Proyectos/AI/blaniel/
 │
 ├── types/
 │   └── notifications.ts                  ✨ NUEVO

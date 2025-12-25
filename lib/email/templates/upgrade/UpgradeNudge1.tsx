@@ -18,7 +18,7 @@ export default function UpgradeNudge1(props: EmailTemplateData) {
 
       <Text style={text}>
         Has usado <strong>{messagesUsed} de {messagesLimit} mensajes</strong> este mes.
-        Eso es increíble! Estás aprovechando al máximo Circuit Prompt AI.
+        Eso es increíble! Estás aprovechando al máximo Blaniel.
       </Text>
 
       <Text style={text}>
@@ -43,7 +43,7 @@ export default function UpgradeNudge1(props: EmailTemplateData) {
       <Text style={signature}>
         Sigue conversando,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

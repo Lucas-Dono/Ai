@@ -149,8 +149,16 @@ export class MessageService {
         throw new Error(`Agent ${agentId} not found`);
       }
 
-      if (agent.userId !== userId) {
-        throw new Error('Forbidden: Agent does not belong to user');
+      // Allow access to:
+      // 1. User's own agents (agent.userId === userId)
+      // 2. System/predefined agents (agent.userId === null)
+      // 3. Public agents (agent.visibility === 'public')
+      const isOwnAgent = agent.userId === userId;
+      const isSystemAgent = agent.userId === null;
+      const isPublicAgent = agent.visibility === 'public';
+
+      if (!isOwnAgent && !isSystemAgent && !isPublicAgent) {
+        throw new Error('Forbidden: Agent is not accessible');
       }
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

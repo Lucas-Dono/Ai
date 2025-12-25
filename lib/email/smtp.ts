@@ -85,7 +85,7 @@ function getTransporter(): Transporter {
  */
 export async function sendEmailViaSMTP(options: SMTPEmailOptions): Promise<SMTPResponse> {
   const fromEmail = options.from || process.env.ENVIALOSIMPLE_FROM_EMAIL || "noreply@creador-ia.com";
-  const fromName = process.env.ENVIALOSIMPLE_FROM_NAME || "Circuit Prompt AI";
+  const fromName = process.env.ENVIALOSIMPLE_FROM_NAME || "Blaniel";
 
   log.info({ to: options.to, subject: options.subject }, "Sending email via SMTP");
 
@@ -150,7 +150,7 @@ export async function sendTestEmailSMTP(to: string): Promise<SMTPResponse> {
             <li>Puerto: ${process.env.SMTP_PORT || "587"}</li>
             <li>Usuario: ${process.env.SMTP_USER || "No configurado"}</li>
           </ul>
-          <p><em>Circuit Prompt AI © 2025</em></p>
+          <p><em>Blaniel © 2025</em></p>
         </body>
       </html>
     `,

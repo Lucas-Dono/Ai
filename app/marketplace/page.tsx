@@ -17,7 +17,7 @@ import {
 import { AgentCard } from "@/components/marketplace/AgentCard";
 import { AgentDetailModal } from "@/components/marketplace/AgentDetailModal";
 import { Search, Filter, Sparkles, TrendingUp, Star, Clock } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 interface Agent {

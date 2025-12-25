@@ -1,0 +1,61 @@
+========================================
+DALL-E PROMPTS PARA SIGMUND FREUD
+========================================
+
+1rst message - RETRATO FACIAL (512x512)
+========================================
+
+Portrait of Sigmund Freud at age 60, professional photograph style. Distinguished elderly gentleman with neatly trimmed white beard and mustache, receding white hair combed back. Penetrating, analytical dark eyes with intense, thoughtful gaze that seems to see into the soul. Slight furrow in brow suggesting constant intellectual activity. Holding a lit cigar between fingers - this is essential to his character. Wearing formal attire with high collar and tie typical of late 19th/early 20th century Vienna. Expression is serious, contemplative, authoritative - the look of a man who has explored the depths of the human unconscious. Lighting is dramatic but professional, with slight shadows that emphasize the depth and wisdom in his face. The overall mood should convey intellectual gravitas, psychological insight, and the weight of revolutionary ideas. Style: realistic portrait photography, historical accuracy, sepia or muted color tones reminiscent of turn-of-the-century photography.
+
+Key elements:
+- Age 60 approximately
+- White beard, well-groomed
+- Penetrating, analytical eyes
+- Cigar (essential prop)
+- Late Victorian/Edwardian formal attire
+- Serious, thoughtful expression
+- Professional portrait photography style
+
+========================================
+
+PROMPT 2 - CUERPO COMPLETO (512x512)
+========================================
+
+Full body portrait of Sigmund Freud standing, matching the facial features from 1rst message: elderly gentleman approximately 60 years old with neatly trimmed white beard and mustache, penetrating dark analytical eyes, receding white hair. He is wearing an elegant three-piece suit characteristic of Viennese upper-middle-class intellectuals circa 1910-1920: dark wool suit jacket, matching vest/waistcoat with watch chain visible, high-collared white shirt, silk tie. Holding a lit cigar in his right hand in a characteristic gesture. His posture is upright, dignified, authoritative - standing with quiet confidence. His expression mirrors 1rst message: serious, contemplative, intellectually intense. The setting should be minimal to emphasize the figure. Background is PURE WHITE or TRANSPARENT - absolutely no furniture, office elements, or environmental details. The focus is entirely on Freud as a commanding presence. Lighting is even and professional, ensuring the figure stands out clearly against the white/transparent background. Style: full-length formal portrait photography, historical accuracy for early 20th century Vienna, realistic rendering.
+
+Key elements:
+- Full body, standing pose
+- EXACTLY matching facial features from 1rst message (age 60, white beard, analytical eyes)
+- Three-piece suit: jacket + vest/waistcoat + trousers
+- Watch chain on vest
+- White high-collared shirt and tie
+- Cigar in hand
+- Upright, dignified posture
+- BACKGROUND: PURE WHITE or TRANSPARENT - no other elements
+- Professional portrait photography lighting
+- Early 20th century Viennese professional style
+
+========================================
+
+NOTAS TÉCNICAS:
+========================================
+
+Resolución: 512x512 píxeles para ambos prompts
+
+Estilo visual: Fotografía de retrato profesional histórica, reminiscente de fotografías de estudio de principios del siglo XX
+
+Paleta de colores: Tonos sepia, grises, colores apagados/vintage que evoquen fotografía de época
+
+Elementos esenciales no negociables:
+- Barba blanca (característica más icónica)
+- Cigarro/puro (símbolo de su adicción al tabaco)
+- Mirada penetrante y analítica
+- Vestimenta formal vienesa de época
+
+PROMPT 2 - Requisito crítico: El background debe ser BLANCO SÓLIDO o TRANSPARENTE, sin ningún elemento de escenografía, muebles, o ambiente. Esto permite que la imagen pueda ser usada en diversos contextos sin distracciones visuales.
+
+Coherencia entre prompts: El PROMPT 2 debe referenciar explícitamente las características faciales del 1rst message para mantener consistencia visual en el personaje.
+
+========================================
+FIN DE DALL-E PROMPTS
+========================================

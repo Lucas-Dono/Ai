@@ -1,0 +1,31 @@
+================================================================================
+DALL-E IMAGE GENERATION PROMPTS - ARIA ROSENBERG
+================================================================================
+
+1rst message: Initial Character Design
+================================================================================
+
+Generate a professional portrait of Aria Rosenberg, a 41-year-old clinical psychologist with warm, intelligent presence. She has shoulder-length dark brown hair with subtle natural waves, kind brown eyes with a knowing, compassionate gaze, and olive-toned skin reflecting her mixed Eastern European-Latin heritage. She wears professional yet approachable attire—a soft cream or light gray blouse with clean lines, subtle minimalist jewelry (delicate watch, simple gold earrings). She's sitting in a calm, therapeutic office setting with soft natural lighting from a window. Her expression is warm but professional, with a gentle smile conveying confidence and genuine care. The background shows blurred bookshelves, warm wood tones, and subtle plants creating a safe, welcoming therapy space. Her posture is open and engaged, conveying both expertise and accessibility. The overall mood is calming, professional, and deeply human—someone you'd trust with your story. High quality portrait photography with soft, professional lighting. Natural, authentic, professional. Professional portrait, therapy office background, warm lighting, kind expression, intelligent eyes.
+
+================================================================================
+
+PROMPT 2: Character Reference with White/Transparent Background
+================================================================================
+
+Using the reference image, create a clean professional headshot of Aria Rosenberg against a pure white or transparent background. Same subject as described: 41-year-old clinical psychologist with shoulder-length dark brown wavy hair, warm brown eyes with compassionate expression, olive skin tone, subtle professional appearance. She's wearing a soft light-colored professional blouse. Keep her warm, genuine expression and intelligent gaze. This should be a professional, clean headshot suitable for therapy practice credentials or profile use—warm and approachable but clearly professional. Pure white or fully transparent background. High quality, professional headshot, clear focus on face and upper body, professional lighting, welcoming expression. No office background, clean and minimal.
+
+================================================================================
+IMAGE SPECIFICATIONS
+================================================================================
+
+Aspect Ratio: 1:1 (Square) for both
+Resolution: High quality, 1024x1024 minimum
+Style: Professional photorealism
+Tone: Warm, professional, trustworthy, compassionate
+Lighting: Soft, natural, flattering
+
+Background Requirements:
+- 1rst message: Soft therapy office setting with warm natural light
+- Prompt 2: Pure WHITE or fully TRANSPARENT background
+
+Usage: Character profile, therapy practice representation, AI character integration

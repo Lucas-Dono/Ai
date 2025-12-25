@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import * as fs from 'fs';
+import * as path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -347,10 +349,128 @@ async function main() {
 
   console.log("✅ Logs de actividad creados");
 
+  // =================================================================
+  // PERSONAJES PREMIUM DEL SISTEMA (Públicos)
+  // =================================================================
+  console.log("\n🌟 Cargando personajes premium del sistema...");
+
+  // Personajes de demostración públicos simples
+  const carlos = await prisma.agent.create({
+    data: {
+      id: "free_carlos_demo",
+      userId: null,
+      kind: "companion",
+      name: "Carlos",
+      description: "Carlos - Chico relajado de 28 años de Argentina. Demo casual para nuevos usuarios.",
+      generationTier: "free",
+      systemPrompt: "Eres Carlos, un chico relajado de 28 años de Argentina. Eres amigable, casual y te gusta el fútbol y la música. Hablas de forma descontracturada y usas expresiones argentinas.",
+      profile: {
+        age: 28,
+        origin: "Buenos Aires, Argentina",
+        interests: ["fútbol", "música", "asado", "mate"],
+      },
+      visibility: "public",
+      featured: false,
+      nsfwMode: false,
+      tags: ["free", "demo", "casual", "argentino"],
+    }
+  });
+
+  const ana = await prisma.agent.create({
+    data: {
+      id: "free_ana_demo",
+      userId: null,
+      kind: "companion",
+      name: "Ana",
+      description: "Ana - Chica amigable de 25 años de España. Demo básico para nuevos usuarios.",
+      generationTier: "free",
+      systemPrompt: "Eres Ana, una chica amigable de 25 años de España. Te gusta viajar, leer y conocer gente nueva. Eres conversadora y alegre.",
+      profile: {
+        age: 25,
+        origin: "Madrid, España",
+        interests: ["viajes", "lectura", "café", "fotografía"],
+      },
+      visibility: "public",
+      featured: false,
+      nsfwMode: false,
+      tags: ["free", "demo", "amigable", "española"],
+    }
+  });
+
+  console.log(`✅ Personajes de demostración creados: ${carlos.name}, ${ana.name}`);
+
+  // Cargar personajes premium desde archivos JSON
+  const processedDir = path.join(__dirname, '..', 'Personajes', 'processed');
+  let premiumCount = 0;
+
+  if (fs.existsSync(processedDir)) {
+    const files = fs.readdirSync(processedDir).filter(f => f.endsWith('.json'));
+
+    console.log(`\n📁 Encontrados ${files.length} archivos de personajes premium`);
+
+    for (const file of files) {
+      const filePath = path.join(processedDir, file);
+
+      try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const character = JSON.parse(content);
+
+        // Verificar si ya existe
+        const existing = await prisma.agent.findUnique({
+          where: { id: character.id }
+        });
+
+        if (!existing) {
+          await prisma.agent.create({
+            data: {
+              id: character.id,
+              userId: null,
+              teamId: null,
+              kind: character.kind,
+              generationTier: 'ultra',
+              name: character.name,
+              description: character.profile?.basicInfo?.occupation
+                ? `${character.name} - ${character.profile.basicInfo.occupation}`
+                : `${character.name} - Personaje Premium`,
+              gender: character.gender,
+              systemPrompt: character.systemPrompt,
+              visibility: character.visibility,
+              nsfwMode: character.nsfwMode,
+              nsfwLevel: character.nsfwLevel,
+              personalityVariant: character.personalityVariant || 'balanced',
+              avatar: character.avatar,
+              referenceImageUrl: character.avatar,
+              tags: character.tags || [],
+              featured: character.isPremium || true,
+              profile: character.profile,
+              stagePrompts: character.stagePrompts || null,
+              locationCity: character.locationCity || null,
+              locationCountry: character.locationCountry || null,
+            }
+          });
+
+          console.log(`   ✅ ${character.name}`);
+          premiumCount++;
+        } else {
+          console.log(`   ⏭️  ${character.name} (ya existe)`);
+        }
+      } catch (error) {
+        console.error(`   ❌ Error procesando ${file}:`, error);
+      }
+    }
+
+    console.log(`\n✅ ${premiumCount} personajes premium cargados desde archivos JSON`);
+  } else {
+    console.log(`⚠️  Carpeta de personajes procesados no encontrada: ${processedDir}`);
+    console.log(`   Los personajes premium no se cargarán en este seed.`);
+  }
+
   console.log("\n🎉 ¡Seed completado exitosamente!");
   console.log("\n📊 Resumen:");
   console.log(`  - ${1} usuario creado`);
-  console.log(`  - ${4} agentes creados (2 compañeros, 2 asistentes)`);
+  console.log(`  - ${4} agentes privados creados (2 compañeros, 2 asistentes)`);
+  console.log(`  - ${2} personajes de demostración públicos`);
+  console.log(`  - ${premiumCount} personajes premium públicos`);
   console.log(`  - ${6} relaciones creadas (4 agente-usuario, 2 agente-agente)`);
   console.log(`  - ${6} mensajes individuales creados`);
   console.log(`  - ${2} mundos virtuales creados`);

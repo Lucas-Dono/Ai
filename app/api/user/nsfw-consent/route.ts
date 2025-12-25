@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     // Obtener usuario
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       select: {
         id: true,
         isAdult: true,
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     // CRITICAL: Verificar que el usuario es adulto (18+)
     if (!user.isAdult) {
       console.log(
-        `[NSFW CONSENT] Intento de menor de edad: ${session.user.email}`
+        `[NSFW CONSENT] Intento de menor de edad: ${user.email}`
       );
       return NextResponse.json(
         {
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     });
 
     console.log(
-      `[NSFW CONSENT] Consentimiento otorgado: ${session.user.email} (${NSFW_CONSENT_VERSION})`
+      `[NSFW CONSENT] Consentimiento otorgado: ${user.email} (${NSFW_CONSENT_VERSION})`
     );
 
     return NextResponse.json(
@@ -141,7 +141,7 @@ export async function DELETE(req: NextRequest) {
 
     // Obtener usuario
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       select: {
         id: true,
         nsfwConsent: true,
@@ -169,7 +169,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     console.log(
-      `[NSFW CONSENT] Consentimiento revocado: ${session.user.email}`
+      `[NSFW CONSENT] Consentimiento revocado: ${user.email}`
     );
 
     return NextResponse.json(
@@ -218,7 +218,7 @@ export async function GET(req: NextRequest) {
 
     // Obtener usuario
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       select: {
         id: true,
         isAdult: true,

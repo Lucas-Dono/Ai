@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useClientLocale } from "@/hooks/useClientLocale";
-import { signOut } from "next-auth/react";
+import { signOut } from "@/lib/auth-client";
 import { User, Settings, LogOut, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";

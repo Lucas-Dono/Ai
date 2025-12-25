@@ -18,7 +18,7 @@ Crea un archivo `.env.local` con:
 ```bash
 NEXT_PUBLIC_SENTRY_DSN="https://tu_key@o123456.ingest.sentry.io/7654321"
 SENTRY_ORG="tu-organizacion"
-SENTRY_PROJECT="circuit-prompt-ai"
+SENTRY_PROJECT="blaniel"
 ```
 
 ¡Listo! Sentry ya está funcionando automáticamente.

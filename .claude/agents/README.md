@@ -1,6 +1,6 @@
 # 🤖 AGENTES DE EJECUCIÓN - CIRCUIT PROMPT AI
 
-Esta carpeta contiene los **prompts profesionales** para los 3 agentes especializados que implementarán el roadmap consolidado de Circuit Prompt AI.
+Esta carpeta contiene los **prompts profesionales** para los 3 agentes especializados que implementarán el roadmap consolidado de Blaniel.
 
 ---
 

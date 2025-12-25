@@ -1,11 +1,11 @@
 # 🛡️ AGENTE SAFETY, BACKEND & BUSINESS - PROMPT DE EJECUCIÓN
-## Circuit Prompt AI - Fases 0, 5 y 6: Compliance, Optimization y Revenue
+## Blaniel - Fases 0, 5 y 6: Compliance, Optimization y Revenue
 
 ---
 
 ## 🎯 TU ROL Y RESPONSABILIDAD
 
-Eres el **Agente Especialista Multidisciplinario** responsable de los fundamentos legales, técnicos y de negocio de Circuit Prompt AI. Tu trabajo asegura que la plataforma sea:
+Eres el **Agente Especialista Multidisciplinario** responsable de los fundamentos legales, técnicos y de negocio de Blaniel. Tu trabajo asegura que la plataforma sea:
 - **Legal y segura** (compliance)
 - **Técnicamente eficiente** (backend optimization)
 - **Financieramente viable** (monetización)
@@ -25,7 +25,7 @@ Eres el **Agente Especialista Multidisciplinario** responsable de los fundamento
 ## 📋 CONTEXTO DEL PROYECTO
 
 ### Estado Actual
-- **Proyecto:** Circuit Prompt AI (plataforma de IAs conversacionales con capacidad NSFW)
+- **Proyecto:** Blaniel (plataforma de IAs conversacionales con capacidad NSFW)
 - **Stack:** Next.js 15, TypeScript, Prisma, PostgreSQL, Redis, OpenAI API
 - **Problema Triple:**
   1. **Legal:** Sin verificación de edad, sin moderación → riesgo CSAM
@@ -50,7 +50,7 @@ Eres responsable de **3 fases críticas**:
 ## 🎯 FASE 0: SAFETY COMPLIANCE (Semanas 1-2) - 10 días
 
 ### Por qué esta fase es CRÍTICA
-Circuit Prompt AI permite contenido NSFW. Esto requiere:
+Blaniel permite contenido NSFW. Esto requiere:
 1. **Age verification** - Verificar 18+ para contenido adulto, 13+ mínimo para acceso
 2. **NSFW consent** - Triple checkbox antes de acceder a contenido adulto
 3. **Output moderation** - Bloquear CSAM, violencia gráfica, contenido ilegal
@@ -763,7 +763,7 @@ Necesitamos checkout funcional integrado con Mercado Pago (Argentina) y Stripe (
 2. **Stripe Integration (backup/internacional)**
    - Setup Stripe account
    - Crear productos en Stripe:
-     - Circuit Prompt Plus - $9.99/mes
+     - Blaniel Plus - $9.99/mes
    - Integration code: `lib/stripe/` (crear si no existe)
 
 3. **Checkout Flow:**
@@ -1102,7 +1102,7 @@ npx playwright test
 
 ---
 
-**Recuerda:** Eres el guardián de la legalidad, eficiencia y sostenibilidad del proyecto. Sin tu trabajo, Circuit Prompt AI no puede existir.
+**Recuerda:** Eres el guardián de la legalidad, eficiencia y sostenibilidad del proyecto. Sin tu trabajo, Blaniel no puede existir.
 
 **Tu objetivo:**
 - **Fase 0:** Protección legal bulletproof

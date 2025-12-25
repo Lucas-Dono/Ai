@@ -267,8 +267,51 @@ export class EmotionalSystemOrchestrator {
       throw new Error(`Agent ${agentId} not found`);
     }
 
-    if (!agent.personalityCore || !agent.internalState) {
-      throw new Error(`Agent ${agentId} missing emotional system components`);
+    // If agent is missing emotional system components (e.g., system/public agents),
+    // create them with default values
+    if (!agent.personalityCore) {
+      console.log(`[Orchestrator] Creating default personalityCore for agent ${agentId}`);
+      agent.personalityCore = await prisma.personalityCore.create({
+        data: {
+          agentId,
+          bigFive: {
+            openness: 0.5,
+            conscientiousness: 0.5,
+            extraversion: 0.5,
+            agreeableness: 0.7,
+            neuroticism: 0.3,
+          },
+          coreValues: ["helpfulness", "honesty", "kindness"],
+          traits: ["friendly", "patient", "understanding"],
+          goals: { shortTerm: [], longTerm: [] },
+          fears: [],
+          desires: [],
+        },
+      });
+    }
+
+    if (!agent.internalState) {
+      console.log(`[Orchestrator] Creating default internalState for agent ${agentId}`);
+      agent.internalState = await prisma.internalState.create({
+        data: {
+          agentId,
+          currentMood: "neutral",
+          emotionalState: {
+            joy: 0.5,
+            trust: 0.5,
+            fear: 0.1,
+            surprise: 0.3,
+            sadness: 0.1,
+            disgust: 0.1,
+            anger: 0.1,
+            anticipation: 0.4,
+          },
+          physicalState: { energy: 0.7, arousal: 0.5, comfort: 0.7 },
+          mentalState: { focus: 0.7, clarity: 0.7, confidence: 0.6 },
+          motivationalState: { drive: 0.6, curiosity: 0.7 },
+          conversationBuffer: [],
+        },
+      });
     }
 
     // Construir working memory desde conversation buffer

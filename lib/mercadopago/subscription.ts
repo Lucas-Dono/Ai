@@ -55,7 +55,7 @@ export async function createSubscriptionPreference(
 
   const body: any = {
     payer_email: email,
-    reason: `Suscripción ${plan.name} - Circuit Prompt AI`,
+    reason: `Suscripción ${plan.name} - Blaniel`,
     auto_recurring: {
       frequency: 1,
       frequency_type: "months",

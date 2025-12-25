@@ -441,7 +441,7 @@ Se ha creado un **sistema de character creation completamente funcional** que:
 
 ## 🏅 Créditos
 
-**Diseñado y desarrollado** por: Circuit Prompt AI Team
+**Diseñado y desarrollado** por: Blaniel Team
 **Inspiración**: Linear, Stripe, Notion, Arc Browser
 **Tecnologías**: Next.js 15, TypeScript, Tailwind CSS 4, Framer Motion
 **Fecha**: 2025-01-19

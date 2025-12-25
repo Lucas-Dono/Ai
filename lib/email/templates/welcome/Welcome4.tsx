@@ -68,7 +68,7 @@ export default function Welcome4(props: EmailTemplateData) {
       <Text style={signature}>
         Nos vemos en la comunidad,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

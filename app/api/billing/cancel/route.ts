@@ -10,13 +10,13 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(req);
+    const authUser = await getAuthenticatedUser(req);
 
-    if (!user?.id) {
+    if (!authUser?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = authUser.id;
     const body = await req.json();
     const { reason, feedback } = body;
 
@@ -92,13 +92,13 @@ export async function POST(req: NextRequest) {
 // Endpoint para reactivar suscripción cancelada
 export async function PATCH(req: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(req);
+    const authUser = await getAuthenticatedUser(req);
 
-    if (!user?.id) {
+    if (!authUser?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = authUser.id;
 
     log.info({ userId }, 'User requested subscription reactivation');
 

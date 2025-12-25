@@ -5,21 +5,21 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(req);
+    const authUser = await getAuthenticatedUser(req);
 
-    if (!user?.id) {
+    if (!authUser?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: authUser.id },
       select: {
         plan: true,
         mercadopagoCustomerId: true,
       },
     });
 
-    const subscription = await getUserSubscription(session.user.id);
+    const subscription = await getUserSubscription(authUser.id);
 
     return NextResponse.json({
       plan: user?.plan || "free",

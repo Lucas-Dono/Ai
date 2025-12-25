@@ -3,10 +3,10 @@ import type { SwaggerDefinition } from "swagger-jsdoc";
 export const swaggerDefinition: SwaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Circuit Prompt AI API",
+    title: "Blaniel API",
     version: "1.0.0",
     description: `
-# Circuit Prompt AI API
+# Blaniel API
 
 API REST completa para crear y gestionar agentes de IA emocionales y administrativos.
 

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const stats = await getUsageStats(session.user.id);
+    const stats = await getUsageStats(user.id);
 
     if (!stats) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

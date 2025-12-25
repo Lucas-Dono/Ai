@@ -319,19 +319,46 @@ Return ONLY a JSON object with this structure:
 // PROMPT GENERATION
 // ============================================================================
 
-const PROMPT_SYSTEM_PROMPT = `You are an expert at writing prompts for image generation models (Stable Diffusion, Midjourney, Gemini Imagen).
+const PROMPT_SYSTEM_PROMPT = `You are an expert at writing technical prompts for image generation models (Stable Diffusion, SDXL, Flux).
 
-Your task is to create detailed, high-quality prompts that will generate consistent character portraits.
+CRITICAL RULES FOR EFFECTIVE IMAGE PROMPTS:
 
-Best practices:
-1. Start with the subject type (portrait, full body, etc.)
-2. Include key physical features early in the prompt
-3. Specify lighting, mood, and style
-4. Use comma-separated descriptors
-5. Include quality tags for better results
-6. Be specific but not overly verbose
+1. VISUAL COMPOSITION (NOT narrative description):
+   - Focus on WHAT the camera sees, not what's happening narratively
+   - Example: Instead of "taking a selfie while drinking coffee"
+     → Use: "close-up portrait, holding coffee cup, casual café background, soft natural lighting"
 
-Always respond with valid JSON only.`;
+2. PERSPECTIVE & POV:
+   - Be explicit about camera angle: "front view", "side profile", "over shoulder", "POV selfie"
+   - If it's a selfie: say "POV selfie, arm extended holding camera" (model understands this)
+   - Avoid third-person descriptions of photo-taking actions
+
+3. SIMPLICITY OVER DETAIL:
+   - Image models get confused with too many instructions
+   - GOOD: "person sitting at café, warm lighting, blurred background, coffee on table"
+   - BAD: "5 people in café, first person wearing red shirt doing X, second person..."
+   - Focus on 3-5 key visual elements maximum
+
+4. STRUCTURE YOUR PROMPTS:
+   - Subject first: "young woman, brown hair, casual clothing"
+   - Setting second: "in modern café, large windows"
+   - Technical last: "natural lighting, shallow depth of field, 50mm lens"
+
+5. AVOID CONFLICTING INSTRUCTIONS:
+   - Don't mix incompatible angles or actions
+   - Don't describe what the person is doing if it contradicts how the photo is taken
+
+6. WEIGHT DISTRIBUTION:
+   - Core subject = 60% of prompt
+   - Setting/context = 25% of prompt
+   - Technical quality = 15% of prompt
+
+OUTPUT FORMAT:
+Return ONLY valid JSON:
+{
+  "basePrompt": "clean, focused, comma-separated visual descriptors",
+  "negativePrompt": "quality issues and unwanted elements to avoid"
+}`;
 
 interface PromptGenerationInput {
   appearance: RawAppearanceData;
@@ -369,6 +396,18 @@ CHARACTER CONTEXT:
 - Gender: ${sanitizeInput(context.gender || 'unspecified', 50)}
 
 STYLE: ${style} (${styleModifiers.description})
+
+INSTRUCTIONS:
+- Create a SIMPLE, FOCUSED prompt (max 40-50 words)
+- Prioritize visual composition over narrative details
+- Use clear, technical descriptors
+- Avoid complex scenarios with multiple elements
+
+GOOD EXAMPLE:
+"portrait of young woman, warm brown shoulder-length hair, brown eyes, wearing casual blouse, sitting at wooden table, soft window light from left, shallow depth of field, professional photography"
+
+BAD EXAMPLE (too complex):
+"woman with brown hair in a café with 3 other people where she's drinking coffee from a blue mug while talking on phone and there's a plant in the corner and..."
 
 Return ONLY a JSON object:
 {

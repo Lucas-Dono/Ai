@@ -33,10 +33,10 @@ export default function EmailLayout({ preview, children, unsubscribeUrl }: Email
               src={`${process.env.NEXTAUTH_URL}/logo.png`}
               width="40"
               height="40"
-              alt="Circuit Prompt AI"
+              alt="Blaniel"
               style={logo}
             />
-            <Text style={headerText}>Circuit Prompt AI</Text>
+            <Text style={headerText}>Blaniel</Text>
           </Section>
 
           {/* Content */}
@@ -48,7 +48,7 @@ export default function EmailLayout({ preview, children, unsubscribeUrl }: Email
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              2025 Circuit Prompt AI. Todos los derechos reservados.
+              2025 Blaniel. Todos los derechos reservados.
             </Text>
             <Text style={footerText}>
               <Link href={unsubscribeUrl} style={footerLink}>

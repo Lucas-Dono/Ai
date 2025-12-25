@@ -93,7 +93,7 @@ export async function sendPaymentSuccessEmail(
 
   return await sendEmail({
     to: user.email,
-    subject: "✅ Pago Confirmado - Circuit Prompt AI",
+    subject: "✅ Pago Confirmado - Blaniel",
     html,
     substitutions: {
       userName: user.name || "Usuario",
@@ -127,7 +127,7 @@ export async function sendPaymentFailedEmail(
 
   return await sendEmail({
     to: user.email,
-    subject: "⚠️ Problema con tu Pago - Circuit Prompt AI",
+    subject: "⚠️ Problema con tu Pago - Blaniel",
     html,
     substitutions: {
       userName: user.name || "Usuario",
@@ -160,7 +160,7 @@ export async function sendCancellationEmail(
 
   return await sendEmail({
     to: user.email,
-    subject: "Suscripción Cancelada - Circuit Prompt AI",
+    subject: "Suscripción Cancelada - Blaniel",
     html,
     substitutions: {
       userName: user.name || "Usuario",
@@ -196,7 +196,7 @@ export async function sendReactivationEmail(
 
   return await sendEmail({
     to: user.email,
-    subject: "🎊 ¡Bienvenido de Vuelta! - Circuit Prompt AI",
+    subject: "🎊 ¡Bienvenido de Vuelta! - Blaniel",
     html,
     substitutions: {
       userName: user.name || "Usuario",

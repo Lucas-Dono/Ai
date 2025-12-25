@@ -16,6 +16,7 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
     features: [
       Feature.CHAT_BASIC,
       Feature.AGENT_CREATION,
+      Feature.GROUPS,
       Feature.COMMUNITY_BASIC,
       Feature.ANALYTICS_BASIC,
     ],
@@ -40,6 +41,7 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
       // Todas las de Free
       Feature.CHAT_BASIC,
       Feature.AGENT_CREATION,
+      Feature.GROUPS,
       Feature.COMMUNITY_BASIC,
       Feature.ANALYTICS_BASIC,
       // Nuevas de Plus
@@ -47,6 +49,7 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
       Feature.IMAGE_GENERATION,
       Feature.WORLDS,
       Feature.WORLD_CREATION,
+      Feature.GROUPS_ADVANCED,
       Feature.MARKETPLACE_PUBLISHING,
       Feature.COMMUNITY_ADVANCED,
       Feature.PRIORITY_SUPPORT,
@@ -78,12 +81,14 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
       // Todas las anteriores
       Feature.CHAT_BASIC,
       Feature.AGENT_CREATION,
+      Feature.GROUPS,
       Feature.COMMUNITY_BASIC,
       Feature.ANALYTICS_BASIC,
       Feature.VOICE_MESSAGES,
       Feature.IMAGE_GENERATION,
       Feature.WORLDS,
       Feature.WORLD_CREATION,
+      Feature.GROUPS_ADVANCED,
       Feature.MARKETPLACE_PUBLISHING,
       Feature.COMMUNITY_ADVANCED,
       Feature.PRIORITY_SUPPORT,
@@ -91,6 +96,7 @@ export const TIER_CONFIGS: Record<UserTier, TierConfig> = {
       // Exclusivas de Ultra
       Feature.AGENT_PUBLISHING,
       Feature.WORLD_ADVANCED_FEATURES,
+      Feature.GROUPS_ANALYTICS,
       Feature.MARKETPLACE_UNLIMITED,
       Feature.COMMUNITY_MODERATION,
       Feature.ANALYTICS_ADVANCED,
@@ -209,6 +215,32 @@ export const FEATURE_METADATA: Record<Feature, FeatureMetadata> = {
     minTier: UserTier.ULTRA,
     upgradeMessage: "Actualiza a Ultra para features avanzadas",
     category: "worlds",
+  },
+
+  // Groups
+  [Feature.GROUPS]: {
+    feature: Feature.GROUPS,
+    name: "Grupos",
+    description: "Crea grupos con usuarios e IAs",
+    minTier: UserTier.FREE,
+    upgradeMessage: "Free: 2 grupos, Plus: 10 grupos, Ultra: 50 grupos",
+    category: "groups",
+  },
+  [Feature.GROUPS_ADVANCED]: {
+    feature: Feature.GROUPS_ADVANCED,
+    name: "Features Avanzadas de Grupos",
+    description: "Story Mode, AI Director, eventos emergentes",
+    minTier: UserTier.PLUS,
+    upgradeMessage: "Actualiza a Plus para Story Mode y AI Director",
+    category: "groups",
+  },
+  [Feature.GROUPS_ANALYTICS]: {
+    feature: Feature.GROUPS_ANALYTICS,
+    name: "Analytics de Grupos",
+    description: "Visualiza relaciones y dinámicas del grupo",
+    minTier: UserTier.ULTRA,
+    upgradeMessage: "Actualiza a Ultra para analytics avanzadas",
+    category: "groups",
   },
 
   // Marketplace

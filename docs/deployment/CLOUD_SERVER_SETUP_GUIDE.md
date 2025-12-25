@@ -353,7 +353,7 @@ Si usas PM2 para manejar tu app:
 # Agregar variable de entorno en ecosystem.config.js
 module.exports = {
   apps: [{
-    name: 'circuit-prompt-ai',
+    name: 'blaniel',
     script: 'npm',
     args: 'start',
     env: {

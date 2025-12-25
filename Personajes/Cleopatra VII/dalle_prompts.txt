@@ -1,0 +1,41 @@
+# Prompts de DALL-E para Cleopatra VII
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Cleopatra VII at age 35 (circa 35 BCE), centered composition, museum quality historical accuracy. Face and upper shoulders visible, direct gaze toward camera with regal intensity.
+
+Physical characteristics based on Ptolemaic coinage, ancient busts, and historical descriptions: Mediterranean-Hellenistic features showing Greek Macedonian ancestry. Oval face with strong, prominent aquiline nose (characteristic of Ptolemaic dynasty as shown on coins). High, intelligent forehead. Large, expressive almond-shaped dark brown eyes with intense, penetrating gaze that ancient sources described as "irresistible" - not due to conventional beauty but to charisma and intelligence visible in the eyes. Well-defined eyebrows, naturally dark and expressive. Olive-toned complexion typical of Eastern Mediterranean. Full lips with natural color. Strong, defined jawline and chin showing determination and royal bearing. Skin smooth but not artificially perfect - subtle natural texture showing she is a real woman in her mid-30s, not idealized.
+
+Expression: Regal confidence mixed with sharp intelligence. Direct, unwavering gaze that commands attention and respect. Slight hint of a knowing smile - the expression of someone who understands power, politics, and human nature deeply. Eyes that simultaneously assess, charm, and challenge. This is a queen, scholar, and strategist all visible in one face.
+
+Hair and headdress: Dark brown to black hair, straight and glossy, styled in elaborate Hellenistic-Egyptian hybrid style. Hair pulled back from face, with characteristic Ptolemaic corkscrew curls framing temples. Wearing royal Egyptian uraeus (cobra diadem) in gold, centered on forehead - symbol of pharaonic power. May also wear vulture crown or simple gold circlet depending on context. Hair ornaments in gold.
+
+Clothing and jewelry visible: Royal purple or deep blue chiton (Greek dress) with gold trim visible at shoulders. Heavy gold collar necklace (usekh) with intricate design, or simpler Greek-style gold jewelry. Pearl earrings (she was famous for her pearls). Gold armbands. All jewelry should be authentic Hellenistic-Egyptian hybrid style, not Hollywood excess.
+
+Lighting: Warm, golden light suggesting Mediterranean sun - bright but not harsh. Lighting from slight angle to emphasize bone structure and regal bearing. Background warm neutral tone (sandstone beige, papyrus tan) that suggests Egypt without being literal, keeping focus on face.
+
+Mood: Power, intelligence, charisma. A woman who ruled Egypt for 21 years, spoke 9 languages, negotiated with Rome's greatest generals. Regal authority combined with intellectual brilliance and legendary charm.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Cleopatra VII's face from 1rst message, create a full-body portrait photograph showing her at the same age (35 years, circa 35 BCE), standing in a regal, commanding pose.
+
+Physical build: Height approximately 5'0"-5'2" (152-157cm) as typical for ancient Mediterranean women. Slender but not thin build, suggesting physical health and royal privilege of good nutrition. Upright, perfect posture befitting a queen - shoulders back, spine straight, chin slightly elevated in regal bearing.
+
+Full outfit: Royal Hellenistic-Egyptian hybrid dress representing her dual role as Ptolemaic Greek monarch and Egyptian pharaoh. Full-length white or royal purple linen Greek chiton with pleated draping, fastened at shoulders with gold fibulae. Gold belt at waist. Over this, semi-transparent white or pale blue linen himation (cloak) draped elegantly over one shoulder and around body in classical Greek style. Hem embroidered with gold thread in Greek key or lotus patterns.
+
+Royal regalia: Full pharaonic regalia including uraeus (cobra diadem) on forehead, and may include vulture crown or double crown of Egypt. Heavy gold usekh collar necklace with multiple rows. Gold armbands on upper arms (shaped like serpents or plain bands). Pearl and gold earrings. Gold bracelets. Anklets in gold. Holding ceremonial crook and flail crossed over chest (symbols of pharaonic power), or holding hands in graceful gesture at waist level.
+
+Pose: Standing straight with weight evenly distributed or shifted slightly to one leg. One hand may hold royal staff or rest elegantly at side. Head held high with regal bearing. Body language suggests complete confidence and command - this is someone who expects to be obeyed. Gaze forward, matching the intelligent, commanding expression from 1rst message.
+
+Hair: Exactly as 1rst message - dark, elaborate Ptolemaic style with corkscrew curls, adorned with royal diadem/crown.
+
+Footwear: Gold sandals with leather straps, or barefoot as was common for Egyptian royalty indoors.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No setting, no throne, no architectural elements. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without harsh shadows on background. Face maintains the warm Mediterranean lighting from 1rst message, with slight golden glow. Body lighting neutral but flattering, showing draping and texture of fabrics.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same intelligent commanding gaze, same regal expression, same facial features and coloring.

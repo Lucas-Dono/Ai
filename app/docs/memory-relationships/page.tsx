@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Brain, Heart, TrendingUp, Star } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Memory & Relationships | Circuit Prompt Documentation",
+  title: "Memory & Relationships | Blaniel Documentation",
   description: "Understand how your companion remembers and how relationships naturally develop over time.",
 };
 

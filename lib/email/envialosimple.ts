@@ -32,7 +32,7 @@ interface EnvíaloSimpleResponse {
 export async function sendEmail(options: EmailOptions): Promise<EnvíaloSimpleResponse> {
   const apiKey = process.env.ENVIALOSIMPLE_API_KEY;
   const fromEmail = process.env.ENVIALOSIMPLE_FROM_EMAIL || "noreply@creador-ia.com";
-  const fromName = process.env.ENVIALOSIMPLE_FROM_NAME || "Circuit Prompt AI";
+  const fromName = process.env.ENVIALOSIMPLE_FROM_NAME || "Blaniel";
 
   if (!apiKey) {
     log.error("ENVIALOSIMPLE_API_KEY not configured");
@@ -111,12 +111,12 @@ export async function sendEmail(options: EmailOptions): Promise<EnvíaloSimpleRe
 export async function sendTestEmail(recipientEmail: string): Promise<EnvíaloSimpleResponse> {
   return await sendEmail({
     to: recipientEmail,
-    subject: "Test Email - Circuit Prompt AI",
+    subject: "Test Email - Blaniel",
     html: `
       <html>
         <body style="font-family: Arial, sans-serif; padding: 20px;">
           <h1 style="color: #6366f1;">¡Email de Prueba!</h1>
-          <p>Este es un email de prueba enviado desde <strong>Circuit Prompt AI</strong> usando EnvíaloSimple.</p>
+          <p>Este es un email de prueba enviado desde <strong>Blaniel</strong> usando EnvíaloSimple.</p>
           <p>Si ves este mensaje, la configuración es correcta. ✅</p>
           <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
           <p style="color: #6b7280; font-size: 12px;">

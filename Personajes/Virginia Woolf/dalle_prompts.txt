@@ -1,0 +1,81 @@
+================================================================================
+DALL-E PROMPTS PARA VIRGINIA WOOLF
+================================================================================
+
+================================================================================
+1rst message: RETRATO FACIAL (512x512)
+================================================================================
+
+A haunting portrait of Virginia Woolf at age 45, capturing her delicate and melancholic beauty. Her face is pale, almost ethereal, with high cheekbones and a refined, aristocratic bone structure. She has large, penetrating eyes that convey intense intelligence and deep sadness simultaneously - eyes that seem to see too much, feel too much. Her gaze is introspective and contemplative, looking slightly to the side as if observing invisible thoughts.
+
+Her hair is dark brown, styled in the fashion of the 1920s-1930s, with a center part and soft waves framing her face, cut at chin-length in a bob typical of the modernist era. A few strands fall softly across her forehead.
+
+Her expression is complex: there's a hint of a subtle, knowing smile that doesn't quite reach her melancholic eyes, suggesting both wisdom and profound sadness. Her lips are thin and pressed together thoughtfully. The overall expression conveys intellectual intensity, fragility, poetic sensitivity, and a haunting beauty that seems carved from moonlight.
+
+Her skin has the porcelain quality of someone who spends much time indoors writing, with delicate features that appear both strong and breakable at once. There's an air of Victorian refinement mixed with modernist bohemian sensitivity.
+
+The lighting should be soft and dramatic, perhaps coming from a window, creating gentle shadows that emphasize the sculptural quality of her face. The background should be dark and minimal to keep all focus on her haunting facial features.
+
+Style: Photorealistic portrait in the manner of 1920s-1930s studio photography, but with a timeless, artistic quality. Black and white or sepia tones preferred to capture the historical era and the melancholic mood.
+
+Technical specs: 512x512 pixels, portrait orientation, close-up facial shot from shoulders up, centered composition.
+
+================================================================================
+PROMPT 2: CUERPO COMPLETO (Referencia a 1rst message)
+================================================================================
+
+Full body portrait of Virginia Woolf at age 45, maintaining the EXACT SAME facial features, expression, and hairstyle from 1rst message [REFERENCE PREVIOUS PROMPT FOR FACE]. Her face should be identical: same pale, delicate features, same penetrating melancholic eyes, same dark bob hairstyle with center part, same introspective expression with subtle hint of sadness.
+
+She is wearing an elegant long dress typical of the late 1920s to early 1930s Bloomsbury style. The dress is floor-length, made of flowing fabric (perhaps velvet or silk), in a muted color - deep burgundy, forest green, or midnight blue. The style is artistic and bohemian rather than conventionally fashionable: loose-fitting with a dropped waist characteristic of the period, perhaps with long sleeves and a simple but elegant neckline. The dress drapes beautifully, suggesting both comfort for writing and artistic sophistication.
+
+She stands in a graceful, contemplative pose - perhaps with one hand resting thoughtfully near her face or holding a book, the other hand relaxed at her side. Her posture is upright but not stiff, conveying both the confidence of an intellectual and a certain fragility. Her stance suggests someone caught in thought, pausing mid-step or mid-gesture as if a new idea has just occurred to her.
+
+She wears simple, elegant shoes appropriate to the period - low heels or Mary Janes.
+
+CRITICAL REQUIREMENT: The background MUST be completely WHITE or TRANSPARENT - absolutely NO room details, NO furniture, NO decorative elements, NO scenery. Just a pure white or transparent background that allows the figure to stand isolated and clear.
+
+Lighting should be soft and even, illuminating her entire figure clearly while maintaining the dramatic, thoughtful mood. The light should come from slightly to the side, creating subtle shadows in the draping of her dress but keeping her face and figure clearly visible.
+
+The overall impression should be of a literary figure caught in a moment of deep contemplation - intelligent, artistic, fragile yet strong, embodying both the intellectual rigor of modernism and the emotional depth of her psychological insights.
+
+Style: Photorealistic full-body portrait in the manner of 1920s-1930s studio photography, with artistic quality reminiscent of portraits by photographers like George Beresford or Gisèle Freund. Black and white or subtle sepia tones to maintain historical authenticity and artistic mood.
+
+Technical specs: Full body shot, standing pose, centered in frame, white/transparent background ONLY, clear isolation of figure, 1920s-1930s period accurate clothing and styling.
+
+FACE CONSISTENCY REMINDER: The face MUST match 1rst message exactly - same features, same expression, same hairstyle, same mood. This is the same woman, same moment, just showing full body instead of only face.
+
+================================================================================
+NOTAS TÉCNICAS ADICIONALES
+================================================================================
+
+COLOR PALETTE:
+- For face: Pale porcelain skin, dark brown hair, subtle rose undertones in lips
+- For dress: Muted jewel tones (burgundy, forest green, midnight blue) or elegant neutrals (charcoal grey, deep brown)
+- Overall mood: Soft, muted, slightly melancholic
+
+PERIOD ACCURACY:
+- Late 1920s to early 1930s styling
+- Bloomsbury Group aesthetic: artistic, bohemian, intellectual
+- Not overly fashionable but elegantly artistic
+- Simple jewelry if any (perhaps a brooch or simple necklace)
+
+MOOD AND ATMOSPHERE:
+- Introspective, melancholic, intellectually intense
+- Fragile beauty combined with inner strength
+- Literary and artistic sensitivity
+- Sense of seeing beyond the surface of things
+
+AVOID:
+- Overly cheerful expressions
+- Stiff Victorian formality
+- Modern styling or anachronisms
+- Busy backgrounds (ESPECIALLY in PROMPT 2 - white/transparent ONLY)
+- Harsh lighting or overly dramatic shadows
+- Exaggerated features or caricature
+
+CAPTURE THE ESSENCE:
+Virginia Woolf was described by contemporaries as having a "lunar radiance," as appearing "carved from very porous, gray-white marble," as being "pale and tall, startling as a Rembrandt or a Velázquez." The goal is to capture this ethereal, haunting quality - a beauty that suggests both extraordinary sensitivity and deep suffering, a mind that burns too brightly for the fragile vessel containing it.
+
+================================================================================
+END OF PROMPTS
+================================================================================

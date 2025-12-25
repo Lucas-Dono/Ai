@@ -9,19 +9,20 @@ import {
   Star,
   Users,
   MessageCircle,
-  TrendingUp,
   Heart,
   Crown,
   Brain,
-  Lightbulb,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { generateGradient, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { CompanionCard } from "@/components/companions/CompanionCard";
+import type { CategoryKey } from "@/lib/categories";
+import { Carousel } from "@/components/ui/carousel";
 
 interface Recommendation {
   itemType: "agent" | "world";
@@ -32,6 +33,8 @@ interface Recommendation {
   reason: string;
   tags?: string[];
   avatar?: string | null;
+  categories?: CategoryKey[];
+  generationTier?: 'free' | 'plus' | 'ultra' | null;
 }
 
 interface Agent {
@@ -41,12 +44,43 @@ interface Agent {
   avatar?: string | null;
   tags?: string[];
   featured?: boolean;
+  generationTier?: 'free' | 'plus' | 'ultra' | null;
+  categories?: CategoryKey[];
 }
+
+// Helper function to get complexity badge info
+const getComplexityBadge = (tier?: 'free' | 'plus' | 'ultra' | null) => {
+  switch (tier) {
+    case 'ultra':
+      return {
+        label: 'Ultra',
+        bgClass: 'bg-gradient-to-r from-purple-500 to-pink-500',
+        textClass: 'text-white',
+        icon: '⚡'
+      };
+    case 'plus':
+      return {
+        label: 'Plus',
+        bgClass: 'bg-gradient-to-r from-blue-500 to-cyan-500',
+        textClass: 'text-white',
+        icon: '✨'
+      };
+    case 'free':
+    default:
+      return {
+        label: 'Free',
+        bgClass: 'bg-gradient-to-r from-gray-600 to-gray-700',
+        textClass: 'text-gray-200',
+        icon: '●'
+      };
+  }
+};
 
 export function RecommendedForYou() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const isAuthenticated = status === "authenticated";
+  // Check if user is authenticated (status can be "loading", "authenticated", or "unauthenticated")
+  const isAuthenticated = status === "authenticated" || (typeof window !== 'undefined' && session?.user);
 
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [systemAgents, setSystemAgents] = useState<Agent[]>([]);
@@ -61,6 +95,13 @@ export function RecommendedForYou() {
   const fetchRecommendations = async () => {
     try {
       const response = await fetch("/api/recommendations");
+
+      // Si es 401, el usuario no está autenticado - redirigir a login
+      if (response.status === 401) {
+        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         setRecommendations(data.recommendations);
@@ -75,6 +116,13 @@ export function RecommendedForYou() {
   const fetchSystemAgents = async () => {
     try {
       const response = await fetch("/api/agents?kind=companion");
+
+      // Si es 401, el usuario no está autenticado - redirigir a login
+      if (response.status === 401) {
+        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         // Filter only system agents (userId = null)
@@ -92,6 +140,13 @@ export function RecommendedForYou() {
       const response = await fetch("/api/recommendations/regenerate", {
         method: "POST",
       });
+
+      // Si es 401, el usuario no está autenticado - redirigir a login
+      if (response.status === 401) {
+        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         setRecommendations(data.recommendations);
@@ -165,31 +220,11 @@ export function RecommendedForYou() {
       shadowClass: 'hover:shadow-purple-500/20',
       agents: systemAgents.filter(a => a.tags?.includes('experto'))
     },
-    {
-      id: 'para-empezar',
-      name: 'Para Empezar',
-      icon: Lightbulb,
-      gradientClass: 'bg-gradient-to-r from-cyan-500 to-blue-500',
-      borderClass: 'border-cyan-500/30 hover:border-cyan-500/50',
-      buttonClass: 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 border-cyan-500/30',
-      shadowClass: 'hover:shadow-cyan-500/20',
-      agents: systemAgents.filter(a => a.tags?.includes('free'))
-    },
   ].filter(cat => cat.agents.length > 0); // Only show categories with agents
 
   if (recommendations.length === 0) {
     return (
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-purple-400" />
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Descubre compañeros increíbles
-            </h2>
-          </div>
-        </div>
-
         {/* Categories Grid */}
         <div className="space-y-8">
           {categories.map((category, catIdx) => (
@@ -214,84 +249,23 @@ export function RecommendedForYou() {
                 </span>
               </div>
 
-              {/* Agents Grid */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {/* Agents Carousel */}
+              <Carousel itemWidth={280} gap={24}>
                 {category.agents.map((agent, idx) => (
-                  <motion.div
+                  <CompanionCard
                     key={agent.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: catIdx * 0.1 + idx * 0.05,
-                      ease: [0.4, 0, 0.2, 1],
-                    }}
-                  >
-                    <Link
-                      href={isAuthenticated ? `/agentes/${agent.id}` : `/login?callbackUrl=/agentes/${agent.id}`}
-                    >
-                      <div className={`group relative h-full bg-gradient-to-br from-gray-800/70 to-gray-900/70 backdrop-blur-sm rounded-2xl p-5 border ${category.borderClass} transition-all duration-300 hover:scale-105 hover:shadow-2xl ${category.shadowClass} cursor-pointer`}>
-                        {/* Premium Badge */}
-                        {agent.featured && (
-                          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg z-10">
-                            <Crown className="w-3 h-3" />
-                            PREMIUM
-                          </div>
-                        )}
-
-                        {/* Avatar */}
-                        <div className="flex items-center justify-center mb-4">
-                          {agent.avatar ? (
-                            <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-gray-700/50 shadow-lg group-hover:scale-110 transition-transform">
-                              <img
-                                src={agent.avatar}
-                                alt={agent.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          ) : (
-                            <Avatar
-                              className="h-20 w-20 border-2 border-gray-700/50 shadow-lg rounded-2xl group-hover:scale-110 transition-transform"
-                              style={{ background: generateGradient(agent.name) }}
-                            >
-                              <AvatarFallback className="text-white text-2xl font-bold bg-transparent">
-                                {getInitials(agent.name)}
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="text-center mb-4">
-                          <h3 className="text-lg font-bold text-white truncate group-hover:text-purple-400 transition-colors mb-2">
-                            {agent.name}
-                          </h3>
-                          {agent.description && (
-                            <p className="text-xs text-gray-400 line-clamp-2 mb-3">
-                              {agent.description}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Action Button */}
-                        <Button className={`w-full ${category.buttonClass} border text-white py-2 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 text-sm`}>
-                          <MessageCircle className="w-4 h-4" />
-                          {isAuthenticated ? "Comenzar chat" : "Registrarse para chatear"}
-                        </Button>
-                      </div>
-                    </Link>
-                  </motion.div>
+                    id={agent.id}
+                    name={agent.name}
+                    description={agent.description}
+                    avatar={agent.avatar}
+                    categories={agent.categories}
+                    generationTier={agent.generationTier}
+                    index={catIdx * 10 + idx}
+                  />
                 ))}
-              </div>
+              </Carousel>
             </motion.div>
           ))}
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
-            Chatea con estos compañeros para recibir recomendaciones personalizadas basadas en tus intereses
-          </p>
         </div>
       </div>
     );
@@ -324,8 +298,8 @@ export function RecommendedForYou() {
         </Button>
       </div>
 
-      {/* Grid de Recomendaciones */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {/* Carousel de Recomendaciones */}
+      <Carousel itemWidth={280} gap={24}>
         {recommendations.slice(0, 8).map((rec, idx) => (
           <motion.div
             key={`${rec.itemType}-${rec.itemId}`}
@@ -336,112 +310,88 @@ export function RecommendedForYou() {
               delay: idx * 0.05,
               ease: [0.4, 0, 0.2, 1],
             }}
+            className="relative"
           >
-            <Link
-              href={
-                rec.itemType === "agent"
-                  ? `/agentes/${rec.itemId}`
-                  : `/dashboard/mundos/${rec.itemId}`
-              }
-            >
-              <div className="group relative h-full bg-gradient-to-br from-gray-800/70 to-gray-900/70 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 cursor-pointer">
-                {/* Score Badge */}
-                <div className="absolute -top-2 -right-2 z-10">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                    <Star className="w-3 h-3 fill-white" />
-                    {Math.round(rec.score * 100)}%
-                  </div>
-                </div>
+            {/* Score Badge - positioned above the card */}
+            <div className="absolute -top-2 -right-2 z-20">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+                <Star className="w-3 h-3 fill-white" />
+                {Math.round(rec.score * 100)}%
+              </div>
+            </div>
 
-                {/* Type Badge */}
-                <div className="absolute top-3 left-3 z-10">
-                  {rec.itemType === "agent" ? (
-                    <Heart className="w-4 h-4 text-pink-400" />
-                  ) : (
+            {rec.itemType === "agent" ? (
+              <div className="relative h-full">
+                <CompanionCard
+                  id={rec.itemId}
+                  name={rec.name}
+                  description={rec.description}
+                  avatar={rec.avatar}
+                  categories={rec.categories}
+                  generationTier={rec.generationTier}
+                  index={idx}
+                />
+                {/* Recommendation Reason - overlaid at bottom */}
+                <div className="absolute bottom-16 left-0 right-0 mx-4 bg-purple-500/95 backdrop-blur-sm border border-purple-400/30 rounded-lg p-2">
+                  <p className="text-[10px] text-white flex items-start gap-1.5">
+                    <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                    <span className="line-clamp-2">{rec.reason}</span>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <Link href={`/dashboard/mundos/${rec.itemId}`}>
+                <div className="group relative h-full bg-gradient-to-br from-gray-800/70 to-gray-900/70 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer" style={{ aspectRatio: '2/3' }}>
+                  {/* Type Badge */}
+                  <div className="absolute top-3 left-3 z-10">
                     <Users className="w-4 h-4 text-blue-400" />
-                  )}
-                </div>
+                  </div>
 
-                {/* Avatar/Icon */}
-                <div className="flex items-center justify-center mb-4 pt-4">
-                  {rec.itemType === "agent" ? (
-                    rec.avatar ? (
-                      <div className="h-20 w-20 rounded-2xl overflow-hidden border-2 border-purple-500/30 shadow-lg">
-                        <img
-                          src={rec.avatar}
-                          alt={rec.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <Avatar
-                        className="h-20 w-20 border-2 border-purple-500/30 shadow-lg rounded-2xl"
-                        style={{ background: generateGradient(rec.name) }}
-                      >
-                        <AvatarFallback className="text-white text-2xl font-bold bg-transparent">
-                          {getInitials(rec.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                    )
-                  ) : (
+                  {/* Icon */}
+                  <div className="flex items-center justify-center mb-4 pt-4">
                     <div
                       className="h-20 w-20 rounded-2xl flex items-center justify-center shadow-lg"
                       style={{ background: generateGradient(rec.name) }}
                     >
                       <span className="text-4xl">🌍</span>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Content */}
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-bold text-white truncate group-hover:text-purple-400 transition-colors mb-1">
-                    {rec.name}
-                  </h3>
-                  {rec.description && (
-                    <p className="text-xs text-gray-400 line-clamp-2 mb-3">
-                      {rec.description}
+                  {/* Content */}
+                  <div className="text-center mb-4">
+                    <h3 className="text-base font-bold text-white truncate group-hover:text-blue-400 transition-colors mb-1.5">
+                      {rec.name}
+                    </h3>
+                    {rec.description && (
+                      <p className="text-xs text-gray-400 line-clamp-2 mb-3">
+                        {rec.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Reason */}
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-2 mb-3">
+                    <p className="text-xs text-blue-300 flex items-start gap-2">
+                      <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                      <span className="line-clamp-2">{rec.reason}</span>
                     </p>
-                  )}
+                  </div>
 
-                  {/* Tags */}
-                  {rec.tags && rec.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 justify-center mb-3">
-                      {rec.tags.slice(0, 2).map((tag, i) => (
-                        <span
-                          key={i}
-                          className="text-[10px] bg-gray-700/50 text-gray-300 px-2 py-0.5 rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {/* Action Button */}
+                  <Button className="mt-auto w-full bg-[#27272a] text-gray-200 hover:bg-[#3f3f46] hover:text-white transition-all duration-150 rounded-lg py-2.5 text-[13px] font-semibold">
+                    Explorar
+                  </Button>
                 </div>
-
-                {/* Reason (Why recommended) */}
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-3 mb-3">
-                  <p className="text-xs text-purple-300 flex items-start gap-2">
-                    <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" />
-                    <span className="line-clamp-2">{rec.reason}</span>
-                  </p>
-                </div>
-
-                {/* Action Button */}
-                <Button className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 border border-purple-500/30 text-white py-2 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 text-sm">
-                  <MessageCircle className="w-4 h-4" />
-                  {rec.itemType === "agent" ? "Chatear" : "Explorar"}
-                </Button>
-              </div>
-            </Link>
+              </Link>
+            )}
           </motion.div>
         ))}
-      </div>
+      </Carousel>
 
-      {/* Footer */}
+      {/* Footer - Subtle info */}
       <div className="text-center">
-        <p className="text-xs text-gray-500">
-          Recomendaciones actualizadas diariamente basadas en tus interacciones
+        <p className="text-xs text-gray-500/70">
+          Actualizado diariamente
         </p>
       </div>
     </div>

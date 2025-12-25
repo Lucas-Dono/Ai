@@ -338,7 +338,7 @@ await NotificationService.createNotification({
 ## Estructura de Archivos
 
 ```
-/run/media/lucas/SSD/Proyectos/AI/circuit-prompt-ai/
+/run/media/lucas/SSD/Proyectos/AI/blaniel/
 ├── types/
 │   └── notifications.ts          # Tipos y helpers
 ├── hooks/

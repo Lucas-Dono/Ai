@@ -5,7 +5,7 @@ import { ArrowLeft, Check, Sparkles, MessageSquare, Heart } from "lucide-react";
 import { DocsNavigation } from "@/components/docs/DocsNavigation";
 
 export const metadata: Metadata = {
-  title: "Getting Started | Circuit Prompt Documentation",
+  title: "Getting Started | Blaniel Documentation",
   description: "Quick start guide to create your first companion and start building meaningful relationships.",
 };
 
@@ -22,7 +22,7 @@ export default function GettingStartedDocs() {
 
         <h1 className="text-5xl font-bold mb-4">Getting Started</h1>
         <p className="text-xl text-muted-foreground mb-12">
-          Welcome to Circuit Prompt! This guide will walk you through creating your first companion and starting meaningful conversations.
+          Welcome to Blaniel! This guide will walk you through creating your first companion and starting meaningful conversations.
         </p>
 
         {/* Step 1 */}

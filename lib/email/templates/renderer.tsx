@@ -28,8 +28,13 @@ import TrialEnding1 from './trial/TrialEnding1';
 import TrialEnding2 from './trial/TrialEnding2';
 import TrialEnding3 from './trial/TrialEnding3';
 
+// Auth templates
+import EmailVerification from './auth/EmailVerification';
+import PasswordReset from './auth/PasswordReset';
+import PasswordChanged from './auth/PasswordChanged';
+
 // Template registry
-const TEMPLATES: Record<string, React.ComponentType<EmailTemplateData>> = {
+const TEMPLATES: Record<string, React.ComponentType<any>> = {
   // Welcome sequence
   'welcome_1': WelcomeEmail,
   'welcome_2': TipsEmail,
@@ -52,6 +57,11 @@ const TEMPLATES: Record<string, React.ComponentType<EmailTemplateData>> = {
   'trial_ending_1': TrialEnding1,
   'trial_ending_2': TrialEnding2,
   'trial_ending_3': TrialEnding3,
+
+  // Auth templates
+  'email_verification': EmailVerification,
+  'password_reset': PasswordReset,
+  'password_changed': PasswordChanged,
 };
 
 /**

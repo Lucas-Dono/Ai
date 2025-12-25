@@ -394,7 +394,6 @@ export function ModernChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: messageText,
-          userId,
         }),
       });
 
@@ -590,7 +589,7 @@ export function ModernChat({
       const response = await fetch(`/api/agents/${agentId}/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: url, userId, messageType: type }),
+        body: JSON.stringify({ content: url, messageType: type }),
       });
 
       if (!response.ok) throw new Error(`Failed to send ${type}`);

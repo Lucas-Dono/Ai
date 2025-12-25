@@ -1,0 +1,55 @@
+# Prompts de DALL-E para Harriet Tubman
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Harriet Tubman at age 45 (circa 1867), centered composition, museum quality historical accuracy matching authenticated Civil War era photographs and daguerreotypes. Face and upper shoulders visible, direct powerful gaze toward camera with unwavering determination.
+
+Physical characteristics based on authenticated photographs, contemporary descriptions, and historical records: Strong African features with West African ancestry appearance. Oval-shaped face with broad, intelligent forehead showing wisdom earned through extraordinary experiences. Dark brown, almost black eyes with penetrating, fierce gaze - eyes that have stared down death multiple times, eyes of a military commander and freedom fighter. Deep, intense stare that radiates both compassion and absolute determination. Not conventionally beautiful by Victorian standards but possessing a severe, commanding attractiveness that demands respect. Broad nose with slight flare. Full lips usually held in serious, resolute expression - this is a woman who has led 70 people out of slavery and commanded Union troops. Very dark skin, described by contemporaries as "very black" or "of the blackest" - rich, deep brown complexion. Visible scar on forehead from the two-pound weight that fractured her skull at age 13 - a badge of resistance, not shame. Subtle asymmetry in facial features possibly from the head trauma. Expression carries weight of having survived and triumphed over unimaginable hardship.
+
+Hair: Very short, tightly coiled natural African hair texture, or completely covered by a headscarf/bandana as was her common practice. If visible, hair is kept extremely practical - no time or interest in elaborate styling during a life of constant action and danger. Natural, unpretentious style befitting a guerrilla fighter and conductor on the Underground Railroad, not a society woman. During Civil War era (1867), would typically wear hair wrapped in simple cotton headscarf.
+
+Head covering: Simple cotton headscarf or bandana wrapped around head in practical working style common to formerly enslaved women of the era. Plain dark color (dark brown, deep blue, or black). Tied at back or side. Functional, not decorative - this is work clothing for someone who has spent life in action.
+
+Expression: Fierce, unwavering, intensely determined. Eyes that show both brilliant strategic mind and unshakeable moral conviction. Direct, challenging gaze that seems to ask: "Are you worthy of the freedom I fought to give you?" No smile, but not hostile - simply the grave demeanor of a warrior who has seen horrors, committed acts of violence when necessary, and liberated hundreds. Slight hint of exhaustion visible - the toll of years sleeping in swamps, being hunted like an animal, carrying a loaded revolver for protection, and suffering from narcoleptic seizures from the head injury. But the exhaustion is overshadowed by an indomitable spirit that radiates: "I survived. I won. I freed my people."
+
+Clothing visible: Simple, practical dark clothing typical of working-class African American women of the 1860s. High-necked dark cotton or wool dress - possibly dark brown, navy, or black. No elaborate decoration - Harriet spent her entire life in poverty and hard work. White or light cotton collar as simple ornamentation, reflecting post-Civil War era when she served as Union spy, scout, and nurse. No jewelry except possibly simple items. Everything practical, durable, suitable for someone who might need to move quickly. This is clothing that has seen hard use - travel, work, survival.
+
+Visible signs of hard life: Weathered skin from years of outdoor exposure (sleeping in swamps and forests during Underground Railroad missions, serving outdoors during Civil War). Slight signs of premature aging from constant stress, physical hardship, malnutrition during slavery, and effects of traumatic brain injury. But despite hardships, face radiates strength, dignity, and fierce pride.
+
+Lighting: Soft studio lighting typical of Civil War era photography, slightly from above and side, creating subtle shadows that emphasize strong bone structure and commanding presence. Slightly warm tone suggesting strength and humanity. Background neutral gray or sepia typical of 1860s photography, keeping focus entirely on the powerful face and unwavering eyes.
+
+Mood: Military leadership and spiritual conviction. Unshakeable determination. The face of someone who escaped slavery, returned 13 times to enemy territory to free others, carried a loaded gun and threatened to use it, commanded Union troops in armed combat, and liberated 700+ people in a single military raid. Exhaustion tempered by triumph. The face of Moses leading her people to freedom.
+
+Historical note: Harriet Tubman was approximately 5 feet tall (very short), very dark-skinned, with a visible scar from the head trauma that gave her lifelong narcolepsy and visions she interpreted as divine guidance. She carried herself with military bearing despite her small stature.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image, create a full-body portrait photograph showing her at the same age (45 years, circa 1867, post-Civil War era), standing in strong, dignified military-style pose befitting someone who commanded troops in combat.
+
+Physical build: Height approximately 5 feet (152 cm) - very short stature, but powerfully built for her size. Muscular, compact frame from lifetime of brutal physical labor in slavery (worked as field hand, lumberjack, hauling boats) and years of physically demanding Underground Railroad missions (walking hundreds of miles, sleeping outdoors, carrying supplies). Broad shoulders and strong arms despite small frame. Posture is military-straight, dignified, commanding - this is a woman who commanded Union troops and was called "General Tubman" by John Brown. Weight-bearing stance suggesting readiness for action. Despite small size, body language radiates authority and physical capability. Not delicate or fragile - this is a fighter, survivor, warrior.
+
+Full outfit: Full-length simple cotton or wool dress in dark color (dark brown, navy blue, or black) typical of working-class African American women in 1860s America. Mid-19th century practical style, post-Civil War era. High neckline with simple white cotton collar - modest, practical. Long sleeves with simple cuffs. Bodice fitted but not fashionable or elaborate - this is functional clothing. Full-length skirt to ankles with natural drape, no hoops or excessive decoration. Dress is well-worn, showing signs of heavy use and frequent washing - clothing of someone who lived in poverty despite being a war hero. Everything dark except white collar. Style reflects someone who spent the Civil War years as a Union spy, scout, and nurse - practical military-adjacent clothing.
+
+Head covering: Simple cotton headscarf or bandana wrapped around head, EXACTLY as shown in 1rst message. Plain dark color tied at back or side. This is her signature look - Harriet almost always wore a headscarf. Completely covers hair in practical working style. Critical: The headscarf is essential to her historical accuracy and iconic appearance.
+
+Visible scar: The prominent scar on forehead from the weight that fractured her skull should be visible, matching 1rst message exactly.
+
+Posture and pose: Standing at military attention or slight relaxed stance of a veteran. Weight evenly distributed, feet shoulder-width apart, stance suggesting both dignity and readiness for action. Hands either hanging naturally at sides or one hand resting on hip in confident pose. Shoulders back, head held high with the same fierce, direct gaze  No dramatic or theatrical poses - simple, direct presentation befitting a military leader and freedom fighter. Body language suggests someone accustomed to command, uninterested in feminine delicacy or Victorian propriety. This is a warrior at rest.
+
+Accessories: No jewelry whatsoever - Harriet lived in poverty most of her life and spent any money helping others. Possibly a simple shawl draped over shoulders if weather suggests it. May have small bag or satchel at her side - she traveled constantly and always carried essentials. No props that can't be easily removed or edited out. Everything practical, nothing decorative or frivolous.
+
+Footwear: Simple well-worn leather boots or heavy work shoes, practical for walking long distances. Barely visible under long skirt but suggesting capability for hard travel. Boots would show wear from years of walking hundreds of miles on Underground Railroad missions.
+
+Hands: Visible, showing signs of hard physical labor - calloused, strong, capable hands. These are hands that loaded rifles, rowed boats, dug graves, nursed wounded soldiers, pulled people out of slavery. Working hands, not delicate society hands.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No historical props, no rifles, no lanterns, no Underground Railroad imagery, no stars, no setting. Clean background for easy extraction and compositing. Pure white seamless backdrop.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the soft, warm-toned directional lighting  showing her strong features, visible scar, and fierce expression. Body lighting neutral and even, showing draping and texture of simple worn cotton/wool dress fabric and practical headscarf.
+
+Important details: Very short stature (5 feet) but powerful, muscular build. Visible scar on forehead. Headscarf completely covering hair (signature look). Simple, worn, practical clothing with no vanity or decoration. Military-straight posture radiating command and dignity. Everything practical and functional - this is a woman whose entire life was dedicated to action, survival, and liberating others, not personal appearance or social niceties.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same fierce determined gaze, same strong African features, same visible scar on forehead, same dark skin, same expression of unwavering conviction and military command. Headscarf must be present and match 1rst message. Age approximately 45 years (post-Civil War, 1867).
+
+Historical accuracy note: Harriet Tubman in 1860s photographs typically wore dark, simple, well-worn working-class clothing with a headscarf covering her hair. She carried herself with dignity and strength despite poverty. Her small stature (5 feet) was contrasted by her commanding presence and the respect she commanded from both Black and white abolitionists, including being called "General Tubman" by John Brown and having Colonel Robert Gould Shaw of the 54th Massachusetts refer to her expertise. This photo should capture that paradox: small in physical size, giant in presence and accomplishment.

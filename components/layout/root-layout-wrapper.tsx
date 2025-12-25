@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { Toaster } from "@/components/ui/toast";
 import { AccessibilityIndicator } from "@/components/accessibility/AccessibilityIndicator";
 import { Footer } from "@/components/layout/footer";
+import { PaymentModalProvider } from "@/components/billing/PaymentModalProvider";
 
 interface RootLayoutWrapperProps {
   children: React.ReactNode;
@@ -87,6 +88,7 @@ export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
         }}
         visibleToasts={3}
       />
+      <PaymentModalProvider />
     </ErrorBoundary>
   );
 }

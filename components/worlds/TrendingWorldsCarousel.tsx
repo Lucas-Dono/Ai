@@ -107,7 +107,7 @@ export function TrendingWorldsCarousel() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <TrendingUp className="w-6 h-6 text-orange-400" />
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold text-foreground">
           Mundos Trending
         </h2>
         <span className="text-sm text-gray-400 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">

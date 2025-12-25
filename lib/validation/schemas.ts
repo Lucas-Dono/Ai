@@ -16,7 +16,7 @@ export const messageInputSchema = z.object({
     .max(10000, 'Content too long (max 10,000 characters)'),
   messageType: z.enum(['text', 'audio', 'gif', 'image']).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  userId: z.string().cuid().optional(),
+  // userId is removed from schema - it should ALWAYS come from authenticated session, never from request body
 });
 
 export const audioUploadSchema = z.object({

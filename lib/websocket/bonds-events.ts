@@ -12,8 +12,7 @@
 
 import { Server as SocketServer } from "socket.io";
 import { Server as HTTPServer } from "http";
-import { getSession } from "next-auth/react";
-import type { Session } from "next-auth";
+import { auth, type Session } from "@/lib/auth";
 
 // Re-export types from shared file (safe for client-side imports)
 export * from "./bond-event-types";

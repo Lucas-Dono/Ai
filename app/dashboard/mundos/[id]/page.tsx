@@ -14,7 +14,7 @@ import { generateGradient, getInitials } from "@/lib/utils";
 import { ExportConversationButton } from "@/components/export-conversation-button";
 import { VisualNovelViewer } from "@/components/worlds/visual-novel/VisualNovelViewer";
 import { useTrackInteraction } from "@/hooks/use-track-interaction";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 
 interface Message {
   id: string;

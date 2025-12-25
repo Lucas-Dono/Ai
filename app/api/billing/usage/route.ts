@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const stats = await getUserUsageStats(session.user.id);
+    const stats = await getUserUsageStats(user.id);
 
     return NextResponse.json(stats);
   } catch (error) {

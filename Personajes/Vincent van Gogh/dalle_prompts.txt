@@ -1,0 +1,43 @@
+# Prompts de DALL-E para Vincent van Gogh
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Vincent van Gogh at age 35 (circa 1888, during his Arles period), centered composition, museum quality historical accuracy matching authenticated photographs and self-portraits. Face and upper shoulders visible, intense direct gaze toward camera.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Gaunt, angular Dutch face with strong bone structure. High, prominent forehead showing intellectual capacity. Deep-set eyes in distinctive blue-green color (sometimes appearing gray depending on light) with intense, penetrating gaze - eyes described by contemporaries as "fanatical" and "burning." Eyes show both brilliant artistic vision and inner turmoil - slight wildness or instability visible. Heavy, prominent brow ridge. Strong, aquiline nose. High, sharp cheekbones emphasized by thinness. Square, determined jaw. Thin lips usually pressed together in concentration or tension. Weathered, sun-damaged skin from years of outdoor painting - rough texture, premature lines, reddish undertones suggesting exposure. Face showing signs of poor nutrition, illness, and emotional distress - hollowed cheeks, tired appearance around eyes.
+
+Hair and facial hair: Distinctive flame-red (auburn/ginger) hair and beard - this coloring is crucial to his appearance. Hair short to medium length, somewhat disheveled, natural texture. Full beard and mustache, somewhat unkempt but not extremely long - beard shows natural curl and texture. Eyebrows red-blonde, prominent and expressive.
+
+Expression: Intense, searching gaze with hint of suffering and inner fire. Expression suggests both artistic passion and mental anguish. Not aggressive but deeply serious, almost haunted. Eyes that have seen and felt too much. Slight tension in jaw and around eyes suggesting chronic anxiety or pain. This is genius combined with torment - both visible in the face.
+
+Clothing visible: Simple peasant-style or worker's clothing in earth tones - brown, ochre, or olive workman's jacket or coat. Simple collar, possibly stained with paint. Everything practical and worn, reflecting both his poverty and his identification with working people.
+
+Lighting: Natural warm light suggesting Mediterranean sun of Southern France - warm golden tone. Lighting from slight angle to emphasize angular bone structure and create subtle shadows. Light quality matches the vibrant, warm colors he painted with. Background warm ochre, burnt sienna, or golden yellow - colors from his palette, keeping focus on face.
+
+Mood: Artistic intensity mixed with psychological suffering. The burning gaze of someone who sees the world in colors more vivid than others can perceive. Genius combined with madness. Beauty in anguish. The face of someone creating masterpieces while battling inner demons.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Vincent van Gogh's face from 1rst message, create a full-body portrait photograph showing him at the same age (35 years, circa 1888 Arles period), standing in characteristic working pose.
+
+Physical build: Height approximately 5'7" (170cm). Thin, almost gaunt build from poor nutrition and illness - approximately 130-140 pounds on that frame. Broad shoulders but slender overall. Slightly hunched posture from years of bending over easel. Body showing physical toll of hard living, poverty, mental illness, and relentless work - someone who paints obsessively and forgets to eat or sleep properly.
+
+Full outfit: Working clothes of a plein-air painter and manual laborer. Worn brown or khaki canvas work jacket or coat, stained with paint smears in various colors - yellow, blue, green clearly visible. Underneath, simple collared shirt in dull blue or gray, also with paint stains. Dark brown or black work trousers, worn and paint-splattered. Heavy work boots or peasant shoes, dusty and worn. Wide-brimmed straw hat typical of Southern French peasants and outdoor workers (he wore this constantly while painting outdoors to protect from sun). Alternatively, if no hat, might show red hair more clearly. Simple leather belt. Everything well-worn, practical, showing poverty but also showing the honored stains of artistic work.
+
+Posture and pose: Standing with weight slightly on one leg, body showing fatigue but determined. One hand hanging at side, other hand raised holding something (paintbrush, pipe, or simply gesturing). Posture not perfectly erect - showing physical exhaustion and chronic illness, but not collapsed. Shoulders slightly forward, head tilted in characteristic thoughtful angle. Gaze forward, matching the intense, searching expression from 1rst message.
+
+Hair and beard: Exactly as 1rst message - distinctive red-orange (auburn) color is crucial. Short to medium hair, full beard, somewhat disheveled. Hat may be worn or held.
+
+Facial expression: Same intense, troubled gaze from 1rst message - artist burning with creative fire and psychological torment.
+
+Accessories: Might hold or have simple clay pipe (he smoked constantly). Paint-stained hands visible - fingernails with paint, hands showing manual labor.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No sunflowers, no wheat fields, no easels, no yellow house - nothing contextual. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the warm Mediterranean golden light from 1rst message, showing his distinctive features. Body lighting neutral but warm-toned, showing texture of worn, paint-stained clothing.
+
+Important details: Thin, worn body showing toll of poverty and illness. Paint-stained practical working clothes. Posture showing both exhaustion and determination. Red-orange hair and beard are distinctive and crucial. The straw hat is characteristic if included.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same intense troubled gaze, same gaunt angular features, same red-orange hair and beard, same weathered skin and haunted expression.

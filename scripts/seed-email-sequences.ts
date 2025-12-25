@@ -29,7 +29,7 @@ async function main() {
         create: [
           {
             name: 'welcome_1',
-            subject: 'Bienvenido a Circuit Prompt AI, {{userName}}!',
+            subject: 'Bienvenido a Blaniel, {{userName}}!',
             templateId: 'welcome_1',
             previewText: 'Tu guía rápida para empezar',
             delayDays: 0,

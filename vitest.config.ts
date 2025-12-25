@@ -8,6 +8,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts", "./__tests__/setup.ts"],
+    testTimeout: 10000, // 10 seconds for slow tests
+    hookTimeout: 10000,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
@@ -24,6 +26,13 @@ export default defineConfig({
         branches: 60,
         statements: 60,
       },
+    },
+    env: {
+      // Test environment variables
+      NODE_ENV: "test",
+      DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+      NEXTAUTH_SECRET: "test-secret-min-32-chars-long-123456",
+      NEXTAUTH_URL: "http://localhost:3000",
     },
   },
   resolve: {

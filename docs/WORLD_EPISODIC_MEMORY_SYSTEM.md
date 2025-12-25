@@ -460,4 +460,4 @@ Para preguntas o issues:
 
 ## Licencia
 
-Parte del sistema Circuit Prompt AI - 2025
+Parte del sistema Blaniel - 2025

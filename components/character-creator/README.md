@@ -466,7 +466,7 @@ interface CharacterDraft {
 
 ## 📄 License
 
-Part of the Circuit Prompt AI project. All rights reserved.
+Part of the Blaniel project. All rights reserved.
 
 ---
 
@@ -476,4 +476,4 @@ For questions or issues, contact the development team or open an issue in the pr
 
 ---
 
-**Built with ❤️ by the Circuit Prompt AI team**
+**Built with ❤️ by the Blaniel team**

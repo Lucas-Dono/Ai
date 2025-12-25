@@ -12,8 +12,8 @@ export async function GET(req: NextRequest) {
   const teams = await prisma.team.findMany({
     where: {
       OR: [
-        { ownerId: session.user.id },
-        { members: { some: { userId: session.user.id } } },
+        { ownerId: user.id },
+        { members: { some: { userId: user.id } } },
       ],
     },
     include: {
@@ -47,10 +47,10 @@ export async function POST(req: NextRequest) {
     data: {
       name,
       description,
-      ownerId: session.user.id,
+      ownerId: user.id,
       members: {
         create: {
-          userId: session.user.id,
+          userId: user.id,
           role: "owner",
         },
       },

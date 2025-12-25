@@ -51,7 +51,7 @@ export default function UpgradeNudge2(props: EmailTemplateData) {
       <Text style={signature}>
         Aventuras te esperan,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

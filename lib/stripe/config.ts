@@ -19,7 +19,7 @@ export const stripe = new Proxy({} as Stripe, {
         apiVersion: "2025-10-29.clover", // Latest stable version
         typescript: true,
         appInfo: {
-          name: "Circuit Prompt AI",
+          name: "Blaniel",
           version: "1.0.0",
         },
       });

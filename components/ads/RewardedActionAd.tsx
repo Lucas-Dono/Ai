@@ -30,7 +30,7 @@ const ACTIONS = {
   share_twitter: {
     icon: Twitter,
     label: "Compartir en Twitter",
-    description: "Comparte sobre Circuit Prompt AI en Twitter",
+    description: "Comparte sobre Blaniel en Twitter",
     reward: { messages: 5, images: 2 },
     action: "compartir",
   },

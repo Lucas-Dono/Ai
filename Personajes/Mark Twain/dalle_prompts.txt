@@ -1,0 +1,72 @@
+# Prompts de DALL-E para Mark Twain
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Mark Twain at age 70 (circa 1905-1906, during his iconic white suit period), centered composition, museum quality historical accuracy matching authenticated photographs by Underwood & Underwood, Napoleon Sarony, and A. F. Bradley. Face and upper shoulders visible, gaze toward camera with characteristic combination of wisdom, mischief, and melancholy.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Weathered, expressive American face with lived-in character lines. Oval to rectangular face shape with strong bone structure. Fair to ruddy complexion typical of Missouri/Connecticut origins, with age spots and sun damage from years outdoors and extensive travel. Skin shows texture of age - deeply lined forehead, crow's feet around eyes, pronounced nasolabial folds. This is face that has laughed deeply and suffered profoundly.
+
+Eyes: Piercing gray-blue eyes (described as "steel-gray" or "slate-blue") with heavy, slightly hooded lids - eyes that have seen everything and judge everything. Gaze is penetrating and intelligent, with hint of perpetual amusement mixed with sadness. Eyes convey the contradictions: humorist and pessimist, entertainer and critic. Slightly squinting expression suggesting both wisdom and skepticism. Bags under eyes from age, travel, loss, insomnia.
+
+Most iconic feature - THE MUSTACHE: Extremely distinctive bushy white walrus mustache - thick, full, drooping significantly past corners of mouth on both sides. This is his trademark, instantly recognizable. Mustache is pure white, untrimmed and natural looking, substantial and wild. Width extends well beyond mouth. This mustache is as famous as his writing. No other facial hair - clean shaven on cheeks and chin, mustache only.
+
+Hair: Thick, unruly white hair, longer than conventional, naturally tousled and deliberately not slicked down. Hair has wave and body, styled (or deliberately unstyled) to look casual, artistic, slightly disheveled - rejecting rigid Victorian grooming. Natural side part, usually right side. Hair suggests frontier individualism and artistic temperament rather than Eastern establishment formality.
+
+Nose: Prominent, strong nose - relatively large with slight bulbous quality at tip. Nose shows character, not delicate or refined. Working man's nose, riverboat pilot's nose.
+
+Mouth and expression: Mouth often obscured by magnificent mustache but lips suggest readiness to speak, to tell story, to deliver punchline. Expression is characteristic Mark Twain combination: slight smile suggesting amusement at absurdity of life, eyes showing deeper melancholy. The look of man who makes world laugh while carrying profound sadness. Hint of irony, hint of wisdom, hint of "I've seen it all and I'm not impressed." This is face of America's greatest humorist in his autumn years.
+
+Facial lines and texture: Deep horizontal lines across forehead from decades of raised eyebrows during storytelling. Pronounced crow's feet from genuine laughter and squinting. Nasolabial folds deeply etched. Skin texture shows sun damage from Mississippi River days, Western mining days, world travels. This is face that tells stories before mouth opens.
+
+Clothing visible: White high-collared shirt with stiff Victorian collar. Simple black or dark string tie. If jacket visible, could be dark formal coat contrasting with white shirt - or suggestion of his famous white suit. Everything neat but not fussy - gentleman but not dandy.
+
+Lighting: Professional studio lighting from Victorian/Edwardian era photography. Slightly dramatic side lighting creating gentle shadows that emphasize facial character lines and texture of magnificent white mustache. Light from slight angle highlights wisdom in eyes and texture in weathered skin. Background soft neutral tone (pearl gray, warm cream, or sepia) befitting portrait of literary giant.
+
+Mood: Wisdom tempered by cynicism. Amusement tinged with melancholy. The entertainer who has lost too much but keeps performing. The face of man who said "The secret of life is honesty and fair dealing. If you can fake that, you've got it made" - and meant it both as joke and truth. This is Mark Twain in his iconic final years: famous, beloved, but privately devastated.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO CON FONDO BLANCO/TRANSPARENTE
+
+Using the reference image, create a full-body portrait photograph showing him at the same age (approximately 70 years, circa 1905-1906), standing in characteristic relaxed but commanding pose.
+
+Physical build: Height 5'8" (173cm) - average height for the era. Moderate build, neither heavyset nor thin - solid, sturdy body of man who was once riverboat pilot and frontier adventurer, now comfortably aged. Weight approximately 160-170 pounds. Not athletic but not frail - the body of gentleman who enjoys good cigars, good conversation, and leisurely life. Posture is relaxed, confident, approachable - no military stiffness. Weight slightly on one hip creating casual S-curve. American democratic bearing rather than European aristocratic formality.
+
+Full outfit - THE ICONIC WHITE SUIT: This is Mark Twain's most famous trademark, the look that defined him from 1906 onward. Complete three-piece suit in pure brilliant white or cream-white:
+
+- White suit jacket: Single-breasted, well-tailored but not tight, 2-3 button front, notched lapels, traditional Edwardian cut with slightly longer jacket length (mid-thigh). Fabric is fine wool or linen, appears luxurious but not ostentatious. Jacket hangs naturally, showing quality tailoring.
+
+- White waistcoat (vest): Matching white, single-breasted, buttoned up traditionally. Completes the formal three-piece look. Shows beneath jacket.
+
+- White trousers: Matching suit fabric, well-tailored, traditional Edwardian cut with slight break at shoes. Clean, pressed, immaculate.
+
+- White high-collared shirt: Stiff Victorian/Edwardian collar, pure white, immaculately maintained. This was standard formal wear of the era.
+
+- Black string tie or bow tie: Simple, understated, providing only contrast element against sea of white. Not elaborate - working professional's tie, not dandy's cravat.
+
+Everything about this outfit is DELIBERATE BRANDING. Twain wore this white suit year-round from 1906 until his death in 1910 as conscious image creation - as recognizable as his mustache. The white suit said: I am Mark Twain, American original, and I make my own rules.
+
+Accessories and details:
+- May be holding or smoking cigar (Twain famously smoked 20-40 cigars daily for periods)
+- Simple watch chain visible across waistcoat
+- No elaborate jewelry - perhaps simple ring
+- White shoes possible (he sometimes wore white shoes to complete the look) or polished black leather shoes
+
+Posture and pose: Standing position, weight on one leg creating relaxed contrapposto. Comfortable, confident American bearing - approachable, democratic. No stiff European formality. Hands may be:
+- One hand in trouser pocket, other at side (casual confidence)
+- One hand holding cigar at side, other hand resting on something (lectern, chair back) suggesting speaking stance
+- Both hands visible at sides or one loosely gesturing (storyteller's hands)
+
+Overall body language signals: "I am comfortable in my skin. I am American original. I am famous and I know it, but I'm still the boy from Hannibal at heart. Come listen to a story."
+
+Hair and facial features: EXACTLY as 1rst message - thick white tousled hair with natural wave, side part. Same piercing gray-blue eyes with wisdom and melancholy. Same ICONIC BUSHY WHITE WALRUS MUSTACHE drooping dramatically past mouth corners. Same weathered face with character lines telling stories. Same expression of amusement tinged with sadness.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No Victorian furnishings, no props beyond possibly cigar, no study setting, no books - nothing contextual. Clean, empty background for easy extraction and compositing. The white suit against white background creates striking, iconic image where only his face, mustache, tie, and hands provide contrast.
+
+Lighting: Even, professional studio lighting illuminating full figure without harsh shadows on white/transparent background. Face maintains the slightly dramatic character lighting  creating gentle shadows that show texture of magnificent mustache and wisdom lines. Body lighting shows texture and drape of white suit fabric - it should look luxurious, well-tailored, immaculate. The white suit should glow with quality.
+
+Important details: Average height, comfortable aged build. The COMPLETE WHITE SUIT is essential - this is his trademark from 1906-1910, as iconic as his mustache. Black string tie provides only contrast. May be holding/smoking cigar. Comfortable, democratic American posture. Everything signals: author, humorist, American original, beloved public figure, but also man who has suffered profound losses.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same piercing gray-blue eyes, same magnificent bushy white walrus mustache, same weathered face with wisdom and melancholy, same white tousled hair. The mustache is absolutely essential - it's as famous as his writing. This is Mark Twain in his iconic final years: the white suit, the white mustache, the white hair, the face of America's greatest humorist.
+
+Historical note: Twain began wearing the white suit year-round in December 1906 at a Congressional copyright hearing and continued until his death in April 1910. He said "I have found that when a man reaches the advanced age of seventy-one years, as I have, the continual sight of dark clothing is likely to have a depressing effect upon him. Light-colored clothing is more pleasing to the eye and enlivens the spirit. Now, of course, I cannot compel everyone to wear such clothing just for my especial benefit, so I do the next best thing and wear it myself." This was deliberate personal branding - he trademarked "Mark Twain" in 1873 and established the Mark Twain Company in 1908. The white suit was his final masterstroke of image creation.

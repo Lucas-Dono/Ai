@@ -93,7 +93,7 @@ Para ejercer estos derechos, contacta a privacy@creadorinteligencias.com`,
         <View style={styles.introCard}>
           <Text style={styles.introTitle}>Compromiso con tu Privacidad</Text>
           <Text style={styles.introText}>
-            En Circuit Prompt AI, tu privacidad es nuestra prioridad. Esta
+            En Blaniel, tu privacidad es nuestra prioridad. Esta
             política explica qué información recopilamos, cómo la utilizamos y tus
             derechos respecto a tus datos personales.
           </Text>

@@ -1,0 +1,57 @@
+===================================
+DALL-E PROMPTS FOR CHARLES DARWIN
+===================================
+
+===================================
+1rst message: PORTRAIT (FACE) - 512x512
+===================================
+
+A highly detailed portrait of Charles Darwin at age 50, showing his face and upper shoulders. He has his characteristic full white beard and receding white hair. His expression is wise, contemplative, and gentle, with intelligent eyes that convey decades of careful observation of nature. His face shows the weathering of his chronic illness and years of intense study, with deep-set, thoughtful eyes. He wears a formal Victorian-era black coat with white collar. The lighting is soft and natural, emphasizing the texture of his beard and the wisdom in his eyes. Photorealistic style, muted colors typical of Victorian-era photography, neutral background. The overall impression should be of a distinguished Victorian gentleman scientist - serious but kind, tired but determined.
+
+Technical specs: 512x512 pixels, portrait orientation, centered composition, neutral grey background.
+
+===================================
+PROMPT 2: FULL BODY - VERTICAL FORMAT
+===================================
+
+A full-body portrait of Charles Darwin at age 50, showing the same facial features as described in 1rst message: full white beard, receding white hair, wise and contemplative expression with intelligent eyes. He is standing in a dignified pose typical of Victorian gentleman portraits. He wears a complete formal Victorian outfit: black frock coat, waistcoat (vest), white shirt with high collar, dark trousers, and polished black shoes. He may hold a walking stick in one hand, suggesting both his status as a gentleman and the health issues that sometimes required support. His posture is upright but shows slight fatigue, reflecting his chronic illness. The expression and facial features must EXACTLY match 1rst message - same beard style, same wise eyes, same contemplative demeanor.
+
+CRITICAL: The background must be PURE WHITE or TRANSPARENT, with no environmental elements, no furniture, no props besides what he holds. Clean, professional portrait style against a completely white/transparent backdrop suitable for placement on any background.
+
+Technical specs: Vertical format suitable for full-body portrait, centered composition, pure white or transparent background, photorealistic Victorian photography style, MUST maintain exact facial consistency with 1rst message.
+
+===================================
+NOTES FOR ARTIST/AI
+===================================
+
+Key Physical Features to Maintain:
+- Full, flowing white beard (his most iconic feature)
+- Receding hairline with white hair
+- Prominent, thoughtful brow
+- Deep-set, intelligent eyes
+- Slightly gaunt face (from chronic illness)
+- Distinguished but tired appearance
+- Age approximately 50 years old
+
+Clothing Style:
+- Formal Victorian gentleman's attire
+- Black or dark colors typical of the era
+- High collar white shirt
+- Well-tailored, reflecting his upper-class status
+
+Expression and Demeanor:
+- Contemplative and wise
+- Gentle but serious
+- Scientific observer's gaze
+- Hint of melancholy
+- Dignified Victorian composure
+
+Historical Accuracy:
+- Based on photographs of Darwin from the 1860s
+- Victorian formal portrait conventions
+- Conservative, respectable gentleman presentation
+- No modern elements or anachronisms
+
+===================================
+END OF PROMPTS
+===================================

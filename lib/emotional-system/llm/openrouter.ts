@@ -114,7 +114,7 @@ export class OpenRouterClient {
             "Content-Type": "application/json",
             Authorization: `Bearer ${currentKey}`,
             "HTTP-Referer": "http://localhost:3000", // Para analytics
-            "X-Title": "Circuit Prompt AI", // Para analytics
+            "X-Title": "Blaniel", // Para analytics
           },
           body: JSON.stringify(body),
         });
@@ -215,7 +215,7 @@ export class OpenRouterClient {
             "Content-Type": "application/json",
             Authorization: `Bearer ${currentKey}`,
             "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "Circuit Prompt AI",
+            "X-Title": "Blaniel",
           },
           body: JSON.stringify(body),
         });

@@ -12,7 +12,9 @@ vi.mock('@/lib/prisma', () => ({
     worldEpisodicMemory: {
       create: vi.fn(),
       findMany: vi.fn(),
+      update: vi.fn(),
       updateMany: vi.fn(),
+      deleteMany: vi.fn(),
       count: vi.fn(),
       aggregate: vi.fn(),
     },

@@ -51,7 +51,7 @@ export default function TrialEnding2(props: EmailTemplateData) {
       <Text style={signature}>
         Mañana es el último día,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

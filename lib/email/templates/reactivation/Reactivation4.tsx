@@ -51,7 +51,7 @@ export default function Reactivation4(props: EmailTemplateData) {
       <Text style={signature}>
         Gracias por darnos una oportunidad,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

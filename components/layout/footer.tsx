@@ -104,7 +104,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
           {/* Copyright */}
           <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-muted-foreground">
-            <span>© {currentYear} Circuit Prompt AI.</span>
+            <span>© {currentYear} Blaniel.</span>
             <span className="hidden sm:inline">•</span>
             <span className="flex items-center gap-1">
               {t("madeWith")} <Heart className="h-3 w-3 text-red-500 fill-red-500 animate-pulse" />

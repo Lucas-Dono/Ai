@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Sparkles, User, FileText, ImageIcon } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Character Creation Guide | Circuit Prompt Documentation",
+  title: "Character Creation Guide | Blaniel Documentation",
   description: "Learn how to create compelling companions with rich personalities and engaging backstories.",
 };
 
@@ -22,7 +22,7 @@ export default function CharacterCreationDocs() {
           <h2 className="text-3xl font-bold mb-6">Choosing a Personality</h2>
           <Card className="p-6 mb-6">
             <p className="text-muted-foreground mb-6">
-              Your companion's personality is the foundation of how they'll interact with you. Circuit Prompt offers various personality archetypes to choose from.
+              Your companion's personality is the foundation of how they'll interact with you. Blaniel offers various personality archetypes to choose from.
             </p>
 
             <div className="space-y-4">

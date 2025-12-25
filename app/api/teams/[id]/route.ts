@@ -19,8 +19,8 @@ export async function GET(
     where: {
       id,
       OR: [
-        { ownerId: session.user.id },
-        { members: { some: { userId: session.user.id } } },
+        { ownerId: user.id },
+        { members: { some: { userId: user.id } } },
       ],
     },
     include: {

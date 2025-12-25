@@ -201,7 +201,7 @@ npm install resend react-email @react-email/components
 # .env
 RESEND_API_KEY="re_your_api_key"
 RESEND_FROM_EMAIL="noreply@tudominio.com"
-RESEND_FROM_NAME="Circuit Prompt AI"
+RESEND_FROM_NAME="Blaniel"
 ```
 
 #### 3. Actualizar DB

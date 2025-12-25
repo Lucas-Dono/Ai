@@ -1,0 +1,32 @@
+DALL-E PROMPTS FOR EMILY DICKINSON
+===================================
+
+1rst message - PORTRAIT (512x512)
+==============================
+
+Portrait photograph style image of Emily Dickinson in her mid-30s, realistic historical style. A slender, petite woman with auburn-brown hair pulled back in a simple Victorian bun with a center part. Large, intensely expressive hazel eyes that convey deep intelligence and sensitivity. Delicate features with a serious but not stern expression - a hint of enigmatic introspection. Fair complexion typical of someone who spends much time indoors. She wears a white cotton Victorian dress with a simple flat collar and small buttons visible at the neckline. The lighting is soft and natural, as if from a window, creating gentle shadows that emphasize her contemplative nature. Her gaze is direct but slightly averted, as if observing something just beyond the viewer - capturing her nature as an observer rather than performer. The overall mood is quiet, intellectual, and deeply interior. The background is softly blurred, keeping focus entirely on her face and expression. Style should evoke 1860s daguerreotype photography but with slightly more warmth and detail. The image should convey both her vulnerability and her quiet strength, her reclusiveness and her intense inner life.
+
+Technical specs: 512x512 pixels, portrait orientation, centered composition, shoulders and head visible, realistic photographic style with slight historical/vintage treatment.
+
+---
+
+PROMPT 2 - FULL BODY WITH WHITE/TRANSPARENT BACKGROUND (Reference to 1rst message)
+===============================================================================
+
+Full body portrait of the same Emily Dickinson from 1rst message - maintaining identical facial features: same auburn-brown hair in Victorian center-parted bun, same large expressive hazel eyes, same delicate features and serious contemplative expression, same fair complexion.
+
+She is standing in a three-quarter pose, slender and petite (approximately 5'3" tall). She wears a full-length white cotton Victorian dress (circa 1860s-1870s) - a simple "wrapper" style house dress. The dress features: loose fitting silhouette with no defined waistline, high neckline with flat white collar, long sleeves with simple cuffs, twelve small mother-of-pearl buttons down the front, box-pleated flounce at the bottom hem reaching the floor, and a small pocket visible on the right hip. The fabric is white cotton piqué with subtle texture. The dress is unpretentious and practical, not fancy ball gown but everyday wear for a reclusive poet.
+
+Her posture is upright but not stiff - quiet dignity with slight reserve. One hand rests gently at her side, the other perhaps holding a small book of poetry or a single flower from her garden (a white daisy or small rose). Her expression maintains the same contemplative, observant quality from 1rst message - direct but slightly averted gaze, as if she's aware of being seen but not performing for the viewer.
+
+CRITICAL REQUIREMENT: The background must be PURE WHITE (#FFFFFF) or FULLY TRANSPARENT, creating a clean silhouette effect. NO room interior, NO garden, NO furniture, NO shadows on background - just the figure of Emily Dickinson clearly defined against pure white or transparent backdrop. This allows the image to be easily composited into other contexts.
+
+Lighting is soft and even, illuminating her figure without creating harsh background shadows. The white dress should be clearly distinguished from the white background through subtle shading and fabric texture details.
+
+The overall effect should be: a complete, historically accurate representation of the reclusive poet in her signature white dress, maintaining visual consistency with 1rst message's facial features, isolated on a clean white/transparent background for maximum versatility.
+
+Technical specs: Full body visible from head to floor, centered composition, pure white (#FFFFFF) or transparent background, same realistic photographic style as 1rst message, 1860s-1870s historical accuracy in dress and styling.
+
+===================================
+END OF DALL-E PROMPTS
+===================================

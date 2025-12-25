@@ -24,12 +24,13 @@ import {
   Activity,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
 import { useEffect, useState } from "react";
 
 export function DashboardNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const { t } = useClientLocale();
   const [userPlan, setUserPlan] = useState<string>("free");
@@ -42,6 +43,12 @@ export function DashboardNav() {
           console.log("[DashboardNav] Fetching plan for user:", session.user.id);
           const res = await fetch(`/api/user/plan`);
           console.log("[DashboardNav] Response status:", res.status);
+
+          // Si es 401, el usuario no está autenticado - redirigir a login
+          if (res.status === 401) {
+            router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+            return;
+          }
 
           if (res.ok) {
             const data = await res.json();
@@ -60,7 +67,7 @@ export function DashboardNav() {
     };
 
     fetchUserPlan();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, router]);
 
   const displayName = session?.user?.name || session?.user?.email?.split("@")[0] || "Usuario";
   const initials = displayName

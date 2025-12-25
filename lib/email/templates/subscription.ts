@@ -141,7 +141,7 @@ export function getWelcomeEmail(data: SubscriptionEmailData): string {
             <p>Si tienes alguna pregunta, no dudes en contactarnos. ¡Estamos aquí para ayudarte!</p>
           </div>
           <div class="footer">
-            <p>Circuit Prompt AI © 2025</p>
+            <p>Blaniel © 2025</p>
             <p>
               <a href="https://creador-ia.com/dashboard/billing">Gestionar Suscripción</a> |
               <a href="mailto:soporte@creador-ia.com">Soporte</a>
@@ -190,7 +190,7 @@ export function getPaymentSuccessEmail(data: SubscriptionEmailData): string {
             </center>
           </div>
           <div class="footer">
-            <p>Circuit Prompt AI © 2025</p>
+            <p>Blaniel © 2025</p>
             <p><a href="https://creador-ia.com/dashboard/billing">Gestionar Suscripción</a></p>
           </div>
         </div>
@@ -247,7 +247,7 @@ export function getPaymentFailedEmail(data: SubscriptionEmailData): string {
             <p>Si necesitas ayuda, contáctanos en <a href="mailto:soporte@creador-ia.com">soporte@creador-ia.com</a></p>
           </div>
           <div class="footer">
-            <p>Circuit Prompt AI © 2025</p>
+            <p>Blaniel © 2025</p>
           </div>
         </div>
       </body>
@@ -289,10 +289,10 @@ export function getCancellationEmail(data: SubscriptionEmailData): string {
               <a href="https://creador-ia.com/dashboard/billing" class="button">Ver Planes Disponibles</a>
             </center>
 
-            <p>Esperamos verte pronto de vuelta. ¡Gracias por haber sido parte de Circuit Prompt AI!</p>
+            <p>Esperamos verte pronto de vuelta. ¡Gracias por haber sido parte de Blaniel!</p>
           </div>
           <div class="footer">
-            <p>Circuit Prompt AI © 2025</p>
+            <p>Blaniel © 2025</p>
             <p>
               <a href="https://creador-ia.com/feedback">Déjanos tu Feedback</a> |
               <a href="mailto:soporte@creador-ia.com">Contactar Soporte</a>
@@ -338,10 +338,10 @@ export function getReactivationEmail(data: SubscriptionEmailData): string {
               <a href="https://creador-ia.com/dashboard" class="button">Ir a tu Dashboard</a>
             </center>
 
-            <p>¡Gracias por confiar en Circuit Prompt AI!</p>
+            <p>¡Gracias por confiar en Blaniel!</p>
           </div>
           <div class="footer">
-            <p>Circuit Prompt AI © 2025</p>
+            <p>Blaniel © 2025</p>
           </div>
         </div>
       </body>

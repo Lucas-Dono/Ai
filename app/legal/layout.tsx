@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Legal - Circuit Prompt AI",
-  description: "Información legal, términos de servicio, política de privacidad y recursos de ayuda para Circuit Prompt AI",
+  title: "Legal - Blaniel",
+  description: "Información legal, términos de servicio, política de privacidad y recursos de ayuda para Blaniel",
 };
 
 export default function LegalLayout({

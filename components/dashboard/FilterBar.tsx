@@ -216,9 +216,12 @@ export function FilterBar({
                   </Select>
                 </div>
 
-                {/* Generation Tier */}
+                {/* Complexity Level (informational only - all characters accessible) */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Generation Tier</Label>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm font-medium">Complexity Level</Label>
+                    <span className="text-xs text-muted-foreground">(All accessible)</span>
+                  </div>
                   <Select
                     value={filters.tier}
                     onValueChange={(value: any) => updateFilter('tier', value)}
@@ -227,12 +230,15 @@ export function FilterBar({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Tiers</SelectItem>
-                      <SelectItem value="free">Free</SelectItem>
-                      <SelectItem value="plus">Plus</SelectItem>
-                      <SelectItem value="ultra">Ultra</SelectItem>
+                      <SelectItem value="all">All Levels</SelectItem>
+                      <SelectItem value="free">Basic (Simple context)</SelectItem>
+                      <SelectItem value="plus">Advanced (Rich context)</SelectItem>
+                      <SelectItem value="ultra">Ultra (Deep personality)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Note: All characters are accessible. More complex ones use your daily limit faster.
+                  </p>
                 </div>
 
                 {/* NSFW Filter */}
@@ -310,7 +316,7 @@ export function FilterBar({
 
           {filters.tier !== 'all' && (
             <Badge variant="secondary" className="gap-1 capitalize">
-              Tier: {filters.tier}
+              Complexity: {filters.tier}
               <X
                 className="w-3 h-3 cursor-pointer"
                 onClick={() => updateFilter('tier', 'all')}

@@ -1,0 +1,41 @@
+# Prompts de DALL-E para Nikola Tesla
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Nikola Tesla at age 38 (circa 1894), centered composition, museum quality historical accuracy matching authenticated photographs from this period. Face and upper shoulders visible, intense direct gaze toward camera.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Tall, striking Eastern European Slavic features. Long, angular face with high, prominent cheekbones. Very high, broad forehead suggesting intellectual capacity. Intensely penetrating light blue-gray eyes with almost hypnotic quality - contemporaries described his gaze as "electric" and "piercing." Eyes set deep under strong brow ridge. Straight, prominent aquiline nose. Strong, defined jawline and chin showing determination. Thin lips usually held in neutral or slightly stern expression. Clean-shaven face (Tesla disliked facial hair and shaved meticulously). Skin pale from indoor work, clear complexion, smooth texture.
+
+Hair: Jet black hair, thick and lustrous, combed back neatly from forehead in characteristic late Victorian style. Hair reaches collar in back but is well-groomed and controlled. Perfect center part. Natural wave but disciplined styling - Tesla was famously fastidious about his appearance.
+
+Expression: Intense intellectual focus mixed with confidence bordering on intensity. Eyes that seem to look through the viewer, as if seeing electromagnetic fields and rotating magnetic fields invisible to others. Serious, composed demeanor - rarely smiled in photographs due to both personal temperament and photographic conventions of the era. Slight tension in facial muscles suggesting the obsessive mental activity constantly occurring. This is the face of genius combined with obsessive-compulsive perfectionism.
+
+Clothing visible: Impeccably tailored dark charcoal or black wool suit jacket with high Victorian collar. Crisp white shirt with high starched collar and black bow tie or cravat, perfectly arranged. Every detail of clothing immaculate - Tesla was obsessively neat and wore only the finest clothing despite frequent poverty.
+
+Lighting: Classic late Victorian studio portrait lighting - soft but directional, coming from 45-degree angle. Creates subtle shadows emphasizing bone structure. Slightly cool tone suggesting artificial studio lighting of 1890s photography. Background solid dark gray or charcoal, keeping all focus on the striking face and intense eyes.
+
+Mood: Genius intensity. Obsessive focus. The look of someone whose mind is always elsewhere - calculating, inventing, visualizing in three dimensions. Confidence of someone who knows he has glimpsed the future. Slight melancholy or isolation visible in eyes despite composed expression.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Nikola Tesla's face from 1rst message, create a full-body portrait photograph showing him at the same age (38 years, circa 1894), standing in dignified, formal pose.
+
+Physical build: Height 6'2" (188cm) - very tall for the period. Slender, almost gaunt build - approximately 142 pounds (64kg) on that tall frame. Long-limbed and elegant but with slightly hunched shoulders from decades bending over workbenches and drawing tables. Posture generally upright but with characteristic forward lean of intense thinkers. Build suggests someone who forgets to eat when absorbed in work (which Tesla often did).
+
+Full outfit: Three-piece suit in finest black or charcoal wool - tailcoat or frock coat in Victorian/Edwardian style, impeccably tailored. Matching waistcoat (vest) underneath. High-collared white shirt with starched wing collar. Black silk cravat or bow tie, perfectly tied. Pocket watch chain visible across waistcoat. Straight-cut trousers with perfect crease. Black leather Oxford shoes or buttoned boots, polished to shine. White pocket square in breast pocket, precisely folded. Every element of clothing is perfect - Tesla was obsessive about appearance and dressed like aristocracy despite not being wealthy.
+
+Pose: Standing with weight slightly more on one leg, other leg positioned slightly forward and to side. Hands position: one hand holding lapel or tucked into waistcoat in classical portrait pose, other hand hanging at side or holding walking stick (Tesla carried a cane as fashionable accessory). Alternatively, both arms at sides in formal attention stance. Shoulders back, spine straight, head held high with slight tilt - dignified bearing befitting a distinguished scientist and inventor. Gaze forward matching the intense, piercing look from 1rst message.
+
+Hair: Exactly as 1rst message - jet black, combed back smoothly with center part, reaching collar.
+
+Facial expression: Same intense, intellectual focus from 1rst message - serious, composed, eyes that see beyond the visible.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No laboratory equipment, no electrical discharges, no setting whatsoever. Clean studio background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the slightly cool, directional studio lighting quality from 1rst message, emphasizing his striking features. Body lighting neutral but shows fine texture and tailoring of the excellent suit fabric.
+
+Important details: Very tall, very thin physique. Perfect grooming and immaculate clothing despite slender build suggesting someone who cares intensely about presentation. Posture showing both confidence and the slight physical toll of obsessive work habits.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same intense penetrating gaze, same serious expression, same pale complexion and striking features.

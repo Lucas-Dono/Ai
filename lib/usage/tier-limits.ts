@@ -37,6 +37,13 @@ export interface ResourceLimits {
   voiceMessagesPerMonth: number;
   voiceMessagesPerDay: number;    // ANTI-ABUSE: Límite diario para mensajes de voz
   proactiveMessagesPerDay: number; // Mensajes proactivos de la IA
+
+  // GROUPS SYSTEM
+  activeGroups: number;            // Grupos activos simultáneos
+  maxUsersPerGroup: number;        // Usuarios por grupo
+  maxAIsPerGroup: number;          // IAs por grupo
+  groupMessagesPerDay: number;     // Mensajes en grupos por día
+  groupCooldownMs: number;         // Cooldown entre mensajes en grupos (ms)
 }
 
 export interface TierLimits {
@@ -104,6 +111,13 @@ export const TIER_LIMITS: Record<UserTier, TierLimits> = {
       voiceMessagesPerMonth: 0,
       voiceMessagesPerDay: 0, // Sin voz en free
       proactiveMessagesPerDay: 0, // Sin proactive en free
+
+      // GROUPS SYSTEM
+      activeGroups: 2,              // 2 grupos activos
+      maxUsersPerGroup: 5,          // 5 usuarios por grupo
+      maxAIsPerGroup: 1,            // 1 IA por grupo
+      groupMessagesPerDay: 100,     // 100 mensajes en grupos/día
+      groupCooldownMs: 5000,        // 5 segundos entre mensajes
     },
 
     features: {
@@ -154,6 +168,13 @@ export const TIER_LIMITS: Record<UserTier, TierLimits> = {
       voiceMessagesPerMonth: 50, // Voz limitada ($0.17/msg)
       voiceMessagesPerDay: 5, // ANTI-ABUSE: Max 5 voz/día
       proactiveMessagesPerDay: 3, // 3 proactive/día
+
+      // GROUPS SYSTEM
+      activeGroups: 10,             // 10 grupos activos
+      maxUsersPerGroup: 20,         // 20 usuarios por grupo
+      maxAIsPerGroup: 5,            // 5 IAs por grupo
+      groupMessagesPerDay: 1000,    // 1000 mensajes en grupos/día
+      groupCooldownMs: 2000,        // 2 segundos entre mensajes
     },
 
     features: {
@@ -204,6 +225,13 @@ export const TIER_LIMITS: Record<UserTier, TierLimits> = {
       voiceMessagesPerMonth: 600, // 20/día × 30 = 600/mes
       voiceMessagesPerDay: 20, // Generoso pero no abusivo
       proactiveMessagesPerDay: 10, // Suficiente para proactividad sin spam
+
+      // GROUPS SYSTEM
+      activeGroups: 50,             // 50 grupos activos
+      maxUsersPerGroup: 100,        // 100 usuarios por grupo
+      maxAIsPerGroup: 20,           // 20 IAs por grupo
+      groupMessagesPerDay: -1,      // Mensajes ilimitados
+      groupCooldownMs: 1000,        // 1 segundo entre mensajes
     },
 
     features: {

@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await grantRewardedImages(
-      session.user.id,
+      user.id,
       watchedSeconds,
-      session.user.plan || "free"
+      user.plan || "free"
     );
 
     if (!result.success) {

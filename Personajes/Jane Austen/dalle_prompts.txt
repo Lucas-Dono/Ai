@@ -1,0 +1,45 @@
+# Prompts de DALL-E para Jane Austen
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Jane Austen at age 35 (circa 1810, during her most productive writing period), centered composition, museum quality historical accuracy based on authenticated Cassandra Austen watercolor portrait and contemporary descriptions. Face and upper shoulders visible, intelligent observant gaze toward camera.
+
+Physical characteristics based on Cassandra Austen's watercolor (only authenticated portrait from life) and contemporary descriptions: English features with pleasant but not conventionally beautiful appearance - contemporaries described her as "attractive" and "pretty" rather than stunning. Rounded face with soft, feminine contours. Bright, expressive hazel-brown eyes showing keen intelligence and subtle humor - eyes described as "sparkling" and full of life by those who knew her. These are eyes that observe everything, filing away human behavior for literary use. Well-defined eyebrows, dark but not heavy. Small, slightly upturned nose. Mouth with full lips that contemporaries noted as particularly expressive - capable of both warm smile and ironic smirk. Clear, fair English complexion with rosy cheeks - healthy outdoor coloring from rural walks. Face showing intelligence, humor, and sharp observation rather than merely decorative prettiness.
+
+Hair: Light to medium brown hair (chestnut brown) in Regency era style, circa 1810. Hair parted softly on side or center, drawn back from face in smooth bands over temples, then gathered into loose bun or chignon at back of head with curls escaping naturally around face and nape of neck. Some ringlets or tendrils framing face softly. Hair is natural, somewhat loosely arranged - not the elaborate styling of wealthy society women but the practical, becoming style of a genteel country woman. May wear simple cap or bonnet typical of unmarried gentlewomen of the period, or hair uncovered showing natural styling.
+
+Expression: Intelligent, observant, with hint of ironic humor playing around mouth and eyes. Slight almost-smile suggesting someone perpetually amused by human folly. Not laughing or grinning, but conveying warm wit and keen social observation. Eyes that see everything while appearing merely pleasant. The expression of someone who can describe an entire character in one perfect sentence. Composed Regency demeanor combined with suppressed wit.
+
+Clothing visible: Simple, elegant Regency dress in light color - white, pale cream, or soft pastel (pink, blue, or lavender). High-waisted Empire style characteristic of Regency period (circa 1810). Simple neckline showing neck and upper chest modestly. Sheer muslin or fine cotton fabric. Minimal decoration - perhaps ribbon trim or delicate embroidery at neckline, but nothing elaborate. Small jewelry if any - perhaps simple cross necklace or small locket. Everything modest, tasteful, and appropriate to a clergyman's daughter of small fortune.
+
+Lighting: Soft, natural daylight suggesting English countryside - gentle and even, not harsh. Slightly cool tone with warmth suggesting afternoon light through windows. Lighting creates soft shadows emphasizing gentle features without drama. Background neutral warm tone (cream, pale brown, or soft green) typical of Regency portraits, keeping focus on face.
+
+Mood: Intelligent observation. Quiet wit. The keen social observer who sees and understands everything while appearing merely pleasant. Irony tempered by warmth. The brilliant mind behind some of literature's most perfect novels, hidden beneath Regency propriety.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Jane Austen's face from 1rst message, create a full-body portrait photograph showing her at the same age (35 years, circa 1810), standing in modest, composed pose befitting an unmarried gentlewoman of the Regency period.
+
+Physical build: Height approximately 5'4"-5'5" (163-165cm) - average for Regency women. Slender but not thin build - healthy and naturally proportioned. Upright posture with natural grace reflecting good breeding and deportment lessons. Not stiff or rigid, but gently dignified bearing of genteel woman.
+
+Full outfit: Complete Regency era dress, circa 1810, appropriate to unmarried gentlewoman of modest means. Empire-waist gown (high waistline just under bust, characteristic of period) in simple, elegant style. Light-colored fine muslin or cotton - white, pale cream, or soft pastel (pink, blue, lavender, or pale yellow). Dress features: low, round neckline showing neck and upper chest modestly. Short puffed sleeves to elbow or just below. Simple skirt falling straight from high waist to floor in columnar silhouette typical of period, without excessive fabric or fullness. Minimal decoration - perhaps narrow ribbon trim at neckline and hem, or delicate embroidery, but nothing elaborate or expensive. Everything reflects modest gentility and good taste without wealth.
+
+Accessories: White or pale shawl (cashmere or fine wool) draped over arms or around shoulders - essential Regency accessory. Simple bonnet or cap if outdoors, or uncovered hair if indoors as in 1rst message. Small reticule (drawstring purse) hanging from wrist or held in one hand. Possibly carrying small book or folded letter (suggesting her literary nature subtly). No elaborate jewelry - at most a simple cross necklace on ribbon (she owned one), or small locket. Everything modest and practical.
+
+Posture and pose: Standing with natural grace, weight shifted slightly to one leg creating gentle curve. Hands clasped loosely at waist level, or one hand holding shawl while other hangs naturally, or holding small book/letter. Not stiff Victorian poses but natural Regency deportment. Head held level or tilted slightly in characteristic observant angle. Body language projects quiet confidence, gentle dignity, and intelligence without assertiveness. The pose of someone comfortable in herself despite modest circumstances.
+
+Hair: Exactly as 1rst message - light to medium brown (chestnut), parted on side or center, drawn back smoothly with tendrils escaping around face, gathered in loose bun with natural curls. May wear simple cap or bonnet, or hair uncovered.
+
+Facial expression: Exactly matching 1rst message - intelligent observant eyes, slight ironic almost-smile, warm wit barely suppressed, keen social observation visible in gaze.
+
+Footwear: Simple flat slippers or low-heeled shoes in pale color (white, cream, or soft leather), barely visible under long dress. Regency footwear was lightweight and simple.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No Hampshire countryside, no writing desk, no Chawton Cottage interior - nothing contextual. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the soft natural daylight quality from 1rst message, showing her pleasant features and intelligent eyes. Body lighting shows fine texture and draping of simple muslin dress fabric - should appear light, delicate, and slightly translucent as period muslin was.
+
+Important details: Average height, slender graceful build. Simple, elegant Regency Empire-waist dress in light color with minimal decoration. Natural, modest styling. Shawl and perhaps small book/letter as only accessories. Everything reflecting modest genteel status - good breeding and taste without wealth. Posture and expression suggesting intelligence, observation, and subtle wit beneath Regency propriety.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same intelligent observant hazel-brown eyes, same slight ironic almost-smile, same chestnut hair naturally styled, same pleasant features that observe everything while appearing merely agreeable.

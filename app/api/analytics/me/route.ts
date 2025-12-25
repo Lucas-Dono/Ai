@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     const section = searchParams.get("section") || "all";
     const days = parseInt(searchParams.get("days") || "30");
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Handle specific sections for faster loading
     switch (section) {

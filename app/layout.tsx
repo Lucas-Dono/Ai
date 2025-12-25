@@ -8,7 +8,7 @@ import { getMessages } from "@/lib/i18n/get-messages";
 import { AccessibilityFilters } from "@/components/accessibility/AccessibilityFilters";
 
 export const metadata: Metadata = {
-  title: "Circuit Prompt AI - Create emotional AIs with real memory",
+  title: "Blaniel - Create emotional AIs with real memory",
   description:
     "Leading platform to create emotional AI companions with real emotions, long-term memory and interactive virtual worlds. Uncensored, unlimited.",
   keywords: [
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
     "AI memory",
     "AI emotions",
   ],
-  authors: [{ name: "Circuit Prompt" }],
+  authors: [{ name: "Blaniel" }],
   openGraph: {
-    title: "Circuit Prompt AI - Create AIs that truly understand you",
+    title: "Blaniel - Create AIs that truly understand you",
     description: "Create emotional AI companions with real emotions and long-term memory",
     type: "website",
   },

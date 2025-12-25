@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     console.log("[API /api/user/plan] GET request received");
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    console.log("[API /api/user/plan] Session:", {
-      userId: session?.user?.id,
-      userEmail: session?.user?.email,
+    console.log("[API /api/user/plan] User:", {
+      userId: user?.id,
+      userEmail: user?.email,
     });
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       console.log("[API /api/user/plan] No autorizado - sin sesión");
       return NextResponse.json(
         { error: "No autorizado" },
@@ -21,17 +21,17 @@ export async function GET() {
     }
 
     // Obtener el plan actualizado desde la base de datos
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
       select: { plan: true, email: true },
     });
 
     console.log("[API /api/user/plan] Usuario encontrado:", {
-      email: user?.email,
-      plan: user?.plan,
+      email: dbUser?.email,
+      plan: dbUser?.plan,
     });
 
-    if (!user) {
+    if (!dbUser) {
       console.log("[API /api/user/plan] Usuario no encontrado en BD");
       return NextResponse.json(
         { error: "Usuario no encontrado" },
@@ -39,8 +39,8 @@ export async function GET() {
       );
     }
 
-    console.log("[API /api/user/plan] Respondiendo con plan:", user.plan);
-    return NextResponse.json({ plan: user.plan });
+    console.log("[API /api/user/plan] Respondiendo con plan:", dbUser.plan);
+    return NextResponse.json({ plan: dbUser.plan });
   } catch (error) {
     console.error("[API /api/user/plan] Error:", error);
     return NextResponse.json(

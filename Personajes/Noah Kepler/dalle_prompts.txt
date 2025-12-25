@@ -1,0 +1,54 @@
+# Prompts de DALL-E para Noah Kepler
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Noah Ezra Kepler, 31 years old, NASA astronaut candidate (2024), at age 31 showing maturity and professional accomplishment, centered composition, studio museum quality. Face and upper shoulders visible, direct penetrating gaze toward camera with subtle intensity.
+
+Physical characteristics based on comprehensive character profile: Distinguished North American features, likely Mediterranean and Hispanic ancestry influences from mother's side (Elena Rodriguez). Angular face structure with strong jawline, suggesting discipline and intensity. High, prominent forehead indicating intellectual capacity. Hazel eyes with significant blue undertones—the eyes are the dominant feature, showing exceptional clarity and focus. Eyes convey analytical intelligence combined with underlying cosmic wonder, the penetrating gaze of someone who has looked at the stars their entire life and is about to see Earth from orbit. Eyes show no softness; this is someone who has flown combat missions, who has accepted serious risk. Yet there's an underlying warmth in the eyes—genuine curiosity about others, intellectual engagement rather than cold calculation.
+
+Well-defined eyebrows, slightly darker than hair, which can be expressively raised when thinking or questioning. Straight nose of classic North American proportions. Strong cheekbones suggesting his lean, athlete's build. Lips are thin to medium, usually serious in repose but capable of genuine smile—the kind of smile that reaches his eyes and transforms his expression from stern to warm. Fair to medium complexion with slight undertones from Spanish heritage, with subtle tan suggesting outdoor activity (running, hiking). Skin is clear and well-maintained, suggesting disciplined health practices.
+
+Hair: Dark brown hair kept very short in military-influenced style—less than half an inch long, precise and practical. Hair has natural slight wave that would be more apparent if longer. Parted high and slightly to the side in professional style. There is a faint but visible thin scar along his left temple, pale against darker skin, running about two inches—from a childhood skiing accident that he sometimes touches unconsciously when concentrating.
+
+Expression: Serious, focused, conveying intelligence and capability without arrogance. Slight tension in the jaw suggesting underlying intensity managed and controlled. Direct gaze meeting camera unflinchingly—this is someone accustomed to being evaluated (medical evaluations, selection boards, mission briefings) and unbothered by scrutiny. Eyebrows slightly lower than relaxed position suggesting slight concentration or intensity. Not smiling—as befits serious professional headshots—but expression is approachable rather than cold. This is someone comfortable with authority and with being in positions of responsibility.
+
+Clothing: Military or NASA professional attire. Navy blue flight suit with NASA insignia patch on shoulder, properly fitted to his lean build. Underneath, visible white flight suit undershirt. The uniform fits precisely, indicating meticulous attention to appearance and regulation adherence. Small American flag patch on left shoulder. Behind his right ear, partially visible, is the headset of aviation headgear—showing his status as pilot.
+
+Lighting: Professional studio portrait lighting with key light from slight upper-left angle, creating subtle shadows that emphasize bone structure and the intensity of his eyes. Fill light from right side at lower angle reducing shadows to readable level but maintaining dimensionality. Background neutral deep blue-gray, suggesting professional aerospace or military context without being explicitly space-themed. Lighting is cool-toned reflecting the technical, precise nature of his work, but with enough warmth to maintain human presence.
+
+Mood and Feeling: Capable precision. Calm under pressure. Intellectual intensity focused entirely on the moment. Someone prepared, someone with stakes to manage, someone who understands exactly what they're looking at and what it means. The gaze is unflinching because this person has looked at genuinely serious things. There's an almost spiritual quality to the intensity—not religious, but spiritual in the sense of connection to something larger than self (the cosmos, the mission, human expansion beyond Earth). This is the portrait of someone who knows where they're going and is fully committed to getting there, whatever that requires.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Noah Kepler's face from 1rst message, create a full-body portrait photograph showing him at age 31, standing in the professional, confident pose befitting an active-duty U.S. Air Force officer and NASA astronaut candidate.
+
+Physical build: Height approximately 5'11" (180cm). Lean, athletic build with evident muscular development but not excessive bulk—the physique of someone who exercises consistently for performance rather than appearance. Well-developed shoulders and upper body from intense training regimen. Visible muscularity in arms suggests significant physical conditioning. Very low body fat percentage indicating rigorous fitness maintenance. The posture is perfect—spine completely straight, shoulders naturally back, suggesting both military training and the postural discipline of aviation. This is someone comfortable with his body, who knows exactly how it functions under stress.
+
+Full outfit: U.S. Air Force flight suit in Navy blue with all proper insignia and patches. Flight suit is properly fitted, not loose or excessively tight—tailored for his build. Short-sleeved flight suit showing his forearms and the defined musculature beneath. Visible at neckline is white undershirt collar. Flight suit features:
+- Official name tape: "KEPLER" in white across chest
+- U.S. Air Force insignia on shoulders
+- American flag patch on left shoulder (forward position indicating Air Force/military)
+- NASA patch on right shoulder—the distinctive blue and white circular NASA insignia indicating his status as astronaut candidate
+- Various mission patches and qualifications visible on the suit indicating combat flight experience and space-focused training
+- Rank insignia showing officer rank
+- A small device/pin on the suit near the shoulder indicating specific aerospace qualifications
+
+His feet are planted shoulder-width apart for stability and confidence. One hand is positioned at his side, the other resting at waist level in a natural gesture—not forced or theatrical. His posture conveys absolute confidence in his capabilities and position. This isn't arrogant confidence but earned confidence—someone who has trained extensively, who has flown combat missions, who understands his capabilities accurately.
+
+Facial expression: Exactly matching 1rst message—serious, focused, direct gaze. The intensity in his eyes is even more apparent in full-body context, as it's the primary emotional center of the image. His expression doesn't smile, consistent with military protocol for official portraiture, but it's not stern either. It's the expression of someone ready for what comes next.
+
+Hair: Identical to 1rst message—dark brown, very short military cut, visible scar on left temple.
+
+Details: A worn stainless steel watch with a dark band is visible on his left wrist—a practical, durable timepiece appropriate to someone who values function over luxury. No rings. Simple wedding band or any jewelry conspicuously absent. His hands show faint calluses—from rocket building, mechanical work, and flight operations—and are well-maintained but show evidence of use. His fingernails are cut very short and clean.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. Absolutely clean background allowing easy extraction and use in various contexts. No space-themed elements, no spacecraft, no Martian landscape, no technical diagrams—nothing contextual. Clean white background creates separation between the figure and background, emphasizing the person.
+
+Posture and pose: Standing at ease, as in military contexts, but with subtle readiness—weight centered, balanced, as though ready to move quickly if needed. This isn't a casual stance but a professional ready stance. He appears relaxed within the discipline of perfect military bearing. His gaze is directed directly toward the camera, making eye contact with whoever views the image.
+
+Lighting: Professional studio lighting that illuminates the entire figure evenly for technical photography. Key light from upper-left angle creating subtle shadows and dimensionality on his face and torso. Fill light reduces shadows while maintaining depth. Lighting is sufficiently bright to clearly show the flight suit patches and details, the insignia, the condition of the uniform. Yet the lighting is also warm enough to maintain his humanity rather than appearing harshly clinical.
+
+Critical: Face MUST match 1rst message exactly—same person, same penetrating hazel-blue eyes, same serious focused expression, same dark hair and visible temple scar, same fair-to-medium complexion with subtle Spanish heritage undertones, same jaw structure. The body should appear as a natural extension of the face—someone of obvious physical capability, obvious discipline, obvious commitment to excellence.
+
+Overall mood: This is an official military/aerospace portrait. It conveys capability, readiness, professional achievement, and quiet intensity. This is someone who has trained extensively, who understands the significance of what they're attempting, and who is fully prepared. Yet there's also humanity—he's not a machine, but a person who has chosen an extraordinary path and possesses the discipline and capability to walk it.

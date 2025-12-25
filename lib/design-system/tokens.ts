@@ -1,6 +1,6 @@
 /**
  * DESIGN SYSTEM TOKENS
- * Circuit Prompt AI - Design tokens basados en Material Design 3
+ * Blaniel - Design tokens basados en Material Design 3
  *
  * Este archivo centraliza todos los tokens de diseño para mantener
  * consistencia visual en toda la aplicación.

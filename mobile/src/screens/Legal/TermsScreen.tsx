@@ -17,7 +17,7 @@ export default function TermsScreen() {
     {
       icon: 'file-text',
       title: 'Aceptación de Términos',
-      content: `Al crear una cuenta y utilizar Circuit Prompt AI, confirmas que:
+      content: `Al crear una cuenta y utilizar Blaniel, confirmas que:
 
 • Tienes al menos 18 años de edad o cuentas con el consentimiento de un tutor legal
 • Has leído y comprendes estos términos de servicio
@@ -78,7 +78,7 @@ Nos reservamos el derecho de revisar, moderar o eliminar contenido inapropiado, 
         <View style={styles.introCard}>
           <Text style={styles.introTitle}>Introducción</Text>
           <Text style={styles.introText}>
-            Bienvenido a Circuit Prompt AI. Al acceder y utilizar nuestra
+            Bienvenido a Blaniel. Al acceder y utilizar nuestra
             plataforma, aceptas estar sujeto a estos términos y condiciones. Por
             favor, léelos cuidadosamente antes de usar nuestros servicios.
           </Text>

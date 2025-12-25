@@ -47,7 +47,7 @@ Agrega a tu `.env` o variables de Vercel:
 # Resend
 RESEND_API_KEY="re_TU_API_KEY_AQUI"
 RESEND_FROM_EMAIL="noreply@mail.tudominio.com"  # El que verificaste
-RESEND_FROM_NAME="Circuit Prompt AI"
+RESEND_FROM_NAME="Blaniel"
 RESEND_REPLY_TO_EMAIL="support@tudominio.com"   # Opcional
 
 # Rate Limits (usar defaults del .env.example)

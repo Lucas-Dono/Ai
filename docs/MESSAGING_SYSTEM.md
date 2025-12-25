@@ -1,6 +1,6 @@
 # Sistema de Direct Messaging (DMs)
 
-Sistema completo de mensajería directa implementado para el proyecto circuit-prompt-ai.
+Sistema completo de mensajería directa implementado para el proyecto blaniel.
 
 ## Estado de Implementación: COMPLETO ✅
 

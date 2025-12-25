@@ -77,7 +77,7 @@ export async function sendEmail(emailData: EmailData): Promise<void> {
 
   try {
     await resend.emails.send({
-      from: 'Circuit Prompt AI <noreply@tudominio.com>', // Cambiar por tu dominio
+      from: 'Blaniel <noreply@tudominio.com>', // Cambiar por tu dominio
       to: emailData.to,
       subject: content.subject,
       html: content.html,
@@ -475,13 +475,13 @@ function generateWelcomeEmail(userName: string, planName: string): EmailContent 
               <li>🔞 Contenido NSFW (si lo deseas)</li>
             </ul>
             <p>Estamos emocionados de tenerte con nosotros.</p>
-            <a href="https://circuit-prompt-ai.com/dashboard" class="cta">
+            <a href="https://blaniel.com/dashboard" class="cta">
               Comenzar ahora →
             </a>
           </div>
           <div class="footer">
             <p>¿Necesitás ayuda? Respondé a este email.</p>
-            <p>Circuit Prompt AI © 2025</p>
+            <p>Blaniel © 2025</p>
           </div>
         </div>
       </body>

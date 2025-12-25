@@ -559,5 +559,5 @@ ChatGPT  Character.AI  Replika  Us
 ---
 
 **Última actualización**: 2025-01-19
-**Autor**: Circuit Prompt AI Team
+**Autor**: Blaniel Team
 **Revisores**: Design Lead, Engineering Lead, Product Manager

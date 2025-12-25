@@ -13,8 +13,8 @@ export default function Welcome1(props: EmailTemplateData) {
   const { userName = 'Usuario', dashboardUrl = '#', unsubscribeUrl = '#' } = props;
 
   return (
-    <EmailLayout preview="Bienvenido a Circuit Prompt AI" unsubscribeUrl={unsubscribeUrl}>
-      <Heading style={h1}>Hola {userName}, bienvenido a Circuit Prompt AI</Heading>
+    <EmailLayout preview="Bienvenido a Blaniel" unsubscribeUrl={unsubscribeUrl}>
+      <Heading style={h1}>Hola {userName}, bienvenido a Blaniel</Heading>
 
       <Text style={text}>
         Estamos emocionados de tenerte aquí. Has dado el primer paso hacia conversaciones increíbles
@@ -57,7 +57,7 @@ export default function Welcome1(props: EmailTemplateData) {
       <Text style={signature}>
         Hasta pronto,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

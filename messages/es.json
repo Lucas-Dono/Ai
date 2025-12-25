@@ -12,6 +12,8 @@
       "demo": "Demo",
       "pricing": "Precios",
       "community": "Comunidad",
+      "careers": "Carreras",
+      "sponsors": "Marcas",
       "login": "Iniciar sesión",
       "getStarted": "Empezar gratis",
       "docs": "Documentación"
@@ -332,15 +334,15 @@
       },
       "recommended": {
         "title": "Recomendados",
-        "badge": "Personajes premium con personalidades avanzadas",
-        "badgeShort": "Premium",
-        "premiumBadge": "PREMIUM",
+        "badge": "Personajes destacados con personalidades avanzadas",
+        "badgeShort": "Destacado",
+        "premiumBadge": "DESTACADO",
         "trendingBadge": "Trending",
         "reason": "Popular en conversaciones sobre {topic}",
         "interactions": "{count} interacciones",
         "noRating": "Sin calificaciones",
         "chatButton": "Chatear ahora",
-        "subtitle": "Personajes premium con personalidades avanzadas",
+        "subtitle": "Personajes destacados con personalidades avanzadas",
         "noRatings": "Sin calificaciones",
         "popularIn": "Popular en conversaciones sobre {topic}",
         "diverseTopics": "temas diversos"
@@ -358,6 +360,26 @@
         "title": "Más vistos",
         "badge": "Popular",
         "newBadge": "NEW"
+      },
+      "featured": {
+        "title": "Destacados",
+        "badge": "Destacado",
+        "subtitle": "Personajes destacados e históricos con personalidades complejas"
+      },
+      "forYou": {
+        "title": "Para Ti",
+        "badge": "Personalizado",
+        "subtitle": "Recomendaciones personalizadas basadas en tus intereses"
+      },
+      "historical": {
+        "title": "Personajes Históricos",
+        "badge": "Históricos",
+        "subtitle": "Figuras icónicas de la historia"
+      },
+      "premium": {
+        "title": "Destacados",
+        "badge": "Alta Calidad",
+        "subtitle": "Personajes destacados con personalidades profundas y complejas (Accesibles para todos)"
       },
       "all": {
         "title": "Todos los compañeros",
@@ -425,7 +447,7 @@
       "history": "Historia",
       "genius": "Genio",
       "cinema": "Cine",
-      "premium": "Premium",
+      "premium": "Destacado",
       "companion": "Compañero",
       "trending": "Tendencia",
       "new": "Nuevo",

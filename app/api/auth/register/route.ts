@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { checkRegisterRateLimit, getClientIp } from "@/lib/auth/rate-limit";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
+import { sendEmailVerification } from "@/lib/email/auth-emails.service";
 
 const registerSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -181,11 +182,21 @@ export async function POST(req: Request) {
       console.error("[REGISTER] Error tracking events:", trackError);
     }
 
+    // Send email verification (works even if emails are disabled)
+    try {
+      await sendEmailVerification(user.id, user.email, user.name || undefined);
+      console.log(`[REGISTER] Email verification sent to: ${user.email}`);
+    } catch (emailError) {
+      // No lanzar error si falla el envío de email, solo loguearlo
+      console.error("[REGISTER] Error sending verification email:", emailError);
+    }
+
     return NextResponse.json(
       {
         success: true,
         message: "Usuario registrado exitosamente",
-        user
+        user,
+        emailVerificationSent: process.env.EMAIL_ENABLED === 'true',
       },
       {
         status: 201,

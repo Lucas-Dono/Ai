@@ -1,4 +1,4 @@
-# Circuit Prompt AI - App Móvil
+# Blaniel - App Móvil
 
 Aplicación móvil para Android desarrollada con React Native + Expo.
 

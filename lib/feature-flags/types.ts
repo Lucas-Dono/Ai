@@ -33,6 +33,11 @@ export enum Feature {
   WORLD_CREATION = "WORLD_CREATION",
   WORLD_ADVANCED_FEATURES = "WORLD_ADVANCED_FEATURES",
 
+  // Groups
+  GROUPS = "GROUPS",
+  GROUPS_ADVANCED = "GROUPS_ADVANCED",
+  GROUPS_ANALYTICS = "GROUPS_ANALYTICS",
+
   // Marketplace
   MARKETPLACE_PUBLISHING = "MARKETPLACE_PUBLISHING",
   MARKETPLACE_UNLIMITED = "MARKETPLACE_UNLIMITED",
@@ -115,7 +120,7 @@ export interface FeatureMetadata {
   icon?: string;
   minTier: UserTier;
   upgradeMessage: string;
-  category: "chat" | "agents" | "worlds" | "marketplace" | "community" | "analytics" | "api" | "business";
+  category: "chat" | "agents" | "worlds" | "groups" | "marketplace" | "community" | "analytics" | "api" | "business";
 }
 
 /**

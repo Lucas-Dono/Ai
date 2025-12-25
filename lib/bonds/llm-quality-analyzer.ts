@@ -11,7 +11,7 @@
  * conectan con los personajes, no solo a quienes hacen spam.
  */
 
-import { openrouterRequest } from "@/lib/llm/provider";
+import { getLLMProvider } from "@/lib/llm/provider";
 
 export interface ConversationQualityAnalysis {
   overallScore: number; // 0-100
@@ -120,8 +120,9 @@ Provide your analysis in JSON format:
 Return ONLY valid JSON, no other text.`;
 
     // Call LLM for analysis
-    const response = await openrouterRequest({
-      model: "anthropic/claude-3.5-sonnet", // Use strong model for quality analysis
+    const llm = getLLMProvider();
+    const analysisText = await llm.generate({
+      systemPrompt: "You are an expert in analyzing human-AI conversations to detect genuine engagement vs. gaming/spam behavior.",
       messages: [
         {
           role: "user",
@@ -129,12 +130,9 @@ Return ONLY valid JSON, no other text.`;
         },
       ],
       temperature: 0.3, // Lower temperature for more consistent analysis
-      max_tokens: 1500,
+      maxTokens: 1500,
+      useFullModel: true, // Use Gemini Flash Full for better quality analysis
     });
-
-    // Parse response
-    const analysisText =
-      response.choices[0].message.content || "{}";
 
     // Extract JSON from response (might have markdown code blocks)
     const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
@@ -207,14 +205,14 @@ Provide JSON:
 
 Return ONLY valid JSON.`;
 
-    const response = await openrouterRequest({
-      model: "anthropic/claude-3.5-haiku", // Faster model for quick checks
+    const llm = getLLMProvider();
+    const analysisText = await llm.generate({
+      systemPrompt: "You are an expert in analyzing conversation quality.",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
-      max_tokens: 300,
+      maxTokens: 300,
+      useFullModel: false, // Use Gemini Flash Lite for quick checks
     });
-
-    const analysisText = response.choices[0].message.content || "{}";
     const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
     const data = jsonMatch ? JSON.parse(jsonMatch[0]) : { score: 50, signals: [] };
 
@@ -309,14 +307,14 @@ Provide JSON:
 
 Return ONLY valid JSON.`;
 
-    const response = await openrouterRequest({
-      model: "anthropic/claude-3.5-haiku",
+    const llm = getLLMProvider();
+    const analysisText = await llm.generate({
+      systemPrompt: "You are an expert in detecting gaming and spam behavior in conversations.",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
-      max_tokens: 400,
+      maxTokens: 400,
+      useFullModel: false, // Use Gemini Flash Lite for detection
     });
-
-    const analysisText = response.choices[0].message.content || "{}";
     const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
     const data = jsonMatch
       ? JSON.parse(jsonMatch[0])

@@ -56,11 +56,11 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
     }
   }
 
-  // SEGUNDO: Intentar autenticación con NextAuth (web) - solo si no hay JWT
+  // SEGUNDO: Intentar autenticación con better-auth (web) - solo si no hay JWT
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
     if (session?.user?.id) {
-      console.log('[AuthHelper] ✅ Authenticated via NextAuth:', session.user.email);
+      console.log('[AuthHelper] ✅ Authenticated via better-auth:', session.user.email);
       return {
         id: session.user.id,
         email: session.user.email || '',
@@ -68,9 +68,9 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
         plan: (session.user as any).plan || 'free',
       };
     }
-    console.log('[AuthHelper] NextAuth session not found');
+    console.log('[AuthHelper] better-auth session not found');
   } catch (error) {
-    console.log('[AuthHelper] NextAuth failed:', error);
+    console.log('[AuthHelper] better-auth failed:', error);
   }
 
   console.log('[AuthHelper] ❌ Authentication failed - no valid JWT or NextAuth session');

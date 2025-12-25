@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
     // Por ahora, confiamos en el cliente
 
     const result = await grantRewardedMessages(
-      session.user.id,
-      session.user.plan || "free"
+      user.id,
+      user.plan || "free"
     );
 
     if (!result.success) {

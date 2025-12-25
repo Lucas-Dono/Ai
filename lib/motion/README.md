@@ -1,4 +1,4 @@
-# Motion System - Circuit Prompt AI
+# Motion System - Blaniel
 
 Sistema centralizado de animaciones basado en Material Design 3 Motion y Framer Motion.
 

@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     "compañero virtual",
     "chatbot inteligente",
   ],
-  authors: [{ name: "Circuit Prompt" }],
-  creator: "Circuit Prompt",
-  publisher: "Circuit Prompt",
+  authors: [{ name: "Blaniel" }],
+  creator: "Blaniel",
+  publisher: "Blaniel",
   formatDetection: {
     email: false,
     address: false,
@@ -49,13 +49,13 @@ export const metadata: Metadata = {
     description:
       "Compañeros virtuales con emociones reales, memoria de largo plazo y mundos interactivos. Sin censura, sin límites.",
     url: "/",
-    siteName: "Circuit Prompt AI",
+    siteName: "Blaniel",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Circuit Prompt AI - Emotional AI Companions",
+        alt: "Blaniel - Emotional AI Companions",
       },
     ],
     locale: "es_ES",
@@ -91,7 +91,7 @@ export default function LandingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Circuit Prompt AI",
+    name: "Blaniel",
     applicationCategory: "CommunicationApplication",
     offers: {
       "@type": "Offer",

@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await savePushSubscription(session.user.id, subscription);
+    await savePushSubscription(user.id, subscription);
 
     return NextResponse.json({
       success: true,
@@ -106,7 +106,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await removePushSubscription(session.user.id);
+    await removePushSubscription(user.id);
 
     return NextResponse.json({
       success: true,

@@ -683,4 +683,4 @@ className="
 ---
 
 **Última actualización**: 2025-01-19
-**Autor**: Circuit Prompt AI Design Team
+**Autor**: Blaniel Design Team

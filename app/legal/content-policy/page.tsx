@@ -37,7 +37,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Content Policy - Circuit Prompt AI",
+  title: "Content Policy - Blaniel",
   description:
     "Our comprehensive content policy covering age verification, NSFW content, moderation, and privacy protection.",
 };
@@ -124,7 +124,7 @@ export default function ContentPolicyPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                Circuit Prompt AI is committed to providing a safe, responsible,
+                Blaniel is committed to providing a safe, responsible,
                 and privacy-focused platform for AI interactions. Our policies
                 are designed to:
               </p>
@@ -661,7 +661,7 @@ export default function ContentPolicyPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                By using Circuit Prompt AI, you agree to:
+                By using Blaniel, you agree to:
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside ml-2">
                 <li>Provide accurate age information during registration</li>
@@ -772,7 +772,7 @@ export default function ContentPolicyPage() {
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 This Content Policy is part of our Terms of Service and is
-                legally binding. By using Circuit Prompt AI, you agree to comply
+                legally binding. By using Blaniel, you agree to comply
                 with this policy.
               </p>
 

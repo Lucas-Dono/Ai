@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from "@/lib/auth-server";
-import { authOptions } from '@/lib/auth-server';
 import { createCharacter, validateBeforeCreation } from '@/lib/services/character-creation-orchestrator.service';
 import type { CharacterDraft } from '@/lib/services/validation.service';
 
@@ -18,7 +17,7 @@ export async function POST(request: NextRequest) {
     // 1. Auth
     const user = await getAuthenticatedUser(request);
 
-    if (!session?.user) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }

@@ -17,7 +17,7 @@ export default function Welcome5(props: EmailTemplateData) {
       <Heading style={h1}>Hola {userName}, desbloquea todo el potencial</Heading>
 
       <Text style={text}>
-        Han pasado 2 semanas desde que te uniste a Circuit Prompt AI. Esperamos que
+        Han pasado 2 semanas desde que te uniste a Blaniel. Esperamos que
         estés disfrutando de tus conversaciones con nuestras IAs.
       </Text>
 
@@ -59,7 +59,7 @@ export default function Welcome5(props: EmailTemplateData) {
       <Text style={signature}>
         Gracias por estar con nosotros,
         <br />
-        El equipo de Circuit Prompt AI
+        El equipo de Blaniel
       </Text>
     </EmailLayout>
   );

@@ -164,7 +164,7 @@ export default function CreateCommunityPage() {
               pattern="[a-z0-9\-]+"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              {t('form.slug.hint')} <span className="font-mono">circuit-prompt.com/community/{formData.slug || 'tu-comunidad'}</span>
+              {t('form.slug.hint')} <span className="font-mono">blaniel.com/community/{formData.slug || 'tu-comunidad'}</span>
             </p>
           </div>
 

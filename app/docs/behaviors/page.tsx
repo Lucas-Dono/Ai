@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, AlertTriangle, Sparkles, Sliders } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Behaviors Guide | Circuit Prompt Documentation",
+  title: "Behaviors Guide | Blaniel Documentation",
   description: "Explore different personality behaviors and create unique companion dynamics safely.",
 };
 

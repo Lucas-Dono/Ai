@@ -1,8 +1,8 @@
-# Age Verification System - Circuit Prompt AI
+# Age Verification System - Blaniel
 
 ## Overview
 
-El sistema de verificación de edad es un componente CRÍTICO de compliance legal para Circuit Prompt AI. Este sistema cumple con:
+El sistema de verificación de edad es un componente CRÍTICO de compliance legal para Blaniel. Este sistema cumple con:
 
 - **COPPA (Children's Online Privacy Protection Act)**: Ley estadounidense que protege a menores de 13 años
 - **GDPR**: Regulación europea de protección de datos

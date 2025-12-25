@@ -1,0 +1,98 @@
+# DALL-E PROMPTS PARA WOLFGANG AMADEUS MOZART
+
+---
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+**DIMENSIONES**: 512x512 pixels (ratio 1:1, cuadrada perfecta)
+
+**PROMPT COMPLETO**:
+
+Professional portrait photograph of Wolfgang Amadeus Mozart at age 32 (circa 1788, at the peak of his creative powers), centered composition, museum quality based on authenticated historical portraits by Joseph Lange and della Croce.
+
+FACE AND EXPRESSION: Youthful, intelligent musical gaze with intensity and passion. Eyes bright blue, piercing and expressive, slightly bulging as described in historical accounts. The expression should capture his "extreme variability" of features—a moment of focused concentration with a hint of playful mischief. Small, delicate facial features. Pale complexion typical of indoor musicians. Slight pockmarks from childhood smallpox, subtle but visible. Large nose, somewhat prominent. Face slightly fuller than gaunt, showing the health of his prime years.
+
+HAIR: Abundant white/silver powdered wig in the 18th century style, meticulously styled with curls on the sides (known as "rolls" or "curls"). Hair pulled back and tied with a black ribbon bow at the nape. The wig should be formal but not ostentatiously large—refined, befitting a court composer. Some strands slightly disheveled, suggesting he's been working at the piano.
+
+CLOTHING: Dark formal coat (likely dark blue or deep burgundy), high white collar with delicate lace cravat at the neck, typical of late 18th century Viennese fashion. White ruffled shirt visible at the chest. The clothing should suggest elegance but not excessive wealth—refined taste on a limited budget.
+
+LIGHTING: Soft, directional lighting from the left side, creating gentle shadows that emphasize facial structure. Warm candlelight quality consistent with 18th century portraiture. The lighting should make his eyes particularly luminous and expressive.
+
+BACKGROUND: Soft, dark gradient background in deep browns and blacks, typical of classical portrait painting. Slightly lighter around the head to create separation. No distracting elements—all focus on the face.
+
+MOOD AND ATMOSPHERE: Dignified yet approachable. Intellectual intensity combined with artistic sensitivity. The portrait should convey both the genius composer and the passionate, somewhat vulnerable human being. There should be a sense of vitality and creative energy, as if he might suddenly turn to a piano and begin playing.
+
+TECHNICAL SPECIFICATIONS: Ultra-high definition, photorealistic quality. Sharp focus on the eyes and face. Subtle texture showing skin pores, fabric weave, and hair details. Color palette dominated by warm tones (creams, golds, deep reds, dark browns) against cool shadows. The overall aesthetic should feel like a colorized and slightly modernized version of Joseph Lange's famous unfinished portrait of Mozart.
+
+CRITICAL: This is the reference face that MUST be matched exactly in PROMPT 2. Pay special attention to: eye shape and color, nose structure, facial proportions, chin shape, expression quality.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+**DIMENSIONES**: 512x768 pixels (ratio 2:3, vertical, cuerpo completo)
+
+**PROMPT COMPLETO**:
+
+Using the EXACT reference image of Mozart's face from 1rst message, create a full-body standing portrait showing him at the same age (32 years old, circa 1788, peak of his career).
+
+FACE: MUST MATCH 1rst message EXACTLY. Same facial features, same expression (focused intensity with hint of playful mischief), same bright blue eyes, same pale complexion with subtle pockmarks, same prominent nose, same white powdered wig styled identically. CRITICAL: Facial consistency is paramount.
+
+BODY AND POSTURE: Standing position, three-quarter turn to the right, looking toward the camera/viewer. Height approximately 5'4" (163cm)—shorter than average. Slender, thin frame consistent with historical descriptions of "a man of small build, very thin." Posture elegant and refined, befitting a court composer, but with a slight informal lean suggesting his personality. Left hand gesturing expressively (perhaps holding a quill pen or music manuscript), right hand resting naturally at his side or holding a violin bow. Small, delicate hands, proportionally smaller than average—historically noted detail.
+
+CLOTHING (18th Century Viennese Fashion, circa 1788):
+- **Coat (Justaucorps)**: Formal frock coat in rich deep burgundy or royal blue velvet, knee-length, with wide cuffs turned back showing contrasting fabric (gold or cream). Eight decorative buttons down the front (gold or silver), likely not all fastened. Fitted at the waist, flaring slightly at the hips. Subtle embroidery or brocade patterns on the cuffs and pocket flaps, showing refinement but not excessive wealth.
+- **Waistcoat (Gilet)**: Ornate embroidered waistcoat visible beneath the coat, in cream or gold silk with floral or musical motif embroidery. Buttons down the front, fitted to the torso.
+- **Shirt**: White linen shirt with ruffled lace cravat at the neck (matching 1rst message). Lace ruffles also visible at the wrists extending from coat sleeves.
+- **Breeches (Culottes)**: Knee-length breeches in matching fabric to the coat or in cream/tan. Fitted to the leg, fastening just below the knee with small buttons or buckles.
+- **Stockings**: White silk stockings covering the calves from knee to ankle.
+- **Shoes**: Black leather shoes with small silver buckles, low heels (typical 18th century style), slightly pointed toes. Polished but showing some wear.
+- **Accessories**: Small decorative sword or dress sword hanging from a waist belt on the left side (optional, denoting gentleman status). Possibly a pocket watch chain visible.
+
+HAIR/WIG: Identical to 1rst message—white powdered wig with side curls, tied back with black ribbon bow.
+
+POSE DETAILS: Weight shifted slightly to the right leg, left leg slightly forward in a classical portrait stance. The pose should suggest both confidence and approachability. Expression shows he's been captured mid-thought, perhaps while composing or discussing music. The overall posture conveys artistic temperament—refined but not stiff, elegant but with underlying energy.
+
+HANDS: Particularly important—small, delicate hands as historically documented. Left hand perhaps holding a rolled manuscript of sheet music or a quill pen, fingers positioned as if gesturing while explaining a musical concept. Right hand in a natural position, perhaps near the violin or resting elegantly.
+
+PROPORTIONS: Head slightly large in proportion to body (historically noted). Overall appearance should match descriptions: "small stature, thin frame, pale complexion."
+
+BACKGROUND: COMPLETELY WHITE (#FFFFFF) or COMPLETELY TRANSPARENT (alpha channel). Absolutely no shadows, textures, gradients, or environmental elements. Pure white void or transparent background only. The figure should appear as if photographed against a professional studio white backdrop with perfect, even lighting that eliminates all background shadows.
+
+LIGHTING: Soft, even lighting from multiple angles to eliminate harsh shadows while maintaining three-dimensional form. Slightly stronger key light from the upper left to create subtle modeling. The lighting should make the costume details clearly visible while keeping the white background pure white with no gradation.
+
+MOOD: Professional yet personable. The portrait should capture Mozart as the successful, fashionable Viennese composer at the height of his powers—confident in his genius, elegant in presentation, but with the underlying passion and volatility of his artistic temperament visible in his expression and posture.
+
+TECHNICAL SPECIFICATIONS: Ultra-high definition, photorealistic quality. Sharp focus throughout entire figure. Detailed fabric textures showing velvet nap, silk sheen, lace patterns, embroidery details. Accurate 18th century costume construction and tailoring. Color palette: rich jewel tones (burgundy, royal blue, gold) contrasted with whites and creams, against pure white background.
+
+CRITICAL REQUIREMENT: The face MUST match 1rst message exactly in every detail—eye color and shape, nose structure, facial proportions, expression, skin tone, wig styling. Use 1rst message as the absolute reference for all facial features.
+
+---
+
+## NOTAS TÉCNICAS PARA IMPLEMENTACIÓN
+
+**Consistencia entre Prompts**:
+- 1rst message establece el rostro canónico de Mozart
+- PROMPT 2 DEBE usar ese rostro exacto en un cuerpo completo
+- Si es posible, usar img2img o inpainting para mantener consistencia facial perfecta
+
+**Referencias Históricas Visuales**:
+- Retrato de Joseph Lange (1782-1783) - considerado el más auténtico
+- Retrato familiar de della Croce (c.1780) - muestra a Mozart a sus 25 años
+- Grabado en punta de plata de Doris Stock (1789) - ampliamente aceptado como auténtico
+
+**Paleta de Colores Sugerida**:
+- Wig: #F5F5F0 (white powder)
+- Skin: #F5E6D3 (pale with warm undertones)
+- Eyes: #4A90E2 (bright blue)
+- Coat: #8B0000 (dark burgundy) o #1E3A8A (royal blue)
+- Waistcoat: #F4E4C1 (cream/gold)
+- Background (PROMPT 2): #FFFFFF (pure white)
+
+**Dimensiones Exactas**:
+- 1rst message: 512x512 (1:1)
+- PROMPT 2: 512x768 (2:3)
+
+---
+
+**TOTAL PROMPTS: 2 (según especificaciones)**

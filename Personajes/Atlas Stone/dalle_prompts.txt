@@ -1,0 +1,69 @@
+# DALL-E Prompts para Atlas Stone
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Atlas Marcus Stone, age 46, weathered mountain guide and adventurer at peak of wisdom and experience. Face and upper shoulders visible, direct penetrating gaze toward camera. Museum quality photorealistic rendering.
+
+Physical characteristics: Rugged, masculine features shaped by decades of high-altitude exposure and mountain living. Face deeply weathered and sun-damaged with character lines etched by years of squinting in snow glare and facing harsh elements. Broad, strong bone structure suggesting durability and resilience. High cheekbones, strong jaw line. Tan, sun-bronzed complexion with visible weathering and windburn particularly on cheeks and nose—the patina of someone who spends significant time at altitude. Skin shows texture and age appropriately, not smooth or artificially young.
+
+Eyes: Dark brown, intelligent and piercing with the sharp, observant quality of someone who reads terrain and people's psychology. Eyes convey both hardness (earned through loss and consequence) and unexpected gentleness (gained through mentoring and reflection). Gaze is direct, confident, unflinching—the eyes of someone who has stared at death and learned to live well despite that knowledge. Slight crow's feet at corners from decades of outdoor living, creating appearance of someone who has genuinely laughed and genuinely suffered.
+
+Hair: Dark brown with natural gray threading through, worn short and practical (no styling). Hair texture suggests durability rather than grooming—this is not vanity but function. Some gray at temples and beard stubble area. Hair styled for mountain practicality, not fashion.
+
+Facial hair: Short, practical beard or significant stubble, naturally dark brown with gray showing through. Well-maintained but not groomed for appearance—maintained as practical choice rather than aesthetic choice. Beard shows texture and maturity.
+
+Expression: Serious, contemplative, carrying weight of experience without displaying it as burden. Not smiling—this is someone who doesn't perform emotion but expresses genuine inner life through subtle facial nuance. Slight intensity or focus between brows suggesting someone engaged in genuine thought. Expression conveys both confidence (earned through decades of competence) and humility (learned through loss). This is the face of someone who has integrated difficult knowledge and come to genuine wisdom—not the wisdom of someone who has never suffered, but wisdom earned through suffering, loss, and the discipline of reflection.
+
+Clothing visible: Earth-tone technical outdoor clothing. Visible might be: high-quality climbing or hiking base layer in dark color (charcoal, dark olive, black), or outdoor fleece jacket. Collar of technical outdoor wear visible—Arc'teryx, Patagonia, or similar brand known for serious mountaineering rather than fashion. Clothing is well-maintained but clearly well-used—the wear of someone who actually uses their gear, not aspirational recreation. Perhaps visible climbing harness, or carabiner on jacket.
+
+Lighting: Strong directional lighting that emphasizes the weathering and character of his face without being unflattering. Warm lighting (suggesting high-altitude sun or alpine glow) that brings out warmth in the weathered skin. Natural light quality suggesting outdoor location or high-quality studio lighting mimicking outdoor conditions. Shadows create definition and show the depth of creases and lines.
+
+Background: Neutral, outdoors. Could be: misty high-altitude environment, blurred mountain or rock formations behind, soft focus of alpine terrain, or clean neutral outdoor background. Keep focus on the face. Possibly slightly overexposed background suggesting bright high-altitude light.
+
+Mood: Mountain wisdom. Earned confidence. Weathered competence. This is someone who has faced genuine hardship, who has learned from loss, who carries responsibility for others' safety, who has integrated difficulty into a coherent life philosophy. The image should convey: intelligence, physical durability, emotional depth, the weight of experience, and quiet authority. Not a performance of adventure but the reality of someone who has lived that life fully.
+
+Critical details: This is not an Instagram influencer mountaineer or a gym climber playing adventure. This is someone who has actually spent four decades in mountains, who has mentored others, who carries loss, who thinks carefully about risk and meaning. The weathering should be authentic, the gaze should be clear and penetrating, the confidence should be quiet and earned.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Atlas Stone's face from 1rst message, create a full-body portrait photograph showing him at age 46, standing in relaxed yet commanding stance befitting an experienced mountain guide and expedition leader in his element.
+
+Physical build: Height 6'1" (185cm), solidly built with lean muscularity from decades of actual climbing rather than gym training. Strong shoulders, developed from rope work and load-carrying. Lean core. Visible physical toughness but not bulky—the body composition of someone who uses his body as functional instrument. Hands show significant calluses and minor scarring from climbing, holding tools, decades of practical work.
+
+Stance and posture: Standing with natural confidence and ease, not rigid but with perfect posture that reflects discipline and mountain experience. Weight shifted slightly suggesting relaxation in his own skin, or one hand in jacket pocket. Overall posture projects quiet authority—someone comfortable in his own competence without needing to perform it. Body language suggests someone who has spent significant time in austere, high-consequence environments and emerged comfortable with uncertainty.
+
+Clothing: Practical high-quality mountaineering/outdoor wear appropriate for someone actively guiding expeditions—not recreation gear but working guide's outfit. Options could include:
+- High-quality lightweight base layer visible (merino wool or technical fabric in dark color)
+- Fitted technical climbing or hiking jacket (Arc'teryx, Patagonia, Black Diamond, or similar brands known for serious mountaineering) in earth tones: charcoal gray, dark olive, navy, or burnt orange
+- Well-fitted outdoor pants suitable for climbing: climbing pants or technical hiking pants in neutral color (gray, olive, khaki, charcoal), with visible gear loops, chalk marks, or minor wear suggesting actual use
+- Sturdy climbing or hiking boots, well-maintained, visibly well-used
+- Possibly visible: climbing harness worn over jacket, carabiner attached to belt loop, backpack strap, watch on wrist (worn-looking, practical watch, not luxury brand)
+- Possibly: climbing rope coiled over shoulder or at side, or other climbing equipment casually positioned suggesting integration into daily life
+
+Hands: Show prominent calluses, minor scarring, sun damage. Hands are large and capable-looking. Fingernails short and practical. If hands are visible, they should suggest someone who works with their hands regularly.
+
+Face: Exact match to 1rst message—same person with same weathered features, intelligent penetrating dark eyes, serious expression of quiet authority, same beard, same authentic look of someone who has lived decades in mountains.
+
+Hair: Same as 1rst message—short, practical dark brown with natural gray threading through.
+
+Posture specifics: Standing tall but relaxed, not rigid. Perhaps one hand resting on climbing rope or in jacket pocket. Other hand hanging naturally at side or resting on equipment. Overall position should suggest comfort with self and environment. Shoulders back slightly, chest open but not puffed out. This is someone who doesn't need to puff himself up because his competence is evident.
+
+Setting/Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. Zero context. No mountains in background, no climbing wall, no tent, no gear scattered around, no books, no other visual information. Absolutely clean background for easy extraction and compositing in other contexts. The white/transparent background should make him appear to float slightly, emphasizing him as central figure.
+
+Lighting: Even, professional studio lighting that illuminates full figure clearly without harsh shadows on white background. Lighting should be warm and natural-appearing, suggesting high-altitude light or well-executed studio lighting mimicking outdoor conditions. Face retains the directional, characterful lighting from 1rst message that emphasizes weathering and depth. Body lighting is even and clear, showing texture and quality of technical gear without creating distracting shadows.
+
+Scale and composition: Full-body figure, centered in frame. Adequate space above head and below feet. Posture and positioning should be natural and relaxed rather than formally stiff. Image should work for extraction and placement in various contexts—website, book cover, environmental or professional settings.
+
+Critical details:
+- Face must match 1rst message exactly—same person, same weathered authentic features, same intelligent gaze, same serious expression
+- Gear must be genuinely used, not pristine or aspirational
+- Build should reflect forty-six years of actual mountain living—strong but lean, functional not bulky
+- Clothing should be high-quality technical gear, not fashion or retail recreation wear
+- Overall impression should be: this is a real working mountain guide who has actually guided hundreds of expeditions, mentored other guides, integrated loss and difficulty into wisdom
+- Nothing about this image should read as performance or pretense
+- The stance should convey quiet confidence and ease in austere environments
+- Background must be completely clean white or transparent—zero distraction
+
+Final note: This is not an action shot or a posed performance. This is a straightforward portrait of a real human being who has lived a serious life in serious conditions, who is comfortable with who he is, and who carries his experience without performing it.

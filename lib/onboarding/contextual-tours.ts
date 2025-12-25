@@ -21,6 +21,23 @@ export interface ContextualTrigger {
 export async function getUserStats() {
   try {
     const res = await fetch('/api/user/onboarding-stats');
+
+    // Si es 401, el usuario no está autenticado - redirigir a login
+    if (res.status === 401) {
+      if (typeof window !== 'undefined') {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+      }
+      return {
+        agentCount: 0,
+        worldCount: 0,
+        messageCount: 0,
+        totalMessages: 0,
+        hasVisitedCommunity: false,
+        timeSinceLogin: 0,
+        daysSinceSignup: 0,
+      };
+    }
+
     if (!res.ok) throw new Error('Failed to fetch stats');
     return await res.json();
   } catch (error) {
