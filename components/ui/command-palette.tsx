@@ -114,17 +114,17 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         keywords: ["home", "dashboard", "inicio"],
       },
       {
-        id: "nav-worlds",
-        label: "Ir a Mundos",
-        description: "Explorar y crear mundos",
+        id: "nav-groups",
+        label: "Ir a Grupos",
+        description: "Explorar y crear grupos",
         icon: Network,
         category: "navigation",
         action: () => {
-          router.push("/dashboard/mundos");
+          router.push("/dashboard/grupos");
           onOpenChange(false);
         },
         shortcut: ["g", "w"],
-        keywords: ["worlds", "mundos"],
+        keywords: ["groups", "grupos"],
       },
       {
         id: "nav-community",
@@ -207,17 +207,17 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         keywords: ["create", "new", "agent", "ai", "crear", "nueva"],
       },
       {
-        id: "create-world",
-        label: "Crear Nuevo Mundo",
-        description: "Crear mundo interactivo",
+        id: "create-group",
+        label: "Crear Nuevo Grupo",
+        description: "Crear grupo interactivo",
         icon: Globe,
         category: "creation",
         action: () => {
-          router.push("/dashboard/mundos/crear");
+          router.push("/dashboard/grupos/crear");
           onOpenChange(false);
         },
         shortcut: ["c", "w"],
-        keywords: ["create", "world", "mundo", "crear"],
+        keywords: ["create", "group", "grupo", "crear"],
       },
       {
         id: "create-post",

@@ -805,7 +805,7 @@
   "navigation": {
     "home": "Home",
     "companions": "Companions",
-    "worlds": "Worlds",
+    "groups": "Groups",
     "myProgress": "My Progress",
     "community": "Community",
     "billing": "Billing",
@@ -2199,11 +2199,11 @@
         },
         "dashboard": {
           "title": "Your Personal Dashboard",
-          "description": "Here you'll see all your AI companions, worlds, and statistics. You can organize them by categories: Recommended, Created by you, and Popular."
+          "description": "Here you'll see all your AI companions, groups, and statistics. You can organize them by categories: Recommended, Created by you, and Popular."
         },
         "navigation": {
           "title": "Main Navigation",
-          "description": "Use the sidebar to navigate between Dashboard, Worlds, Progress, Community, Plans, and Settings."
+          "description": "Use the sidebar to navigate between Dashboard, Groups, Progress, Community, Plans, and Settings."
         },
         "create": {
           "title": "Create Your First AI",

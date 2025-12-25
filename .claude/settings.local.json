@@ -150,7 +150,8 @@
       "mcp__playwright__browser_console_messages",
       "Bash({ chmod -R 777 /mnt/SSD/Proyectos/AI/creador-inteligencias/.next)",
       "Bash(})",
-      "mcp__playwright__browser_hover"
+      "mcp__playwright__browser_hover",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

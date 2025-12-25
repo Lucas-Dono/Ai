@@ -805,7 +805,7 @@
   "navigation": {
     "home": "Inicio",
     "companions": "Compañeros",
-    "worlds": "Mundos",
+    "groups": "Grupos",
     "myProgress": "Mi Progreso",
     "community": "Comunidad",
     "billing": "Facturación",
@@ -2084,11 +2084,11 @@
         },
         "dashboard": {
           "title": "Tu Dashboard Personal",
-          "description": "Aquí verás todos tus compañeros AI, mundos y estadísticas. Puedes organizarlos por categorías: Recomendados, Creados por ti, y Populares."
+          "description": "Aquí verás todos tus compañeros AI, grupos y estadísticas. Puedes organizarlos por categorías: Recomendados, Creados por ti, y Populares."
         },
         "navigation": {
           "title": "Navegación Principal",
-          "description": "Usa la barra lateral para navegar entre Dashboard, Mundos, Progreso, Comunidad, Planes y Configuración."
+          "description": "Usa la barra lateral para navegar entre Dashboard, Grupos, Progreso, Comunidad, Planes y Configuración."
         },
         "create": {
           "title": "Crea tu Primera IA",

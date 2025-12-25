@@ -43,8 +43,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   agents             Agent[]
-  worlds             World[]
-
   // Groups System Relations
   groupsCreated      Group[]           @relation("GroupCreator")
   groupMemberships   GroupMember[]     @relation("GroupMemberUser")
@@ -237,14 +235,10 @@ model Agent {
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
-
-  worldAgents       WorldAgent[]
   messagesAsAgent   Message[]          @relation("AgentMessages")
   relationsSubject  Relation[]         @relation("SubjectRelations")
   reviews           Review[]
   clones            AgentClone[]       @relation("OriginalAgent")
-  worldInteractions WorldInteraction[] @relation("SpeakerInteractions")
-
   // Groups System Relations
   groupMemberships GroupMember[]  @relation("GroupMemberAgent")
   groupMessages    GroupMessage[] @relation("GroupMessageAgent")
@@ -719,236 +713,17 @@ model RoutineSimulationState {
   @@index([agentId])
 }
 
-// ============================================
-// SISTEMA DE MUNDOS INTERACTIVOS
-// ============================================
-
 // Modelo de Mundo (entorno grupal donde múltiples IAs interactúan)
-model World {
-  id          String  @id @default(cuid())
-  userId      String? // Null para mundos predefinidos del sistema
-  name        String
-  description String?
-
-  // Sistema de mundos predefinidos
-  isPredefined Boolean @default(false) // Mundos creados por el sistema
-  category     String? // Categoría del mundo: "social", "profesional", "fantasia", "educativo", etc.
-  featured     Boolean @default(false) // Destacar en la lista de mundos predefinidos
-  difficulty   String? // "beginner", "intermediate", "advanced"
-
-  // Configuración del entorno
-  scenario       String? @db.Text // Escenario/contexto del mundo (ej: "Oficina corporativa", "Escuela secundaria")
-  initialContext String? @db.Text // Contexto inicial de la simulación
-  rules          Json? // Reglas del mundo (ej: {"allowConflict": true, "theme": "fantasy"})
-
-  // Estado de la simulación
-  status     WorldStatus @default(STOPPED) // RUNNING, PAUSED, STOPPED
-  visibility String      @default("private") // private, public, shared
-
-  // Configuración de simulación
-  autoMode         Boolean @default(true) // Modo automático (IAs hablan sin intervención)
-  turnsPerCycle    Int     @default(1) // Cuántos turnos por ciclo de simulación
-  interactionDelay Int     @default(3000) // Delay entre interacciones (ms)
-  maxInteractions  Int? // Límite opcional de interacciones
-
-  // Configuración de personalidad grupal
-  allowEmotionalBonds Boolean @default(true) // Permitir que IAs desarrollen lazos emocionales
-  allowConflicts      Boolean @default(true) // Permitir conflictos entre IAs
-  topicFocus          String? // Tema de enfoque (opcional)
-
-  // Sistema de narrativa guiada (para mundos tipo historia)
-  storyMode             Boolean @default(false) // Si está en modo historia con guión
-  currentStoryBeat      String? // Evento/beat actual del guión
-  storyProgress         Float   @default(0) // Progreso general de la historia (0-1)
-  directorAgentId       String? // ID del agente IA Director (gestiona la narrativa)
-  storyScript           Json? // Guión completo con eventos y arcos
-  directorState         Json? // Estado del AI Director (decisiones, timing, etc.)
-  currentSceneDirection Json? // Dirección actual de escena del Director (tone, pacing, etc.)
-  currentEmergentEvent  Json? // Evento emergente activo (bump-into, interruption, etc.)
-
-  // Especificación editable del mundo (para modo creador)
-  worldSpec    Json? // Especificación completa del mundo para poder editarlo después
-  creationMode String? // "simple" | "advanced" - indica cómo se creó el mundo
-
-  // Métricas para ranking
-  viewCount      Int       @default(0) // Número de veces que se ha visitado
-  totalTimeSpent Int       @default(0) // Tiempo total en segundos que usuarios han pasado
-  lastViewedAt   DateTime? // Última vez que alguien vio este mundo
-  rating         Float? // Rating promedio del mundo (si implementamos reviews para mundos)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  worldAgents     WorldAgent[]
-  messages        Message[]
-  interactions    WorldInteraction[]
-  simulationState WorldSimulationState?
-  agentRelations  AgentToAgentRelation[] // Relaciones entre IAs en este mundo
-  storyEvents     StoryEvent[] // Eventos programados del guión
-  characterArcs   CharacterArc[] // Arcos de personajes
-
-  @@index([userId])
-  @@index([status])
-  @@index([visibility])
-  @@index([isPredefined])
-  @@index([category])
-  @@index([featured])
-  @@index([storyMode])
-  @@index([viewCount])
-  @@index([rating])
-  @@index([lastViewedAt])
-}
 
 // ENUM: Estado de la simulación del mundo
-enum WorldStatus {
-  RUNNING // Simulación activa
-  PAUSED // Simulación pausada
-  STOPPED // Simulación detenida
-}
 
 // Tabla intermedia para Mundos y Agentes
-model WorldAgent {
-  worldId  String
-  agentId  String
-  joinedAt DateTime @default(now())
-
-  // Rol del agente en el mundo (opcional)
-  role String? // "leader", "observer", "participant", etc.
-
-  // Estado del agente en el mundo
-  isActive Boolean @default(true) // Si el agente está participando activamente
-
-  // Estadísticas
-  totalInteractions Int       @default(0) // Número de veces que ha hablado
-  lastInteractionAt DateTime? // Última vez que interactuó
-
-  // Sistema de importancia narrativa (para mundos con historia)
-  importanceLevel   String    @default("secondary") // "main", "secondary", "filler"
-  screenTime        Int       @default(0) // Tracking de participación total
-  promotionScore    Float     @default(0.5) // Score para determinar promoción/degradación (0-1)
-  characterArcStage String? // Etapa actual en su arco: "introduction", "development", "climax", "resolution"
-  emotionalState    Json? // Estado emocional actual del personaje en este mundo
-  isFocused         Boolean   @default(false) // Si el Director ha marcado este personaje como foco
-  focusedUntil      DateTime? // Hasta cuándo está en foco
-
-  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  @@id([worldId, agentId])
-  @@index([worldId, isActive])
-  @@index([worldId, importanceLevel])
-}
 
 // Interacciones entre IAs en un mundo
-model WorldInteraction {
-  id      String @id @default(cuid())
-  worldId String
-
-  // Agentes involucrados
-  speakerId String // ID del agente que habla
-  targetId  String? // ID del agente objetivo (null si es mensaje grupal)
-
-  // Contenido
-  content   String  @db.Text
-  messageId String? @unique // Referencia al mensaje en la tabla Message
-
-  // Contexto emocional
-  speakerEmotion Json? // Estado emocional del hablante
-  targetEmotion  Json? // Estado emocional del objetivo (si aplica)
-
-  // Metadata
-  interactionType String  @default("dialogue") // dialogue, action, thought, system
-  turnNumber      Int // Número de turno en la simulación
-  turn            Int? // Alias de turnNumber para compatibilidad
-  sentiment       String? // Análisis de sentimiento: "positive", "negative", "neutral", etc.
-  metadata        Json? // Datos adicionales (topics, etc.)
-
-  createdAt DateTime @default(now())
-
-  world   World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  speaker Agent @relation("SpeakerInteractions", fields: [speakerId], references: [id], onDelete: Cascade)
-
-  @@index([worldId])
-  @@index([worldId, turnNumber])
-  @@index([speakerId])
-  @@index([targetId])
-  @@index([createdAt])
-}
 
 // Estado de simulación del mundo (cache/snapshot)
-model WorldSimulationState {
-  id      String @id @default(cuid())
-  worldId String @unique
-
-  // Estado actual
-  currentTurn       Int     @default(0) // Turno actual
-  totalInteractions Int     @default(0) // Total de interacciones
-  lastSpeakerId     String? // Último agente que habló
-
-  // Contexto de conversación
-  recentTopics   Json @default("[]") // Temas recientes discutidos
-  activeSpeakers Json @default("[]") // Agentes que han hablado recientemente
-
-  // Estadísticas agregadas
-  statistics Json @default("{}") // Stats del mundo (emotions, interactions, etc.)
-
-  // Control de simulación
-  startedAt DateTime?
-  pausedAt  DateTime?
-  resumedAt DateTime?
-  stoppedAt DateTime?
-
-  lastUpdated DateTime @default(now())
-
-  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-
-  @@index([worldId])
-}
 
 // Relaciones emocionales entre agentes (en contexto de un mundo)
-model AgentToAgentRelation {
-  id      String @id @default(cuid())
-  worldId String
-
-  // Agentes involucrados
-  subjectId String // Agente que tiene los sentimientos
-  targetId  String // Agente objetivo
-
-  // Métricas relacionales (similar a Relation pero entre IAs)
-  trust      Float @default(0.5) // Confianza (0-1)
-  affinity   Float @default(0.5) // Afinidad/simpatía (0-1)
-  respect    Float @default(0.5) // Respeto (0-1)
-  attraction Float @default(0.5) // Atracción (romántica o platónica) (0-1)
-
-  // Estado emocional privado (no visible al usuario directamente)
-  privateState Json @default("{}") // { "love": 0.3, "jealousy": 0.1, "admiration": 0.7 }
-
-  // Interacciones
-  totalInteractions    Int @default(0)
-  positiveInteractions Int @default(0)
-  negativeInteractions Int @default(0)
-  neutralInteractions  Int @default(0)
-
-  // Historia de relación
-  relationshipHistory Json @default("[]") // [{turn: 10, event: "conflict", impact: -0.2}, ...]
-
-  // Progresión
-  stage             String    @default("strangers") // strangers | acquaintances | friends | close | complex
-  lastInteractionAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-
-  @@unique([worldId, subjectId, targetId])
-  @@index([worldId])
-  @@index([subjectId])
-  @@index([targetId])
-  @@index([stage])
-}
 
 // Modelo de Relaciones (emocionales entre agentes o usuario-agente)
 model Relation {
@@ -981,7 +756,6 @@ model Relation {
 // Modelo de Mensajes
 model Message {
   id        String   @id @default(cuid())
-  worldId   String? // Si es en un mundo grupal
   agentId   String? // Si es chat individual
   userId    String? // Usuario que envió el mensaje
   role      String // user, assistant, system
@@ -989,13 +763,10 @@ model Message {
   metadata  Json? // Datos adicionales (emociones, contexto, tipo de mensaje: text/audio/image, etc.)
   createdAt DateTime @default(now())
 
-  world            World?               @relation(fields: [worldId], references: [id], onDelete: Cascade)
   agent            Agent?               @relation("AgentMessages", fields: [agentId], references: [id], onDelete: Cascade)
   reactions        Reaction[] // Reacciones de usuarios al mensaje
   behaviorTriggers BehaviorTriggerLog[] // Triggers detectados en este mensaje
 
-  @@index([worldId])
-  @@index([agentId])
   @@index([createdAt])
 }
 
@@ -1659,94 +1430,8 @@ model ProactiveMessage {
 // ========================================
 
 // Eventos programados del guión (ej: festival cultural, exámenes, confesión)
-model StoryEvent {
-  id      String @id @default(cuid())
-  worldId String
-
-  // Información del evento
-  eventType   String // "school_festival", "exam_week", "confession", "conflict", "resolution"
-  eventName   String // Nombre del evento
-  description String @db.Text
-
-  // Trigger conditions
-  triggerType       String // "automatic", "progress_based", "character_action"
-  triggerConditions Json? // Condiciones para que se active
-  requiredProgress  Float? // Progreso mínimo requerido (0-1)
-
-  // Participantes
-  involvedCharacters Json    @default("[]") // IDs de personajes que participan
-  focusCharacter     String? // Personaje principal del evento
-
-  // Estado
-  isCompleted Boolean @default(false)
-  isActive    Boolean @default(false)
-  outcome     String? // Resultado del evento
-
-  // Scheduling
-  scheduledAt DateTime?
-  startedAt   DateTime?
-  completedAt DateTime?
-
-  // Metadata
-  storyImpact Json? // Impacto en la historia y personajes
-  nextEvents  Json? // IDs de eventos que pueden seguir
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-
-  @@index([worldId])
-  @@index([worldId, isCompleted])
-  @@index([worldId, isActive])
-  @@index([eventType])
-}
 
 // Arcos de personajes (desarrollo narrativo individual)
-model CharacterArc {
-  id      String @id @default(cuid())
-  worldId String
-  agentId String
-
-  // Información del arco
-  arcName     String // "Tsundere Redemption", "Shy Girl Opens Up", "Rival to Friend"
-  arcType     String // "romance", "friendship", "rivalry", "personal_growth", "comedy"
-  description String @db.Text
-
-  // Estructura del arco
-  milestones       Json // Array de hitos del arco con sus condiciones
-  currentMilestone Int   @default(0) // Índice del hito actual
-  progress         Float @default(0) // Progreso en el arco actual (0-1)
-
-  // Estado
-  isActive    Boolean @default(true)
-  isCompleted Boolean @default(false)
-
-  // Relaciones con otros personajes
-  relatedCharacters Json @default("[]") // IDs de personajes relacionados
-  conflictsWith     Json @default("[]") // IDs de personajes en conflicto
-  alliesWith        Json @default("[]") // IDs de personajes aliados
-
-  // Progreso narrativo
-  keyMoments  Json    @default("[]") // Momentos clave ya ocurridos
-  currentGoal String? // Objetivo actual del personaje
-
-  // Metadata
-  emotionalTone   String? // "comedic", "dramatic", "heartwarming", "bittersweet"
-  characterGrowth Json? // Cambios en la personalidad/relaciones
-
-  startedAt   DateTime  @default(now())
-  completedAt DateTime?
-  updatedAt   DateTime  @updatedAt
-
-  world World @relation(fields: [worldId], references: [id], onDelete: Cascade)
-
-  @@index([worldId])
-  @@index([agentId])
-  @@index([worldId, isActive])
-  @@index([worldId, agentId])
-  @@index([arcType])
-}
 
 // ========================================
 // SISTEMA DE RECOMENDACIÓN IA
@@ -3755,8 +3440,7 @@ model CrossContextMemory {
   agentId String // El agente que tiene esta memoria
 
   // Contexto de origen
-  sourceType    String // "individual_chat", "world_interaction", "group_interaction", "proactive"
-  sourceWorldId String? // Si viene de un mundo
+  sourceType    String // "individual_chat", "group_interaction", "proactive"
   sourceGroupId String? // Si viene de un grupo
   sourceUserId  String? // Si viene de chat individual
 
@@ -3787,7 +3471,6 @@ model CrossContextMemory {
 
   @@index([agentId])
   @@index([sourceType])
-  @@index([sourceWorldId])
   @@index([sourceGroupId])
   @@index([happenedAt])
   @@index([importance])
@@ -3800,12 +3483,12 @@ model TemporalContext {
 
   // Última interacción por contexto
   lastIndividualChatAt DateTime?
-  lastWorldInteractionAt DateTime?
-  lastWorldId String? // Último mundo donde interactuó
+  lastGroupInteractionAt DateTime?
+  lastGroupId String? // Último grupo donde interactuó
 
   // Tracking de frecuencia
   individualChatCount Int @default(0)
-  worldInteractionCount Int @default(0)
+  groupInteractionCount Int @default(0)
 
   // Awareness temporal
   typicalResponseTime Int? // Minutos típicos de respuesta (para simular realismo)
@@ -3817,7 +3500,7 @@ model TemporalContext {
   @@unique([agentId, userId])
   @@index([agentId])
   @@index([userId])
-  @@index([lastWorldId])
+  @@index([lastGroupId])
 }
 
 model TopicFatigue {

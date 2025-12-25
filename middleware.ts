@@ -112,7 +112,7 @@ export default async function middleware(req: NextRequest) {
     "/api/auth", // better-auth: Todas las rutas de autenticación (sign-in, sign-out, get-session, register, etc.)
     "/api/webhooks/mercadopago",
     "/api/community", // GROWTH: API pública de comunidad (read + anonymous post)
-    "/api/worlds", // GROWTH: API pública de mundos (read-only)
+    "/api/groups", // GROWTH: API pública de grupos (read-only)
   ];
 
   // SECURITY FIX #5: Verificar coincidencia exacta o que sea subruta válida

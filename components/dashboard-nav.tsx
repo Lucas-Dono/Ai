@@ -85,7 +85,7 @@ export function DashboardNav() {
 
   const navItems = [
     { href: "/dashboard", label: t("navigation.home"), icon: Home },
-    { href: "/dashboard/mundos", label: t("navigation.worlds"), icon: Network },
+    { href: "/dashboard/grupos", label: t("navigation.groups"), icon: Network },
     { href: "/dashboard/my-stats", label: t("navigation.myProgress"), icon: BarChart3 },
     { href: "/community", label: t("navigation.community"), icon: Users },
     { href: "/dashboard/billing", label: t("navigation.billing"), icon: CreditCard },
@@ -116,7 +116,7 @@ export function DashboardNav() {
           // Add data-tour attribute based on route
           const getTourAttr = (href: string) => {
             if (href === '/community') return 'community-link';
-            if (href === '/dashboard/mundos') return 'worlds-link';
+            if (href === '/dashboard/grupos') return 'groups-link';
             if (href === '/dashboard/billing') return 'billing-link';
             if (href === '/dashboard/my-stats') return 'my-stats-link';
             return undefined;
