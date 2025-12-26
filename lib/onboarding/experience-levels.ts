@@ -9,7 +9,7 @@ export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert
 
 export interface UserStats {
   agentCount: number;
-  worldCount: number;
+  groupCount: number;
   messageCount: number;
   totalMessages: number;
   daysSinceSignup: number;
@@ -21,12 +21,12 @@ export interface UserStats {
  * Determina el nivel de experiencia del usuario basándose en sus estadísticas
  */
 export function getUserExperienceLevel(stats: UserStats): ExperienceLevel {
-  const { agentCount, worldCount, messageCount, daysSinceSignup } = stats;
+  const { agentCount, groupCount, messageCount, daysSinceSignup } = stats;
 
   // Expert: Usuario power avanzado
   if (
     agentCount >= 10 &&
-    worldCount >= 3 &&
+    groupCount >= 3 &&
     messageCount >= 500 &&
     daysSinceSignup >= 14
   ) {
@@ -36,7 +36,7 @@ export function getUserExperienceLevel(stats: UserStats): ExperienceLevel {
   // Advanced: Usuario experimentado
   if (
     agentCount >= 5 &&
-    worldCount >= 1 &&
+    groupCount >= 1 &&
     messageCount >= 100 &&
     daysSinceSignup >= 7
   ) {
@@ -62,13 +62,13 @@ export const toursByLevel: Record<ExperienceLevel, string[]> = {
     'community-interaction',
   ],
   intermediate: [
-    'worlds-intro',
+    'groups-intro',
     'community-tour',
     'plans-and-features',
   ],
   advanced: [
     'community-tour',
-    'worlds-intro',
+    'groups-intro',
     'plans-and-features',
   ],
   expert: [
@@ -190,10 +190,10 @@ export function getProgressToNextLevel(stats: UserStats, currentLevel: Experienc
         requirementsEn.push(`Create ${5 - stats.agentCount} more AI`);
       }
 
-      if (stats.worldCount >= 1) completedRequirements++;
+      if (stats.groupCount >= 1) completedRequirements++;
       else {
-        requirements.push("Crea tu primer mundo");
-        requirementsEn.push("Create your first world");
+        requirements.push("Crea tu primer grupo");
+        requirementsEn.push("Create your first group");
       }
 
       if (stats.messageCount >= 100) completedRequirements++;
@@ -217,10 +217,10 @@ export function getProgressToNextLevel(stats: UserStats, currentLevel: Experienc
         requirementsEn.push(`Create ${10 - stats.agentCount} more AI`);
       }
 
-      if (stats.worldCount >= 3) completedRequirements++;
+      if (stats.groupCount >= 3) completedRequirements++;
       else {
-        requirements.push(`Crea ${3 - stats.worldCount} mundos más`);
-        requirementsEn.push(`Create ${3 - stats.worldCount} more worlds`);
+        requirements.push(`Crea ${3 - stats.groupCount} grupos más`);
+        requirementsEn.push(`Create ${3 - stats.groupCount} more groups`);
       }
 
       if (stats.messageCount >= 500) completedRequirements++;
@@ -253,7 +253,7 @@ export function getProgressToNextLevel(stats: UserStats, currentLevel: Experienc
 export function getMockUserStats(): UserStats {
   return {
     agentCount: 0,
-    worldCount: 0,
+    groupCount: 0,
     messageCount: 0,
     totalMessages: 0,
     daysSinceSignup: 0,

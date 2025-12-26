@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const userId = authUser.id;
 
     // Fetch all required data in parallel
-    const [user, agentCount, worldCount, messageCount, communityActivity] = await Promise.all([
+    const [user, agentCount, groupCount, messageCount, communityActivity] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
         select: { createdAt: true },
@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
       prisma.agent.count({
         where: { userId },
       }),
-      prisma.world.count({
-        where: { userId },
+      prisma.group.count({
+        where: { creatorId: userId },
       }),
       prisma.message.count({
         where: { userId, role: "user" },
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     const stats: UserStats = {
       agentCount,
-      worldCount,
+      groupCount,
       messageCount,
       totalMessages: messageCount, // Same as messageCount for now
       daysSinceSignup: Math.max(daysSinceSignup, 0),
