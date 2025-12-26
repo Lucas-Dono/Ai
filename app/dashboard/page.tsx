@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { TrendingWorldsCarousel } from "@/components/worlds/TrendingWorldsCarousel";
 import { RecommendedForYou } from "@/components/recommendations/RecommendedForYou";
 import { SpecialEventBanner } from "@/components/upgrade/SpecialEventBanner";
 import { PullToRefresh } from "@/components/mobile/PullToRefresh";
@@ -72,19 +71,6 @@ interface Agent {
   _count?: {
     reviews: number;
   };
-}
-
-interface World {
-  id: string;
-  name: string;
-  description?: string;
-  category?: string;
-  difficulty?: string;
-  featured?: boolean;
-  isPredefined?: boolean;
-  agents?: Agent[];
-  agentCount?: number;
-  interactionCount?: number;
 }
 
 // Helper function to get category color
@@ -166,7 +152,6 @@ export default function DashboardPage() {
   const searchParams = useSearchParams();
   const { data: session, status: sessionStatus } = useSession();
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [forYouRecommendations, setForYouRecommendations] = useState<Agent[]>([]);
@@ -198,18 +183,6 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchWorlds = async () => {
-    try {
-      const res = await fetch("/api/worlds");
-      if (res.ok) {
-        const data = await res.json();
-        setWorlds(data.worlds || []);
-      }
-    } catch (error) {
-      console.error("Error fetching worlds:", error);
-    }
-  };
-
   const fetchForYouRecommendations = async () => {
     if (!isAuthenticated) return;
 
@@ -226,13 +199,13 @@ export default function DashboardPage() {
 
   // Pull-to-refresh handler
   const handleRefresh = async () => {
-    await Promise.all([fetchAgents(), fetchWorlds(), fetchForYouRecommendations()]);
+    await Promise.all([fetchAgents(), fetchForYouRecommendations()]);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchAgents(), fetchWorlds()]);
+      await fetchAgents();
       setLoading(false);
     };
     fetchData();
@@ -267,24 +240,6 @@ export default function DashboardPage() {
       alert(t("actions.deleteError"));
     } finally {
       setDeleting(null);
-    }
-  };
-
-  const handleCloneWorld = async (worldId: string, worldName: string) => {
-    try {
-      const res = await fetch(`/api/worlds/${worldId}/clone`, {
-        method: "POST",
-      });
-
-      if (res.ok) {
-        alert(t("actions.cloneSuccess", { name: worldName }));
-        fetchWorlds();
-      } else {
-        throw new Error("Failed to clone");
-      }
-    } catch (error) {
-      console.error("Error cloning world:", error);
-      alert(t("actions.cloneError"));
     }
   };
 
@@ -401,9 +356,6 @@ export default function DashboardPage() {
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) === 0
   );
 
-  const predefinedWorlds = worlds.filter((w) => w.isPredefined);
-  const userWorlds = worlds.filter((w) => !w.isPredefined);
-
   return (
     <ErrorBoundary variant="page">
     <div className="min-h-screen" data-tour="dashboard-main">
@@ -430,14 +382,6 @@ export default function DashboardPage() {
               <Heart className="h-4 w-4 md:mr-2" />
               <span className="hidden md:inline">{t("tabs.companions", { count: companions.length })}</span>
               <span className="md:hidden text-xs ml-1">{companions.length}</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="worlds"
-              className="px-4 md:px-6 py-2.5 rounded-2xl data-[state=active]:md-surface-container-highest data-[state=active]:shadow-sm whitespace-nowrap flex-1 md:flex-none"
-            >
-              <Network className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">{t("tabs.worlds", { count: worlds.length })}</span>
-              <span className="md:hidden text-xs ml-1">{worlds.length}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -752,161 +696,6 @@ export default function DashboardPage() {
             )}
           </TabsContent>
 
-          {/* Worlds Tab */}
-          <TabsContent value="worlds" className="space-y-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold md-text-primary">{t("worlds.title")}</h2>
-                <p className="text-sm md-text-secondary mt-1">
-                  {t("worlds.subtitle")}
-                </p>
-              </div>
-              <Link href="/dashboard/mundos">
-                <Button variant="outline" className="px-6 py-2.5">
-                  {t("worlds.viewAll")}
-                </Button>
-              </Link>
-            </div>
-
-            {/* Trending Worlds Carousel */}
-            <TrendingWorldsCarousel />
-
-            {/* Featured Predefined Worlds */}
-            {predefinedWorlds.filter((w) => w.featured).length > 0 && (
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <Crown className="h-6 w-6 text-yellow-400" />
-                  <h2 className="text-2xl font-bold">{t("worlds.featured.title")}</h2>
-                  <span className="text-sm text-gray-400 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
-                    {t("worlds.featured.badge")}
-                  </span>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {predefinedWorlds
-                    .filter((w) => w.featured)
-                    .slice(0, 3)
-                    .map((world, idx) => (
-                      <motion.div
-                        key={world.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.3,
-                          delay: idx * 0.05,
-                          ease: [0.4, 0, 0.2, 1],
-                        }}
-                      >
-                        <div className="md-card p-6 group">
-                          <div className="flex items-start gap-4 mb-4">
-                            <div
-                              className="h-14 w-14 rounded-2xl flex items-center justify-center shrink-0"
-                              style={{ background: generateGradient(world.name) }}
-                            >
-                              <Network className="h-7 w-7 text-white" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-lg font-semibold md-text-primary truncate">
-                                {world.name}
-                              </h3>
-                              <p className="text-sm md-text-secondary line-clamp-2 mt-1">
-                                {world.description || t("worlds.noDescription")}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4 text-sm md-text-secondary mb-4">
-                            <span className="flex items-center gap-1.5">
-                              <Users className="h-4 w-4" />
-                              {world.agentCount || 0}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <MessageCircle className="h-4 w-4" />
-                              {world.interactionCount || 0}
-                            </span>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <Link href={`/dashboard/mundos/${world.id}`} className="flex-1">
-                              <Button variant="outline" className="w-full md-button-tonal py-2.5">
-                                <Play className="h-4 w-4 mr-2" />
-                                {t("actions.view")}
-                              </Button>
-                            </Link>
-                            <Button
-                              className="flex-1 md-button md-button-filled py-2.5"
-                              onClick={() => handleCloneWorld(world.id, world.name)}
-                            >
-                              <Copy className="h-4 w-4 mr-2" />
-                              {t("actions.clone")}
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                </div>
-              </div>
-            )}
-
-            {/* User Worlds */}
-            {userWorlds.length > 0 && (
-              <div>
-                <h3 className="text-xl font-semibold md-text-primary mb-4">{t("worlds.myWorlds")}</h3>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {userWorlds.slice(0, 3).map((world, idx) => (
-                    <motion.div
-                      key={world.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.3,
-                        delay: idx * 0.05,
-                        ease: [0.4, 0, 0.2, 1],
-                      }}
-                    >
-                      <div className="md-card p-6 hover-lift-glow">
-                        <div className="flex items-start gap-4 mb-4">
-                          <div
-                            className="h-14 w-14 rounded-2xl flex items-center justify-center shrink-0"
-                            style={{ background: generateGradient(world.name) }}
-                          >
-                            <Network className="h-7 w-7 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold md-text-primary truncate">
-                              {world.name}
-                            </h3>
-                            <p className="text-sm md-text-secondary line-clamp-2 mt-1">
-                              {world.description || t("worlds.noDescription")}
-                            </p>
-                          </div>
-                        </div>
-
-                        <Link href={`/dashboard/mundos/${world.id}`} className="block">
-                          <Button className="w-full md-button md-button-tonal py-2.5">
-                            <Play className="h-4 w-4 mr-2" />
-                            {t("worlds.openWorld")}
-                          </Button>
-                        </Link>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {worlds.length === 0 && (
-              <EmptyState
-                icon={Network}
-                iconColor="text-blue-400 dark:text-blue-500"
-                gradientFrom="from-blue-100"
-                gradientTo="to-cyan-100"
-                title={t("empty.worlds.title")}
-                description={t("empty.worlds.description")}
-                actionLabel={t("empty.worlds.action")}
-                onAction={() => router.push("/dashboard/mundos")}
-              />
-            )}
-          </TabsContent>
         </Tabs>
         )}
       </PullToRefresh>

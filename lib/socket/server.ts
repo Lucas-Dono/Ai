@@ -12,8 +12,6 @@ import {
   TYPING_TIMEOUT,
 } from "./events";
 import { registerChatEvents, registerReactionEvents } from "./chat-events";
-import { worldSocketEvents } from "@/lib/worlds/socket-events";
-import { initializeRedisSync } from "@/lib/worlds/redis-sync-initializer";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
@@ -40,9 +38,6 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
     return io;
   }
 
-  // 🔥 REDIS: Inicializar sistema de sincronización de mundos
-  initializeRedisSync();
-
   io = new SocketIOServer(httpServer, {
     cors: {
       origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
@@ -60,9 +55,6 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
     console.warn('[SocketServer] Failed to warmup Qwen model:', error.message);
     console.warn('[SocketServer] Embeddings funcionará en modo degradado (solo keywords)');
   });
-
-  // Initialize world socket events
-  worldSocketEvents.initialize(io);
 
   // Authentication middleware
   io.use(async (socket: AuthenticatedSocket, next) => {
