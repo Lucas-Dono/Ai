@@ -18,7 +18,7 @@ const genreService = getGenreService();
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSession(req);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSession(req);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -100,10 +100,10 @@ export async function PATCH(req: NextRequest) {
       session: {
         id: updated.id,
         currentStep: updated.currentStep,
-        selectedGenre: updated.selectedGenre,
-        selectedSubgenre: updated.selectedSubgenre,
-        selectedArchetype: updated.selectedArchetype,
-        characterType: updated.characterType,
+        genre: updated.selectedGenre,
+        subgenre: updated.selectedSubgenre,
+        archetype: updated.selectedArchetype,
+        source: updated.characterType,
       },
     });
   } catch (error) {
@@ -120,7 +120,7 @@ export async function PATCH(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSession(req);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

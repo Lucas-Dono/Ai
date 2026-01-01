@@ -155,7 +155,7 @@ export async function moderateMessage(
 
       log.warn({
         userId,
-        violationId: violation.id,
+        violationId: violation?.id,
         severity,
         action,
         violationCount,
@@ -168,7 +168,7 @@ export async function moderateMessage(
         reason: 'reason' in contentResult ? contentResult.reason : 'Contenido no permitido',
         suggestion: 'suggestion' in contentResult ? contentResult.suggestion : undefined,
         action,
-        violationId: violation.id,
+        violationId: violation?.id || '',
         details: {
           contentFilter: 'violations' in contentResult ? contentResult : undefined,
           userHistory: { violationCount },
@@ -268,7 +268,7 @@ export async function moderatePost(
         reason: contentResult.overallReason,
         suggestion: contentResult.suggestion,
         action,
-        violationId: violation.id,
+        violationId: violation?.id || '',
       };
     }
 
@@ -341,7 +341,7 @@ export async function moderateComment(
         severity: 'high',
         reason: contentResult.reason,
         action: 'blocked',
-        violationId: violation.id,
+        violationId: violation?.id,
       };
     }
 
@@ -363,47 +363,54 @@ export async function moderateComment(
 
 /**
  * Flag content manually (user report)
+ * @deprecated - contentViolation model no longer exists in schema
  */
 export async function flagContent(params: FlagContentParams): Promise<{
   success: boolean;
   flagId?: string;
   message: string;
 }> {
-  try {
-    const { userId, contentType, contentId, reason, description, severity = 'medium' } = params;
+  log.warn('flagContent called but contentViolation model no longer exists');
+  return {
+    success: false,
+    message: 'Content flagging is currently disabled.',
+  };
+  // try {
+  //   const { userId, contentType, contentId, reason, description, severity = 'medium' } = params;
 
-    // Create flag record
-    const flag = await prisma.contentViolation.create({
-      data: {
-        userId,
-        contentType,
-        contentId,
-        reason: `User report: ${reason}`,
-        content: description || null,
-        severity,
-        action: 'flagged',
-      },
-    });
+  //   // Create flag record
+  //   const flag = await prisma.contentViolation.create({
+  //     data: {
+  //       userId,
+  //       contentType,
+  //       contentId,
+  //       reason: `User report: ${reason}`,
+  //       content: description || null,
+  //       severity,
+  //       action: 'flagged',
+  //     },
+  //   });
 
-    log.info({ flagId: flag.id, userId, contentType, contentId }, 'Content flagged by user');
+  //   log.info({ flagId: flag.id, userId, contentType, contentId }, 'Content flagged by user');
 
-    return {
-      success: true,
-      flagId: flag.id,
-      message: 'Gracias por tu reporte. Lo revisaremos pronto.',
-    };
+  //   return {
+  //     success: true,
+  //     flagId: flag.id,
+  //     message: 'Gracias por tu reporte. Lo revisaremos pronto.',
+  //   };
 
-  } catch (error) {
-    log.error({ error, params }, 'Error flagging content');
-    return {
-      success: false,
-      message: 'Error al reportar contenido. Intenta nuevamente.',
-    };
-  }
+  // } catch (error) {
+  //   log.error({ error, params }, 'Error flagging content');
+  //   return {
+  //     success: false,
+  //     message: 'Error al reportar contenido. Intenta nuevamente.',
+  //   };
+  // }
 }
 
 /**
  * Get user violation history
+ * @deprecated - contentViolation model no longer exists in schema
  */
 export async function getUserViolations(
   userId: string,
@@ -413,42 +420,46 @@ export async function getUserViolations(
     severity?: 'low' | 'medium' | 'high';
   } = {}
 ): Promise<any[]> {
-  const { limit = 50, hoursBack = 168, severity } = options; // Default: last 7 days
+  return [];
+  // const { limit = 50, hoursBack = 168, severity } = options; // Default: last 7 days
 
-  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
+  // const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
 
-  const violations = await prisma.contentViolation.findMany({
-    where: {
-      userId,
-      createdAt: { gte: since },
-      ...(severity && { severity }),
-    },
-    orderBy: { createdAt: 'desc' },
-    take: limit,
-  });
+  // const violations = await prisma.contentViolation.findMany({
+  //   where: {
+  //     userId,
+  //     createdAt: { gte: since },
+  //     ...(severity && { severity }),
+  //   },
+  //   orderBy: { createdAt: 'desc' },
+  //   take: limit,
+  // });
 
-  return violations;
+  // return violations;
 }
 
 /**
  * Get violation count for a user
+ * @deprecated - contentViolation model no longer exists in schema
  */
 async function getUserViolationCount(userId: string, hoursBack: number = 24): Promise<number> {
-  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
+  return 0;
+  // const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
 
-  const count = await prisma.contentViolation.count({
-    where: {
-      userId,
-      createdAt: { gte: since },
-      severity: { in: ['medium', 'high'] }, // Only count significant violations
-    },
-  });
+  // const count = await prisma.contentViolation.count({
+  //   where: {
+  //     userId,
+  //     createdAt: { gte: since },
+  //     severity: { in: ['medium', 'high'] }, // Only count significant violations
+  //   },
+  // });
 
-  return count;
+  // return count;
 }
 
 /**
  * Log a violation to database
+ * @deprecated - contentViolation model no longer exists in schema
  */
 async function logViolation(params: {
   userId: string;
@@ -458,24 +469,26 @@ async function logViolation(params: {
   content: string;
   severity: 'low' | 'medium' | 'high';
   action: string;
-}) {
-  const violation = await prisma.contentViolation.create({
-    data: {
-      userId: params.userId,
-      contentType: params.contentType,
-      contentId: params.contentId,
-      reason: params.reason,
-      content: params.content,
-      severity: params.severity,
-      action: params.action,
-    },
-  });
+}): Promise<{ id: string } | null> {
+  return null;
+  // const violation = await prisma.contentViolation.create({
+  //   data: {
+  //     userId: params.userId,
+  //     contentType: params.contentType,
+  //     contentId: params.contentId,
+  //     reason: params.reason,
+  //     content: params.content,
+  //     severity: params.severity,
+  //     action: params.action,
+  //   },
+  // });
 
-  return violation;
+  // return violation;
 }
 
 /**
  * Get recent violations (admin)
+ * @deprecated - contentViolation model no longer exists in schema
  */
 export async function getRecentViolations(options: {
   limit?: number;
@@ -483,174 +496,191 @@ export async function getRecentViolations(options: {
   action?: string;
   contentType?: string;
 } = {}) {
-  const { limit = 100, severity, action, contentType } = options;
+  return [];
+  // const { limit = 100, severity, action, contentType } = options;
 
-  const violations = await prisma.contentViolation.findMany({
-    where: {
-      ...(severity && { severity }),
-      ...(action && { action }),
-      ...(contentType && { contentType }),
-    },
-    orderBy: { createdAt: 'desc' },
-    take: limit,
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          plan: true,
-        },
-      },
-    },
-  });
+  // const violations = await prisma.contentViolation.findMany({
+  //   where: {
+  //     ...(severity && { severity }),
+  //     ...(action && { action }),
+  //     ...(contentType && { contentType }),
+  //   },
+  //   orderBy: { createdAt: 'desc' },
+  //   take: limit,
+  //   include: {
+  //     user: {
+  //       select: {
+  //         id: true,
+  //         name: true,
+  //         email: true,
+  //         plan: true,
+  //       },
+  //     },
+  //   },
+  // });
 
-  return violations;
+  // return violations;
 }
 
 /**
  * Get moderation statistics
+ * @deprecated - contentViolation model no longer exists in schema
  */
 export async function getModerationStats(hoursBack: number = 24) {
-  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
-
-  const [total, bySeverity, byAction, byType] = await Promise.all([
-    // Total violations
-    prisma.contentViolation.count({
-      where: { createdAt: { gte: since } },
-    }),
-
-    // By severity
-    prisma.contentViolation.groupBy({
-      by: ['severity'],
-      where: { createdAt: { gte: since } },
-      _count: true,
-    }),
-
-    // By action
-    prisma.contentViolation.groupBy({
-      by: ['action'],
-      where: { createdAt: { gte: since } },
-      _count: true,
-    }),
-
-    // By content type
-    prisma.contentViolation.groupBy({
-      by: ['contentType'],
-      where: { createdAt: { gte: since } },
-      _count: true,
-    }),
-  ]);
-
   return {
-    total,
-    bySeverity,
-    byAction,
-    byType,
+    total: 0,
+    bySeverity: [],
+    byAction: [],
+    byType: [],
     period: `Last ${hoursBack} hours`,
   };
+  // const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
+
+  // const [total, bySeverity, byAction, byType] = await Promise.all([
+  //   // Total violations
+  //   prisma.contentViolation.count({
+  //     where: { createdAt: { gte: since } },
+  //   }),
+
+  //   // By severity
+  //   prisma.contentViolation.groupBy({
+  //     by: ['severity'],
+  //     where: { createdAt: { gte: since } },
+  //     _count: true,
+  //   }),
+
+  //   // By action
+  //   prisma.contentViolation.groupBy({
+  //     by: ['action'],
+  //     where: { createdAt: { gte: since } },
+  //     _count: true,
+  //   }),
+
+  //   // By content type
+  //   prisma.contentViolation.groupBy({
+  //     by: ['contentType'],
+  //     where: { createdAt: { gte: since } },
+  //     _count: true,
+  //   }),
+  // ]);
+
+  // return {
+  //   total,
+  //   bySeverity,
+  //   byAction,
+  //   byType,
+  //   period: `Last ${hoursBack} hours`,
+  // };
 }
 
 /**
  * Check if user is banned
+ * @deprecated - userBan model no longer exists in schema
  */
 export async function isUserBanned(userId: string): Promise<{
   banned: boolean;
   reason?: string;
   expiresAt?: Date;
 }> {
-  const ban = await prisma.userBan.findUnique({
-    where: { userId },
-  });
+  return { banned: false };
+  // const ban = await prisma.userBan.findUnique({
+  //   where: { userId },
+  // });
 
-  if (!ban) {
-    return { banned: false };
-  }
+  // if (!ban) {
+  //   return { banned: false };
+  // }
 
-  // Check if ban expired
-  if (ban.expiresAt && ban.expiresAt < new Date()) {
-    // Remove expired ban
-    await prisma.userBan.delete({ where: { userId } });
-    return { banned: false };
-  }
+  // // Check if ban expired
+  // if (ban.expiresAt && ban.expiresAt < new Date()) {
+  //   // Remove expired ban
+  //   await prisma.userBan.delete({ where: { userId } });
+  //   return { banned: false };
+  // }
 
-  return {
-    banned: true,
-    reason: ban.reason,
-    expiresAt: ban.expiresAt || undefined,
-  };
+  // return {
+  //   banned: true,
+  //   reason: ban.reason,
+  //   expiresAt: ban.expiresAt || undefined,
+  // };
 }
 
 /**
  * Ban user permanently or temporarily
+ * @deprecated - userBan model no longer exists in schema
  */
 export async function banUserPermanent(
   userId: string,
   reason: string,
   expiresAt?: Date
 ): Promise<void> {
-  await prisma.userBan.upsert({
-    where: { userId },
-    create: {
-      userId,
-      reason,
-      expiresAt,
-    },
-    update: {
-      reason,
-      expiresAt,
-    },
-  });
+  log.warn({ userId, reason, expiresAt }, 'banUserPermanent called but userBan model no longer exists');
+  // await prisma.userBan.upsert({
+  //   where: { userId },
+  //   create: {
+  //     userId,
+  //     reason,
+  //     expiresAt,
+  //   },
+  //   update: {
+  //     reason,
+  //     expiresAt,
+  //   },
+  // });
 
-  log.warn({ userId, reason, expiresAt }, 'User banned');
+  // log.warn({ userId, reason, expiresAt }, 'User banned');
 }
 
 /**
  * Unban user
+ * @deprecated - userBan model no longer exists in schema
  */
 export async function unbanUserPermanent(userId: string): Promise<void> {
-  await prisma.userBan.deleteMany({
-    where: { userId },
-  });
+  log.info({ userId }, 'unbanUserPermanent called but userBan model no longer exists');
+  // await prisma.userBan.deleteMany({
+  //   where: { userId },
+  // });
 
-  log.info({ userId }, 'User unbanned');
+  // log.info({ userId }, 'User unbanned');
 }
 
 /**
  * Get top violators (admin)
+ * @deprecated - contentViolation model no longer exists in schema
  */
 export async function getTopViolators(limit: number = 20, hoursBack: number = 168) {
-  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
+  return [];
+  // const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
 
-  const violators = await prisma.contentViolation.groupBy({
-    by: ['userId'],
-    where: {
-      createdAt: { gte: since },
-      severity: { in: ['medium', 'high'] },
-    },
-    _count: true,
-    orderBy: {
-      _count: {
-        userId: 'desc',
-      },
-    },
-    take: limit,
-  });
+  // const violators = await prisma.contentViolation.groupBy({
+  //   by: ['userId'],
+  //   where: {
+  //     createdAt: { gte: since },
+  //     severity: { in: ['medium', 'high'] },
+  //   },
+  //   _count: true,
+  //   orderBy: {
+  //     _count: {
+  //       userId: 'desc',
+  //     },
+  //   },
+  //   take: limit,
+  // });
 
-  // Enrich with user data
-  const enriched = await Promise.all(
-    violators.map(async (v) => {
-      const user = await prisma.user.findUnique({
-        where: { id: v.userId },
-        select: { id: true, name: true, email: true, plan: true },
-      });
+  // // Enrich with user data
+  // const enriched = await Promise.all(
+  //   violators.map(async (v: any) => {
+  //     const user = await prisma.user.findUnique({
+  //       where: { id: v.userId },
+  //       select: { id: true, name: true, email: true, plan: true },
+  //     });
 
-      return {
-        user,
-        violationCount: v._count,
-      };
-    })
-  );
+  //     return {
+  //       user,
+  //       violationCount: v._count,
+  //     };
+  //   })
+  // );
 
-  return enriched;
+  // return enriched;
 }

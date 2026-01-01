@@ -1,8 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import BondsAnalyticsDashboard from "@/components/admin/BondsAnalyticsDashboard";
 
 export const metadata: Metadata = {
@@ -11,19 +10,15 @@ export const metadata: Metadata = {
 };
 
 export default async function BondsAnalyticsPage() {
-  const session = await auth();
+  const session = await getServerSession();
 
-  if (!session?.user) {
+  if (!session?.user?.email) {
     redirect("/login?callbackUrl=/admin/bonds-analytics");
   }
 
-  // Check if user is admin
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { role: true },
-  });
-
-  if (user?.role !== "ADMIN") {
+  // Check if user is admin (using ADMIN_EMAILS env var)
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
+  if (!adminEmails.includes(session.user.email)) {
     redirect("/dashboard");
   }
 

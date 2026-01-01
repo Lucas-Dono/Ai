@@ -32,6 +32,10 @@ export interface UsageStats {
     current: number;
     limit: number;
   };
+  groups: {
+    current: number;
+    limit: number;
+  };
   voiceMessages: {
     current: number;
     limit: number;
@@ -85,10 +89,10 @@ export async function getUserUsageStats(userId: string): Promise<UsageStats> {
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
 
-    // Contar mundos del usuario
-    const worldsCount = await prisma.world.count({
+    // Contar grupos del usuario (reemplaza a mundos)
+    const groupsCount = await prisma.group.count({
       where: {
-        userId: userId,
+        creatorId: userId,
       },
     });
 
@@ -159,8 +163,12 @@ export async function getUserUsageStats(userId: string): Promise<UsageStats> {
         messageLimitWeekly: tokensToMessages(tierLimits.resources.totalTokensPerWeek),
       },
       worlds: {
-        current: worldsCount,
-        limit: planLimits.worlds,
+        current: 0,
+        limit: 0,
+      },
+      groups: {
+        current: groupsCount,
+        limit: (planLimits as any).groups || 1,
       },
       voiceMessages: {
         current: dailyStats.thisMonth.voice.used,
@@ -190,8 +198,18 @@ export async function getUserUsageStats(userId: string): Promise<UsageStats> {
     // Return default values on error
     return {
       agents: { current: 0, limit: 3 },
-      messages: { current: 0, limit: 20, period: "day" },
-      worlds: { current: 0, limit: 1 },
+      tokens: {
+        tokensUsedToday: 0,
+        tokenLimitToday: 0,
+        tokensUsedWeekly: 0,
+        tokenLimitWeekly: 0,
+        messagesUsedToday: 0,
+        messageLimitToday: 0,
+        messagesUsedWeekly: 0,
+        messageLimitWeekly: 0,
+      },
+      worlds: { current: 0, limit: 0 },
+      groups: { current: 0, limit: 1 },
       voiceMessages: { current: 0, limit: 0, period: "month" },
       imageAnalysis: { current: 0, limit: 5, period: "month" },
       imageGeneration: { current: 0, limit: 0, period: "month" },
@@ -204,7 +222,7 @@ export async function getUserUsageStats(userId: string): Promise<UsageStats> {
  */
 export async function canCreateResource(
   userId: string,
-  resource: "agent" | "world" | "message"
+  resource: "agent" | "group"
 ): Promise<{ allowed: boolean; reason?: string }> {
   const stats = await getUserUsageStats(userId);
 
@@ -219,22 +237,12 @@ export async function canCreateResource(
       }
       return { allowed: true };
 
-    case "world":
-      if (stats.worlds.limit === -1) return { allowed: true };
-      if (stats.worlds.current >= stats.worlds.limit) {
+    case "group":
+      if (stats.groups.limit === -1) return { allowed: true };
+      if (stats.groups.current >= stats.groups.limit) {
         return {
           allowed: false,
-          reason: `You have reached your limit of ${stats.worlds.limit} worlds. Upgrade to create more.`,
-        };
-      }
-      return { allowed: true };
-
-    case "message":
-      if (stats.messages.limit === -1) return { allowed: true };
-      if (stats.messages.current >= stats.messages.limit) {
-        return {
-          allowed: false,
-          reason: `You have reached your ${stats.messages.period}ly message limit of ${stats.messages.limit}. Upgrade for unlimited messages.`,
+          reason: `You have reached your limit of ${stats.groups.limit} groups. Upgrade to create more.`,
         };
       }
       return { allowed: true };

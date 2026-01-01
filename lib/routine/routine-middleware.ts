@@ -97,7 +97,7 @@ export async function checkAgentAvailability(agentId: string): Promise<{
     const { currentActivity, responseModification } = context;
 
     // Check if can respond
-    const canRespond = responseModification?.canRespond ?? true;
+    const canRespond = currentActivity?.canRespond ?? true;
 
     if (!canRespond) {
       return {

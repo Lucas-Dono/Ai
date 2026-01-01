@@ -148,7 +148,7 @@ export async function createCharacter(
       await prisma.behaviorProfile.create({
         data: {
           agentId: agent.id,
-          behaviorType: draft.initialBehavior,
+          behaviorType: draft.initialBehavior as any,
           baseIntensity: 0.3,
           currentPhase: 1,
           volatility: 0.5,

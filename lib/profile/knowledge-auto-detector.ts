@@ -253,11 +253,16 @@ const COMMON_KNOWLEDGE_PATTERNS: Record<string, DetectionPattern> = {
 export class KnowledgeAutoDetector {
   /**
    * Detecta knowledge groups relevantes basándose en el mensaje del usuario
+   * NOTE: knowledgeGroup feature has been deprecated/removed
    */
   async detectRelevantKnowledge(
     agentId: string,
     userMessage: string
   ): Promise<KnowledgeDetectionResult[]> {
+    // Feature deprecated - knowledgeGroup table no longer exists
+    return [];
+
+    /* DEPRECATED CODE - knowledgeGroup feature removed
     // Obtener todos los knowledge groups del agente
     const knowledgeGroups = await prisma.knowledgeGroup.findMany({
       where: {
@@ -291,6 +296,7 @@ export class KnowledgeAutoDetector {
 
     // Filtrar solo los que superan umbral mínimo (0.5)
     return detections.filter((d) => d.confidence >= 0.5);
+    */
   }
 
   /**
@@ -393,6 +399,7 @@ export class KnowledgeAutoDetector {
 
   /**
    * Carga automáticamente knowledge relevante y retorna el contenido
+   * NOTE: knowledgeGroup feature has been deprecated/removed
    */
   async autoLoadKnowledge(
     agentId: string,
@@ -402,6 +409,10 @@ export class KnowledgeAutoDetector {
     loadedGroups: KnowledgeDetectionResult[];
     combinedContent: string;
   }> {
+    // Feature deprecated - knowledgeGroup table no longer exists
+    return { loadedGroups: [], combinedContent: "" };
+
+    /* DEPRECATED CODE - knowledgeGroup feature removed
     const detections = await this.detectRelevantKnowledge(agentId, userMessage);
 
     // Limitar a los N grupos más relevantes
@@ -435,6 +446,7 @@ export class KnowledgeAutoDetector {
       loadedGroups: topDetections,
       combinedContent,
     };
+    */
   }
 
   /**

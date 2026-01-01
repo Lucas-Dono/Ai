@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Link2, Image as ImageIcon, Loader2, Check, X, Circle, Square, RectangleHorizontal, RectangleVertical } from 'lucide-react';
@@ -21,6 +21,7 @@ interface CommunityImageUploaderProps {
   placeholder?: string;
   hint?: string;
   type?: 'icon' | 'banner';
+  onPendingChange?: (isPending: boolean) => void;
 }
 
 const SHAPE_OPTIONS: { value: ImageShape; aspect: number }[] = [
@@ -38,7 +39,8 @@ export function CommunityImageUploader({
   onImageChange,
   placeholder,
   hint,
-  type = 'icon'
+  type = 'icon',
+  onPendingChange
 }: CommunityImageUploaderProps) {
   const t = useTranslations('community.communities.imageUploader');
   const [activeTab, setActiveTab] = useState<string>('upload');
@@ -67,6 +69,13 @@ export function CommunityImageUploader({
   // Calcular aspect ratio basado en la forma seleccionada
   const aspect = SHAPE_OPTIONS.find(opt => opt.value === selectedShape)?.aspect || 1;
   const maxSizeMB = type === 'banner' ? 10 : 5;
+
+  // Notificar al padre cuando hay una imagen pendiente de confirmar
+  useEffect(() => {
+    if (onPendingChange) {
+      onPendingChange(!!uploadedImage && !finalImage);
+    }
+  }, [uploadedImage, finalImage, onPendingChange]);
 
   /**
    * Procesa un archivo de imagen

@@ -33,6 +33,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!subscription.mercadopagoPreapprovalId) {
+      log.warn({ userId }, 'No mercadopago preapproval ID found');
+      return NextResponse.json(
+        { error: "Invalid subscription data" },
+        { status: 400 }
+      );
+    }
+
     // Cancelar en Mercado Pago usando la función centralizada
     await cancelSubscription(subscription.mercadopagoPreapprovalId);
 
@@ -117,6 +125,14 @@ export async function PATCH(req: NextRequest) {
       log.warn({ userId, status: subscription.status }, 'Subscription is not cancelled');
       return NextResponse.json(
         { error: "Subscription is not cancelled" },
+        { status: 400 }
+      );
+    }
+
+    if (!subscription.mercadopagoPreapprovalId) {
+      log.warn({ userId }, 'No mercadopago preapproval ID found');
+      return NextResponse.json(
+        { error: "Invalid subscription data" },
         { status: 400 }
       );
     }

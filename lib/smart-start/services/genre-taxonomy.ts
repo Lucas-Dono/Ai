@@ -592,6 +592,7 @@ export const GENRE_TAXONOMY: Record<GenreId, Genre> = {
           },
         ],
         systemPromptModifiers: {
+          tone: 'epic and immersive',
           narrativeStyle: 'descriptive and immersive',
           worldBuilding: 'consistent fantasy setting',
           actionDescriptions: 'cinematic and detailed',
@@ -613,6 +614,7 @@ export const GENRE_TAXONOMY: Record<GenreId, Genre> = {
           },
         ],
         systemPromptModifiers: {
+          tone: 'realistic and grounded',
           narrativeStyle: 'realistic dialogue and situations',
           emotionalDepth: 'nuanced and layered',
           conflictStyle: 'realistic interpersonal dynamics',
@@ -634,6 +636,7 @@ export const GENRE_TAXONOMY: Record<GenreId, Genre> = {
           },
         ],
         systemPromptModifiers: {
+          tone: 'futuristic and exploratory',
           narrativeStyle: 'science-fiction conventions',
           techDetail: 'consistent futuristic technology',
           worldBuilding: 'cohesive sci-fi setting',
@@ -655,6 +658,7 @@ export const GENRE_TAXONOMY: Record<GenreId, Genre> = {
           },
         ],
         systemPromptModifiers: {
+          tone: 'gentle and contemplative',
           narrativeStyle: 'focus on small moments',
           pacing: 'slower, contemplative',
           emotionalTone: 'gentle, authentic',

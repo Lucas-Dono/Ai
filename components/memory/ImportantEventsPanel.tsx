@@ -607,12 +607,13 @@ export function ImportantEventsPanel({ agentId }: ImportantEventsPanelProps) {
                   </div>
 
                   <div className="flex items-center gap-2 ml-4">
-                    <AlertCircle
-                      className={`w-5 h-5 ${
-                        priorityColors[event.priority]
-                      }`}
-                      title={`Prioridad: ${event.priority}`}
-                    />
+                    <div title={`Prioridad: ${event.priority}`}>
+                      <AlertCircle
+                        className={`w-5 h-5 ${
+                          priorityColors[event.priority]
+                        }`}
+                      />
+                    </div>
                     <button
                       onClick={() => handleEdit(event)}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"

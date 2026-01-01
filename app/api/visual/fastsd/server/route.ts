@@ -21,12 +21,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
       include: { fastsdInstallation: true },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -35,9 +35,9 @@ export async function GET(request: NextRequest) {
     const systemInfo = await fastsd.getSystemInfo();
 
     // Actualizar estado en BD
-    if (user.fastsdInstallation) {
+    if (dbUser.fastsdInstallation) {
       await prisma.fastSDInstallation.update({
-        where: { userId: user.id },
+        where: { userId: dbUser.id },
         data: {
           serverRunning: isRunning,
           lastHealthCheck: new Date(),
@@ -71,16 +71,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
       include: { fastsdInstallation: true },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (!user.fastsdInstallation?.installed) {
+    if (!dbUser.fastsdInstallation?.installed) {
       return NextResponse.json(
         { error: "FastSD is not installed. Install it first." },
         { status: 400 }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Actualizar estado
     await prisma.fastSDInstallation.update({
-      where: { userId: user.id },
+      where: { userId: dbUser.id },
       data: {
         serverRunning: started,
         lastHealthCheck: new Date(),

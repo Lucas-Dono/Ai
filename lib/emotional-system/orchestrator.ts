@@ -274,18 +274,21 @@ export class EmotionalSystemOrchestrator {
       agent.personalityCore = await prisma.personalityCore.create({
         data: {
           agentId,
-          bigFive: {
-            openness: 0.5,
-            conscientiousness: 0.5,
-            extraversion: 0.5,
-            agreeableness: 0.7,
-            neuroticism: 0.3,
-          },
+          openness: 0.5,
+          conscientiousness: 0.5,
+          extraversion: 0.5,
+          agreeableness: 0.7,
+          neuroticism: 0.3,
           coreValues: ["helpfulness", "honesty", "kindness"],
-          traits: ["friendly", "patient", "understanding"],
-          goals: { shortTerm: [], longTerm: [] },
-          fears: [],
-          desires: [],
+          moralSchemas: [],
+          baselineEmotions: {
+            joy: 0.5,
+            fear: 0.1,
+            sadness: 0.1,
+            anger: 0.1,
+            disliking: 0.1,
+            interest: 0.4,
+          },
         },
       });
     }
@@ -295,21 +298,25 @@ export class EmotionalSystemOrchestrator {
       agent.internalState = await prisma.internalState.create({
         data: {
           agentId,
-          currentMood: "neutral",
-          emotionalState: {
+          currentEmotions: {
             joy: 0.5,
-            trust: 0.5,
             fear: 0.1,
-            surprise: 0.3,
             sadness: 0.1,
-            disgust: 0.1,
             anger: 0.1,
-            anticipation: 0.4,
+            disliking: 0.1,
+            interest: 0.4,
           },
-          physicalState: { energy: 0.7, arousal: 0.5, comfort: 0.7 },
-          mentalState: { focus: 0.7, clarity: 0.7, confidence: 0.6 },
-          motivationalState: { drive: 0.6, curiosity: 0.7 },
+          moodValence: 0.0,
+          moodArousal: 0.5,
+          moodDominance: 0.5,
+          emotionDecayRate: 0.1,
+          emotionInertia: 0.3,
+          needConnection: 0.5,
+          needAutonomy: 0.5,
+          needCompetence: 0.5,
+          needNovelty: 0.5,
           conversationBuffer: [],
+          activeGoals: [],
         },
       });
     }

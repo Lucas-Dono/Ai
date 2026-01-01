@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       ]);
 
     // Get user profile data
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     });
 
     const exportData = {
-      user,
+      user: dbUser,
       overview,
       messagesPerDay,
       mostUsedAIs,
@@ -91,10 +91,10 @@ export async function GET(req: NextRequest) {
         `Exported At: ${exportData.exportedAt}`,
         "",
         "USER INFORMATION",
-        `Email,${user?.email}`,
-        `Name,${user?.name || "N/A"}`,
-        `Plan,${user?.plan}`,
-        `Member Since,${user?.createdAt}`,
+        `Email,${dbUser?.email}`,
+        `Name,${dbUser?.name || "N/A"}`,
+        `Plan,${dbUser?.plan}`,
+        `Member Since,${dbUser?.createdAt}`,
         "",
         "OVERVIEW",
         `Total AIs Created,${overview.totalAIsCreated}`,

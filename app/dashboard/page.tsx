@@ -38,6 +38,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RecommendedForYou } from "@/components/recommendations/RecommendedForYou";
+import { useSectionOrder } from "@/hooks/useSectionOrder";
 import { SpecialEventBanner } from "@/components/upgrade/SpecialEventBanner";
 import { PullToRefresh } from "@/components/mobile/PullToRefresh";
 import { EmptyState } from "@/components/ui/empty-states/EmptyState";
@@ -48,8 +49,11 @@ import { ProactiveMessagesWidget } from "@/components/dashboard/ProactiveMessage
 import { useSession } from "@/lib/auth-client";
 import { FilterBar, type FilterState } from "@/components/dashboard/FilterBar";
 import { CompanionCard } from "@/components/companions/CompanionCard";
+import { CompanionCardSkeleton } from "@/components/companions/CompanionCardSkeleton";
+import { CompanionListItem } from "@/components/companions/CompanionListItem";
 import type { CategoryKey } from "@/lib/categories";
 import { Carousel } from "@/components/ui/carousel";
+import { LayoutGrid, List as ListIcon } from "lucide-react";
 
 interface Agent {
   id: string;
@@ -68,6 +72,7 @@ interface Agent {
   generationTier?: string | null;
   tags?: string[] | null;
   categories?: CategoryKey[];
+  gender?: string | null;
   _count?: {
     reviews: number;
   };
@@ -113,110 +118,81 @@ const getComplexityBadge = (tier?: string | null) => {
   }
 };
 
-// Helper to extract tags from description or name
-const extractTags = (agent: Agent, t: any): string[] => {
-  const tags: string[] = [];
-
-  // Common patterns
-  if (agent.description?.toLowerCase().includes("científico") || agent.description?.toLowerCase().includes("ciencia")) {
-    tags.push(t("tags.science"));
-  }
-  if (agent.description?.toLowerCase().includes("físic")) {
-    tags.push(t("tags.physics"));
-  }
-  if (agent.description?.toLowerCase().includes("arte") || agent.description?.toLowerCase().includes("artista")) {
-    tags.push(t("tags.art"));
-  }
-  if (agent.description?.toLowerCase().includes("historia") || agent.description?.toLowerCase().includes("históric")) {
-    tags.push(t("tags.history"));
-  }
-  if (agent.description?.toLowerCase().includes("genio") || agent.description?.toLowerCase().includes("inteligente")) {
-    tags.push(t("tags.genius"));
-  }
-  if (agent.description?.toLowerCase().includes("cine") || agent.description?.toLowerCase().includes("actor")) {
-    tags.push(t("tags.cinema"));
-  }
-
-  // If no tags found, add generic ones
-  if (tags.length === 0) {
-    if (agent.featured) tags.push(t("tags.premium"));
-    tags.push(t("tags.companion"));
-  }
-
-  return tags.slice(0, 3);
-};
-
 export default function DashboardPage() {
   const t = useTranslations("dashboard");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, isPending } = useSession();
+  const userId = session?.user?.id;
+  const { sectionOrder, trackSectionView, trackSectionClick } = useSectionOrder(userId);
+
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [agentsLoading, setAgentsLoading] = useState(true);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [forYouRecommendations, setForYouRecommendations] = useState<Agent[]>([]);
+  const [recentAgents, setRecentAgents] = useState<Agent[]>([]);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     categories: [],
-    kind: 'all',
+    gender: 'all',
     visibility: 'all',
     tier: 'all',
     nsfw: 'all',
     sortBy: 'newest',
   });
 
-  const isAuthenticated = sessionStatus === "authenticated";
+  // Detectar si hay filtros activos
+  const hasActiveFilters =
+    filters.search !== '' ||
+    filters.categories.length > 0 ||
+    filters.gender !== 'all' ||
+    filters.visibility !== 'all' ||
+    filters.tier !== 'all' ||
+    filters.nsfw !== 'all';
+
+  const isAuthenticated = !!session?.user;
 
   // Check URL params for initial tab
   const filterParam = searchParams?.get('filter');
   const initialTab = filterParam === 'companion' ? 'companions' : 'companions';
 
-  const fetchAgents = async () => {
+  // Endpoint unificado optimizado - reduce múltiples llamadas a una sola
+  const fetchDashboardData = async () => {
     try {
-      const res = await fetch("/api/agents");
+      const res = await fetch("/api/dashboard/data");
       if (res.ok) {
         const data = await res.json();
-        setAgents(data);
+        setAgents(data.agents || []);
+        setRecentAgents(data.recentAgents || []);
       }
     } catch (error) {
-      console.error("Error fetching agents:", error);
+      console.error("Error fetching dashboard data:", error);
     }
   };
 
-  const fetchForYouRecommendations = async () => {
-    if (!isAuthenticated) return;
-
-    try {
-      const res = await fetch("/api/recommendations/for-you");
-      if (res.ok) {
-        const data = await res.json();
-        setForYouRecommendations(data.recommendations || []);
-      }
-    } catch (error) {
-      console.error("Error fetching recommendations:", error);
-    }
-  };
-
-  // Pull-to-refresh handler
+  // Pull-to-refresh handler - usa endpoint unificado
   const handleRefresh = async () => {
-    await Promise.all([fetchAgents(), fetchForYouRecommendations()]);
+    setAgentsLoading(true);
+    setRecentLoading(true);
+    setRecommendationsLoading(true);
+
+    await fetchDashboardData();
+
+    setAgentsLoading(false);
+    setRecentLoading(false);
   };
 
+  // Carga inicial optimizada - una sola llamada para todo
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      await fetchAgents();
-      setLoading(false);
+      await fetchDashboardData();
+      setAgentsLoading(false);
+      setRecentLoading(false);
     };
     fetchData();
   }, []);
-
-  // Fetch personalized recommendations when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchForYouRecommendations();
-    }
-  }, [isAuthenticated]);
 
   const handleDeleteAgent = async (agentId: string, agentName: string) => {
     if (!confirm(t("actions.deleteConfirm", { name: agentName }))) {
@@ -255,9 +231,11 @@ export default function DashboardPage() {
       if (!matchesName && !matchesDesc) return false;
     }
 
-    // Kind filter (already filtered by companion above, but keeping for consistency)
-    if (filters.kind !== 'all' && companion.kind !== filters.kind) {
-      return false;
+    // Gender filter
+    if (filters.gender !== 'all') {
+      if (!companion.gender || companion.gender.toLowerCase() !== filters.gender.toLowerCase()) {
+        return false;
+      }
     }
 
     // Visibility filter
@@ -290,9 +268,9 @@ export default function DashboardPage() {
 
     // Categories filter
     if (filters.categories.length > 0) {
-      const agentTags = Array.isArray(companion.tags) ? companion.tags : [];
+      const agentCategories = Array.isArray(companion.categories) ? companion.categories : [];
       const hasMatchingCategory = filters.categories.some(cat =>
-        agentTags.some(tag => tag.toLowerCase().includes(cat.toLowerCase()))
+        agentCategories.some(category => category.toLowerCase() === cat.toLowerCase())
       );
       if (!hasMatchingCategory) {
         return false;
@@ -338,16 +316,6 @@ export default function DashboardPage() {
           !a.tags.some(tag => tag.toLowerCase().includes('historical'))
   );
 
-  // Para ti - Recomendaciones personalizadas del endpoint (con fallback automático)
-  // Si no hay recomendaciones del servidor, usar fallback local
-  const forYouCompanions = forYouRecommendations.length > 0
-    ? forYouRecommendations
-    : featuredCompanions.filter(
-        (a) => Array.isArray(a.tags) && (
-          a.tags.some(tag => ['nsfw', 'romantic', 'emotional', 'creative'].includes(tag.toLowerCase()))
-        )
-      ).slice(0, 4);
-
   const popularCompanions = sortedCompanions.filter(
     (a) => a.userId === null && !a.featured && (a.cloneCount || 0) > 0
   );
@@ -364,16 +332,7 @@ export default function DashboardPage() {
 
       {/* Main Content with Pull-to-Refresh */}
       <PullToRefresh onRefresh={handleRefresh} className="lg:h-auto">
-        {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <LoadingIndicator
-              variant="inline"
-              size="lg"
-              message={t("loading.dashboard")}
-            />
-          </div>
-        ) : (
-          <Tabs defaultValue={initialTab} className="space-y-4 md:space-y-6">
+        <Tabs defaultValue={initialTab} className="space-y-4 md:space-y-6">
           <TabsList className="md-surface-container-high p-1 rounded-2xl w-full md:w-auto overflow-x-auto">
             <TabsTrigger
               value="companions"
@@ -392,26 +351,112 @@ export default function DashboardPage() {
               <FilterBar filters={filters} onFiltersChange={setFilters} />
             </div>
 
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold md-text-primary">{t("sections.companions.title")}</h2>
-                <p className="text-xs md:text-sm md-text-secondary mt-1">
-                  {t("sections.companions.count", {
-                    count: sortedCompanions.length,
-                    companion: sortedCompanions.length === 1 ? t("sections.companions.companionSingular") : t("sections.companions.companionPlural")
-                  })}
-                </p>
-              </div>
-              <Link href="/create-character" className="hidden md:block">
-                <Button className="md-button md-button-filled px-4 md:px-6 py-2.5">
-                  <Plus className="h-5 w-5 mr-2" />
-                  <span className="hidden sm:inline">{t("actions.newCompanion")}</span>
-                  <span className="sm:hidden">{t("actions.new")}</span>
-                </Button>
-              </Link>
-            </div>
+            {hasActiveFilters ? (
+              /* Vista de Resultados con Filtros */
+              <div className="space-y-4">
+                {/* Header con contador y toggle de vista */}
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-semibold md-text-primary">
+                      {t("sections.companions.title")}
+                    </h2>
+                    <p className="text-xs md:text-sm md-text-secondary mt-1">
+                      {t("sections.companions.count", {
+                        count: sortedCompanions.length,
+                        companion: sortedCompanions.length === 1 ? t("sections.companions.companionSingular") : t("sections.companions.companionPlural")
+                      })}
+                    </p>
+                  </div>
 
-            {companions.length === 0 ? (
+                  {/* Toggle de Vista */}
+                  <div className="flex items-center gap-2 bg-gray-800/50 p-1 rounded-xl border border-gray-700/50">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`p-2 rounded-lg transition-all flex items-center gap-2 text-sm ${
+                        viewMode === 'grid'
+                          ? 'bg-gray-700 text-white shadow-sm'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <LayoutGrid size={18} />
+                      <span className="hidden sm:inline">Grilla</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-2 rounded-lg transition-all flex items-center gap-2 text-sm ${
+                        viewMode === 'list'
+                          ? 'bg-gray-700 text-white shadow-sm'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <ListIcon size={18} />
+                      <span className="hidden sm:inline">Lista</span>
+                    </button>
+                  </div>
+                </div>
+
+                {sortedCompanions.length === 0 ? (
+                  <EmptyState
+                    icon={Heart}
+                    iconColor="text-pink-400 dark:text-pink-500"
+                    gradientFrom="from-pink-100"
+                    gradientTo="to-rose-100"
+                    title="No se encontraron resultados"
+                    description="Intenta ajustar los filtros para ver más personajes"
+                    actionLabel={t("empty.companions.action")}
+                    onAction={() => router.push("/create-character")}
+                  />
+                ) : viewMode === 'grid' ? (
+                  /* Vista de Grilla */
+                  <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {sortedCompanions.map((agent, idx) => (
+                      <CompanionCard
+                        key={agent.id}
+                        id={agent.id}
+                        name={agent.name}
+                        description={agent.description}
+                        avatar={agent.avatar}
+                        categories={agent.categories}
+                        generationTier={agent.generationTier}
+                        index={idx}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* Vista de Lista */
+                  <div className="flex flex-col gap-2">
+                    {sortedCompanions.map((agent) => (
+                      <CompanionListItem
+                        key={agent.id}
+                        id={agent.id}
+                        name={agent.name}
+                        description={agent.description}
+                        avatar={agent.avatar}
+                        categories={agent.categories}
+                        generationTier={agent.generationTier}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : agentsLoading ? (
+              /* Loading State - Mostrar skeletons */
+              <div className="space-y-6 md:space-y-8">
+                {/* Skeleton Section */}
+                <div>
+                  <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                    <div className="w-6 h-6 bg-purple-500/20 rounded animate-pulse" />
+                    <div className="h-6 w-48 bg-purple-500/20 rounded animate-pulse" />
+                  </div>
+                  <Carousel itemWidth={280} gap={24}>
+                    {Array.from({ length: 8 }).map((_, idx) => (
+                      <CompanionCardSkeleton key={idx} />
+                    ))}
+                  </Carousel>
+                </div>
+              </div>
+            ) : companions.length === 0 ? (
+              /* Vista Normal del Dashboard sin Filtros - Empty State */
               <EmptyState
                 icon={Heart}
                 iconColor="text-pink-400 dark:text-pink-500"
@@ -424,10 +469,39 @@ export default function DashboardPage() {
               />
             ) : (
               <>
-                {/* AI Recommendations */}
-                <RecommendedForYou />
+                {/* 1. USADOS RECIENTEMENTE - ARRIBA DE TODO (solo autenticados) */}
+                {isAuthenticated && recentAgents.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                      <Clock className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
+                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.recent.title")}</h2>
+                      <span className="text-xs md:text-sm text-gray-400 bg-purple-500/10 px-2 md:px-3 py-1 rounded-full border border-purple-500/20">
+                        {recentAgents.length}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-4">{t("sections.recent.subtitle")}</p>
+                    <Carousel itemWidth={280} gap={24}>
+                      {recentAgents.map((agent, idx) => (
+                        <CompanionCard
+                          key={agent.id}
+                          id={agent.id}
+                          name={agent.name}
+                          description={agent.description}
+                          avatar={agent.avatar}
+                          categories={agent.categories}
+                          generationTier={agent.generationTier}
+                          index={idx}
+                          onClick={() => {
+                            trackSectionClick('recent');
+                            router.push(`/agentes/${agent.id}`);
+                          }}
+                        />
+                      ))}
+                    </Carousel>
+                  </div>
+                )}
 
-                {/* Creados por ti Section - Enhanced (only for authenticated users) */}
+                {/* 2. CREADOS POR TI - FÁCIL ACCESO (solo autenticados) */}
                 {isAuthenticated && myCompanions.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-4 md:mb-6 flex-wrap gap-3">
@@ -579,33 +653,21 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {/* Para Ti Section - Personalized Recommendations */}
-                {forYouCompanions.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
-                      <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
-                      <h2 className="text-xl md:text-2xl font-bold">{t("sections.forYou.title")}</h2>
-                      <span className="text-xs md:text-sm text-gray-400 bg-purple-500/10 px-2 md:px-3 py-1 rounded-full border border-purple-500/20">
-                        {t("sections.forYou.badge")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-4">{t("sections.forYou.subtitle")}</p>
-                    <Carousel itemWidth={280} gap={24}>
-                      {forYouCompanions.map((agent, idx) => (
-                        <CompanionCard
-                          key={agent.id}
-                          id={agent.id}
-                          name={agent.name}
-                          description={agent.description}
-                          avatar={agent.avatar}
-                          categories={agent.categories}
-                          generationTier={agent.generationTier}
-                          index={idx}
-                        />
-                      ))}
-                    </Carousel>
-                  </div>
+                {/* 3. PARA TI - RECOMENDACIONES IA (SISTEMA ÚNICO) */}
+                {isAuthenticated && (
+                  <RecommendedForYou
+                    filters={filters}
+                    onLoadingChange={setRecommendationsLoading}
+                    onAgentClick={(agentId) => {
+                      trackSectionClick('recommended');
+                      router.push(`/agentes/${agentId}`);
+                    }}
+                    fallbackToCategories={true}
+                    agents={agents}
+                  />
                 )}
+
+                {/* 4-7. SECCIONES DINÁMICAS (orden según uso del usuario) */}
 
                 {/* Personajes Históricos Section */}
                 {historicalCompanions.length > 0 && (
@@ -697,7 +759,6 @@ export default function DashboardPage() {
           </TabsContent>
 
         </Tabs>
-        )}
       </PullToRefresh>
 
       {/* FAB - Floating Action Button */}

@@ -25,10 +25,9 @@ export function ReviewStep() {
     setError(null);
 
     try {
-      // Pass God Mode config if enabled
-      const characterId = await finalizeCharacter(
-        godModeConfig.enabled ? godModeConfig : undefined
-      );
+      // Note: God Mode config is not currently supported in finalizeCharacter
+      // TODO: Add support for God Mode in character creation
+      const characterId = await finalizeCharacter();
 
       // Success - redirect to character page
       router.push(`/characters/${characterId}`);
@@ -60,10 +59,10 @@ export function ReviewStep() {
         />
 
         {/* Appearance */}
-        {characterDraft.appearance && (
+        {characterDraft.physicalAppearance && (
           <ReviewField
             label={t('fields.appearance')}
-            value={characterDraft.appearance}
+            value={characterDraft.physicalAppearance}
           />
         )}
 
@@ -80,10 +79,10 @@ export function ReviewStep() {
         )}
 
         {/* Background */}
-        {characterDraft.background && (
+        {characterDraft.backstory && (
           <ReviewField
             label={t('fields.background')}
-            value={characterDraft.background}
+            value={characterDraft.backstory}
           />
         )}
 

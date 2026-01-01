@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
           userId: true,
           triggerType: true,
           status: true,
-          scheduledFor: true,
+          sentAt: true,
         },
       });
 

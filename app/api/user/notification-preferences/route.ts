@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 /**
  * GET /api/user/notification-preferences
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(preferences);
   } catch (error) {
-    log.error({ error }, "Error fetching notification preferences");
+    logger.error({ error }, "Error fetching notification preferences");
     return NextResponse.json(
       { error: "Error al obtener preferencias" },
       { status: 500 }
@@ -108,14 +108,14 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    log.info(
+    logger.info(
       { userId: user.id, updates: Object.keys(body) },
       "Notification preferences updated"
     );
 
     return NextResponse.json(preferences);
   } catch (error) {
-    log.error({ error }, "Error updating notification preferences");
+    logger.error({ error }, "Error updating notification preferences");
     return NextResponse.json(
       { error: "Error al actualizar preferencias" },
       { status: 500 }
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    log.info(
+    logger.info(
       { userId: user.id, bondId, action: unmute ? "unmute" : "mute" },
       "Bond notification preferences updated"
     );
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
       mutedBonds: newMutedBonds,
     });
   } catch (error) {
-    log.error({ error }, "Error muting/unmuting bond");
+    logger.error({ error }, "Error muting/unmuting bond");
     return NextResponse.json(
       { error: "Error al actualizar preferencias" },
       { status: 500 }

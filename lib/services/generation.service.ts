@@ -511,6 +511,7 @@ export async function generateEpisodicMemoriesFromProfile(
       await prisma.episodicMemory.create({
         data: {
           agentId,
+          event: memory.content, // Required field
           ...memory,
         },
       });

@@ -168,7 +168,7 @@ export function getUserDisplayData(
 ): UserNicknameResult {
   if (user?.id) {
     return {
-      nickname: user.name || user.email.split('@')[0] || 'Usuario',
+      nickname: user.name || user.email?.split('@')[0] || 'Usuario',
       isAnonymous: false,
       userId: user.id,
     };

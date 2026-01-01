@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { IntelligentStorageSystem } from '../intelligent-storage';
-import type { EmotionState, AppraisalScores } from '../../../types';
+import type { EmotionState, AppraisalScores } from '../../../types/index';
 
 describe('IntelligentStorageSystem', () => {
   let system: IntelligentStorageSystem;
@@ -27,12 +27,11 @@ describe('IntelligentStorageSystem', () => {
         sadness: 0.1,
         anger: 0.1,
         disliking: 0.1,
-        surprise: 0.7,
+        curiosity: 0.7,
         interest: 0.6,
-        lastUpdated: new Date(),
       };
 
-      const appraisal: Partial<Appraisal> = {
+      const appraisal: Partial<AppraisalScores> = {
         desirability: 0.8,
         urgency: 0.5,
         relevanceToGoals: 0.5,
@@ -46,7 +45,7 @@ describe('IntelligentStorageSystem', () => {
         userMessage: 'Estoy muy feliz!',
         characterResponse: 'Me alegra verte así!',
         emotions,
-        appraisal: appraisal as Appraisal,
+        appraisal: appraisal as AppraisalScores,
       });
 
       expect(decision.factors.emotional).toBeGreaterThan(0);
@@ -61,12 +60,11 @@ describe('IntelligentStorageSystem', () => {
         sadness: 0.3,
         anger: 0.2,
         disliking: 0.2,
-        surprise: 0.4,
+        curiosity: 0.4,
         interest: 0.5,
-        lastUpdated: new Date(),
       };
 
-      const appraisal: Partial<Appraisal> = {
+      const appraisal: Partial<AppraisalScores> = {
         desirability: 0.2,
         urgency: 0.3,
         relevanceToGoals: 0.3,
@@ -80,7 +78,7 @@ describe('IntelligentStorageSystem', () => {
         userMessage: 'Hola',
         characterResponse: 'Hola, ¿cómo estás?',
         emotions,
-        appraisal: appraisal as Appraisal,
+        appraisal: appraisal as AppraisalScores,
       });
 
       expect(decision.factors.emotional).toBe(0);
@@ -480,9 +478,8 @@ function createNeutralEmotions(): EmotionState {
     sadness: 0.3,
     anger: 0.2,
     disliking: 0.2,
-    surprise: 0.4,
+    curiosity: 0.4,
     interest: 0.5,
-    lastUpdated: new Date(),
   };
 }
 
@@ -494,9 +491,8 @@ function createHighPositiveEmotions(): EmotionState {
     sadness: 0.1,
     anger: 0.1,
     disliking: 0.1,
-    surprise: 0.7,
+    curiosity: 0.7,
     interest: 0.8,
-    lastUpdated: new Date(),
   };
 }
 
@@ -508,76 +504,67 @@ function createHighNegativeEmotions(): EmotionState {
     sadness: 0.9,
     anger: 0.7,
     disliking: 0.6,
-    surprise: 0.3,
+    curiosity: 0.3,
     interest: 0.2,
-    lastUpdated: new Date(),
   };
 }
 
-function createNeutralAppraisal(): Appraisal {
+function createNeutralAppraisal(): AppraisalScores {
   return {
     desirability: 0.0,
     praiseworthiness: 0.0,
     appealingness: 0.0,
     desirabilityForUser: 0.0,
-    deservingness: 0.0,
-    liking: 0.0,
     likelihood: 0.5,
-    effort: 0.5,
-    realization: 0.5,
     urgency: 0.3,
     relevanceToGoals: 0.3,
     novelty: 0.3,
+    valueAlignment: 0.0,
+    socialAppropriateness: 0.5,
   };
 }
 
-function createPositiveAppraisal(): Appraisal {
+function createPositiveAppraisal(): AppraisalScores {
   return {
     desirability: 0.8,
     praiseworthiness: 0.7,
     appealingness: 0.7,
     desirabilityForUser: 0.8,
-    deservingness: 0.7,
-    liking: 0.8,
     likelihood: 0.5,
-    effort: 0.5,
-    realization: 0.8,
     urgency: 0.4,
     relevanceToGoals: 0.7,
     novelty: 0.6,
+    valueAlignment: 0.7,
+    socialAppropriateness: 0.8,
   };
 }
 
-function createNegativeAppraisal(): Appraisal {
+function createNegativeAppraisal(): AppraisalScores {
   return {
     desirability: -0.8,
     praiseworthiness: -0.5,
     appealingness: -0.7,
     desirabilityForUser: -0.8,
-    deservingness: -0.5,
-    liking: -0.6,
     likelihood: 0.5,
-    effort: 0.5,
-    realization: 0.5,
     urgency: 0.7,
     relevanceToGoals: 0.6,
     novelty: 0.4,
+    valueAlignment: -0.6,
+    socialAppropriateness: 0.3,
   };
 }
 
-function createUrgentAppraisal(): Appraisal {
+function createUrgentAppraisal(): AppraisalScores {
   return {
     desirability: -0.7,
     praiseworthiness: 0.0,
     appealingness: -0.5,
     desirabilityForUser: -0.7,
-    deservingness: 0.0,
-    liking: 0.0,
     likelihood: 0.5,
-    effort: 0.5,
-    realization: 0.5,
     urgency: 0.9,
     relevanceToGoals: 0.8,
     novelty: 0.7,
+    valueAlignment: 0.0,
+    socialAppropriateness: 0.5,
   };
 }

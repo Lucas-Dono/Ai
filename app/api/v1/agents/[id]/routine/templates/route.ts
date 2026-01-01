@@ -49,8 +49,8 @@ export async function POST(
         priority: body.priority || "medium",
         isFlexible: body.isFlexible ?? true,
         allowVariations: body.allowVariations ?? true,
-        variationParameters: body.variationParameters || {},
-        moodImpact: body.moodImpact || {},
+        variationParameters: (body.variationParameters || {}) as any,
+        moodImpact: (body.moodImpact || {}) as any,
         location: body.location,
       },
     });

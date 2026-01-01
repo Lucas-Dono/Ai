@@ -21,7 +21,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Authorization - solo admins
-    if (user.role !== 'admin') {
+    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
+    if (!adminEmails.includes(user.email)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -118,7 +119,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Authorization - solo admins
-    if (user.role !== 'admin') {
+    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
+    if (!adminEmails.includes(user.email)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

@@ -32,41 +32,46 @@ export const ModerationSuggestionsService = {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const [hiddenPosts, blockedUsers, contentPreferences] = await Promise.all([
-      prisma.hiddenPost.findMany({
-        where: {
-          userId,
-          createdAt: { gte: thirtyDaysAgo },
-        },
-        include: {
-          post: {
-            select: {
-              authorId: true,
-              type: true,
-              tags: true,
-              communityId: true,
-            },
-          },
-        },
-      }),
-      prisma.blockedUser.findMany({
-        where: { userId },
-        select: { blockedId: true },
-      }),
-      prisma.contentPreference.findMany({
-        where: { userId },
-        select: { type: true, value: true },
-      }),
-    ]);
+    // TODO: HiddenPost, BlockedUser, ContentPreference models removed - need to implement alternative
+    const hiddenPosts: any[] = [];
+    const blockedUsers: any[] = [];
+    const contentPreferences: any[] = [];
 
-    const blockedUserIds = new Set(blockedUsers.map(b => b.blockedId));
+    // const [hiddenPosts, blockedUsers, contentPreferences] = await Promise.all([
+    //   prisma.hiddenPost.findMany({
+    //     where: {
+    //       userId,
+    //       createdAt: { gte: thirtyDaysAgo },
+    //     },
+    //     include: {
+    //       post: {
+    //         select: {
+    //           authorId: true,
+    //           type: true,
+    //           tags: true,
+    //           communityId: true,
+    //         },
+    //       },
+    //     },
+    //   }),
+    //   prisma.blockedUser.findMany({
+    //     where: { userId },
+    //     select: { blockedId: true },
+    //   }),
+    //   prisma.contentPreference.findMany({
+    //     where: { userId },
+    //     select: { type: true, value: true },
+    //   }),
+    // ]);
+
+    const blockedUserIds = new Set(blockedUsers.map((b: any) => b.blockedId));
     const existingPreferences = new Set(
-      contentPreferences.map(p => `${p.type}:${p.value}`)
+      contentPreferences.map((p: any) => `${p.type}:${p.value}`)
     );
 
     // 1. Analizar autores de posts ocultos frecuentemente
     const authorFrequency = new Map<string, number>();
-    hiddenPosts.forEach(hp => {
+    hiddenPosts.forEach((hp: any) => {
       if (hp.post?.authorId) {
         const count = authorFrequency.get(hp.post.authorId) || 0;
         authorFrequency.set(hp.post.authorId, count + 1);
@@ -99,7 +104,7 @@ export const ModerationSuggestionsService = {
 
     // 2. Analizar tags frecuentes en posts ocultos
     const tagFrequency = new Map<string, number>();
-    hiddenPosts.forEach(hp => {
+    hiddenPosts.forEach((hp: any) => {
       if (hp.post?.tags) {
         hp.post.tags.forEach((tag: string) => {
           const count = tagFrequency.get(tag) || 0;
@@ -129,7 +134,7 @@ export const ModerationSuggestionsService = {
 
     // 3. Analizar tipos de posts ocultos frecuentemente
     const typeFrequency = new Map<string, number>();
-    hiddenPosts.forEach(hp => {
+    hiddenPosts.forEach((hp: any) => {
       if (hp.post?.type) {
         const count = typeFrequency.get(hp.post.type) || 0;
         typeFrequency.set(hp.post.type, count + 1);
@@ -165,7 +170,7 @@ export const ModerationSuggestionsService = {
 
     // 4. Analizar comunidades frecuentes en posts ocultos
     const communityFrequency = new Map<string, number>();
-    hiddenPosts.forEach(hp => {
+    hiddenPosts.forEach((hp: any) => {
       if (hp.post?.communityId) {
         const count = communityFrequency.get(hp.post.communityId) || 0;
         communityFrequency.set(hp.post.communityId, count + 1);
@@ -212,45 +217,48 @@ export const ModerationSuggestionsService = {
       throw new Error('Sugerencia no encontrada');
     }
 
-    // Aplicar la acción según el tipo
-    switch (suggestion.type) {
-      case 'block_user':
-        await prisma.blockedUser.create({
-          data: {
-            userId,
-            blockedId: suggestion.action.value,
-            reason: `Auto-bloqueado por sugerencia: ${suggestion.reason}`,
-          },
-        });
-        break;
+    // TODO: BlockedUser and ContentPreference models removed - need to implement alternative
+    throw new Error('Suggestion application disabled - models removed');
 
-      case 'hide_tag':
-      case 'hide_post_type':
-      case 'hide_community':
-        const prefData = JSON.parse(suggestion.action.value);
-        await prisma.contentPreference.upsert({
-          where: {
-            userId_type_value: {
-              userId,
-              type: prefData.type,
-              value: prefData.value,
-            },
-          },
-          create: {
-            userId,
-            type: prefData.type,
-            value: prefData.value,
-            action: prefData.action,
-          },
-          update: {
-            action: prefData.action,
-          },
-        });
-        break;
+    // // Aplicar la acción según el tipo
+    // switch (suggestion.type) {
+    //   case 'block_user':
+    //     await prisma.blockedUser.create({
+    //       data: {
+    //         userId,
+    //         blockedId: suggestion.action.value,
+    //         reason: `Auto-bloqueado por sugerencia: ${suggestion.reason}`,
+    //       },
+    //     });
+    //     break;
 
-      default:
-        throw new Error('Tipo de sugerencia no soportado');
-    }
+    //   case 'hide_tag':
+    //   case 'hide_post_type':
+    //   case 'hide_community':
+    //     const prefData = JSON.parse(suggestion.action.value);
+    //     await prisma.contentPreference.upsert({
+    //       where: {
+    //         userId_type_value: {
+    //           userId,
+    //           type: prefData.type,
+    //           value: prefData.value,
+    //         },
+    //       },
+    //       create: {
+    //         userId,
+    //         type: prefData.type,
+    //         value: prefData.value,
+    //         action: prefData.action,
+    //       },
+    //       update: {
+    //         action: prefData.action,
+    //       },
+    //     });
+    //     break;
+
+    //   default:
+    //     throw new Error('Tipo de sugerencia no soportado');
+    // }
 
     return true;
   },
@@ -272,26 +280,31 @@ export const ModerationSuggestionsService = {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const [recentHides, recentBlocks, recentPreferences] = await Promise.all([
-      prisma.hiddenPost.count({
-        where: {
-          userId,
-          createdAt: { gte: startDate },
-        },
-      }),
-      prisma.blockedUser.count({
-        where: {
-          userId,
-          createdAt: { gte: startDate },
-        },
-      }),
-      prisma.contentPreference.count({
-        where: {
-          userId,
-          createdAt: { gte: startDate },
-        },
-      }),
-    ]);
+    // TODO: HiddenPost, BlockedUser, ContentPreference models removed - need to implement alternative
+    const recentHides = 0;
+    const recentBlocks = 0;
+    const recentPreferences = 0;
+
+    // const [recentHides, recentBlocks, recentPreferences] = await Promise.all([
+    //   prisma.hiddenPost.count({
+    //     where: {
+    //       userId,
+    //       createdAt: { gte: startDate },
+    //     },
+    //   }),
+    //   prisma.blockedUser.count({
+    //     where: {
+    //       userId,
+    //       createdAt: { gte: startDate },
+    //     },
+    //   }),
+    //   prisma.contentPreference.count({
+    //     where: {
+    //       userId,
+    //       createdAt: { gte: startDate },
+    //     },
+    //   }),
+    // ]);
 
     return {
       recentHides,

@@ -42,7 +42,7 @@ function withTimeout<T>(
 
 // Cache interface
 export interface SearchCache {
-  get(query: string, genre: GenreId): Promise<SearchResult[] | null>;
+  get(query: string, genre: GenreId): Promise<{ results: SearchResult[]; cached: true } | null>;
   set(query: string, genre: GenreId, results: SearchResult[], ttl?: number): Promise<void>;
 }
 
@@ -199,20 +199,20 @@ export class SearchRouter {
 
   /**
    * Main search method - tries sources in priority order with fallback
-   * Returns results with metadata indicating if they came from cache
+   * Returns results array (for backward compatibility)
    */
   async search(
     query: string,
     genre: GenreId,
     options: SearchOptions = {}
-  ): Promise<{ results: SearchResult[]; cached: boolean }> {
+  ): Promise<SearchResult[]> {
     // 1. Check cache
     const cacheData = await this.cache.get(query, genre);
     if (cacheData && cacheData.results.length > 0) {
       console.log(`[SearchRouter] Cache hit for "${query}" in ${genre}`);
       // Enrich cached results with fresh match scores
       const enrichedResults = this.enrichWithMatchScores(query, cacheData.results);
-      return { results: enrichedResults, cached: true };
+      return enrichedResults;
     }
 
     // 2. Get prioritized sources for this genre
@@ -254,7 +254,7 @@ export class SearchRouter {
           // Cache successful results
           await this.cache.set(query, genre, enrichedResults, 86400); // 24 hours
 
-          return { results: enrichedResults, cached: false };
+          return enrichedResults;
         }
 
         console.log(`[SearchRouter] No results from ${config.source.sourceId}`);
@@ -279,10 +279,10 @@ export class SearchRouter {
     if (fallbackResults.length > 0) {
       const enrichedFallback = this.enrichWithMatchScores(query, fallbackResults);
       await this.cache.set(query, genre, enrichedFallback, 86400);
-      return { results: enrichedFallback, cached: false };
+      return enrichedFallback;
     }
 
-    return { results: [], cached: false };
+    return [];
   }
 
   /**

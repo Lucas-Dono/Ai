@@ -3,18 +3,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { GroupMessageBubble } from "./GroupMessageBubble";
 import { GroupMessageInput } from "./GroupMessageInput";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Hash } from "lucide-react";
 
 interface GroupMessageThreadProps {
   groupId: string;
   currentUserId: string;
   initialMessages?: any[];
+  groupName?: string;
 }
 
 export function GroupMessageThread({
   groupId,
   currentUserId,
   initialMessages = [],
+  groupName = "este grupo",
 }: GroupMessageThreadProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
@@ -171,26 +173,38 @@ export function GroupMessageThread({
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto relative"
+        style={{ backgroundColor: '#171717' }}
       >
-        {/* Load more indicator */}
-        {hasMore && (
-          <div className="flex justify-center py-4">
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            ) : (
-              <button
-                onClick={loadMoreMessages}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Cargar mensajes anteriores
-              </button>
-            )}
-          </div>
-        )}
+        <div className="px-4 py-4">
+          {/* Welcome message */}
+          {messages.length === 0 && !isLoading && (
+            <div className="flex flex-col items-center justify-center py-8 text-center text-neutral-500 mb-8">
+              <div className="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mb-4">
+                <Hash size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Bienvenido a #{groupName}</h3>
+              <p className="text-sm max-w-md">Este es el comienzo de tu historial de mensajes.</p>
+            </div>
+          )}
 
-        {/* Messages */}
-        <div className="space-y-1">
+          {/* Load more indicator */}
+          {hasMore && messages.length > 0 && (
+            <div className="flex justify-center py-4">
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-neutral-400" />
+              ) : (
+                <button
+                  onClick={loadMoreMessages}
+                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+                >
+                  Cargar mensajes anteriores
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Messages */}
           {messages.map((message) => (
             <GroupMessageBubble
               key={message.id}
@@ -199,24 +213,10 @@ export function GroupMessageThread({
               onReply={handleReply}
             />
           ))}
+
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} />
         </div>
-
-        {/* Empty state */}
-        {messages.length === 0 && !isLoading && (
-          <div className="flex items-center justify-center h-full text-center">
-            <div>
-              <p className="text-muted-foreground mb-2">
-                No hay mensajes todavía
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Sé el primero en enviar un mensaje
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Scroll anchor */}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input area */}
@@ -225,6 +225,7 @@ export function GroupMessageThread({
         onSend={handleSendMessage}
         replyingTo={replyingTo}
         onCancelReply={() => setReplyingTo(null)}
+        placeholder="Envía un mensaje..."
       />
     </div>
   );

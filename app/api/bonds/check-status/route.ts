@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
-    if (!session?.user) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -96,13 +96,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user is in queue
-    const queuePosition = await prisma.bondQueuePosition.findFirst({
+    const queuePosition = await prisma.bondQueue.findFirst({
       where: {
         userId: user.id,
         agentId,
       },
       select: {
-        position: true,
+        queuePosition: true,
         tier: true,
       },
     });
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       canEstablish: canEstablishAny,
       reason,
       inQueue: !!queuePosition,
-      queuePosition: queuePosition?.position,
+      queuePosition: queuePosition?.queuePosition,
       queueTier: queuePosition?.tier,
     });
   } catch (error: any) {

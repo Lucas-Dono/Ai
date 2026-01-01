@@ -16,9 +16,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 export const logger = pino({
   level: isDevelopment ? 'debug' : 'info',
 
-  // IMPORTANT: Disable worker threads to avoid webpack bundling issues in Next.js
-  sync: true,
-
   // Pretty print disabled to avoid worker thread issues in Next.js
   // transport: isDevelopment ? {
   //   target: 'pino-pretty',

@@ -1,3 +1,4 @@
+// @ts-ignore - ngeohash no tiene tipos disponibles
 import geohash from "ngeohash";
 import type {
   SimpleWeather,

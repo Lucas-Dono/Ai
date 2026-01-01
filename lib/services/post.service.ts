@@ -88,7 +88,7 @@ export const PostService = {
         videos: data.videos || [],
         pollOptions: data.pollOptions || undefined,
         pollEndDate: data.pollEndDate,
-        sharedAgentId: data.sharedAgentId,
+        // sharedAgentId: data.sharedAgentId, // Field removed from schema
         slug,
       },
       include: {
@@ -209,7 +209,7 @@ export const PostService = {
       where: { id: postId },
       data: {
         ...data,
-        isEdited: true,
+        // isEdited: true, // Field removed from schema (only in CommunityComment)
       },
     });
 

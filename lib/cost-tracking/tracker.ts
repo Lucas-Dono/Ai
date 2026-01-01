@@ -77,12 +77,12 @@ async function flushBuffer() {
 
   try {
     // Check if costTracking model exists
-    if (!prisma.costTracking) {
+    if (!(prisma as any).costTracking) {
       console.warn('[CostTracker] CostTracking model not found in Prisma schema - skipping flush');
       return;
     }
 
-    await prisma.costTracking.createMany({
+    await (prisma as any).costTracking.createMany({
       data: entries.map(entry => ({
         userId: entry.userId,
         agentId: entry.agentId,
@@ -241,7 +241,7 @@ export async function getCostSummary(
   }
 
   // Get total cost
-  const totalResult = await prisma.costTracking.aggregate({
+  const totalResult = await (prisma as any).costTracking.aggregate({
     where,
     _sum: {
       cost: true,
@@ -250,7 +250,7 @@ export async function getCostSummary(
   });
 
   // Get breakdown by type
-  const byType = await prisma.costTracking.groupBy({
+  const byType = await (prisma as any).costTracking.groupBy({
     by: ['type'],
     where,
     _sum: {
@@ -260,7 +260,7 @@ export async function getCostSummary(
   });
 
   // Get breakdown by provider
-  const byProvider = await prisma.costTracking.groupBy({
+  const byProvider = await (prisma as any).costTracking.groupBy({
     by: ['provider'],
     where,
     _sum: {
@@ -270,7 +270,7 @@ export async function getCostSummary(
   });
 
   // Get breakdown by model (top 10)
-  const byModel = await prisma.costTracking.groupBy({
+  const byModel = await (prisma as any).costTracking.groupBy({
     by: ['model'],
     where: {
       ...where,
@@ -291,17 +291,17 @@ export async function getCostSummary(
   return {
     total: totalResult._sum.cost ?? 0,
     callCount: totalResult._count,
-    byType: byType.map(item => ({
+    byType: byType.map((item: any) => ({
       type: item.type,
       cost: item._sum.cost ?? 0,
       count: item._count,
     })),
-    byProvider: byProvider.map(item => ({
+    byProvider: byProvider.map((item: any) => ({
       provider: item.provider,
       cost: item._sum.cost ?? 0,
       count: item._count,
     })),
-    byModel: byModel.map(item => ({
+    byModel: byModel.map((item: any) => ({
       model: item.model!,
       cost: item._sum.cost ?? 0,
       count: item._count,
@@ -361,7 +361,7 @@ export async function getTopUsers(
     if (endDate) where.createdAt.lte = endDate;
   }
 
-  const topUsers = await prisma.costTracking.groupBy({
+  const topUsers = await (prisma as any).costTracking.groupBy({
     by: ['userId'],
     where: {
       ...where,
@@ -379,7 +379,7 @@ export async function getTopUsers(
     take: limit,
   });
 
-  return topUsers.map(item => ({
+  return topUsers.map((item: any) => ({
     userId: item.userId!,
     cost: item._sum.cost ?? 0,
     count: item._count,

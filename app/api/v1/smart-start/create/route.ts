@@ -61,12 +61,12 @@ export async function POST(req: NextRequest) {
       }
 
       // Get user's plan/tier
-      const user = await prisma.user.findUnique({
+      const dbUser = await prisma.user.findUnique({
         where: { id: userId },
         select: { plan: true }
       });
 
-      const tier = (user?.plan || 'free') as 'free' | 'plus' | 'ultra';
+      const tier = (dbUser?.plan || 'free') as 'free' | 'plus' | 'ultra';
 
       // Build profile object
       const profile: any = {
@@ -215,13 +215,6 @@ export async function POST(req: NextRequest) {
         },
         { status: 201 }
       );
-    } catch (error) {
-      console.error("[Smart Start Create] Error:", error);
-      return NextResponse.json(
-        { error: "Failed to create character" },
-        { status: 500 }
-      );
-    }
   } catch (error) {
     console.error("[Smart Start Create] Error:", error);
     return NextResponse.json(

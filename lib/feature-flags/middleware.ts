@@ -51,7 +51,7 @@ export async function requireFeature(
   req: NextRequest,
   feature: Feature
 ): Promise<void> {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: req.headers });
   const userId = session?.user?.id;
 
   if (!userId) {
@@ -95,7 +95,7 @@ export async function requireFeatureWithLimit(
   req: NextRequest,
   feature: Feature
 ): Promise<void> {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: req.headers });
   const userId = session?.user?.id;
 
   if (!userId) {
@@ -141,7 +141,7 @@ export async function checkFeatureAccess(
   feature: Feature
 ): Promise<boolean> {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
     const userId = session?.user?.id;
 
     if (!userId) {
@@ -171,7 +171,7 @@ export function withFeature(
 ) {
   return async (req: NextRequest): Promise<NextResponse> => {
     try {
-      const session = await auth();
+      const session = await auth.api.getSession({ headers: req.headers });
       const userId = session?.user?.id;
 
       if (!userId) {
@@ -219,7 +219,7 @@ export function withFeatureLimit(
 ) {
   return async (req: NextRequest): Promise<NextResponse> => {
     try {
-      const session = await auth();
+      const session = await auth.api.getSession({ headers: req.headers });
       const userId = session?.user?.id;
 
       if (!userId) {

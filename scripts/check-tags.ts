@@ -24,8 +24,8 @@ async function main() {
   const agentsByTag = new Map<string, string[]>();
 
   agents.forEach(agent => {
-    const tags = agent.tags || [];
-    tags.forEach(tag => {
+    const tags = (agent.tags as string[]) || [];
+    tags.forEach((tag: string) => {
       tagStats.set(tag, (tagStats.get(tag) || 0) + 1);
       if (!agentsByTag.has(tag)) {
         agentsByTag.set(tag, []);
@@ -55,7 +55,7 @@ async function main() {
   });
 
   console.log('\n=== PERSONAJES SIN ETIQUETAS ===');
-  const withoutTags = agents.filter(a => !a.tags || a.tags.length === 0);
+  const withoutTags = agents.filter(a => !a.tags || (a.tags as string[]).length === 0);
   console.log(`Total: ${withoutTags.length}`);
   withoutTags.slice(0, 20).forEach(a => {
     console.log(`  - ${a.name} (tier: ${a.generationTier || 'none'}, featured: ${a.featured})`);

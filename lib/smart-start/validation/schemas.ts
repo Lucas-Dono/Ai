@@ -19,7 +19,7 @@ export const SearchResultSchema = z.object({
   source: z.string(),
   sourceUrl: z.string().url().optional().or(z.literal('')),
   confidence: z.number().min(0).max(1).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 
   // Optional fields from detailed fetch
   nameNative: z.string().optional(),
@@ -184,8 +184,8 @@ export function validateData<T extends z.ZodTypeAny>(
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map(err => `${err.path.join('.')}: ${err.message}`)
+    const errors = result.error.issues
+      .map((err: any) => `${err.path.join('.')}: ${err.message}`)
       .join(', ');
 
     throw new Error(`${context} validation failed: ${errors}`);
@@ -241,7 +241,7 @@ export async function validateAPIResponse<T extends z.ZodTypeAny>(
  * Partial validation - allows fields to be optional
  * Useful for PATCH/update requests
  */
-export function createPartialSchema<T extends z.ZodTypeAny>(schema: T) {
+export function createPartialSchema<T extends z.ZodObject<any>>(schema: T) {
   return schema.partial();
 }
 

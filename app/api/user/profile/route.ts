@@ -32,9 +32,9 @@ export async function GET(req: NextRequest) {
       where: { userId: user.id },
     });
 
-    // Get worlds count
-    const worldsCount = await prisma.world.count({
-      where: { userId: user.id },
+    // Get groups count
+    const groupsCount = await prisma.group.count({
+      where: { creatorId: user.id },
     });
 
     // Get messages count for this month
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       user: userProfile,
       stats: {
         agentsCount,
-        worldsCount,
+        groupsCount,
         messagesThisMonth,
       },
     });

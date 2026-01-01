@@ -59,7 +59,7 @@ export async function getCurrentResourceCount(
   if (resourceType === "agent") {
     return await prisma.agent.count({ where: { userId } });
   } else if (resourceType === "world") {
-    return await prisma.world.count({ where: { userId } });
+    return await prisma.group.count({ where: { creatorId: userId } });
   }
   return 0;
 }

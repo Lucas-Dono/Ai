@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getServerSession } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { ReputationService } from '@/lib/services/reputation.service';
 import { UserModerationService } from '@/lib/services/user-moderation.service';
@@ -12,7 +12,7 @@ interface ProfilePageProps {
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const session = await auth();
+  const session = await getServerSession();
   const { userId } = await params;
 
   // Fetch user

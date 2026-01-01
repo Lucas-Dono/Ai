@@ -3,7 +3,9 @@
  * Checks emotional system compatibility, field requirements, and data quality
  */
 
-import { CharacterDraft, GenreId, SubGenreId, ArchetypeId } from '../core/types';
+import { GenreId, SubGenreId, ArchetypeId } from '../core/types';
+import { CharacterDraft as SchemaCharacterDraft } from '../validation/schemas';
+import { CharacterDraft } from '@/types/character-creation';
 import { getGenreService } from './genre-service';
 
 export interface ValidationIssue {
@@ -37,9 +39,9 @@ export class ValidationService {
     // Field-specific validation
     issues.push(...this.validateName(draft.name));
     issues.push(...this.validatePersonality(draft.personality));
-    issues.push(...this.validateBackground(draft.background));
+    issues.push(...this.validateBackground(draft.backstory));
     issues.push(...this.validateSystemPrompt(draft.systemPrompt));
-    issues.push(...this.validateGenreSelection(draft.genreId, draft.subgenreId, draft.archetypeId));
+    issues.push(...this.validateGenreSelection(draft.genreId as GenreId | undefined, draft.subgenreId as SubGenreId | undefined, draft.archetypeId as ArchetypeId | undefined));
 
     // Emotional system compatibility
     issues.push(...this.validateEmotionalSystemCompatibility(draft));
@@ -130,9 +132,9 @@ export class ValidationService {
   }
 
   /**
-   * Validate personality array
+   * Validate personality (accepts both string and string[])
    */
-  private validatePersonality(personality?: string[]): ValidationIssue[] {
+  private validatePersonality(personality?: string | string[]): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
     if (!personality) {
@@ -146,7 +148,12 @@ export class ValidationService {
       return issues;
     }
 
-    if (personality.length < 3) {
+    // Convert string to array for validation
+    const personalityArray = Array.isArray(personality)
+      ? personality
+      : personality.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
+    if (personalityArray.length < 3) {
       issues.push({
         field: 'personality',
         type: 'min_length',
@@ -156,7 +163,7 @@ export class ValidationService {
       });
     }
 
-    if (personality.length > 15) {
+    if (personalityArray.length > 15) {
       issues.push({
         field: 'personality',
         type: 'max_length',
@@ -167,8 +174,8 @@ export class ValidationService {
     }
 
     // Check for duplicate traits
-    const unique = new Set(personality.map(t => t.toLowerCase().trim()));
-    if (unique.size < personality.length) {
+    const unique = new Set(personalityArray.map(t => t.toLowerCase().trim()));
+    if (unique.size < personalityArray.length) {
       issues.push({
         field: 'personality',
         type: 'quality',
@@ -182,14 +189,14 @@ export class ValidationService {
   }
 
   /**
-   * Validate background
+   * Validate backstory
    */
-  private validateBackground(background?: string): ValidationIssue[] {
+  private validateBackground(backstory?: string): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
-    if (!background || background.trim().length === 0) {
+    if (!backstory || backstory.trim().length === 0) {
       issues.push({
-        field: 'background',
+        field: 'backstory',
         type: 'required',
         message: 'Background story is recommended',
         severity: 'warning',
@@ -198,11 +205,11 @@ export class ValidationService {
       return issues;
     }
 
-    const trimmed = background.trim();
+    const trimmed = backstory.trim();
 
     if (trimmed.length < 50) {
       issues.push({
-        field: 'background',
+        field: 'backstory',
         type: 'min_length',
         message: 'Background is too short (min 50 characters)',
         severity: 'warning',
@@ -212,7 +219,7 @@ export class ValidationService {
 
     if (trimmed.length > 2000) {
       issues.push({
-        field: 'background',
+        field: 'backstory',
         type: 'max_length',
         message: 'Background is too long (max 2000 characters)',
         severity: 'warning',
@@ -312,27 +319,33 @@ export class ValidationService {
 
     if (!draft.genreId) return issues;
 
-    const genre = this.genreService.getGenre(draft.genreId);
+    const genre = this.genreService.getGenre(draft.genreId as GenreId);
     if (!genre) return issues;
 
     const emotionalProfile = genre.metadata?.emotionalProfile;
     if (!emotionalProfile) return issues;
 
     // Check if personality traits align with emotional profile
-    if (draft.personality && draft.personality.length > 0) {
-      const hasCompatibleTraits = this.checkPersonalityCompatibility(
-        draft.personality,
-        emotionalProfile
-      );
+    if (draft.personality) {
+      const personalityArray: string[] = Array.isArray(draft.personality)
+        ? draft.personality
+        : draft.personality.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0);
 
-      if (!hasCompatibleTraits) {
-        issues.push({
-          field: 'personality',
-          type: 'compatibility',
-          message: `Personality traits may not align well with ${genre.name} genre`,
-          severity: 'info',
-          suggestion: `Consider traits that match ${genre.name} characteristics`,
-        });
+      if (personalityArray.length > 0) {
+        const hasCompatibleTraits = this.checkPersonalityCompatibility(
+          personalityArray,
+          emotionalProfile
+        );
+
+        if (!hasCompatibleTraits) {
+          issues.push({
+            field: 'personality',
+            type: 'compatibility',
+            message: `Personality traits may not align well with ${genre.name} genre`,
+            severity: 'info',
+            suggestion: `Consider traits that match ${genre.name} characteristics`,
+          });
+        }
       }
     }
 
@@ -340,7 +353,7 @@ export class ValidationService {
     if (draft.systemPrompt) {
       const hasEmotionalDepth = this.checkEmotionalDepth(draft.systemPrompt);
 
-      if (!hasEmotionalDepth && emotionalProfile.expressiveness === 'high') {
+      if (!hasEmotionalDepth && genre.id === 'romance') {
         issues.push({
           field: 'systemPrompt',
           type: 'compatibility',
@@ -470,9 +483,17 @@ export class ValidationService {
 
     if (draft.name) filled++;
     if (draft.systemPrompt && draft.systemPrompt.length > 100) filled++;
-    if (draft.personality && draft.personality.length >= 3) filled++;
-    if (draft.background && draft.background.length >= 50) filled++;
-    if (draft.appearance) filled++;
+
+    // Handle both string and array personality
+    if (draft.personality) {
+      const personalityArray: string[] = Array.isArray(draft.personality)
+        ? draft.personality
+        : draft.personality.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0);
+      if (personalityArray.length >= 3) filled++;
+    }
+
+    if (draft.backstory && draft.backstory.length >= 50) filled++;
+    if (draft.physicalAppearance) filled++;
     if (draft.age) filled++;
     if (draft.occupation) filled++;
     if (draft.genreId) filled++;
@@ -498,11 +519,18 @@ export class ValidationService {
       'to be determined',
     ];
 
+    // Handle both string and array personality
+    const personalityText = draft.personality
+      ? Array.isArray(draft.personality)
+        ? draft.personality.join(' ')
+        : draft.personality
+      : '';
+
     const allText = [
       draft.name,
-      draft.background,
+      draft.backstory,
       draft.systemPrompt,
-      ...(draft.personality || []),
+      personalityText,
     ].join(' ').toLowerCase();
 
     for (const phrase of genericPhrases) {
@@ -551,7 +579,8 @@ export class ValidationService {
         return this.validateName(value);
       case 'personality':
         return this.validatePersonality(value);
-      case 'background':
+      case 'backstory':
+      case 'background': // Support legacy field name
         return this.validateBackground(value);
       case 'systemPrompt':
         return this.validateSystemPrompt(value);

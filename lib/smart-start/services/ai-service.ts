@@ -326,7 +326,7 @@ Return ONLY valid JSON, no additional text.`;
    */
   isConfigured(): { gemini: boolean; venice: boolean } {
     return {
-      gemini: this.geminiClient !== null,
+      gemini: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
       venice: this.veniceApiKey !== null,
     };
   }

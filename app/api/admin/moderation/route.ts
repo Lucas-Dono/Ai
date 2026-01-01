@@ -208,6 +208,12 @@ export async function POST(req: NextRequest) {
         break;
 
       case 'review_violation':
+        // TODO: Restore when contentViolation model is added to Prisma schema
+        return NextResponse.json(
+          { error: 'contentViolation model not found in schema' },
+          { status: 501 }
+        );
+        /*
         if (!violationId) {
           return NextResponse.json(
             { error: 'violationId required for review action' },
@@ -234,6 +240,7 @@ export async function POST(req: NextRequest) {
           violationId,
         }, 'Admin reviewed violation');
         break;
+        */
 
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
@@ -253,8 +260,14 @@ export async function POST(req: NextRequest) {
 /**
  * DELETE /api/admin/moderation
  * Delete a violation record
+ * TODO: Restore when contentViolation model is added to Prisma schema
  */
 export async function DELETE(req: NextRequest) {
+  return NextResponse.json(
+    { error: 'contentViolation model not found in schema' },
+    { status: 501 }
+  );
+  /*
   try {
     const user = await getAuthenticatedUser(req);
     if (!user) {
@@ -292,4 +305,5 @@ export async function DELETE(req: NextRequest) {
       { status: 500 }
     );
   }
+  */
 }

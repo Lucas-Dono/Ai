@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { detectCountryAndPricing } from "@/lib/payment/geo-detection";
 import { createPaddleCheckout } from "@/lib/paddle/checkout";
-import { createSubscription } from "@/lib/mercadopago/subscription";
+import { createSubscriptionPreference } from "@/lib/mercadopago/subscription";
 import { billingLogger as log } from "@/lib/logging/loggers";
 
 export const runtime = "nodejs";
@@ -98,12 +98,15 @@ export async function POST(req: NextRequest) {
       });
     } else {
       // Checkout LATAM con MercadoPago
-      const subscriptionData = await createSubscription(userId, planId, interval);
+      const initPoint = await createSubscriptionPreference(
+        userId,
+        userEmail,
+        planId
+      );
 
       return NextResponse.json({
         provider: "mercadopago",
-        initPoint: subscriptionData.initPoint,
-        preapprovalId: subscriptionData.preapprovalId,
+        initPoint,
         countryCode,
         pricing: {
           amount,

@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Platform, Vibration, AppState, AppStateStatus } from "react-native";
 import * as Notifications from "expo-notifications";
 import { Audio } from "expo-av";
-import { proactiveApi, ProactiveAPIError } from "@/services/api/proactive.api";
+import { proactiveApi, ProactiveAPIError } from "../services/api/proactive.api";
 import type {
   ProactiveMessage,
   UseProactiveMessagesOptions,
@@ -72,7 +72,7 @@ export function useProactiveMessages(
 
   // Refs para mantener track de estado
   const seenMessageIds = useRef<Set<string>>(new Set());
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollingIntervalRef = useRef<number | null>(null);
   const soundObjectRef = useRef<Audio.Sound | null>(null);
   const appState = useRef<AppStateStatus>(AppState.currentState);
 
@@ -192,7 +192,7 @@ export function useProactiveMessages(
 
       // Detectar mensajes nuevos
       const unseenMessages = newMessages.filter(
-        (msg) => !seenMessageIds.current.has(msg.id)
+        (msg: ProactiveMessage) => !seenMessageIds.current.has(msg.id)
       );
 
       // Procesar mensajes nuevos
@@ -200,7 +200,7 @@ export function useProactiveMessages(
         console.log(`[useProactiveMessages] Found ${unseenMessages.length} new messages`);
 
         // Agregar a la lista de vistos
-        unseenMessages.forEach((msg) => {
+        unseenMessages.forEach((msg: ProactiveMessage) => {
           seenMessageIds.current.add(msg.id);
         });
 

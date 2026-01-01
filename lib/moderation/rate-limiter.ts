@@ -345,7 +345,7 @@ export async function checkUserBan(userId: string, action?: string): Promise<{
   }
 
   try {
-    const banData = await redis.get<{ reason: string; expiresAt: number }>(key);
+    const banData = await redis.get(key) as { reason: string; expiresAt: number } | null;
 
     if (!banData) {
       return { banned: false };

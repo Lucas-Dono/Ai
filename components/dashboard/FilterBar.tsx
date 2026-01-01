@@ -23,7 +23,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 export interface FilterState {
   search: string;
   categories: string[];
-  kind: 'all' | 'companion' | 'assistant';
+  gender: 'all' | 'male' | 'female' | 'non-binary';
   visibility: 'all' | 'private' | 'public';
   tier: 'all' | 'free' | 'plus' | 'ultra';
   nsfw: 'all' | 'sfw' | 'nsfw';
@@ -37,16 +37,20 @@ interface FilterBarProps {
 }
 
 const DEFAULT_CATEGORIES = [
-  'romance',
-  'sci-fi',
-  'fantasy',
-  'historical',
-  'professional',
-  'wellness',
+  'history',
+  'literature',
+  'psychology',
+  'science',
+  'art',
+  'music',
+  'philosophy',
+  'adventure',
   'gaming',
-  'anime',
-  'roleplay',
-  'educational',
+  'technology',
+  'nature',
+  'wisdom',
+  'business',
+  'gastronomy',
 ];
 
 export function FilterBar({
@@ -56,7 +60,7 @@ export function FilterBar({
 }: FilterBarProps) {
   const activeFiltersCount = [
     filters.categories.length > 0,
-    filters.kind !== 'all',
+    filters.gender !== 'all',
     filters.visibility !== 'all',
     filters.tier !== 'all',
     filters.nsfw !== 'all',
@@ -80,7 +84,7 @@ export function FilterBar({
     onFiltersChange({
       search: '',
       categories: [],
-      kind: 'all',
+      gender: 'all',
       visibility: 'all',
       tier: 'all',
       nsfw: 'all',
@@ -106,18 +110,46 @@ export function FilterBar({
 
         {/* Quick Filters */}
         <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-          {/* Kind Filter */}
+          {/* Gender Filter */}
           <Select
-            value={filters.kind}
-            onValueChange={(value: any) => updateFilter('kind', value)}
+            value={filters.gender}
+            onValueChange={(value: any) => updateFilter('gender', value)}
           >
             <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Type" />
+              <SelectValue placeholder="Gender" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="companion">Companion</SelectItem>
-              <SelectItem value="assistant">Assistant</SelectItem>
+              <SelectItem value="all">All Genders</SelectItem>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+              <SelectItem value="non-binary">Non-binary</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Quick Category Filter */}
+          <Select
+            value={filters.categories[0] || 'all'}
+            onValueChange={(value: any) => {
+              if (value === 'all') {
+                updateFilter('categories', []);
+              } else {
+                updateFilter('categories', [value]);
+              }
+            }}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="history">History</SelectItem>
+              <SelectItem value="literature">Literature</SelectItem>
+              <SelectItem value="psychology">Psychology</SelectItem>
+              <SelectItem value="science">Science</SelectItem>
+              <SelectItem value="art">Art</SelectItem>
+              <SelectItem value="music">Music</SelectItem>
+              <SelectItem value="philosophy">Philosophy</SelectItem>
+              <SelectItem value="gaming">Gaming</SelectItem>
             </SelectContent>
           </Select>
 
@@ -267,7 +299,7 @@ export function FilterBar({
       {/* Active Filters Display */}
       {(filters.search ||
         filters.categories.length > 0 ||
-        filters.kind !== 'all' ||
+        filters.gender !== 'all' ||
         filters.visibility !== 'all' ||
         filters.tier !== 'all' ||
         filters.nsfw !== 'all') && (
@@ -294,12 +326,12 @@ export function FilterBar({
             </Badge>
           ))}
 
-          {filters.kind !== 'all' && (
+          {filters.gender !== 'all' && (
             <Badge variant="secondary" className="gap-1 capitalize">
-              {filters.kind}
+              Gender: {filters.gender}
               <X
                 className="w-3 h-3 cursor-pointer"
-                onClick={() => updateFilter('kind', 'all')}
+                onClick={() => updateFilter('gender', 'all')}
               />
             </Badge>
           )}

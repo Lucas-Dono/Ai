@@ -48,42 +48,47 @@ export async function syncStripeSubscription(
     }
 
     // Actualizar o crear suscripción en BD
-    await prisma.subscription.upsert({
-      where: {
-        stripeSubscriptionId: subscription.id,
-      },
-      create: {
-        userId,
-        stripeSubscriptionId: subscription.id,
-        stripeCustomerId: subscription.customer as string,
-        status: subscription.status,
-        priceId,
-        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-        cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-        trialStart: (subscription as any).trial_start
-          ? new Date((subscription as any).trial_start * 1000)
-          : null,
-        trialEnd: (subscription as any).trial_end
-          ? new Date((subscription as any).trial_end * 1000)
-          : null,
-        canceledAt: (subscription as any).canceled_at
-          ? new Date((subscription as any).canceled_at * 1000)
-          : null,
-        metadata: subscription.metadata as any,
-      },
-      update: {
-        status: subscription.status,
-        priceId,
-        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-        cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-        canceledAt: (subscription as any).canceled_at
-          ? new Date((subscription as any).canceled_at * 1000)
-          : null,
-        metadata: subscription.metadata as any,
-      },
+    // NOTA: Este código es legacy de Stripe. El sistema ahora usa Paddle/MercadoPago
+    // Buscar por userId en lugar de stripeSubscriptionId
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: { userId },
     });
+
+    if (existingSubscription) {
+      await prisma.subscription.update({
+        where: { id: existingSubscription.id },
+        data: {
+          status: subscription.status,
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+          cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+          canceledAt: (subscription as any).canceled_at
+            ? new Date((subscription as any).canceled_at * 1000)
+            : null,
+          metadata: subscription.metadata as any,
+        },
+      });
+    } else {
+      await prisma.subscription.create({
+        data: {
+          userId,
+          status: subscription.status,
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+          cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+          trialStart: (subscription as any).trial_start
+            ? new Date((subscription as any).trial_start * 1000)
+            : null,
+          trialEnd: (subscription as any).trial_end
+            ? new Date((subscription as any).trial_end * 1000)
+            : null,
+          canceledAt: (subscription as any).canceled_at
+            ? new Date((subscription as any).canceled_at * 1000)
+            : null,
+          metadata: subscription.metadata as any,
+        },
+      });
+    }
 
     // Actualizar plan del usuario según el estado de la suscripción
     const shouldHavePremiumAccess =
@@ -93,7 +98,6 @@ export async function syncStripeSubscription(
       where: { id: userId },
       data: {
         plan: shouldHavePremiumAccess ? plan : "free",
-        stripeCustomerId: subscription.customer as string,
       },
     });
 
@@ -140,15 +144,20 @@ export async function handleSubscriptionCancellation(
     );
 
     // Actualizar suscripción en BD
-    await prisma.subscription.update({
-      where: {
-        stripeSubscriptionId: subscription.id,
-      },
-      data: {
-        status: "cancelled",
-        canceledAt: new Date(),
-      },
+    // NOTA: Este código es legacy de Stripe. El sistema ahora usa Paddle/MercadoPago
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: { userId },
     });
+
+    if (existingSubscription) {
+      await prisma.subscription.update({
+        where: { id: existingSubscription.id },
+        data: {
+          status: "cancelled",
+          canceledAt: new Date(),
+        },
+      });
+    }
 
     // Downgrade a free
     await prisma.user.update({
@@ -193,11 +202,11 @@ export async function handleSubscriptionRenewal(
     );
 
     // Registrar el pago en BD
+    // NOTA: Este código es legacy de Stripe. El sistema ahora usa Paddle/MercadoPago
     await prisma.invoice.create({
       data: {
         userId,
-        stripeInvoiceId: invoice.id,
-        stripePaymentIntentId: (invoice as any).payment_intent as string,
+        mercadopagoPaymentId: invoice.id, // Usar el campo correcto
         amount: (invoice as any).amount_paid,
         currency: invoice.currency,
         status: "paid",
@@ -240,11 +249,11 @@ export async function handlePaymentFailed(
     );
 
     // Registrar el intento fallido
+    // NOTA: Este código es legacy de Stripe. El sistema ahora usa Paddle/MercadoPago
     await prisma.invoice.create({
       data: {
         userId,
-        stripeInvoiceId: invoice.id,
-        stripePaymentIntentId: (invoice as any).payment_intent as string,
+        mercadopagoPaymentId: invoice.id, // Usar el campo correcto
         amount: (invoice as any).amount_due,
         currency: invoice.currency,
         status: "payment_failed",

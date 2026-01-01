@@ -20,12 +20,25 @@ export interface ProactiveMessageResult {
   error?: string;
 }
 
+export interface ProcessAllAgentsResult {
+  totalProcessed: number;
+  results: Array<{
+    agentId: string;
+    userId: string;
+    success: boolean;
+    messageId?: string;
+    error?: string;
+  }>;
+}
+
 /**
  * Process proactive messaging for all agents
  * This should be called periodically (e.g., every hour) by a cron job
  */
-export async function processAllAgents(): Promise<void> {
+export async function processAllAgents(): Promise<ProcessAllAgentsResult> {
   log.info('Starting proactive message processing for all agents');
+
+  const results: ProcessAllAgentsResult['results'] = [];
 
   try {
     // Get all agents with proactive config enabled
@@ -43,18 +56,40 @@ export async function processAllAgents(): Promise<void> {
     // Process each agent
     for (const config of configs) {
       try {
-        await processAgent(config.agentId, config.userId);
+        const result = await processAgent(config.agentId, config.userId);
+        if (result) {
+          results.push({
+            agentId: config.agentId,
+            userId: config.userId,
+            ...result,
+          });
+        }
       } catch (error) {
         log.error(
           { error, agentId: config.agentId, userId: config.userId },
           'Error processing agent'
         );
+        results.push({
+          agentId: config.agentId,
+          userId: config.userId,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     }
 
     log.info('Completed proactive message processing');
+
+    return {
+      totalProcessed: configs.length,
+      results,
+    };
   } catch (error) {
     log.error({ error }, 'Error in processAllAgents');
+    return {
+      totalProcessed: 0,
+      results,
+    };
   }
 }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { log } from "@/lib/logging/logger";
+import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import {
   getRetentionLeaderboard,
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       total: leaderboard.length,
     });
   } catch (error) {
-    log.error({ error }, "Error fetching retention leaderboard");
+    logger.error({ error }, "Error fetching retention leaderboard");
     return NextResponse.json(
       { error: "Error al obtener leaderboard" },
       { status: 500 }

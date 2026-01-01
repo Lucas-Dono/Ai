@@ -122,22 +122,21 @@ export async function GET(req: NextRequest) {
 
     const { prisma } = await import('@/lib/prisma');
 
-    const reports = await prisma.contentViolation.findMany({
+    const reports = await prisma.moderationAction.findMany({
       where: {
-        userId: user.id,
-        action: 'flagged',
+        moderatorId: user.id,
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
       select: {
         id: true,
-        contentType: true,
-        contentId: true,
+        targetType: true,
+        targetId: true,
         reason: true,
-        severity: true,
+        action: true,
         createdAt: true,
-        reviewedAt: true,
-        reviewedBy: true,
+        expiresAt: true,
+        details: true,
       },
     });
 

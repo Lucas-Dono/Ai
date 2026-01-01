@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Bot, Crown, Shield, MoreVertical, UserX, Settings } from "lucide-react";
+import { User, Bot, Crown, Shield, MoreVertical, UserX, Settings, UserPlus, CheckCircle2 } from "lucide-react";
 
 interface GroupMemberListProps {
   groupId: string;
@@ -26,6 +26,7 @@ interface GroupMemberListProps {
   currentUserRole?: string;
   onRemoveMember?: (memberId: string) => Promise<void>;
   onUpdateMember?: (memberId: string, updates: any) => Promise<void>;
+  onAddClick?: () => void;
 }
 
 export function GroupMemberList({
@@ -34,6 +35,7 @@ export function GroupMemberList({
   currentUserRole = "member",
   onRemoveMember,
   onUpdateMember,
+  onAddClick,
 }: GroupMemberListProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<string | null>(null);
@@ -83,217 +85,85 @@ export function GroupMemberList({
   });
 
   return (
-    <div className="space-y-6">
-      {/* Users section */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <User className="w-4 h-4 text-muted-foreground" />
-          <h3 className="font-semibold text-sm">
-            Usuarios ({userMembers.length})
-          </h3>
-        </div>
-
-        <div className="space-y-2">
-          {sortedUserMembers.map((member) => {
-            const isMenuOpen = openMenuId === member.id;
-            const isOwner = member.role === "owner";
-            const isModerator = member.role === "moderator";
-
-            return (
-              <div
-                key={member.id}
-                className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-              >
-                {/* Avatar */}
-                <div className="relative flex-shrink-0">
-                  {member.user?.image ? (
-                    <img
-                      src={member.user.image}
-                      alt={member.user.name || "User"}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-                      <User className="w-5 h-5 text-primary" />
-                    </div>
-                  )}
-
-                  {/* Role badge */}
-                  {isOwner && (
-                    <div
-                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-background"
-                      title="Owner"
-                    >
-                      <Crown className="w-3 h-3 text-white" />
-                    </div>
-                  )}
-                  {isModerator && (
-                    <div
-                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-background"
-                      title="Moderador"
-                    >
-                      <Shield className="w-3 h-3 text-white" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">
-                    {member.user?.name || "Usuario"}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {member.totalMessages} mensajes
-                    {member.isMuted && (
-                      <span className="ml-2 text-yellow-600">• Silenciado</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions menu */}
-                {canManageMembers && !isOwner && (
-                  <div className="relative">
-                    <button
-                      onClick={() =>
-                        setOpenMenuId(isMenuOpen ? null : member.id)
-                      }
-                      className="p-2 hover:bg-muted rounded transition-colors"
-                      disabled={isLoading === member.id}
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-
-                    {isMenuOpen && (
-                      <>
-                        {/* Backdrop */}
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setOpenMenuId(null)}
-                        />
-
-                        {/* Menu */}
-                        <div className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-lg shadow-lg z-20 overflow-hidden">
-                          <button
-                            onClick={() =>
-                              handleToggleMute(member.id, member.isMuted)
-                            }
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors"
-                          >
-                            {member.isMuted ? "Desilenciar" : "Silenciar"}
-                          </button>
-
-                          <button
-                            onClick={() => handleRemoveMember(member.id)}
-                            className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-destructive/10 transition-colors"
-                          >
-                            <div className="flex items-center gap-2">
-                              <UserX className="w-4 h-4" />
-                              <span>Remover</span>
-                            </div>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 border-b border-neutral-800 flex justify-between items-center">
+        <h3 className="font-bold text-neutral-300 text-sm uppercase tracking-wider">Miembros</h3>
+        <span className="bg-neutral-800 text-neutral-500 px-2 py-0.5 rounded text-xs">{members.filter(m => m.isActive).length}</span>
       </div>
 
-      {/* AIs section */}
-      {aiMembers.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Bot className="w-4 h-4 text-muted-foreground" />
-            <h3 className="font-semibold text-sm">
-              Inteligencias Artificiales ({aiMembers.length})
-            </h3>
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-6">
+        {/* Add button */}
+        <button
+          onClick={onAddClick}
+          className="w-full py-3 px-4 rounded-xl border-2 border-dashed border-neutral-700 text-neutral-400 hover:border-indigo-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+        >
+          <div className="bg-neutral-800 p-1 rounded-full group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+            <UserPlus size={16} />
           </div>
+          <span className="font-medium text-sm">Añadir Persona/IA</span>
+        </button>
 
-          <div className="space-y-2">
-            {aiMembers.map((member) => {
-              const isMenuOpen = openMenuId === member.id;
-
-              return (
-                <div
-                  key={member.id}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-colors"
-                >
-                  {/* Avatar */}
-                  <div className="relative flex-shrink-0">
+        {/* AIs section */}
+        {aiMembers.length > 0 && (
+          <div>
+            <h4 className="text-xs font-semibold text-neutral-500 uppercase mb-3 px-2">Inteligencias Artificiales</h4>
+            <div className="space-y-1">
+              {aiMembers.map((member) => (
+                <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-neutral-800 rounded-lg cursor-pointer group transition-colors">
+                  <div className="relative">
                     {member.agent?.avatar ? (
-                      <img
-                        src={member.agent.avatar}
-                        alt={member.agent.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
+                      <img src={member.agent.avatar} alt={member.agent.name} className="w-8 h-8 rounded-full object-cover" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center">
-                        <Bot className="w-5 h-5 text-purple-500" />
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-purple-500" />
                       </div>
                     )}
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-neutral-900"></span>
                   </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">
-                        {member.agent?.name}
-                      </span>
-                      <span className="px-1.5 py-0.5 bg-primary/20 text-primary text-[10px] font-semibold rounded">
-                        IA
-                      </span>
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-medium text-neutral-200 group-hover:text-white">{member.agent?.name}</p>
+                      <CheckCircle2 size={12} className="text-indigo-400" fill="currentColor" />
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {member.totalMessages} mensajes
-                    </div>
+                    <p className="text-[10px] text-neutral-500 truncate w-32">IA - {member.agent?.name?.split(' ')[0] || 'Artista'}</p>
                   </div>
-
-                  {/* Actions menu */}
-                  {canManageMembers && (
-                    <div className="relative">
-                      <button
-                        onClick={() =>
-                          setOpenMenuId(isMenuOpen ? null : member.id)
-                        }
-                        className="p-2 hover:bg-muted rounded transition-colors"
-                        disabled={isLoading === member.id}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-
-                      {isMenuOpen && (
-                        <>
-                          {/* Backdrop */}
-                          <div
-                            className="fixed inset-0 z-10"
-                            onClick={() => setOpenMenuId(null)}
-                          />
-
-                          {/* Menu */}
-                          <div className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-lg shadow-lg z-20 overflow-hidden">
-                            <button
-                              onClick={() => handleRemoveMember(member.id)}
-                              className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-destructive/10 transition-colors"
-                            >
-                              <div className="flex items-center gap-2">
-                                <UserX className="w-4 h-4" />
-                                <span>Remover IA</span>
-                              </div>
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Users section */}
+        {userMembers.length > 0 && (
+          <div>
+            <h4 className="text-xs font-semibold text-neutral-500 uppercase mb-3 px-2">Humanos</h4>
+            <div className="space-y-1">
+              {sortedUserMembers.map((member) => {
+                const isOwner = member.role === "owner";
+                const isModerator = member.role === "moderator";
+
+                return (
+                  <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-neutral-800 rounded-lg cursor-pointer group transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center text-xs font-bold text-neutral-400 border border-neutral-600">
+                      {member.user?.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1">
+                        <p className="text-sm font-medium text-neutral-200 group-hover:text-white">{member.user?.name || 'Usuario'}</p>
+                        {isOwner && <Crown size={12} className="text-yellow-500" />}
+                        {isModerator && <Shield size={12} className="text-blue-500" />}
+                      </div>
+                      <p className="text-[10px] text-neutral-500">{isOwner ? 'Admin' : isModerator ? 'Moderador' : 'Miembro'}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

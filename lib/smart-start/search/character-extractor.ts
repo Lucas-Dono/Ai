@@ -82,7 +82,7 @@ export class CharacterExtractor {
     // Calculate confidence based on data completeness and quality
     const confidence = this.calculateConfidence({
       hasName: Boolean(result.name),
-      hasDescription: Boolean(result.description) && result.description.length > 50,
+      hasDescription: Boolean(result.description) && (result.description?.length ?? 0) > 50,
       hasPersonality: personality.length >= 3,
       hasBackground: background.length > 100,
       hasAppearance: Boolean(appearance),
@@ -102,19 +102,19 @@ export class CharacterExtractor {
       alternateName: result.alternateName,
       personality,
       background,
-      appearance,
-      age: metadata.age?.toString(),
-      gender: metadata.gender,
-      occupation: metadata.occupation || metadata.profession,
-      relationships: metadata.relationships || [],
-      goals: metadata.goals || [],
-      quirks: metadata.quirks || [],
-      communicationStyle: metadata.communicationStyle,
-      catchphrases: metadata.catchphrases || [],
-      likes: metadata.likes || [],
-      dislikes: metadata.dislikes || [],
-      skills: metadata.skills || [],
-      fears: metadata.fears || [],
+      appearance: typeof appearance === 'string' ? appearance : undefined,
+      age: metadata.age ? String(metadata.age) : undefined,
+      gender: typeof metadata.gender === 'string' ? metadata.gender : undefined,
+      occupation: typeof (metadata.occupation || metadata.profession) === 'string' ? (metadata.occupation || metadata.profession) as string : undefined,
+      relationships: Array.isArray(metadata.relationships) ? metadata.relationships.map(r => String(r)) : [],
+      goals: Array.isArray(metadata.goals) ? metadata.goals.map(g => String(g)) : [],
+      quirks: Array.isArray(metadata.quirks) ? metadata.quirks.map(q => String(q)) : [],
+      communicationStyle: typeof metadata.communicationStyle === 'string' ? metadata.communicationStyle : undefined,
+      catchphrases: Array.isArray(metadata.catchphrases) ? metadata.catchphrases.map(c => String(c)) : [],
+      likes: Array.isArray(metadata.likes) ? metadata.likes.map(l => String(l)) : [],
+      dislikes: Array.isArray(metadata.dislikes) ? metadata.dislikes.map(d => String(d)) : [],
+      skills: Array.isArray(metadata.skills) ? metadata.skills.map(s => String(s)) : [],
+      fears: Array.isArray(metadata.fears) ? metadata.fears.map(f => String(f)) : [],
       metadata: {
         source: result.source,
         extractedFrom: result.sourceUrl || result.id,
@@ -238,7 +238,7 @@ export class CharacterExtractor {
       confident: ['confident', 'self-assured', 'poised', 'assertive', 'bold', 'sure'],
       insecure: ['insecure', 'uncertain', 'doubtful', 'hesitant', 'self-conscious'],
       determined: ['determined', 'resolute', 'persistent', 'tenacious', 'steadfast'],
-      weak-willed: ['weak-willed', 'irresolute', 'indecisive', 'wavering', 'vacillating'],
+      "weak-willed": ['weak-willed', 'irresolute', 'indecisive', 'wavering', 'vacillating'],
       disciplined: ['disciplined', 'controlled', 'restrained', 'self-controlled'],
       undisciplined: ['undisciplined', 'uncontrolled', 'wild', 'unrestrained'],
     },
@@ -353,7 +353,7 @@ export class CharacterExtractor {
     const metadata = result.metadata || {};
 
     // If we have explicit background
-    if (metadata.background) {
+    if (metadata.background && typeof metadata.background === 'string') {
       return metadata.background;
     }
 

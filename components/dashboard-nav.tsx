@@ -7,6 +7,7 @@ import { OnboardingMenu } from "@/components/onboarding/OnboardingMenu";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { GroupsNavItem } from "@/components/dashboard/GroupsNavItem";
 import { useClientLocale } from "@/hooks/useClientLocale";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -121,6 +122,17 @@ export function DashboardNav() {
             if (href === '/dashboard/my-stats') return 'my-stats-link';
             return undefined;
           };
+
+          // Use custom component for Groups item
+          if (item.href === '/dashboard/grupos') {
+            return (
+              <GroupsNavItem
+                key={item.href}
+                label={item.label}
+                isActive={isActive}
+              />
+            );
+          }
 
           return (
             <Link key={item.href} href={item.href} data-tour={getTourAttr(item.href)}>

@@ -313,7 +313,7 @@ export async function POST(
       agentId,
       userId,
       tier,
-      routineData.modifiedSystemPrompt,
+      routineData.enhancedPrompt,
       {
         livingAIContext: livingAIContext.combinedContext,
         energyContext: energyContextStr,
@@ -367,7 +367,7 @@ export async function POST(
     const llm = getLLMProvider();
     const response = await llm.generate({
       systemPrompt: finalPrompt,
-      messages: optimizedMessages, // Ya vienen en el formato correcto y orden correcto
+      messages: optimizedMessages as Array<{ role: "user" | "assistant" | "system"; content: string }>, // Ya vienen en el formato correcto y orden correcto
     });
 
     const estimatedTokens = Math.ceil((message.length + response.length) / 4);

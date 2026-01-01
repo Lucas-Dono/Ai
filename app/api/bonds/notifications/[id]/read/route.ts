@@ -14,7 +14,7 @@ type Params = {
 export async function POST(request: NextRequest, { params }: Params) {
   try {
     const user = await getAuthenticatedUser(request);
-    if (!session?.user) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     // Verify notification ownership
     const notification = await prisma.notification.findUnique({
       where: { id },
-      select: { userId: true },
+      select: { recipientId: true },
     });
 
     if (!notification) {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       );
     }
 
-    if (notification.userId !== user.id) {
+    if (notification.recipientId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

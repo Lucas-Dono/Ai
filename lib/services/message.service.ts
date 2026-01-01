@@ -139,7 +139,6 @@ export class MessageService {
             createdAt: true,
             metadata: true,
             userId: true,
-            worldId: true,
             agentId: true,
           },
         }),
@@ -597,7 +596,8 @@ export class MessageService {
         // Agregar contexto de memoria al prompt y regenerar
         const expandedPromptWithMemory = finalPrompt + searchResult.memoryContext;
 
-        response = await llm.generate({
+        const llmProvider = getLLMProvider();
+        response = await llmProvider.generate({
           systemPrompt: expandedPromptWithMemory,
           messages: conversationMessages,
         });
@@ -655,7 +655,8 @@ export class MessageService {
         );
 
         // Regenerate without commands
-        response = await llm.generate({
+        const llmProvider = getLLMProvider();
+        response = await llmProvider.generate({
           systemPrompt: finalPrompt + '\n\n⚠️ IMPORTANTE: NO uses comandos ([INTERESTS], [WORK], etc.) en tu respuesta. Responde directamente con texto natural.',
           messages: conversationMessages,
         });
@@ -721,7 +722,7 @@ export class MessageService {
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // MEMORY REFERENCE DETECTION (🆕 Memory Highlights Feature)
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      const memoryReferences = detectMemoryReferences(finalResponse, memoryContext);
+      const memoryReferences = detectMemoryReferences(finalResponse, memoryContext as any);
 
       if (memoryReferences.length > 0) {
         log.info(
@@ -832,7 +833,6 @@ export class MessageService {
             content, // user message
             finalResponse, // agent response
             {
-              conversationId: userMessage.conversationId || undefined,
               emotionalState: {
                 intensity: Math.max(
                   emotionalSummary.pad.valence,

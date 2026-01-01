@@ -190,7 +190,7 @@ export class EmbeddingQueueManager {
       } catch (error) {
         log.error({ error }, 'Error en procesamiento de cola');
       }
-    }, 500);
+    }, 500) as unknown as NodeJS.Timeout;
   }
 
   /**

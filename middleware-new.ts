@@ -91,7 +91,7 @@ function isPublicRoute(pathname: string): boolean {
 // ============================================================================
 // MAIN MIDDLEWARE
 // ============================================================================
-export default auth(async (req) => {
+export default async function middleware(req: any) {
   const { pathname, search } = req.nextUrl;
   const origin = req.headers.get("origin");
   const requestId = generateRequestId();
@@ -233,7 +233,7 @@ export default auth(async (req) => {
   }
 
   return response;
-});
+}
 
 export const config = {
   matcher: [

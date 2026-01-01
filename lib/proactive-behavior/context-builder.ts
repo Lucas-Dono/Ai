@@ -255,6 +255,7 @@ export class ContextBuilder {
 
   /**
    * Obtiene contexto de life events
+   * NOTE: narrativeArc feature has been deprecated/removed
    */
   private async getLifeEventsContext(
     agentId: string,
@@ -263,6 +264,14 @@ export class ContextBuilder {
     activeNarrativeArcs: NarrativeArcSummary[];
     upcomingEvents: EventSummary[];
   }> {
+    // Feature deprecated - narrativeArc table no longer exists
+    // Returning empty data for now
+    return {
+      activeNarrativeArcs: [],
+      upcomingEvents: []
+    };
+
+    /* DEPRECATED CODE - narrativeArc feature removed
     const activeArcs = await prisma.narrativeArc.findMany({
       where: {
         agentId,
@@ -278,7 +287,7 @@ export class ContextBuilder {
       take: 3,
     });
 
-    const activeNarrativeArcs: NarrativeArcSummary[] = activeArcs.map((arc) => {
+    const activeNarrativeArcs: NarrativeArcSummary[] = activeArcs.map((arc: any) => {
       const lastEvent = arc.events[0];
       const daysSinceStart = Math.floor(
         (Date.now() - arc.startedAt.getTime()) / (1000 * 60 * 60 * 24)
@@ -313,6 +322,7 @@ export class ContextBuilder {
     }
 
     return { activeNarrativeArcs, upcomingEvents };
+    */
   }
 
   /**

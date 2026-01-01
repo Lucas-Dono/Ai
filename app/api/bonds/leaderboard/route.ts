@@ -13,7 +13,7 @@ import { BondTier } from "@prisma/client";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const tier = searchParams.get("tier") as BondTier | null;
+    const tierParam = searchParams.get("tier");
     const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
 
     // Build where clause
@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
       status: "active",
     };
 
-    if (tier && tier !== "all") {
-      where.tier = tier;
+    if (tierParam && tierParam !== "all") {
+      where.tier = tierParam as BondTier;
     }
 
     // Fetch top bonds ordered by rarity score
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       leaderboard,
       count: leaderboard.length,
-      filter: tier || "all",
+      filter: tierParam || "all",
     });
   } catch (error) {
     console.error("Error fetching leaderboard:", error);

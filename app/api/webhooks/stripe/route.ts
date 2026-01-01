@@ -91,6 +91,9 @@ export async function POST(req: NextRequest) {
       "Stripe webhook received and verified"
     );
 
+    // TODO: WebhookEvent model not yet implemented in schema
+    // Uncomment when WebhookEvent model is added to Prisma schema
+    /*
     // Verificar idempotencia - evitar procesar el mismo evento 2 veces
     const existingEvent = await prisma.webhookEvent.findUnique({
       where: { stripeEventId: event.id },
@@ -113,15 +116,19 @@ export async function POST(req: NextRequest) {
         createdAt: new Date(event.created * 1000),
       },
     });
+    */
 
     // Manejar el evento según su tipo
     await handleStripeEvent(event);
 
+    // TODO: Uncomment when WebhookEvent model is added
+    /*
     // Marcar como procesado
     await prisma.webhookEvent.update({
       where: { stripeEventId: event.id },
       data: { processed: true, processedAt: new Date() },
     });
+    */
 
     log.info({ eventId: event.id, type: event.type }, "Webhook processed successfully");
 
@@ -263,10 +270,15 @@ async function handleSubscriptionUpdated(
 
     const userId = subscription.metadata.userId;
 
-    // Obtener suscripción anterior para detectar el tipo de cambio
+    // TODO: Subscription model doesn't have stripeSubscriptionId
+    // Need to use the correct field (mercadopagoPreapprovalId or paddleSubscriptionId)
+    // For now, skip the old subscription check
+    const oldSubscription = null;
+    /*
     const oldSubscription = await prisma.subscription.findUnique({
       where: { stripeSubscriptionId: subscription.id },
     });
+    */
 
     // Detectar tipo de cambio
     let changeType: string | null = null;

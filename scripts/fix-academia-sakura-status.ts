@@ -1,10 +1,12 @@
 #!/usr/bin/env tsx
 
 /**
- * Script para arreglar el status del mundo Academia Sakura
- * Cambia autoMode a false y status a STOPPED
+ * SCRIPT OBSOLETO
+ * Este script usa el modelo 'World' que fue migrado a 'Group'
+ * Mantenerlo solo para referencia histórica
  */
 
+/*
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -59,3 +61,7 @@ async function main() {
 }
 
 main();
+*/
+
+console.log('❌ Este script está obsoleto. El sistema World fue migrado a Group.');
+console.log('💡 Usa los nuevos scripts de gestión de grupos en su lugar.');

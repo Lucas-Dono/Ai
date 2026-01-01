@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { Bot, User, Info } from "lucide-react";
+import { Bot, Info } from "lucide-react";
 import { useState } from "react";
 
 interface GroupMessageBubbleProps {
@@ -49,7 +49,7 @@ export function GroupMessageBubble({
   if (message.isSystemMessage) {
     return (
       <div className="flex items-center justify-center py-2">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-full text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/50 rounded-full text-xs text-neutral-400">
           <Info className="w-3 h-3" />
           <span>{message.content}</span>
         </div>
@@ -66,48 +66,44 @@ export function GroupMessageBubble({
 
   return (
     <div
-      className={`flex gap-3 py-2 px-4 hover:bg-muted/30 transition-colors ${
-        isOwnMessage ? "flex-row-reverse" : ""
-      }`}
+      className={`flex gap-4 mb-6 ${isOwnMessage ? "flex-row-reverse" : ""} group relative z-10`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {/* Avatar */}
-      <div className="flex-shrink-0">
-        {authorAvatar ? (
-          <img
-            src={authorAvatar}
-            alt={authorName || "User"}
-            className="w-8 h-8 rounded-full object-cover"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-            {isAIMessage ? (
-              <Bot className="w-4 h-4 text-primary" />
+      <div className="flex-shrink-0 mt-1">
+        {isAIMessage ? (
+          <div className="relative">
+            {authorAvatar ? (
+              <img
+                src={authorAvatar}
+                alt={authorName || "AI"}
+                className="w-10 h-10 rounded-full object-cover border border-neutral-700"
+              />
             ) : (
-              <User className="w-4 h-4 text-primary" />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center border border-neutral-700">
+                <Bot className="w-5 h-5 text-purple-400" />
+              </div>
             )}
+            <div className="absolute -bottom-1 -right-1 bg-indigo-500 text-white p-[2px] rounded-full border-2 border-neutral-900">
+              <Bot size={10} />
+            </div>
+          </div>
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center text-neutral-300 font-bold border border-neutral-600">
+            TU
           </div>
         )}
       </div>
 
       {/* Message content */}
-      <div className={`flex-1 min-w-0 ${isOwnMessage ? "items-end" : ""}`}>
+      <div className={`max-w-[70%] flex flex-col ${isOwnMessage ? "items-end" : "items-start"}`}>
         {/* Author name and timestamp */}
-        <div
-          className={`flex items-baseline gap-2 mb-1 ${
-            isOwnMessage ? "flex-row-reverse" : ""
-          }`}
-        >
-          <span className="font-medium text-sm">
-            {authorName || "Usuario"}
-            {isAIMessage && (
-              <span className="ml-1.5 px-1.5 py-0.5 bg-primary/20 text-primary text-[10px] font-semibold rounded">
-                IA
-              </span>
-            )}
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className={`font-medium text-sm ${isAIMessage ? 'text-indigo-400' : 'text-white'}`}>
+            {isOwnMessage ? "Tu (Usuario)" : authorName || "Usuario"}
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-[10px] text-neutral-500">
             {formatDistanceToNow(new Date(message.createdAt), {
               addSuffix: true,
               locale: es,
@@ -117,11 +113,7 @@ export function GroupMessageBubble({
 
         {/* Reply preview */}
         {message.replyTo && (
-          <div
-            className={`mb-2 pl-3 border-l-2 border-primary/40 text-xs text-muted-foreground ${
-              isOwnMessage ? "text-right border-r-2 border-l-0 pr-3 pl-0" : ""
-            }`}
-          >
+          <div className="mb-2 pl-3 border-l-2 border-indigo-500/40 text-xs text-neutral-400">
             <div className="font-medium">
               {message.replyTo.authorType === "user"
                 ? message.replyTo.user?.name
@@ -133,42 +125,13 @@ export function GroupMessageBubble({
 
         {/* Message bubble */}
         <div
-          className={`relative inline-block max-w-[80%] px-4 py-2 rounded-2xl ${
-            isOwnMessage
-              ? "bg-primary text-primary-foreground rounded-br-sm"
-              : isAIMessage
-              ? "bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-bl-sm"
-              : "bg-muted rounded-bl-sm"
-          }`}
+          className={`p-3 rounded-2xl text-sm leading-relaxed shadow-sm
+            ${isOwnMessage
+              ? 'bg-indigo-600 text-white rounded-tr-sm'
+              : 'bg-[#262626] text-neutral-100 rounded-tl-sm border border-neutral-700'
+            }`}
         >
-          <p className="text-sm whitespace-pre-wrap break-words">
-            {message.content}
-          </p>
-
-          {/* Action buttons (on hover) */}
-          {showActions && onReply && (
-            <button
-              onClick={() => onReply(message)}
-              className={`absolute -top-2 ${
-                isOwnMessage ? "-left-2" : "-right-2"
-              } p-1 bg-background border border-border rounded-full shadow-sm hover:bg-muted transition-colors opacity-0 group-hover:opacity-100`}
-              title="Responder"
-            >
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-                />
-              </svg>
-            </button>
-          )}
+          <p className="whitespace-pre-wrap break-words">{message.content}</p>
         </div>
       </div>
     </div>

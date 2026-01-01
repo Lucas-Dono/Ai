@@ -22,6 +22,7 @@ interface FeaturedAgent {
   };
   rating?: number | null;
   cloneCount?: number;
+  ownerId?: string | null;
 }
 
 const categoryIcons = {
@@ -70,7 +71,7 @@ export function FeaturedAIsHero() {
       if (res.ok) {
         const data = await res.json();
         // Get only public featured agents
-        const featured = data.filter((a: FeaturedAgent) => a.featured && !a.userId);
+        const featured = data.filter((a: FeaturedAgent) => a.featured && !a.ownerId);
         setFeaturedAgents(featured);
       }
     } catch (error) {

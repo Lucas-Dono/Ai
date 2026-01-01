@@ -89,8 +89,8 @@ export async function POST(
         id: true,
         name: true,
         avatar: true,
-        creatorId: true,
-        isPublic: true,
+        userId: true,
+        visibility: true,
       },
     });
 
@@ -103,7 +103,7 @@ export async function POST(
 
     // 5. Verificar permisos de acceso al agente
     // El agente debe ser del usuario o público
-    if (agent.creatorId !== user.id && !agent.isPublic) {
+    if (agent.userId !== user.id && agent.visibility !== "public") {
       return NextResponse.json(
         { error: "No tienes acceso a este agente" },
         { status: 403 }

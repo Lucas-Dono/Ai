@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   try {
     // Verificar autenticación
     const user = await getAuthenticatedUser(req);
-    if (!session?.user) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await getAuthenticatedUser(req);
-    if (!session?.user) {
+    if (!user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

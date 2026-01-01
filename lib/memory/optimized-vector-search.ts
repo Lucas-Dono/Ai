@@ -185,7 +185,9 @@ export class OptimizedVectorSearch {
     if (this.embeddingCache.size >= this.MAX_CACHE_SIZE) {
       // Remove oldest entry
       const firstKey = this.embeddingCache.keys().next().value;
-      this.embeddingCache.delete(firstKey);
+      if (firstKey) {
+        this.embeddingCache.delete(firstKey);
+      }
     }
 
     this.embeddingCache.set(cacheKey, {
@@ -198,7 +200,7 @@ export class OptimizedVectorSearch {
       const redisCacheKey = `embedding:${cacheKey}`;
       redis
         .set(redisCacheKey, JSON.stringify(embedding), 'EX', config.cacheTTL)
-        .catch((err) =>
+        .catch((err: unknown) =>
           console.warn('[OptimizedVectorSearch] Redis cache set error:', err)
         );
     } catch (error) {

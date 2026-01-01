@@ -428,7 +428,7 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.primary,
   },
 
   // App Header

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { checkAndAwardBadges } from "@/lib/gamification/badge-system";
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    log.error({ error }, "Error fetching badges");
+    logger.error({ error }, "Error fetching badges");
     return NextResponse.json(
       { error: "Error al obtener badges" },
       { status: 500 }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       count: awardedBadges.length,
     });
   } catch (error) {
-    log.error({ error }, "Error checking badges");
+    logger.error({ error }, "Error checking badges");
     return NextResponse.json(
       { error: "Error al verificar badges" },
       { status: 500 }

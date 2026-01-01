@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { log } from "@/lib/logging/logger";
+import log from "@/lib/logging/logger";
 import { updateRetentionLeaderboard } from "@/lib/gamification/retention-leaderboard";
 
 /**
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const secret = searchParams.get("secret");
 
     if (secret !== process.env.CRON_SECRET) {
-      log.warn({ ip: request.ip }, "Unauthorized cron job attempt");
+      log.warn("Unauthorized cron job attempt");
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }

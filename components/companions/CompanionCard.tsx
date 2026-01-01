@@ -15,6 +15,7 @@ interface CompanionCardProps {
   categories?: CategoryKey[];
   generationTier?: string | null;
   index?: number;
+  onClick?: () => void;
 }
 
 const getTierBadge = (tier?: string | null) => {
@@ -45,7 +46,8 @@ export function CompanionCard({
   avatar,
   categories = [],
   generationTier,
-  index = 0
+  index = 0,
+  onClick
 }: CompanionCardProps) {
   const locale = useLocale();
   const tierBadge = getTierBadge(generationTier);
@@ -53,6 +55,13 @@ export function CompanionCard({
 
   // Generar gradiente único basado en el nombre si no hay avatar
   const bgGradient = avatar ? undefined : generateGradient(name);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick();
+    }
+  };
 
   return (
     <motion.article
@@ -65,6 +74,7 @@ export function CompanionCard({
       }}
       className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#141416] transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
       style={{ aspectRatio: '3/5' }}
+      onClick={handleClick}
     >
       {/* Image Area */}
       <Link href={`/agentes/${id}`} className="relative w-full" style={{ aspectRatio: '1/1' }}>
@@ -113,15 +123,18 @@ export function CompanionCard({
         {/* Categories */}
         {characterCategories.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3.5">
-            {characterCategories.map((category) => (
-              <span
-                key={category.key}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-medium rounded-full border ${category.color.text} ${category.color.border} ${category.color.bg}`}
-              >
-                <span>{category.icon}</span>
-                <span>{category.label[locale as 'en' | 'es']}</span>
-              </span>
-            ))}
+            {characterCategories.map((category) => {
+              const IconComponent = category.icon;
+              return (
+                <span
+                  key={category.key}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-medium rounded-full border ${category.color.text} ${category.color.border} ${category.color.bg}`}
+                >
+                  <IconComponent className="w-3 h-3" />
+                  <span>{category.label[locale as 'en' | 'es']}</span>
+                </span>
+              );
+            })}
           </div>
         )}
 

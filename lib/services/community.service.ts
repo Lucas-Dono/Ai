@@ -16,6 +16,7 @@ export interface CreateCommunityData {
   banner?: string;
   bannerShape?: string;
   rules?: string;
+  primaryColor?: string;
 }
 
 export interface UpdateCommunityData {
@@ -54,10 +55,9 @@ export const CommunityService = {
         category: data.category,
         type: data.type || 'public',
         icon: data.icon,
-        iconShape: data.iconShape,
         banner: data.banner,
-        bannerShape: data.bannerShape,
         rules: data.rules,
+        primaryColor: data.primaryColor || '#8B5CF6',
       },
       include: {
         owner: {
@@ -631,138 +631,10 @@ export const CommunityService = {
   },
 
   /**
-   * Verificar si un usuario es owner o co-owner
+   * Verificar si un usuario es owner
    */
-  isOwnerOrCoOwner(community: any, userId: string): boolean {
-    if (community.ownerId === userId) return true;
-
-    const coOwnerIds = Array.isArray(community.coOwnerIds)
-      ? community.coOwnerIds
-      : [];
-
-    return coOwnerIds.includes(userId);
-  },
-
-  /**
-   * Agregar co-owner a una comunidad (solo owner principal)
-   */
-  async addCoOwner(communityId: string, requesterId: string, newCoOwnerId: string) {
-    // Verificar que el requester sea el owner principal
-    const community = await prisma.community.findUnique({
-      where: { id: communityId },
-    });
-
-    if (!community) {
-      throw new Error('Comunidad no encontrada');
-    }
-
-    if (community.ownerId !== requesterId) {
-      throw new Error('Solo el propietario principal puede agregar co-propietarios');
-    }
-
-    // Verificar que el nuevo co-owner no sea ya owner o co-owner
-    const coOwnerIds = Array.isArray(community.coOwnerIds)
-      ? community.coOwnerIds as string[]
-      : [];
-
-    if (community.ownerId === newCoOwnerId) {
-      throw new Error('Esta persona ya es el propietario principal');
-    }
-
-    if (coOwnerIds.includes(newCoOwnerId)) {
-      throw new Error('Esta persona ya es co-propietario');
-    }
-
-    // Verificar que sea miembro de la comunidad
-    const member = await prisma.communityMember.findUnique({
-      where: {
-        communityId_userId: {
-          communityId,
-          userId: newCoOwnerId,
-        },
-      },
-    });
-
-    if (!member) {
-      throw new Error('La persona debe ser miembro de la comunidad primero');
-    }
-
-    // Agregar como co-owner
-    const updatedCoOwnerIds = [...coOwnerIds, newCoOwnerId];
-
-    await prisma.community.update({
-      where: { id: communityId },
-      data: {
-        coOwnerIds: updatedCoOwnerIds,
-      },
-    });
-
-    // Actualizar su rol de miembro a owner
-    await prisma.communityMember.update({
-      where: {
-        communityId_userId: {
-          communityId,
-          userId: newCoOwnerId,
-        },
-      },
-      data: {
-        role: 'owner',
-        canModerate: true,
-      },
-    });
-
-    return { success: true };
-  },
-
-  /**
-   * Remover co-owner (solo owner principal)
-   */
-  async removeCoOwner(communityId: string, requesterId: string, coOwnerIdToRemove: string) {
-    // Verificar que el requester sea el owner principal
-    const community = await prisma.community.findUnique({
-      where: { id: communityId },
-    });
-
-    if (!community) {
-      throw new Error('Comunidad no encontrada');
-    }
-
-    if (community.ownerId !== requesterId) {
-      throw new Error('Solo el propietario principal puede remover co-propietarios');
-    }
-
-    const coOwnerIds = Array.isArray(community.coOwnerIds)
-      ? community.coOwnerIds as string[]
-      : [];
-
-    if (!coOwnerIds.includes(coOwnerIdToRemove)) {
-      throw new Error('Esta persona no es co-propietario');
-    }
-
-    // Remover del array
-    const updatedCoOwnerIds = coOwnerIds.filter(id => id !== coOwnerIdToRemove);
-
-    await prisma.community.update({
-      where: { id: communityId },
-      data: {
-        coOwnerIds: updatedCoOwnerIds,
-      },
-    });
-
-    // Cambiar su rol a moderator (mantiene privilegios pero no ownership)
-    await prisma.communityMember.update({
-      where: {
-        communityId_userId: {
-          communityId,
-          userId: coOwnerIdToRemove,
-        },
-      },
-      data: {
-        role: 'moderator',
-      },
-    });
-
-    return { success: true };
+  isOwner(community: any, userId: string): boolean {
+    return community.ownerId === userId;
   },
 
   /**
@@ -796,22 +668,11 @@ export const CommunityService = {
       throw new Error('El nuevo propietario debe ser miembro de la comunidad');
     }
 
-    const coOwnerIds = Array.isArray(community.coOwnerIds)
-      ? community.coOwnerIds as string[]
-      : [];
-
-    // Si el nuevo owner era co-owner, removerlo del array
-    const updatedCoOwnerIds = coOwnerIds.filter(id => id !== newOwnerId);
-
-    // Agregar al owner anterior como co-owner
-    updatedCoOwnerIds.push(currentOwnerId);
-
     // Actualizar la comunidad
     await prisma.community.update({
       where: { id: communityId },
       data: {
         ownerId: newOwnerId,
-        coOwnerIds: updatedCoOwnerIds,
       },
     });
 
@@ -830,7 +691,7 @@ export const CommunityService = {
       },
     });
 
-    // Owner anterior (ahora co-owner)
+    // Owner anterior pasa a moderator
     await prisma.communityMember.update({
       where: {
         communityId_userId: {
@@ -839,7 +700,7 @@ export const CommunityService = {
         },
       },
       data: {
-        role: 'owner', // Mantiene rol owner (ahora como co-owner)
+        role: 'moderator',
       },
     });
 

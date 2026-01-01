@@ -62,9 +62,9 @@ export default function CommunitySettingsPage() {
         type: community.type,
         rules: community.rules || "",
         icon: community.icon || "",
-        iconShape: (community.iconShape as any) || "circle",
+        iconShape: "circle" as const,
         banner: community.banner || "",
-        bannerShape: (community.bannerShape as any) || "banner",
+        bannerShape: "banner" as const,
         primaryColor: community.primaryColor,
       });
     }
@@ -285,7 +285,7 @@ export default function CommunitySettingsPage() {
             label={`${t('form.icon.label')} (${t('form.optional')})`}
             currentImage={formData.icon}
             currentShape={formData.iconShape}
-            onImageChange={(url, shape) => setFormData({ ...formData, icon: url, iconShape: shape })}
+            onImageChange={(url, shape) => setFormData({ ...formData, icon: url, iconShape: shape as "circle" })}
             placeholder={t('form.icon.placeholder')}
             hint={t('form.icon.hint')}
             type="icon"
@@ -296,7 +296,7 @@ export default function CommunitySettingsPage() {
             label={`${t('form.banner.label')} (${t('form.optional')})`}
             currentImage={formData.banner}
             currentShape={formData.bannerShape}
-            onImageChange={(url, shape) => setFormData({ ...formData, banner: url, bannerShape: shape })}
+            onImageChange={(url, shape) => setFormData({ ...formData, banner: url, bannerShape: shape as "banner" })}
             placeholder={t('form.banner.placeholder')}
             hint={t('form.banner.hint')}
             type="banner"

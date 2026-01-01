@@ -54,7 +54,7 @@ export function determineResponseDepth(
   if (userMessageLength < 50) {
     // Usuario envió mensaje muy corto
     if (baseLength === "long") baseLength = "medium";
-    if (baseLength === "very_long") baseLength = "long";
+    // very_long no está disponible en el tipo actual
   } else if (userMessageLength > 300) {
     // Usuario envió mensaje largo = reciprocar con respuesta más detallada
     if (baseLength === "very_short") baseLength = "short";
@@ -64,17 +64,17 @@ export function determineResponseDepth(
   // Ajustar según posición en conversación
   if (messagesInSession < 3) {
     // Inicio de conversación - respuestas más medidas
-    if (baseLength === "very_long") baseLength = "long";
+    // very_long no está disponible en el tipo actual
   } else if (messagesInSession > 20) {
     // Conversación larga - posible cansancio
     if (baseLength === "long") baseLength = "medium";
-    if (baseLength === "very_long") baseLength = "medium";
+    // very_long no está disponible en el tipo actual
   }
 
   // Ajustar según relación
   if (relationshipLevel === "stranger" || relationshipLevel === "acquaintance") {
     // Con strangers, respuestas más medidas
-    if (baseLength === "very_long") baseLength = "long";
+    // very_long no está disponible en el tipo actual
   }
 
   return generateDepthInstructions(baseLength);

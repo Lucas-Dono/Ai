@@ -1,3 +1,10 @@
+/**
+ * SCRIPT OBSOLETO
+ * Este script usa el modelo 'World' que fue migrado a 'Group'
+ * Mantenerlo solo para referencia histórica
+ */
+
+/*
 import { prisma } from "../lib/prisma";
 
 async function cleanupWorlds() {
@@ -22,7 +29,7 @@ async function cleanupWorlds() {
   console.log(`📊 Total de mundos encontrados: ${allWorlds.length}\n`);
 
   // Mostrar todos los mundos
-  allWorlds.forEach((world, idx) => {
+  allWorlds.forEach((world: any, idx: number) => {
     console.log(`${idx + 1}. ${world.name}`);
     console.log(`   ID: ${world.id}`);
     console.log(`   Predefinido: ${world.isPredefined ? 'Sí' : 'No'}`);
@@ -32,7 +39,7 @@ async function cleanupWorlds() {
   });
 
   // Buscar Academia Sakura
-  const academiaSakura = allWorlds.find(w =>
+  const academiaSakura = allWorlds.find((w: any) =>
     w.name.toLowerCase().includes('academia') &&
     w.name.toLowerCase().includes('sakura')
   );
@@ -46,7 +53,7 @@ async function cleanupWorlds() {
   console.log(`✅ Mundo a mantener: ${academiaSakura.name} (${academiaSakura.id})\n`);
 
   // Mundos a eliminar
-  const worldsToDelete = allWorlds.filter(w => w.id !== academiaSakura.id);
+  const worldsToDelete = allWorlds.filter((w: any) => w.id !== academiaSakura.id);
 
   if (worldsToDelete.length === 0) {
     console.log("ℹ️  No hay mundos para eliminar. Solo existe Academia Sakura.");
@@ -54,7 +61,7 @@ async function cleanupWorlds() {
   }
 
   console.log(`🗑️  Mundos a eliminar: ${worldsToDelete.length}\n`);
-  worldsToDelete.forEach(w => console.log(`   - ${w.name} (${w.id})`));
+  worldsToDelete.forEach((w: any) => console.log(`   - ${w.name} (${w.id})`));
 
   console.log("\n⚠️  Iniciando eliminación en cascada...\n");
 
@@ -79,7 +86,7 @@ async function cleanupWorlds() {
 
   console.log("\n✨ Resultado final:");
   console.log(`📊 Mundos restantes: ${remainingWorlds.length}\n`);
-  remainingWorlds.forEach(w => console.log(`   ✓ ${w.name} (${w.id})`));
+  remainingWorlds.forEach((w: any) => console.log(`   ✓ ${w.name} (${w.id})`));
 
   console.log("\n✅ Limpieza completada!");
 }
@@ -87,3 +94,7 @@ async function cleanupWorlds() {
 cleanupWorlds()
   .catch(console.error)
   .finally(() => prisma.$disconnect());
+*/
+
+console.log('❌ Este script está obsoleto. El sistema World fue migrado a Group.');
+console.log('💡 Usa los nuevos scripts de gestión de grupos en su lugar.');

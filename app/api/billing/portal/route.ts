@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getUserSubscription } from "@/lib/mercadopago/subscription";
-import { createStripePortalSession } from "@/lib/stripe/checkout";
 import { billingLogger as log } from "@/lib/logging/loggers";
 
 export async function POST(req: NextRequest) {
@@ -25,19 +24,16 @@ export async function POST(req: NextRequest) {
     log.info({ userId: user.id }, "Opening billing portal");
 
     // Determinar el proveedor y redirigir al portal apropiado
-    if (subscription.stripeSubscriptionId && subscription.stripeCustomerId) {
-      // STRIPE PORTAL - Portal completo de gestión
-      log.info({ userId: user.id, provider: "stripe" }, "Redirecting to Stripe portal");
+    if (subscription.paddleSubscriptionId) {
+      // PADDLE PORTAL - Portal completo de gestión
+      log.info({ userId: user.id, provider: "paddle" }, "Redirecting to Paddle portal");
 
-      const portalUrl = await createStripePortalSession(
-        subscription.stripeCustomerId,
-        `${process.env.NEXTAUTH_URL}/dashboard/billing`
-      );
+      const portalUrl = `${process.env.NEXTAUTH_URL}/dashboard/billing/manage`;
 
       return NextResponse.json({
         url: portalUrl,
-        provider: "stripe",
-        message: "Manage your subscription through Stripe"
+        provider: "paddle",
+        message: "Manage your subscription through Paddle"
       });
     } else if (subscription.mercadopagoPreapprovalId) {
       // MERCADOPAGO - Redirigir a dashboard interno

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, X } from "lucide-react";
+import { Send, X, Paperclip, Smile } from "lucide-react";
 
 interface GroupMessageInputProps {
   groupId: string;
@@ -72,12 +72,12 @@ export function GroupMessageInput({
   };
 
   return (
-    <div className="border-t border-border bg-background">
+    <div className="px-4 py-3 border-t border-white/5 z-20 shrink-0" style={{ backgroundColor: '#171717' }}>
       {/* Reply preview */}
       {replyingTo && (
-        <div className="flex items-start gap-2 px-4 py-2 bg-muted/50 border-b border-border">
+        <div className="flex items-start gap-2 px-4 py-2 bg-neutral-800/50 border-b border-neutral-700 mb-2 rounded-lg">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-0.5">
+            <div className="flex items-center gap-2 text-xs text-neutral-400 mb-0.5">
               <svg
                 className="w-3 h-3"
                 fill="none"
@@ -93,13 +93,13 @@ export function GroupMessageInput({
               </svg>
               <span>Respondiendo a {replyingTo.authorName}</span>
             </div>
-            <p className="text-sm text-foreground/80 line-clamp-2 pl-5">
+            <p className="text-sm text-neutral-200 line-clamp-2 pl-5">
               {replyingTo.content}
             </p>
           </div>
           <button
             onClick={onCancelReply}
-            className="p-1 hover:bg-background rounded transition-colors"
+            className="p-1 hover:bg-neutral-700 rounded transition-colors text-neutral-400"
             title="Cancelar"
           >
             <X className="w-4 h-4" />
@@ -108,7 +108,11 @@ export function GroupMessageInput({
       )}
 
       {/* Input area */}
-      <div className="flex items-end gap-2 p-4">
+      <div className="max-w-4xl mx-auto flex items-end gap-3 bg-neutral-800/50 p-2 rounded-xl border border-neutral-700 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/20 transition-all">
+        <button className="p-2 text-neutral-400 hover:text-white hover:bg-neutral-700 rounded-lg transition-colors">
+          <Paperclip size={20} />
+        </button>
+
         <textarea
           ref={textareaRef}
           value={content}
@@ -116,25 +120,23 @@ export function GroupMessageInput({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled || isSending}
-          className="flex-1 resize-none bg-muted rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed max-h-[200px]"
+          className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder-neutral-500 resize-none py-2 max-h-32 min-h-[44px] focus:outline-none"
           rows={1}
         />
 
-        <button
-          onClick={handleSend}
-          disabled={!content.trim() || disabled || isSending}
-          className="flex-shrink-0 p-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all disabled:hover:bg-primary"
-          title="Enviar (Enter)"
-        >
-          <Send className={`w-5 h-5 ${isSending ? "animate-pulse" : ""}`} />
-        </button>
-      </div>
-
-      {/* Helper text */}
-      <div className="px-4 pb-2 text-xs text-muted-foreground">
-        Presiona <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">Enter</kbd>{" "}
-        para enviar, <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">Shift+Enter</kbd>{" "}
-        para nueva línea
+        <div className="flex items-center gap-1">
+          <button className="p-2 text-neutral-400 hover:text-yellow-400 hover:bg-neutral-700 rounded-lg transition-colors">
+            <Smile size={20} />
+          </button>
+          <button
+            onClick={handleSend}
+            disabled={!content.trim() || disabled || isSending}
+            className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600"
+            title="Enviar (Enter)"
+          >
+            <Send size={18} className={isSending ? "animate-pulse" : ""} />
+          </button>
+        </div>
       </div>
     </div>
   );

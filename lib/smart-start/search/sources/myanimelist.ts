@@ -163,7 +163,7 @@ export class MyAnimeListSource implements SearchSource {
       description: this.cleanDescription(char.about),
       imageUrl: char.images.jpg.image_url,
       thumbnailUrl: char.images.jpg.small_image_url || char.images.jpg.image_url,
-      source: 'mal',
+      source: 'myanimelist',
       sourceUrl: char.url,
       metadata: {
         nicknames: char.nicknames,

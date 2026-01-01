@@ -10,6 +10,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+// @ts-expect-error - string-similarity doesn't have type definitions
 import stringSimilarity from "string-similarity";
 
 // Thresholds para detección
@@ -334,7 +335,7 @@ export async function flagUserForReview(
       targetId: userId,
       action: "flag_suspicious",
       reason,
-      metadata: evidence,
+      details: JSON.stringify(evidence),
     },
   });
 }

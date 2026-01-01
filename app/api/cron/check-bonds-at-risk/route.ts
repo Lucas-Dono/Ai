@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import log from "@/lib/logging/logger";
 import { notifyBondAtRisk } from "@/lib/notifications/push";
 import { PushNotificationServerService } from "@/lib/services/push-notification-server.service";
 import {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const secret = searchParams.get("secret");
 
     if (secret !== process.env.CRON_SECRET) {
-      log.warn({ ip: request.ip }, "Unauthorized cron job attempt");
+      log.warn("Unauthorized cron job attempt");
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const bondsAtRisk = bonds
       .map((bond) => {
-        const lastInteractionDate = bond.lastInteractionAt || bond.createdAt;
+        const lastInteractionDate = bond.lastInteraction || bond.createdAt;
         const daysSinceInteraction = Math.floor(
           (now.getTime() - lastInteractionDate.getTime()) / (1000 * 60 * 60 * 24)
         );

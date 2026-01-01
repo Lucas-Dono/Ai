@@ -149,8 +149,8 @@ export async function POST(req: NextRequest) {
     // Build generation input
     const generationInput: SmartStartGenerationInput = {
       name: name.trim(),
-      context,
-      archetype,
+      context: context as any, // Already validated above
+      archetype: archetype as any, // Already validated above
       tier,
       depthLevel, // Use validated depth level
       language: language as 'es' | 'en',

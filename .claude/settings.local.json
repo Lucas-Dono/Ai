@@ -151,7 +151,8 @@
       "Bash({ chmod -R 777 /mnt/SSD/Proyectos/AI/creador-inteligencias/.next)",
       "Bash(})",
       "mcp__playwright__browser_hover",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(PGPASSWORD=\"${DATABASE_PASSWORD:-creador_inteligencias_password}\" psql:*)"
     ],
     "deny": [],
     "ask": []

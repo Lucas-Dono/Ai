@@ -3,12 +3,20 @@
 /**
  * Test script para el World Generator
  * Ejecutar: npx tsx scripts/test-world-generator.ts
+ *
+ * NOTA: Este script está deshabilitado porque el sistema de Worlds
+ * fue migrado al sistema de Groups. Este archivo se mantiene solo
+ * como referencia histórica.
  */
 
-import { getWorldGenerator } from '../lib/worlds/world-generator';
+// import { getWorldGenerator } from '../lib/worlds/world-generator';
 
 async function main() {
-  console.log('🧪 Testing World Generator with Gemini\n');
+  console.log('⚠️  This test is disabled: World system migrated to Groups\n');
+  console.log('The world-generator module no longer exists.\n');
+  return;
+
+  /* console.log('🧪 Testing World Generator with Gemini\n');
 
   const generator = getWorldGenerator();
 
@@ -48,14 +56,14 @@ async function main() {
       console.log(result.initialContext.substring(0, 200) + '...\n');
 
       console.log(`👥 Characters (${result.suggestedAgents.length}):`);
-      result.suggestedAgents.forEach((agent, idx) => {
+      result.suggestedAgents.forEach((agent: any, idx: number) => {
         console.log(`  ${idx + 1}. ${agent.name} (${agent.importanceLevel}) - ${agent.role}`);
         console.log(`     ${agent.description.substring(0, 100)}...`);
       });
 
       if (result.suggestedEvents && result.suggestedEvents.length > 0) {
         console.log(`\n📅 Events (${result.suggestedEvents.length}):`);
-        result.suggestedEvents.forEach((event, idx) => {
+        result.suggestedEvents.forEach((event: any, idx: number) => {
           console.log(`  ${idx + 1}. ${event.name} (${event.triggerType})`);
         });
       }
@@ -68,7 +76,7 @@ async function main() {
       }
 
       console.log(`\n💡 Tips (${result.tips?.length || 0}):`);
-      result.tips?.forEach((tip, idx) => {
+      result.tips?.forEach((tip: string, idx: number) => {
         console.log(`  ${idx + 1}. ${tip}`);
       });
 
@@ -84,6 +92,7 @@ async function main() {
   console.log(`\n${'='.repeat(60)}`);
   console.log('🎉 Test completed!');
   console.log(`${'='.repeat(60)}\n`);
+  */
 }
 
 main()

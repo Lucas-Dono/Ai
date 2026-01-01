@@ -15,9 +15,9 @@ export function CharacterPreview({ draft, className }: CharacterPreviewProps) {
 
   const hasContent = !!(
     draft.name ||
-    draft.appearance ||
+    draft.physicalAppearance ||
     draft.personality ||
-    draft.background
+    draft.backstory
   );
 
   if (!hasContent) {
@@ -67,8 +67,8 @@ export function CharacterPreview({ draft, className }: CharacterPreviewProps) {
       </div>
 
       {/* Appearance */}
-      {draft.appearance && (
-        <PreviewSection title={t('fields.appearance')} content={draft.appearance} />
+      {draft.physicalAppearance && (
+        <PreviewSection title={t('fields.appearance')} content={draft.physicalAppearance} />
       )}
 
       {/* Personality */}
@@ -84,8 +84,8 @@ export function CharacterPreview({ draft, className }: CharacterPreviewProps) {
       )}
 
       {/* Background */}
-      {draft.background && (
-        <PreviewSection title={t('fields.background')} content={draft.background} />
+      {draft.backstory && (
+        <PreviewSection title={t('fields.background')} content={draft.backstory} />
       )}
 
       {/* Additional fields */}

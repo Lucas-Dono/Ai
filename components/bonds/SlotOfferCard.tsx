@@ -213,11 +213,10 @@ export default function SlotOfferCard({
             {/* Progress bar */}
             <Progress
               value={percentLeft}
-              className="h-2"
-              indicatorClassName={`transition-colors ${
+              className={`h-2 transition-colors ${
                 isExpiring
-                  ? "bg-gradient-to-r from-red-500 to-orange-500"
-                  : "bg-gradient-to-r from-green-500 to-emerald-500"
+                  ? "[&>div]:bg-gradient-to-r [&>div]:from-red-500 [&>div]:to-orange-500"
+                  : "[&>div]:bg-gradient-to-r [&>div]:from-green-500 [&>div]:to-emerald-500"
               }`}
             />
           </div>

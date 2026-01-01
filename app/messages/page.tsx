@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 
 export default function MessagesPage() {
   const t = useTranslations("messages");
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
   const router = useRouter();
 
   const {
@@ -32,12 +32,12 @@ export default function MessagesPage() {
   const [mobileListOpen, setMobileListOpen] = useState(true);
 
   // Redirect si no está autenticado
-  if (status === 'unauthenticated') {
+  if (!isPending && !session) {
     router.push('/login');
     return null;
   }
 
-  if (status === 'loading') {
+  if (isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
         <MessageSquare className="h-8 w-8 animate-pulse text-muted-foreground" />

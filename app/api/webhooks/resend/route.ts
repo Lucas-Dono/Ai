@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
 
     console.log('📧 Resend webhook received:', type);
 
+    // TODO: EmailSent model not yet implemented in schema
+    // Uncomment when EmailSent model is added to Prisma schema
+    /*
     // Find email by Resend ID
     const emailSent = await prisma.emailSent.findUnique({
       where: { resendId: data.email_id },
@@ -57,6 +60,7 @@ export async function POST(request: NextRequest) {
       default:
         console.log('Unknown event type:', type);
     }
+    */
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -68,6 +72,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// TODO: Uncomment when EmailSent model is added to Prisma schema
+/*
 async function handleEmailSent(emailId: string, data: any) {
   await prisma.emailSent.update({
     where: { id: emailId },
@@ -143,3 +149,4 @@ async function handleEmailClicked(emailId: string, data: any) {
   });
   console.log('🖱️  Email clicked:', emailId, data.click?.link);
 }
+*/

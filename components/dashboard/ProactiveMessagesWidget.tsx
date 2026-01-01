@@ -92,33 +92,27 @@ export function ProactiveMessagesWidget() {
 
   useEffect(() => {
     fetchProactiveMessages();
-    const interval = setInterval(fetchProactiveMessages, 60000); // Refresh every minute
+    // Reducido de 60 segundos (1 min) a 5 minutos para evitar sobrecarga
+    // Solo hacer polling si el usuario está activo
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchProactiveMessages();
+      }
+    }, 300000); // 5 minutos
     return () => clearInterval(interval);
   }, []);
 
   const fetchProactiveMessages = async () => {
     try {
-      // Get user's agents
-      const agentsRes = await fetch("/api/agents");
-      if (!agentsRes.ok) return;
-      const agentsData = await agentsRes.json();
-      setAgents(agentsData);
+      // Usar endpoint unificado que devuelve mensajes proactivos de todos los agentes
+      const res = await fetch("/api/proactive-messages/all");
+      if (!res.ok) {
+        setLoading(false);
+        return;
+      }
 
-      // Get proactive messages for all agents
-      const messagesPromises = agentsData.map(async (agent: Agent) => {
-        const res = await fetch(`/api/agents/${agent.id}/proactive-messages`);
-        if (!res.ok) return [];
-        const data = await res.json();
-        return (data.messages || []).map((msg: any) => ({
-          ...msg,
-          agentId: agent.id,
-          agentName: agent.name,
-          agentAvatar: agent.avatar,
-        }));
-      });
-
-      const allMessages = (await Promise.all(messagesPromises)).flat();
-      setMessages(allMessages);
+      const data = await res.json();
+      setMessages(data.messages || []);
     } catch (error) {
       console.error("Error fetching proactive messages:", error);
     } finally {

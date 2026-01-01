@@ -23,21 +23,21 @@ export const simpleColors = {
   secondaryLight: colors.secondary[400],
   secondaryDark: colors.secondary[600],
 
-  success: colors.success[500],
-  successLight: colors.success[400],
-  successDark: colors.success[600],
+  success: colors.success.main,
+  successLight: colors.success.light,
+  successDark: colors.success.dark,
 
-  warning: colors.warning[500],
-  warningLight: colors.warning[400],
-  warningDark: colors.warning[600],
+  warning: colors.warning.main,
+  warningLight: colors.warning.light,
+  warningDark: colors.warning.dark,
 
-  error: colors.error[500],
-  errorLight: colors.error[400],
-  errorDark: colors.error[600],
+  error: colors.error.main,
+  errorLight: colors.error.light,
+  errorDark: colors.error.dark,
 
-  info: colors.info[500],
-  infoLight: colors.info[400],
-  infoDark: colors.info[600],
+  info: colors.info.main,
+  infoLight: colors.info.light,
+  infoDark: colors.info.dark,
 
   // Colores neutros
   background: colors.background.primary,

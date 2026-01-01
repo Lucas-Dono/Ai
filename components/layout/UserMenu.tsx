@@ -34,7 +34,8 @@ export function UserMenu({ displayName, initials, userPlan }: UserMenuProps) {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await signOut({ callbackUrl: "/login" });
+      await signOut();
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       setIsLoggingOut(false);

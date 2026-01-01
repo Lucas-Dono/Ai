@@ -54,8 +54,8 @@ export async function createMemoryFromWorldInteraction(
   await prisma.crossContextMemory.create({
     data: {
       agentId,
-      sourceType: "world_interaction",
-      sourceWorldId: worldId,
+      sourceType: "group_interaction",
+      sourceGroupId: worldId,
       summary,
       involvedAgents,
       happenedAt: new Date(),
@@ -279,7 +279,15 @@ export async function extractMemoriesFromWorld(
   agentId: string,
   lastNInteractions: number = 10
 ): Promise<void> {
-  // Obtener las últimas N interacciones del mundo donde participó este agente
+  // TODO: Implement group interaction tracking
+  // The worldInteraction model has been removed in favor of group messages
+  // This functionality should be reimplemented using GroupMessage model
+  console.warn('[Cross Context Memory] World interaction tracking not implemented - using group messages instead');
+
+  // For now, return early
+  return;
+
+  /* Original code - keeping for reference until reimplemented
   const interactions = await prisma.worldInteraction.findMany({
     where: {
       worldId,
@@ -297,13 +305,13 @@ export async function extractMemoriesFromWorld(
   // En el futuro, usar LLM para generar resumen más inteligente
   const recentContent = interactions
     .reverse()
-    .map((i) => i.content)
+    .map((i: any) => i.content)
     .join(" ");
 
   // Calcular importancia basada en sentiment y metadata
   let importance = 0.5;
-  const hasPositiveSentiment = interactions.some((i) => i.sentiment === "positive");
-  const hasNegativeSentiment = interactions.some((i) => i.sentiment === "negative");
+  const hasPositiveSentiment = interactions.some((i: any) => i.sentiment === "positive");
+  const hasNegativeSentiment = interactions.some((i: any) => i.sentiment === "negative");
 
   if (hasPositiveSentiment || hasNegativeSentiment) {
     importance = 0.7; // Interacciones emocionales son más importantes
@@ -313,8 +321,8 @@ export async function extractMemoriesFromWorld(
   const otherAgentIds = [
     ...new Set(
       interactions
-        .flatMap((i) => [i.speakerId, i.targetId])
-        .filter((id) => id && id !== agentId)
+        .flatMap((i: any) => [i.speakerId, i.targetId])
+        .filter((id: any) => id && id !== agentId)
     ),
   ];
 
@@ -346,6 +354,7 @@ export async function extractMemoriesFromWorld(
     involvedAgents,
     importance
   );
+  */
 }
 
 /**

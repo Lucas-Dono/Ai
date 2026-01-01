@@ -237,14 +237,39 @@ export function WizardShell({
   }, [isFirstStep, goToPreviousStep, router]);
 
   // Keyboard shortcuts
-  useKeyboardShortcuts({
-    onNext: goToNextStep,
-    onPrevious: goToPreviousStep,
-    onSave: saveDraft,
-    onTogglePreview: togglePreview,
-    onBack: handleEscapeKey,
-    enabled: true,
-  });
+  useKeyboardShortcuts([
+    {
+      key: 'ArrowRight',
+      ctrl: true,
+      description: 'Next step',
+      action: goToNextStep,
+    },
+    {
+      key: 'ArrowLeft',
+      ctrl: true,
+      description: 'Previous step',
+      action: goToPreviousStep,
+    },
+    {
+      key: 's',
+      ctrl: true,
+      description: 'Save draft',
+      action: saveDraft,
+      preventDefault: true,
+    },
+    {
+      key: 'p',
+      ctrl: true,
+      description: 'Toggle preview',
+      action: togglePreview,
+      preventDefault: true,
+    },
+    {
+      key: 'Escape',
+      description: 'Go back',
+      action: handleEscapeKey,
+    },
+  ], { enabled: true });
 
   // Context value
   const contextValue = useMemo<WizardContextValue>(

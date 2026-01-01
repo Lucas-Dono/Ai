@@ -209,7 +209,7 @@ function inferCategoriesFromText(name: string, description?: string): CategoryKe
  */
 function assignCategories(agent: {
   name: string;
-  description?: string;
+  description: string | null;
   tags?: any;
 }): CategoryKey[] {
   const categories: Set<CategoryKey> = new Set();
@@ -228,7 +228,7 @@ function assignCategories(agent: {
 
   // 2. Si no hay suficientes categorías, inferir del texto
   if (categories.size < 2) {
-    const inferred = inferCategoriesFromText(agent.name, agent.description);
+    const inferred = inferCategoriesFromText(agent.name, agent.description || undefined);
     inferred.forEach(cat => {
       if (categories.size < 2) {
         categories.add(cat);

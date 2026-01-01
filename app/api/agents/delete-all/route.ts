@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // DELETE /api/agents/delete-all - Delete all user agents
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -15,7 +15,7 @@ export async function DELETE() {
     // This will cascade delete messages, memories, behaviors, etc.
     const result = await prisma.agent.deleteMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 

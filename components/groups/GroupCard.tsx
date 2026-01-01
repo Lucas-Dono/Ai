@@ -111,10 +111,14 @@ export function GroupCard({ group }: GroupCardProps) {
               <h3 className="font-semibold text-base truncate">{group.name}</h3>
               {/* Role badge */}
               {group.role === "owner" && (
-                <Crown className="w-4 h-4 text-yellow-500 flex-shrink-0" title="Owner" />
+                <div title="Owner">
+                  <Crown className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                </div>
               )}
               {group.role === "moderator" && (
-                <Shield className="w-4 h-4 text-blue-500 flex-shrink-0" title="Moderador" />
+                <div title="Moderador">
+                  <Shield className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                </div>
               )}
             </div>
 

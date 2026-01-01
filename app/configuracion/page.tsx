@@ -58,7 +58,7 @@ interface UserStats {
 
 export default function ConfiguracionPage() {
   const t = useTranslations("settings");
-  const { data: session, update: updateSession } = useSession();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
@@ -122,7 +122,7 @@ export default function ConfiguracionPage() {
       if (res.ok) {
         const data = await res.json();
         setProfile(data.user);
-        await updateSession();
+        // Session will be updated automatically on next page load
         toast.success(t("profile.toasts.saveSuccess"));
       } else {
         toast.error(t("profile.toasts.saveError"));
@@ -201,8 +201,9 @@ export default function ConfiguracionPage() {
       if (res.ok) {
         toast.success(t("danger.deleteAccount.toast"));
         // Sign out and redirect to home
-        setTimeout(() => {
-          signOut({ callbackUrl: "/" });
+        setTimeout(async () => {
+          await signOut();
+          window.location.href = "/";
         }, 1500);
       } else {
         toast.error(t("danger.deleteAccount.toastError"));

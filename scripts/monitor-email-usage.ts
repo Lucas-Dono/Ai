@@ -8,7 +8,7 @@
  * 0 22 * * * cd /path/to/app && npm run monitor:emails >> /var/log/email-usage.log
  */
 
-import { emailLogger as log } from "@/lib/logging/loggers";
+import { cronLogger as log } from "@/lib/logging/loggers";
 
 interface EmailUsageStats {
   date: string;

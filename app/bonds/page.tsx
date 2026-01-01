@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
 import BondsDashboard from "@/components/bonds/BondsDashboard";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BondsPage() {
-  const session = await auth();
+  const session = await getServerSession();
 
   if (!session?.user) {
     redirect("/login?callbackUrl=/bonds");

@@ -3,6 +3,30 @@
  * Cada personaje puede tener máximo 2 categorías
  */
 
+import type { LucideIcon } from 'lucide-react';
+import {
+  ScrollText,
+  Sparkles,
+  Microscope,
+  Lightbulb,
+  Gamepad2,
+  Users,
+  Wand2,
+  Sword,
+  Palette,
+  BookOpen,
+  Drama,
+  Music,
+  Briefcase,
+  Brain,
+  Dumbbell,
+  Globe,
+  Heart,
+  FlaskConical,
+  ChefHat,
+  Leaf
+} from 'lucide-react';
+
 export type CategoryKey =
   | 'philosophy'
   | 'wisdom'
@@ -27,7 +51,7 @@ export type CategoryKey =
 
 export interface Category {
   key: CategoryKey;
-  icon: string;
+  icon: LucideIcon;
   label: {
     en: string;
     es: string;
@@ -42,7 +66,7 @@ export interface Category {
 export const CATEGORIES: Record<CategoryKey, Category> = {
   philosophy: {
     key: 'philosophy',
-    icon: '📜',
+    icon: ScrollText,
     label: { en: 'Philosophy', es: 'Filosofía' },
     color: {
       text: 'text-yellow-400',
@@ -52,7 +76,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   wisdom: {
     key: 'wisdom',
-    icon: '✨',
+    icon: Sparkles,
     label: { en: 'Wisdom', es: 'Sabiduría' },
     color: {
       text: 'text-purple-400',
@@ -62,7 +86,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   science: {
     key: 'science',
-    icon: '🔬',
+    icon: Microscope,
     label: { en: 'Science', es: 'Ciencia' },
     color: {
       text: 'text-blue-400',
@@ -72,7 +96,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   physics: {
     key: 'physics',
-    icon: '💡',
+    icon: Lightbulb,
     label: { en: 'Physics', es: 'Física' },
     color: {
       text: 'text-cyan-400',
@@ -82,7 +106,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   gaming: {
     key: 'gaming',
-    icon: '🎮',
+    icon: Gamepad2,
     label: { en: 'Gaming', es: 'Gaming' },
     color: {
       text: 'text-pink-400',
@@ -92,7 +116,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   friendship: {
     key: 'friendship',
-    icon: '👥',
+    icon: Users,
     label: { en: 'Friendship', es: 'Amistad' },
     color: {
       text: 'text-orange-400',
@@ -102,7 +126,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   fantasy: {
     key: 'fantasy',
-    icon: '🔮',
+    icon: Wand2,
     label: { en: 'Fantasy', es: 'Fantasía' },
     color: {
       text: 'text-violet-400',
@@ -112,7 +136,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   adventure: {
     key: 'adventure',
-    icon: '⚔️',
+    icon: Sword,
     label: { en: 'Adventure', es: 'Aventura' },
     color: {
       text: 'text-emerald-400',
@@ -122,7 +146,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   art: {
     key: 'art',
-    icon: '🎨',
+    icon: Palette,
     label: { en: 'Art', es: 'Arte' },
     color: {
       text: 'text-rose-400',
@@ -132,7 +156,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   literature: {
     key: 'literature',
-    icon: '📚',
+    icon: BookOpen,
     label: { en: 'Literature', es: 'Literatura' },
     color: {
       text: 'text-amber-400',
@@ -142,7 +166,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   theater: {
     key: 'theater',
-    icon: '🎭',
+    icon: Drama,
     label: { en: 'Theater', es: 'Teatro' },
     color: {
       text: 'text-fuchsia-400',
@@ -152,7 +176,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   music: {
     key: 'music',
-    icon: '🎵',
+    icon: Music,
     label: { en: 'Music', es: 'Música' },
     color: {
       text: 'text-indigo-400',
@@ -162,7 +186,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   business: {
     key: 'business',
-    icon: '💼',
+    icon: Briefcase,
     label: { en: 'Business', es: 'Negocios' },
     color: {
       text: 'text-slate-400',
@@ -172,7 +196,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   psychology: {
     key: 'psychology',
-    icon: '🧠',
+    icon: Brain,
     label: { en: 'Psychology', es: 'Psicología' },
     color: {
       text: 'text-teal-400',
@@ -182,7 +206,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   sports: {
     key: 'sports',
-    icon: '💪',
+    icon: Dumbbell,
     label: { en: 'Sports', es: 'Deporte' },
     color: {
       text: 'text-red-400',
@@ -192,7 +216,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   history: {
     key: 'history',
-    icon: '🌍',
+    icon: Globe,
     label: { en: 'History', es: 'Historia' },
     color: {
       text: 'text-stone-400',
@@ -202,7 +226,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   romance: {
     key: 'romance',
-    icon: '💖',
+    icon: Heart,
     label: { en: 'Romance', es: 'Romance' },
     color: {
       text: 'text-pink-500',
@@ -212,7 +236,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   technology: {
     key: 'technology',
-    icon: '🧪',
+    icon: FlaskConical,
     label: { en: 'Technology', es: 'Tecnología' },
     color: {
       text: 'text-sky-400',
@@ -222,7 +246,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   gastronomy: {
     key: 'gastronomy',
-    icon: '🍳',
+    icon: ChefHat,
     label: { en: 'Gastronomy', es: 'Gastronomía' },
     color: {
       text: 'text-orange-500',
@@ -232,7 +256,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   },
   nature: {
     key: 'nature',
-    icon: '🌿',
+    icon: Leaf,
     label: { en: 'Nature', es: 'Naturaleza' },
     color: {
       text: 'text-green-400',

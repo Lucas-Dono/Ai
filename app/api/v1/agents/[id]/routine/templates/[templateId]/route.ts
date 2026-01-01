@@ -58,8 +58,8 @@ export async function PATCH(
         priority: body.priority,
         isFlexible: body.isFlexible,
         allowVariations: body.allowVariations,
-        variationParameters: body.variationParameters,
-        moodImpact: body.moodImpact,
+        variationParameters: body.variationParameters as any,
+        moodImpact: body.moodImpact as any,
         location: body.location,
       },
     });

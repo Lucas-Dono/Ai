@@ -356,6 +356,11 @@
         "messages": "{count} messages",
         "openChat": "Open chat"
       },
+      "recent": {
+        "title": "Recent Chats",
+        "badge": "Recent",
+        "subtitle": "Continue your conversations where you left off"
+      },
       "popular": {
         "title": "Most viewed",
         "badge": "Popular",

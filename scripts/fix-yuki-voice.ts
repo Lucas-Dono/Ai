@@ -1,10 +1,12 @@
 #!/usr/bin/env tsx
 
 /**
- * Script para corregir la voz de Yuki Tanaka
- * (Resultó que era mujer, no hombre 😅)
+ * SCRIPT OBSOLETO
+ * Este script usa el modelo 'WorldInteraction' que fue migrado a 'GroupMessage'
+ * Mantenerlo solo para referencia histórica
  */
 
+/*
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs/promises';
 import path from 'path';
@@ -103,3 +105,7 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+*/
+
+console.log('❌ Este script está obsoleto. El sistema WorldInteraction fue migrado a GroupMessage.');
+console.log('💡 Usa los nuevos scripts de gestión de grupos en su lugar.');

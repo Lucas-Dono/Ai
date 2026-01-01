@@ -10,3 +10,4 @@ export type { MessageBubbleProps } from "./MessageBubble";
 export { ChatHeader } from "./ChatHeader";
 export { ChatInput } from "./ChatInput";
 export { ModernChat } from "./ModernChat";
+export { DirectMessageChat } from "./DirectMessageChat";

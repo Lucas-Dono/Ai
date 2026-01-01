@@ -47,9 +47,10 @@ async function testVeniceWithModularPrompts() {
     return;
   }
 
+  const resolvedPrompt1 = await modularPrompt1;
   console.log('✅ Prompt modular encontrado:');
   console.log('─'.repeat(50));
-  console.log(modularPrompt1.substring(0, 300) + '...\n');
+  console.log(resolvedPrompt1!.substring(0, 300) + '...\n');
 
   const veniceClient = getVeniceClient();
 
@@ -109,9 +110,10 @@ ${modularPrompt1}`;
   if (!modularPrompt2) {
     console.log('⚠️  No se encontró prompt modular (expected, aún no están todos creados)\n');
   } else {
+    const resolvedPrompt2 = await modularPrompt2;
     console.log('✅ Prompt modular encontrado:');
     console.log('─'.repeat(50));
-    console.log(modularPrompt2.substring(0, 300) + '...\n');
+    console.log(resolvedPrompt2!.substring(0, 300) + '...\n');
 
     const systemPrompt2 = `Eres Carla, una persona de 28 años, dominante y segura.
 
@@ -168,9 +170,10 @@ ${modularPrompt2}`;
   if (!modularPrompt3) {
     console.log('⚠️  No se encontró prompt modular NSFW\n');
   } else {
+    const resolvedPrompt3 = await modularPrompt3;
     console.log('✅ Prompt modular NSFW encontrado:');
     console.log('─'.repeat(50));
-    console.log(modularPrompt3.substring(0, 300) + '...\n');
+    console.log(resolvedPrompt3!.substring(0, 300) + '...\n');
 
     const systemPrompt3 = `Eres Ana, una persona de 24 años, sumisa y tímida.
 
@@ -234,9 +237,10 @@ ${modularPrompt3}`;
   if (!modularPrompt4) {
     console.log('⚠️  No se encontró prompt modular para esta combinación\n');
   } else {
+    const resolvedPrompt4 = await modularPrompt4;
     console.log('✅ Prompt modular encontrado (con adaptación para mundo ficticio):');
     console.log('─'.repeat(50));
-    console.log(modularPrompt4.substring(0, 400) + '...\n');
+    console.log(resolvedPrompt4!.substring(0, 400) + '...\n');
 
     const systemPrompt4 = `Eres Arya, una joven de 22 años de Westeros (mundo de Game of Thrones).
 

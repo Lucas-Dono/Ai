@@ -77,89 +77,31 @@ export const LifeEventsTimelineService = {
 
   /**
    * Busca un arco activo relacionado con el evento detectado
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async findRelatedActiveArc(
     agentId: string,
     userId: string,
     event: DetectedArcEvent
-  ) {
-    // Buscar arcos activos de la misma categoría en los últimos 90 días
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
-    const activeArcs = await prisma.narrativeArc.findMany({
-      where: {
-        agentId,
-        userId,
-        category: event.category,
-        status: 'active',
-        lastEventAt: {
-          gte: ninetyDaysAgo,
-        },
-      },
-      include: {
-        events: {
-          orderBy: { eventDate: 'desc' },
-          take: 5,
-        },
-      },
-    });
-
-    // Buscar el arco más relacionado
-    for (const arc of activeArcs) {
-      const theme1 = arc.theme;
-      const theme2 = NarrativeArcDetector.extractTheme(event.message);
-      const similarity = NarrativeArcDetector.calculateThemeSimilarity(
-        theme1,
-        theme2
-      );
-
-      if (similarity > 0.3) {
-        return arc;
-      }
-    }
-
+  ): Promise<any> {
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily return null until model is added
     return null;
   },
 
   /**
    * Crea un nuevo arco narrativo
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async createNewArc(
     event: DetectedArcEvent,
     agentId: string,
     userId: string
   ) {
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily just create the important event without arc
     const theme = NarrativeArcDetector.extractTheme(event.message);
-    const title = this.generateArcTitle(event);
 
-    // Crear arco
-    const arc = await prisma.narrativeArc.create({
-      data: {
-        agentId,
-        userId,
-        category: event.category,
-        theme,
-        title,
-        currentState: event.state,
-        startedAt: event.timestamp,
-        lastEventAt: event.timestamp,
-        totalEvents: 1,
-        confidence: event.confidence,
-        status: event.state === 'conclusion' ? 'completed' : 'active',
-        completedAt: event.state === 'conclusion' ? event.timestamp : null,
-        outcome:
-          event.state === 'conclusion'
-            ? event.emotionalTone === 'positive'
-              ? 'positive'
-              : event.emotionalTone === 'negative'
-              ? 'negative'
-              : 'neutral'
-            : null,
-      },
-    });
-
-    // Crear evento asociado
     await prisma.importantEvent.create({
       data: {
         agentId,
@@ -168,20 +110,22 @@ export const LifeEventsTimelineService = {
         type: this.mapCategoryToEventType(event.category),
         description: event.message,
         priority: 'medium',
-        narrativeArcId: arc.id,
-        narrativeState: event.state,
-        narrativeTheme: theme,
-        detectionConfidence: event.confidence,
-        detectedKeywords: event.keywords,
-        emotionalTone: event.emotionalTone || 'neutral',
+        metadata: {
+          narrativeState: event.state,
+          narrativeTheme: theme,
+          detectionConfidence: event.confidence,
+          detectedKeywords: event.keywords,
+          emotionalTone: event.emotionalTone || 'neutral',
+        },
       },
     });
 
-    return arc;
+    return null;
   },
 
   /**
    * Agrega un evento a un arco existente
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async addEventToArc(
     arcId: string,
@@ -189,45 +133,10 @@ export const LifeEventsTimelineService = {
     agentId: string,
     userId: string
   ) {
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily just create the important event
     const theme = NarrativeArcDetector.extractTheme(event.message);
 
-    // Actualizar arco
-    const arc = await prisma.narrativeArc.findUnique({
-      where: { id: arcId },
-      include: { events: true },
-    });
-
-    if (!arc) return;
-
-    // Calcular nueva confianza promedio
-    const newConfidence =
-      (arc.confidence * arc.totalEvents + event.confidence) /
-      (arc.totalEvents + 1);
-
-    // Determinar si se completa el arco
-    const shouldComplete = event.state === 'conclusion';
-    const outcome = shouldComplete
-      ? event.emotionalTone === 'positive'
-        ? 'positive'
-        : event.emotionalTone === 'negative'
-        ? 'negative'
-        : 'neutral'
-      : arc.outcome;
-
-    await prisma.narrativeArc.update({
-      where: { id: arcId },
-      data: {
-        currentState: event.state,
-        lastEventAt: event.timestamp,
-        totalEvents: arc.totalEvents + 1,
-        confidence: newConfidence,
-        status: shouldComplete ? 'completed' : arc.status,
-        completedAt: shouldComplete ? event.timestamp : arc.completedAt,
-        outcome,
-      },
-    });
-
-    // Crear evento asociado
     await prisma.importantEvent.create({
       data: {
         agentId,
@@ -236,18 +145,21 @@ export const LifeEventsTimelineService = {
         type: this.mapCategoryToEventType(event.category),
         description: event.message,
         priority: 'medium',
-        narrativeArcId: arcId,
-        narrativeState: event.state,
-        narrativeTheme: theme,
-        detectionConfidence: event.confidence,
-        detectedKeywords: event.keywords,
-        emotionalTone: event.emotionalTone || 'neutral',
+        metadata: {
+          arcId,
+          narrativeState: event.state,
+          narrativeTheme: theme,
+          detectionConfidence: event.confidence,
+          detectedKeywords: event.keywords,
+          emotionalTone: event.emotionalTone || 'neutral',
+        },
       },
     });
   },
 
   /**
    * Obtiene todos los arcos narrativos de un agente
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async getArcs(
     agentId: string,
@@ -258,83 +170,24 @@ export const LifeEventsTimelineService = {
       limit?: number;
     } = {}
   ): Promise<NarrativeArc[]> {
-    const where: any = {
-      agentId,
-      userId,
-    };
-
-    if (filters.category) where.category = filters.category;
-    if (filters.status) where.status = filters.status;
-
-    const arcs = await prisma.narrativeArc.findMany({
-      where,
-      include: {
-        events: {
-          orderBy: { eventDate: 'asc' },
-        },
-      },
-      orderBy: {
-        lastEventAt: 'desc',
-      },
-      take: filters.limit || 50,
-    });
-
-    return arcs.map((arc) => ({
-      ...arc,
-      title: arc.title || undefined,
-      description: arc.description || undefined,
-      currentState: arc.currentState || undefined,
-      completedAt: arc.completedAt || undefined,
-      outcome: arc.outcome || undefined,
-      events: arc.events.map((e) => ({
-        id: e.id,
-        eventDate: e.eventDate,
-        description: e.description,
-        narrativeState: e.narrativeState || undefined,
-        detectionConfidence: e.detectionConfidence || undefined,
-        detectedKeywords: e.detectedKeywords || undefined,
-      })),
-    }));
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily return empty array
+    return [];
   },
 
   /**
    * Obtiene un arco específico con todos sus eventos
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async getArc(arcId: string, userId: string): Promise<NarrativeArc | null> {
-    const arc = await prisma.narrativeArc.findFirst({
-      where: {
-        id: arcId,
-        userId,
-      },
-      include: {
-        events: {
-          orderBy: { eventDate: 'asc' },
-        },
-      },
-    });
-
-    if (!arc) return null;
-
-    return {
-      ...arc,
-      title: arc.title || undefined,
-      description: arc.description || undefined,
-      currentState: arc.currentState || undefined,
-      completedAt: arc.completedAt || undefined,
-      outcome: arc.outcome || undefined,
-      events: arc.events.map((e) => ({
-        id: e.id,
-        eventDate: e.eventDate,
-        description: e.description,
-        narrativeState: e.narrativeState || undefined,
-        detectionConfidence: e.detectionConfidence || undefined,
-        detectedKeywords: e.detectedKeywords || undefined,
-      })),
-    };
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily return null
+    return null;
   },
 
   /**
    * Obtiene timeline completo (todos los arcos ordenados cronológicamente)
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async getTimeline(
     agentId: string,
@@ -345,75 +198,22 @@ export const LifeEventsTimelineService = {
       categories?: NarrativeCategory[];
     } = {}
   ) {
-    const where: any = {
-      agentId,
-      userId,
-    };
-
-    if (filters.startDate) {
-      where.startedAt = { gte: filters.startDate };
-    }
-
-    if (filters.endDate) {
-      where.lastEventAt = { lte: filters.endDate };
-    }
-
-    if (filters.categories && filters.categories.length > 0) {
-      where.category = { in: filters.categories };
-    }
-
-    const arcs = await prisma.narrativeArc.findMany({
-      where,
-      include: {
-        events: {
-          orderBy: { eventDate: 'asc' },
-        },
-      },
-      orderBy: {
-        startedAt: 'desc',
-      },
-    });
-
-    return arcs.map((arc) => ({
-      ...arc,
-      title: arc.title || undefined,
-      description: arc.description || undefined,
-      currentState: arc.currentState || undefined,
-      completedAt: arc.completedAt || undefined,
-      outcome: arc.outcome || undefined,
-      events: arc.events.map((e) => ({
-        id: e.id,
-        eventDate: e.eventDate,
-        description: e.description,
-        narrativeState: e.narrativeState || undefined,
-        detectionConfidence: e.detectionConfidence || undefined,
-        detectedKeywords: e.detectedKeywords || undefined,
-      })),
-    }));
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily return empty array
+    return [];
   },
 
   /**
    * Marcar arco como abandonado
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async markAsAbandoned(arcId: string, userId: string) {
-    const arc = await prisma.narrativeArc.findFirst({
-      where: { id: arcId, userId },
-    });
-
-    if (!arc) {
-      throw new Error('Arc not found or unauthorized');
-    }
-
-    return await prisma.narrativeArc.update({
-      where: { id: arcId },
-      data: {
-        status: 'abandoned',
-      },
-    });
+    throw new Error('narrativeArc model no longer exists');
   },
 
   /**
    * Actualizar título y descripción de un arco
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async updateArc(
     arcId: string,
@@ -423,57 +223,22 @@ export const LifeEventsTimelineService = {
       description?: string;
     }
   ) {
-    const arc = await prisma.narrativeArc.findFirst({
-      where: { id: arcId, userId },
-    });
-
-    if (!arc) {
-      throw new Error('Arc not found or unauthorized');
-    }
-
-    return await prisma.narrativeArc.update({
-      where: { id: arcId },
-      data,
-    });
+    throw new Error('narrativeArc model no longer exists');
   },
 
   /**
    * Obtener estadísticas de arcos
+   * @deprecated - narrativeArc model no longer exists in schema
    */
   async getArcStats(agentId: string, userId: string) {
-    const [total, active, completed, abandoned, byCategory] = await Promise.all(
-      [
-        // Total de arcos
-        prisma.narrativeArc.count({
-          where: { agentId, userId },
-        }),
-        // Arcos activos
-        prisma.narrativeArc.count({
-          where: { agentId, userId, status: 'active' },
-        }),
-        // Arcos completados
-        prisma.narrativeArc.count({
-          where: { agentId, userId, status: 'completed' },
-        }),
-        // Arcos abandonados
-        prisma.narrativeArc.count({
-          where: { agentId, userId, status: 'abandoned' },
-        }),
-        // Por categoría
-        prisma.narrativeArc.groupBy({
-          by: ['category'],
-          where: { agentId, userId },
-          _count: true,
-        }),
-      ]
-    );
-
+    // TODO: NarrativeArc model not yet created in Prisma schema
+    // Temporarily return empty stats
     return {
-      total,
-      active,
-      completed,
-      abandoned,
-      byCategory,
+      total: 0,
+      active: 0,
+      completed: 0,
+      abandoned: 0,
+      byCategory: [],
     };
   },
 

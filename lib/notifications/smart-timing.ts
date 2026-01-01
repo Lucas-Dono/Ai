@@ -7,7 +7,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import { defaultLogger as log } from "@/lib/logging/logger";
 
 interface SmartTimingResult {
   shouldSendNow: boolean;

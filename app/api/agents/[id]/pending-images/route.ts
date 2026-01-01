@@ -4,6 +4,8 @@
  * GET /api/agents/[id]/pending-images
  * - Retorna imágenes pendientes y completadas para un agente
  * - Permite al frontend hacer polling para detectar nuevas imágenes
+ *
+ * TODO: Restore when pendingImageGeneration model is added to Prisma schema
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,6 +17,11 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return NextResponse.json(
+    { error: 'pendingImageGeneration model not found in schema' },
+    { status: 501 }
+  );
+  /*
   try {
     const { id: agentId } = await params;
 
@@ -121,4 +128,5 @@ export async function GET(
       { status: 500 }
     );
   }
+  */
 }

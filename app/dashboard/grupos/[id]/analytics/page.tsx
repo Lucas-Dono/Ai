@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { checkFeature } from "@/lib/feature-flags";
 import { Feature } from "@/lib/feature-flags/types";
@@ -18,7 +17,7 @@ export default async function GroupAnalyticsPage({
   const { id: groupId } = await params;
 
   // 1. Autenticación
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
 
   if (!session?.user?.email) {
     redirect("/login");

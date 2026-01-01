@@ -491,9 +491,11 @@ export function getTierComparison(fromTier: UserTier, toTier: UserTier): TierCom
     improvements.push(`${toLimits.apiRequests.perMinute} solicitudes/min (antes: ${fromLimits.apiRequests.perMinute})`);
   }
 
-  // Messages
-  if (toLimits.resources.messagesPerDay !== fromLimits.resources.messagesPerDay) {
-    const toMsg = isUnlimited(toLimits.resources.messagesPerDay) ? "ilimitados" : toLimits.resources.messagesPerDay;
+  // Messages (basado en tokens, ~350 tokens por mensaje)
+  const toMessagesPerDay = Math.floor(toLimits.resources.totalTokensPerDay / 350);
+  const fromMessagesPerDay = Math.floor(fromLimits.resources.totalTokensPerDay / 350);
+  if (toMessagesPerDay !== fromMessagesPerDay) {
+    const toMsg = isUnlimited(toLimits.resources.totalTokensPerDay) ? "ilimitados" : toMessagesPerDay;
     improvements.push(`${toMsg} mensajes/día`);
   }
 

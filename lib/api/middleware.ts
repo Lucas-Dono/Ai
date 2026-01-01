@@ -125,7 +125,7 @@ export function withAuth(handler: AuthenticatedHandler) {
  * ```
  */
 export function withOwnership(
-  resourceType: 'agent' | 'world' | 'team' | 'post' | 'community' | 'event',
+  resourceType: 'agent' | 'group' | 'team' | 'post' | 'community' | 'event',
   handler: OwnershipHandler,
   options?: {
     /**
@@ -161,7 +161,7 @@ export function withOwnership(
       // Map resource type to Prisma model
       const modelMap = {
         agent: prisma.agent,
-        world: prisma.world,
+        group: prisma.group,
         team: prisma.team,
         post: prisma.communityPost,
         community: prisma.community,

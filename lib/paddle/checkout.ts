@@ -7,7 +7,7 @@
 import { getPaddleClient, getPaddlePriceId } from "./config";
 import { billingLogger as log } from "@/lib/logging/loggers";
 import type {
-  CreateTransactionRequest,
+  CreateTransactionRequestBody,
   Transaction,
   Subscription,
 } from "@paddle/paddle-node-sdk";
@@ -39,7 +39,7 @@ export async function createPaddleCheckout(params: {
   try {
     const priceId = getPaddlePriceId(planId, interval);
 
-    const transactionRequest: CreateTransactionRequest = {
+    const transactionRequest: CreateTransactionRequestBody = {
       items: [
         {
           priceId: priceId,
@@ -51,13 +51,14 @@ export async function createPaddleCheckout(params: {
         planId: planId,
         interval: interval,
       },
-      customerEmail: userEmail,
-      returnUrl: successUrl || `${process.env.APP_URL}/dashboard/billing?success=true`,
+      checkout: {
+        url: successUrl || `${process.env.APP_URL}/dashboard/billing?success=true`,
+      },
     };
 
     const transaction = await paddle.transactions.create(transactionRequest);
 
-    const checkoutUrl = transaction.data?.checkoutUrl;
+    const checkoutUrl = transaction.checkout?.url;
 
     if (!checkoutUrl) {
       throw new Error("No checkout URL returned from Paddle");
@@ -67,7 +68,7 @@ export async function createPaddleCheckout(params: {
       {
         userId,
         planId,
-        transactionId: transaction.data?.id,
+        transactionId: transaction.id,
         checkoutUrl,
       },
       "Paddle checkout created successfully"
@@ -75,7 +76,7 @@ export async function createPaddleCheckout(params: {
 
     return {
       checkoutUrl,
-      transactionId: transaction.data?.id,
+      transactionId: transaction.id,
     };
   } catch (error: any) {
     log.error(
@@ -101,7 +102,7 @@ export async function getPaddleSubscription(subscriptionId: string) {
   try {
     const subscription = await paddle.subscriptions.get(subscriptionId);
 
-    return subscription.data;
+    return subscription;
   } catch (error: any) {
     log.error(
       {
@@ -129,7 +130,7 @@ export async function cancelPaddleSubscription(subscriptionId: string) {
 
     log.info({ subscriptionId }, "Paddle subscription cancelled successfully");
 
-    return subscription.data;
+    return subscription;
   } catch (error: any) {
     log.error(
       {
@@ -157,7 +158,7 @@ export async function reactivatePaddleSubscription(subscriptionId: string) {
 
     log.info({ subscriptionId }, "Paddle subscription reactivated successfully");
 
-    return subscription.data;
+    return subscription;
   } catch (error: any) {
     log.error(
       {
@@ -198,7 +199,7 @@ export async function updatePaddleSubscription(
 
     log.info({ subscriptionId }, "Paddle subscription updated successfully");
 
-    return subscription.data;
+    return subscription;
   } catch (error: any) {
     log.error(
       {

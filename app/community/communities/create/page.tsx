@@ -38,6 +38,8 @@ export default function CreateCommunityPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { shakeClass } = useShakeOnError(!!error);
+  const [iconPending, setIconPending] = useState(false);
+  const [bannerPending, setBannerPending] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -125,6 +127,20 @@ export default function CreateCommunityPage() {
             <div className={`p-3 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-start gap-2 ${shakeClass}`}>
               <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
               <p className="text-sm text-destructive">{error}</p>
+            </div>
+          )}
+
+          {/* Warning for pending images */}
+          {(iconPending || bannerPending) && (
+            <div className="p-3 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-yellow-600 dark:text-yellow-500">
+                {iconPending && bannerPending
+                  ? "Debes confirmar el recorte del ícono y el banner antes de crear la comunidad"
+                  : iconPending
+                  ? "Debes confirmar el recorte del ícono antes de crear la comunidad"
+                  : "Debes confirmar el recorte del banner antes de crear la comunidad"}
+              </p>
             </div>
           )}
 
@@ -261,7 +277,8 @@ export default function CreateCommunityPage() {
             label={`${t('form.icon.label')} (${t('form.optional')})`}
             currentImage={formData.icon}
             currentShape={formData.iconShape}
-            onImageChange={(url, shape) => setFormData({ ...formData, icon: url, iconShape: shape })}
+            onImageChange={(url, shape) => setFormData({ ...formData, icon: url, iconShape: shape as "circle" })}
+            onPendingChange={setIconPending}
             placeholder={t('form.icon.placeholder')}
             hint={t('form.icon.hint')}
             type="icon"
@@ -272,7 +289,8 @@ export default function CreateCommunityPage() {
             label={`${t('form.banner.label')} (${t('form.optional')})`}
             currentImage={formData.banner}
             currentShape={formData.bannerShape}
-            onImageChange={(url, shape) => setFormData({ ...formData, banner: url, bannerShape: shape })}
+            onImageChange={(url, shape) => setFormData({ ...formData, banner: url, bannerShape: shape as "banner" })}
+            onPendingChange={setBannerPending}
             placeholder={t('form.banner.placeholder')}
             hint={t('form.banner.hint')}
             type="banner"
@@ -302,7 +320,7 @@ export default function CreateCommunityPage() {
             </Link>
             <Button
               type="submit"
-              disabled={loading || !formData.name || !formData.slug || !formData.description}
+              disabled={loading || !formData.name || !formData.slug || !formData.description || iconPending || bannerPending}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
             >
               {loading ? (

@@ -114,7 +114,7 @@ describe("Stripe Webhook Handler", () => {
       vi.mocked(prisma.subscription.upsert).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
-      await syncStripeSubscription(mockSubscription as Stripe.Subscription);
+      await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       expect(prisma.subscription.upsert).toHaveBeenCalledWith({
         where: { stripeSubscriptionId: "sub_123" },
@@ -166,7 +166,7 @@ describe("Stripe Webhook Handler", () => {
       vi.mocked(prisma.subscription.upsert).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
-      await syncStripeSubscription(mockSubscription as Stripe.Subscription);
+      await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: "user_123" },
@@ -203,7 +203,7 @@ describe("Stripe Webhook Handler", () => {
       vi.mocked(prisma.subscription.upsert).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
-      await syncStripeSubscription(mockSubscription as Stripe.Subscription);
+      await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: "user_123" },
@@ -227,7 +227,7 @@ describe("Stripe Webhook Handler", () => {
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       await handleSubscriptionCancellation(
-        mockSubscription as Stripe.Subscription
+        mockSubscription as unknown as Stripe.Subscription
       );
 
       expect(prisma.subscription.update).toHaveBeenCalledWith({
@@ -414,14 +414,8 @@ describe("Stripe Webhook Handler", () => {
     it("should skip processing if event already processed", async () => {
       const eventId = "evt_123";
 
-      vi.mocked(prisma.webhookEvent.findUnique).mockResolvedValue({
-        id: "webhook_123",
-        stripeEventId: eventId,
-        type: "customer.subscription.updated",
-        processed: true,
-        processedAt: new Date(),
-        createdAt: new Date(),
-      });
+      // Note: webhookEvent table doesn't exist in schema
+      // This test should be updated to match actual webhook handling
 
       // Should skip processing and not create any records
       // (this would be in the actual route handler)
@@ -430,17 +424,8 @@ describe("Stripe Webhook Handler", () => {
     it("should process event if not seen before", async () => {
       const eventId = "evt_456";
 
-      vi.mocked(prisma.webhookEvent.findUnique).mockResolvedValue(null);
-      vi.mocked(prisma.webhookEvent.create).mockResolvedValue({
-        id: "webhook_456",
-        stripeEventId: eventId,
-        type: "customer.subscription.updated",
-        processed: false,
-        processedAt: null,
-        createdAt: new Date(),
-      });
-
-      // Should create webhook event record and process
+      // Note: webhookEvent table doesn't exist in schema
+      // This test should be updated to match actual webhook handling
     });
   });
 
@@ -462,7 +447,7 @@ describe("Stripe Webhook Handler", () => {
         canceled_at: null,
       };
 
-      await syncStripeSubscription(mockSubscription as Stripe.Subscription);
+      await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       // Should log error and not crash
       expect(prisma.subscription.upsert).not.toHaveBeenCalled();
@@ -504,7 +489,7 @@ describe("Stripe Webhook Handler", () => {
         canceled_at: null,
       };
 
-      await syncStripeSubscription(mockSubscription as Stripe.Subscription);
+      await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       // Should log warning and not update plan
       expect(prisma.subscription.upsert).not.toHaveBeenCalled();

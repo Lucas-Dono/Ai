@@ -17,7 +17,7 @@ const MAX_SIZE = 5 * 1024 * 1024;
 export async function POST(req: NextRequest) {
   try {
     // Verificar autenticación
-    const user = await requireAuth();
+    const user = await requireAuth(req);
 
     // Obtener FormData
     const formData = await req.formData();

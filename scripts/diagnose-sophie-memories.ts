@@ -68,7 +68,7 @@ async function diagnoseSophie() {
     if (events.length > 0) {
       console.log('   Últimos 3 eventos:');
       events.slice(0, 3).forEach((event, i) => {
-        console.log(`   ${i + 1}. ${event.content}`);
+        console.log(`   ${i + 1}. ${event.event}`);
       });
     } else {
       console.log('   ❌ NO tiene eventos guardados');
@@ -86,7 +86,7 @@ async function diagnoseSophie() {
     if (people.length > 0) {
       console.log('   Personas:');
       people.forEach((person, i) => {
-        console.log(`   ${i + 1}. ${person.name} - ${person.relationshipType || 'sin relación definida'}`);
+        console.log(`   ${i + 1}. ${person.name} - ${person.relationship || 'sin relación definida'}`);
       });
     } else {
       console.log('   ❌ NO tiene personas guardadas');
@@ -95,21 +95,19 @@ async function diagnoseSophie() {
 
     // 4. Verificar Bond con usuario
     console.log('4️⃣ Verificando Bond con usuario Lucas...');
-    const bond = await prisma.symbolicBond.findUnique({
+    const bond = await prisma.symbolicBond.findFirst({
       where: {
-        userId_agentId: {
-          userId,
-          agentId,
-        }
-      },
+        userId,
+        agentId,
+      }
     });
 
     if (bond) {
       console.log(`   ✅ Bond existe`);
-      console.log(`   Level: ${bond.level}`);
-      console.log(`   XP: ${bond.xp}`);
-      console.log(`   Stage: ${bond.currentStage}`);
-      console.log(`   Messages: ${bond.totalMessages}`);
+      console.log(`   Tier: ${bond.tier}`);
+      console.log(`   Affinity Level: ${bond.affinityLevel}`);
+      console.log(`   Status: ${bond.status}`);
+      console.log(`   Total Interactions: ${bond.totalInteractions}`);
       console.log(`   Created: ${bond.createdAt}`);
       console.log(`   Updated: ${bond.updatedAt}`);
     } else {
@@ -134,20 +132,19 @@ async function diagnoseSophie() {
     const userMemories = await prisma.episodicMemory.findMany({
       where: {
         agentId,
-        userId, // Memorias que involucran al usuario
       },
       orderBy: { createdAt: 'desc' },
       take: 5,
     });
 
-    console.log(`   Memorias sobre Lucas: ${userMemories.length}`);
+    console.log(`   Memorias del agente: ${userMemories.length}`);
     if (userMemories.length > 0) {
       console.log('   Últimas memorias:');
       userMemories.forEach((mem, i) => {
-        console.log(`   ${i + 1}. ${mem.content}`);
+        console.log(`   ${i + 1}. ${mem.event}`);
       });
     } else {
-      console.log('   ❌ NO tiene memorias específicas sobre Lucas');
+      console.log('   ❌ NO tiene memorias guardadas');
     }
     console.log();
 
@@ -169,8 +166,8 @@ async function diagnoseSophie() {
 
     if (!bond) {
       problems.push('❌ No existe bond con el usuario');
-    } else if (bond.currentStage === 'desconocidos' && messageCount > 5) {
-      problems.push(`⚠️ Bond está en "desconocidos" después de ${messageCount} mensajes`);
+    } else if (bond.status === 'dormant' && messageCount > 5) {
+      problems.push(`⚠️ Bond está en "${bond.status}" después de ${messageCount} mensajes`);
     }
 
     if (userMemories.length === 0 && messageCount > 5) {

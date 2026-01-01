@@ -91,7 +91,7 @@ export async function initializeGodMode({
       await prisma.symbolicBond.update({
         where: { id: existingBond.id },
         data: {
-          tier: bondTier,
+          tier: bondTier as any,
           affinityLevel: tierInfo?.initialAffinity || 0,
           affinityProgress: tierInfo?.initialAffinity || 0,
           status: 'active',
@@ -103,7 +103,7 @@ export async function initializeGodMode({
         data: {
           userId,
           agentId,
-          tier: bondTier,
+          tier: bondTier as any,
           affinityLevel: tierInfo?.initialAffinity || 0,
           affinityProgress: tierInfo?.initialAffinity || 0,
           status: 'active',
@@ -139,13 +139,15 @@ async function injectSharedMemories(
   const events = memories.map((memory) => ({
     agentId,
     userId,
+    eventDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000), // Random past date
+    type: 'relationship' as const,
     title: getMemoryTitle(memory.type),
     description: memory.description,
     emotionalImpact: memory.isPositive ? 'positive' : 'negative',
     emotionalIntensity: memory.emotionalWeight,
     category: 'relationship' as const,
     isRecurring: false,
-    occurredAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000), // Random past date
+    occurredAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
     participants: [characterName, 'User'],
   }));
 
@@ -415,7 +417,15 @@ export async function getGodModeConfig(agentId: string): Promise<GodModeConfig |
     enabled: agent.godModeEnabled,
     visibility: (agent.visibility as 'public' | 'private') || 'private',
     initialRelationship: (agent.initialRelationship as InitialRelationshipTier) || 'stranger',
-    sharedMemories: (agent.sharedMemories as SharedMemory[]) || [],
+    sharedMemories: Array.isArray(agent.sharedMemories)
+      ? (agent.sharedMemories as any[]).map((m, index) => ({
+          id: m.id || `shared-memory-${index}`,
+          type: m.type || 'custom',
+          description: m.description || '',
+          emotionalWeight: m.emotionalWeight || 0.5,
+          isPositive: m.isPositive ?? true,
+        }))
+      : [],
     characterFeelings: (agent.characterFeelings as FeelingType) || 'neutral',
     feelingIntensity: agent.feelingIntensity || 0,
     powerDynamic: (agent.powerDynamic as PowerDynamic) || 'balanced',

@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useEffect, useState, useCallback } from "react";
 import { Feature, UserTier, FeatureLimits, FeatureUsage } from "@/lib/feature-flags/types";
 
@@ -96,9 +96,9 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
  * }
  */
 export function useFeatures(): UseFeatures {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
-  const userPlan = session?.user?.plan as UserTier | undefined;
+  const userPlan = (session?.user as any)?.plan as UserTier | undefined;
 
   const [features, setFeatures] = useState<Set<Feature>>(new Set());
   const [limits, setLimits] = useState<FeatureLimits | null>(null);

@@ -227,6 +227,10 @@ export const bondsWorker = isRedisConfigured ? new Worker(
 
 async function processRarityCalculation(data: { bondId: string }) {
   const result = await updateBondRarity(data.bondId);
+  if (!result) {
+    console.log(`[RarityCalc] Bond ${data.bondId} → not found or error`);
+    return { rarityTier: 'Common', rarityScore: 0, globalRank: 0 };
+  }
   console.log(
     `[RarityCalc] Bond ${data.bondId} → ${result.rarityTier} (score: ${result.rarityScore.toFixed(3)})`
   );

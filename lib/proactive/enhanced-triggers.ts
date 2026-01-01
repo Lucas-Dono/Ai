@@ -231,8 +231,13 @@ async function checkCrossContextTrigger(
 
 /**
  * Trigger de experiencia compartida (clima/rutina)
+ * NOTE: routine feature has been deprecated/removed
  */
 async function checkSharedExperienceTrigger(agentId: string): Promise<EnhancedTrigger | null> {
+  // Feature deprecated - routine table no longer exists
+  return null;
+
+  /* DEPRECATED CODE - routine feature removed
   // Verificar si el agente tiene una rutina actual interesante
   const routine = await prisma.routine.findFirst({
     where: {
@@ -267,6 +272,7 @@ async function checkSharedExperienceTrigger(agentId: string): Promise<EnhancedTr
   }
 
   return null;
+  */
 }
 
 /**

@@ -415,6 +415,7 @@ function checkMilestone(bond: any): string | undefined {
     }
     if (
       "affinity" in milestone &&
+      milestone.affinity !== undefined &&
       bond.affinityLevel >= milestone.affinity &&
       bond.affinityLevel - 5 < milestone.affinity
     ) {

@@ -293,8 +293,8 @@ export async function sendGroupInvitationNotification(
       include: { notificationPreferences: true },
     });
 
-    if (invitee?.notificationPreferences?.pushNotificationsEnabled) {
-      const pushSubscription = invitee.metadata?.pushSubscription;
+    if (invitee?.notificationPreferences?.pushNotifications) {
+      const pushSubscription = (invitee.notificationPreferences as any)?.pushSubscription;
       if (pushSubscription) {
         await sendWebPushNotification(pushSubscription, {
           title: "Invitación a grupo",

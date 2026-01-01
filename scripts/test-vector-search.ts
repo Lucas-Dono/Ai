@@ -16,8 +16,10 @@ async function setupTestData(agentId: string, userId: string) {
       id: agentId,
       name: 'Test Agent',
       personality: 'friendly',
-      isPublic: true,
       userId,
+      kind: 'companion',
+      profile: 'Test profile',
+      systemPrompt: 'You are a friendly test agent',
     },
     update: {},
   });

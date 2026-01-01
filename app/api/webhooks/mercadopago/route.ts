@@ -479,33 +479,34 @@ async function handleClaimEvent(claimId: string) {
       return;
     }
 
+    // TODO: Implementar modelo Claim en Prisma schema si se necesita
     // Guardar o actualizar el reclamo en la base de datos
-    await prisma.claim.upsert({
-      where: { mercadopagoClaimId: claimId },
-      create: {
-        mercadopagoClaimId: claimId,
-        mercadopagoPaymentId: claim.payment_id ? String(claim.payment_id) : null,
-        userId,
-        type: claim.type || 'unknown',
-        status: claim.status || 'opened',
-        stage: claim.stage || null,
-        amount: claim.amount || 0,
-        currency: claim.currency_id || 'ARS',
-        reason: claim.reason || null,
-        claimDate: claim.date_created ? new Date(claim.date_created) : new Date(),
-        resolutionDate: claim.resolution_date ? new Date(claim.resolution_date) : null,
-        expirationDate: claim.expiration_date ? new Date(claim.expiration_date) : null,
-        metadata: claim,
-      },
-      update: {
-        status: claim.status || 'opened',
-        stage: claim.stage || null,
-        resolutionDate: claim.resolution_date ? new Date(claim.resolution_date) : null,
-        metadata: claim,
-      },
-    });
+    // await prisma.claim.upsert({
+    //   where: { mercadopagoClaimId: claimId },
+    //   create: {
+    //     mercadopagoClaimId: claimId,
+    //     mercadopagoPaymentId: claim.payment_id ? String(claim.payment_id) : null,
+    //     userId,
+    //     type: claim.type || 'unknown',
+    //     status: claim.status || 'opened',
+    //     stage: claim.stage || null,
+    //     amount: claim.amount || 0,
+    //     currency: claim.currency_id || 'ARS',
+    //     reason: claim.reason || null,
+    //     claimDate: claim.date_created ? new Date(claim.date_created) : new Date(),
+    //     resolutionDate: claim.resolution_date ? new Date(claim.resolution_date) : null,
+    //     expirationDate: claim.expiration_date ? new Date(claim.expiration_date) : null,
+    //     metadata: claim,
+    //   },
+    //   update: {
+    //     status: claim.status || 'opened',
+    //     stage: claim.stage || null,
+    //     resolutionDate: claim.resolution_date ? new Date(claim.resolution_date) : null,
+    //     metadata: claim,
+    //   },
+    // });
 
-    log.info({ claimId, userId, status: claim.status }, 'Claim saved to database');
+    log.info({ claimId, userId, status: claim.status }, 'Claim event received (not saved - Claim model not implemented)');
 
     // TODO: Enviar notificación al usuario sobre el reclamo
     // TODO: Enviar email al equipo de soporte

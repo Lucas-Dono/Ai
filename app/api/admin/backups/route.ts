@@ -29,23 +29,23 @@ async function verifyAdminAuth(req: NextRequest) {
   }
 
   // Verificar que el usuario existe
-  const user = await prisma.user.findUnique({
+  const dbUser = await prisma.user.findUnique({
     where: { email: user.email },
     select: { id: true, email: true },
   });
 
-  if (!user) {
+  if (!dbUser) {
     return { authorized: false, error: 'User not found' };
   }
 
   // TODO: Add proper admin role check when role field is added to User model
   // For now, only allow specific admin emails
   const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-  if (!adminEmails.includes(user.email)) {
+  if (!adminEmails.includes(dbUser.email)) {
     return { authorized: false, error: 'Forbidden - Admin access required' };
   }
 
-  return { authorized: true, userId: user.id };
+  return { authorized: true, userId: dbUser.id };
 }
 
 /**

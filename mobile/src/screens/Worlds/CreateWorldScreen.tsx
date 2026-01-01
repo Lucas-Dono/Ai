@@ -13,7 +13,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
-import worldApi from '../../services/api/world.api';
+// TODO: Migrar a Groups API - World API deprecated
+// import worldApi from '../../services/api/world.api';
 import { AgentsService } from '../../services/api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 
@@ -85,22 +86,23 @@ export default function CreateWorldScreen({ navigation }: CreateWorldScreenProps
 
     try {
       setLoading(true);
-      const world = await worldApi.createWorld({
-        name: name.trim(),
-        description: description.trim(),
-        genre: selectedGenre || undefined,
-        format: selectedFormat,
-        agentIds: selectedAgents.length > 0 ? selectedAgents : undefined,
-      });
+      // TODO: Migrar a Groups API - World API deprecated
+      // const world = await worldApi.createWorld({
+      //   name: name.trim(),
+      //   description: description.trim(),
+      //   genre: selectedGenre || undefined,
+      //   format: selectedFormat,
+      //   agentIds: selectedAgents.length > 0 ? selectedAgents : undefined,
+      // });
 
       Alert.alert(
-        '¡Mundo Creado!',
-        `Tu mundo "${world.name}" ha sido creado exitosamente`,
+        'Función en Migración',
+        'La creación de mundos está siendo migrada al nuevo sistema de grupos. Por favor, intenta más tarde.',
         [
           {
-            text: 'Ir al Mundo',
+            text: 'OK',
             onPress: () => {
-              navigation.replace('Chat', { worldId: world.id });
+              navigation.goBack();
             },
           },
         ]

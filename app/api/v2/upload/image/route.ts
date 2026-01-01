@@ -9,7 +9,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from "@/lib/auth-server";
-import { authOptions } from '@/lib/auth-server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -29,14 +28,19 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('file') as File;
 
-    if (!file) {
+    // Get file from FormData (using type assertion to work around TypeScript definitions)
+    const fileValue = (formData as any).get('file');
+
+    // Type guard to ensure file is a File instance
+    if (!fileValue || !(fileValue instanceof File)) {
       return NextResponse.json(
-        { error: 'No file provided' },
+        { error: 'No file provided or invalid file type' },
         { status: 400 }
       );
     }
+
+    const file: File = fileValue;
 
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {

@@ -82,7 +82,7 @@ export function SharedAICard({ character }: SharedAICardProps) {
   };
 
   return (
-    <Link href={`/community/share/characters/${character.id}`}>
+    <Link href={`/agentes/${character.id}`}>
       <motion.div
         whileHover={{ y: -4 }}
         className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all cursor-pointer h-full flex flex-col hover-lift-glow"

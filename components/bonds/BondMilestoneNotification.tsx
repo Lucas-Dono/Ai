@@ -1,10 +1,10 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, Trophy, Heart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import confetti from "canvas-confetti";
-import { useEffect, useState } from "react";
 
 export interface BondMilestone {
   type: "tier_upgrade" | "affinity_milestone" | "time_milestone" | "interaction_milestone";
@@ -56,7 +56,7 @@ const TIER_COLORS: Record<string, string> = {
 function getMilestoneMessage(milestone: BondMilestone): {
   title: string;
   subtitle: string;
-  icon: JSX.Element;
+  icon: React.ReactElement;
   color: string;
 } {
   switch (milestone.type) {

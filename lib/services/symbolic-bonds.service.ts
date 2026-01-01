@@ -99,9 +99,9 @@ export async function getOrCreateBondConfig(agentId: string) {
     config = await prisma.agentBondConfig.create({
       data: {
         agentId,
-        slotsPerTier: DEFAULT_SLOTS_PER_TIER,
-        tierRequirements: DEFAULT_TIER_REQUIREMENTS,
-        decaySettings: DEFAULT_DECAY_SETTINGS,
+        slotsPerTier: DEFAULT_SLOTS_PER_TIER as any,
+        tierRequirements: DEFAULT_TIER_REQUIREMENTS as any,
+        decaySettings: DEFAULT_DECAY_SETTINGS as any,
         isPolyamorous: false,
       },
     });
@@ -161,7 +161,7 @@ export async function attemptEstablishBond(
 
   // Verificar requisitos mínimos
   const config = await getOrCreateBondConfig(agentId);
-  const requirements = (config.tierRequirements as Record<BondTier, BondRequirements>)[tier];
+  const requirements = (config.tierRequirements as any as Record<BondTier, BondRequirements>)[tier];
 
   if (
     affinityProgress < requirements.minAffinity
@@ -498,7 +498,7 @@ export async function releaseBond(bondId: string, reason: string) {
       totalInteractions: bond.totalInteractions,
       narrativesUnlocked: bond.narrativesUnlocked,
       legacyImpact: bond.legacyImpact,
-      canonContributions: bond.canonContributions,
+      canonContributions: bond.canonContributions as any,
       releaseReason: reason,
       legacyBadge,
     },

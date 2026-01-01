@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 /**
  * POST /api/agents/[id]/share
@@ -54,7 +54,7 @@ export async function POST(
     });
 
     // Log the share event
-    log.info(
+    logger.info(
       {
         shareEventId: shareEvent.id,
         agentId,
@@ -74,7 +74,7 @@ export async function POST(
       message: "Compartido registrado exitosamente",
     });
   } catch (error) {
-    log.error({ error, agentId: (await params).id }, "Error tracking share");
+    logger.error({ error, agentId: (await params).id }, "Error tracking share");
     return NextResponse.json(
       { error: "Error al registrar compartido" },
       { status: 500 }
@@ -178,7 +178,7 @@ export async function GET(
       mostPopularMethod: sharesByMethodWithPercentage[0]?.method || null,
     });
   } catch (error) {
-    log.error({ error, agentId: (await params).id }, "Error fetching share stats");
+    logger.error({ error, agentId: (await params).id }, "Error fetching share stats");
     return NextResponse.json(
       { error: "Error al obtener estadísticas" },
       { status: 500 }

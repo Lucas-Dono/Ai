@@ -3,7 +3,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import log from "@/lib/logging/logger";
 
 // Definición de badges disponibles
 export const BADGE_DEFINITIONS = {

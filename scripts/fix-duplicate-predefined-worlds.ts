@@ -1,8 +1,10 @@
 /**
- * Script para eliminar mundos predefinidos duplicados
- * Mantiene solo el mundo predefinido más antiguo de cada nombre
+ * SCRIPT OBSOLETO
+ * Este script usa el modelo 'World' que fue migrado a 'Group'
+ * Mantenerlo solo para referencia histórica
  */
 
+/*
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -36,16 +38,16 @@ async function main() {
   for (const [name, worlds] of worldsByName) {
     if (worlds.length > 1) {
       console.log(`⚠️  Duplicados encontrados para "${name}": ${worlds.length} copias`);
-      console.log(`   IDs: ${worlds.map(w => w.id).join(', ')}`);
+      console.log(`   IDs: ${worlds.map((w: any) => w.id).join(', ')}`);
 
       // Mantener el primero (más antiguo), eliminar el resto
       const toKeep = worlds[0];
       const toDelete = worlds.slice(1);
 
       console.log(`   ✅ Mantener: ${toKeep.id} (creado: ${toKeep.createdAt})`);
-      console.log(`   🗑️  Eliminar: ${toDelete.map(w => `${w.id} (${w.createdAt})`).join(', ')}`);
+      console.log(`   🗑️  Eliminar: ${toDelete.map((w: any) => `${w.id} (${w.createdAt})`).join(', ')}`);
 
-      duplicates.push(...toDelete.map(w => w.id));
+      duplicates.push(...toDelete.map((w: any) => w.id));
       console.log('');
     }
   }
@@ -89,7 +91,7 @@ async function main() {
   console.log(`   Eliminadas ${deletedInteractions.count} interacciones`);
 
   // Eliminar worldSimulationState
-  const deletedStates = await prisma.worldSimulationState.deleteMany({
+  const deletedStates = await prisma.groupSimulationState.deleteMany({
     where: {
       worldId: {
         in: duplicates,
@@ -138,3 +140,7 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+*/
+
+console.log('❌ Este script está obsoleto. El sistema World fue migrado a Group.');
+console.log('💡 Usa los nuevos scripts de gestión de grupos en su lugar.');

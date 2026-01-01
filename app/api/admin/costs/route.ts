@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user is admin (you can add admin field to User model)
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
       select: { id: true, email: true },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -58,14 +58,14 @@ export async function GET(request: NextRequest) {
       case 'top-users':
         const topUsers = await getTopUsers(10, startDate, endDate);
         // Fetch user details
-        const userIds = topUsers.map(u => u.userId);
+        const userIds = topUsers.map((u: any) => u.userId);
         const users = await prisma.user.findMany({
           where: { id: { in: userIds } },
           select: { id: true, email: true, name: true, plan: true },
         });
 
-        const topUsersWithDetails = topUsers.map(tu => {
-          const userDetail = users.find(u => u.id === tu.userId);
+        const topUsersWithDetails = topUsers.map((tu: any) => {
+          const userDetail = users.find((u: any) => u.id === tu.userId);
           return {
             ...tu,
             email: userDetail?.email,

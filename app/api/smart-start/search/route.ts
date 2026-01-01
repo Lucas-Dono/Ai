@@ -14,7 +14,7 @@ const orchestrator = getSmartStartOrchestrator();
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSession(req);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -42,12 +42,12 @@ export async function POST(req: NextRequest) {
     const searchTime = Date.now() - startTime;
 
     // Handle both old format (array) and new format ({results, cached})
-    const results = Array.isArray(searchData) ? searchData : searchData.results;
-    const cached = Array.isArray(searchData) ? false : searchData.cached;
+    const results = Array.isArray(searchData) ? searchData : (searchData as any).results || searchData;
+    const cached = Array.isArray(searchData) ? false : (searchData as any).cached || false;
 
     return NextResponse.json({
       success: true,
-      results: results.map(r => ({
+      results: results.map((r: any) => ({
         id: r.id,
         externalId: r.externalId,
         name: r.name,

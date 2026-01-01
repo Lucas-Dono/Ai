@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
         "onnxruntime-node": false,
         "hnswlib-node": false,
         "node-llama-cpp": false,
+        undici: false,
       };
 
       // Ignorar archivos .node en el cliente

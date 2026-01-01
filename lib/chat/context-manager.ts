@@ -152,7 +152,7 @@ export async function extractAndStoreSemanticFacts(
     create: {
       agentId,
       userFacts: allFacts,
-      knowledgeBase: {},
+      userPreferences: {},
     },
     update: {
       userFacts: allFacts,

@@ -24,21 +24,45 @@ const sourceIcons = {
   wikipedia: Globe,
   jikan: Tv,
   fandom: BookOpen,
+  anilist: Tv,
   custom: LinkIcon,
+  mal: Tv,
+  tmdb: Tv,
+  tvmaze: Tv,
+  igdb: Tv,
+  myanimelist: Tv,
+  wikidata: Globe,
+  firecrawl: Globe,
 };
 
 const sourceLabels = {
   wikipedia: 'Wikipedia',
   jikan: 'MyAnimeList',
   fandom: 'Fandom Wiki',
+  anilist: 'AniList',
   custom: 'Personalizado',
+  mal: 'MyAnimeList',
+  tmdb: 'TMDB',
+  tvmaze: 'TVMaze',
+  igdb: 'IGDB',
+  myanimelist: 'MyAnimeList',
+  wikidata: 'Wikidata',
+  firecrawl: 'Web Scraping',
 };
 
 const sourceBadgeColors = {
   wikipedia: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
   jikan: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
   fandom: 'bg-green-500/10 text-green-500 border-green-500/20',
+  anilist: 'bg-pink-500/10 text-pink-500 border-pink-500/20',
   custom: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+  mal: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+  tmdb: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+  tvmaze: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
+  igdb: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
+  myanimelist: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+  wikidata: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+  firecrawl: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
 };
 
 export function CharacterSearchSelector({

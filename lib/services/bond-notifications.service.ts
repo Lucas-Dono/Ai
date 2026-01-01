@@ -43,14 +43,10 @@ export async function createBondNotification(data: NotificationData) {
   try {
     const notification = await prisma.notification.create({
       data: {
-        userId: data.userId,
+        recipientId: data.userId,
         type: data.type,
         title: data.title,
         message: data.message,
-        metadata: data.metadata || {},
-        link: data.link,
-        read: false,
-        priority: data.priority || "medium",
       },
     });
 
@@ -99,10 +95,7 @@ export async function notifySlotAvailable(
   });
 
   // Emit WebSocket event
-  emitSlotAvailable(userId, agentId, tier, {
-    offerId,
-    expiresAt: expiresAt.toISOString(),
-  });
+  emitSlotAvailable(userId, agentId, tier, {});
 }
 
 /**
@@ -169,7 +162,7 @@ export async function notifyBondAtRisk(
   });
 
   // Emit WebSocket event
-  emitBondAtRisk(userId, bondId, { daysInactive, status });
+  emitBondAtRisk(bondId, userId, status, daysInactive);
 }
 
 /**
@@ -197,7 +190,7 @@ export async function notifyRankChanged(
   });
 
   // Emit WebSocket event
-  emitRankChanged(userId, bondId, { newRank, oldRank, tier });
+  emitRankChanged(bondId, userId, oldRank, newRank);
 }
 
 /**
@@ -222,7 +215,7 @@ export async function notifyMilestoneReached(
   });
 
   // Emit WebSocket event
-  emitMilestoneReached(userId, bondId, { milestoneName, reward });
+  emitMilestoneReached(bondId, userId, milestoneName, { reward });
 }
 
 /**
@@ -327,14 +320,14 @@ export async function getUserBondNotifications(
   unreadOnly: boolean = false
 ) {
   const where: any = {
-    userId,
+    user: { id: userId },
     type: {
       startsWith: "bond_",
     },
   };
 
   if (unreadOnly) {
-    where.read = false;
+    where.isRead = false;
   }
 
   return await prisma.notification.findMany({
@@ -350,7 +343,7 @@ export async function getUserBondNotifications(
 export async function markBondNotificationAsRead(notificationId: string) {
   return await prisma.notification.update({
     where: { id: notificationId },
-    data: { read: true },
+    data: { isRead: true },
   });
 }
 
@@ -360,11 +353,11 @@ export async function markBondNotificationAsRead(notificationId: string) {
 export async function markAllBondNotificationsAsRead(userId: string) {
   return await prisma.notification.updateMany({
     where: {
-      userId,
+      recipientId: userId,
       type: { startsWith: "bond_" },
-      read: false,
+      isRead: false,
     },
-    data: { read: true },
+    data: { isRead: true },
   });
 }
 
@@ -374,9 +367,9 @@ export async function markAllBondNotificationsAsRead(userId: string) {
 export async function getUnreadBondNotificationsCount(userId: string): Promise<number> {
   return await prisma.notification.count({
     where: {
-      userId,
+      recipientId: userId,
       type: { startsWith: "bond_" },
-      read: false,
+      isRead: false,
     },
   });
 }

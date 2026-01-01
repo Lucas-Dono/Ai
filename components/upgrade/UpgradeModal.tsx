@@ -146,7 +146,7 @@ export function UpgradeModal({
     }
   };
 
-  const getContextMessage = () => {
+  const getContextMessage = (): string | null => {
     if (!context) return null;
 
     const messages = {
@@ -161,10 +161,12 @@ export function UpgradeModal({
     };
 
     if (context.type === "limit_reached" && context.limitType) {
-      return messages.limit_reached[context.limitType];
+      const msg = messages.limit_reached[context.limitType];
+      return typeof msg === 'string' ? msg : "Has alcanzado un límite de tu plan";
     }
 
-    return context.message || messages[context.type];
+    const msg = context.message || messages[context.type];
+    return typeof msg === 'string' ? msg : null;
   };
 
   return (

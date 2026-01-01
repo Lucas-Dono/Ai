@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 
 interface NSFWConsentStatus {
   isAdult: boolean;
@@ -24,14 +24,14 @@ interface UseNSFWConsentReturn {
  * Hook para manejar el consentimiento NSFW del usuario
  */
 export function useNSFWConsent(): UseNSFWConsentReturn {
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, isPending: sessionPending } = useSession();
   const [status, setStatus] = useState<NSFWConsentStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch consent status
   const fetchConsentStatus = useCallback(async () => {
-    if (sessionStatus !== "authenticated") {
+    if (!session?.user) {
       setLoading(false);
       return;
     }
@@ -56,7 +56,7 @@ export function useNSFWConsent(): UseNSFWConsentReturn {
     } finally {
       setLoading(false);
     }
-  }, [sessionStatus]);
+  }, [session]);
 
   // Initial fetch
   useEffect(() => {

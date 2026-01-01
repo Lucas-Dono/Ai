@@ -181,7 +181,7 @@ function parseTimeWindow(window: string): number {
     m: 60,
     h: 3600,
     d: 86400,
-  }[unit];
+  }[unit] ?? 1;
 
   return parseInt(amount) * seconds;
 }

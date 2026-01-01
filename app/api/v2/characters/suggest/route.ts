@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = result.response;
-    let suggestion = response.text();
+    let suggestion: string | string[] = response.text();
 
     // Parse JSON for traits
     if (type === 'traits') {

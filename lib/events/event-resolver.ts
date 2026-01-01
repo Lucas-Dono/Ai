@@ -246,14 +246,16 @@ async function applyConsequences(
     data: {
       agentId: agent.id,
       event: `${event.title}: ${outcome.description}`,
-      emotionalContext: {
+      userEmotion: wasSuccess ? "joy" : "distress",
+      characterEmotion: wasSuccess ? "happy_for" : "pity",
+      emotionalValence: wasSuccess ? 0.7 : -0.6,
+      importance: consequences.memoryImportance || (wasSuccess ? 0.7 : 0.6),
+      metadata: {
         outcome: wasSuccess ? "success" : "failure",
         feelings: outcome.emotionalImpact || {},
+        tags: [event.eventType, wasSuccess ? "success" : "failure"],
+        relatedEntities: event.relatedGoalId ? [event.relatedGoalId] : [],
       },
-      importance: consequences.memoryImportance || (wasSuccess ? 0.7 : 0.6),
-      category: event.category,
-      tags: [event.eventType, wasSuccess ? "success" : "failure"],
-      relatedEntities: event.relatedGoalId ? [event.relatedGoalId] : [],
     },
   });
 

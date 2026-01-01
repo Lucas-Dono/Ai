@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getVeniceClient } from "@/lib/llm/venice";
+import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
 
 /**
  * Group Story Engine Service

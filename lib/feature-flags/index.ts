@@ -54,7 +54,7 @@ export async function getUserTier(userId: string): Promise<UserTier> {
   // Try Redis cache first
   if (isRedisConfigured()) {
     try {
-      const cached = await redis.get<string>(cacheKey);
+      const cached = await redis.get(cacheKey) as string | null;
       if (cached && Object.values(UserTier).includes(cached as UserTier)) {
         return cached as UserTier;
       }
@@ -219,7 +219,7 @@ export async function trackFeatureUsage(
 
   if (isRedisConfigured()) {
     try {
-      currentCount = (await redis.get<number>(key)) || 0;
+      currentCount = (await redis.get(key) as number | null) || 0;
       await redis.set(key, currentCount + count, { ex: 86400 }); // 24h TTL
     } catch (error) {
       console.error("Redis usage tracking error:", error);
@@ -272,7 +272,7 @@ export async function getFeatureUsage(
 
   if (isRedisConfigured()) {
     try {
-      currentCount = (await redis.get<number>(key)) || 0;
+      currentCount = (await redis.get(key) as number | null) || 0;
     } catch (error) {
       console.error("Redis usage get error:", error);
     }

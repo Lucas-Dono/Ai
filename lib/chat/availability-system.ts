@@ -175,7 +175,7 @@ export async function checkAvailability(
     return {
       available: false,
       reason: `El personaje está ${availability.currentActivity}. Puede responder ocasionalmente.`,
-      blockedUntil: availability.blockedUntil,
+      blockedUntil: availability.blockedUntil ?? undefined,
       canRespondSpaced: true,
       nextResponseAt: new Date(nextResponseTime),
     };
@@ -185,7 +185,7 @@ export async function checkAvailability(
   return {
     available: false,
     reason: `El personaje está ${availability.currentActivity} y no puede responder ahora.`,
-    blockedUntil: availability.blockedUntil,
+    blockedUntil: availability.blockedUntil ?? undefined,
     canRespondSpaced: false,
   };
 }

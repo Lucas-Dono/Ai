@@ -92,11 +92,11 @@ export async function POST(
     }
 
     // Obtener usuario
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json(
         { error: "Usuario no encontrado" },
         { status: 404 }
@@ -116,7 +116,7 @@ export async function POST(
     }
 
     // Verificar que el usuario no esté calificando su propio agente
-    if (agent.userId === user.id) {
+    if (agent.userId === dbUser.id) {
       return NextResponse.json(
         { error: "No puedes calificar tu propio compañero" },
         { status: 403 }
@@ -128,7 +128,7 @@ export async function POST(
       where: {
         agentId_userId: {
           agentId,
-          userId: user.id,
+          userId: dbUser.id,
         },
       },
       update: {
@@ -137,7 +137,7 @@ export async function POST(
       },
       create: {
         agentId,
-        userId: user.id,
+        userId: dbUser.id,
         rating,
         comment: comment || null,
       },
@@ -194,11 +194,11 @@ export async function DELETE(
     const { id: agentId } = await params;
 
     // Obtener usuario
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json(
         { error: "Usuario no encontrado" },
         { status: 404 }
@@ -209,7 +209,7 @@ export async function DELETE(
     const deleted = await prisma.review.deleteMany({
       where: {
         agentId,
-        userId: user.id,
+        userId: dbUser.id,
       },
     });
 

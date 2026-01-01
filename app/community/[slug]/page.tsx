@@ -60,7 +60,7 @@ export default function CommunityDetailPage() {
       <div className="relative">
         {/* Banner */}
         {community.banner && (() => {
-          const bannerStyles = getCommunityImageStyles(community.bannerShape as any, 'large');
+          const bannerStyles = getCommunityImageStyles('banner' as const, 'large');
           return (
             <div className={bannerStyles.containerClass}>
               <img
@@ -86,7 +86,7 @@ export default function CommunityDetailPage() {
             <div className="flex items-end gap-4 mb-6">
               {/* Icon */}
               {community.icon ? (() => {
-                const iconStyles = getCommunityImageStyles(community.iconShape as any, 'large');
+                const iconStyles = getCommunityImageStyles('circle' as const, 'large');
                 return (
                   <div className={`${iconStyles.containerClass} border-4 border-background`}>
                     <img

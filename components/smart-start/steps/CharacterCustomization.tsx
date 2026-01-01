@@ -191,8 +191,8 @@ export function CharacterCustomization() {
   const syncToContext = useCallback(() => {
     updateCharacterDraft({
       name: localDraft.name,
-      age: localDraft.age,
-      gender: localDraft.gender,
+      age: parseInt(localDraft.age) || 25,
+      gender: localDraft.gender as 'male' | 'female' | 'non-binary' | 'other',
       occupation: localDraft.occupation,
       personality: localDraft.personality,
       traits: localDraft.traits.split(',').map((t) => t.trim()).filter(Boolean),
@@ -223,10 +223,10 @@ export function CharacterCustomization() {
     });
   }, [localDraft, updateCharacterDraft]);
 
-  // Continue to depth customization
+  // Continue to review
   const handleContinue = useCallback(() => {
     syncToContext();
-    goToStep('depth');
+    goToStep('review');
   }, [syncToContext, goToStep]);
 
   // Open Manual Wizard with current data

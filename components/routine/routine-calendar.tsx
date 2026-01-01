@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import type {
   CurrentActivity,
-  RoutineTemplate,
   ActivityType,
   DayOfWeek
 } from "@/types/routine";
@@ -11,6 +10,18 @@ import type {
 interface RoutineCalendarProps {
   agentId: string;
   className?: string;
+}
+
+interface RoutineTemplate {
+  id: string;
+  name: string;
+  type: ActivityType;
+  startTime: string;
+  endTime: string;
+  daysOfWeek: DayOfWeek[];
+  isFlexible: boolean;
+  description?: string;
+  location?: string;
 }
 
 interface RoutineData {
@@ -129,7 +140,7 @@ export function RoutineCalendar({ agentId, className = "" }: RoutineCalendarProp
                 {routine.currentActivity.name}
               </div>
               <div className="text-sm text-gray-600">
-                {routine.currentActivity.timeRange}
+                {new Date(routine.currentActivity.startedAt).toLocaleTimeString()} - {new Date(routine.currentActivity.expectedEnd).toLocaleTimeString()}
               </div>
             </div>
           </div>
@@ -171,13 +182,13 @@ export function RoutineCalendar({ agentId, className = "" }: RoutineCalendarProp
               key={template.id}
               className={`
                 p-4 rounded-lg border-l-4
-                ${ACTIVITY_COLORS[template.type]}
+                ${ACTIVITY_COLORS[template.type as ActivityType]}
                 hover:shadow-md transition-shadow
               `}
             >
               <div className="flex items-start gap-3">
                 <span className="text-2xl">
-                  {ACTIVITY_ICONS[template.type]}
+                  {ACTIVITY_ICONS[template.type as ActivityType]}
                 </span>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">

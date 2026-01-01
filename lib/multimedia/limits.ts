@@ -183,12 +183,14 @@ async function countMultimediaUsage(
 ): Promise<number> {
   if (type === 'image') {
     // Contar imágenes generadas (completadas + generando)
-    return await prisma.pendingImageGeneration.count({
-      where: {
-        userId,
-        status: { in: ['completed', 'generating'] },
-      },
-    });
+    // @deprecated - pendingImageGeneration model no longer exists in schema
+    return 0;
+    // return await prisma.pendingImageGeneration.count({
+    //   where: {
+    //     userId,
+    //     status: { in: ['completed', 'generating'] },
+    //   },
+    // });
   } else {
     // Contar mensajes con audio generado
     return await prisma.message.count({

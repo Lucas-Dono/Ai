@@ -28,40 +28,54 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { Sparkles, X, MessageCircle, Clock, Heart } from "lucide-react-native";
-import type {
-  ProactiveMessage,
-  ProactiveMessageBannerProps,
-} from "../../../types/proactive-messages";
+import type { ProactiveMessage } from "@/hooks/useProactiveMessages";
+
+/**
+ * Props del componente ProactiveMessageBanner
+ */
+export interface ProactiveMessageBannerProps {
+  /** Mensaje a mostrar */
+  message: ProactiveMessage;
+  /** Callback al presionar el mensaje */
+  onPress: () => void;
+  /** Callback al descartar el mensaje */
+  onDismiss: () => void;
+  /** Estilo personalizado */
+  style?: any;
+  /** Si debe mostrar animación de entrada */
+  animated?: boolean;
+  /** Callback cuando la animación termina */
+  onAnimationComplete?: () => void;
+}
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 /**
  * Obtener icono según tipo de trigger
  */
-function getTriggerIcon(triggerType: ProactiveMessage["triggerType"]) {
+function getTriggerIcon(triggerType: string) {
   const iconSize = 20;
-  const iconColor = "white";
 
   switch (triggerType) {
     case "inactivity":
-      return <Clock size={iconSize} color={iconColor} />;
+      return <Clock size={iconSize} />;
     case "follow_up":
-      return <MessageCircle size={iconSize} color={iconColor} />;
+      return <MessageCircle size={iconSize} />;
     case "emotional_checkin":
-      return <Heart size={iconSize} color={iconColor} />;
+      return <Heart size={iconSize} />;
     case "celebration":
-      return <Sparkles size={iconSize} color={iconColor} />;
+      return <Sparkles size={iconSize} />;
     case "life_event":
-      return <Sparkles size={iconSize} color={iconColor} />;
+      return <Sparkles size={iconSize} />;
     default:
-      return <Sparkles size={iconSize} color={iconColor} />;
+      return <Sparkles size={iconSize} />;
   }
 }
 
 /**
  * Obtener colores de gradiente según tipo de trigger
  */
-function getTriggerColors(triggerType: ProactiveMessage["triggerType"]): [string, string] {
+function getTriggerColors(triggerType: string): [string, string] {
   switch (triggerType) {
     case "inactivity":
       return ["#3B82F6", "#2563EB"]; // blue-500 to blue-600
@@ -221,7 +235,7 @@ export function ProactiveMessageBanner({
               onPress={handleDismiss}
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
-              <X size={20} color="white" />
+              <X size={20} />
             </TouchableOpacity>
           </View>
 

@@ -24,7 +24,7 @@ export function useDraftAutosave(
   draft: CharacterDraft,
   enabled: boolean = true
 ) {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const lastSavedRef = useRef<Date | null>(null);
 
   // Save to localStorage
@@ -53,13 +53,8 @@ export function useDraftAutosave(
 
       const data = JSON.parse(saved);
 
-      // Convert dates back from ISO strings
-      if (data.draft.createdAt) {
-        data.draft.createdAt = new Date(data.draft.createdAt);
-      }
-      if (data.draft.lastModified) {
-        data.draft.lastModified = new Date(data.draft.lastModified);
-      }
+      // Note: CharacterDraft doesn't have createdAt or lastModified fields
+      // These might be legacy fields that can be safely ignored
 
       lastSavedRef.current = new Date(data.savedAt);
       return data.draft;
@@ -91,7 +86,7 @@ export function useDraftAutosave(
     // Set new timeout
     timeoutRef.current = setTimeout(() => {
       saveDraft(draft);
-    }, AUTOSAVE_DELAY);
+    }, AUTOSAVE_DELAY) as unknown as NodeJS.Timeout;
 
     // Cleanup
     return () => {

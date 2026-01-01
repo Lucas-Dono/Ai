@@ -75,9 +75,10 @@ async function fetchWithTimeout(
       // CRITICAL: Pass custom dispatcher with extended timeouts
       // @ts-ignore - undici types may not match exactly but this works
       dispatcher: extendedTimeoutAgent,
-    });
+    } as any);
     clearTimeout(timeoutId);
-    return response;
+    // @ts-ignore - undici Response is compatible with standard Response
+    return response as Response;
   } catch (error) {
     clearTimeout(timeoutId);
     // Re-throw with better error message
@@ -90,7 +91,7 @@ async function fetchWithTimeout(
 
 export interface CharacterSearchResult {
   id: string; // Identificador único
-  source: 'wikipedia' | 'anilist' | 'fandom' | 'custom';
+  source: 'wikipedia' | 'anilist' | 'fandom' | 'custom' | 'jikan' | 'mal' | 'tmdb' | 'tvmaze' | 'igdb' | 'myanimelist' | 'wikidata' | 'firecrawl';
   name: string;
   description: string; // Descripción corta (1-2 líneas)
   imageUrl?: string;

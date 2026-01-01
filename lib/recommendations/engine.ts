@@ -33,6 +33,9 @@ async function generateCandidates(userId: string): Promise<{
   const interactedItemIds = new Set(history.map((h) => h.itemId));
 
   // 1. TRENDING (Popular ahora)
+  // NOTE: world feature has been deprecated/removed
+  const trendingWorlds: any[] = [];
+  /* DEPRECATED CODE - world feature removed
   const trendingWorlds = await prisma.world.findMany({
     where: {
       isPredefined: true,
@@ -47,6 +50,7 @@ async function generateCandidates(userId: string): Promise<{
       },
     },
   });
+  */
 
   // 2. COLLABORATIVE FILTERING BÁSICO (usuarios similares)
   // Encontrar usuarios que interactuaron con los mismos items
@@ -201,14 +205,17 @@ async function rankCandidatesWithLLM(
           rating: h.rating,
         };
       } else {
+        // NOTE: world feature has been deprecated/removed
+        /* DEPRECATED CODE - world feature removed
         const world = await prisma.world.findUnique({
           where: { id: h.itemId },
           select: { name: true, description: true, category: true },
         });
+        */
         return {
           type: "world",
-          name: world?.name || "Unknown",
-          description: world?.description || "",
+          name: "Unknown",
+          description: "",
           duration: h.duration,
         };
       }

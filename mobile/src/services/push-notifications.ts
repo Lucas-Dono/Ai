@@ -13,7 +13,7 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_BASE_URL } from "@/config/api.config";
+import { API_BASE_URL } from "../config/api.config";
 
 /**
  * Configuración de notificaciones

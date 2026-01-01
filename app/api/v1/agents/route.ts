@@ -187,18 +187,28 @@ export async function POST(req: NextRequest) {
       tone,
     }, tier);
 
+    // Type assertion for profile to include extended fields
+    type ExtendedProfile = Record<string, any> & {
+      deepRelationalPatterns?: any;
+      philosophicalFramework?: any;
+      psychologicalProfile?: any;
+      currentLocation?: any;
+      background?: any;
+    };
+    const extendedProfile = profile as ExtendedProfile;
+
     // Extract location from profile (for real-time weather system)
     let locationCity = null;
     let locationCountry = null;
 
-    if (profile.currentLocation) {
+    if (extendedProfile.currentLocation) {
       // LLM generates currentLocation in the profile
-      locationCity = profile.currentLocation.city;
-      locationCountry = profile.currentLocation.country;
-    } else if (profile.background?.birthplace) {
+      locationCity = extendedProfile.currentLocation.city;
+      locationCountry = extendedProfile.currentLocation.country;
+    } else if (extendedProfile.background?.birthplace) {
       // Fallback to birthplace if no current location
-      locationCity = profile.background.birthplace.city;
-      locationCountry = profile.background.birthplace.country;
+      locationCity = extendedProfile.background.birthplace.city;
+      locationCountry = extendedProfile.background.birthplace.country;
     }
 
     // Create agent with tier information
@@ -221,93 +231,93 @@ export async function POST(req: NextRequest) {
     });
 
     // For ULTRA tier: Create the exclusive psychological profiles
-    if (tier === 'ultra' && profile.psychologicalProfile) {
+    if (tier === 'ultra' && extendedProfile.psychologicalProfile) {
       await prisma.psychologicalProfile.create({
         data: {
           agentId: agent.id,
-          attachmentStyle: profile.psychologicalProfile.attachmentStyle || 'secure',
-          attachmentDescription: profile.psychologicalProfile.attachmentDescription,
-          primaryCopingMechanisms: profile.psychologicalProfile.primaryCopingMechanisms || [],
-          unhealthyCopingMechanisms: profile.psychologicalProfile.unhealthyCopingMechanisms || [],
-          copingTriggers: profile.psychologicalProfile.copingTriggers || [],
-          emotionalRegulationBaseline: profile.psychologicalProfile.emotionalRegulationBaseline || 'estable',
-          emotionalExplosiveness: profile.psychologicalProfile.emotionalExplosiveness || 30,
-          emotionalRecoverySpeed: profile.psychologicalProfile.emotionalRecoverySpeed || 'moderado',
-          mentalHealthConditions: profile.psychologicalProfile.mentalHealthConditions || [],
-          therapyStatus: profile.psychologicalProfile.therapyStatus,
-          medicationUse: profile.psychologicalProfile.medicationUse || false,
-          mentalHealthStigma: profile.psychologicalProfile.mentalHealthStigma,
-          defenseMethanisms: profile.psychologicalProfile.defenseMethanisms || {},
-          traumaHistory: profile.psychologicalProfile.traumaHistory,
-          resilienceFactors: profile.psychologicalProfile.resilienceFactors || [],
-          selfAwarenessLevel: profile.psychologicalProfile.selfAwarenessLevel || 50,
-          blindSpots: profile.psychologicalProfile.blindSpots || [],
-          insightAreas: profile.psychologicalProfile.insightAreas || [],
+          attachmentStyle: extendedProfile.psychologicalProfile.attachmentStyle || 'secure',
+          attachmentDescription: extendedProfile.psychologicalProfile.attachmentDescription,
+          primaryCopingMechanisms: extendedProfile.psychologicalProfile.primaryCopingMechanisms || [],
+          unhealthyCopingMechanisms: extendedProfile.psychologicalProfile.unhealthyCopingMechanisms || [],
+          copingTriggers: extendedProfile.psychologicalProfile.copingTriggers || [],
+          emotionalRegulationBaseline: extendedProfile.psychologicalProfile.emotionalRegulationBaseline || 'estable',
+          emotionalExplosiveness: extendedProfile.psychologicalProfile.emotionalExplosiveness || 30,
+          emotionalRecoverySpeed: extendedProfile.psychologicalProfile.emotionalRecoverySpeed || 'moderado',
+          mentalHealthConditions: extendedProfile.psychologicalProfile.mentalHealthConditions || [],
+          therapyStatus: extendedProfile.psychologicalProfile.therapyStatus,
+          medicationUse: extendedProfile.psychologicalProfile.medicationUse || false,
+          mentalHealthStigma: extendedProfile.psychologicalProfile.mentalHealthStigma,
+          defenseMethanisms: extendedProfile.psychologicalProfile.defenseMethanisms || {},
+          traumaHistory: extendedProfile.psychologicalProfile.traumaHistory,
+          resilienceFactors: extendedProfile.psychologicalProfile.resilienceFactors || [],
+          selfAwarenessLevel: extendedProfile.psychologicalProfile.selfAwarenessLevel || 50,
+          blindSpots: extendedProfile.psychologicalProfile.blindSpots || [],
+          insightAreas: extendedProfile.psychologicalProfile.insightAreas || [],
         },
       });
     }
 
-    if (tier === 'ultra' && profile.deepRelationalPatterns) {
+    if (tier === 'ultra' && extendedProfile.deepRelationalPatterns) {
       await prisma.deepRelationalPatterns.create({
         data: {
           agentId: agent.id,
-          givingLoveLanguages: profile.deepRelationalPatterns.givingLoveLanguages || [],
-          receivingLoveLanguages: profile.deepRelationalPatterns.receivingLoveLanguages || [],
-          loveLanguageIntensities: profile.deepRelationalPatterns.loveLanguageIntensities || {},
-          repeatingPatterns: profile.deepRelationalPatterns.repeatingPatterns || [],
-          whyRepeats: profile.deepRelationalPatterns.whyRepeats,
-          awarenessOfPatterns: profile.deepRelationalPatterns.awarenessOfPatterns || 'inconsciente',
-          personalBoundaryStyle: profile.deepRelationalPatterns.personalBoundaryStyle || 'saludable',
-          professionalBoundaryStyle: profile.deepRelationalPatterns.professionalBoundaryStyle || 'saludable',
-          boundaryEnforcement: profile.deepRelationalPatterns.boundaryEnforcement || 50,
-          boundaryGuilty: profile.deepRelationalPatterns.boundaryGuilty || false,
-          conflictStyle: profile.deepRelationalPatterns.conflictStyle || 'colaborativo',
-          conflictTriggers: profile.deepRelationalPatterns.conflictTriggers || [],
-          healthyConflictSkills: profile.deepRelationalPatterns.healthyConflictSkills || [],
-          unhealthyConflictPatterns: profile.deepRelationalPatterns.unhealthyConflictPatterns || [],
-          trustBaseline: profile.deepRelationalPatterns.trustBaseline || 50,
-          vulnerabilityComfort: profile.deepRelationalPatterns.vulnerabilityComfort || 50,
-          trustRepairAbility: profile.deepRelationalPatterns.trustRepairAbility || 50,
-          intimacyComfort: profile.deepRelationalPatterns.intimacyComfort || {},
-          intimacyFears: profile.deepRelationalPatterns.intimacyFears || [],
-          intimacyNeeds: profile.deepRelationalPatterns.intimacyNeeds || [],
-          socialMaskLevel: profile.deepRelationalPatterns.socialMaskLevel || 30,
-          authenticityByContext: profile.deepRelationalPatterns.authenticityByContext || {},
-          socialEnergy: profile.deepRelationalPatterns.socialEnergy || 'neutral',
+          givingLoveLanguages: extendedProfile.deepRelationalPatterns.givingLoveLanguages || [],
+          receivingLoveLanguages: extendedProfile.deepRelationalPatterns.receivingLoveLanguages || [],
+          loveLanguageIntensities: extendedProfile.deepRelationalPatterns.loveLanguageIntensities || {},
+          repeatingPatterns: extendedProfile.deepRelationalPatterns.repeatingPatterns || [],
+          whyRepeats: extendedProfile.deepRelationalPatterns.whyRepeats,
+          awarenessOfPatterns: extendedProfile.deepRelationalPatterns.awarenessOfPatterns || 'inconsciente',
+          personalBoundaryStyle: extendedProfile.deepRelationalPatterns.personalBoundaryStyle || 'saludable',
+          professionalBoundaryStyle: extendedProfile.deepRelationalPatterns.professionalBoundaryStyle || 'saludable',
+          boundaryEnforcement: extendedProfile.deepRelationalPatterns.boundaryEnforcement || 50,
+          boundaryGuilty: extendedProfile.deepRelationalPatterns.boundaryGuilty || false,
+          conflictStyle: extendedProfile.deepRelationalPatterns.conflictStyle || 'colaborativo',
+          conflictTriggers: extendedProfile.deepRelationalPatterns.conflictTriggers || [],
+          healthyConflictSkills: extendedProfile.deepRelationalPatterns.healthyConflictSkills || [],
+          unhealthyConflictPatterns: extendedProfile.deepRelationalPatterns.unhealthyConflictPatterns || [],
+          trustBaseline: extendedProfile.deepRelationalPatterns.trustBaseline || 50,
+          vulnerabilityComfort: extendedProfile.deepRelationalPatterns.vulnerabilityComfort || 50,
+          trustRepairAbility: extendedProfile.deepRelationalPatterns.trustRepairAbility || 50,
+          intimacyComfort: extendedProfile.deepRelationalPatterns.intimacyComfort || {},
+          intimacyFears: extendedProfile.deepRelationalPatterns.intimacyFears || [],
+          intimacyNeeds: extendedProfile.deepRelationalPatterns.intimacyNeeds || [],
+          socialMaskLevel: extendedProfile.deepRelationalPatterns.socialMaskLevel || 30,
+          authenticityByContext: extendedProfile.deepRelationalPatterns.authenticityByContext || {},
+          socialEnergy: extendedProfile.deepRelationalPatterns.socialEnergy || 'neutral',
         },
       });
     }
 
-    if (tier === 'ultra' && profile.philosophicalFramework) {
+    if (tier === 'ultra' && extendedProfile.philosophicalFramework) {
       await prisma.philosophicalFramework.create({
         data: {
           agentId: agent.id,
-          optimismLevel: profile.philosophicalFramework.optimismLevel || 50,
-          worldviewType: profile.philosophicalFramework.worldviewType,
-          meaningSource: profile.philosophicalFramework.meaningSource,
-          existentialStance: profile.philosophicalFramework.existentialStance,
-          politicalLeanings: profile.philosophicalFramework.politicalLeanings,
-          politicalEngagement: profile.philosophicalFramework.politicalEngagement || 30,
-          activismLevel: profile.philosophicalFramework.activismLevel || 20,
-          socialJusticeStance: profile.philosophicalFramework.socialJusticeStance,
-          ethicalFramework: profile.philosophicalFramework.ethicalFramework,
-          moralComplexity: profile.philosophicalFramework.moralComplexity || 50,
-          moralRigidity: profile.philosophicalFramework.moralRigidity || 50,
-          moralDilemmas: profile.philosophicalFramework.moralDilemmas,
-          religiousBackground: profile.philosophicalFramework.religiousBackground,
-          currentBeliefs: profile.philosophicalFramework.currentBeliefs,
-          spiritualPractices: profile.philosophicalFramework.spiritualPractices || [],
-          faithImportance: profile.philosophicalFramework.faithImportance || 30,
-          lifePhilosophy: profile.philosophicalFramework.lifePhilosophy,
-          coreBeliefs: profile.philosophicalFramework.coreBeliefs || [],
-          dealbreakers: profile.philosophicalFramework.dealbreakers || [],
-          personalMotto: profile.philosophicalFramework.personalMotto,
-          epistomologyStance: profile.philosophicalFramework.epistomologyStance,
-          scienceTrustLevel: profile.philosophicalFramework.scienceTrustLevel || 70,
-          intuitionVsLogic: profile.philosophicalFramework.intuitionVsLogic || 50,
-          growthMindset: profile.philosophicalFramework.growthMindset || 60,
-          opennessToChange: profile.philosophicalFramework.opennessToChange || 50,
-          philosophicalEvolution: profile.philosophicalFramework.philosophicalEvolution,
+          optimismLevel: extendedProfile.philosophicalFramework.optimismLevel || 50,
+          worldviewType: extendedProfile.philosophicalFramework.worldviewType,
+          meaningSource: extendedProfile.philosophicalFramework.meaningSource,
+          existentialStance: extendedProfile.philosophicalFramework.existentialStance,
+          politicalLeanings: extendedProfile.philosophicalFramework.politicalLeanings,
+          politicalEngagement: extendedProfile.philosophicalFramework.politicalEngagement || 30,
+          activismLevel: extendedProfile.philosophicalFramework.activismLevel || 20,
+          socialJusticeStance: extendedProfile.philosophicalFramework.socialJusticeStance,
+          ethicalFramework: extendedProfile.philosophicalFramework.ethicalFramework,
+          moralComplexity: extendedProfile.philosophicalFramework.moralComplexity || 50,
+          moralRigidity: extendedProfile.philosophicalFramework.moralRigidity || 50,
+          moralDilemmas: extendedProfile.philosophicalFramework.moralDilemmas,
+          religiousBackground: extendedProfile.philosophicalFramework.religiousBackground,
+          currentBeliefs: extendedProfile.philosophicalFramework.currentBeliefs,
+          spiritualPractices: extendedProfile.philosophicalFramework.spiritualPractices || [],
+          faithImportance: extendedProfile.philosophicalFramework.faithImportance || 30,
+          lifePhilosophy: extendedProfile.philosophicalFramework.lifePhilosophy,
+          coreBeliefs: extendedProfile.philosophicalFramework.coreBeliefs || [],
+          dealbreakers: extendedProfile.philosophicalFramework.dealbreakers || [],
+          personalMotto: extendedProfile.philosophicalFramework.personalMotto,
+          epistomologyStance: extendedProfile.philosophicalFramework.epistomologyStance,
+          scienceTrustLevel: extendedProfile.philosophicalFramework.scienceTrustLevel || 70,
+          intuitionVsLogic: extendedProfile.philosophicalFramework.intuitionVsLogic || 50,
+          growthMindset: extendedProfile.philosophicalFramework.growthMindset || 60,
+          opennessToChange: extendedProfile.philosophicalFramework.opennessToChange || 50,
+          philosophicalEvolution: extendedProfile.philosophicalFramework.philosophicalEvolution,
         },
       });
     }

@@ -88,13 +88,6 @@ export class GenreService {
         score += 50;
       }
 
-      // Tags match
-      for (const tag of genre.tags) {
-        if (tag.toLowerCase().includes(normalizedQuery)) {
-          score += 30;
-        }
-      }
-
       // Subgenre name match
       for (const subgenre of genre.subgenres) {
         if (subgenre.name.toLowerCase().includes(normalizedQuery)) {
@@ -174,9 +167,9 @@ export class GenreService {
     const genre = this.getGenre(genreId);
     if (!genre) return [];
 
-    // If no history, return all subgenres sorted by priority
+    // If no history, return all subgenres in their original order
     if (userHistory.length === 0) {
-      return [...genre.subgenres].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      return [...genre.subgenres];
     }
 
     // Count subgenre occurrences in user history for this genre
@@ -189,10 +182,10 @@ export class GenreService {
       }
     }
 
-    // Combine usage frequency with base priority
+    // Sort by usage frequency
     const scored = genre.subgenres.map(subgenre => ({
       subgenre,
-      score: (subgenreCounts.get(subgenre.id) || 0) * 10 + (subgenre.priority || 0),
+      score: (subgenreCounts.get(subgenre.id) || 0) * 10,
     }));
 
     scored.sort((a, b) => b.score - a.score);
@@ -211,9 +204,9 @@ export class GenreService {
     const subgenre = this.getSubGenre(genreId, subgenreId);
     if (!subgenre) return [];
 
-    // If no history, return all archetypes sorted by priority
+    // If no history, return all archetypes in their original order
     if (userHistory.length === 0) {
-      return [...subgenre.archetypes].sort((a, b) => (b.priority || 0) - (a.priority || 0));
+      return [...subgenre.archetypes];
     }
 
     // Count archetype occurrences
@@ -230,10 +223,10 @@ export class GenreService {
       }
     }
 
-    // Combine usage frequency with base priority
+    // Sort by usage frequency
     const scored = subgenre.archetypes.map(archetype => ({
       archetype,
-      score: (archetypeCounts.get(archetype.id) || 0) * 10 + (archetype.priority || 0),
+      score: (archetypeCounts.get(archetype.id) || 0) * 10,
     }));
 
     scored.sort((a, b) => b.score - a.score);

@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { FeaturedCharacterGoldenFrame } from "@/components/dashboard/FeaturedCharacterGoldenFrame";
 import { CharacterCardIntriga } from "@/components/dashboard/CharacterCardIntriga";
 import { PremiumSection } from "@/components/dashboard/PremiumSection";
-import { WorldCard } from "@/components/dashboard/WorldCard";
+// import { WorldCard } from "@/components/dashboard/WorldCard"; // Component doesn't exist
 import {
   getFeaturedCharacter,
   getEmotionalConnections,

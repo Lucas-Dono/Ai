@@ -400,8 +400,16 @@ En las conversaciones:
 
 /**
  * Crea los mundos predefinidos en la base de datos
+ *
+ * NOTA: Esta función está deshabilitada debido a la migración de Worlds a Grupos.
+ * Los modelos World y WorldAgent ya no existen en el esquema.
+ * Si se necesita esta funcionalidad, debe ser reimplementada usando el sistema de Grupos.
  */
 export async function seedPredefinedWorlds() {
+  console.log('🌍 Predefined worlds seed skipped - Worlds system has been migrated to Groups');
+  return;
+
+  /* CÓDIGO DESHABILITADO - Requiere migración a sistema de Grupos
   console.log('🌍 Seeding predefined worlds...');
 
   for (const worldData of predefinedWorlds) {
@@ -519,4 +527,5 @@ export async function seedPredefinedWorlds() {
   }
 
   console.log('🎉 Predefined worlds seeded successfully!\n');
+  */ // FIN CÓDIGO DESHABILITADO
 }

@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(req: NextRequest) {
   try {
     // Verificar autenticación
-    const currentUser = await requireAuth();
+    const currentUser = await requireAuth(req);
 
     // Obtener query de búsqueda
     const { searchParams } = new URL(req.url);

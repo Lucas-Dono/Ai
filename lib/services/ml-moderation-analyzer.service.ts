@@ -68,25 +68,26 @@ export const MLModerationAnalyzer = {
     const suggestions: MLSuggestion[] = [];
 
     try {
+      // TODO: HiddenPost model removed - need to implement alternative
       // Obtener posts ocultos recientes (últimos 30 días)
-      const hiddenPosts = await prisma.hiddenPost.findMany({
-        where: {
-          userId,
-          createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        },
-        include: {
-          post: {
-            select: {
-              id: true,
-              title: true,
-              content: true,
-              tags: true,
-              type: true,
-            },
-          },
-        },
-        take: 20,
-      });
+      const hiddenPosts: any[] = []; // await prisma.hiddenPost.findMany({
+      //   where: {
+      //     userId,
+      //     createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+      //   },
+      //   include: {
+      //     post: {
+      //       select: {
+      //         id: true,
+      //         title: true,
+      //         content: true,
+      //         tags: true,
+      //         type: true,
+      //       },
+      //     },
+      //   },
+      //   take: 20,
+      // });
 
       if (hiddenPosts.length < 3) {
         log.debug({ userId }, 'Pocos posts ocultos para análisis semántico');
@@ -100,7 +101,7 @@ export const MLModerationAnalyzer = {
 
       // Obtener embeddings de posts ocultos (usa cola con prioridad baja)
       const hiddenTexts = hiddenPosts.map(
-        hp => `${hp.post.title} ${hp.post.content}`.substring(0, 1000)
+        (hp: any) => `${hp.post.title} ${hp.post.content}`.substring(0, 1000)
       );
 
       const hiddenEmbeddings = await getBatchEmbeddings(hiddenTexts, {
@@ -123,14 +124,7 @@ export const MLModerationAnalyzer = {
           status: 'published',
           createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
           NOT: {
-            OR: [
-              { id: { in: hiddenPosts.map(hp => hp.postId) } },
-              {
-                hiddenBy: {
-                  some: { userId },
-                },
-              },
-            ],
+            id: { in: hiddenPosts.map((hp: any) => hp.postId) },
           },
         },
         select: {
@@ -138,9 +132,6 @@ export const MLModerationAnalyzer = {
           title: true,
           content: true,
           authorId: true,
-          author: {
-            select: { name: true },
-          },
         },
         take: 100,
       });
@@ -163,7 +154,7 @@ export const MLModerationAnalyzer = {
             id: `semantic_hide_${post.id}`,
             type: 'hide_post',
             title: `Post similar a contenido que ocultaste`,
-            description: `"${post.title.substring(0, 50)}..." de ${post.author.name}`,
+            description: `"${post.title.substring(0, 50)}..."`,
             confidence: Math.round(similarity * 100),
             reason: `${Math.round(similarity * 100)}% similar a posts que ocultaste`,
             action: {
@@ -197,30 +188,31 @@ export const MLModerationAnalyzer = {
     const suggestions: MLSuggestion[] = [];
 
     try {
+      // TODO: BlockedUser model removed - need to implement alternative
       // Obtener usuarios bloqueados y sus posts
-      const blockedUsers = await prisma.blockedUser.findMany({
-        where: { userId },
-        include: {
-          blockedUser: {
-            include: {
-              posts: {
-                where: { status: 'published' },
-                select: { title: true, content: true, type: true, tags: true },
-                take: 10,
-              },
-            },
-          },
-        },
-      });
+      const blockedUsers: any[] = []; // await prisma.blockedUser.findMany({
+      //   where: { userId },
+      //   include: {
+      //     blockedUser: {
+      //       include: {
+      //         posts: {
+      //           where: { status: 'published' },
+      //           select: { title: true, content: true, type: true, tags: true },
+      //           take: 10,
+      //         },
+      //       },
+      //     },
+      //   },
+      // });
 
       if (blockedUsers.length < 2) {
         return suggestions; // Necesitamos al menos 2 usuarios bloqueados
       }
 
       // Crear "perfil" promedio de usuarios bloqueados
-      const blockedTexts = blockedUsers.flatMap(bu =>
+      const blockedTexts = blockedUsers.flatMap((bu: any) =>
         bu.blockedUser.posts.map(
-          p => `${p.title} ${p.content}`.substring(0, 1000)
+          (p: any) => `${p.title} ${p.content}`.substring(0, 1000)
         )
       );
 
@@ -236,35 +228,35 @@ export const MLModerationAnalyzer = {
       const blockedCentroid = this.calculateCentroid(blockedEmbeddings);
 
       // Analizar autores de posts recientes que el usuario ve
-      const recentAuthors = await prisma.user.findMany({
+      // NOTE: User model doesn't have posts relation, using CommunityPost instead
+      const recentPosts = await prisma.communityPost.findMany({
         where: {
-          posts: {
-            some: {
-              status: 'published',
-              createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-            },
-          },
-          NOT: {
-            blockedBy: {
-              some: { userId },
-            },
-          },
+          status: 'published',
+          createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
         },
-        include: {
-          posts: {
-            where: { status: 'published' },
-            select: { title: true, content: true },
-            take: 5,
-          },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          authorId: true,
         },
-        take: 50,
+        take: 100,
+      });
+
+      // Group posts by author
+      const authorPostsMap = new Map<string, any[]>();
+      recentPosts.forEach(post => {
+        if (!authorPostsMap.has(post.authorId)) {
+          authorPostsMap.set(post.authorId, []);
+        }
+        authorPostsMap.get(post.authorId)!.push(post);
       });
 
       // Comparar cada autor con el perfil de bloqueados
-      for (const author of recentAuthors) {
-        if (author.posts.length === 0) continue;
+      for (const [authorId, posts] of authorPostsMap.entries()) {
+        if (posts.length === 0) continue;
 
-        const authorTexts = author.posts.map(
+        const authorTexts = posts.map(
           p => `${p.title} ${p.content}`.substring(0, 1000)
         );
 
@@ -279,19 +271,19 @@ export const MLModerationAnalyzer = {
         // Si es muy similar a usuarios bloqueados (>70%), sugerir bloquear
         if (similarity > 0.7) {
           suggestions.push({
-            id: `author_block_${author.id}`,
+            id: `author_block_${authorId}`,
             type: 'block_user',
             title: `Usuario con contenido similar a bloqueados`,
-            description: `${author.name} publica contenido similar a usuarios que bloqueaste`,
+            description: `Usuario publica contenido similar a usuarios que bloqueaste`,
             confidence: Math.round(similarity * 100),
             reason: `${Math.round(similarity * 100)}% similar a usuarios bloqueados`,
             action: {
               type: 'block_user',
-              userId: author.id,
+              userId: authorId,
             },
             metadata: {
               similarity,
-              authorId: author.id,
+              authorId,
             },
           });
         }
@@ -311,21 +303,22 @@ export const MLModerationAnalyzer = {
     const suggestions: MLSuggestion[] = [];
 
     try {
+      // TODO: HiddenPost model removed - need to implement alternative
       // Obtener posts ocultos con tags
-      const hiddenPosts = await prisma.hiddenPost.findMany({
-        where: {
-          userId,
-          createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-        },
-        include: {
-          post: {
-            select: {
-              tags: true,
-              type: true,
-            },
-          },
-        },
-      });
+      const hiddenPosts: any[] = []; // await prisma.hiddenPost.findMany({
+      //   where: {
+      //     userId,
+      //     createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+      //   },
+      //   include: {
+      //     post: {
+      //       select: {
+      //         tags: true,
+      //         type: true,
+      //       },
+      //     },
+      //   },
+      // });
 
       if (hiddenPosts.length < 5) {
         return suggestions;
@@ -335,7 +328,7 @@ export const MLModerationAnalyzer = {
       const tagFreq = new Map<string, number>();
       const typeFreq = new Map<string, number>();
 
-      hiddenPosts.forEach(hp => {
+      hiddenPosts.forEach((hp: any) => {
         hp.post.tags.forEach((tag: string) => {
           tagFreq.set(tag, (tagFreq.get(tag) || 0) + 1);
         });
@@ -412,56 +405,60 @@ export const MLModerationAnalyzer = {
    * Guardar sugerencias ML en base de datos
    */
   async saveSuggestions(userId: string, suggestions: MLSuggestion[]): Promise<void> {
-    // Eliminar sugerencias antiguas (>7 días)
-    await prisma.mLSuggestion.deleteMany({
-      where: {
-        userId,
-        createdAt: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-      },
-    });
+    // TODO: MLSuggestion model removed - need to implement alternative
+    log.info({ userId, count: suggestions.length }, 'Sugerencias ML (not saved - model removed)');
+    // // Eliminar sugerencias antiguas (>7 días)
+    // await prisma.mLSuggestion.deleteMany({
+    //   where: {
+    //     userId,
+    //     createdAt: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+    //   },
+    // });
 
-    // Guardar nuevas sugerencias
-    await prisma.mLSuggestion.createMany({
-      data: suggestions.map(s => ({
-        userId,
-        suggestionId: s.id,
-        type: s.type,
-        title: s.title,
-        description: s.description,
-        confidence: s.confidence,
-        reason: s.reason,
-        action: s.action,
-        metadata: s.metadata,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      })),
-      skipDuplicates: true,
-    });
+    // // Guardar nuevas sugerencias
+    // await prisma.mLSuggestion.createMany({
+    //   data: suggestions.map(s => ({
+    //     userId,
+    //     suggestionId: s.id,
+    //     type: s.type,
+    //     title: s.title,
+    //     description: s.description,
+    //     confidence: s.confidence,
+    //     reason: s.reason,
+    //     action: s.action,
+    //     metadata: s.metadata,
+    //     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    //   })),
+    //   skipDuplicates: true,
+    // });
 
-    log.info({ userId, count: suggestions.length }, 'Sugerencias ML guardadas');
+    // log.info({ userId, count: suggestions.length }, 'Sugerencias ML guardadas');
   },
 
   /**
    * Obtener sugerencias ML guardadas
    */
   async getSavedSuggestions(userId: string): Promise<MLSuggestion[]> {
-    const saved = await prisma.mLSuggestion.findMany({
-      where: {
-        userId,
-        expiresAt: { gt: new Date() },
-      },
-      orderBy: { confidence: 'desc' },
-      take: 10,
-    });
+    // TODO: MLSuggestion model removed - need to implement alternative
+    return [];
+    // const saved = await prisma.mLSuggestion.findMany({
+    //   where: {
+    //     userId,
+    //     expiresAt: { gt: new Date() },
+    //   },
+    //   orderBy: { confidence: 'desc' },
+    //   take: 10,
+    // });
 
-    return saved.map(s => ({
-      id: s.suggestionId,
-      type: s.type as any,
-      title: s.title,
-      description: s.description,
-      confidence: s.confidence,
-      reason: s.reason,
-      action: s.action,
-      metadata: s.metadata,
-    }));
+    // return saved.map((s: any) => ({
+    //   id: s.suggestionId,
+    //   type: s.type as any,
+    //   title: s.title,
+    //   description: s.description,
+    //   confidence: s.confidence,
+    //   reason: s.reason,
+    //   action: s.action,
+    //   metadata: s.metadata,
+    // }));
   },
 };

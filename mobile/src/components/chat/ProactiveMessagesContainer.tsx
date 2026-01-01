@@ -11,7 +11,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import { AnimatePresence } from "moti";
 import { ProactiveMessageBanner } from "./ProactiveMessageBanner";
-import { useProactiveMessages } from "@/hooks/useProactiveMessages";
+import { useProactiveMessages, type ProactiveMessage } from "@/hooks/useProactiveMessages";
 import type { ProactiveMessagesContainerProps } from "../../../types/proactive-messages";
 
 /**
@@ -28,6 +28,17 @@ import type { ProactiveMessagesContainerProps } from "../../../types/proactive-m
  * />
  * ```
  */
+// Redefinir las props para usar el tipo correcto de ProactiveMessage
+interface Props {
+  agentId: string;
+  agentName?: string;
+  agentAvatar?: string;
+  onMessageResponse?: (message: ProactiveMessage, response: string) => void;
+  onMessageRead?: (message: ProactiveMessage) => void;
+  onMessageDismissed?: (message: ProactiveMessage) => void;
+  containerStyle?: any;
+}
+
 export function ProactiveMessagesContainer({
   agentId,
   agentName,
@@ -36,7 +47,7 @@ export function ProactiveMessagesContainer({
   onMessageRead,
   onMessageDismissed,
   containerStyle,
-}: ProactiveMessagesContainerProps) {
+}: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
@@ -48,9 +59,6 @@ export function ProactiveMessagesContainer({
     hasMessages,
   } = useProactiveMessages(agentId, {
     pollingInterval: 60000, // 1 minuto
-    enableVibration: true,
-    enableSound: true,
-    autoShowNotification: true,
     onNewMessage: (message) => {
       console.log("[ProactiveMessagesContainer] New message received:", message.id);
       // El banner aparecerá automáticamente

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { PricingTable } from "@/components/billing/PricingTable";
-import { getAuthenticatedUser } from "@/lib/auth-server";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function PlanesPage() {
-  const user = await getAuthenticatedUser();
+  const session = await getServerSession();
 
   // Si no está autenticado, mostrar planes de todos modos (para marketing)
   // Si está autenticado, obtener su plan actual
-  const currentPlan = user?.plan || "free";
+  const currentPlan = (session?.user as any)?.plan || "free";
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,7 +37,7 @@ export default async function PlanesPage() {
           onSelectPlan={async (planId) => {
             "use server";
             // Si el usuario no está autenticado, redirigir a login
-            if (!user) {
+            if (!session) {
               redirect("/auth/signin?callbackUrl=/planes");
             }
             // Si está autenticado, esto será manejado por el modal
@@ -116,7 +116,7 @@ export default async function PlanesPage() {
           <p className="text-xl text-muted-foreground mb-8">
             Únete a miles de usuarios que ya están creando compañeros IA increíbles
           </p>
-          {!user && (
+          {!session && (
             <a
               href="/auth/signin"
               className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"

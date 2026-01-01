@@ -44,9 +44,6 @@ const isTest = process.env.NODE_ENV === 'test';
 const pinoConfig: pino.LoggerOptions = {
   level: process.env.LOG_LEVEL || (isDevelopment ? 'debug' : 'info'),
 
-  // IMPORTANT: Disable worker threads to avoid webpack bundling issues in Next.js
-  sync: true,
-
   // Redactar datos sensibles
   redact: {
     paths: redactPaths,

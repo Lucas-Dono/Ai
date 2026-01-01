@@ -53,7 +53,7 @@ export default function BillingScreen({ navigation }: BillingScreenProps) {
   const handleUpgrade = async (tier: 'plus' | 'ultra') => {
     try {
       setUpgrading(true);
-      const { url } = await billingApi.createCheckout(tier, 'stripe');
+      const { url } = await billingApi.createCheckout(tier, 'month');
       await Linking.openURL(url);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo iniciar el proceso de upgrade');

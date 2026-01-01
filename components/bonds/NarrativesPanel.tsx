@@ -195,6 +195,7 @@ export default function NarrativesPanel({
             narrative={narrative}
             index={index}
             agentName={agentName}
+            bondId={bondId}
           />
         ))}
       </div>
@@ -206,10 +207,12 @@ function NarrativeCard({
   narrative,
   index,
   agentName,
+  bondId,
 }: {
   narrative: NarrativeArc;
   index: number;
   agentName: string;
+  bondId: string;
 }) {
   const categoryColor = CATEGORY_COLORS[narrative.category];
   const categoryIcon = CATEGORY_ICONS[narrative.category];

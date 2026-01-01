@@ -112,15 +112,6 @@ export const MarketplaceCharacterService = {
           },
         },
         ratings: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
@@ -325,15 +316,6 @@ export const MarketplaceCharacterService = {
       update: {
         rating,
         review,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
       },
     });
 

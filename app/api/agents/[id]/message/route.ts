@@ -508,9 +508,6 @@ export async function POST(
         agentId,
         messageId: result.assistantMessage.id,
         userMessageContent: content.substring(0, 100), // First 100 chars for debugging
-        characterTier, // Include tier for analytics
-        actualInputTokens, // Include actual tokens for reference
-        actualOutputTokens,
       }
     );
 

@@ -15,15 +15,17 @@ interface RootLayoutWrapperProps {
 }
 
 export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const pathname = usePathname();
 
-  // Hide footer in chat pages (agentes/[id])
-  const isChat = pathname?.startsWith('/agentes/') && !pathname.includes('/edit') && !pathname.includes('/behaviors') && !pathname.includes('/memory');
+  // Hide footer in chat pages (agentes/[id] and grupos/[id])
+  const isAgentChat = pathname?.startsWith('/agentes/') && !pathname.includes('/edit') && !pathname.includes('/behaviors') && !pathname.includes('/memory');
+  const isGroupChat = pathname?.startsWith('/dashboard/grupos/') && pathname.split('/').length >= 4 && !pathname.includes('/configuracion') && !pathname.includes('/analytics');
+  const isChat = isAgentChat || isGroupChat;
 
   // ANALYTICS TRACKING: Mobile Session Detection (Fase 6 - User Experience)
   useEffect(() => {
-    if (status !== "authenticated" || !session?.user?.id) return;
+    if (!session?.user?.id) return;
 
     // Detect if device is mobile
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

@@ -5,15 +5,15 @@
 
 import { PrismaClient } from '@prisma/client';
 import {
-  SmartStartSession,
+  SmartStartSessionData,
   SmartStartStep,
-  SmartStartAction,
   CharacterDraft,
   SearchResult,
   GenreId,
   SubGenreId,
   ArchetypeId,
 } from '../core/types';
+import type { GenderType } from '@/types/character-creation';
 import { getGenreService } from '../services/genre-service';
 import { getSearchRouter } from '../search/search-router';
 import { getCharacterExtractor } from '../search/character-extractor';
@@ -22,6 +22,40 @@ import { getValidationService } from '../services/validation-service';
 import { PromptBuilder } from '../prompts/generator';
 
 const prisma = new PrismaClient();
+
+// Define the action types used in the orchestrator
+interface SmartStartAction {
+  type: 'select_genre' | 'select_type' | 'search' | 'select_result' | 'customize' | 'generate' | 'complete' | 'abandon';
+  data: any;
+}
+
+// Define SmartStartSession interface matching Prisma model
+interface SmartStartSession {
+  id: string;
+  userId: string;
+  currentStep: string;
+  startedAt: Date;
+  completedAt?: Date | null;
+  abandonedAt?: Date | null;
+  resultCharacterId?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  timestamp?: number;
+  // Session data fields from Prisma model
+  selectedGenre?: string | null;
+  selectedSubgenre?: string | null;
+  selectedArchetype?: string | null;
+  characterType?: string | null;
+  searchQuery?: string | null;
+  searchResults?: any;
+  selectedResult?: any;
+  extractedCharacter?: any;
+  userInput?: any;
+  aiGeneratedFields?: any;
+  userModifications?: any;
+  timeSpentPerStep?: any;
+  interactionEvents?: any;
+}
 
 export class SmartStartOrchestrator {
   private genreService = getGenreService();
@@ -83,11 +117,14 @@ export class SmartStartOrchestrator {
     // State machine transitions
     const newState = this.transitionState(session as SmartStartSession, action);
 
+    // Extract only allowed update fields
+    const { userId: _userId, id: _id, createdAt: _createdAt, startedAt: _startedAt, timestamp: _timestamp, ...allowedUpdates } = newState;
+
     // Update session
     const updated = await prisma.smartStartSession.update({
       where: { id: sessionId },
       data: {
-        ...newState,
+        ...allowedUpdates,
         timeSpentPerStep,
         interactionEvents: {
           push: {
@@ -139,8 +176,8 @@ export class SmartStartOrchestrator {
         break;
 
       case 'select_result':
-        updates.selectedResultId = action.data.resultId;
-        updates.externalData = action.data.characterData;
+        updates.selectedResult = action.data.characterData;
+        updates.extractedCharacter = action.data.characterData;
         updates.currentStep = 'customize';
         break;
 
@@ -156,13 +193,13 @@ export class SmartStartOrchestrator {
 
       case 'complete':
         updates.completedAt = new Date();
-        updates.currentStep = 'completed';
+        updates.currentStep = 'review'; // Use valid step instead of 'completed'
         updates.resultCharacterId = action.data.characterId;
         break;
 
       case 'abandon':
         updates.abandonedAt = new Date();
-        updates.currentStep = 'abandoned';
+        updates.currentStep = 'review'; // Use valid step instead of 'abandoned'
         break;
 
       default:
@@ -234,7 +271,7 @@ export class SmartStartOrchestrator {
       subgenreId: session.selectedSubgenre as SubGenreId | undefined,
       archetypeId: session.selectedArchetype as ArchetypeId | undefined,
       name: extracted.name,
-      personality: extracted.personality,
+      personality: extracted.personality || [],
       background: extracted.background,
       appearance: extracted.appearance,
     };
@@ -249,15 +286,22 @@ export class SmartStartOrchestrator {
       systemPrompt = `You are ${extracted.name}. ${extracted.background}\n\nPersonality: ${extracted.personality?.join(', ') || 'unique and interesting'}`;
     }
 
-    // Create draft
+    // Parse age to number if it's a string
+    const parsedAge = extracted.age ? (typeof extracted.age === 'number' ? extracted.age : parseInt(extracted.age, 10)) : undefined;
+
+    // Create draft - convert personality to string if it's an array
+    const personalityStr = Array.isArray(extracted.personality)
+      ? extracted.personality.join(', ')
+      : (extracted.personality || '');
+
     const draft: CharacterDraft = {
       name: extracted.name,
       alternateName: extracted.alternateName,
-      personality: extracted.personality,
-      background: extracted.background,
-      appearance: extracted.appearance,
-      age: extracted.age,
-      gender: extracted.gender,
+      personality: personalityStr,
+      backstory: extracted.background,
+      physicalAppearance: extracted.appearance,
+      age: parsedAge && !isNaN(parsedAge) ? parsedAge : undefined,
+      gender: extracted.gender as GenderType | undefined,
       occupation: extracted.occupation,
       systemPrompt,
       imageUrl: result.imageUrl,
@@ -265,20 +309,8 @@ export class SmartStartOrchestrator {
       genreId,
       subgenreId: session.selectedSubgenre as SubGenreId | undefined,
       archetypeId: session.selectedArchetype as ArchetypeId | undefined,
-      externalSourceId: result.externalId,
-      externalSourceType: result.source,
-      externalSourceUrl: result.sourceUrl,
-      aiGeneratedFields: ['systemPrompt'],
-      userEditedFields: [],
       communicationStyle: extracted.communicationStyle,
       catchphrases: extracted.catchphrases,
-      likes: extracted.likes,
-      dislikes: extracted.dislikes,
-      skills: extracted.skills,
-      fears: extracted.fears,
-      relationships: extracted.relationships,
-      goals: extracted.goals,
-      quirks: extracted.quirks,
     };
 
     // Update session
@@ -328,36 +360,24 @@ export class SmartStartOrchestrator {
       config.additionalContext
     );
 
-    // Create draft
+    // Create draft - convert personality to string if needed
+    const personalityStr = typeof generated.personality === 'string'
+      ? generated.personality
+      : (Array.isArray(generated.personality) ? generated.personality.join(', ') : '');
+
     const draft: CharacterDraft = {
       name: config.name || generated.name || 'New Character',
-      personality: generated.personality || [],
-      background: generated.background || '',
-      appearance: generated.appearance,
-      age: generated.age,
+      personality: personalityStr,
+      backstory: generated.background || '',
+      physicalAppearance: generated.appearance,
+      age: typeof generated.age === 'string' ? parseInt(generated.age, 10) : generated.age,
       occupation: generated.occupation,
       systemPrompt,
       genreId: config.genreId,
       subgenreId: config.subgenreId,
       archetypeId: config.archetypeId,
-      aiGeneratedFields: [
-        'personality',
-        'background',
-        'appearance',
-        'age',
-        'occupation',
-        'systemPrompt',
-      ],
-      userEditedFields: [],
       communicationStyle: generated.communicationStyle,
       catchphrases: generated.catchphrases,
-      likes: generated.likes,
-      dislikes: generated.dislikes,
-      skills: generated.skills,
-      fears: generated.fears,
-      relationships: generated.relationships,
-      goals: generated.goals,
-      quirks: generated.quirks,
     };
 
     // Validate
@@ -425,7 +445,7 @@ Return a corrected version in JSON format.`;
       archetypeId: session.selectedArchetype as ArchetypeId,
       name: session.userModifications?.name,
       additionalContext: session.userModifications?.additionalContext,
-      externalData: session.externalData,
+      externalData: session.extractedCharacter,
     };
   }
 

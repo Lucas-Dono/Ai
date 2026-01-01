@@ -108,6 +108,10 @@ export class IGDBSource implements SearchSource {
       this.accessToken = data.access_token;
       this.tokenExpiry = Date.now() + data.expires_in * 1000;
 
+      if (!this.accessToken) {
+        throw new Error('Failed to obtain access token from Twitch');
+      }
+
       return this.accessToken;
     } catch (error) {
       console.error('IGDB authentication error:', error);
@@ -346,12 +350,7 @@ export class IGDBSource implements SearchSource {
               genres: primaryGame.genres?.map(g => g.name),
             }
           : undefined,
-        games: games?.map(game => ({
-          name: game.name,
-          releaseYear: game.first_release_date
-            ? new Date(game.first_release_date * 1000).getFullYear()
-            : undefined,
-        })),
+        games: games?.map(game => game.name),
       },
       confidence: this.calculateConfidence(char, imageUrl, games),
     };

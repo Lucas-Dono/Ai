@@ -30,7 +30,7 @@ export class GenreDetector {
     const source = result.source;
 
     // PRIORITY 1: Source-based detection (highest confidence)
-    if (source === 'anilist' || source === 'mal' || source === 'jikan') {
+    if (source === 'anilist' || source === 'myanimelist' || source === 'jikan') {
       detections.push({
         genre: 'roleplay',
         confidence: 0.95,
@@ -78,7 +78,7 @@ export class GenreDetector {
       detections.push({
         genre: 'professional',
         confidence: 0.8,
-        reasoning: `Persona profesional: ${result.occupation || 'ocupación detectada'}`,
+        reasoning: 'Persona profesional detectada',
       });
     }
 
@@ -187,11 +187,6 @@ export class GenreDetector {
   }
 
   private isProfessional(result: SearchResult, metadata: Record<string, unknown>): boolean {
-    // Real people with occupations
-    if (result.occupation && !this.isAnimeCharacter(metadata)) {
-      return true;
-    }
-
     // Wikipedia entries for real people
     if (metadata.wikipediaUrl && !this.isAnimeCharacter(metadata)) {
       return true;
@@ -233,7 +228,6 @@ export class GenreDetector {
 
   private isWellnessMentor(result: SearchResult, metadata: Record<string, unknown>): boolean {
     const description = result.description?.toLowerCase() || '';
-    const occupation = result.occupation?.toLowerCase() || '';
 
     const mentorKeywords = [
       'mentor',
@@ -247,10 +241,7 @@ export class GenreDetector {
       'coach',
     ];
 
-    return (
-      mentorKeywords.some(keyword => description.includes(keyword)) ||
-      mentorKeywords.some(keyword => occupation.includes(keyword))
-    );
+    return mentorKeywords.some(keyword => description.includes(keyword));
   }
 
   private hasAnimeNamePattern(name: string): boolean {
@@ -296,7 +287,7 @@ export class GenreDetector {
         break;
 
       case 'professional':
-        if (result.occupation) {
+        if (description.includes('career') || description.includes('professional')) {
           return { subgenre: 'career-mentor', confidence: 0.8 };
         }
         break;

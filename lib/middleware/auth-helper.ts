@@ -30,7 +30,6 @@ export async function getAuthSession(request: NextRequest): Promise<AuthSession 
           id: session.user.id,
           email: session.user.email || '',
           name: session.user.name || null,
-          plan: session.user.plan,
         },
       };
     }

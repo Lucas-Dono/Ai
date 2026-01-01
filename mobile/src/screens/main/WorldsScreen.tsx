@@ -18,7 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
 import { WorldsService, buildAvatarUrl } from '../../services/api';
-import worldApi from '../../services/api/world.api';
+// TODO: Migrar a Groups API - World API deprecated
+// import worldApi from '../../services/api/world.api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 
 type WorldsScreenProps = {

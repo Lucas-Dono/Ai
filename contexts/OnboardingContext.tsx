@@ -224,7 +224,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         timerId = setTimeout(() => {
           console.log('✅ [TOUR] Navigation complete, setting isNavigating to false');
           setIsNavigating(false);
-        }, 50); // Reducido de 100ms a 50ms
+        }, 50) as unknown as NodeJS.Timeout; // Reducido de 100ms a 50ms
       });
 
       return () => {

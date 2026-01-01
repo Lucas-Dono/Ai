@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import BondDetailView from "@/components/bonds/BondDetailView";
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BondDetailPage({ params }: Props) {
-  const session = await auth();
+  const session = await getServerSession();
   const { id } = await params;
 
   if (!session?.user) {

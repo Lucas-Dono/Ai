@@ -217,25 +217,8 @@ export async function canSendMessage(
     };
   }
 
-  // ANTI-ABUSE: Verificar límite SEMANAL (para planes Plus y Ultra)
-  const tierLimits = getTierLimits(effectiveTier);
-  const weeklyLimit = tierLimits.resources.messagesPerWeek;
-
-  if (!isUnlimited(weeklyLimit) && weeklyLimit > 0) {
-    const weeklyUsage = await getWeeklyUsage(userId, "message");
-
-    if (weeklyUsage >= weeklyLimit) {
-      return {
-        allowed: false,
-        reason: `Límite semanal alcanzado (${weeklyLimit}/semana). Este límite se resetea el domingo. Actualiza a un plan superior para más mensajes.`,
-        current: weeklyUsage,
-        limit: weeklyLimit,
-        canUseRewarded: false,
-        effectiveTier,
-        tempTierInfo,
-      };
-    }
-  }
+  // ANTI-ABUSE: Límite semanal fue removido del sistema
+  // Solo se usa el límite diario ahora
 
   // Permitido
   return {
@@ -739,11 +722,8 @@ export async function checkTierResourceLimit(
   let currentUsage = 0;
 
   switch (resource) {
-    case "messagesPerDay": {
-      const usage = await getDailyUsage(userId);
-      currentUsage = usage.messagesCount;
-      break;
-    }
+    // Note: messagesPerDay is handled by canSendMessage(), not here
+    // Messages are token-based, so use totalTokensPerDay instead
     case "activeAgents": {
       currentUsage = await prisma.agent.count({
         where: { userId },
@@ -751,9 +731,9 @@ export async function checkTierResourceLimit(
       break;
     }
     case "activeWorlds": {
-      currentUsage = await prisma.world.count({
-        where: { userId },
-      });
+      // NOTA: World model fue migrado a Groups
+      // Usar activeGroups en su lugar
+      currentUsage = 0;
       break;
     }
     case "charactersInMarketplace": {
@@ -866,9 +846,8 @@ export async function getTierUsageSummary(userId: string, userPlan: string) {
     where: { userId },
   });
 
-  const worldCount = await prisma.world.count({
-    where: { userId },
-  });
+  // NOTA: World model fue migrado a Groups
+  const worldCount = 0;
 
   const marketplaceCharacters = await prisma.marketplaceCharacter.count({
     where: { authorId: userId },
@@ -880,8 +859,8 @@ export async function getTierUsageSummary(userId: string, userPlan: string) {
     usage: {
       messages: {
         current: dailyUsage.messagesCount,
-        limit: tierLimits.resources.messagesPerDay,
-        remaining: getRemainingQuota(dailyUsage.messagesCount, tierLimits.resources.messagesPerDay),
+        limit: Math.floor(tierLimits.resources.totalTokensPerDay / 350), // ~350 tokens por mensaje
+        remaining: getRemainingQuota(dailyUsage.messagesCount, Math.floor(tierLimits.resources.totalTokensPerDay / 350)),
       },
       agents: {
         current: agentCount,

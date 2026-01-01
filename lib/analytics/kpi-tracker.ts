@@ -321,7 +321,7 @@ export async function getUserExperienceMetrics(
       timestamp: { gte: sevenDaysAgo },
       metadata: {
         path: ["userId"],
-        in: cohortUserIds,
+        array_contains: cohortUserIds.length > 0 ? cohortUserIds[0] : undefined,
       },
     },
   });

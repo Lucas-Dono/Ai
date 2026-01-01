@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { GroupSettingsPanel } from "@/components/groups/GroupSettingsPanel";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -49,7 +48,7 @@ export default async function GroupConfigPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: groupId } = await params;
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
 
   if (!session?.user?.id) {
     redirect("/login");

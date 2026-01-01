@@ -90,9 +90,8 @@ export const UserAnalyticsService = {
       UserModerationService.getModerationStats(userId),
 
       // Posts guardados
-      prisma.savedPost.count({
-        where: { userId },
-      }),
+      // TODO: El modelo SavedPost no existe en el schema actual
+      Promise.resolve(0),
     ]);
 
     // Calcular engagement rate (aproximado)

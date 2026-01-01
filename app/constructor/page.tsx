@@ -241,7 +241,7 @@ export default function ConstructorPage() {
     try {
       const searchResult = await searchCharacterMultiSource(name, {
         includeWikipedia: true,
-        includeJikan: true,
+        includeAniList: true,
         includeFandom: true,
         limit: 5,
       });
@@ -431,9 +431,9 @@ export default function ConstructorPage() {
   };
 
   // Labels para las fuentes (helper para mensajes)
-  const sourceLabels = {
+  const sourceLabels: Record<string, string> = {
     wikipedia: 'Wikipedia',
-    jikan: 'MyAnimeList',
+    anilist: 'AniList',
     fandom: 'Fandom Wiki',
     custom: 'Personalizado',
   };

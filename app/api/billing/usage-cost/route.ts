@@ -53,20 +53,25 @@ export async function GET(req: NextRequest) {
     const userId = user.id;
 
     // Get user with subscription info
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         plan: true,
-        subscriptionId: true,
         createdAt: true,
+        subscriptions: {
+          where: {
+            status: "active",
+          },
+          take: 1,
+        },
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const planName = user.plan || "free";
+    const planName = dbUser.plan || "free";
 
     // Free plan doesn't have costs
     if (planName === "free") {
@@ -78,7 +83,7 @@ export async function GET(req: NextRequest) {
 
     // Get subscription start date (use account creation as fallback)
     // In production, you should track subscription date separately
-    const subscriptionDate = user.createdAt;
+    const subscriptionDate = dbUser.createdAt;
     const daysElapsed = daysSince(subscriptionDate);
 
     // Get all messages from this billing period (current month)

@@ -104,7 +104,7 @@ export default function CharacterCustomizeScreen({ navigation, route }: Props) {
   const fadeIn = useSharedValue(0);
 
   useEffect(() => {
-    setCurrentStep('customize');
+    setCurrentStep('depth');
     fadeIn.value = withSpring(1, { damping: 15, stiffness: 100 });
 
     // Auto-detect emotion from character

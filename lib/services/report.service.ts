@@ -542,7 +542,7 @@ export const ReportService = {
       where: { id: communityId },
       select: {
         ownerId: true,
-        coOwnerIds: true,
+        // coOwnerIds: true, // Field removed from schema
       },
     });
 
@@ -551,11 +551,11 @@ export const ReportService = {
     }
 
     // Owner o co-owner
-    const coOwnerIds = Array.isArray(community.coOwnerIds)
-      ? community.coOwnerIds
-      : [];
+    // const coOwnerIds = Array.isArray(community.coOwnerIds)
+    //   ? community.coOwnerIds
+    //   : [];
 
-    if (community.ownerId === userId || coOwnerIds.includes(userId)) {
+    if (community.ownerId === userId) { // || coOwnerIds.includes(userId)
       return true;
     }
 

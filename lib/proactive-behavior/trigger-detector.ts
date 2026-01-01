@@ -331,11 +331,16 @@ export class TriggerDetector {
 
   /**
    * Detecta life events próximos que requieren mención
+   * NOTE: narrativeArc feature has been deprecated/removed
    */
   async detectUpcomingLifeEvent(
     agentId: string,
     userId: string
   ): Promise<ProactiveTrigger | null> {
+    // Feature deprecated - narrativeArc table no longer exists
+    return null;
+
+    /* DEPRECATED CODE - narrativeArc feature removed
     // Buscar arcos narrativos activos con eventos próximos
     const activeArcs = await prisma.narrativeArc.findMany({
       where: {
@@ -380,6 +385,7 @@ export class TriggerDetector {
     }
 
     return null;
+    */
   }
 
   /**

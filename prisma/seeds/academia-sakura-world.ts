@@ -904,7 +904,16 @@ Actúa en personaje. Responde como Haruto respondería.`,
 // FUNCIÓN DE SEED
 // ========================================
 
+/**
+ * NOTA: Esta función está deshabilitada debido a la migración de Worlds a Grupos.
+ * Los modelos World, WorldAgent, CharacterArc y StoryEvent ya no existen en el esquema.
+ * Si se necesita esta funcionalidad, debe ser reimplementada usando el sistema de Grupos.
+ */
 export async function seedAcademiaSakura() {
+  log.info('Academia Sakura seed skipped - Worlds system has been migrated to Groups');
+  return null;
+
+  /* CÓDIGO DESHABILITADO - Requiere migración a sistema de Grupos
   log.info('Starting Academia Sakura world seed...');
 
   try {
@@ -1071,4 +1080,5 @@ export async function seedAcademiaSakura() {
     log.error({ error }, 'Error seeding Academia Sakura world');
     throw error;
   }
+  */ // FIN CÓDIGO DESHABILITADO
 }

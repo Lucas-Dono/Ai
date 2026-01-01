@@ -214,7 +214,7 @@ export const ReputationService = {
     ] = await Promise.all([
       prisma.agent.count({ where: { userId } }),
       prisma.directMessage.count({ where: { senderId: userId } }),
-      prisma.world.count({ where: { userId } }),
+      Promise.resolve(0), // prisma.world.count({ where: { userId } }), // World model removed
       prisma.behaviorProfile.count({ where: { agent: { userId } } }),
       prisma.importantEvent.count({ where: { userId } }),
       prisma.communityPost.count({ where: { authorId: userId, status: 'published' } }),
@@ -274,7 +274,7 @@ export const ReputationService = {
     let voiceChats = 0;
     let multimodalChats = 0;
 
-    userMessagesWithMetadata.forEach(msg => {
+    userMessagesWithMetadata.forEach((msg: any) => {
       const metadata = msg.metadata as any;
       const messageType = metadata?.messageType;
 
@@ -286,7 +286,7 @@ export const ReputationService = {
     });
 
     // Count events won by checking if userId appears in winners array
-    const eventsWon = eventsData.filter(event => {
+    const eventsWon = eventsData.filter((event: any) => {
       const winners = event.winners as any;
       if (!Array.isArray(winners)) return false;
       return winners.some((winner: any) =>

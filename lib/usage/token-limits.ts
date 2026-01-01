@@ -367,7 +367,7 @@ export async function grantRewardedTokens(
   const inputGranted = Math.floor(actualGranted / 2);
   const outputGranted = actualGranted - inputGranted;
 
-  await trackTokenUsage(userId, inputGranted, outputGranted, { source: 'rewarded_video' }, true);
+  await trackTokenUsage(userId, inputGranted, outputGranted, {}, true);
 
   return {
     success: true,

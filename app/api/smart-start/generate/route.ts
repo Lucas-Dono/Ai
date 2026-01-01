@@ -14,7 +14,7 @@ const orchestrator = getSmartStartOrchestrator();
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getSession(req);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -119,8 +119,8 @@ export async function POST(req: NextRequest) {
         name: characterDraft.name,
         alternateName: characterDraft.alternateName,
         personality: characterDraft.personality,
-        background: characterDraft.background,
-        appearance: characterDraft.appearance,
+        ...(characterDraft as any).background && { background: (characterDraft as any).background },
+        ...(characterDraft as any).appearance && { appearance: (characterDraft as any).appearance },
         age: characterDraft.age,
         gender: characterDraft.gender,
         occupation: characterDraft.occupation,

@@ -211,7 +211,7 @@ export function AgentCard({ agent, onViewDetails, onClone, showVisibilityBadge =
           id: agent.id,
           name: agent.name,
           avatar: agent.avatar,
-          description: agent.description,
+          description: agent.description ?? undefined,
         }}
       />
     </Card>

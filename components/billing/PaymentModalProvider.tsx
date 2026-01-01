@@ -3,6 +3,7 @@
 import { PaymentModal } from "./PaymentModal";
 import { usePaymentModal } from "@/hooks/usePaymentModal";
 import { useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 /**
  * Provider que debe estar en el layout raíz para que el modal
@@ -10,11 +11,12 @@ import { useSession } from "@/lib/auth-client";
  */
 export function PaymentModalProvider() {
   const { isOpen, currentPlan, close } = usePaymentModal();
-  const { data: session, update } = useSession();
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const handleSuccess = async () => {
-    // Actualizar la sesión para reflejar el nuevo plan
-    await update();
+    // Refresh the page to reload session data
+    router.refresh();
     close();
   };
 

@@ -21,7 +21,7 @@ const rarityColors = {
 };
 
 export function RewardNotification({ reward, onClose }: RewardNotificationProps) {
-  const locale = useClientLocale();
+  const { locale } = useClientLocale();
   const isEnglish = locale === 'en';
   const { showSparkles, sparklesConfig, triggerSparkles } = useEmotionalSparkles();
 

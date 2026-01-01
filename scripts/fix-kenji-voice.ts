@@ -1,14 +1,12 @@
 #!/usr/bin/env tsx
 
 /**
- * Script para corregir la voz de Kenji Yamamoto
- *
- * Cambia de: wo6udizrrtpIxWGp2qJk (voz muy gruesa)
- * A: tomkxGQGz4b1kE0EM722 (voz más apropiada para otaku)
- *
- * Ejecutar con: npx tsx scripts/fix-kenji-voice.ts
+ * SCRIPT OBSOLETO
+ * Este script usa el modelo 'World' que fue migrado a 'Group'
+ * Mantenerlo solo para referencia histórica
  */
 
+/*
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs/promises';
 import path from 'path';
@@ -92,7 +90,7 @@ async function main() {
 
     // 4. Limpiar metadata de interacciones de Kenji
     const kenjiInteractions = world.interactions.filter(
-      (i) => i.speaker?.name === 'Kenji Yamamoto'
+      (i: any) => i.speaker?.name === 'Kenji Yamamoto'
     );
 
     for (const interaction of kenjiInteractions) {
@@ -125,3 +123,7 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+*/
+
+console.log('❌ Este script está obsoleto. El sistema World fue migrado a Group.');
+console.log('💡 Usa los nuevos scripts de gestión de grupos en su lugar.');

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 /**
  * GET /api/analytics/shares
@@ -154,7 +154,7 @@ export async function GET(request: NextRequest) {
       sharesTimeline,
     });
   } catch (error) {
-    log.error({ error }, "Error fetching share analytics");
+    logger.error({ error }, "Error fetching share analytics");
     return NextResponse.json(
       { error: "Error al obtener analytics" },
       { status: 500 }

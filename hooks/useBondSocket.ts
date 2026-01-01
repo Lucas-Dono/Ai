@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { io, Socket } from "socket.io-client";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { BondEventType } from "@/lib/websocket/bond-event-types";
 import { BondEvent } from "@/lib/websocket/bonds-events";
 

@@ -177,9 +177,10 @@ async function detectCoordinatedAttack(agentId: string): Promise<{
   }
 
   // Obtener users data
+  const userIds = recentUsers.map((u) => u.userId).filter((id): id is string => id !== null);
   const users = await prisma.user.findMany({
     where: {
-      id: { in: recentUsers.map((u) => u.userId) },
+      id: { in: userIds },
     },
     select: {
       id: true,
@@ -363,7 +364,7 @@ export async function autoBlockFraudulentUser(
         blockedAt: new Date().toISOString(),
         blockReason: reason,
         blockEvidence: evidence,
-      },
+      } as any,
     },
   });
 
@@ -375,7 +376,7 @@ export async function autoBlockFraudulentUser(
       targetId: userId,
       action: "block",
       reason,
-      metadata: evidence,
+      details: JSON.stringify(evidence),
     },
   });
 
@@ -404,7 +405,7 @@ export async function autoBlockFraudulentUser(
         totalInteractions: bond.totalInteractions,
         narrativesUnlocked: bond.narrativesUnlocked,
         legacyImpact: bond.legacyImpact,
-        canonContributions: bond.canonContributions,
+        canonContributions: bond.canonContributions as any,
         releaseReason: "fraud_detected",
         legacyBadge: "Removed (Fraud)",
       },

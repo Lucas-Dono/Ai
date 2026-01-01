@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import QueueDashboard from "@/components/bonds/QueueDashboard";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function QueuePage() {
-  const session = await auth();
+  const session = await getServerSession();
 
   if (!session?.user) {
     redirect("/login?callbackUrl=/bonds/queue");

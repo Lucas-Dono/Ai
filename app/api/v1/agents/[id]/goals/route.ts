@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return withAPIAuth(req, async (userId) => {
-    const agentId = id;
+    const { id: agentId } = await params;
 
     // Verify agent exists and user has access
     const agent = await prisma.agent.findFirst({
@@ -79,7 +79,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return withAPIAuth(req, async (userId) => {
-    const agentId = id;
+    const { id: agentId } = await params;
 
     // Verify agent exists and user owns it
     const agent = await prisma.agent.findFirst({

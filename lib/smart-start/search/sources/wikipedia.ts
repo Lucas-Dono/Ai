@@ -83,7 +83,7 @@ export class WikipediaSource implements SearchSource {
       list: 'search',
       srsearch: enhancedQuery,
       srlimit: (options.limit || 10).toString(),
-      sroffset: ((options.page || 1) - 1) * (options.limit || 10).toString(),
+      sroffset: (((options.page || 1) - 1) * (options.limit || 10)).toString(),
       format: 'json',
       origin: '*',
     });

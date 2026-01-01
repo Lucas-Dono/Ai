@@ -351,7 +351,7 @@ export function GenreSelection() {
         {availableGenres.map((genre, idx) => (
           <div
             key={genre.id}
-            ref={(el) => (genreRefs.current[idx] = el)}
+            ref={(el) => { genreRefs.current[idx] = el; }}
             className={cn(
               'rounded-xl transition-all',
               focusLevel === 'genre' && idx === genreIndex && 'ring-2 ring-primary ring-offset-2'
@@ -388,7 +388,7 @@ export function GenreSelection() {
             {selectedGenre.subGenres.map((subgenre, idx) => (
               <button
                 key={subgenre.id}
-                ref={(el) => (subgenreRefs.current[idx] = el)}
+                ref={(el) => { subgenreRefs.current[idx] = el; }}
                 onClick={() => {
                   setSelectedSubgenre(subgenre);
                   setSelectedArchetype(null);
@@ -435,7 +435,7 @@ export function GenreSelection() {
                 {selectedSubgenre.archetypes.map((archetype, idx) => (
                   <button
                     key={archetype.id}
-                    ref={(el) => (archetypeRefs.current[idx] = el)}
+                    ref={(el) => { archetypeRefs.current[idx] = el; }}
                     onClick={() => setSelectedArchetype(archetype)}
                     className={cn(
                       'p-3 rounded-lg border-2 text-left transition-all',

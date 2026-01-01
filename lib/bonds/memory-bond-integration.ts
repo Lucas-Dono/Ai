@@ -118,8 +118,9 @@ export async function createBondSpecialMemory(
       throw new Error("Bond not found");
     }
 
-    // Create special memory in the bond
-    const specialMemories = (bond.specialMemories as any[]) || [];
+    // TODO: Implement special memories storage
+    // The specialMemories field has been removed from SymbolicBond model
+    // Consider using a separate table or storing in sharedExperiences
     const newMemory = {
       id: `mem_${Date.now()}`,
       title,
@@ -129,15 +130,9 @@ export async function createBondSpecialMemory(
       metadata,
     };
 
-    specialMemories.push(newMemory);
-
-    // Update bond with new special memory
-    await prisma.symbolicBond.update({
-      where: { id: bondId },
-      data: {
-        specialMemories: specialMemories as any,
-      },
-    });
+    // For now, just return the memory without storing it
+    // This functionality should be reimplemented with a proper storage solution
+    console.warn('[Bond Memory Integration] Special memories storage not implemented');
 
     return newMemory;
   } catch (error) {
@@ -154,24 +149,13 @@ export async function getBondSpecialMemories(
   limit: number = 5
 ): Promise<any[]> {
   try {
-    const bond = await prisma.symbolicBond.findUnique({
-      where: { id: bondId },
-      select: { specialMemories: true },
-    });
+    // TODO: Implement special memories retrieval
+    // The specialMemories field has been removed from SymbolicBond model
+    // Consider using a separate table or retrieving from sharedExperiences
+    console.warn('[Bond Memory Integration] Special memories retrieval not implemented');
 
-    if (!bond || !bond.specialMemories) {
-      return [];
-    }
-
-    const memories = bond.specialMemories as any[];
-
-    // Sort by timestamp (most recent first)
-    return memories
-      .sort(
-        (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      )
-      .slice(0, limit);
+    // Return empty array for now
+    return [];
   } catch (error) {
     console.error("[Bond Memory Integration] Error getting special memories:", error);
     return [];

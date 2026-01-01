@@ -22,7 +22,7 @@ import { getActiveEvent, activateEventForUser } from '@/lib/usage/special-events
 export async function POST(req: Request) {
   try {
     // Verificar autenticación
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
  */
 export async function GET(req: Request) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
 
     if (!session?.user?.id) {
       return NextResponse.json(

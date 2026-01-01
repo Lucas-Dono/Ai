@@ -117,17 +117,7 @@ export const EventService = {
             slug: true,
           },
         },
-        registrations: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
+        registrations: true,
       },
     });
 
@@ -157,15 +147,6 @@ export const EventService = {
           },
         },
         registrations: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
           orderBy: { createdAt: 'asc' },
         },
       },
@@ -283,15 +264,6 @@ export const EventService = {
       data: {
         eventId,
         userId,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
       },
     });
 
@@ -438,15 +410,6 @@ export const EventService = {
       orderBy: [
         { createdAt: 'asc' },
       ],
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
     });
 
     return registrations;

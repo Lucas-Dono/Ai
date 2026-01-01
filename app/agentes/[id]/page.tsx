@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ModernChat } from "@/components/chat/v2";
+import { DirectMessageChat } from "@/components/chat/v2";
 import { useTrackInteraction } from "@/hooks/use-track-interaction";
 import { useTranslations } from "next-intl";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
@@ -74,7 +74,7 @@ export default function AgentChatPage() {
 
   return (
     <ErrorBoundary variant="page">
-      <ModernChat
+      <DirectMessageChat
         agentId={agent.id}
         agentName={agent.name}
         agentAvatar={agent.avatar}

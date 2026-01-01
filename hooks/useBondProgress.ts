@@ -153,7 +153,7 @@ class BondProgressManager {
       if (options.enabled) {
         this.fetchBondProgress(agentId, options);
       }
-    }, options.pollingInterval);
+    }, options.pollingInterval) as unknown as NodeJS.Timeout;
   }
 
   /**

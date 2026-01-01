@@ -356,6 +356,11 @@
         "messages": "{count} mensajes",
         "openChat": "Abrir chat"
       },
+      "recent": {
+        "title": "Chats Recientes",
+        "badge": "Reciente",
+        "subtitle": "Continúa tus conversaciones donde las dejaste"
+      },
       "popular": {
         "title": "Más vistos",
         "badge": "Popular",
@@ -649,6 +654,16 @@
           },
           "color": {
             "label": "Color Principal"
+          },
+          "icon": {
+            "label": "Ícono de la Comunidad",
+            "placeholder": "Sube un ícono para tu comunidad",
+            "hint": "Imagen cuadrada, mínimo 256x256px"
+          },
+          "banner": {
+            "label": "Banner de la Comunidad",
+            "placeholder": "Sube un banner para tu comunidad",
+            "hint": "Imagen rectangular, recomendado 1920x480px"
           },
           "rules": {
             "label": "Reglas",

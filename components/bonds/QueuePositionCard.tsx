@@ -179,8 +179,7 @@ export default function QueuePositionCard({
                 </div>
                 <Progress
                   value={progressPercent}
-                  className="h-2"
-                  indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-500"
+                  className="h-2 [&>div]:bg-gradient-to-r [&>div]:from-blue-500 [&>div]:to-cyan-500"
                 />
               </div>
 

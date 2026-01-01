@@ -10,8 +10,8 @@ async function main() {
   // Limpiar datos existentes (opcional)
   await prisma.message.deleteMany();
   await prisma.relation.deleteMany();
-  await prisma.worldAgent.deleteMany();
-  await prisma.world.deleteMany();
+  // await prisma.worldAgent.deleteMany(); // Removido: modelo eliminado en migración de Worlds a Grupos
+  // await prisma.world.deleteMany(); // Removido: modelo eliminado en migración de Worlds a Grupos
   await prisma.agent.deleteMany();
   await prisma.user.deleteMany();
 
@@ -247,6 +247,11 @@ async function main() {
 
   console.log("✅ Mensajes de ejemplo creados");
 
+  // ============================================================
+  // NOTA: Los "Mundos" fueron reemplazados por "Grupos" en la migración
+  // Esta sección está comentada porque los modelos World y WorldAgent ya no existen
+  // ============================================================
+  /*
   // Crear mundos virtuales de demostración
   const world1 = await prisma.world.create({
     data: {
@@ -311,6 +316,7 @@ async function main() {
   }
 
   console.log("✅ Mensajes de mundo creados");
+  */
 
   // Crear logs de actividad
   await prisma.log.create({
@@ -339,13 +345,13 @@ async function main() {
     },
   });
 
-  await prisma.log.create({
-    data: {
-      userId: user.id,
-      action: "world_created",
-      metadata: { worldName: world1.name },
-    },
-  });
+  // await prisma.log.create({
+  //   data: {
+  //     userId: user.id,
+  //     action: "world_created",
+  //     metadata: { worldName: world1.name },
+  //   },
+  // }); // Removido: world1 ya no existe
 
   console.log("✅ Logs de actividad creados");
 
@@ -473,9 +479,9 @@ async function main() {
   console.log(`  - ${premiumCount} personajes premium públicos`);
   console.log(`  - ${6} relaciones creadas (4 agente-usuario, 2 agente-agente)`);
   console.log(`  - ${6} mensajes individuales creados`);
-  console.log(`  - ${2} mundos virtuales creados`);
-  console.log(`  - ${3} mensajes de mundo creados`);
-  console.log(`  - ${4} logs de actividad creados`);
+  // console.log(`  - ${2} mundos virtuales creados`); // Removido en migración Worlds → Grupos
+  // console.log(`  - ${3} mensajes de mundo creados`); // Removido en migración Worlds → Grupos
+  console.log(`  - ${3} logs de actividad creados`); // Actualizado: 4 → 3 (removido log de world_created)
   console.log("\n✨ Puedes iniciar sesión con: demo@creador-ia.com");
 }
 

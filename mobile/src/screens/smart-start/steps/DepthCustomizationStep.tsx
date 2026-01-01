@@ -21,7 +21,7 @@ import {
   getFeaturesForDepth,
   canAccessDepth,
 } from '@circuitpromptai/smart-start-core';
-import { colors, spacing } from '../../../theme';
+import { colors, spacing, simpleColors } from '../../../theme';
 import { useSmartStartContext } from '../../../contexts/SmartStartContext';
 
 // ============================================================================
@@ -205,14 +205,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.text,
+    color: colors.text.primary,
     marginBottom: spacing.sm,
     letterSpacing: -0.5,
   },
 
   subtitle: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
     lineHeight: 24,
     letterSpacing: -0.2,
   },
@@ -228,16 +228,16 @@ const styles = StyleSheet.create({
 
   // Depth Card
   depthCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background.elevated,
     borderRadius: 16,
     padding: spacing.lg,
     borderWidth: 2,
-    borderColor: colors.border,
+    borderColor: colors.border.main,
   },
 
   depthCardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryTransparent,
+    borderColor: colors.primary[500],
+    backgroundColor: `${colors.primary[500]}20`,
   },
 
   depthCardLocked: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   depthCardTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.text,
+    color: colors.text.primary,
     letterSpacing: -0.3,
   },
 
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
 
   depthCardDescription: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
     lineHeight: 20,
     marginBottom: spacing.md,
     letterSpacing: -0.1,
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+    borderBottomColor: colors.border.light,
   },
 
   stat: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
 
   statText: {
     fontSize: 13,
-    color: colors.textTertiary,
+    color: colors.text.tertiary,
     fontWeight: '500',
   },
 
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   featuresTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.textSecondary,
+    color: colors.text.secondary,
     marginBottom: spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
 
   featureName: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
     flex: 1,
     letterSpacing: -0.1,
   },
@@ -362,13 +362,13 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.lg,
     padding: spacing.md,
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
   },
 
   infoText: {
     fontSize: 13,
-    color: colors.textTertiary,
+    color: colors.text.tertiary,
     flex: 1,
     lineHeight: 18,
   },

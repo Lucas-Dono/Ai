@@ -20,6 +20,11 @@ import { addDays, addHours, isWithinInterval, setHours } from 'date-fns';
  * Trigger an email sequence for a user
  */
 export async function triggerSequence(trigger: EmailTrigger): Promise<void> {
+  // TODO: Re-enable when email sequence models are added to Prisma schema
+  console.warn('[Email Sequences] Email sequence system is currently disabled - missing Prisma models');
+  return;
+
+  /* DISABLED UNTIL SCHEMA IS UPDATED
   const { event, userId, metadata } = trigger;
 
   // Get user
@@ -125,6 +130,7 @@ export async function triggerSequence(trigger: EmailTrigger): Promise<void> {
   });
 
   console.log(`✅ Started sequence ${sequence.name} for user ${userId}`);
+  */
 }
 
 /**
@@ -135,6 +141,11 @@ export async function processScheduledEmails(): Promise<{
   sent: number;
   failed: number;
 }> {
+  // TODO: Re-enable when email sequence models are added to Prisma schema
+  console.warn('[Email Sequences] Email sequence system is currently disabled - missing Prisma models');
+  return { processed: 0, sent: 0, failed: 0 };
+
+  /* DISABLED UNTIL SCHEMA IS UPDATED
   const now = new Date();
 
   // Find all sequence states ready for next email
@@ -310,6 +321,7 @@ export async function processScheduledEmails(): Promise<{
   }
 
   return { processed, sent, failed };
+  */
 }
 
 /**
@@ -320,6 +332,11 @@ export async function trackConversion(params: {
   sequenceId: string;
   conversionType: ConversionType;
 }): Promise<void> {
+  // TODO: Re-enable when email sequence models are added to Prisma schema
+  console.warn('[Email Sequences] Email sequence system is currently disabled - missing Prisma models');
+  return;
+
+  /* DISABLED UNTIL SCHEMA IS UPDATED
   const { userId, sequenceId, conversionType } = params;
 
   // Find most recent email sent in this sequence
@@ -346,12 +363,18 @@ export async function trackConversion(params: {
 
     console.log(`✅ Tracked conversion: ${conversionType} for sequence ${sequenceId}`);
   }
+  */
 }
 
 /**
  * Cancel a sequence for a user
  */
 export async function cancelSequence(userId: string, sequenceName: SequenceName): Promise<void> {
+  // TODO: Re-enable when email sequence models are added to Prisma schema
+  console.warn('[Email Sequences] Email sequence system is currently disabled - missing Prisma models');
+  return;
+
+  /* DISABLED UNTIL SCHEMA IS UPDATED
   const sequence = await prisma.emailSequence.findUnique({
     where: { name: sequenceName },
   });
@@ -369,6 +392,7 @@ export async function cancelSequence(userId: string, sequenceName: SequenceName)
       cancelledAt: new Date(),
     },
   });
+  */
 }
 
 /**

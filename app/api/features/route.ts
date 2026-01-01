@@ -11,9 +11,9 @@ import {
   getFeatureLimits,
 } from "@/lib/feature-flags";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
     const userId = session?.user?.id;
 
     if (!userId) {

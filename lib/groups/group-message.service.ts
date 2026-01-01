@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getVeniceClient } from "@/lib/llm/venice";
+import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
 import { crossContextMemoryService } from "./cross-context-memory.service";
 import { groupStoryEngineService } from "./group-story-engine.service";
 import { groupAIDirectorService } from "./group-ai-director.service";
@@ -318,11 +318,11 @@ export class GroupMessageService {
           turnNumber: nextTurnNumber,
           replyToId: triggeringMessage.id,
           agentEmotion: agent.internalState
-            ? {
+            ? ({
                 valence: agent.internalState.moodValence,
                 arousal: agent.internalState.moodArousal,
                 dominance: agent.internalState.moodDominance,
-              }
+              } as any)
             : null,
         },
         include: {

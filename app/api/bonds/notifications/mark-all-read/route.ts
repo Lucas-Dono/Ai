@@ -9,7 +9,7 @@ import { markAllBondNotificationsAsRead } from "@/lib/services/bond-notification
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
-    if (!session?.user) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

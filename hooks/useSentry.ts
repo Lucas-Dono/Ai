@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import {
   captureCustomError,
   setUserContext,

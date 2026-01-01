@@ -675,7 +675,7 @@ async function main() {
     console.log(`\n📦 Procesando TODOS los personajes (${allCharacters.length})`);
     console.log('⚠️  ADVERTENCIA: Esto tomará MUCHO tiempo (varias horas)');
   } else {
-    const batchNum = parseInt(batchNumber);
+    const batchNum = parseInt(batchNumber!);
     if (isNaN(batchNum) || batchNum < 1 || batchNum > 5) {
       console.error('❌ Número de lote inválido. Debe ser 1-5 o "all"');
       process.exit(1);

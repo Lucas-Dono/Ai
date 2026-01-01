@@ -4,7 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { log } from "@/lib/logging/logger";
+import log from "@/lib/logging/logger";
 
 /**
  * Calcular y actualizar el leaderboard de retention

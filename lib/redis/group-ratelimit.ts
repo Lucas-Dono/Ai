@@ -21,6 +21,10 @@ export async function checkGroupMessageLimit(
 
   try {
     const limiter = getRateLimiter(plan, "perDay");
+    if (!limiter) {
+      // Fallback when Redis is not available
+      return { allowed: true };
+    }
     const result = await limiter.limit(identifier);
 
     return {

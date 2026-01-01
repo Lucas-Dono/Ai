@@ -19,8 +19,7 @@ import type { ContextDetectionResult } from '@/lib/smart-start/context-detector'
 const AVAILABLE_ARCHETYPES: GenreId[] = [
   'romance',      // Romantic/intimate connection
   'friendship',   // Platonic companionship
-  'mentor',       // Learning/guidance (will use 'professional' GenreId for now)
-  'professional', // Work/productivity
+  'professional', // Learning/guidance/Work/productivity
   'roleplay',     // Narrative/storytelling
   'wellness',     // Mental health/self-care
 ];

@@ -12,6 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession(request);
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -56,6 +57,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession(request);
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -64,13 +66,12 @@ export async function POST(
       );
     }
 
-    // Verificar que es owner o co-owner (solo ellos pueden crear reglas)
+    // Verificar que es owner o moderador (solo ellos pueden crear reglas)
     const { prisma } = await import('@/lib/prisma');
     const community = await prisma.community.findUnique({
-      where: { id: id },
+      where: { id },
       select: {
         ownerId: true,
-        coOwnerIds: true,
       },
     });
 
@@ -81,17 +82,13 @@ export async function POST(
       );
     }
 
-    const coOwnerIds = Array.isArray(community.coOwnerIds)
-      ? community.coOwnerIds
-      : [];
+    // Verificar si es owner o tiene permisos de moderación
+    const isOwner = community.ownerId === session.user.id;
+    const canModerate = await ReportService.canModerate(session.user.id, id);
 
-    const isOwnerOrCoOwner =
-      community.ownerId === session.user.id ||
-      coOwnerIds.includes(session.user.id);
-
-    if (!isOwnerOrCoOwner) {
+    if (!isOwner && !canModerate) {
       return NextResponse.json(
-        { error: 'Solo owners y co-owners pueden crear reglas de AutoMod' },
+        { error: 'Solo owners y moderadores pueden crear reglas de AutoMod' },
         { status: 403 }
       );
     }

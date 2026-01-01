@@ -134,7 +134,7 @@ class ProactiveMessagesManager {
     // Setup interval
     instance.pollingIntervalId = setInterval(() => {
       this.fetchMessages(agentId, options);
-    }, options.pollingInterval);
+    }, options.pollingInterval) as unknown as NodeJS.Timeout;
 
     console.log(`[ProactiveMessages] Started polling for agent ${agentId} (interval: ${options.pollingInterval}ms)`);
   }

@@ -82,7 +82,7 @@ async function seedPremiumCharacters() {
             tags: character.tags || [],
             featured: true, // Todos los personajes premium son destacados
             profile: character.profile,
-            stagePrompts: character.stagePrompts || null,
+            stagePrompts: character.stagePrompts || undefined,
             locationCity: character.locationCity,
             locationCountry: character.locationCountry,
           }
@@ -111,7 +111,7 @@ async function seedPremiumCharacters() {
             tags: character.tags || [],
             featured: true,
             profile: character.profile,
-            stagePrompts: character.stagePrompts || null,
+            stagePrompts: character.stagePrompts || undefined,
             locationCity: character.locationCity,
             locationCountry: character.locationCountry,
           }

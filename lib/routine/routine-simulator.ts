@@ -527,7 +527,7 @@ export async function getCurrentActivity(
     status: instance.status as any,
     canRespond: determineCanRespond(instance.type as ActivityType, variations),
     responseStyle: determineResponseStyle(instance.type as ActivityType, variations),
-    location: instance.template?.location,
+    location: undefined, // Template relation not included in query
     notes: variations.moodDuringEvent,
   };
 }
@@ -724,7 +724,7 @@ function getResponseModification(
   if (realismLevel === "immersive") {
     switch (style) {
       case "unavailable":
-        modification.canRespond = false;
+        // canRespond is set on CurrentActivity, not ResponseModification
         modification.contextPrompt =
           "You are sleeping and cannot respond. If the user messages, they should see a notification that you're unavailable.";
         break;

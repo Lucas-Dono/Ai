@@ -14,7 +14,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X, Loader2 } from "lucide-react";
-import { Grid } from "react-window";
 import { cn } from "@/lib/utils";
 
 interface StickerGifPickerProps {
@@ -77,55 +76,74 @@ const cleanExpiredCache = () => {
   }
 };
 
-// Componente de Grid virtualizado para GIFs
-const GifGrid = ({ gifs, onSelect }: { gifs: GiphyGif[]; onSelect: (gif: GiphyGif) => void }) => {
-  const columnCount = 2;
-  const columnWidth = 180;
-  const rowHeight = 180;
-  const gapSize = 8;
+// Componente de Grid simple con infinite scroll
+const GifGrid = ({
+  gifs,
+  onSelect,
+  onLoadMore,
+  hasMore,
+  isLoading,
+}: {
+  gifs: GiphyGif[];
+  onSelect: (gif: GiphyGif) => void;
+  onLoadMore: () => void;
+  hasMore: boolean;
+  isLoading: boolean;
+}) => {
+  const observerTarget = useRef<HTMLDivElement>(null);
 
-  const rowCount = Math.ceil(gifs.length / columnCount);
-
-  const Cell = ({ columnIndex, rowIndex, style, gifs, onSelect }: any) => {
-    const index = rowIndex * columnCount + columnIndex;
-    if (index >= gifs.length) return null;
-
-    const gif = gifs[index];
-
-    return (
-      <div style={style}>
-        <button
-          onClick={() => onSelect(gif)}
-          className="w-full h-full bg-[#2a2a2a] rounded-2xl overflow-hidden hover:ring-2 hover:ring-green-500 transition-all"
-          style={{
-            margin: gapSize / 2,
-            width: columnWidth - gapSize,
-            height: rowHeight - gapSize,
-          }}
-        >
-          <img
-            src={gif.preview}
-            alt={gif.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </button>
-      </div>
+  // Intersection Observer para infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1 }
     );
-  };
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasMore, isLoading, onLoadMore]);
 
   return (
-    <Grid
-      columnCount={columnCount}
-      columnWidth={columnWidth}
-      defaultHeight={320}
-      defaultWidth={columnCount * columnWidth}
-      rowCount={rowCount}
-      rowHeight={rowHeight}
-      className="mx-auto"
-      cellComponent={Cell}
-      cellProps={{ gifs, onSelect }}
-    />
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        {gifs.map((gif) => (
+          <button
+            key={gif.id}
+            onClick={() => onSelect(gif)}
+            className="relative aspect-square bg-[#2a2a2a] rounded-2xl overflow-hidden hover:ring-2 hover:ring-green-500 transition-all"
+          >
+            <img
+              src={gif.preview}
+              alt={gif.title}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </button>
+        ))}
+      </div>
+
+      {/* Elemento observador para infinite scroll */}
+      {hasMore && <div ref={observerTarget} className="h-10" />}
+
+      {/* Loading indicator al cargar más */}
+      {isLoading && hasMore && (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -137,26 +155,92 @@ export function StickerGifPicker({
   const [gifSearchQuery, setGifSearchQuery] = useState("");
   const [gifs, setGifs] = useState<GiphyGif[]>([]);
   const [isLoadingGifs, setIsLoadingGifs] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const GIFS_PER_PAGE = 20;
 
-  // Buscar GIFs en Giphy con cache
-  const searchGifs = useCallback(async (query: string) => {
+  // Cargar GIFs trending con paginación
+  const loadTrendingGifs = useCallback(async (offsetValue = 0, append = false) => {
+    // Verificar si tenemos trending en cache
+    const cacheKey = `trending:${offsetValue}`;
+    const cached = gifCache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      if (append) {
+        setGifs((prev) => [...prev, ...cached.gifs]);
+      } else {
+        setGifs(cached.gifs);
+      }
+      setHasMore(cached.gifs.length === GIFS_PER_PAGE);
+      return;
+    }
+
+    setIsLoadingGifs(true);
+
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY || "demo";
+      const response = await fetch(
+        `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=${GIFS_PER_PAGE}&offset=${offsetValue}&rating=g`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch trending GIFs");
+      }
+
+      const data = await response.json();
+
+      const newGifs: GiphyGif[] = data.data.map((gif: any) => ({
+        id: gif.id,
+        url: gif.images.original.url,
+        preview: gif.images.fixed_width_small.url,
+        title: gif.title,
+      }));
+
+      // Guardar en cache
+      gifCache.set(cacheKey, { gifs: newGifs, timestamp: Date.now() });
+
+      if (append) {
+        setGifs((prev) => [...prev, ...newGifs]);
+      } else {
+        setGifs(newGifs);
+      }
+
+      setHasMore(newGifs.length === GIFS_PER_PAGE);
+    } catch (error) {
+      console.error("Error fetching trending GIFs:", error);
+      if (!append) {
+        setGifs([]);
+      }
+      setHasMore(false);
+    } finally {
+      setIsLoadingGifs(false);
+    }
+  }, [GIFS_PER_PAGE]);
+
+  // Buscar GIFs en Giphy con paginación
+  const searchGifs = useCallback(async (query: string, offsetValue = 0, append = false) => {
     if (!query.trim()) {
       // Mostrar trending GIFs si no hay búsqueda
-      loadTrendingGifs();
+      loadTrendingGifs(0, false);
       return;
     }
 
     // Limpiar cache expirado periódicamente
     cleanExpiredCache();
 
-    // Verificar si tenemos resultado en cache
-    const cacheKey = `search:${query.toLowerCase()}`;
+    // Verificar si tenemos resultado en cache (solo para la primera página)
+    const cacheKey = `search:${query.toLowerCase()}:${offsetValue}`;
     const cached = gifCache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setGifs(cached.gifs);
+      if (append) {
+        setGifs((prev) => [...prev, ...cached.gifs]);
+      } else {
+        setGifs(cached.gifs);
+      }
+      setHasMore(cached.gifs.length === GIFS_PER_PAGE);
       return;
     }
 
@@ -167,7 +251,9 @@ export function StickerGifPicker({
       // y las llamadas deben hacerse desde el backend
       const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY || "demo";
       const response = await fetch(
-        `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=30&rating=g`
+        `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(
+          query
+        )}&limit=${GIFS_PER_PAGE}&offset=${offsetValue}&rating=g`
       );
 
       if (!response.ok) {
@@ -176,7 +262,7 @@ export function StickerGifPicker({
 
       const data = await response.json();
 
-      const gifs: GiphyGif[] = data.data.map((gif: any) => ({
+      const newGifs: GiphyGif[] = data.data.map((gif: any) => ({
         id: gif.id,
         url: gif.images.original.url,
         preview: gif.images.fixed_width_small.url,
@@ -184,58 +270,39 @@ export function StickerGifPicker({
       }));
 
       // Guardar en cache
-      gifCache.set(cacheKey, { gifs, timestamp: Date.now() });
-      setGifs(gifs);
-    } catch (error) {
-      console.error("Error fetching GIFs:", error);
-      setGifs([]);
-    } finally {
-      setIsLoadingGifs(false);
-    }
-  }, []);
+      gifCache.set(cacheKey, { gifs: newGifs, timestamp: Date.now() });
 
-  // Cargar GIFs trending con cache
-  const loadTrendingGifs = useCallback(async () => {
-    // Verificar si tenemos trending en cache
-    const cacheKey = "trending";
-    const cached = gifCache.get(cacheKey);
-
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setGifs(cached.gifs);
-      return;
-    }
-
-    setIsLoadingGifs(true);
-
-    try {
-      const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY || "demo";
-      const response = await fetch(
-        `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=30&rating=g`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch trending GIFs");
+      if (append) {
+        setGifs((prev) => [...prev, ...newGifs]);
+      } else {
+        setGifs(newGifs);
       }
 
-      const data = await response.json();
-
-      const gifs: GiphyGif[] = data.data.map((gif: any) => ({
-        id: gif.id,
-        url: gif.images.original.url,
-        preview: gif.images.fixed_width_small.url,
-        title: gif.title,
-      }));
-
-      // Guardar en cache
-      gifCache.set(cacheKey, { gifs, timestamp: Date.now() });
-      setGifs(gifs);
+      setHasMore(newGifs.length === GIFS_PER_PAGE);
     } catch (error) {
-      console.error("Error fetching trending GIFs:", error);
-      setGifs([]);
+      console.error("Error fetching GIFs:", error);
+      if (!append) {
+        setGifs([]);
+      }
+      setHasMore(false);
     } finally {
       setIsLoadingGifs(false);
     }
-  }, []);
+  }, [GIFS_PER_PAGE, loadTrendingGifs]);
+
+  // Función para cargar más GIFs (infinite scroll)
+  const loadMoreGifs = useCallback(() => {
+    if (isLoadingGifs || !hasMore) return;
+
+    const newOffset = offset + GIFS_PER_PAGE;
+    setOffset(newOffset);
+
+    if (gifSearchQuery.trim()) {
+      searchGifs(gifSearchQuery, newOffset, true);
+    } else {
+      loadTrendingGifs(newOffset, true);
+    }
+  }, [offset, isLoadingGifs, hasMore, gifSearchQuery, GIFS_PER_PAGE, searchGifs, loadTrendingGifs]);
 
   // Efecto para búsqueda con debounce
   useEffect(() => {
@@ -246,8 +313,12 @@ export function StickerGifPicker({
       searchTimeoutRef.current = null;
     }
 
+    // Reset offset cuando cambia la búsqueda
+    setOffset(0);
+    setHasMore(true);
+
     searchTimeoutRef.current = setTimeout(() => {
-      searchGifs(gifSearchQuery);
+      searchGifs(gifSearchQuery, 0, false);
     }, 500);
 
     return () => {
@@ -262,10 +333,12 @@ export function StickerGifPicker({
   // Cargar trending GIFs al abrir la pestaña
   useEffect(() => {
     if (activeTab === "gifs" && gifs.length === 0) {
-      loadTrendingGifs();
+      setOffset(0);
+      setHasMore(true);
+      loadTrendingGifs(0, false);
     }
-     
-  }, [activeTab, gifs.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   return (
     <div className="bg-[#1f1f1f] rounded-2xl border border-[#2a2a2a] shadow-xl max-w-md w-full">
@@ -350,14 +423,26 @@ export function StickerGifPicker({
             </div>
           </div>
 
-          {/* Grid de GIFs con lazy loading */}
-          <div ref={containerRef} className="max-h-[320px]">
-            {isLoadingGifs ? (
+          {/* Grid de GIFs con lazy loading e infinite scroll */}
+          <div
+            ref={containerRef}
+            className="max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#3a3a3a] scrollbar-track-transparent"
+          >
+            {isLoadingGifs && gifs.length === 0 ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
               </div>
             ) : gifs.length > 0 ? (
-              <GifGrid gifs={gifs} onSelect={(gif) => { onSend(gif.url, "gif"); onClose(); }} />
+              <GifGrid
+                gifs={gifs}
+                onSelect={(gif) => {
+                  onSend(gif.url, "gif");
+                  onClose();
+                }}
+                onLoadMore={loadMoreGifs}
+                hasMore={hasMore}
+                isLoading={isLoadingGifs}
+              />
             ) : (
               <div className="text-center py-8 text-gray-500 text-sm">
                 {gifSearchQuery

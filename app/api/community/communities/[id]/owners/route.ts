@@ -22,9 +22,10 @@ export async function POST(
       return NextResponse.json({ error: 'userId es requerido' }, { status: 400 });
     }
 
-    await CommunityService.addCoOwner(communityId, session.user.id, userId);
+    // TODO: Implement addCoOwner method in CommunityService
+    // await CommunityService.addCoOwner(communityId, session.user.id, userId);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ error: 'Method not implemented' }, { status: 501 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
@@ -50,9 +51,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'userId es requerido' }, { status: 400 });
     }
 
-    await CommunityService.removeCoOwner(communityId, session.user.id, userId);
+    // TODO: Implement removeCoOwner method in CommunityService
+    // await CommunityService.removeCoOwner(communityId, session.user.id, userId);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ error: 'Method not implemented' }, { status: 501 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }

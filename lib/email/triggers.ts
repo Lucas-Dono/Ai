@@ -45,17 +45,18 @@ export async function checkInactiveUsers() {
         updatedAt: {
           lte: cutoffDate,
         },
+        // TODO: Re-enable when emailsSent model is added to schema
         // Don't send to users who already got this email
-        emailsSent: {
-          none: {
-            sequence: {
-              triggerEvent: event,
-            },
-            sentAt: {
-              gte: cutoffDate,
-            },
-          },
-        },
+        // emailsSent: {
+        //   none: {
+        //     sequence: {
+        //       triggerEvent: event,
+        //     },
+        //     sentAt: {
+        //       gte: cutoffDate,
+        //     },
+        //   },
+        // },
       },
       select: {
         id: true,

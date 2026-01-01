@@ -97,6 +97,22 @@ export async function checkRateLimit(
   // Usar Redis
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback to in-memory when Redis is not available
+      logRedisFallback("checkRateLimit", new Error("Redis not configured"));
+      const limits = {
+        free: { max: 10, window: 60000 },
+        plus: { max: 100, window: 60000 },
+        ultra: { max: 1000, window: 60000 },
+      };
+      const planLimit = limits[plan as keyof typeof limits] || limits.free;
+      const success = inMemoryRateLimit(identifier, planLimit.max, planLimit.window);
+      return {
+        success,
+        limit: planLimit.max,
+        remaining: success ? planLimit.max - 1 : 0,
+      };
+    }
     const result = await limiter.limit(identifier);
 
     return {
@@ -137,7 +153,7 @@ export async function withRateLimit(
   handler: () => Promise<NextResponse>
 ): Promise<NextResponse> {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
     const user = session?.user;
 
     if (!user?.id) {
@@ -145,7 +161,7 @@ export async function withRateLimit(
     }
 
     // Obtener plan del usuario
-    const plan = user.plan || "free";
+    const plan = await getCachedUserPlan(user.id);
 
     // Check rate limit
     const { success, limit, remaining, reset } = await checkRateLimit(
@@ -297,6 +313,20 @@ export async function checkWorldMessageLimit(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkMessageRateLimit", new Error("Redis not configured"));
+      const success = inMemoryRateLimit(identifier, limits.messagesPerDay, 24 * 60 * 60 * 1000);
+      const record = inMemoryLimits.get(identifier);
+      const remaining = record ? limits.messagesPerDay - record.count : limits.messagesPerDay;
+      return {
+        allowed: success,
+        reason: success ? undefined : `Límite diario alcanzado`,
+        remaining: Math.max(0, remaining),
+        limit: limits.messagesPerDay,
+        resetAt: record?.resetAt,
+      };
+    }
     const result = await limiter.limit(identifier);
 
     return {
@@ -366,6 +396,11 @@ export async function checkWorldCooldown(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkMessageCooldown", new Error("Redis not configured"));
+      return { allowed: true };
+    }
     const result = await limiter.limit(identifier);
 
     if (!result.success && result.reset) {
@@ -431,6 +466,15 @@ export async function checkSpamProtection(
 
   try {
     const limiter = getRateLimiterLegacy("free"); // Usar límites free para spam
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkIdenticalMessageSpam", new Error("Redis not configured"));
+      const success = inMemoryRateLimit(identifier, maxIdentical, 60 * 60 * 1000); // 1 hora
+      return {
+        allowed: success,
+        reason: success ? undefined : "Has enviado este mensaje demasiadas veces. Por favor envía algo diferente.",
+      };
+    }
     const result = await limiter.limit(identifier);
 
     return {
@@ -596,10 +640,10 @@ export async function getCachedUserPlan(userId: string): Promise<string> {
 
   try {
     const cacheKey = getCacheKey("user-plan", userId);
-    const cached = await redis.get<string>(cacheKey);
+    const cached = await redis.get(cacheKey);
 
     if (cached) {
-      return cached;
+      return cached as string;
     }
 
     // Cache miss - fetch from DB and cache
@@ -730,7 +774,7 @@ export async function withTierRateLimit(
   handler: (user: any) => Promise<NextResponse>
 ): Promise<NextResponse> {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: req.headers });
     const user = session?.user;
 
     if (!user?.id) {
@@ -738,7 +782,8 @@ export async function withTierRateLimit(
     }
 
     // Check tier-based rate limit
-    const rateLimitResult = await checkTierRateLimit(user.id, user.plan);
+    const plan = await getCachedUserPlan(user.id);
+    const rateLimitResult = await checkTierRateLimit(user.id, plan);
 
     if (!rateLimitResult.success) {
       const error = rateLimitResult.error!;
@@ -870,6 +915,20 @@ export async function checkPostCreationLimit(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkCommunityPostLimit", new Error("Redis not configured"));
+      const success = inMemoryRateLimit(identifier, limits.postsPerDay, 24 * 60 * 60 * 1000);
+      const record = inMemoryLimits.get(identifier);
+      const remaining = record ? limits.postsPerDay - record.count : limits.postsPerDay;
+      return {
+        allowed: success,
+        reason: success ? undefined : `Límite diario de posts alcanzado`,
+        remaining: Math.max(0, remaining),
+        limit: limits.postsPerDay,
+        resetAt: record?.resetAt,
+      };
+    }
     const result = await limiter.limit(identifier);
 
     return {
@@ -935,6 +994,11 @@ export async function checkPostCooldown(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkCommunityPostCooldown", new Error("Redis not configured"));
+      return { allowed: true };
+    }
     const result = await limiter.limit(identifier);
 
     if (!result.success && result.reset) {
@@ -1004,6 +1068,20 @@ export async function checkCommentCreationLimit(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkCommunityCommentLimit", new Error("Redis not configured"));
+      const success = inMemoryRateLimit(identifier, limits.commentsPerDay, 24 * 60 * 60 * 1000);
+      const record = inMemoryLimits.get(identifier);
+      const remaining = record ? limits.commentsPerDay - record.count : limits.commentsPerDay;
+      return {
+        allowed: success,
+        reason: success ? undefined : `Límite diario de comentarios alcanzado`,
+        remaining: Math.max(0, remaining),
+        limit: limits.commentsPerDay,
+        resetAt: record?.resetAt,
+      };
+    }
     const result = await limiter.limit(identifier);
 
     return {
@@ -1068,6 +1146,11 @@ export async function checkCommentCooldown(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback when Redis is not available
+      logRedisFallback("checkCommunityCommentCooldown", new Error("Redis not configured"));
+      return { allowed: true };
+    }
     const result = await limiter.limit(identifier);
 
     if (!result.success && result.reset) {
@@ -1137,6 +1220,23 @@ export async function checkVoteLimit(
 
   try {
     const limiter = getRateLimiterLegacy(plan);
+    if (!limiter) {
+      // Fallback to in-memory
+      const success = inMemoryRateLimit(identifier, limits.votesPerDay, 24 * 60 * 60 * 1000);
+      const record = inMemoryLimits.get(identifier);
+      const remaining = record ? limits.votesPerDay - record.count : limits.votesPerDay;
+
+      return {
+        allowed: success,
+        reason: success
+          ? undefined
+          : `Límite diario de votos alcanzado (${limits.votesPerDay}/día). ${plan === "free" ? "Actualiza a Plus o Ultra para votos ilimitados." : ""}`,
+        remaining: Math.max(0, remaining),
+        limit: limits.votesPerDay,
+        resetAt: record?.resetAt,
+      };
+    }
+
     const result = await limiter.limit(identifier);
 
     return {

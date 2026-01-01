@@ -7,12 +7,8 @@ import {
   Loader2,
   RefreshCw,
   Star,
-  Users,
   MessageCircle,
-  Heart,
-  Crown,
-  Brain,
-  Zap,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -21,8 +17,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { CompanionCard } from "@/components/companions/CompanionCard";
+import { CompanionCardSkeleton } from "@/components/companions/CompanionCardSkeleton";
+import { CategoryBasedRecommendations } from "@/components/recommendations/CategoryBasedRecommendations";
 import type { CategoryKey } from "@/lib/categories";
 import { Carousel } from "@/components/ui/carousel";
+import type { FilterState } from "@/components/dashboard/FilterBar";
 
 interface Recommendation {
   itemType: "agent" | "world";
@@ -35,6 +34,7 @@ interface Recommendation {
   avatar?: string | null;
   categories?: CategoryKey[];
   generationTier?: 'free' | 'plus' | 'ultra' | null;
+  gender?: string | null;
 }
 
 interface Agent {
@@ -46,6 +46,7 @@ interface Agent {
   featured?: boolean;
   generationTier?: 'free' | 'plus' | 'ultra' | null;
   categories?: CategoryKey[];
+  gender?: string | null;
 }
 
 // Helper function to get complexity badge info
@@ -76,199 +77,165 @@ const getComplexityBadge = (tier?: 'free' | 'plus' | 'ultra' | null) => {
   }
 };
 
-export function RecommendedForYou() {
-  const { data: session, status } = useSession();
+interface RecommendedForYouProps {
+  filters?: FilterState;
+  onLoadingChange?: (loading: boolean) => void;
+  fallbackToCategories?: boolean;
+  onAgentClick?: (agentId: string) => void;
+  agents?: Agent[]; // Agentes del dashboard para evitar fetch extra
+}
+
+export function RecommendedForYou({
+  filters,
+  onLoadingChange,
+  fallbackToCategories = true,
+  onAgentClick,
+  agents
+}: RecommendedForYouProps) {
+  const { data: session } = useSession();
   const router = useRouter();
-  // Check if user is authenticated (status can be "loading", "authenticated", or "unauthenticated")
-  const isAuthenticated = status === "authenticated" || (typeof window !== 'undefined' && session?.user);
+  // Check if user is authenticated
+  const isAuthenticated = typeof window !== 'undefined' && session?.user;
 
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [systemAgents, setSystemAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     fetchRecommendations();
-    fetchSystemAgents();
   }, []);
 
   const fetchRecommendations = async () => {
     try {
       const response = await fetch("/api/recommendations");
 
-      // Si es 401, el usuario no está autenticado - redirigir a login
+      // Si es 401 o no autenticado, activar fallback
       if (response.status === 401) {
-        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+        setFailed(true);
+        setLoading(false);
+        onLoadingChange?.(false);
         return;
       }
 
       if (response.ok) {
         const data = await response.json();
-        setRecommendations(data.recommendations);
+        setRecommendations(data.recommendations || []);
+        setFailed(false);
+      } else {
+        // Cualquier otro error, activar fallback
+        setFailed(true);
       }
     } catch (error) {
       console.error("Error fetching recommendations:", error);
+      setFailed(true);
     } finally {
       setLoading(false);
+      onLoadingChange?.(false);
     }
   };
 
-  const fetchSystemAgents = async () => {
-    try {
-      const response = await fetch("/api/agents?kind=companion");
-
-      // Si es 401, el usuario no está autenticado - redirigir a login
-      if (response.status === 401) {
-        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
-        return;
-      }
-
-      if (response.ok) {
-        const data = await response.json();
-        // Filter only system agents (userId = null)
-        const systemOnly = data.filter((agent: Agent) => agent.tags?.includes('premium') || agent.tags?.includes('free'));
-        setSystemAgents(systemOnly);
-      }
-    } catch (error) {
-      console.error("Error fetching system agents:", error);
-    }
-  };
 
   const handleRegenerate = async () => {
     setRegenerating(true);
+    onLoadingChange?.(true);
     try {
       const response = await fetch("/api/recommendations/regenerate", {
         method: "POST",
       });
 
-      // Si es 401, el usuario no está autenticado - redirigir a login
+      // Si es 401, activar fallback
       if (response.status === 401) {
-        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+        setFailed(true);
         return;
       }
 
       if (response.ok) {
         const data = await response.json();
-        setRecommendations(data.recommendations);
+        setRecommendations(data.recommendations || []);
+        setFailed(false);
+      } else {
+        setFailed(true);
       }
     } catch (error) {
       console.error("Error regenerating recommendations:", error);
+      setFailed(true);
     } finally {
       setRegenerating(false);
+      onLoadingChange?.(false);
     }
   };
 
+  // Apply filters to agents
+  const applyFiltersToAgent = (agent: Agent | Recommendation): boolean => {
+    if (!filters) return true;
+
+    // Search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      const matchesName = agent.name.toLowerCase().includes(searchLower);
+      const matchesDesc = (agent.description?.toLowerCase() || '').includes(searchLower);
+      if (!matchesName && !matchesDesc) return false;
+    }
+
+    // Gender filter
+    if (filters.gender !== 'all') {
+      if (!agent.gender || agent.gender.toLowerCase() !== filters.gender.toLowerCase()) {
+        return false;
+      }
+    }
+
+    // Categories filter
+    if (filters.categories.length > 0) {
+      const agentCategories = Array.isArray(agent.categories) ? agent.categories : [];
+      const hasMatchingCategory = filters.categories.some(cat =>
+        agentCategories.some(category => category.toLowerCase() === cat.toLowerCase())
+      );
+      if (!hasMatchingCategory) return false;
+    }
+
+    // Tier filter (for Agent type)
+    if (filters.tier !== 'all' && 'generationTier' in agent) {
+      if (agent.generationTier !== filters.tier) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Filter recommendations and system agents
+  const filteredRecommendations = recommendations.filter(applyFiltersToAgent);
+
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20 rounded-2xl p-8 border border-purple-500/20">
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-purple-500/20 rounded animate-pulse" />
+            <div className="h-6 w-48 bg-purple-500/20 rounded animate-pulse" />
+          </div>
         </div>
+
+        {/* Cards Skeleton */}
+        <Carousel itemWidth={280} gap={24}>
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <CompanionCardSkeleton key={idx} />
+          ))}
+        </Carousel>
       </div>
     );
   }
 
-  // Categorize agents by tags
-  const categories = [
-    {
-      id: 'figuras-historicas',
-      name: 'Figuras Históricas',
-      icon: Crown,
-      gradientClass: 'bg-gradient-to-r from-yellow-500 to-orange-500',
-      borderClass: 'border-yellow-500/30 hover:border-yellow-500/50',
-      buttonClass: 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border-yellow-500/30',
-      shadowClass: 'hover:shadow-yellow-500/20',
-      agents: systemAgents.filter(a => a.tags?.includes('figuras-históricas'))
-    },
-    {
-      id: 'mentor',
-      name: 'Mentores Intelectuales',
-      icon: Brain,
-      gradientClass: 'bg-gradient-to-r from-blue-500 to-purple-500',
-      borderClass: 'border-blue-500/30 hover:border-blue-500/50',
-      buttonClass: 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border-blue-500/30',
-      shadowClass: 'hover:shadow-blue-500/20',
-      agents: systemAgents.filter(a => a.tags?.includes('mentor'))
-    },
-    {
-      id: 'romantico',
-      name: 'Conexiones Románticas',
-      icon: Heart,
-      gradientClass: 'bg-gradient-to-r from-pink-500 to-rose-500',
-      borderClass: 'border-pink-500/30 hover:border-pink-500/50',
-      buttonClass: 'bg-gradient-to-r from-pink-500/20 to-rose-500/20 hover:from-pink-500/30 hover:to-rose-500/30 border-pink-500/30',
-      shadowClass: 'hover:shadow-pink-500/20',
-      agents: systemAgents.filter(a => a.tags?.includes('romántico'))
-    },
-    {
-      id: 'confidente',
-      name: 'Confidentes y Apoyo',
-      icon: Users,
-      gradientClass: 'bg-gradient-to-r from-green-500 to-emerald-500',
-      borderClass: 'border-green-500/30 hover:border-green-500/50',
-      buttonClass: 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 border-green-500/30',
-      shadowClass: 'hover:shadow-green-500/20',
-      agents: systemAgents.filter(a => a.tags?.includes('confidente'))
-    },
-    {
-      id: 'experto',
-      name: 'Expertos y Profesionales',
-      icon: Zap,
-      gradientClass: 'bg-gradient-to-r from-purple-500 to-indigo-500',
-      borderClass: 'border-purple-500/30 hover:border-purple-500/50',
-      buttonClass: 'bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 border-purple-500/30',
-      shadowClass: 'hover:shadow-purple-500/20',
-      agents: systemAgents.filter(a => a.tags?.includes('experto'))
-    },
-  ].filter(cat => cat.agents.length > 0); // Only show categories with agents
+  // Si falló o no tiene recomendaciones y hay fallback habilitado
+  if ((failed || filteredRecommendations.length === 0) && fallbackToCategories) {
+    return <CategoryBasedRecommendations filters={filters} onAgentClick={onAgentClick} agents={agents} />;
+  }
 
-  if (recommendations.length === 0) {
-    return (
-      <div className="space-y-6">
-        {/* Categories Grid */}
-        <div className="space-y-8">
-          {categories.map((category, catIdx) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.4,
-                delay: catIdx * 0.1,
-                ease: [0.4, 0, 0.2, 1],
-              }}
-            >
-              {/* Category Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`p-2 rounded-xl ${category.gradientClass}`}>
-                  <category.icon className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                <span className="text-xs text-gray-400 bg-gray-800/50 px-3 py-1 rounded-full border border-gray-700/50">
-                  {category.agents.length} {category.agents.length === 1 ? 'compañero' : 'compañeros'}
-                </span>
-              </div>
-
-              {/* Agents Carousel */}
-              <Carousel itemWidth={280} gap={24}>
-                {category.agents.map((agent, idx) => (
-                  <CompanionCard
-                    key={agent.id}
-                    id={agent.id}
-                    name={agent.name}
-                    description={agent.description}
-                    avatar={agent.avatar}
-                    categories={agent.categories}
-                    generationTier={agent.generationTier}
-                    index={catIdx * 10 + idx}
-                  />
-                ))}
-              </Carousel>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    );
+  // Si no hay recomendaciones y no hay fallback, no mostrar nada
+  if (filteredRecommendations.length === 0) {
+    return null;
   }
 
   return (
@@ -300,7 +267,7 @@ export function RecommendedForYou() {
 
       {/* Carousel de Recomendaciones */}
       <Carousel itemWidth={280} gap={24}>
-        {recommendations.slice(0, 8).map((rec, idx) => (
+        {filteredRecommendations.slice(0, 8).map((rec, idx) => (
           <motion.div
             key={`${rec.itemType}-${rec.itemId}`}
             initial={{ opacity: 0, y: 20 }}

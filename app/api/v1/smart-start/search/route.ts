@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     // Search across all sources
     const result = await searchCharacterMultiSource(query, {
       includeWikipedia: true,
-      includeJikan: true,
+      includeAniList: true,
       includeFandom: true,
       limit,
     });

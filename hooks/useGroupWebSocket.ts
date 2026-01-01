@@ -113,7 +113,7 @@ export function useGroupWebSocket(options: UseGroupWebSocketOptions) {
 
     typingTimeoutRef.current = setTimeout(() => {
       stopTyping();
-    }, 3000);
+    }, 3000) as unknown as NodeJS.Timeout;
   };
 
   const stopTyping = () => {

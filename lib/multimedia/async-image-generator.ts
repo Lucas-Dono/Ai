@@ -43,80 +43,82 @@ export class AsyncImageGenerator {
   /**
    * Genera un mensaje de espera contextual usando la personalidad de la IA
    * y luego inicia la generación de la imagen en segundo plano
+   * @deprecated - pendingImageGeneration model no longer exists in schema
    */
   async startAsyncGeneration(
     options: AsyncImageGenerationOptions
   ): Promise<WaitingMessageResult> {
-    const { agentId, agentName, agentPersonality, agentSystemPrompt, userId, description } = options;
+    throw new Error('AsyncImageGenerator is deprecated - pendingImageGeneration model no longer exists');
+    // const { agentId, agentName, agentPersonality, agentSystemPrompt, userId, description } = options;
 
-    log.info({ agentId, userId, description: description.substring(0, 50) }, 'Starting async image generation');
+    // log.info({ agentId, userId, description: description.substring(0, 50) }, 'Starting async image generation');
 
-    try {
-      // 1. Generar mensaje de espera contextual usando la IA
-      const waitingMessageText = await this.generateWaitingMessage(
-        agentName,
-        agentPersonality,
-        agentSystemPrompt,
-        description
-      );
+    // try {
+    //   // 1. Generar mensaje de espera contextual usando la IA
+    //   const waitingMessageText = await this.generateWaitingMessage(
+    //     agentName,
+    //     agentPersonality,
+    //     agentSystemPrompt,
+    //     description
+    //   );
 
-      // 2. Guardar pending generation en BD
-      const pendingGeneration = await prisma.pendingImageGeneration.create({
-        data: {
-          agentId,
-          userId,
-          description,
-          status: 'pending',
-          metadata: {
-            referenceImageUrl: options.referenceImageUrl,
-          },
-        },
-      });
+    //   // 2. Guardar pending generation en BD
+    //   const pendingGeneration = await prisma.pendingImageGeneration.create({
+    //     data: {
+    //       agentId,
+    //       userId,
+    //       description,
+    //       status: 'pending',
+    //       metadata: {
+    //         referenceImageUrl: options.referenceImageUrl,
+    //       },
+    //     },
+    //   });
 
-      // 3. Guardar mensaje de espera
-      const waitingMessage = await prisma.message.create({
-        data: {
-          agentId,
-          userId,
-          role: 'assistant',
-          content: waitingMessageText,
-          metadata: {
-            type: 'waiting_for_image',
-            pendingGenerationId: pendingGeneration.id,
-            isTransient: true, // Este mensaje es temporal
-          },
-        },
-      });
+    //   // 3. Guardar mensaje de espera
+    //   const waitingMessage = await prisma.message.create({
+    //     data: {
+    //       agentId,
+    //       userId,
+    //       role: 'assistant',
+    //       content: waitingMessageText,
+    //       metadata: {
+    //         type: 'waiting_for_image',
+    //         pendingGenerationId: pendingGeneration.id,
+    //         isTransient: true, // Este mensaje es temporal
+    //       },
+    //     },
+    //   });
 
-      // 4. Actualizar pending generation con ID del mensaje
-      await prisma.pendingImageGeneration.update({
-        where: { id: pendingGeneration.id },
-        data: { waitingMessageId: waitingMessage.id },
-      });
+    //   // 4. Actualizar pending generation con ID del mensaje
+    //   await prisma.pendingImageGeneration.update({
+    //     where: { id: pendingGeneration.id },
+    //     data: { waitingMessageId: waitingMessage.id },
+    //   });
 
-      // 5. Iniciar generación en segundo plano (no await)
-      this.processImageGeneration(pendingGeneration.id, options).catch((error) => {
-        log.error({ error, pendingGenerationId: pendingGeneration.id }, 'Background image generation failed');
-      });
+    //   // 5. Iniciar generación en segundo plano (no await)
+    //   this.processImageGeneration(pendingGeneration.id, options).catch((error) => {
+    //     log.error({ error, pendingGenerationId: pendingGeneration.id }, 'Background image generation failed');
+    //   });
 
-      log.info(
-        { pendingGenerationId: pendingGeneration.id, waitingMessageId: waitingMessage.id },
-        'Async generation started'
-      );
+    //   log.info(
+    //     { pendingGenerationId: pendingGeneration.id, waitingMessageId: waitingMessage.id },
+    //     'Async generation started'
+    //   );
 
-      return {
-        waitingMessage: {
-          id: waitingMessage.id,
-          content: waitingMessage.content,
-          createdAt: waitingMessage.createdAt,
-          metadata: waitingMessage.metadata as Record<string, unknown>,
-        },
-        pendingGenerationId: pendingGeneration.id,
-      };
-    } catch (error) {
-      log.error({ error, agentId, userId }, 'Failed to start async image generation');
-      throw error;
-    }
+    //   return {
+    //     waitingMessage: {
+    //       id: waitingMessage.id,
+    //       content: waitingMessage.content,
+    //       createdAt: waitingMessage.createdAt,
+    //       metadata: waitingMessage.metadata as Record<string, unknown>,
+    //     },
+    //     pendingGenerationId: pendingGeneration.id,
+    //   };
+    // } catch (error) {
+    //   log.error({ error, agentId, userId }, 'Failed to start async image generation');
+    //   throw error;
+    // }
   }
 
   /**
@@ -175,142 +177,144 @@ Tu mensaje:`;
 
   /**
    * Procesa la generación de la imagen en segundo plano
+   * @deprecated - pendingImageGeneration model no longer exists in schema
    */
   private async processImageGeneration(
     pendingGenerationId: string,
     options: AsyncImageGenerationOptions
   ): Promise<void> {
-    log.info({ pendingGenerationId }, 'Processing image generation in background');
+    throw new Error('processImageGeneration is deprecated - pendingImageGeneration model no longer exists');
+    // log.info({ pendingGenerationId }, 'Processing image generation in background');
 
-    try {
-      // 1. Actualizar estado a "generating"
-      await prisma.pendingImageGeneration.update({
-        where: { id: pendingGenerationId },
-        data: { status: 'generating' },
-      });
+    // try {
+    //   // 1. Actualizar estado a "generating"
+    //   await prisma.pendingImageGeneration.update({
+    //     where: { id: pendingGenerationId },
+    //     data: { status: 'generating' },
+    //   });
 
-      // 2. Obtener apariencia base del personaje
-      const appearance = await prisma.characterAppearance.findUnique({
-        where: { agentId: options.agentId },
-      });
+    //   // 2. Obtener apariencia base del personaje
+    //   const appearance = await prisma.characterAppearance.findUnique({
+    //     where: { agentId: options.agentId },
+    //   });
 
-      const baseAppearance = appearance?.basePrompt || `character ${options.agentName}`;
+    //   const baseAppearance = appearance?.basePrompt || `character ${options.agentName}`;
 
-      // 3. Construir prompt mejorado (ahora async)
-      const enhancedPrompt = await this.buildImagePrompt(
-        options.description,
-        options.agentName,
-        options.agentPersonality,
-        baseAppearance
-      );
+    //   // 3. Construir prompt mejorado (ahora async)
+    //   const enhancedPrompt = await this.buildImagePrompt(
+    //     options.description,
+    //     options.agentName,
+    //     options.agentPersonality,
+    //     baseAppearance
+    //   );
 
-      // 4. Generar imagen con AI Horde
-      const aiHordeClient = getAIHordeClient();
-      const genParams: any = {
-        prompt: enhancedPrompt,
-        negativePrompt:
-          'low quality, blurry, distorted, different person, different face, different body, anime, cartoon, 3d render, deformed, ugly',
-        width: 512,
-        height: 512,
-        steps: 30,
-        cfgScale: 7.5,
-        sampler: 'k_euler_a',
-        seed: -1,
-        nsfw: false,
-      };
+    //   // 4. Generar imagen con AI Horde
+    //   const aiHordeClient = getAIHordeClient();
+    //   const genParams: any = {
+    //     prompt: enhancedPrompt,
+    //     negativePrompt:
+    //       'low quality, blurry, distorted, different person, different face, different body, anime, cartoon, 3d render, deformed, ugly',
+    //     width: 512,
+    //     height: 512,
+    //     steps: 30,
+    //     cfgScale: 7.5,
+    //     sampler: 'k_euler_a',
+    //     seed: -1,
+    //     nsfw: false,
+    //   };
 
-      // IMG2IMG: Si hay imagen de referencia, usarla
-      if (options.referenceImageUrl) {
-        log.info({ pendingGenerationId }, 'Using img2img with reference image');
-        const sourceImageBase64 = await this.imageUrlToBase64(options.referenceImageUrl);
+    //   // IMG2IMG: Si hay imagen de referencia, usarla
+    //   if (options.referenceImageUrl) {
+    //     log.info({ pendingGenerationId }, 'Using img2img with reference image');
+    //     const sourceImageBase64 = await this.imageUrlToBase64(options.referenceImageUrl);
 
-        if (sourceImageBase64) {
-          genParams.sourceImage = sourceImageBase64;
-          genParams.denoisingStrength = 0.6;
-        }
-      }
+    //     if (sourceImageBase64) {
+    //       genParams.sourceImage = sourceImageBase64;
+    //       genParams.denoisingStrength = 0.6;
+    //     }
+    //   }
 
-      // Actualizar pending generation con prompt
-      await prisma.pendingImageGeneration.update({
-        where: { id: pendingGenerationId },
-        data: { prompt: enhancedPrompt },
-      });
+    //   // Actualizar pending generation con prompt
+    //   await prisma.pendingImageGeneration.update({
+    //     where: { id: pendingGenerationId },
+    //     data: { prompt: enhancedPrompt },
+    //   });
 
-      log.info({ pendingGenerationId }, 'Starting AI Horde generation...');
+    //   log.info({ pendingGenerationId }, 'Starting AI Horde generation...');
 
-      const result = await aiHordeClient.generateImage(genParams);
+    //   const result = await aiHordeClient.generateImage(genParams);
 
-      if (!result || !result.imageUrl) {
-        throw new Error('AI Horde returned no image');
-      }
+    //   if (!result || !result.imageUrl) {
+    //     throw new Error('AI Horde returned no image');
+    //   }
 
-      log.info({ pendingGenerationId, imageUrl: result.imageUrl.substring(0, 50) }, 'Image generated successfully');
+    //   log.info({ pendingGenerationId, imageUrl: result.imageUrl.substring(0, 50) }, 'Image generated successfully');
 
-      // 4. Generar mensaje de completado contextual
-      const completionMessage = await this.generateCompletionMessage(
-        options.agentName,
-        options.agentPersonality,
-        options.agentSystemPrompt,
-        options.description
-      );
+    //   // 4. Generar mensaje de completado contextual
+    //   const completionMessage = await this.generateCompletionMessage(
+    //     options.agentName,
+    //     options.agentPersonality,
+    //     options.agentSystemPrompt,
+    //     options.description
+    //   );
 
-      // 5. Guardar mensaje con la imagen
-      const completedMessage = await prisma.message.create({
-        data: {
-          agentId: options.agentId,
-          userId: options.userId,
-          role: 'assistant',
-          content: completionMessage,
-          metadata: {
-            multimedia: [
-              {
-                type: 'image',
-                url: result.imageUrl,
-                description: options.description,
-                metadata: {
-                  prompt: enhancedPrompt,
-                  model: result.model,
-                  usedReference: !!options.referenceImageUrl && !!genParams.sourceImage,
-                  denoisingStrength: genParams.denoisingStrength,
-                  generatedAsync: true,
-                },
-              },
-            ],
-          },
-        },
-      });
+    //   // 5. Guardar mensaje con la imagen
+    //   const completedMessage = await prisma.message.create({
+    //     data: {
+    //       agentId: options.agentId,
+    //       userId: options.userId,
+    //       role: 'assistant',
+    //       content: completionMessage,
+    //       metadata: {
+    //         multimedia: [
+    //           {
+    //             type: 'image',
+    //             url: result.imageUrl,
+    //             description: options.description,
+    //             metadata: {
+    //               prompt: enhancedPrompt,
+    //               model: result.model,
+    //               usedReference: !!options.referenceImageUrl && !!genParams.sourceImage,
+    //               denoisingStrength: genParams.denoisingStrength,
+    //               generatedAsync: true,
+    //             },
+    //           },
+    //         ],
+    //       },
+    //     },
+    //   });
 
-      // 6. Actualizar pending generation como completado
-      await prisma.pendingImageGeneration.update({
-        where: { id: pendingGenerationId },
-        data: {
-          status: 'completed',
-          imageUrl: result.imageUrl,
-          completedMessageId: completedMessage.id,
-          completedAt: new Date(),
-        },
-      });
+    //   // 6. Actualizar pending generation como completado
+    //   await prisma.pendingImageGeneration.update({
+    //     where: { id: pendingGenerationId },
+    //     data: {
+    //       status: 'completed',
+    //       imageUrl: result.imageUrl,
+    //       completedMessageId: completedMessage.id,
+    //       completedAt: new Date(),
+    //     },
+    //   });
 
-      log.info(
-        { pendingGenerationId, completedMessageId: completedMessage.id },
-        'Async image generation completed successfully'
-      );
-    } catch (error) {
-      log.error({ error, pendingGenerationId }, 'Failed to generate image');
+    //   log.info(
+    //     { pendingGenerationId, completedMessageId: completedMessage.id },
+    //     'Async image generation completed successfully'
+    //   );
+    // } catch (error) {
+    //   log.error({ error, pendingGenerationId }, 'Failed to generate image');
 
-      // Guardar error en BD
-      await prisma.pendingImageGeneration.update({
-        where: { id: pendingGenerationId },
-        data: {
-          status: 'failed',
-          errorMessage: error instanceof Error ? error.message : 'Unknown error',
-          completedAt: new Date(),
-        },
-      });
+    //   // Guardar error en BD
+    //   await prisma.pendingImageGeneration.update({
+    //     where: { id: pendingGenerationId },
+    //     data: {
+    //       status: 'failed',
+    //       errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    //       completedAt: new Date(),
+    //     },
+    //   });
 
-      // Enviar mensaje de error al usuario
-      await this.sendErrorMessage(pendingGenerationId, options);
-    }
+    //   // Enviar mensaje de error al usuario
+    //   await this.sendErrorMessage(pendingGenerationId, options);
+    // }
   }
 
   /**

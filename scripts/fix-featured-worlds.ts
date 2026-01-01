@@ -1,8 +1,10 @@
 /**
- * Script para arreglar los mundos destacados
- * Solo Academia Sakura debe estar destacado manualmente
+ * SCRIPT OBSOLETO
+ * Este script usa el modelo 'World' que fue migrado a 'Group'
+ * Mantenerlo solo para referencia histórica
  */
 
+/*
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -45,7 +47,7 @@ async function main() {
   });
 
   console.log("\n📊 Mundos destacados actuales:");
-  featuredWorlds.forEach((world) => {
+  featuredWorlds.forEach((world: any) => {
     console.log(`  - ${world.name} (${world.id})`);
   });
 
@@ -64,3 +66,7 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+*/
+
+console.log('❌ Este script está obsoleto. El sistema World fue migrado a Group.');
+console.log('💡 Usa los nuevos scripts de gestión de grupos en su lugar.');

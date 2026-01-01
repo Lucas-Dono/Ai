@@ -557,16 +557,12 @@ export function SmartStartProvider({ children }: SmartStartProviderProps) {
         case 'search':
           previousStep = 'type';
           break;
-        case 'depth':
-          // If came from search flow, go back to search; otherwise go to customize
-          previousStep = prev.characterType === 'existing' ? 'search' : 'customize';
-          break;
         case 'customize':
           // If came from search, go back to search; otherwise go to type
           previousStep = prev.characterType === 'existing' ? 'search' : 'type';
           break;
         case 'review':
-          previousStep = 'depth';
+          previousStep = 'customize';
           break;
         case 'genre':
           // If on genre selection (changing genre), go back to customize

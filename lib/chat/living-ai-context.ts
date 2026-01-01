@@ -196,31 +196,35 @@ async function generateEventsContext(agentId: string): Promise<string> {
 async function generateRoutineContext(agentId: string): Promise<string> {
   const routine = await prisma.characterRoutine.findUnique({
     where: { agentId },
-    include: {
-      routineInstances: {
-        where: {
-          startTime: {
-            lte: new Date(),
-          },
-          endTime: {
-            gte: new Date(),
-          },
-        },
-        take: 1,
-      },
-    },
+    // TODO: Re-enable when routineInstances model is added to schema
+    // include: {
+    //   routineInstances: {
+    //     where: {
+    //       startTime: {
+    //         lte: new Date(),
+    //       },
+    //       endTime: {
+    //         gte: new Date(),
+    //       },
+    //     },
+    //     take: 1,
+    //   },
+    // },
   });
 
-  if (!routine || !routine.enabled || routine.routineInstances.length === 0) {
+  if (!routine || !routine.enabled) {
     return "";
   }
 
-  const currentInstance = routine.routineInstances[0];
-  const activity = currentInstance.actualActivity || currentInstance.plannedActivity;
+  // TODO: Re-enable when routineInstances is available
+  // const currentInstance = routine.routineInstances[0];
+  // const activity = currentInstance.actualActivity || currentInstance.plannedActivity;
+  const activity = "realizando sus actividades diarias";
 
   let context = "\n## ⏰ ACTIVIDAD ACTUAL\n\n";
   context += `Ahora mismo estás: **${activity}**\n`;
-  context += `(${formatTime(currentInstance.startTime)} - ${formatTime(currentInstance.endTime)})\n\n`;
+  // TODO: Re-enable when routineInstances is available
+  // context += `(${formatTime(currentInstance.startTime)} - ${formatTime(currentInstance.endTime)})\n\n`;
 
   if (routine.realismLevel === "immersive") {
     context += "**Modo inmersivo activo**: Tu disponibilidad y tono deben reflejar esta actividad. Si estás durmiendo, trabajando en algo intenso, o muy ocupado, puedes responder de forma breve o incluso rechazar la conversación educadamente.\n\n";

@@ -216,7 +216,7 @@ export function CharacterSearch() {
           autoFocus
         />
         <Button
-          onClick={handleSearch}
+          onClick={() => handleSearch()}
           disabled={!localQuery.trim() || isSearching}
           size="lg"
           className="px-6"

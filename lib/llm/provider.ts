@@ -16,6 +16,18 @@ export interface GenerateOptions {
 interface ProfileGenerationResult {
   profile: {
     basicIdentity?: Record<string, unknown>;
+    currentLocation?: {
+      city?: string;
+      country?: string;
+      description?: string;
+    };
+    background?: {
+      birthplace?: {
+        city?: string;
+        country?: string;
+      };
+      [key: string]: unknown;
+    };
     family?: Record<string, unknown>;
     occupation?: Record<string, unknown>;
     socialCircle?: Record<string, unknown>;
@@ -27,6 +39,47 @@ interface ProfileGenerationResult {
     personality?: Record<string, unknown>;
     communication?: Record<string, unknown>;
     presentTense?: Record<string, unknown>;
+    psychologicalProfile?: {
+      attachmentStyle?: string;
+      attachmentDescription?: string;
+      primaryCopingMechanisms?: string[];
+      unhealthyCopingMechanisms?: string[];
+      copingTriggers?: string[];
+      emotionalRegulationBaseline?: string;
+      emotionalExplosiveness?: number;
+      emotionalRecoverySpeed?: string;
+      mentalHealthConditions?: string[];
+      therapyStatus?: string;
+      medicationUse?: boolean;
+      mentalHealthStigma?: string;
+      defenseMethanisms?: Record<string, unknown>;
+      traumaHistory?: string;
+      resilienceFactors?: string[];
+      selfAwarenessLevel?: number;
+      blindSpots?: string[];
+      insightAreas?: string[];
+      [key: string]: unknown;
+    };
+    deepRelationalPatterns?: {
+      givingLoveLanguages?: string[];
+      receivingLoveLanguages?: string[];
+      loveLanguageIntensities?: Record<string, unknown>;
+      repeatingPatterns?: string[];
+      whyRepeats?: string;
+      awarenessOfPatterns?: string;
+      personalBoundaryStyle?: string;
+      professionalBoundaryStyle?: string;
+      boundaryEnforcement?: number;
+      boundaryGuilty?: boolean;
+      conflictStyle?: string;
+      conflictTriggers?: string[];
+      healthyConflictSkills?: string[];
+      unhealthyConflictPatterns?: string[];
+      trustBaseline?: number;
+      vulnerabilityComfort?: number;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
   };
   systemPrompt: string;
 }

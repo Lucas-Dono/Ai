@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getVeniceClient } from "@/lib/llm/venice";
+import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
 
 /**
  * Group Emergent Events Service
@@ -177,7 +177,7 @@ export class GroupEmergentEventsService {
 
     const aiPersonalities = group.members
       .filter((m: any) => m.memberType === "agent" && m.agent)
-      .map((m: any) => ({
+      .map((m: { agentId: string; agent: { name: string; personalityCore?: { traits?: any } } }) => ({
         id: m.agentId,
         name: m.agent.name,
         traits: m.agent.personalityCore?.traits || [],
@@ -189,7 +189,7 @@ CONVERSACIÓN RECIENTE:
 ${conversationSummary}
 
 PERSONAJES:
-${aiPersonalities.map((ai) => `- ${ai.name}: ${ai.traits.join(", ")}`).join("\n")}
+${aiPersonalities.map((ai: any) => `- ${ai.name}: ${ai.traits.join(", ")}`).join("\n")}
 
 Genera un evento emergente en JSON con esta estructura:
 {
@@ -306,7 +306,7 @@ El evento debe:
         currentEmergentEvent: {
           ...event,
           startedAt: new Date().toISOString(),
-        },
+        } as any,
       },
     });
 
@@ -380,7 +380,7 @@ El evento debe:
     if (eventEnd < new Date()) {
       await prisma.group.update({
         where: { id: groupId },
-        data: { currentEmergentEvent: null },
+        data: { currentEmergentEvent: null as any },
       });
 
       console.log(`Event expired and cleared: ${event.title}`);

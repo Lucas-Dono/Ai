@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Obtener usuario
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
       select: {
         id: true,
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json(
         { error: "Usuario no encontrado" },
         {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // CRITICAL: Verificar que el usuario es adulto (18+)
-    if (!user.isAdult) {
+    if (!dbUser.isAdult) {
       console.log(
         `[NSFW CONSENT] Intento de menor de edad: ${user.email}`
       );
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Si ya tiene consentimiento, retornar
-    if (user.nsfwConsent) {
+    if (dbUser.nsfwConsent) {
       return NextResponse.json(
         {
           success: true,
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     // Guardar consentimiento
     const updatedUser = await prisma.user.update({
-      where: { id: user.id },
+      where: { id: dbUser.id },
       data: {
         nsfwConsent: true,
         nsfwConsentAt: new Date(),
@@ -140,7 +140,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Obtener usuario
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
       select: {
         id: true,
@@ -148,7 +148,7 @@ export async function DELETE(req: NextRequest) {
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json(
         { error: "Usuario no encontrado" },
         {
@@ -160,7 +160,7 @@ export async function DELETE(req: NextRequest) {
 
     // Revocar consentimiento
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: dbUser.id },
       data: {
         nsfwConsent: false,
         nsfwConsentAt: null,
@@ -217,7 +217,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Obtener usuario
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
       select: {
         id: true,
@@ -228,7 +228,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json(
         { error: "Usuario no encontrado" },
         {
@@ -240,11 +240,11 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        isAdult: user.isAdult,
-        nsfwConsent: user.nsfwConsent,
-        nsfwConsentAt: user.nsfwConsent ? user.nsfwConsentAt : null,
-        nsfwConsentVersion: user.nsfwConsent ? user.nsfwConsentVersion : null,
-        canAccessNSFW: user.isAdult && user.nsfwConsent,
+        isAdult: dbUser.isAdult,
+        nsfwConsent: dbUser.nsfwConsent,
+        nsfwConsentAt: dbUser.nsfwConsent ? dbUser.nsfwConsentAt : null,
+        nsfwConsentVersion: dbUser.nsfwConsent ? dbUser.nsfwConsentVersion : null,
+        canAccessNSFW: dbUser.isAdult && dbUser.nsfwConsent,
       },
       {
         headers: { "Content-Type": "application/json" },

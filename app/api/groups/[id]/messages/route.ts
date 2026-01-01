@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
-import { checkTierRateLimit } from "@/lib/usage/check-tier-rate-limit";
+import { checkTierRateLimit } from "@/lib/redis/ratelimit";
 import {
   checkAllGroupLimits,
   incrementGroupMessageCount,

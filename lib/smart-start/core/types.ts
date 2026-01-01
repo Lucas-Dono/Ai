@@ -129,33 +129,36 @@ export type SearchSourceId =
   | 'myanimelist'
   | 'anilist'
   | 'jikan'
+  | 'mal'
   | 'tvmaze'
   | 'tmdb'
   | 'igdb'
   | 'wikipedia'
   | 'wikidata'
+  | 'fandom'
+  | 'custom'
   | 'firecrawl';
 
+export interface SearchOptions {
+  limit?: number;
+  page?: number;
+  filters?: Record<string, unknown>;
+}
+
 export interface SearchSource {
-  id: SearchSourceId;
+  sourceId: SearchSourceId;
   name: string;
-  apiEndpoint: string;
-  genres: GenreId[] | ['all'];
-  dataStructure: CharacterType | 'celebrity' | 'historical';
-  rateLimit: string;
-  authRequired: boolean;
-  priority: number; // 1 = highest
-
-  capabilities: {
-    [key: string]: boolean | string;
+  supportedGenres: GenreId[];
+  baseUrl: string;
+  rateLimit: {
+    requests: number;
+    per: number;
   };
 
-  endpoints?: {
-    [key: string]: string;
-  };
-
-  requestBody?: Record<string, unknown>;
-  usage?: string;
+  // Methods that implementations must provide
+  search(query: string, options?: SearchOptions): Promise<SearchResult[]>;
+  getDetails(id: string): Promise<SearchResult | null>;
+  testConnection(): Promise<boolean>;
 }
 
 export interface SearchResult {

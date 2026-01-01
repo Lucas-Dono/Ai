@@ -90,3 +90,8 @@ export const cronLogger = createLogger('cron');
  * Logger para métricas y analytics
  */
 export const metricsLogger = createLogger('metrics');
+
+/**
+ * Logger para sistema de emails (SMTP, envío, secuencias)
+ */
+export const emailLogger = createLogger('email');
