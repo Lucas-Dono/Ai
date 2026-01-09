@@ -24,6 +24,13 @@ export const metadata: Metadata = {
     "AI emotions",
   ],
   authors: [{ name: "Blaniel" }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    apple: '/apple-icon.png',
+  },
   openGraph: {
     title: "Blaniel - Create AIs that truly understand you",
     description: "Create emotional AI companions with real emotions and long-term memory",

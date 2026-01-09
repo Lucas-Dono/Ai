@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { withAPIAuth } from "@/lib/api/auth";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
+import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
 
 /**
  * @swagger
@@ -138,20 +139,11 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   return withAPIAuth(req, async (userId) => {
-    // Check agent quota
-    const quotaCheck = await canUseResource(userId, "agent");
-    if (!quotaCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: quotaCheck.reason,
-          current: quotaCheck.current,
-          limit: quotaCheck.limit,
-        },
-        { status: 403 }
-      );
-    }
+    try {
+      // NOTE: Agent quota check moved to atomic transaction below
+      // to prevent race conditions
 
-    const body = await req.json();
+      const body = await req.json();
     const { name, kind, personality, purpose, tone } = body;
 
     if (!name || !kind) {
@@ -211,23 +203,44 @@ export async function POST(req: NextRequest) {
       locationCountry = extendedProfile.background.birthplace.country;
     }
 
-    // Create agent with tier information
-    const agent = await prisma.agent.create({
-      data: {
-        userId,
-        kind,
-        generationTier: tier, // Store which tier was used to generate this agent
-        name,
-        description: personality || purpose,
-        personality,
-        purpose,
-        tone,
-        profile: profile as Record<string, string | number | boolean | null>,
-        systemPrompt,
-        visibility: "private",
-        locationCity, // For real-time weather system
-        locationCountry, // For real-time weather system
+    // CRITICAL: Create agent with atomic limit check to prevent race condition
+    const agent = await prisma.$transaction(
+      async (tx) => {
+        // Verificar límite DENTRO de la transacción
+        await atomicCheckAgentLimit(tx, userId, tier);
+
+        // Crear agente dentro de la transacción
+        const newAgent = await tx.agent.create({
+          data: {
+            userId,
+            kind,
+            generationTier: tier, // Store which tier was used to generate this agent
+            name,
+            description: personality || purpose,
+            personality,
+            purpose,
+            tone,
+            profile: profile as Record<string, string | number | boolean | null>,
+            systemPrompt,
+            visibility: "private",
+            locationCity, // For real-time weather system
+            locationCountry, // For real-time weather system
+          },
+        });
+
+        return newAgent;
       },
+      {
+        isolationLevel: "Serializable",
+        maxWait: 5000,
+        timeout: 10000,
+      }
+    ).catch((error) => {
+      if (error.message.startsWith("{")) {
+        const errorData = JSON.parse(error.message);
+        throw errorData;
+      }
+      throw error;
     });
 
     // For ULTRA tier: Create the exclusive psychological profiles
@@ -336,12 +349,35 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Track usage
-    await trackUsage(userId, "agent", 1, agent.id, {
-      name: agent.name,
-      kind: agent.kind,
-    });
+      // Track usage
+      await trackUsage(userId, "agent", 1, agent.id, {
+        name: agent.name,
+        kind: agent.kind,
+      });
 
-    return NextResponse.json(agent, { status: 201 });
+      return NextResponse.json(agent, { status: 201 });
+    } catch (error: any) {
+      console.error("Error creating agent (v1 API):", error);
+
+      // Si es un error de límite (lanzado desde la transacción)
+      if (error.error && error.limit) {
+        return NextResponse.json(error, { status: 403 });
+      }
+
+      // Errores de transacción de Prisma
+      if (error.code === "P2034") {
+        // Serialization failure - race condition detectada
+        return NextResponse.json(
+          {
+            error: "Agent limit reached. Please try again.",
+            hint: "Multiple concurrent requests detected"
+          },
+          { status: 409 }
+        );
+      }
+
+      // Re-throw para que withAPIAuth lo maneje
+      throw error;
+    }
   });
 }

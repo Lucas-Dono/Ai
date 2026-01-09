@@ -359,7 +359,8 @@
       "recent": {
         "title": "Recent Chats",
         "badge": "Recent",
-        "subtitle": "Continue your conversations where you left off"
+        "subtitle": "Continue your conversations where you left off",
+        "empty": "No recent conversations. Start a chat with your companions to see them here"
       },
       "popular": {
         "title": "Most viewed",
@@ -1967,6 +1968,10 @@
           "title": "Agent updates",
           "description": "Notifications about your AIs' activity"
         }
+      },
+      "sfwProtection": {
+        "title": "Content Protection (SFW)",
+        "description": "Control the type of content your AIs can generate"
       }
     },
     "accessibility": {

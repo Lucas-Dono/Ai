@@ -31,8 +31,8 @@ export function HowItWorks() {
   ];
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -40,7 +40,7 @@ export function HowItWorks() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16 max-w-3xl mx-auto"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
             {t("title")}{" "}
             <span className="text-muted-foreground">
               {t("titleHighlight")}

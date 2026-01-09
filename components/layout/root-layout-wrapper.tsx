@@ -18,10 +18,11 @@ export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
   const { data: session } = useSession();
   const pathname = usePathname();
 
-  // Hide footer in chat pages (agentes/[id] and grupos/[id])
+  // Hide footer in chat pages (agentes/[id] and grupos/[id]) and landing pages
   const isAgentChat = pathname?.startsWith('/agentes/') && !pathname.includes('/edit') && !pathname.includes('/behaviors') && !pathname.includes('/memory');
   const isGroupChat = pathname?.startsWith('/dashboard/grupos/') && pathname.split('/').length >= 4 && !pathname.includes('/configuracion') && !pathname.includes('/analytics');
-  const isChat = isAgentChat || isGroupChat;
+  const isLanding = pathname?.startsWith('/landing') || pathname === '/';
+  const shouldHideFooter = isAgentChat || isGroupChat || isLanding;
 
   // ANALYTICS TRACKING: Mobile Session Detection (Fase 6 - User Experience)
   useEffect(() => {
@@ -68,14 +69,14 @@ export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
       .catch((error) => {
         console.warn("[TRACKING] Failed to track mobile session:", error);
       });
-  }, [session, status]);
+  }, [session]);
 
   return (
     <ErrorBoundary variant="page">
       <div className="flex flex-col min-h-screen">
         <OfflineBanner />
         <div className="flex-1">{children}</div>
-        {!isChat && <Footer />}
+        {!shouldHideFooter && <Footer />}
         <AccessibilityIndicator />
       </div>
       <Toaster

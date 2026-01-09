@@ -31,6 +31,8 @@ export type MainStackParamList = {
   CreatePost: undefined;
   CreateCommunity: undefined;
   CreateEvent: undefined;
+  FollowingPosts: undefined;
+  Preferences: undefined;
   // Messaging screens
   Conversation: { conversationId: string };
   StartConversation: { userId?: string };

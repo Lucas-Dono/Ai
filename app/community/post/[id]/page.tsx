@@ -20,6 +20,7 @@ import {
   Trash2,
   X,
   Check,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -64,6 +65,7 @@ interface Comment {
   createdAt: string;
   userVote?: 'upvote' | 'downvote' | null;
   isEdited?: boolean;
+  images?: string[];
 }
 
 export default function PostDetailPage() {
@@ -76,6 +78,7 @@ export default function PostDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
+  const [newCommentImages, setNewCommentImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [showPostMenu, setShowPostMenu] = useState(false);
   const [editingPost, setEditingPost] = useState(false);
@@ -124,35 +127,129 @@ export default function PostDetailPage() {
         throw new Error('Failed to load comments');
       }
       const data = await response.json();
-      setComments(data || []);
+
+      console.log('📦 Comentarios recibidos del servidor (ya organizados en árbol):', data);
+
+      // El servidor ya devuelve los comentarios organizados en árbol
+      // Solo necesitamos usarlos directamente
+      const comments = Array.isArray(data) ? data : (data.comments || []);
+
+      console.log('🌳 Comentarios procesados:', comments.length, 'comentarios raíz');
+      console.log('📊 Estructura completa:', JSON.stringify(comments, null, 2));
+
+      setComments(comments);
     } catch (error) {
       console.error('Error loading comments:', error);
     }
   };
 
   const handleVotePost = async (voteType: 'upvote' | 'downvote') => {
+    if (!post) return;
+
+    // Guardar estado original para revertir si falla
+    const originalPost = post;
+
+    // Calcular nuevos valores
+    const wasUpvote = post.userVote === 'upvote';
+    const wasDownvote = post.userVote === 'downvote';
+    const isUpvote = voteType === 'upvote';
+
+    let newUpvotes = post.upvotes;
+    let newDownvotes = post.downvotes;
+
+    // Remover voto anterior
+    if (wasUpvote) newUpvotes--;
+    if (wasDownvote) newDownvotes--;
+
+    // Si es el mismo voto, toggle (remover)
+    if (post.userVote === voteType) {
+      console.log('🔄 [handleVotePost] Toggle - Removiendo voto');
+      setPost({ ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null });
+    } else {
+      // Agregar nuevo voto
+      if (isUpvote) {
+        newUpvotes++;
+      } else {
+        newDownvotes++;
+      }
+      console.log('✅ [handleVotePost] Nuevo voto aplicado:', { voteType, newUpvotes, newDownvotes });
+      setPost({ ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: voteType });
+    }
+
+    // Luego llamar a la API
     try {
-      await fetch(`/api/community/posts/${postId}/vote`, {
+      const response = await fetch(`/api/community/posts/${postId}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ voteType }),
       });
-      loadPost();
+
+      if (!response.ok) {
+        // Revertir si falla
+        console.error('❌ [handleVotePost] API falló, revirtiendo...');
+        setPost(originalPost);
+      }
     } catch (error) {
       console.error('Error voting:', error);
+      // Revertir en caso de error
+      setPost(originalPost);
     }
   };
 
   const handleVoteComment = async (commentId: string, voteType: 'upvote' | 'downvote') => {
+    // Actualización optimista - Actualizar localmente ANTES de la petición
+    const updateComment = (commentToUpdate: Comment): Comment => {
+      if (commentToUpdate.id === commentId) {
+        const wasUpvote = commentToUpdate.userVote === 'upvote';
+        const wasDownvote = commentToUpdate.userVote === 'downvote';
+        const isUpvote = voteType === 'upvote';
+
+        let newUpvotes = commentToUpdate.upvotes;
+        let newDownvotes = commentToUpdate.downvotes;
+
+        // Remover voto anterior
+        if (wasUpvote) newUpvotes--;
+        if (wasDownvote) newDownvotes--;
+
+        // Si es el mismo voto, toggle (remover)
+        if (commentToUpdate.userVote === voteType) {
+          console.log('🔄 [handleVoteComment] Toggle - Removiendo voto');
+          return { ...commentToUpdate, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null };
+        }
+
+        // Agregar nuevo voto
+        if (isUpvote) {
+          newUpvotes++;
+        } else {
+          newDownvotes++;
+        }
+
+        console.log('✅ [handleVoteComment] Nuevo voto aplicado:', { voteType, newUpvotes, newDownvotes });
+        return { ...commentToUpdate, upvotes: newUpvotes, downvotes: newDownvotes, userVote: voteType };
+      }
+
+      return commentToUpdate;
+    };
+
+    const previousComments = comments;
+    setComments(comments.map(updateComment));
+
     try {
-      await fetch(`/api/community/comments/${commentId}/vote`, {
+      const response = await fetch(`/api/community/comments/${commentId}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ voteType }),
       });
-      loadComments();
+
+      if (!response.ok) {
+        // Revertir si falla
+        console.error('❌ [handleVoteComment] API falló, revirtiendo...');
+        setComments(previousComments);
+      }
     } catch (error) {
       console.error('Error voting comment:', error);
+      // Revertir en caso de error
+      setComments(previousComments);
     }
   };
 
@@ -168,11 +265,13 @@ export default function PostDetailPage() {
         body: JSON.stringify({
           content: newComment,
           postId: postId,
+          images: newCommentImages,
         }),
       });
 
       if (response.ok) {
         setNewComment("");
+        setNewCommentImages([]);
         loadComments();
         loadPost(); // Reload to update comment count
       } else {
@@ -503,21 +602,41 @@ export default function PostDetailPage() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                variant={post.userVote === 'upvote' ? 'default' : 'outline'}
+                variant="outline"
                 onClick={() => handleVotePost('upvote')}
                 className="gap-2"
               >
-                <ThumbsUp className="h-4 w-4" />
-                {post.upvotes}
+                <div className={cn(
+                  "rounded-full p-1",
+                  post.userVote === 'upvote' && "bg-green-500"
+                )}>
+                  <ThumbsUp
+                    className={cn(
+                      "h-4 w-4",
+                      post.userVote === 'upvote' ? "fill-white text-white" : "fill-none"
+                    )}
+                  />
+                </div>
+                <span>{post.upvotes}</span>
               </Button>
               <Button
                 size="sm"
-                variant={post.userVote === 'downvote' ? 'default' : 'outline'}
+                variant="outline"
                 onClick={() => handleVotePost('downvote')}
                 className="gap-2"
               >
-                <ThumbsDown className="h-4 w-4" />
-                {post.downvotes}
+                <div className={cn(
+                  "rounded-full p-1",
+                  post.userVote === 'downvote' && "bg-red-500"
+                )}>
+                  <ThumbsDown
+                    className={cn(
+                      "h-4 w-4",
+                      post.userVote === 'downvote' ? "fill-white text-white" : "fill-none"
+                    )}
+                  />
+                </div>
+                <span>{post.downvotes}</span>
               </Button>
             </div>
 
@@ -548,25 +667,102 @@ export default function PostDetailPage() {
         </motion.div>
 
         {/* Comments Section */}
-        <div id="comments" className="space-y-6">
-          <h2 className="text-2xl font-bold">Comentarios ({comments.length})</h2>
-
-          {/* New Comment Form */}
-          <form onSubmit={handleSubmitComment} className="bg-card border border-border rounded-2xl p-4">
+        <div id="comments" className="space-y-4">
+          {/* New Comment Form - Estilo Reddit */}
+          <form onSubmit={handleSubmitComment} className="bg-card border-2 border-border rounded-xl px-3 py-2">
             <Textarea
-              placeholder="Escribe tu comentario..."
+              placeholder="¿Qué opinas?"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              rows={3}
-              className="mb-3 resize-none"
+              rows={2}
+              className="resize-none border-0 bg-transparent focus:ring-0 focus-visible:ring-0 text-sm mb-2 px-1 py-1"
             />
-            <div className="flex justify-end">
-              <Button type="submit" disabled={submitting || !newComment.trim()} className="gap-2">
-                <Send className="h-4 w-4" />
-                {submitting ? 'Enviando...' : 'Comentar'}
-              </Button>
+
+            {/* Preview de imágenes seleccionadas */}
+            {newCommentImages.length > 0 && (
+              <div className="flex gap-2 mb-2">
+                {newCommentImages.map((img, idx) => (
+                  <div key={idx} className="relative w-16 h-16 rounded border border-border overflow-hidden">
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setNewCommentImages(prev => prev.filter((_, i) => i !== idx))}
+                      className="absolute top-0 right-0 bg-black/70 text-white p-0.5 rounded-bl"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+              {/* Iconos de acción - Estilo Reddit */}
+              <div className="flex items-center gap-1">
+                <input
+                  type="file"
+                  id="comment-image-upload"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    files.forEach(file => {
+                      if (newCommentImages.length >= 4) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setNewCommentImages(prev => [...prev, ev.target?.result as string]);
+                      };
+                      reader.readAsDataURL(file);
+                    });
+                    e.target.value = '';
+                  }}
+                />
+                <label htmlFor="comment-image-upload" className="cursor-pointer">
+                  <div className="h-8 w-8 flex items-center justify-center rounded hover:bg-accent transition-colors">
+                    <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setNewComment("");
+                    setNewCommentImages([]);
+                  }}
+                  className="text-xs"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submitting || !newComment.trim()}
+                  size="sm"
+                  className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                >
+                  {submitting ? 'Enviando...' : 'Comentar'}
+                </Button>
+              </div>
             </div>
           </form>
+
+          {/* Sorting and Search */}
+          <div className="flex items-center gap-4 py-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Ordenar por:</span>
+              <Button variant="ghost" size="sm" className="h-7 text-xs font-semibold">
+                Mejores ▾
+              </Button>
+            </div>
+            <div className="flex-1" />
+            <div className="text-sm text-muted-foreground">
+              {comments.length} {comments.length === 1 ? 'comentario' : 'comentarios'}
+            </div>
+          </div>
 
           {/* Comments List */}
           <div className="space-y-4">
@@ -575,9 +771,11 @@ export default function PostDetailPage() {
                 key={comment.id}
                 comment={comment}
                 currentUserId={currentUserId}
+                postId={postId}
                 onVote={handleVoteComment}
                 onEdit={handleEditComment}
                 onDelete={handleDeleteComment}
+                onReplySuccess={loadComments}
               />
             ))}
 
@@ -598,19 +796,29 @@ export default function PostDetailPage() {
 function CommentCard({
   comment,
   currentUserId,
+  postId,
   onVote,
   onEdit,
   onDelete,
+  onReplySuccess,
+  depth = 0,
 }: {
   comment: Comment;
   currentUserId?: string;
+  postId: string;
   onVote: (commentId: string, voteType: 'upvote' | 'downvote') => void;
   onEdit: (commentId: string, newContent: string) => void;
   onDelete: (commentId: string) => void;
+  onReplySuccess?: () => void;
+  depth?: number;
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
+  const [replyImages, setReplyImages] = useState<string[]>([]);
   const voteScore = comment.upvotes - comment.downvotes;
 
   // Close menu when clicking outside
@@ -639,154 +847,406 @@ function CommentCard({
     setIsEditing(false);
   };
 
+  const handleSubmitReply = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    if (!replyContent.trim()) return;
+
+    console.log('📤 Enviando respuesta:', {
+      postId,
+      parentId: comment.id,
+      content: replyContent,
+      images: replyImages.length
+    });
+
+    try {
+      const response = await fetch('/api/community/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId: postId,
+          content: replyContent,
+          parentId: comment.id,
+          images: replyImages,
+        }),
+      });
+
+      console.log('📥 Respuesta del servidor:', response.status, response.statusText);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Respuesta creada:', data);
+        setReplyContent("");
+        setReplyImages([]);
+        setIsReplying(false);
+        // Llamar al callback para recargar comentarios sin recargar la página
+        if (onReplySuccess) {
+          onReplySuccess();
+        }
+      } else {
+        const error = await response.json();
+        console.error('❌ Error del servidor:', error);
+        alert(error.error || 'Error al responder');
+      }
+    } catch (error) {
+      console.error('❌ Error submitting reply:', error);
+      alert('Error al responder: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+    }
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="bg-card border border-border rounded-2xl p-4"
-    >
-      {/* Author & Time & Menu */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-            <span className="text-xs font-semibold text-primary">
-              {comment.author.name.slice(0, 2).toUpperCase()}
+    <div className="relative">
+      {/* Thread line - posición ajustada por depth */}
+      {depth > 0 && (
+        <div
+          className="absolute top-0 bottom-0 w-0.5 bg-border/50"
+          style={{ left: `${depth * 32 - 28}px` }}
+        />
+      )}
+
+      <div
+        className="flex gap-2"
+        style={{ marginLeft: depth > 0 ? `${depth * 32}px` : '0' }}
+      >
+        {/* Collapse button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="flex-shrink-0 w-6 h-6 rounded hover:bg-accent flex items-center justify-center mt-1"
+        >
+          {isCollapsed ? (
+            <span className="text-xs font-bold text-muted-foreground">+</span>
+          ) : (
+            <span className="text-xs font-bold text-muted-foreground">−</span>
+          )}
+        </button>
+
+        <div className="flex-1 min-w-0">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-1">
+            <div className="h-6 w-6 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-semibold text-primary">
+                {comment.author.name.slice(0, 2).toUpperCase()}
+              </span>
+            </div>
+            <span className="text-xs font-semibold">{comment.author.name}</span>
+            <span className="text-xs text-muted-foreground">•</span>
+            <span className="text-xs text-muted-foreground">
+              hace {getTimeAgo(comment.createdAt)}
             </span>
-          </div>
-          <div>
-            <p className="text-sm font-semibold">{comment.author.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {new Date(comment.createdAt).toLocaleDateString('es-ES', {
-                day: 'numeric',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </p>
-          </div>
-        </div>
 
-        {/* Menu Button - Solo mostrar si el usuario es el autor */}
-        {currentUserId && currentUserId === comment.authorId && (
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowMenu(!showMenu);
-              }}
-              className="h-8 w-8 p-0"
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
+            {/* Menu Button - Solo mostrar si el usuario es el autor */}
+            {currentUserId && currentUserId === comment.authorId && (
+              <div className="relative ml-auto">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(!showMenu);
+                  }}
+                  className="h-6 w-6 p-0"
+                >
+                  <MoreVertical className="h-3 w-3" />
+                </Button>
 
-            {/* Dropdown Menu */}
-            {showMenu && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="absolute right-0 mt-2 w-44 bg-card border border-border rounded-2xl shadow-lg z-50 overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => {
-                    setIsEditing(true);
-                    setShowMenu(false);
-                  }}
-                  className="w-full px-4 py-2 text-sm text-left hover:bg-accent flex items-center gap-2 transition-colors"
-                >
-                  <Edit2 className="h-3 w-3" />
-                  Editar
-                </button>
-                <button
-                  onClick={() => {
-                    setShowMenu(false);
-                    onDelete(comment.id);
-                  }}
-                  className="w-full px-4 py-2 text-sm text-left hover:bg-accent text-red-500 flex items-center gap-2 transition-colors"
-                >
-                  <Trash2 className="h-3 w-3" />
-                  Eliminar
-                </button>
-              </motion.div>
+                {/* Dropdown Menu */}
+                {showMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="absolute right-0 mt-2 w-44 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsEditing(true);
+                        setShowMenu(false);
+                      }}
+                      className="w-full px-4 py-2 text-xs text-left hover:bg-accent flex items-center gap-2 transition-colors"
+                    >
+                      <Edit2 className="h-3 w-3" />
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        onDelete(comment.id);
+                      }}
+                      className="w-full px-4 py-2 text-xs text-left hover:bg-accent text-red-500 flex items-center gap-2 transition-colors"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Eliminar
+                    </button>
+                  </motion.div>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
 
-      {/* Content - Edit Mode or Display Mode */}
-      {isEditing ? (
-        <div className="space-y-3 mb-3">
-          <Textarea
-            value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
-            rows={3}
-            className="resize-none text-sm"
-          />
-          <div className="flex gap-2 justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCancelEdit}
-              className="gap-1"
+          {/* Content - Only show if not collapsed */}
+          {!isCollapsed && (
+            <>
+              {isEditing ? (
+                <div className="space-y-2 mb-2">
+                  <Textarea
+                    value={editedContent}
+                    onChange={(e) => setEditedContent(e.target.value)}
+                    rows={3}
+                    className="resize-none text-xs"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancelEdit}
+                      className="h-7 text-xs"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveEdit}
+                      disabled={!editedContent.trim()}
+                      className="h-7 text-xs bg-red-500 hover:bg-red-600"
+                    >
+                      Guardar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-2">
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{comment.content}</p>
+                  {comment.isEdited && (
+                    <p className="text-[10px] text-muted-foreground mt-0.5 italic">
+                      (editado)
+                    </p>
+                  )}
+
+                  {/* Images */}
+                  {comment.images && comment.images.length > 0 && (
+                    <div className={cn(
+                      "mt-2 grid gap-1.5",
+                      comment.images.length === 1 && "grid-cols-1",
+                      comment.images.length === 2 && "grid-cols-2",
+                      comment.images.length >= 3 && "grid-cols-2"
+                    )}>
+                      {comment.images.slice(0, 4).map((image, index) => (
+                        <div key={index} className="relative overflow-hidden rounded-lg border border-border">
+                          <img
+                            src={image}
+                            alt={`Imagen ${index + 1}`}
+                            className="w-full h-24 object-cover hover:scale-105 transition-transform cursor-pointer"
+                            onClick={() => window.open(image, '_blank')}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Voting Actions - Estilo Reddit */}
+          {!isEditing && !isCollapsed && (
+            <div className="flex items-center gap-1 text-xs font-semibold">
+              {/* Upvote */}
+              <button
+                onClick={() => onVote(comment.id, 'upvote')}
+                className={cn(
+                  "p-1 rounded hover:bg-accent transition-colors",
+                  comment.userVote === 'upvote' && "text-orange-500"
+                )}
+              >
+                <ThumbsUp className="h-4 w-4" />
+              </button>
+
+              {/* Vote count */}
+              <span className={cn(
+                "min-w-[2rem] text-center",
+                voteScore > 0 ? "text-orange-500" :
+                voteScore < 0 ? "text-blue-500" :
+                "text-muted-foreground"
+              )}>
+                {voteScore > 0 ? '+' : ''}{voteScore}
+              </span>
+
+              {/* Downvote */}
+              <button
+                onClick={() => onVote(comment.id, 'downvote')}
+                className={cn(
+                  "p-1 rounded hover:bg-accent transition-colors",
+                  comment.userVote === 'downvote' && "text-blue-500"
+                )}
+              >
+                <ThumbsDown className="h-4 w-4" />
+              </button>
+
+              {/* Responder */}
+              <button
+                onClick={() => setIsReplying(!isReplying)}
+                className="px-2 py-1 rounded hover:bg-accent text-muted-foreground transition-colors ml-1 cursor-pointer"
+              >
+                Responder
+              </button>
+
+              {/* Premiar */}
+              <button className="px-2 py-1 rounded hover:bg-accent text-muted-foreground transition-colors cursor-pointer">
+                Premiar
+              </button>
+
+              {/* Compartir */}
+              <button className="px-2 py-1 rounded hover:bg-accent text-muted-foreground transition-colors cursor-pointer">
+                Compartir
+              </button>
+
+              {/* More */}
+              <button className="px-1 py-1 rounded hover:bg-accent text-muted-foreground transition-colors cursor-pointer">
+                ...
+              </button>
+            </div>
+          )}
+
+          {/* Reply Form - Mismo estilo que el formulario principal */}
+          {isReplying && !isCollapsed && (
+            <form
+              onSubmit={handleSubmitReply}
+              className="mt-2 bg-card border-2 border-border rounded-xl px-3 py-2"
             >
-              <X className="h-3 w-3" />
-              Cancelar
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSaveEdit}
-              disabled={!editedContent.trim()}
-              className="gap-1"
-            >
-              <Check className="h-3 w-3" />
-              Guardar
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="mb-3">
-          <p className="text-sm text-foreground whitespace-pre-wrap">{comment.content}</p>
-          {comment.isEdited && (
-            <p className="text-xs text-muted-foreground mt-1 italic">
-              (editado)
-            </p>
+              <Textarea
+                placeholder="¿Qué opinas?"
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                rows={2}
+                className="resize-none border-0 bg-transparent focus:ring-0 focus-visible:ring-0 text-sm mb-2 px-1 py-1"
+              />
+
+              {/* Preview de imágenes seleccionadas */}
+              {replyImages.length > 0 && (
+                <div className="flex gap-2 mb-2">
+                  {replyImages.map((img, idx) => (
+                    <div key={idx} className="relative w-16 h-16 rounded border border-border overflow-hidden">
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setReplyImages(prev => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="absolute top-0 right-0 bg-black/70 text-white p-0.5 rounded-bl"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                {/* Icono de imagen */}
+                <div className="flex items-center gap-1">
+                  <input
+                    type="file"
+                    id={`reply-image-upload-${comment.id}`}
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      files.forEach(file => {
+                        if (replyImages.length >= 4) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          setReplyImages(prev => [...prev, ev.target?.result as string]);
+                        };
+                        reader.readAsDataURL(file);
+                      });
+                      e.target.value = '';
+                    }}
+                  />
+                  <label htmlFor={`reply-image-upload-${comment.id}`} className="cursor-pointer">
+                    <div className="h-8 w-8 flex items-center justify-center rounded hover:bg-accent transition-colors">
+                      <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsReplying(false);
+                      setReplyContent("");
+                      setReplyImages([]);
+                    }}
+                    className="text-xs"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={!replyContent.trim()}
+                    size="sm"
+                    className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                  >
+                    Responder
+                  </Button>
+                </div>
+              </div>
+            </form>
+          )}
+
+          {/* Collapsed summary */}
+          {isCollapsed && (
+            <div className="text-xs text-muted-foreground">
+              {comment.author.name} • {voteScore > 0 ? '+' : ''}{voteScore} puntos
+            </div>
           )}
         </div>
-      )}
+      </div>
 
-      {/* Voting Actions */}
-      {!isEditing && (
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant={comment.userVote === 'upvote' ? 'default' : 'ghost'}
-            onClick={() => onVote(comment.id, 'upvote')}
-            className="gap-1"
-          >
-            <ThumbsUp className="h-3 w-3" />
-            <span className="text-xs">{comment.upvotes}</span>
-          </Button>
-          <Button
-            size="sm"
-            variant={comment.userVote === 'downvote' ? 'default' : 'ghost'}
-            onClick={() => onVote(comment.id, 'downvote')}
-            className="gap-1"
-          >
-            <ThumbsDown className="h-3 w-3" />
-            <span className="text-xs">{comment.downvotes}</span>
-          </Button>
-          <span className={cn(
-            "text-xs font-semibold ml-2",
-            voteScore > 0 ? "text-green-500" :
-            voteScore < 0 ? "text-red-500" :
-            "text-muted-foreground"
-          )}>
-            {voteScore > 0 ? '+' : ''}{voteScore}
-          </span>
+      {/* Nested Replies - Renderizar respuestas recursivamente */}
+      {!isCollapsed && comment.replies && comment.replies.length > 0 && (
+        <div className="mt-2">
+          {comment.replies.map((reply) => (
+            <CommentCard
+              key={reply.id}
+              comment={reply}
+              currentUserId={currentUserId}
+              postId={postId}
+              onVote={onVote}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onReplySuccess={onReplySuccess}
+              depth={depth + 1}
+            />
+          ))}
         </div>
       )}
-    </motion.div>
+    </div>
   );
+}
+
+// Helper function to calculate time ago
+function getTimeAgo(date: string): string {
+  const now = new Date();
+  const past = new Date(date);
+  const diffMs = now.getTime() - past.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'ahora';
+  if (diffMins < 60) return `${diffMins} min`;
+  if (diffHours < 24) return `${diffHours} h`;
+  if (diffDays < 30) return `${diffDays} d`;
+  return past.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }

@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { DirectMessageChat } from "@/components/chat/v2";
 import { useTrackInteraction } from "@/hooks/use-track-interaction";
 import { useTranslations } from "next-intl";
@@ -20,10 +20,18 @@ interface Agent {
 export default function AgentChatPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations("agents.chat");
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [fromDemo, setFromDemo] = useState(false);
+
+  // Detectar si viene de demo
+  useEffect(() => {
+    const isFromDemo = searchParams.get('fromDemo') === 'true';
+    setFromDemo(isFromDemo);
+  }, [searchParams]);
 
   // Auto-tracking de interacción para el sistema de recomendaciones
   useTrackInteraction({
@@ -60,6 +68,25 @@ export default function AgentChatPage() {
     fetchAgent();
   }, [params.id, router]);
 
+  // Marcar conversación como leída cuando se abre el chat
+  useEffect(() => {
+    if (!userId || !params.id) return;
+
+    const markAsRead = async () => {
+      try {
+        await fetch(`/api/conversations/${params.id}/mark-read`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        console.log('[Conversation] Marked as read');
+      } catch (error) {
+        console.error('[Conversation] Failed to mark as read:', error);
+      }
+    };
+
+    markAsRead();
+  }, [userId, params.id]);
+
   if (loading) {
     return (
       <LoadingIndicator
@@ -79,6 +106,7 @@ export default function AgentChatPage() {
         agentName={agent.name}
         agentAvatar={agent.avatar}
         userId={userId || "default-user"}
+        fromDemo={fromDemo}
       />
     </ErrorBoundary>
   );

@@ -2,15 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(req);
-  if (!user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
   const { id: originalId } = await params;
   const original = await prisma.agent.findFirst({
@@ -21,38 +23,93 @@ export async function POST(
     return NextResponse.json({ error: "Agent not found" }, { status: 404 });
   }
 
-  const cloned = await prisma.agent.create({
-    data: {
-      userId: user.id,
-      name: `${original.name} (Clone)`,
-      kind: original.kind,
-      description: original.description,
-      gender: original.gender,
-      personality: original.personality,
-      tone: original.tone,
-      purpose: original.purpose,
-      profile: original.profile as Prisma.InputJsonValue,
-      systemPrompt: original.systemPrompt,
-      visibility: "private",
-      avatar: original.avatar,
-      tags: original.tags as Prisma.InputJsonValue,
-      originalId: original.id,
+  // Get user plan
+  const userData = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { plan: true },
+  });
+  const userPlan = userData?.plan || "free";
+
+  // CRITICAL: Clone con verificación atómica para prevenir race condition
+  const cloned = await prisma.$transaction(
+    async (tx) => {
+      // Verificar límite DENTRO de la transacción
+      await atomicCheckAgentLimit(tx, user.id, userPlan);
+
+      // Crear agente clonado
+      const newClone = await tx.agent.create({
+        data: {
+          userId: user.id,
+          name: `${original.name} (Clone)`,
+          kind: original.kind,
+          description: original.description,
+          gender: original.gender,
+          personality: original.personality,
+          tone: original.tone,
+          purpose: original.purpose,
+          profile: original.profile as Prisma.InputJsonValue,
+          systemPrompt: original.systemPrompt,
+          visibility: "private",
+          avatar: original.avatar,
+          tags: original.tags as Prisma.InputJsonValue,
+          originalId: original.id,
+        },
+      });
+
+      // Actualizar contador e historial dentro de la transacción
+      await Promise.all([
+        tx.agent.update({
+          where: { id: originalId },
+          data: { cloneCount: { increment: 1 } },
+        }),
+        tx.agentClone.create({
+          data: {
+            originalAgentId: originalId,
+            clonedByUserId: user.id,
+            clonedAgentId: newClone.id,
+          },
+        }),
+      ]);
+
+      return newClone;
     },
+    {
+      isolationLevel: "Serializable",
+      maxWait: 5000,
+      timeout: 10000,
+    }
+  ).catch((error) => {
+    if (error.message.startsWith("{")) {
+      const errorData = JSON.parse(error.message);
+      throw errorData;
+    }
+    throw error;
   });
 
-  await Promise.all([
-    prisma.agent.update({
-      where: { id: originalId },
-      data: { cloneCount: { increment: 1 } },
-    }),
-    prisma.agentClone.create({
-      data: {
-        originalAgentId: originalId,
-        clonedByUserId: user.id,
-        clonedAgentId: cloned.id,
-      },
-    }),
-  ]);
+    return NextResponse.json({ agent: cloned, success: true });
+  } catch (error: any) {
+    console.error("Error cloning agent:", error);
 
-  return NextResponse.json({ agent: cloned, success: true });
+    // Si es un error de límite (lanzado desde la transacción)
+    if (error.error && error.limit) {
+      return NextResponse.json(error, { status: 403 });
+    }
+
+    // Errores de transacción de Prisma
+    if (error.code === "P2034") {
+      // Serialization failure - race condition detectada
+      return NextResponse.json(
+        {
+          error: "El límite de agentes fue alcanzado. Por favor intenta de nuevo.",
+          hint: "Múltiples requests detectados"
+        },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
+  }
 }

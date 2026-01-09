@@ -359,7 +359,8 @@
       "recent": {
         "title": "Chats Recientes",
         "badge": "Reciente",
-        "subtitle": "Continúa tus conversaciones donde las dejaste"
+        "subtitle": "Continúa tus conversaciones donde las dejaste",
+        "empty": "No hay conversaciones recientes. Inicia un chat con tus compañeros para verlos aquí"
       },
       "popular": {
         "title": "Más vistos",
@@ -1862,6 +1863,10 @@
           "title": "Actualizaciones de agentes",
           "description": "Notificaciones sobre la actividad de tus IAs"
         }
+      },
+      "sfwProtection": {
+        "title": "Protección de Contenido (SFW)",
+        "description": "Controla el tipo de contenido que pueden generar tus IAs"
       }
     },
     "accessibility": {

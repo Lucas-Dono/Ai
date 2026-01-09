@@ -30,6 +30,7 @@ export default function CommunityDetailPage() {
   const { community, topContributors, loading: communityLoading, joinCommunity, leaveCommunity } = useCommunity(slug);
   const { posts, loading: postsLoading, votePost, savePost } = useFeed({
     communityId: community?.id,
+    filter: 'new', // Mostrar posts más recientes primero
   });
 
   if (communityLoading) {
@@ -56,58 +57,54 @@ export default function CommunityDetailPage() {
 
   return (
     <div className="min-h-screen bg-background pb-20 lg:pb-0">
-      {/* Header with Banner */}
-      <div className="relative">
-        {/* Banner */}
-        {community.banner && (() => {
-          const bannerStyles = getCommunityImageStyles('banner' as const, 'large');
-          return (
-            <div className={bannerStyles.containerClass}>
-              <img
-                src={community.banner}
-                alt={community.name}
-                className={bannerStyles.imageClass}
-              />
-            </div>
-          );
-        })()}
-        {!community.banner && (
-          <div
-            className="h-32 md:h-48"
-            style={{
-              background: `linear-gradient(135deg, ${community.primaryColor}40, ${community.primaryColor}20)`,
-            }}
-          />
-        )}
-
-        {/* Community Info */}
+      {/* Header - Estilo Reddit */}
+      <div className="bg-background">
         <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <div className="relative -mt-12 md:-mt-16">
-            <div className="flex items-end gap-4 mb-6">
-              {/* Icon */}
-              {community.icon ? (() => {
-                const iconStyles = getCommunityImageStyles('circle' as const, 'large');
-                return (
-                  <div className={`${iconStyles.containerClass} border-4 border-background`}>
-                    <img
-                      src={community.icon}
-                      alt={community.name}
-                      className={iconStyles.imageClass}
-                    />
-                  </div>
-                );
-              })() : (
+          {/* Banner */}
+          <div className="relative">
+            {community.banner ? (
+              <div className="h-20 md:h-28 rounded-2xl overflow-hidden">
+                <img
+                  src={community.banner}
+                  alt={community.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div
+                className="h-20 md:h-28 rounded-2xl"
+                style={{
+                  background: `linear-gradient(135deg, ${community.primaryColor}40, ${community.primaryColor}20)`,
+                }}
+              />
+            )}
+
+            {/* Icon - Superpuesto al banner */}
+            <div className="absolute -bottom-4 left-4">
+              {community.icon ? (
+                <div className="h-16 w-16 md:h-20 md:w-20 rounded-full border-4 border-background overflow-hidden bg-background">
+                  <img
+                    src={community.icon}
+                    alt={community.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
                 <div
-                  className="h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-background flex items-center justify-center text-2xl md:text-4xl font-bold text-white"
+                  className="h-16 w-16 md:h-20 md:w-20 rounded-full border-4 border-background flex items-center justify-center text-lg md:text-xl font-bold text-white"
                   style={{ backgroundColor: community.primaryColor }}
                 >
                   {community.name.slice(0, 2).toUpperCase()}
                 </div>
               )}
+            </div>
+          </div>
 
-              {/* Name & Stats */}
-              <div className="flex-1 pb-2">
-                <div className="flex items-center gap-2 mb-2">
+          {/* Community Info */}
+          <div className="mt-6 mb-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
                   <h1 className="text-2xl md:text-3xl font-bold">{community.name}</h1>
                   {community.isOfficial && (
                     <div className="bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
@@ -116,7 +113,7 @@ export default function CommunityDetailPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                   <span className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
                     {community.memberCount.toLocaleString()} miembros
@@ -126,10 +123,15 @@ export default function CommunityDetailPage() {
                     {community.postCount.toLocaleString()} posts
                   </span>
                 </div>
+                {community.description && (
+                  <p className="text-sm text-muted-foreground max-w-2xl">
+                    {community.description}
+                  </p>
+                )}
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 {community.isMember ? (
                   <>
                     {community.memberRole === 'owner' && (
@@ -160,13 +162,11 @@ export default function CommunityDetailPage() {
                 </Button>
               </div>
             </div>
-
-            {/* Description */}
-            <p className="text-muted-foreground mb-6 max-w-3xl">
-              {community.description}
-            </p>
           </div>
         </div>
+
+        {/* Separator */}
+        <div className="border-b border-border/50" />
       </div>
 
       {/* Main Content */}
@@ -177,7 +177,7 @@ export default function CommunityDetailPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Posts</h2>
               {community.isMember && (
-                <Link href="/community/create">
+                <Link href={`/community/create?community=${slug}`}>
                   <Button size="sm">Crear Post</Button>
                 </Link>
               )}
@@ -195,7 +195,7 @@ export default function CommunityDetailPage() {
                   Sé el primero en publicar en esta comunidad
                 </p>
                 {community.isMember && (
-                  <Link href="/community/create">
+                  <Link href={`/community/create?community=${slug}`}>
                     <Button>Crear Primer Post</Button>
                   </Link>
                 )}

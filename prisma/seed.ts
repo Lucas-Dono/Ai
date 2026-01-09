@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import * as fs from 'fs';
 import * as path from 'path';
+import { hashPassword } from 'better-auth/crypto';
 
 const prisma = new PrismaClient();
 
@@ -27,6 +28,33 @@ async function main() {
 
   console.log("✅ Usuario creado:", user.email);
 
+  // Crear usuario Lucas (plan ultra)
+  const hashedPassword = await hashPassword("Monster98!");
+  const lucas = await prisma.user.create({
+    data: {
+      email: "lucasdono391@gmail.com",
+      name: "lucas",
+      password: hashedPassword,
+      plan: "ultra",
+      birthDate: new Date("1990-01-01"), // Fecha que lo hace mayor de 18 años
+      ageVerified: true,
+      isAdult: true,
+      ageVerifiedAt: new Date(),
+    },
+  });
+
+  // Crear Account para Better Auth (necesario para login con credenciales)
+  await prisma.account.create({
+    data: {
+      userId: lucas.id,
+      accountId: lucas.email,
+      providerId: "credential",
+      password: hashedPassword,
+    },
+  });
+
+  console.log("✅ Usuario Lucas creado:", lucas.email, "- Plan:", lucas.plan);
+
   // Crear agentes de demostración
   const companion1 = await prisma.agent.create({
     data: {
@@ -43,6 +71,28 @@ async function main() {
         interests: ["psicología", "bienestar", "conversación profunda"],
       },
       visibility: "private",
+    },
+  });
+
+  // Crear agente Luna público para demos en landing page
+  const demoLuna = await prisma.agent.create({
+    data: {
+      id: "demo_luna",
+      userId: user.id,
+      kind: "companion",
+      name: "Luna",
+      description: "Una compañera empática y comprensiva, siempre dispuesta a escuchar",
+      personality: "Empática, cálida, comprensiva, paciente",
+      purpose: "Brindar apoyo emocional y compañía",
+      tone: "Amigable y cercano",
+      systemPrompt: "Eres Luna 🌙, una compañera virtual empática y comprensiva. Tu propósito es brindar apoyo emocional y escuchar con paciencia. Respondes con calidez, empatía y comprensión. Eres amigable pero profesional. Mantienes tus respuestas concisas pero significativas (máximo 3 párrafos). Muestras tus emociones de manera natural y auténtica.",
+      avatar: "/personajes/luna/cara.webp",
+      referenceImageUrl: "/personajes/luna/cuerpo.webp",
+      profile: {
+        traits: ["empática", "paciente", "comprensiva", "cálida", "amigable"],
+        interests: ["psicología", "bienestar emocional", "conversación profunda", "mindfulness"],
+      },
+      visibility: "public",  // Público para que cualquiera pueda chatear en el demo
     },
   });
 
@@ -473,7 +523,9 @@ async function main() {
 
   console.log("\n🎉 ¡Seed completado exitosamente!");
   console.log("\n📊 Resumen:");
-  console.log(`  - ${1} usuario creado`);
+  console.log(`  - ${2} usuarios creados`);
+  console.log(`    • demo@creador-ia.com (plan: free)`);
+  console.log(`    • lucasdono391@gmail.com (plan: ultra)`);
   console.log(`  - ${4} agentes privados creados (2 compañeros, 2 asistentes)`);
   console.log(`  - ${2} personajes de demostración públicos`);
   console.log(`  - ${premiumCount} personajes premium públicos`);
@@ -482,7 +534,9 @@ async function main() {
   // console.log(`  - ${2} mundos virtuales creados`); // Removido en migración Worlds → Grupos
   // console.log(`  - ${3} mensajes de mundo creados`); // Removido en migración Worlds → Grupos
   console.log(`  - ${3} logs de actividad creados`); // Actualizado: 4 → 3 (removido log de world_created)
-  console.log("\n✨ Puedes iniciar sesión con: demo@creador-ia.com");
+  console.log("\n✨ Puedes iniciar sesión con:");
+  console.log("   • demo@creador-ia.com");
+  console.log("   • lucasdono391@gmail.com (contraseña: Monster98!)");
 }
 
 main()

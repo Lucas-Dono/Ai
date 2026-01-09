@@ -25,13 +25,13 @@ export function FinalCTA() {
   };
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden bg-muted/30">
+    <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden bg-muted/30">
       {/* Subtle grid background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -40,7 +40,7 @@ export function FinalCTA() {
           className="max-w-4xl mx-auto"
         >
           <Card className="relative overflow-hidden border border-border shadow-xl bg-card">
-            <div className="p-8 md:p-12 lg:p-16">
+            <div className="p-6 sm:p-8 md:p-10 lg:p-12">
               {/* Badge */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export function FinalCTA() {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="text-center mb-8"
               >
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
                   {t("title")}{" "}
                   <span className="text-muted-foreground">
                     {t("titleHighlight")}
@@ -129,7 +129,7 @@ export function FinalCTA() {
                 ))}
               </motion.div>
 
-              {/* Trust indicators */}
+              {/* Mobile App Download */}
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -138,31 +138,31 @@ export function FinalCTA() {
                 className="text-center"
               >
                 <p className="text-sm text-muted-foreground mb-4">
-                  {t("trust.users")}
+                  También disponible en dispositivos móviles
                 </p>
 
-                {/* Avatar stack and stars */}
-                <div className="flex justify-center items-center gap-4">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div
-                        key={i}
-                        className="w-9 h-9 rounded-full bg-muted border-2 border-background"
-                      />
-                    ))}
+                {/* Google Play Button */}
+                <a
+                  href={process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-black hover:bg-black/90 text-white transition-all duration-300 transform hover:scale-105"
+                >
+                  {/* Google Play Icon */}
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                  </svg>
+                  <div className="flex flex-col items-start">
+                    <span className="text-[10px] leading-none opacity-80">Descárgalo en</span>
+                    <span className="text-base font-semibold leading-tight">Google Play</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <svg
-                        key={i}
-                        className="w-4 h-4 fill-foreground"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
+                </a>
+
+                {process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL ? null : (
+                  <p className="text-xs text-muted-foreground mt-3 italic">
+                    Próximamente disponible
+                  </p>
+                )}
               </motion.div>
 
               {/* Security note */}

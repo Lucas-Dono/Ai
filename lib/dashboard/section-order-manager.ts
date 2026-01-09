@@ -23,7 +23,8 @@ interface SectionStats {
 type SectionStatsMap = Record<SectionId, SectionStats>;
 
 const STORAGE_KEY_PREFIX = 'dashboard_section_stats_';
-const DEFAULT_ORDER: SectionId[] = ['popular', 'historical', 'premium', 'all'];
+// Orden por defecto: Premium y Historical primero (contenido destacado)
+const DEFAULT_ORDER: SectionId[] = ['premium', 'historical', 'popular', 'all'];
 
 /**
  * Inicializar estadísticas por defecto para una sección

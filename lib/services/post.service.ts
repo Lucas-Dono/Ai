@@ -17,6 +17,9 @@ export interface CreatePostData {
   pollOptions?: Array<{ text: string }>;
   pollEndDate?: Date;
   sharedAgentId?: string; // For shared_agent posts
+  isNSFW?: boolean; // Contenido NSFW
+  isSpoiler?: boolean; // Contiene spoilers
+  metadata?: any; // Metadata adicional (isOC, flair, imageMetadata, etc.)
 }
 
 export interface UpdatePostData {
@@ -89,6 +92,9 @@ export const PostService = {
         pollOptions: data.pollOptions || undefined,
         pollEndDate: data.pollEndDate,
         // sharedAgentId: data.sharedAgentId, // Field removed from schema
+        isNSFW: data.isNSFW || false,
+        isSpoiler: data.isSpoiler || false,
+        metadata: data.metadata || {},
         slug,
       },
       include: {

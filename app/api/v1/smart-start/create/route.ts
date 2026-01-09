@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
-import { canUseResource } from "@/lib/usage/tracker";
+import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
 
 /**
  * POST /api/v1/smart-start/create
@@ -19,20 +19,10 @@ export async function POST(req: NextRequest) {
 
     const userId = user.id;
 
-    // Check agent quota
-    const quotaCheck = await canUseResource(userId, "agent");
-    if (!quotaCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: quotaCheck.reason,
-          current: quotaCheck.current,
-          limit: quotaCheck.limit,
-        },
-        { status: 403 }
-      );
-    }
+    // NOTE: Agent quota check moved to atomic transaction below
+    // to prevent race conditions
 
-      const body = await req.json();
+    const body = await req.json();
       const {
         name,
         characterType,
@@ -161,47 +151,68 @@ export async function POST(req: NextRequest) {
         locationCountry = characterAppearance.currentLocation.country;
       }
 
-      // Create agent
-      const agent = await prisma.agent.create({
-        data: {
-          userId,
-          kind: "companion", // Smart Start always creates companions
-          generationTier: tier,
-          name,
-          description: physicalAppearance || `Personaje creado con Smart Start`,
-          personality: personalityCore ? JSON.stringify(personalityCore.bigFive) : null,
-          purpose: genre ? `Personaje de ${genre}` : null,
-          tone: emotionalTone || null,
-          profile: profile,
-          systemPrompt,
-          visibility: "private",
-          locationCity,
-          locationCountry,
-        },
-      });
+      // CRITICAL: Create agent with atomic limit check to prevent race condition
+      const agent = await prisma.$transaction(
+        async (tx) => {
+          // Verificar límite DENTRO de la transacción
+          await atomicCheckAgentLimit(tx, userId, tier);
 
-      // For ULTRA tier: Create psychological profile if we have personality data
-      if (tier === 'ultra' && personalityCore) {
-        await prisma.psychologicalProfile.create({
-          data: {
-            agentId: agent.id,
-            attachmentStyle: personalityCore.attachmentStyle || 'secure',
-            attachmentDescription: personalityCore.attachmentDescription,
-            primaryCopingMechanisms: personalityCore.primaryCopingMechanisms || [],
-            unhealthyCopingMechanisms: personalityCore.unhealthyCopingMechanisms || [],
-            copingTriggers: personalityCore.copingTriggers || [],
-            emotionalRegulationBaseline: 'estable',
-            emotionalExplosiveness: personalityCore.bigFive?.neuroticism || 30,
-            emotionalRecoverySpeed: 'moderado',
-            mentalHealthConditions: [],
-            defenseMethanisms: {},
-            resilienceFactors: personalityCore.coreValues || [],
-            selfAwarenessLevel: personalityCore.bigFive?.openness || 50,
-            blindSpots: [],
-            insightAreas: [],
-          },
-        });
-      }
+          // Crear agente dentro de la transacción
+          const newAgent = await tx.agent.create({
+            data: {
+              userId,
+              kind: "companion", // Smart Start always creates companions
+              generationTier: tier,
+              name,
+              description: physicalAppearance || `Personaje creado con Smart Start`,
+              personality: personalityCore ? JSON.stringify(personalityCore.bigFive) : null,
+              purpose: genre ? `Personaje de ${genre}` : null,
+              tone: emotionalTone || null,
+              profile: profile,
+              systemPrompt,
+              visibility: "private",
+              locationCity,
+              locationCountry,
+            },
+          });
+
+          // For ULTRA tier: Create psychological profile if we have personality data
+          if (tier === 'ultra' && personalityCore) {
+            await tx.psychologicalProfile.create({
+              data: {
+                agentId: newAgent.id,
+                attachmentStyle: personalityCore.attachmentStyle || 'secure',
+                attachmentDescription: personalityCore.attachmentDescription,
+                primaryCopingMechanisms: personalityCore.primaryCopingMechanisms || [],
+                unhealthyCopingMechanisms: personalityCore.unhealthyCopingMechanisms || [],
+                copingTriggers: personalityCore.copingTriggers || [],
+                emotionalRegulationBaseline: 'estable',
+                emotionalExplosiveness: personalityCore.bigFive?.neuroticism || 30,
+                emotionalRecoverySpeed: 'moderado',
+                mentalHealthConditions: [],
+                defenseMethanisms: {},
+                resilienceFactors: personalityCore.coreValues || [],
+                selfAwarenessLevel: personalityCore.bigFive?.openness || 50,
+                blindSpots: [],
+                insightAreas: [],
+              },
+            });
+          }
+
+          return newAgent;
+        },
+        {
+          isolationLevel: "Serializable",
+          maxWait: 5000,
+          timeout: 10000,
+        }
+      ).catch((error) => {
+        if (error.message.startsWith("{")) {
+          const errorData = JSON.parse(error.message);
+          throw errorData;
+        }
+        throw error;
+      });
 
       return NextResponse.json(
         {
@@ -215,8 +226,26 @@ export async function POST(req: NextRequest) {
         },
         { status: 201 }
       );
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Smart Start Create] Error:", error);
+
+    // Si es un error de límite (lanzado desde la transacción)
+    if (error.error && error.limit) {
+      return NextResponse.json(error, { status: 403 });
+    }
+
+    // Errores de transacción de Prisma
+    if (error.code === "P2034") {
+      // Serialization failure - race condition detectada
+      return NextResponse.json(
+        {
+          error: "Agent limit reached. Please try again.",
+          hint: "Multiple concurrent requests detected"
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to create character" },
       { status: 500 }

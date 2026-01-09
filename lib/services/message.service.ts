@@ -36,6 +36,7 @@ import { trackLLMCall } from '@/lib/cost-tracking/tracker';
 import { estimateTokens } from '@/lib/cost-tracking/calculator';
 import { compressContext } from '@/lib/memory/context-compression';
 import { detectMemoryReferences } from '@/lib/memory/memory-reference-detector';
+import { encryptMessage, decryptMessageIfNeeded } from '@/lib/encryption/message-encryption';
 
 type EmotionType = 'joy' | 'trust' | 'fear' | 'surprise' | 'sadness' | 'disgust' | 'anger' | 'anticipation';
 
@@ -136,6 +137,8 @@ export class MessageService {
             id: true,
             role: true,
             content: true,
+            iv: true,
+            authTag: true,
             createdAt: true,
             metadata: true,
             userId: true,
@@ -159,6 +162,15 @@ export class MessageService {
       if (!isOwnAgent && !isSystemAgent && !isPublicAgent) {
         throw new Error('Forbidden: Agent is not accessible');
       }
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // DESENCRIPTAR MENSAJES RECIENTES
+      // Los mensajes están encriptados en BD, desencriptarlos para procesamiento
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const decryptedRecentMessages = decryptedRecentMessages.map(msg => ({
+        ...msg,
+        content: decryptMessageIfNeeded(msg.content, msg.iv, msg.authTag),
+      }));
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // OPTIMIZATION 2: Determine AI-facing content
@@ -185,13 +197,19 @@ export class MessageService {
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // PARALLEL EXECUTION 1: Save user message + Get/Create relation
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      // Encriptar contenido del mensaje del usuario
+      const userMessageEncryption = encryptMessage(contentForUser);
+
       const [userMessage, relation] = await Promise.all([
         prisma.message.create({
           data: {
             agentId,
             userId,
             role: 'user',
-            content: contentForUser,
+            content: userMessageEncryption.encrypted,
+            iv: userMessageEncryption.iv,
+            authTag: userMessageEncryption.authTag,
             metadata: messageMetadata as any,
           },
         }),
@@ -265,7 +283,7 @@ export class MessageService {
       const behaviorOrchestration = await behaviorOrchestrator.processIncomingMessage({
         agent,
         userMessage,
-        recentMessages,
+        decryptedRecentMessages,
         dominantEmotion: (emotionalSummary.dominant[0] || 'joy') as any,
         emotionalState: {
           valence: emotionalSummary.pad.valence,
@@ -411,6 +429,14 @@ export class MessageService {
       );
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // 🆕 SFW PROTECTION INJECTION (nivel de usuario)
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      const { injectSFWProtection } = await import('@/lib/middleware/sfw-injector');
+
+      // Inyectar protección SFW si corresponde
+      const promptWithSFW = await injectSFWProtection(finalPrompt, userId, agentId);
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // PROMPT MODULAR INJECTION (con adaptación dialectal)
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // Extraer información del personaje para adaptación dialectal
@@ -423,12 +449,6 @@ export class MessageService {
         agentProfile?.world ||
         undefined;
 
-      // Obtener usuario para NSFW consent
-      const currentUser = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { nsfwConsent: true },
-      });
-
       // Inyectar prompt modular según personalidad, relación y contexto
       const modularPrompt = await getContextualModularPrompt({
         // ✅ NUEVO: Usar campo explícito de la DB (preferido)
@@ -436,8 +456,8 @@ export class MessageService {
         // ⚠️ FALLBACK: Solo si no hay variant asignado (agentes antiguos)
         personalityTraits: !agent.personalityVariant ? (agent.personality || '') : undefined,
         relationshipStage: relation.stage,
-        recentMessages: recentMessages.map(m => m.content).slice(0, 5),
-        nsfwMode: agent.nsfwMode && (currentUser?.nsfwConsent || false),
+        decryptedRecentMessages: decryptedRecentMessages.map(m => m.content).slice(0, 5),
+        // ⚠️ nsfwMode eliminado - ahora se maneja con SFW Protection a nivel de usuario
         // ✅ NUEVO: Tier del usuario para clasificación inteligente
         userTier: userPlan === 'ultra' ? 'ultra' : userPlan === 'plus' ? 'plus' : 'free',
         characterInfo: characterOrigin ? {
@@ -447,8 +467,8 @@ export class MessageService {
         } : undefined,
       });
 
-      // Agregar prompt modular al prompt final
-      let enhancedPromptFinal = finalPrompt;
+      // Agregar prompt modular al prompt con SFW protection
+      let enhancedPromptFinal = promptWithSFW;
       if (modularPrompt) {
         enhancedPromptFinal += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
         enhancedPromptFinal += '🎯 GUÍA CONTEXTUAL DE COMPORTAMIENTO:\n';
@@ -473,7 +493,7 @@ export class MessageService {
 
       // Construir array de mensajes: mensajes recientes + mensaje actual del usuario
       const allMessages = [
-        ...recentMessages.reverse().map(m => ({
+        ...decryptedRecentMessages.reverse().map(m => ({
           role: m.role as 'user' | 'assistant',
           content: m.content,
           id: m.id,
@@ -734,13 +754,19 @@ export class MessageService {
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // PARALLEL EXECUTION 2: Save all data + Track usage
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      // Encriptar respuesta del asistente
+      const assistantMessageEncryption = encryptMessage(finalResponse);
+
       const [assistantMessage] = await Promise.all([
         prisma.message.create({
           data: {
             agentId,
             userId, // Important: Include userId so messages are scoped to user
             role: 'assistant',
-            content: finalResponse,
+            content: assistantMessageEncryption.encrypted,
+            iv: assistantMessageEncryption.iv,
+            authTag: assistantMessageEncryption.authTag,
             metadata: {
               multimedia: multimedia.length > 0 ? multimedia : undefined,
               emotions: {
@@ -1145,6 +1171,171 @@ export class MessageService {
     }
 
     return { multimedia: [], finalResponse: response };
+  }
+
+  /**
+   * Process demo message (simplified version without database persistence)
+   * For landing page chat demos
+   */
+  async processDemoMessage({
+    agentId,
+    content,
+    session,
+  }: {
+    agentId: string;
+    content: string;
+    session: import('@/lib/services/demo-session.service').DemoSession;
+  }): Promise<{
+    content: string;
+    emotions: {
+      mood: string;
+      dominant: string[];
+      secondary: string[];
+      pad: { valence: number; arousal: number; dominance: number };
+      detailed: Record<string, number>;
+    };
+    emotionalState: import('@/lib/services/demo-session.service').DemoEmotionalState;
+  }> {
+    const timer = startTimer();
+    log.info({ agentId, sessionId: session.id }, 'Processing demo message');
+
+    try {
+      // 1. Get agent with necessary relations
+      const agent = await prisma.agent.findUnique({
+        where: { id: agentId },
+        include: {
+          personalityCore: true,
+          internalState: true,
+          semanticMemory: true,
+        },
+      });
+
+      if (!agent) {
+        throw new Error(`Agent ${agentId} not found`);
+      }
+
+      // 2. Build conversation history from session
+      const conversationMessages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = session.history.map((msg) => ({
+        role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
+        content: msg.content,
+      }));
+
+      // Add current user message
+      conversationMessages.push({
+        role: 'user' as const,
+        content,
+      });
+
+      log.debug({ messageCount: conversationMessages.length }, 'Built conversation history');
+
+      // 3. Basic emotional processing (simplified)
+      let emotionalState = session.emotionalState;
+
+      // Detect sentiment from message to update emotions
+      const contentLower = content.toLowerCase();
+      const isPositive = /gracias|bien|genial|excelente|feliz|alegre|bueno/i.test(content);
+      const isNegative = /mal|triste|terrible|horrible|difícil|problema/i.test(content);
+
+      if (isPositive) {
+        emotionalState = {
+          ...emotionalState,
+          mood: 'happy',
+          emotions: {
+            joy: Math.min(1, (emotionalState.emotions.joy || 0) + 0.1),
+            anticipation: Math.min(1, (emotionalState.emotions.anticipation || 0) + 0.05),
+            trust: Math.min(1, (emotionalState.emotions.trust || 0) + 0.05),
+          },
+          valence: 0.7,
+          arousal: 0.6,
+          dominance: 0.5,
+        };
+      } else if (isNegative) {
+        emotionalState = {
+          ...emotionalState,
+          mood: 'empathetic',
+          emotions: {
+            sadness: Math.min(1, (emotionalState.emotions.sadness || 0) + 0.1),
+            fear: Math.min(1, (emotionalState.emotions.fear || 0) + 0.05),
+          },
+          valence: 0.3,
+          arousal: 0.4,
+          dominance: 0.4,
+        };
+      }
+
+      // 4. Build enhanced prompt for demo using same system as normal chat
+      // Count messages to determine which prompt to use (simulate first contact for demo)
+      const userMessagesInSession = session.history.filter(m => m.role === 'user').length;
+      const messageNumber = userMessagesInSession + 1; // +1 because we're about to process a new message
+
+      log.debug({ messageNumber, historyLength: session.history.length }, 'Demo message number');
+
+      // Use the same prompt system as normal chat, but for first 3 messages
+      // This ensures Luna behaves exactly the same as in real chat
+      const basePrompt = getPromptForMessageNumber(
+        Math.min(messageNumber, 3), // Cap at 3 since demo only has 3 messages
+        messageNumber, // totalInteractions = messageNumber for demo
+        null, // stagePrompts not needed for messages 1-3
+        {
+          systemPrompt: agent.systemPrompt,
+          name: agent.name,
+        }
+      );
+
+      const emotionalContext = `\n\nESTADO EMOCIONAL ACTUAL: ${emotionalState.mood}
+Emociones: ${Object.entries(emotionalState.emotions).map(([emotion, value]) => `${emotion}: ${(value * 100).toFixed(0)}%`).join(', ')}
+Responde de manera coherente con este estado emocional.`;
+
+      const demoContext = `\n\nCONTEXTO DEMO - AJUSTE DE LONGITUD:
+Esta es una conversación demo. Mantén tus respuestas BREVES (2-3 oraciones cortas).
+Conserva tu personalidad completa, pero sé más concisa que de costumbre.`;
+
+      const finalPrompt = basePrompt + emotionalContext + demoContext;
+
+      // 5. Generate response with LLM
+      log.debug('Getting LLM provider');
+      const llmProvider = getLLMProvider();
+
+      log.debug({ promptLength: finalPrompt.length, messageCount: conversationMessages.length }, 'Calling LLM generate');
+      const response = await llmProvider.generate({
+        systemPrompt: finalPrompt,
+        messages: conversationMessages,
+        temperature: 0.9,
+        maxTokens: 200, // Short but natural responses for demos (2-3 sentences with full personality)
+      });
+
+      log.debug({ responseLength: response.length }, 'LLM response received');
+
+      // 6. Build emotional summary for response
+      const emotions = emotionalState.emotions;
+      const sortedEmotions = Object.entries(emotions)
+        .sort(([, a], [, b]) => b - a)
+        .map(([emotion]) => emotion);
+
+      const emotionalSummary = {
+        mood: emotionalState.mood,
+        dominant: sortedEmotions.slice(0, 2),
+        secondary: sortedEmotions.slice(2, 5),
+        pad: {
+          valence: emotionalState.valence || 0.5,
+          arousal: emotionalState.arousal || 0.5,
+          dominance: emotionalState.dominance || 0.5,
+        },
+        detailed: emotions,
+      };
+
+      const elapsed = timer();
+      log.info({ sessionId: session.id, elapsed, responseLength: response.length }, 'Demo message processed');
+
+      return {
+        content: response,
+        emotions: emotionalSummary,
+        emotionalState,
+      };
+    } catch (error: any) {
+      log.error({ error, sessionId: session.id }, 'Error processing demo message');
+      throw new Error(`Failed to process demo message: ${error.message}`);
+    }
   }
 }
 

@@ -17,6 +17,7 @@ import {
   LOCALE_COOKIE_NAME,
   LOCALE_COOKIE_MAX_AGE,
 } from "@/i18n/config";
+import { handleHoneypotRequest } from "@/lib/security/honeypots";
 
 // SECURITY FIX #6: Whitelist de dominios permitidos para CORS
 // Previene requests desde dominios maliciosos
@@ -32,11 +33,23 @@ const ALLOWED_ORIGINS = [
 function isOriginAllowed(origin: string | null): boolean {
   if (!origin) return false;
 
-  // Desarrollo: permitir cualquier localhost
-  if (process.env.NODE_ENV === 'development' && origin.includes('localhost')) {
-    return true;
+  // SECURITY: Validación exacta de orígenes, no usar includes() que puede ser bypasseado
+  // Ejemplo: "evil-localhost.com" NO debe pasar como válido
+
+  // Desarrollo: permitir localhost y 127.0.0.1 con cualquier puerto
+  if (process.env.NODE_ENV === 'development') {
+    // Regex estricta: debe ser exactamente localhost o 127.0.0.1 con puerto opcional
+    // ^http:// = debe empezar con http://
+    // (localhost|127\.0\.0\.1) = exactamente localhost o 127.0.0.1
+    // (:\d+)? = puerto opcional
+    // $ = fin de string (no permite nada después)
+    const localhostPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+    if (localhostPattern.test(origin)) {
+      return true;
+    }
   }
 
+  // Producción: validación exacta contra whitelist
   return ALLOWED_ORIGINS.includes(origin);
 }
 
@@ -51,6 +64,39 @@ export default async function middleware(req: NextRequest) {
     origin,
     requestId
   }, 'Request received');
+
+  // ============================================================================
+  // SECURITY: Bloquear métodos HTTP peligrosos/innecesarios
+  // ============================================================================
+  // TRACE/TRACK pueden exponer información sensible en headers y
+  // permitir ataques de Cross-Site Tracing (XST)
+  // Referencias: OWASP, PCI-DSS, CWE-693
+  if (["TRACE", "TRACK"].includes(req.method)) {
+    log.warn({ method: req.method, requestId }, 'Blocked dangerous HTTP method');
+    return new NextResponse("Method Not Allowed", {
+      status: 405,
+      headers: {
+        Allow: "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
+
+  // ============================================================================
+  // SECURITY: Sistema de Honeypots
+  // ============================================================================
+  // Detectar acceso a honeypots (endpoints trampa) ANTES de cualquier otra lógica
+  // Esto atrapa atacantes temprano y registra su actividad
+  try {
+    const honeypotResponse = await handleHoneypotRequest(req);
+    if (honeypotResponse) {
+      log.warn({ pathname, requestId }, 'Honeypot triggered - returning fake response');
+      return honeypotResponse;
+    }
+  } catch (error) {
+    log.error({ error, requestId }, 'Error in honeypot handler');
+    // Continuar con el flujo normal si hay error
+  }
 
   // ============================================================================
   // DETECCIÓN AUTOMÁTICA DE IDIOMA POR GEOLOCALIZACIÓN
@@ -109,10 +155,16 @@ export default async function middleware(req: NextRequest) {
     "/community", // GROWTH: Comunidad pública - comentar como anónimo (Discord-style)
     "/docs",
     "/legal",
+    "/pricing", // Página de precios pública
+    "/sponsors", // Página de sponsors pública
+    "/careers", // Página de carreras pública
+    "/security", // Security Dashboard (TODO: proteger en producción)
     "/api/auth", // better-auth: Todas las rutas de autenticación (sign-in, sign-out, get-session, register, etc.)
     "/api/webhooks/mercadopago",
     "/api/community", // GROWTH: API pública de comunidad (read + anonymous post)
     "/api/groups", // GROWTH: API pública de grupos (read-only)
+    "/api/security", // Security API (TODO: proteger en producción)
+    "/api/demo", // Demo chat system - Sin autenticación para visitantes de landing
   ];
 
   // SECURITY FIX #5: Verificar coincidencia exacta o que sea subruta válida

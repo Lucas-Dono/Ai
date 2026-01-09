@@ -8,27 +8,27 @@ export function OurAudience() {
   const stats = [
     {
       icon: Users,
-      value: "100,000+",
-      label: "Usuarios activos mensuales",
-      sublabel: "Proyección mes 12",
+      value: "100K",
+      label: "Meta MAU año 1",
+      sublabel: "Proyección conservadora",
     },
     {
       icon: Clock,
-      value: "28 min",
-      label: "Sesión promedio",
-      sublabel: "Engagement profundo",
+      value: "25-35 min",
+      label: "Sesión promedio target",
+      sublabel: "Ref: Character.AI avg",
     },
     {
       icon: Repeat,
-      value: "5.2",
-      label: "Sesiones por semana",
-      sublabel: "Retorno diario: 73%",
+      value: "4-6x",
+      label: "Sesiones/semana objetivo",
+      sublabel: "Benchmark industria IA",
     },
     {
       icon: TrendingUp,
-      value: "81%",
-      label: "Receptivos a recomendaciones",
-      sublabel: "Compran online: 89%",
+      value: "75-85%",
+      label: "Early adopters tech",
+      sublabel: "Perfil audiencia target",
     },
   ];
 
@@ -74,11 +74,11 @@ export function OurAudience() {
           className="text-center mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-            Nuestra Audiencia:{" "}
-            <span className="text-muted-foreground">Alto Poder Adquisitivo</span>
+            Audiencia Target:{" "}
+            <span className="text-blue-600">Alto Poder Adquisitivo</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Usuarios altamente comprometidos, receptivos a recomendaciones de calidad
+            Basado en benchmarks de Character.AI, Replika y sector de IA conversacional
           </p>
         </motion.div>
 
@@ -101,9 +101,9 @@ export function OurAudience() {
                         <Icon className="w-5 h-5" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1">
-                        <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                        <div className="text-sm font-medium mb-1">{stat.label}</div>
-                        <div className="text-xs text-muted-foreground">{stat.sublabel}</div>
+                        <div className="text-3xl font-bold mb-1 text-foreground">{stat.value}</div>
+                        <div className="text-sm font-semibold mb-1 text-foreground">{stat.label}</div>
+                        <div className="text-xs text-foreground/60 font-medium">{stat.sublabel}</div>
                       </div>
                     </div>
                   </Card>
@@ -123,26 +123,26 @@ export function OurAudience() {
         >
           <Card className="p-8 border border-border bg-card/50 backdrop-blur-sm">
             <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-2">Demographics Detallados</h3>
+              <h3 className="text-2xl font-bold mb-2">Perfil Demográfico Target</h3>
               <p className="text-sm text-muted-foreground">
-                Audiencia premium con alto engagement y disposición a compra
+                Basado en datos públicos de Character.AI (20M+ usuarios) y Replika (10M+ usuarios)
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {demographics.map((demo, index) => (
                 <div key={index}>
-                  <h4 className="text-sm font-semibold mb-4 text-foreground">
+                  <h4 className="text-sm font-bold mb-4 text-foreground uppercase tracking-wide">
                     {demo.category}
                   </h4>
                   <div className="space-y-3">
                     {demo.segments.map((segment, segIndex) => (
                       <div key={segIndex}>
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-foreground/70 font-medium">
                             {segment.label}
                           </span>
-                          <span className="text-sm font-semibold">{segment.value}</span>
+                          <span className="text-sm font-bold text-foreground">{segment.value}</span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
@@ -167,36 +167,40 @@ export function OurAudience() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="max-w-6xl mx-auto mt-8"
         >
-          <Card className="p-8 border border-border bg-gradient-to-br from-blue-500/5 to-purple-500/5 backdrop-blur-sm">
+          <Card className="p-8 border border-border bg-blue-500/5 backdrop-blur-sm">
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-2">Benchmarks de Industria</h3>
+              <p className="text-sm text-muted-foreground">Promedios del sector AI conversacional (Character.AI, Replika, Chai)</p>
+            </div>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <DollarSign className="w-6 h-6 text-emerald-600" />
+                  <DollarSign className="w-6 h-6 text-blue-600" />
                   <h4 className="text-lg font-semibold">Comportamiento de Compra</h4>
                 </div>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      <strong>89%</strong> compran online regularmente
+                      <strong className="text-foreground">85-90%</strong> compran online regularmente
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      <strong>76%</strong> dispuestos a probar nuevas marcas
+                      <strong className="text-foreground">70-80%</strong> dispuestos a probar nuevas marcas
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      <strong>84%</strong> influenciados por endorsements
+                      <strong className="text-foreground">80%+</strong> influenciados por recomendaciones
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      <strong>68%</strong> educación universitaria completa
+                      <strong className="text-foreground">60-70%</strong> educación universitaria
                     </span>
                   </li>
                 </ul>
@@ -205,31 +209,31 @@ export function OurAudience() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Globe className="w-6 h-6 text-blue-600" />
-                  <h4 className="text-lg font-semibold">Engagement & Preferencias</h4>
+                  <h4 className="text-lg font-semibold">Engagement Típico</h4>
                 </div>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      <strong>45 mensajes/día</strong> promedio por usuario
+                      <strong className="text-foreground">40-50 mensajes/día</strong> usuarios activos
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      <strong>73%</strong> retornan diariamente
+                      <strong className="text-foreground">65-75%</strong> retención diaria
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      Early adopters de tecnología AI
+                      Mayoría early adopters de IA
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-0.5">✓</span>
+                    <span className="text-blue-600 mt-0.5">✓</span>
                     <span>
-                      Valoran autenticidad y transparencia
+                      Valoran autenticidad sobre publicidad tradicional
                     </span>
                   </li>
                 </ul>
@@ -247,9 +251,9 @@ export function OurAudience() {
           className="text-center mt-12"
         >
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-            Esta audiencia premium pasa 28 minutos promedio por sesión -
-            significativamente más que redes sociales tradicionales. Son el target perfecto
-            para brands que buscan engagement profundo y conversiones reales.
+            El sector de IA conversacional muestra <span className="text-foreground font-semibold">25-35 min promedio</span> por sesión -
+            significativamente más que redes sociales (8-12 min). El target perfecto
+            para brands que buscan <span className="text-foreground font-semibold">engagement profundo y conversiones reales</span>.
           </p>
         </motion.div>
       </div>

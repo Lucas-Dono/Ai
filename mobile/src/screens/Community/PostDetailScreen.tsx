@@ -13,9 +13,11 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { postApi, commentApi } from '../../services/api';
+import { postFollowApi } from '../../services/api/post-follow.api';
 import { Ionicons } from '@expo/vector-icons';
 
 export const PostDetailScreen = () => {
@@ -28,10 +30,13 @@ export const PostDetailScreen = () => {
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
     loadPost();
     loadComments();
+    checkFollowStatus();
   }, [postId]);
 
   const loadPost = async () => {
@@ -72,6 +77,35 @@ export const PostDetailScreen = () => {
     }
   };
 
+  const checkFollowStatus = async () => {
+    try {
+      const following = await postFollowApi.isFollowing(postId);
+      setIsFollowing(following);
+    } catch (error) {
+      console.error('Error checking follow status:', error);
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    setFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await postFollowApi.unfollowPost(postId);
+        setIsFollowing(false);
+        Alert.alert('Éxito', 'Dejaste de seguir esta publicación');
+      } else {
+        await postFollowApi.followPost(postId);
+        setIsFollowing(true);
+        Alert.alert('Éxito', 'Ahora sigues esta publicación. Recibirás notificaciones de nuevos comentarios.');
+      }
+    } catch (error: any) {
+      console.error('Error toggling follow:', error);
+      Alert.alert('Error', error.message || 'No se pudo actualizar el seguimiento');
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
   const handleSubmitComment = async () => {
     if (!commentText.trim()) return;
 
@@ -85,6 +119,11 @@ export const PostDetailScreen = () => {
       setCommentText('');
       setReplyingTo(null);
       loadComments();
+
+      // Auto-seguir el post al comentar (si no está siguiendo ya)
+      if (!isFollowing) {
+        checkFollowStatus();
+      }
     } catch (error) {
       console.error('Error creating comment:', error);
     }
@@ -229,6 +268,27 @@ export const PostDetailScreen = () => {
               <Ionicons name="chatbubble-outline" size={24} color="#6b7280" />
               <Text style={styles.actionText}>{post.commentCount}</Text>
             </View>
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleToggleFollow}
+              disabled={followLoading}
+            >
+              {followLoading ? (
+                <ActivityIndicator size="small" color="#3b82f6" />
+              ) : (
+                <>
+                  <Ionicons
+                    name={isFollowing ? "notifications" : "notifications-outline"}
+                    size={24}
+                    color={isFollowing ? "#3b82f6" : "#6b7280"}
+                  />
+                  <Text style={[styles.actionText, isFollowing && styles.followingText]}>
+                    {isFollowing ? 'Siguiendo' : 'Seguir'}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons name="share-outline" size={24} color="#6b7280" />
@@ -506,5 +566,9 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     opacity: 0.5,
+  },
+  followingText: {
+    color: '#3b82f6',
+    fontWeight: '700',
   },
 });

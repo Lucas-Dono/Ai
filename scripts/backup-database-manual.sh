@@ -19,6 +19,13 @@
 
 set -e  # Exit on error
 
+# Cargar variables de entorno desde .env (eliminar comillas)
+if [ -f .env ]; then
+  set -a  # Automatically export all variables
+  source <(grep -v '^#' .env | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^export //' -e 's/="\(.*\)"$/=\1/')
+  set +a
+fi
+
 # Colores para output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -53,7 +60,7 @@ if ! command -v pg_dump &> /dev/null; then
 fi
 
 # 1. Crear dump
-echo -e "${GREEN}[1/3] Creating database dump...${NC}"
+echo -e "${GREEN}[1/4] Creating database dump...${NC}"
 pg_dump "${DATABASE_URL}" > "${LOCAL_PATH}"
 
 if [ ! -f "${LOCAL_PATH}" ]; then
@@ -65,7 +72,7 @@ DUMP_SIZE=$(du -h "${LOCAL_PATH}" | cut -f1)
 echo -e "${GREEN}✓ Dump created: ${LOCAL_PATH} (${DUMP_SIZE})${NC}"
 
 # 2. Comprimir
-echo -e "${GREEN}[2/3] Compressing backup...${NC}"
+echo -e "${GREEN}[2/4] Compressing backup...${NC}"
 gzip -c "${LOCAL_PATH}" > "${GZIP_PATH}"
 
 if [ ! -f "${GZIP_PATH}" ]; then
@@ -80,36 +87,77 @@ echo -e "${GREEN}✓ Compressed: ${GZIP_PATH} (${GZIP_SIZE})${NC}"
 # Eliminar archivo sin comprimir
 rm -f "${LOCAL_PATH}"
 
-# 3. Upload a R2 (opcional)
+# 3. Encriptar con GPG
+echo -e "${GREEN}[3/4] Encrypting backup with GPG...${NC}"
+
+# Verificar si existe clave GPG
+GPG_KEY_EMAIL="${GPG_BACKUP_EMAIL:-backup@creador-inteligencias.com}"
+GPG_ENCRYPTED_PATH="${GZIP_PATH}.gpg"
+
+if ! gpg --list-keys "${GPG_KEY_EMAIL}" &> /dev/null; then
+    echo -e "${YELLOW}⚠️  GPG key not found. Creating new key for backups...${NC}"
+    # Crear clave GPG no interactiva
+    gpg --batch --gen-key <<EOF
+%no-protection
+Key-Type: RSA
+Key-Length: 4096
+Name-Real: Database Backup
+Name-Email: ${GPG_KEY_EMAIL}
+Expire-Date: 0
+%commit
+EOF
+    echo -e "${GREEN}✓ GPG key created${NC}"
+fi
+
+# Encriptar el backup
+gpg --encrypt --recipient "${GPG_KEY_EMAIL}" --output "${GPG_ENCRYPTED_PATH}" "${GZIP_PATH}"
+
+if [ ! -f "${GPG_ENCRYPTED_PATH}" ]; then
+    echo -e "${RED}Error: Failed to encrypt backup${NC}"
+    rm -f "${GZIP_PATH}"
+    exit 1
+fi
+
+ENCRYPTED_SIZE=$(du -h "${GPG_ENCRYPTED_PATH}" | cut -f1)
+echo -e "${GREEN}✓ Encrypted: ${GPG_ENCRYPTED_PATH} (${ENCRYPTED_SIZE})${NC}"
+
+# Eliminar archivo sin encriptar
+rm -f "${GZIP_PATH}"
+
+# 4. Upload a R2 (opcional)
 if [ "$1" != "--local-only" ]; then
     if command -v aws &> /dev/null && [ -n "${R2_ENDPOINT}" ]; then
-        echo -e "${GREEN}[3/3] Uploading to R2...${NC}"
+        echo -e "${GREEN}[4/4] Uploading to R2...${NC}"
 
         aws s3 cp \
-            "${GZIP_PATH}" \
-            "s3://${BUCKET_NAME}/${BACKUP_PREFIX}${GZIP_FILENAME}" \
+            "${GPG_ENCRYPTED_PATH}" \
+            "s3://${BUCKET_NAME}/${BACKUP_PREFIX}${GZIP_FILENAME}.gpg" \
             --endpoint-url "${R2_ENDPOINT}" \
-            --metadata backup-timestamp="${TIMESTAMP}",database-name="creador-inteligencias",backup-type="manual"
+            --metadata backup-timestamp="${TIMESTAMP}",database-name="creador-inteligencias",backup-type="manual",encrypted="gpg"
 
         if [ $? -eq 0 ]; then
-            echo -e "${GREEN}✓ Uploaded to R2${NC}"
+            echo -e "${GREEN}✓ Uploaded encrypted backup to R2${NC}"
         else
-            echo -e "${YELLOW}⚠️  Warning: Failed to upload to R2, but local backup exists${NC}"
+            echo -e "${YELLOW}⚠️  Warning: Failed to upload to R2, but local encrypted backup exists${NC}"
         fi
     else
-        echo -e "${YELLOW}[3/3] Skipping R2 upload (AWS CLI not installed or R2_ENDPOINT not set)${NC}"
+        echo -e "${YELLOW}[4/4] Skipping R2 upload (AWS CLI not installed or R2_ENDPOINT not set)${NC}"
     fi
 else
-    echo -e "${YELLOW}[3/3] Skipping R2 upload (--local-only flag)${NC}"
+    echo -e "${YELLOW}[4/4] Skipping R2 upload (--local-only flag)${NC}"
 fi
 
 echo ""
 echo -e "${GREEN}════════════════════════════════════════${NC}"
-echo -e "${GREEN}✓ Backup completed successfully!${NC}"
+echo -e "${GREEN}✓ Encrypted backup completed successfully!${NC}"
 echo -e "${GREEN}════════════════════════════════════════${NC}"
 echo ""
-echo -e "Local backup: ${YELLOW}${GZIP_PATH}${NC}"
-echo -e "Size: ${YELLOW}${GZIP_SIZE}${NC}"
+echo -e "Local encrypted backup: ${YELLOW}${GPG_ENCRYPTED_PATH}${NC}"
+echo -e "Size: ${YELLOW}${ENCRYPTED_SIZE}${NC}"
+echo -e "Encryption: ${YELLOW}GPG (${GPG_KEY_EMAIL})${NC}"
 echo ""
 echo -e "${GREEN}To restore this backup:${NC}"
-echo "  gunzip -c ${GZIP_PATH} | psql \$DATABASE_URL"
+echo "  gpg --decrypt ${GPG_ENCRYPTED_PATH} | gunzip | psql \$DATABASE_URL"
+echo ""
+echo -e "${YELLOW}⚠️  IMPORTANT: Keep your GPG private key safe!${NC}"
+echo "  Export key: gpg --export-secret-keys ${GPG_KEY_EMAIL} > backup-key.asc"

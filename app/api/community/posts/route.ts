@@ -125,6 +125,15 @@ export async function POST(request: NextRequest) {
 
     const post = await PostService.createPost(session.user.id, data);
 
+    // AUTO-FOLLOW: El autor automáticamente sigue su propio post
+    try {
+      const { PostFollowService } = await import('@/lib/services/post-follow.service');
+      await PostFollowService.followPost(session.user.id, post.id);
+    } catch (error) {
+      console.error('Error auto-following post:', error);
+      // No fallar la creación del post si el auto-follow falla
+    }
+
     return NextResponse.json(post, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

@@ -12,12 +12,12 @@ export function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-sm">
-                AI
+            <Link href="/landing" className="flex items-center gap-2 mb-4 group w-fit">
+              <div className="w-7 h-7 flex items-center justify-center group-hover:opacity-90 transition-opacity">
+                <img src="/logo.png" alt="Blaniel Logo" className="w-7 h-7 object-contain" />
               </div>
-              <span className="font-semibold text-base">{t("brand")}</span>
-            </div>
+              <span className="font-semibold text-base">Blaniel</span>
+            </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {t("description")}
             </p>
@@ -36,11 +36,6 @@ export function LandingFooter() {
                 <Link href="/pricing" className="hover:text-foreground transition-colors">
                   {t("pricing")}
                 </Link>
-              </li>
-              <li>
-                <a href="#demo" className="hover:text-foreground transition-colors">
-                  {t("demo")}
-                </a>
               </li>
               <li>
                 <Link href="/docs" className="hover:text-foreground transition-colors">

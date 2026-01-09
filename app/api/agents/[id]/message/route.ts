@@ -33,6 +33,8 @@ import { canSendMessage, trackTokenUsage, estimateTokensFromText, getTokenUsageS
 import { semanticCache } from "@/lib/cache/semantic-cache";
 import { checkCooldown, trackCooldown } from "@/lib/usage/cooldown-tracker";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
+import { ConversationTrackingService } from "@/lib/services/conversation-tracking.service";
+import { decryptMessageIfNeeded } from "@/lib/encryption/message-encryption";
 
 /**
  * GET /api/agents/[id]/message
@@ -84,10 +86,11 @@ export const GET = withAuth(async (req, { params, user }) => {
 
     log.info({ agentId, userId, count: messages.length, total: totalCount }, 'Message history loaded');
 
+    // Desencriptar mensajes antes de devolverlos
     return NextResponse.json({
       messages: messages.map(msg => ({
         id: msg.id,
-        content: msg.content,
+        content: decryptMessageIfNeeded(msg.content, msg.iv, msg.authTag),
         role: msg.role,
         metadata: msg.metadata,
         createdAt: msg.createdAt,
@@ -590,6 +593,20 @@ export async function POST(
     } catch (trackError) {
       // No lanzar error si falla el tracking, solo loguearlo
       log.warn({ trackError }, 'Failed to track message analytics events');
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // CONVERSATION TRACKING (Tu Círculo)
+    // Update conversation tracking for recent conversations widget
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    try {
+      // Track both user and assistant messages
+      await ConversationTrackingService.trackMessage(userId, agentId, 'user');
+      await ConversationTrackingService.trackMessage(userId, agentId, 'assistant');
+      log.info({ userId, agentId }, 'Conversation tracking updated successfully');
+    } catch (trackError) {
+      // No lanzar error si falla el tracking, solo loguearlo
+      log.warn({ trackError }, 'Failed to update conversation tracking');
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

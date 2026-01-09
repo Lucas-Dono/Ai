@@ -6,6 +6,7 @@ import { ArrowRight, Play } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { LandingDemoChat } from "./LandingDemoChat";
 
 export function HeroSection() {
   const [videoOpen, setVideoOpen] = useState(false);
@@ -21,8 +22,8 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
       </div>
 
-      <div className="container mx-auto px-4 py-20 sm:py-32">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 lg:py-32">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
           {/* Left Column - Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -40,7 +41,7 @@ export function HeroSection() {
 
             {/* Headline */}
             <div className="space-y-4">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
                 {t("title")}{" "}
                 <span className="text-muted-foreground">
                   {t("titleHighlight")}
@@ -72,79 +73,22 @@ export function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Right Column - Product Preview */}
+          {/* Right Column - Live Demo Chat */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="relative lg:ml-8"
           >
-            {/* Main product shot */}
-            <div className="relative rounded-2xl border border-border shadow-2xl overflow-hidden bg-card">
-              <div className="aspect-[4/3] bg-muted/30 p-6">
-                <div className="h-full rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-6 flex flex-col">
-                  {/* Chat Header */}
-                  <div className="flex items-center gap-3 pb-4 border-b border-border">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40" />
-                    <div>
-                      <div className="font-semibold text-foreground">{tChat("aiName")}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        {tChat("status")}
-                      </div>
-                    </div>
-                  </div>
+            <LandingDemoChat />
 
-                  {/* Chat Messages */}
-                  <div className="flex-1 space-y-3 py-4 overflow-hidden">
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full bg-muted flex-shrink-0" />
-                      <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[75%]">
-                        <p className="text-foreground text-sm leading-relaxed">
-                          {tChat("message1")}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3 justify-end">
-                      <div className="bg-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[75%]">
-                        <p className="text-background text-sm leading-relaxed">
-                          {tChat("message2")}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full bg-muted flex-shrink-0" />
-                      <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[75%]">
-                        <p className="text-foreground text-sm leading-relaxed">
-                          {tChat("message3")}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Status Bar */}
-                  <div className="pt-3 border-t border-border">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <div className="w-1.5 h-1.5 rounded-full bg-foreground" />
-                      <span>Emotional state: Joy (0.85) + Anticipation (0.72)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating badges - Professional style */}
-              <div className="absolute top-4 right-4 backdrop-blur-xl bg-background/80 border border-border rounded-2xl px-3 py-1.5 text-xs font-medium shadow-lg">
-                {tChat("memoryIndicator")}
-              </div>
-              <div className="absolute bottom-20 left-4 backdrop-blur-xl bg-background/80 border border-border rounded-2xl px-3 py-1.5 text-xs font-medium shadow-lg">
-                {tChat("emotionIndicator")}
-              </div>
+            {/* Floating badges - Professional style */}
+            <div className="absolute -top-2 -right-2 backdrop-blur-xl bg-primary/10 border border-primary/20 rounded-2xl px-3 py-1.5 text-xs font-medium shadow-lg text-primary">
+              ✨ Chat real con IA
             </div>
 
             {/* Subtle accent glow */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-foreground/5 to-transparent blur-3xl" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-primary/5 to-transparent blur-3xl" />
           </motion.div>
         </div>
       </div>

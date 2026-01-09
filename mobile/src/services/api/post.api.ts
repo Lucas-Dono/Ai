@@ -118,4 +118,12 @@ export const postApi = {
     const response: any = await apiClient.post(`/community/posts/${id}/lock`, { locked });
     return response.data as any;
   },
+
+  /**
+   * Obtener posts seguidos por el usuario actual
+   */
+  async getFollowedPosts() {
+    const response: any = await apiClient.get('/api/community/posts/following');
+    return response.posts as any[];
+  },
 };

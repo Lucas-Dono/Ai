@@ -33,6 +33,43 @@ const typingTimeouts = new Map<string, NodeJS.Timeout>();
 /**
  * Initialize Socket.IO server
  */
+/**
+ * Lista de orígenes permitidos para CORS en WebSockets
+ * Debe coincidir con la configuración del middleware
+ */
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'https://creador-inteligencias.vercel.app',
+  process.env.NEXTAUTH_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
+].filter(Boolean) as string[];
+
+/**
+ * Validar origen para CORS de Socket.IO
+ * Implementa validación estricta, no usa wildcards
+ */
+function validateSocketOrigin(origin: string, callback: (err: Error | null, success?: boolean) => void) {
+  // Desarrollo: permitir localhost y 127.0.0.1 con cualquier puerto
+  if (process.env.NODE_ENV === 'development') {
+    const localhostPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+    if (localhostPattern.test(origin)) {
+      return callback(null, true);
+    }
+  }
+
+  // Producción: validación exacta contra whitelist
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    return callback(null, true);
+  }
+
+  // Origen no permitido
+  console.warn('[SocketServer] CORS: Origin not allowed:', origin);
+  callback(new Error('Not allowed by CORS'));
+}
+
 export function initSocketServer(httpServer: HTTPServer): SocketServer {
   if (io) {
     return io;
@@ -40,7 +77,7 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
 
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      origin: validateSocketOrigin,
       credentials: true,
     },
     path: "/api/socketio",

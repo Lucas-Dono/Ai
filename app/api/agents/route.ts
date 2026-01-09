@@ -8,6 +8,8 @@ import { saveDataUrlAsFile, isDataUrl } from "@/lib/utils/image-helpers";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
 import type { BehaviorType } from "@prisma/client";
 import type { ProfileData } from "@/types/prisma-json";
+import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
+import { sanitizeAndValidateName } from "@/lib/security/unicode-sanitizer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,21 +25,13 @@ export async function POST(req: NextRequest) {
     const userId = user.id;
     console.log('[API] Usuario autenticado:', userId);
 
-    // Check agent creation quota
-    console.log('[API] Verificando cuota...');
-    const quotaCheck = await canUseResource(userId, "agent");
-    if (!quotaCheck.allowed) {
-      console.log('[API] Cuota excedida');
-      return NextResponse.json(
-        {
-          error: quotaCheck.reason,
-          current: quotaCheck.current,
-          limit: quotaCheck.limit,
-          upgrade: "/pricing",
-        },
-        { status: 403 }
-      );
-    }
+    // Obtener plan del usuario ANTES de procesar (para validación atómica después)
+    const userData = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true },
+    });
+    const userPlan = userData?.plan || "free";
+    console.log('[API] Plan del usuario:', userPlan);
 
     const body = await req.json();
 
@@ -51,7 +45,38 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, kind, personality, purpose, tone, avatar, referenceImage, nsfwMode, allowDevelopTraumas, initialBehavior } = validation.data;
+    const { name: rawName, kind, personality, purpose, tone, avatar, referenceImage, nsfwMode, allowDevelopTraumas, initialBehavior } = validation.data;
+
+    // SECURITY: Sanitizar nombre para prevenir ataques de confusión visual
+    // (homoglyphs, zero-width characters, etc.)
+    const nameValidation = sanitizeAndValidateName(rawName);
+    if (!nameValidation.valid || !nameValidation.sanitized) {
+      console.warn('[API] Nombre rechazado por contener caracteres sospechosos:', {
+        original: rawName,
+        reason: nameValidation.reason,
+        detections: nameValidation.detections
+      });
+      return NextResponse.json(
+        {
+          error: nameValidation.reason || 'El nombre contiene caracteres no permitidos',
+          field: 'name',
+          detections: nameValidation.detections
+        },
+        { status: 400 }
+      );
+    }
+
+    const name = nameValidation.sanitized;
+
+    // Log si se sanitizó algo
+    if (rawName !== name) {
+      console.info('[API] Nombre sanitizado:', {
+        original: rawName,
+        sanitized: name,
+        detections: nameValidation.detections
+      });
+    }
+
     console.log('[API] Datos recibidos:', { name, kind, personality, purpose, tone, avatar: avatar ? 'provided' : 'none', referenceImage: referenceImage ? 'provided' : 'none', nsfwMode, allowDevelopTraumas, initialBehavior });
 
     // Procesar avatar: si es data URL (base64), convertir a archivo
@@ -95,24 +120,46 @@ export async function POST(req: NextRequest) {
     });
     console.log('[API] Perfil generado exitosamente');
 
-    // Crear agente en BD
-    console.log('[API] Creando agente en base de datos...');
-    const agent = await prisma.agent.create({
-      data: {
-        userId,
-        kind,
-        name,
-        description: personality || purpose,
-        personality,
-        purpose,
-        tone,
-        avatar: finalAvatar, // Guardar foto de cara (cuadrada 1:1) como URL de archivo
-        referenceImageUrl: finalReferenceImage, // Guardar imagen de cuerpo completo como URL de archivo
-        profile: profile as Record<string, string | number | boolean | null>,
-        systemPrompt,
-        visibility: "private",
-        nsfwMode: nsfwMode || false,
+    // CRITICAL: Crear agente con verificación atómica de límite para prevenir race condition
+    console.log('[API] Creando agente con verificación atómica...');
+    const agent = await prisma.$transaction(
+      async (tx) => {
+        // Verificar límite DENTRO de la transacción
+        await atomicCheckAgentLimit(tx, userId, userPlan);
+
+        // Crear agente dentro de la transacción
+        const newAgent = await tx.agent.create({
+          data: {
+            userId,
+            kind,
+            name,
+            description: personality || purpose,
+            personality,
+            purpose,
+            tone,
+            avatar: finalAvatar,
+            referenceImageUrl: finalReferenceImage,
+            profile: profile as Record<string, string | number | boolean | null>,
+            systemPrompt,
+            visibility: "private",
+            nsfwMode: nsfwMode || false,
+          },
+        });
+
+        return newAgent;
       },
+      {
+        isolationLevel: "Serializable",
+        maxWait: 5000,
+        timeout: 10000,
+      }
+    ).catch((error) => {
+      // Si es error de límite, parsearlo
+      if (error.message.startsWith("{")) {
+        const errorData = JSON.parse(error.message);
+        throw errorData;
+      }
+      throw error;
     });
     console.log('[API] Agente creado:', agent.id);
 
@@ -264,8 +311,26 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error("[API] Error creating agent:", error);
+
+    // Si es un error de límite (lanzado desde la transacción)
+    if (error.error && error.limit) {
+      return NextResponse.json(error, { status: 403 });
+    }
+
+    // Errores de transacción de Prisma
+    if (error.code === "P2034") {
+      // Serialization failure - race condition detectada
+      return NextResponse.json(
+        {
+          error: "El límite de agentes fue alcanzado. Por favor intenta de nuevo.",
+          hint: "Múltiples requests detectados"
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to create agent", details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

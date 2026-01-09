@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn, signUp } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { useShakeOnError } from "@/hooks/useShake";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,6 +26,18 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { shakeClass } = useShakeOnError(!!error);
+
+  // Demo migration params
+  const [fromDemo, setFromDemo] = useState(false);
+  const [demoSessionId, setDemoSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const isFromDemo = searchParams.get('fromDemo') === 'true';
+    const sessionId = searchParams.get('demoSessionId');
+
+    setFromDemo(isFromDemo);
+    setDemoSessionId(sessionId);
+  }, [searchParams]);
 
   const getPasswordStrength = (pwd: string) => {
     if (pwd.length === 0) return { strength: 0, label: "", color: "" };
@@ -117,6 +130,41 @@ export default function RegisterPage() {
         } catch (updateError) {
           console.error("Error updating profile:", updateError);
           // No bloqueamos el registro si falla la actualización del perfil
+        }
+      }
+
+      // Si viene de demo, migrar mensajes y redirigir al chat de Luna
+      if (fromDemo && demoSessionId) {
+        try {
+          const migrateResponse = await fetch("/api/demo/migrate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              demoSessionId,
+            }),
+          });
+
+          if (migrateResponse.ok) {
+            const migrateData = await migrateResponse.json();
+
+            // Limpiar localStorage del demo
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('luna_demo_session');
+            }
+
+            // Redirigir al chat de Luna con indicador de continuación
+            router.push(`/agentes/${migrateData.agentId}?fromDemo=true`);
+            router.refresh();
+            return;
+          } else {
+            console.error("Error migrating demo:", await migrateResponse.text());
+            // Si falla la migración, seguir al dashboard normal
+          }
+        } catch (migrateError) {
+          console.error("Error migrating demo:", migrateError);
+          // Si falla la migración, seguir al dashboard normal
         }
       }
 

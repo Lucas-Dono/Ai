@@ -36,6 +36,7 @@ interface DirectMessageChatProps {
   agentName: string;
   agentAvatar?: string;
   userId: string;
+  fromDemo?: boolean;
 }
 
 interface AgentState {
@@ -480,12 +481,14 @@ export function DirectMessageChat({
   agentName,
   agentAvatar,
   userId,
+  fromDemo = false,
 }: DirectMessageChatProps) {
   const router = useRouter();
   const sessionKey = `chat-messages-${agentId}-${userId}`;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
+  const [showDemoWelcome, setShowDemoWelcome] = useState(fromDemo);
   const [isTyping, setIsTyping] = useState(false);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -575,6 +578,35 @@ export function DirectMessageChat({
 
     loadMessages();
   }, [agentId]);
+
+  // Show demo welcome message
+  useEffect(() => {
+    if (fromDemo && showDemoWelcome && messages.length > 0) {
+      // Agregar un mensaje especial del sistema al inicio
+      const welcomeMessage: Message = {
+        id: 'demo-welcome',
+        type: 'agent',
+        content: {
+          text: "¡Bienvenido/a! 🌙✨ Veo que continuamos nuestra conversación desde la demo. ¡Me alegra mucho que te hayas registrado! Ahora podemos hablar sin límites. ¿Qué te gustaría conversar?"
+        },
+        timestamp: new Date(),
+        agentName,
+        agentAvatar,
+        metadata: {
+          isDemoWelcome: true,
+        },
+      };
+
+      // Insertar el mensaje al inicio (después de los mensajes migrados)
+      setMessages(prev => [...prev, welcomeMessage]);
+      setShowDemoWelcome(false);
+
+      // Auto-eliminar del historial después de 3 segundos (solo visual, no se guarda en DB)
+      setTimeout(() => {
+        setMessages(prev => prev.filter(m => m.id !== 'demo-welcome'));
+      }, 15000); // 15 segundos para que lo vea
+    }
+  }, [fromDemo, showDemoWelcome, messages.length, agentName, agentAvatar]);
 
   // Load agent state
   useEffect(() => {

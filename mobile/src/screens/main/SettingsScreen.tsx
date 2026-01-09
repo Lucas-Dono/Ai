@@ -87,6 +87,33 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
         </TouchableOpacity>
       </View>
 
+      {/* Comunidad */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Comunidad</Text>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('FollowingPosts')}
+        >
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="notifications" size={20} color={colors.primary[400]} />
+            <Text style={styles.menuItemText}>Posts Seguidos</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Preferences')}
+        >
+          <View style={styles.menuItemLeft}>
+            <Ionicons name="settings-outline" size={20} color={colors.primary[400]} />
+            <Text style={styles.menuItemText}>Preferencias de Contenido</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+      </View>
+
       {/* Notificaciones */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notificaciones</Text>

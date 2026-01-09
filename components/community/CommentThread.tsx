@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { ImageUploader } from "@/components/community/ImageUploader";
 
 interface Comment {
   id: string;
@@ -37,12 +38,13 @@ interface Comment {
   createdAt: string;
   userVote?: 'upvote' | 'downvote' | null;
   replies?: Comment[];
+  images?: string[];
 }
 
 interface CommentThreadProps {
   comments: Comment[];
   onVote: (commentId: string, voteType: 'upvote' | 'downvote') => void;
-  onReply: (parentId: string, content: string) => Promise<void>;
+  onReply: (parentId: string, content: string, images?: string[]) => Promise<void>;
   onReport?: (commentId: string) => void;
   depth?: number;
   maxDepth?: number;
@@ -83,13 +85,14 @@ function CommentItem({
 }: {
   comment: Comment;
   onVote: (commentId: string, voteType: 'upvote' | 'downvote') => void;
-  onReply: (parentId: string, content: string) => Promise<void>;
+  onReply: (parentId: string, content: string, images?: string[]) => Promise<void>;
   onReport?: (commentId: string) => void;
   depth: number;
   maxDepth: number;
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const [replyImages, setReplyImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -98,8 +101,9 @@ function CommentItem({
 
     try {
       setSubmitting(true);
-      await onReply(comment.id, replyContent);
+      await onReply(comment.id, replyContent, replyImages);
       setReplyContent("");
+      setReplyImages([]);
       setShowReplyForm(false);
     } catch (err) {
       console.error('Error replying:', err);
@@ -191,6 +195,27 @@ function CommentItem({
                 {comment.content}
               </p>
 
+              {/* Images */}
+              {comment.images && comment.images.length > 0 && (
+                <div className={cn(
+                  "mb-3 grid gap-2",
+                  comment.images.length === 1 && "grid-cols-1",
+                  comment.images.length === 2 && "grid-cols-2",
+                  comment.images.length >= 3 && "grid-cols-2"
+                )}>
+                  {comment.images.slice(0, 4).map((image, index) => (
+                    <div key={index} className="relative overflow-hidden rounded-lg border border-border">
+                      <img
+                        src={image}
+                        alt={`Imagen ${index + 1}`}
+                        className="w-full h-32 object-cover hover:scale-105 transition-transform cursor-pointer"
+                        onClick={() => window.open(image, '_blank')}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Actions */}
               <div className="flex items-center gap-1">
                 {/* Voting */}
@@ -262,19 +287,30 @@ function CommentItem({
                     exit={{ height: 0, opacity: 0 }}
                     className="mt-3 overflow-hidden"
                   >
-                    <div className="bg-background/50 rounded-2xl p-3 border border-border/50">
+                    <div className="bg-background/50 rounded-2xl p-3 border border-border/50 space-y-3">
                       <Textarea
                         placeholder="Escribe tu respuesta..."
                         value={replyContent}
                         onChange={(e) => setReplyContent(e.target.value)}
                         rows={3}
-                        className="mb-2 resize-none text-sm"
+                        className="resize-none text-sm"
                       />
+
+                      <ImageUploader
+                        images={replyImages}
+                        onImagesChange={setReplyImages}
+                        maxImages={4}
+                        maxSizeMB={5}
+                      />
+
                       <div className="flex gap-2 justify-end">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setShowReplyForm(false)}
+                          onClick={() => {
+                            setShowReplyForm(false);
+                            setReplyImages([]);
+                          }}
                           disabled={submitting}
                         >
                           Cancelar

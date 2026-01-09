@@ -25,6 +25,24 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "better-auth",
   },
+  // SECURITY: Configuración de cookies con flags de seguridad
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 minutos en memoria
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: "better-auth.session_token",
+      options: {
+        httpOnly: true, // No accesible desde JavaScript (previene XSS)
+        sameSite: "lax" as const, // Protección CSRF (usar "strict" si es posible)
+        path: "/",
+        secure: process.env.NODE_ENV === "production", // Solo HTTPS en producción
+      },
+    },
+  },
 });
 
 export type Session = typeof auth.$Infer.Session;

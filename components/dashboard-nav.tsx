@@ -98,8 +98,8 @@ export function DashboardNav() {
     <nav data-tour="sidebar-nav" className="hidden lg:flex fixed left-0 top-0 h-full w-64 border-r border-border bg-card/50 backdrop-blur-sm flex-col">
       <div className="p-6 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-2 group">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Sparkles className="h-6 w-6 text-white" />
+          <div className="h-10 w-10 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
           </div>
           <span className="font-bold text-lg">{t("navigation.brand")}</span>
         </Link>

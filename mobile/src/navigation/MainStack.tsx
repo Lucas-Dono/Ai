@@ -33,6 +33,10 @@ import MyStatsScreen from '../screens/Analytics/MyStatsScreen';
 import TermsScreen from '../screens/Legal/TermsScreen';
 import PrivacyScreen from '../screens/Legal/PrivacyScreen';
 import HelpScreen from '../screens/Legal/HelpScreen';
+// Community screens
+import { FollowingPostsScreen } from '../screens/Community/FollowingPostsScreen';
+// Settings screens
+import { PreferencesScreen } from '../screens/Settings/PreferencesScreen';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -137,6 +141,16 @@ export function MainStack() {
       <Stack.Screen
         name="Help"
         component={HelpScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FollowingPosts"
+        component={FollowingPostsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Preferences"
+        component={PreferencesScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

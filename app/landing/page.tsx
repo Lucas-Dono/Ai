@@ -3,7 +3,6 @@ import { LandingWrapper } from "@/components/landing/LandingWrapper";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { LiveDemoChat } from "@/components/landing/LiveDemoChat";
 import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { SocialProof } from "@/components/landing/SocialProof";
 import { FinalCTA } from "@/components/landing/FinalCTA";
@@ -132,9 +131,6 @@ export default function LandingPage() {
           <FeaturesGrid />
         </div>
         <HowItWorks />
-        <div id="demo">
-          <LiveDemoChat />
-        </div>
         <ComparisonTable />
         <SocialProof />
         <FinalCTA />

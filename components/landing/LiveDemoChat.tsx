@@ -146,8 +146,12 @@ export function LiveDemoChat() {
             {/* Chat Header */}
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl">
-                  🤖
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm">
+                  <img
+                    src="/personajes/luna/cara.webp"
+                    alt="Luna"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
                   <h3 className="font-bold text-white text-lg">{t("chat.header.name")}</h3>

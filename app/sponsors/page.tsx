@@ -5,15 +5,15 @@ import { SponsorsHero } from "@/components/sponsors/SponsorsHero";
 import { HowItWorks } from "@/components/sponsors/HowItWorks";
 import { VisualExamples } from "@/components/sponsors/VisualExamples";
 import { OurAudience } from "@/components/sponsors/OurAudience";
-import { PricingPackages } from "@/components/sponsors/PricingPackages";
-import { CaseStudies } from "@/components/sponsors/CaseStudies";
+import { InvestmentCalculator } from "@/components/sponsors/InvestmentCalculator";
+import { WhyItWorks } from "@/components/sponsors/WhyItWorks";
 import { FAQ } from "@/components/sponsors/FAQ";
 import { FinalCTA } from "@/components/sponsors/FinalCTA";
 
 export const metadata: Metadata = {
   title: "Sponsors | Publicidad Nativa en Conversaciones AI - Blaniel",
   description:
-    "Llega a miles de usuarios comprometidos con product placement orgánico en conversaciones de IA. Engagement 10-50x mayor que display ads. Desde $2,500/mes.",
+    "Publicidad contextual en conversaciones de IA. Engagement 3-5x mayor que display ads. Programa beta con precios desde $100/mes. Disponibilidad limitada.",
   keywords: [
     "sponsor",
     "advertising",
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
     canonical: "/sponsors",
   },
   openGraph: {
-    title: "Sponsors - Publicidad Nativa que Convierte | Blaniel",
+    title: "Sponsors - Publicidad Nativa en Conversaciones AI | Blaniel",
     description:
-      "Product placement orgánico en conversaciones de IA. Engagement 10-50x mayor que display ads. Audience de alto valor con 28 min de sesión promedio.",
+      "Programa beta de publicidad contextual en conversaciones de IA. Engagement 3-5x mayor que display ads. Audiencia early-adopter tech con 25-35 min de sesión promedio.",
     url: "/sponsors",
     siteName: "Blaniel",
     images: [
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sponsors - Publicidad Nativa en Conversaciones AI",
     description:
-      "Engagement 10-50x mayor que display ads. Llega a usuarios de alto valor durante conversaciones que importan.",
+      "Programa beta de publicidad contextual. Engagement 3-5x mayor que display ads. Disponibilidad limitada - Q2 2026.",
     images: ["/og-image-sponsors.png"],
     creator: "@circuitpromptai",
   },
@@ -78,56 +78,35 @@ export default function SponsorsPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: "Blaniel Sponsor Program",
+    name: "Blaniel Sponsor Program - Beta",
     description:
-      "Native advertising through contextual product placement in AI conversations. Reach engaged users with 10-50x better engagement than display ads.",
+      "Native advertising through contextual product placement in AI conversations. Beta program with flexible pricing based on impressions. Engagement 3-5x better than display ads.",
     provider: {
       "@type": "Organization",
       name: "Blaniel",
       url: process.env.NEXT_PUBLIC_APP_URL,
     },
     areaServed: ["Argentina", "Mexico", "United States", "Brazil", "Latin America"],
-    offers: [
-      {
-        "@type": "Offer",
-        name: "Bronze Package",
-        price: "2500",
-        priceCurrency: "USD",
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price: "2500",
-          priceCurrency: "USD",
+    offers: {
+      "@type": "AggregateOffer",
+      lowPrice: "100",
+      highPrice: "5000",
+      priceCurrency: "USD",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        referenceQuantity: {
+          "@type": "QuantityValue",
+          value: "1",
           unitText: "MONTH",
         },
       },
-      {
-        "@type": "Offer",
-        name: "Silver Package",
-        price: "7500",
-        priceCurrency: "USD",
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price: "7500",
-          priceCurrency: "USD",
-          unitText: "MONTH",
-        },
-      },
-      {
-        "@type": "Offer",
-        name: "Gold Package",
-        price: "20000",
-        priceCurrency: "USD",
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price: "20000",
-          priceCurrency: "USD",
-          unitText: "MONTH",
-        },
-      },
-    ],
+      availability: "https://schema.org/LimitedAvailability",
+      availabilityStarts: "2026-04-01",
+      description: "Flexible pricing based on impressions. Beta pricing available for early adopters.",
+    },
     audience: {
       "@type": "Audience",
-      audienceType: "Brand Marketers, CMOs, Marketing Directors",
+      audienceType: "Brand Marketers, CMOs, Marketing Directors, Startups",
       geographicArea: {
         "@type": "Place",
         name: "Latin America and United States",
@@ -150,8 +129,8 @@ export default function SponsorsPage() {
         <HowItWorks />
         <VisualExamples />
         <OurAudience />
-        <PricingPackages />
-        <CaseStudies />
+        <InvestmentCalculator />
+        <WhyItWorks />
         <FAQ />
         <FinalCTA />
         <LandingFooter />

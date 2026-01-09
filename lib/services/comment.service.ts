@@ -8,6 +8,7 @@ export interface CreateCommentData {
   postId: string;
   content: string;
   parentId?: string;
+  images?: string[];
 }
 
 export const CommentService = {
@@ -42,6 +43,7 @@ export const CommentService = {
         content: data.content,
         parentId: data.parentId,
         isByOP: post.authorId === authorId,
+        images: data.images || [],
       },
       include: {
         author: {
@@ -61,6 +63,46 @@ export const CommentService = {
         lastActivityAt: new Date(),
       },
     });
+
+    // AUTO-FOLLOW: El comentarista automáticamente sigue el post
+    try {
+      const { PostFollowService } = await import('./post-follow.service');
+      // Solo auto-seguir si no está ya siguiendo
+      const isAlreadyFollowing = await PostFollowService.isFollowing(authorId, data.postId);
+      if (!isAlreadyFollowing) {
+        await PostFollowService.followPost(authorId, data.postId);
+      }
+    } catch (error) {
+      console.error('Error auto-following post on comment:', error);
+    }
+
+    // NOTIFICACIONES: Notificar a todos los followers del post
+    try {
+      const { NotificationService } = await import('./notification.service');
+      await NotificationService.notifyPostFollowers(
+        data.postId,
+        post.title,
+        authorId,
+        comment.author.name || 'Usuario',
+        comment.author.image || null,
+        data.content
+      );
+    } catch (error) {
+      console.error('Error notifying followers:', error);
+    }
+
+    // EMAIL NOTIFICATIONS: Enviar emails a followers que tengan emails habilitados
+    try {
+      const { PostFollowEmailService } = await import('./post-follow-email.service');
+      await PostFollowEmailService.notifyNewComment(
+        data.postId,
+        comment.id,
+        authorId
+      );
+    } catch (error) {
+      console.error('Error sending email notifications:', error);
+      // No fallar si los emails fallan, solo registrar el error
+    }
 
     return comment;
   },
@@ -83,10 +125,10 @@ export const CommentService = {
         break;
     }
 
-    const comments = await prisma.communityComment.findMany({
+    // Obtener TODOS los comentarios del post (raíz y respuestas)
+    const allComments = await prisma.communityComment.findMany({
       where: {
         postId,
-        parentId: null,
         status: 'published',
       },
       orderBy,
@@ -103,10 +145,38 @@ export const CommentService = {
             replies: true,
           },
         },
+        votes: {
+          select: {
+            voteType: true,
+            userId: true,
+          },
+        },
       },
     });
 
-    return comments;
+    // Organizar en estructura de árbol
+    const commentsMap = new Map();
+    const rootComments: any[] = [];
+
+    // Primero crear el mapa
+    allComments.forEach((comment: any) => {
+      commentsMap.set(comment.id, { ...comment, replies: [] });
+    });
+
+    // Luego organizar en árbol
+    allComments.forEach((comment: any) => {
+      const commentWithReplies = commentsMap.get(comment.id);
+      if (comment.parentId) {
+        const parent = commentsMap.get(comment.parentId);
+        if (parent) {
+          parent.replies.push(commentWithReplies);
+        }
+      } else {
+        rootComments.push(commentWithReplies);
+      }
+    });
+
+    return rootComments;
   },
 
   async getCommentReplies(commentId: string) {

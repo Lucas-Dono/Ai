@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, MessageCircle, Calendar, Download, ArrowRight } from "lucide-react";
+import { Mail, MessageCircle, Calendar, Download, ArrowRight, Sparkles } from "lucide-react";
 
 export function FinalCTA() {
   return (
@@ -27,15 +27,21 @@ export function FinalCTA() {
                   transition={{ duration: 0.5 }}
                   className="mb-8"
                 >
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 mb-4">
+                    <Sparkles className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-600">
+                      Disponibilidad Limitada - Q2 2026
+                    </span>
+                  </div>
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-                    ¿Listo para Revolucionar{" "}
-                    <span className="text-muted-foreground">
-                      tu Estrategia de Marketing?
+                    Sé de los Primeros en{" "}
+                    <span className="text-blue-600">
+                      Acceder a Esta Tecnología
                     </span>
                   </h2>
-                  <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-                    Dejá atrás los display ads que nadie mira. Empezá a conectar con usuarios
-                    durante las conversaciones que realmente importan.
+                  <p className="text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">
+                    Únete al programa beta con precios exclusivos. Solo aceptamos sponsors de manera selectiva
+                    para garantizar resultados óptimos para cada marca.
                   </p>
                 </motion.div>
 
@@ -48,16 +54,16 @@ export function FinalCTA() {
                   className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-12 p-6 rounded-2xl bg-muted/50"
                 >
                   <div>
-                    <div className="text-3xl font-bold text-emerald-600">10-50x</div>
-                    <div className="text-xs text-muted-foreground">Mayor engagement</div>
+                    <div className="text-3xl font-bold text-blue-600">25-35 min</div>
+                    <div className="text-xs text-muted-foreground">Sesión promedio</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold">71%</div>
+                    <div className="text-3xl font-bold text-blue-600">70-80%</div>
                     <div className="text-xs text-muted-foreground">Sentiment positivo</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-blue-600">3-4x</div>
-                    <div className="text-xs text-muted-foreground">ROI vs display</div>
+                    <div className="text-3xl font-bold text-blue-600">3-5x</div>
+                    <div className="text-xs text-muted-foreground">ROI proyectado</div>
                   </div>
                 </motion.div>
               </div>
@@ -125,20 +131,20 @@ export function FinalCTA() {
               >
                 <Button
                   size="lg"
-                  className="h-14 px-8 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:shadow-xl transition-all"
-                  onClick={() => window.open("mailto:sponsors@blaniel.com", "_blank")}
+                  className="h-14 px-8 text-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all"
+                  onClick={() => window.open("mailto:sponsors@blaniel.com?subject=Solicitud Early Access - Programa de Sponsors", "_blank")}
                 >
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Agendar Demo de 30 min
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Solicitar Early Access
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-14 px-8 text-lg font-semibold border-border hover:bg-muted"
-                  onClick={() => alert("Media Kit descarga próximamente")}
+                  className="h-14 px-8 text-lg font-semibold border-2 border-border hover:bg-muted"
+                  onClick={() => window.open("mailto:sponsors@blaniel.com?subject=Solicitud Media Kit", "_blank")}
                 >
                   <Download className="mr-2 h-5 w-5" />
-                  Descargar Media Kit
+                  Solicitar Media Kit
                 </Button>
               </motion.div>
 
@@ -150,44 +156,44 @@ export function FinalCTA() {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="pt-8 border-t border-border"
               >
-                <h3 className="text-sm font-semibold text-center mb-6 text-muted-foreground uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-center mb-6 text-foreground/60 uppercase tracking-wide">
                   FAQ Rápido
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 max-w-3xl mx-auto text-sm">
                   <div>
-                    <p className="font-semibold mb-1">¿Cuánto cuesta?</p>
-                    <p className="text-muted-foreground">
-                      Desde $2,500/mes (Bronze) hasta $20K/mes (Gold)
+                    <p className="font-bold mb-1 text-foreground">¿Cuándo lanza?</p>
+                    <p className="text-foreground/70">
+                      Q2 2026. Early access disponible ahora para primeros sponsors.
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold mb-1">¿Cómo miden ROI?</p>
-                    <p className="text-muted-foreground">
-                      Dashboard con impressions, engagement, sentiment, conversions
+                    <p className="font-bold mb-1 text-foreground">¿Cuántos slots hay?</p>
+                    <p className="text-foreground/70">
+                      Limitado a 5-10 brands en fase beta para optimización dedicada
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold mb-1">¿Puedo elegir personajes?</p>
-                    <p className="text-muted-foreground">
-                      Sí, juntos seleccionamos los de mejor fit
+                    <p className="font-bold mb-1 text-foreground">¿Cuánto cuesta beta?</p>
+                    <p className="text-foreground/70">
+                      Desde $100/mes. Precios beta aumentarán post-lanzamiento.
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold mb-1">¿Hay mínimo de duración?</p>
-                    <p className="text-muted-foreground">
-                      3 meses recomendado para resultados óptimos
+                    <p className="font-bold mb-1 text-foreground">¿Qué incluye early access?</p>
+                    <p className="text-foreground/70">
+                      Precios beta, input en roadmap, soporte dedicado, case study
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold mb-1">¿Exclusividad?</p>
-                    <p className="text-muted-foreground">
-                      Gold package incluye exclusividad de categoría
+                    <p className="font-bold mb-1 text-foreground">¿Cómo miden ROI?</p>
+                    <p className="text-foreground/70">
+                      Dashboard con impressions, engagement, sentiment, conversiones
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold mb-1">¿Cómo funciona disclosure?</p>
-                    <p className="text-muted-foreground">
-                      Badge claro "[Ad]" antes de cada mention, FTC-compliant
+                    <p className="font-bold mb-1 text-foreground">¿Requisitos para aplicar?</p>
+                    <p className="text-foreground/70">
+                      Producto relevante para tech early adopters, presupuesto mínimo
                     </p>
                   </div>
                 </div>
@@ -201,22 +207,21 @@ export function FinalCTA() {
                 transition={{ duration: 0.5, delay: 0.5 }}
                 className="text-center mt-12 pt-8 border-t border-border"
               >
-                <p className="text-sm text-muted-foreground mb-4">
-                  Brands líderes ya están usando Blaniel para conectar con audiencias de alto
-                  valor
+                <p className="text-sm text-foreground/70 mb-4 font-medium">
+                  Programa exclusivo para marcas que quieren liderar la próxima generación de publicidad digital
                 </p>
-                <div className="flex justify-center items-center gap-3 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>FTC Compliant</span>
-                  </div>
-                  <div className="flex items-center gap-1">
+                <div className="flex justify-center items-center gap-4 text-xs text-foreground/70">
+                  <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                    <span>Transparencia Total</span>
+                    <span className="font-semibold">Disponibilidad Limitada</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                    <span>ROI Medible</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="font-semibold">Precios Beta</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="font-semibold">Soporte Dedicado</span>
                   </div>
                 </div>
               </motion.div>
@@ -235,9 +240,9 @@ export function FinalCTA() {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="text-center mt-12"
         >
-          <p className="text-lg font-medium">
-            No interrumpas.{" "}
-            <span className="text-foreground font-bold">Recomienda.</span>
+          <p className="text-lg font-medium text-foreground/70">
+            Los slots se llenan rápido.{" "}
+            <span className="text-blue-600 font-bold">No te quedes afuera.</span>
           </p>
         </motion.div>
       </div>

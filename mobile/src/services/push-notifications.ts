@@ -31,12 +31,58 @@ Notifications.setNotificationHandler({
 /**
  * Navegar basado en datos de notificación
  */
-export function handleNotificationNavigation(notification: Notifications.Notification) {
+export function handleNotificationNavigation(
+  notification: Notifications.Notification,
+  navigation?: any
+) {
   const data = notification.request.content.data;
   console.log("[PushNotifications] Handling navigation with data:", data);
 
-  // Aquí se puede implementar la navegación según el tipo de notificación
-  // Por ahora solo logueamos
+  if (!navigation) {
+    console.warn("[PushNotifications] No navigation object provided");
+    return data;
+  }
+
+  // Manejar diferentes tipos de notificaciones
+  try {
+    switch (data.type) {
+      case 'post_comment':
+        // Nueva comentario en post seguido
+        if (data.postId) {
+          navigation.navigate('PostDetail', { postId: data.postId });
+        }
+        break;
+
+      case 'post_mention':
+        // Mención en un post
+        if (data.postId) {
+          navigation.navigate('PostDetail', { postId: data.postId });
+        }
+        break;
+
+      case 'comment_reply':
+        // Respuesta a un comentario
+        if (data.postId) {
+          navigation.navigate('PostDetail', { postId: data.postId });
+        }
+        break;
+
+      case 'community_post':
+        // Nuevo post en comunidad seguida
+        if (data.postId) {
+          navigation.navigate('PostDetail', { postId: data.postId });
+        } else if (data.communityId) {
+          navigation.navigate('CommunityDetail', { communityId: data.communityId });
+        }
+        break;
+
+      default:
+        console.log("[PushNotifications] Unknown notification type:", data.type);
+    }
+  } catch (error) {
+    console.error("[PushNotifications] Error handling navigation:", error);
+  }
+
   return data;
 }
 

@@ -118,6 +118,12 @@ PROJECT_DIR="${PROJECT_DIR}"
 # 8. Verificación de Alertas (cada hora)
 0 * * * * curl -X POST -H "Authorization: Bearer \${CRON_SECRET}" \${APP_URL}/api/cron/check-alerts >> \${PROJECT_DIR}/logs/check-alerts.log 2>&1
 
+# 9. Digest Diario de Posts Seguidos (diario a las 9 AM)
+0 9 * * * curl -X POST -H "Authorization: Bearer \${CRON_SECRET}" \${APP_URL}/api/cron/daily-digest >> \${PROJECT_DIR}/logs/daily-digest.log 2>&1
+
+# 10. Digest Semanal de Posts Seguidos (lunes a las 9 AM)
+0 9 * * 1 curl -X POST -H "Authorization: Bearer \${CRON_SECRET}" \${APP_URL}/api/cron/weekly-digest >> \${PROJECT_DIR}/logs/weekly-digest.log 2>&1
+
 # Limpieza de logs antiguos (semanal, domingos a las 4 AM)
 0 4 * * 0 find \${PROJECT_DIR}/logs -name "*.log" -mtime +30 -delete >> \${PROJECT_DIR}/logs/cleanup.log 2>&1
 

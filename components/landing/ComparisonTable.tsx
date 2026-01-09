@@ -73,8 +73,8 @@ export function ComparisonTable() {
   ];
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden bg-muted/30">
+      <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -82,7 +82,7 @@ export function ComparisonTable() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16 max-w-3xl mx-auto"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
             {t("title")}{" "}
             <span className="text-muted-foreground">
               {t("titleHighlight")}
@@ -175,35 +175,70 @@ export function ComparisonTable() {
             </div>
           </Card>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {comparisons.map((comparison, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-              >
-                <Card className="p-4">
-                  <h3 className="font-semibold mb-3">{t(`features.feature${index + 1}`)}</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="text-center">
-                      <div className="text-xs text-muted-foreground mb-2">
-                        {t("table.us")}
-                      </div>
-                      <StatusIcon status={comparison.us} />
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-muted-foreground mb-2">
-                        {t("table.others")}
-                      </div>
-                      <StatusIcon status={comparison.others} />
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+          {/* Mobile Horizontal Scroll Table */}
+          <div className="md:hidden">
+            <Card className="overflow-hidden border border-border">
+              {/* Scroll shadows para indicar scrollabilidad */}
+              <div className="relative">
+                <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-card via-card to-transparent pointer-events-none z-10" />
+                <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-card via-card to-transparent pointer-events-none z-10" />
+
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[580px]">
+                    <thead className="bg-muted/50 border-b border-border">
+                      <tr>
+                        <th className="sticky left-0 z-20 bg-muted/50 text-left p-3 text-sm font-semibold min-w-[180px]">
+                          {t("table.feature")}
+                        </th>
+                        <th className="p-3 text-center min-w-[100px]">
+                          <div className="flex flex-col items-center gap-1">
+                            <div className="w-8 h-8 rounded-xl bg-foreground text-background text-xs font-bold flex items-center justify-center">
+                              AI
+                            </div>
+                            <span className="text-xs font-semibold">{t("table.us")}</span>
+                          </div>
+                        </th>
+                        <th className="p-3 text-center min-w-[100px]">
+                          <div className="flex flex-col items-center gap-1">
+                            <div className="w-8 h-8 rounded-xl bg-muted text-xs flex items-center justify-center">📱</div>
+                            <span className="text-xs text-muted-foreground">{t("table.others")}</span>
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisons.map((comparison, index) => (
+                        <tr key={index} className="border-b border-border/50">
+                          <td className="sticky left-0 z-10 bg-card p-3 text-xs font-medium border-r border-border/30">
+                            {t(`features.feature${index + 1}`)}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex justify-center">
+                              <StatusIcon status={comparison.us} />
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex justify-center">
+                              <StatusIcon status={comparison.others} />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Scroll indicator */}
+              <div className="p-2 bg-muted/30 border-t border-border text-center">
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  Desliza para comparar
+                </p>
+              </div>
+            </Card>
           </div>
         </motion.div>
 

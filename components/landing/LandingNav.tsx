@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -11,6 +11,9 @@ export function LandingNav() {
   const t = useTranslations("landing.nav");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Google Play URL from environment variable
+  const googlePlayUrl = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,8 +25,6 @@ export function LandingNav() {
   }, []);
 
   const navLinks = [
-    { href: "#features", labelKey: "features" },
-    { href: "#demo", labelKey: "demo" },
     { href: "/docs", labelKey: "docs" },
     { href: "/pricing", labelKey: "pricing" },
     { href: "/community", labelKey: "community" },
@@ -43,8 +44,8 @@ export function LandingNav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/landing" className="flex items-center gap-2 group">
-            <div className="w-7 h-7 rounded-md bg-foreground flex items-center justify-center text-background font-bold text-sm group-hover:opacity-90 transition-opacity">
-              AI
+            <div className="w-7 h-7 flex items-center justify-center group-hover:opacity-90 transition-opacity">
+              <img src="/logo.png" alt="Logo" className="w-7 h-7 object-contain" />
             </div>
             <span className="font-semibold text-base">{t("logo")}</span>
           </Link>
@@ -64,6 +65,23 @@ export function LandingNav() {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-2">
+            {/* Google Play Button - Only show if URL is configured */}
+            {googlePlayUrl && (
+              <a
+                href={googlePlayUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black hover:bg-black/90 text-white text-xs font-medium transition-all duration-200 hover:scale-105"
+                title="Descargar en Google Play"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                </svg>
+                <span className="hidden lg:inline">Google Play</span>
+                <Smartphone className="lg:hidden w-3.5 h-3.5" />
+              </a>
+            )}
+
             <Link href="/login">
               <Button variant="ghost" size="sm" className="text-sm font-medium">
                 {t("login")}
@@ -117,6 +135,22 @@ export function LandingNav() {
               ))}
 
               <div className="pt-4 mt-4 border-t border-border space-y-2">
+                {/* Google Play Button Mobile - Only show if URL is configured */}
+                {googlePlayUrl && (
+                  <a
+                    href={googlePlayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors w-full"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                    </svg>
+                    Descargar en Google Play
+                  </a>
+                )}
+
                 <Link href="/login" className="block">
                   <Button variant="outline" size="sm" className="w-full text-sm font-medium border-border">
                     {t("login")}

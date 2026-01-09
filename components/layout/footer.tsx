@@ -102,9 +102,16 @@ export function Footer() {
 
         {/* Bottom Footer */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-          {/* Copyright */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-muted-foreground">
-            <span>© {currentYear} Blaniel.</span>
+          {/* Brand & Copyright */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-sm text-muted-foreground">
+            <Link href="/dashboard" className="flex items-center gap-2 group">
+              <div className="w-6 h-6 flex items-center justify-center group-hover:opacity-90 transition-opacity">
+                <img src="/logo.png" alt="Blaniel Logo" className="w-6 h-6 object-contain" />
+              </div>
+              <span className="font-semibold text-foreground">Blaniel</span>
+            </Link>
+            <span className="hidden sm:inline">•</span>
+            <span>© {currentYear}</span>
             <span className="hidden sm:inline">•</span>
             <span className="flex items-center gap-1">
               {t("madeWith")} <Heart className="h-3 w-3 text-red-500 fill-red-500 animate-pulse" />

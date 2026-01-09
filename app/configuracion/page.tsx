@@ -40,6 +40,7 @@ import {
 import { AccessibilitySettings } from "@/components/accessibility/AccessibilitySettings";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { SFWProtectionToggle } from "@/components/settings/SFWProtectionToggle";
 
 interface UserProfile {
   id: string;
@@ -566,6 +567,22 @@ export default function ConfiguracionPage() {
                     )}
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* SFW Protection */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  {t("preferences.sfwProtection.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("preferences.sfwProtection.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SFWProtectionToggle />
               </CardContent>
             </Card>
           </TabsContent>

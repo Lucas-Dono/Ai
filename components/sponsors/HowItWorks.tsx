@@ -20,7 +20,7 @@ export function HowItWorks() {
       title: "Endorsement Auténtico",
       description:
         "Personajes AI comparten experiencias genuinas con tu producto usando su voz única. Se siente como consejo de un amigo, no como publicidad.",
-      highlight: "71% sentiment positivo",
+      highlight: "70-80% sentiment positivo",
     },
     {
       number: "03",
@@ -28,7 +28,7 @@ export function HowItWorks() {
       title: "Resultados Medibles",
       description:
         "Dashboard completo con analytics en tiempo real: impressions, engagement, sentiment, CTR y conversiones. Optimización basada en data.",
-      highlight: "ROI 3-4x vs display ads",
+      highlight: "ROI 3-5x proyectado",
     },
   ];
 
@@ -44,11 +44,11 @@ export function HowItWorks() {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Cómo Funciona{" "}
-            <span className="text-muted-foreground">
+            <span className="text-blue-600">
               el Product Placement Inteligente
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-foreground/80">
             Un proceso simple de 3 pasos que genera resultados extraordinarios
           </p>
         </motion.div>
@@ -86,15 +86,15 @@ export function HowItWorks() {
                     {/* Content */}
                     <div className="space-y-4">
                       <h3 className="text-xl font-semibold">{step.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-sm text-foreground/70 leading-relaxed">
                         {step.description}
                       </p>
 
                       {/* Highlight stat */}
                       <div className="pt-4 border-t border-border">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          <span className="text-xs font-medium">{step.highlight}</span>
+                          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">{step.highlight}</span>
                         </div>
                       </div>
                     </div>
@@ -126,31 +126,31 @@ export function HowItWorks() {
             <div className="grid md:grid-cols-2 gap-8">
               {/* Display Ads */}
               <div>
-                <h4 className="text-sm font-semibold text-muted-foreground mb-4">
+                <h4 className="text-sm font-bold text-foreground/60 mb-4 uppercase tracking-wide">
                   TUS ADS ACTUALES
                 </h4>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-red-500 mt-0.5">✗</span>
-                    <span className="text-muted-foreground">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span className="text-foreground/70">
                       86% ignorados (ad blindness)
                     </span>
                   </li>
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-red-500 mt-0.5">✗</span>
-                    <span className="text-muted-foreground">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span className="text-foreground/70">
                       Click-through rate: &lt;0.1%
                     </span>
                   </li>
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-red-500 mt-0.5">✗</span>
-                    <span className="text-muted-foreground">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span className="text-foreground/70">
                       Bloquean la experiencia
                     </span>
                   </li>
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-red-500 mt-0.5">✗</span>
-                    <span className="text-muted-foreground">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span className="text-foreground/70">
                       No generan confianza
                     </span>
                   </li>
@@ -159,31 +159,31 @@ export function HowItWorks() {
 
               {/* Blaniel */}
               <div>
-                <h4 className="text-sm font-semibold text-foreground mb-4">
+                <h4 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wide">
                   PRODUCT PLACEMENT EN BLANIEL
                 </h4>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
-                    <span className="text-foreground">
+                    <span className="text-emerald-600 mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground font-medium">
                       100% visto (parte de conversación)
                     </span>
                   </li>
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
-                    <span className="text-foreground">
-                      Engagement 10-50x mayor
+                    <span className="text-emerald-600 mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground font-medium">
+                      Engagement significativamente mayor (vs display ads)
                     </span>
                   </li>
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
-                    <span className="text-foreground">
+                    <span className="text-emerald-600 mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground font-medium">
                       Mejora la experiencia
                     </span>
                   </li>
                   <li className="flex items-start gap-2 text-sm">
-                    <span className="text-emerald-500 mt-0.5">✓</span>
-                    <span className="text-foreground">
+                    <span className="text-emerald-600 mt-0.5 font-bold">✓</span>
+                    <span className="text-foreground font-medium">
                       Genera confianza real
                     </span>
                   </li>

@@ -44,9 +44,9 @@ export function getCommunityImageStyles(
       large: 'w-64 h-36',
     },
     banner: {
-      small: 'w-full h-16',
-      default: 'w-full h-24',
-      large: 'w-full h-32',
+      small: 'w-full aspect-[4/1]',
+      default: 'w-full aspect-[4/1]',
+      large: 'w-full aspect-[4/1]',
     },
   };
 
@@ -100,7 +100,7 @@ export function getShapeAspectRatio(shape: ImageShape | null | undefined): numbe
     square: 1,
     vertical: 3/4,
     horizontal: 16/9,
-    banner: 5/1,
+    banner: 4/1,
   };
 
   return ratios[defaultShape] || 1;

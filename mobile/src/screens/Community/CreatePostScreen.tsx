@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { postApi } from '../../services/api';
+import { postFollowApi } from '../../services/api/post-follow.api';
 import { Ionicons } from '@expo/vector-icons';
 
 const POST_TYPES = [
@@ -70,7 +71,7 @@ export const CreatePostScreen = () => {
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
 
-      await postApi.create({
+      const newPost = await postApi.create({
         communityId,
         title: title.trim(),
         content: content.trim(),
@@ -78,7 +79,15 @@ export const CreatePostScreen = () => {
         tags: tagsArray.length > 0 ? tagsArray : undefined,
       });
 
-      Alert.alert('¡Éxito!', 'Post creado correctamente', [
+      // Auto-seguir el post creado
+      try {
+        await postFollowApi.followPost(newPost.id);
+      } catch (error) {
+        console.error('Error auto-following post:', error);
+        // No mostramos error al usuario, el auto-follow es opcional
+      }
+
+      Alert.alert('¡Éxito!', 'Post creado correctamente. Ahora lo estás siguiendo y recibirás notificaciones de nuevos comentarios.', [
         {
           text: 'OK',
           onPress: () => navigation.goBack(),

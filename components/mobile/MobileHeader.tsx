@@ -85,8 +85,8 @@ export function MobileHeader({ title, showMenu = true }: MobileHeaderProps) {
 
           {/* Center: Logo/Title */}
           <Link href="/dashboard" className="flex items-center gap-2 flex-1 justify-center">
-            <div className="h-8 w-8 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-white" />
+            <div className="h-8 w-8 flex items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
             </div>
             <span className="font-bold text-lg">{title || t("brand")}</span>
           </Link>
@@ -131,8 +131,8 @@ export function MobileHeader({ title, showMenu = true }: MobileHeaderProps) {
                 </motion.button>
 
                 <Link href="/dashboard" className="flex items-center gap-2" onClick={handleMenuItemClick}>
-                  <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-white" />
+                  <div className="h-10 w-10 flex items-center justify-center">
+                    <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
                   </div>
                   <span className="font-bold text-lg">{t("brand")}</span>
                 </Link>

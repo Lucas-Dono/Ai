@@ -12,3 +12,5 @@ export * from './marketplace.api';
 export * from './research.api';
 export * from './notification.api';
 export * from './messaging.api';
+export * from './post-follow.api';
+export * from './user-preference.api';

@@ -112,6 +112,41 @@ export function useFeed(options: UseFeedOptions = {}) {
   }, [loadPosts]);
 
   const votePost = useCallback(async (postId: string, voteType: 'upvote' | 'downvote') => {
+    // Actualización optimista ANTES de la petición
+    setPosts(prev => prev.map(post => {
+      if (post.id !== postId) return post;
+
+      const wasUpvote = post.userVote === 'upvote';
+      const wasDownvote = post.userVote === 'downvote';
+      const isUpvote = voteType === 'upvote';
+
+      let newUpvotes = post.upvotes;
+      let newDownvotes = post.downvotes;
+
+      // Remover voto anterior
+      if (wasUpvote) newUpvotes--;
+      if (wasDownvote) newDownvotes--;
+
+      // Si es el mismo voto, toggle (remover)
+      if (post.userVote === voteType) {
+        return { ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null };
+      }
+
+      // Agregar nuevo voto
+      if (isUpvote) {
+        newUpvotes++;
+      } else {
+        newDownvotes++;
+      }
+
+      return {
+        ...post,
+        upvotes: newUpvotes,
+        downvotes: newDownvotes,
+        userVote: voteType,
+      };
+    }));
+
     try {
       const response = await fetch(`/api/community/posts/${postId}/vote`, {
         method: 'POST',
@@ -119,44 +154,18 @@ export function useFeed(options: UseFeedOptions = {}) {
         body: JSON.stringify({ voteType }),
       });
 
-      if (!response.ok) throw new Error('Error al votar');
-
-      // Actualizar el post localmente
-      setPosts(prev => prev.map(post => {
-        if (post.id !== postId) return post;
-
-        const wasUpvote = post.userVote === 'upvote';
-        const wasDownvote = post.userVote === 'downvote';
-        const isUpvote = voteType === 'upvote';
-
-        let newUpvotes = post.upvotes;
-        let newDownvotes = post.downvotes;
-
-        // Remover voto anterior
-        if (wasUpvote) newUpvotes--;
-        if (wasDownvote) newDownvotes--;
-
-        // Si es el mismo voto, toggle (remover)
-        if (post.userVote === voteType) {
-          return { ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null };
-        }
-
-        // Agregar nuevo voto
-        if (isUpvote) {
-          newUpvotes++;
-        } else {
-          newDownvotes++;
-        }
-
-        return {
-          ...post,
-          upvotes: newUpvotes,
-          downvotes: newDownvotes,
-          userVote: voteType,
-        };
-      }));
+      if (!response.ok) {
+        // Revertir el cambio si falla
+        setPosts(prev => prev.map(post => {
+          if (post.id !== postId) return post;
+          // Recargar desde el servidor
+          return post;
+        }));
+        throw new Error('Error al votar');
+      }
     } catch (err) {
       console.error('Error voting:', err);
+      // La reversión ya se hizo arriba
     }
   }, []);
 

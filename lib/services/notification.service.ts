@@ -431,4 +431,52 @@ export const NotificationService = {
       metadata: { projectId },
     });
   },
+
+  /**
+   * Notificar a followers de un post sobre un nuevo comentario
+   */
+  async notifyPostFollowers(
+    postId: string,
+    postTitle: string,
+    commentAuthorId: string,
+    commentAuthorName: string,
+    commentAuthorAvatar: string | null,
+    commentContent: string
+  ) {
+    // Obtener followers del post
+    const followers = await prisma.postFollower.findMany({
+      where: {
+        postId,
+        notificationsEnabled: true,
+        userId: { not: commentAuthorId } // Excluir al autor del comentario
+      },
+      select: {
+        userId: true
+      }
+    });
+
+    if (followers.length === 0) {
+      return { count: 0 };
+    }
+
+    // Crear notificaciones para todos los followers
+    const notifications = followers.map(follower => ({
+      userId: follower.userId,
+      type: 'followed_post_comment',
+      title: 'Nuevo comentario en post que sigues',
+      message: `${commentAuthorName} comentó en "${postTitle}": "${commentContent.substring(0, 80)}${commentContent.length > 80 ? '...' : ''}"`,
+      actionUrl: `/community/post/${postId}`,
+      metadata: {
+        relatedId: postId,
+        relatedType: 'post',
+        actorId: commentAuthorId,
+        actorName: commentAuthorName,
+        actorAvatar: commentAuthorAvatar,
+      },
+    }));
+
+    const result = await this.createBulkNotifications(notifications);
+
+    return { count: result.count };
+  },
 };

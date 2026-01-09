@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
-import { checkAddAIToGroupLimit } from "@/lib/redis/group-ratelimit";
+import { atomicCheckGroupAILimit } from "@/lib/usage/atomic-resource-check";
 
 /**
  * POST /api/groups/[id]/agents
@@ -39,7 +39,7 @@ export async function POST(
       );
     }
 
-    // 2. Verificar límite de IAs por grupo
+    // 2. Obtener grupo y plan (antes de la transacción)
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -57,19 +57,6 @@ export async function POST(
     }
 
     const creatorPlan = group.creator.plan || "free";
-    const limitCheck = await checkAddAIToGroupLimit(groupId, creatorPlan);
-
-    if (!limitCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: limitCheck.reason,
-          current: limitCheck.current,
-          limit: limitCheck.limit,
-          upgradeUrl: "/pricing",
-        },
-        { status: 403 }
-      );
-    }
 
     // 3. Parse request body
     const body = await req.json();
@@ -160,45 +147,67 @@ export async function POST(
       );
     }
 
-    // 8. Crear nuevo miembro (agente)
-    const newMember = await prisma.groupMember.create({
-      data: {
-        groupId,
-        memberType: "agent",
-        agentId,
-        role: "member",
-        isActive: true,
-        importanceLevel,
-      },
-      include: {
-        agent: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true,
+    // 8. CRITICAL: Crear miembro con verificación atómica
+    const newMember = await prisma.$transaction(
+      async (tx) => {
+        // 8.1. Verificar límite DENTRO de la transacción
+        await atomicCheckGroupAILimit(tx, groupId, creatorPlan);
+
+        // 8.2. Crear nuevo miembro (agente)
+        const member = await tx.groupMember.create({
+          data: {
+            groupId,
+            memberType: "agent",
+            agentId,
+            role: "member",
+            isActive: true,
+            importanceLevel,
           },
-        },
-      },
-    });
+          include: {
+            agent: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+              },
+            },
+          },
+        });
 
-    // 9. Actualizar total de miembros
-    await prisma.group.update({
-      where: { id: groupId },
-      data: {
-        totalMembers: { increment: 1 },
-      },
-    });
+        // 8.3. Actualizar total de miembros
+        await tx.group.update({
+          where: { id: groupId },
+          data: {
+            totalMembers: { increment: 1 },
+          },
+        });
 
-    // 10. Crear mensaje de sistema
-    await prisma.groupMessage.create({
-      data: {
-        groupId,
-        authorType: "user",
-        content: `${agent.name} se unió al grupo`,
-        contentType: "system",
-        isSystemMessage: true,
-        turnNumber: (await prisma.groupMessage.count({ where: { groupId } })) + 1,
+        // 8.4. Crear mensaje de sistema
+        const messageCount = await tx.groupMessage.count({ where: { groupId } });
+        await tx.groupMessage.create({
+          data: {
+            groupId,
+            authorType: "user",
+            content: `${agent.name} se unió al grupo`,
+            contentType: "system",
+            isSystemMessage: true,
+            turnNumber: messageCount + 1,
+          },
+        });
+
+        return member;
       },
+      {
+        isolationLevel: "Serializable",
+        maxWait: 5000,
+        timeout: 10000,
+      }
+    ).catch((error) => {
+      if (error.message.startsWith("{")) {
+        const errorData = JSON.parse(error.message);
+        throw errorData;
+      }
+      throw error;
     });
 
     return NextResponse.json(
@@ -208,8 +217,26 @@ export async function POST(
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error adding agent to group:", error);
+
+    // Si es un error de límite (lanzado desde la transacción)
+    if (error.error && error.limit) {
+      return NextResponse.json(error, { status: 403 });
+    }
+
+    // Errores de transacción de Prisma
+    if (error.code === "P2034") {
+      // Serialization failure - race condition detectada
+      return NextResponse.json(
+        {
+          error: "El límite de IAs por grupo fue alcanzado. Por favor intenta de nuevo.",
+          hint: "Múltiples requests detectados"
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Error interno del servidor" },
       { status: 500 }

@@ -143,6 +143,42 @@ export function usePost(postId: string) {
   const votePost = useCallback(async (voteType: 'upvote' | 'downvote') => {
     if (!post) return;
 
+    console.log('🔵 [votePost] Antes del voto:', {
+      voteType,
+      currentUserVote: post.userVote,
+      upvotes: post.upvotes,
+      downvotes: post.downvotes
+    });
+
+    const wasUpvote = post.userVote === 'upvote';
+    const wasDownvote = post.userVote === 'downvote';
+    const isUpvote = voteType === 'upvote';
+
+    let newUpvotes = post.upvotes;
+    let newDownvotes = post.downvotes;
+
+    if (wasUpvote) newUpvotes--;
+    if (wasDownvote) newDownvotes--;
+
+    // Si es el mismo voto, toggle (remover)
+    if (post.userVote === voteType) {
+      console.log('🔄 [votePost] Toggle - Removiendo voto');
+      setPost({ ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null, score: newUpvotes - newDownvotes });
+    } else {
+      // Agregar nuevo voto
+      if (isUpvote) {
+        newUpvotes++;
+      } else {
+        newDownvotes++;
+      }
+      console.log('✅ [votePost] Nuevo voto aplicado:', {
+        newUserVote: voteType,
+        newUpvotes,
+        newDownvotes
+      });
+      setPost({ ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: voteType, score: newUpvotes - newDownvotes });
+    }
+
     try {
       const response = await fetch(`/api/community/posts/${postId}/vote`, {
         method: 'POST',
@@ -150,36 +186,55 @@ export function usePost(postId: string) {
         body: JSON.stringify({ voteType }),
       });
 
-      if (!response.ok) throw new Error('Error al votar');
-
-      const wasUpvote = post.userVote === 'upvote';
-      const wasDownvote = post.userVote === 'downvote';
-      const isUpvote = voteType === 'upvote';
-
-      let newUpvotes = post.upvotes;
-      let newDownvotes = post.downvotes;
-
-      if (wasUpvote) newUpvotes--;
-      if (wasDownvote) newDownvotes--;
-
-      if (post.userVote === voteType) {
-        setPost({ ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null, score: newUpvotes - newDownvotes });
-        return;
+      if (!response.ok) {
+        // Revertir si falla
+        setPost(post);
+        throw new Error('Error al votar');
       }
-
-      if (isUpvote) {
-        newUpvotes++;
-      } else {
-        newDownvotes++;
-      }
-
-      setPost({ ...post, upvotes: newUpvotes, downvotes: newDownvotes, userVote: voteType, score: newUpvotes - newDownvotes });
     } catch (err) {
       console.error('Error voting:', err);
     }
   }, [post, postId]);
 
   const voteComment = useCallback(async (commentId: string, voteType: 'upvote' | 'downvote') => {
+    // Actualizar localmente ANTES de la petición
+    const updateComment = (comments: Comment[]): Comment[] => {
+      return comments.map(comment => {
+        if (comment.id === commentId) {
+          const wasUpvote = comment.userVote === 'upvote';
+          const wasDownvote = comment.userVote === 'downvote';
+          const isUpvote = voteType === 'upvote';
+
+          let newUpvotes = comment.upvotes;
+          let newDownvotes = comment.downvotes;
+
+          if (wasUpvote) newUpvotes--;
+          if (wasDownvote) newDownvotes--;
+
+          if (comment.userVote === voteType) {
+            return { ...comment, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null, score: newUpvotes - newDownvotes };
+          }
+
+          if (isUpvote) {
+            newUpvotes++;
+          } else {
+            newDownvotes++;
+          }
+
+          return { ...comment, upvotes: newUpvotes, downvotes: newDownvotes, userVote: voteType, score: newUpvotes - newDownvotes };
+        }
+
+        if (comment.replies) {
+          return { ...comment, replies: updateComment(comment.replies) };
+        }
+
+        return comment;
+      });
+    };
+
+    const previousComments = comments;
+    setComments(updateComment(comments));
+
     try {
       const response = await fetch(`/api/community/comments/${commentId}/vote`, {
         method: 'POST',
@@ -187,44 +242,11 @@ export function usePost(postId: string) {
         body: JSON.stringify({ voteType }),
       });
 
-      if (!response.ok) throw new Error('Error al votar');
-
-      // Actualizar localmente
-      const updateComment = (comments: Comment[]): Comment[] => {
-        return comments.map(comment => {
-          if (comment.id === commentId) {
-            const wasUpvote = comment.userVote === 'upvote';
-            const wasDownvote = comment.userVote === 'downvote';
-            const isUpvote = voteType === 'upvote';
-
-            let newUpvotes = comment.upvotes;
-            let newDownvotes = comment.downvotes;
-
-            if (wasUpvote) newUpvotes--;
-            if (wasDownvote) newDownvotes--;
-
-            if (comment.userVote === voteType) {
-              return { ...comment, upvotes: newUpvotes, downvotes: newDownvotes, userVote: null, score: newUpvotes - newDownvotes };
-            }
-
-            if (isUpvote) {
-              newUpvotes++;
-            } else {
-              newDownvotes++;
-            }
-
-            return { ...comment, upvotes: newUpvotes, downvotes: newDownvotes, userVote: voteType, score: newUpvotes - newDownvotes };
-          }
-
-          if (comment.replies) {
-            return { ...comment, replies: updateComment(comment.replies) };
-          }
-
-          return comment;
-        });
-      };
-
-      setComments(updateComment(comments));
+      if (!response.ok) {
+        // Revertir si falla
+        setComments(previousComments);
+        throw new Error('Error al votar');
+      }
     } catch (err) {
       console.error('Error voting comment:', err);
     }

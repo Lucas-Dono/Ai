@@ -15,7 +15,13 @@ const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);
 
-const app = next({ dev, hostname, port });
+const app = next({
+  dev,
+  hostname,
+  port,
+  // Habilitar Turbopack en desarrollo para compilaciones mucho más rápidas
+  turbo: dev,
+});
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {

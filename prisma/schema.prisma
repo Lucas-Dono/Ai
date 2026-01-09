@@ -27,6 +27,9 @@ model User {
   nsfwConsentAt      DateTime? // Fecha de consentimiento NSFW
   nsfwConsentVersion String? // Versión de términos NSFW aceptados (ej: "v1.0")
 
+  // SFW Protection System (Simplificado)
+  sfwProtection Boolean @default(true) // Protección de contenido SFW activa (FREE: siempre true, PREMIUM: configurable)
+
   password              String? // Password hash para autenticación con credenciales
   plan                  String  @default("free") // free, plus, ultra
   mercadopagoCustomerId String? @unique // Mercado Pago customer ID
@@ -101,12 +104,23 @@ model User {
   // Smart Start System
   smartStartSessions SmartStartSession[] @relation("UserSmartStartSessions")
 
+  // Post Follow System
+  followedPosts         PostFollower[]           @relation("UserFollowedPosts")
+  contentPreferences    UserContentPreference?   @relation("UserContentPreferences")
+  emailNotificationConfig EmailNotificationConfig? @relation("UserEmailNotificationConfig")
+  actionHistory         UserActionHistory[]      @relation("UserActionHistory")
+  postFollowDigests     PostFollowDigest[]       @relation("UserPostFollowDigests")
+
+  // Conversation Tracking System
+  conversationTracking ConversationTracking[]
+
   @@index([email])
   @@index([mercadopagoCustomerId])
   @@index([apiKey])
   @@index([ageVerified])
   @@index([isAdult])
   @@index([nsfwConsent])
+  @@index([sfwProtection])
 }
 
 // better-auth Account Model
@@ -291,6 +305,9 @@ model Agent {
   // Living AI system
   personalGoals           PersonalGoal[]
   scheduledEvents         ScheduledEvent[]
+
+  // Conversation Tracking System
+  conversationTracking ConversationTracking[]
 
   @@index([userId])
   @@index([teamId])
@@ -759,9 +776,14 @@ model Message {
   agentId   String? // Si es chat individual
   userId    String? // Usuario que envió el mensaje
   role      String // user, assistant, system
-  content   String   @db.Text
+  content   String   @db.Text // Contenido encriptado con AES-256-GCM
   metadata  Json? // Datos adicionales (emociones, contexto, tipo de mensaje: text/audio/image, etc.)
   createdAt DateTime @default(now())
+
+  // Campos de encriptación (AES-256-GCM)
+  // Si iv y authTag son NULL, el mensaje es legacy (texto plano, debe migrarse)
+  iv        String? // Initialization Vector (hex) para encriptación
+  authTag   String? // Authentication Tag (hex) para verificar integridad
 
   agent            Agent?               @relation("AgentMessages", fields: [agentId], references: [id], onDelete: Cascade)
   reactions        Reaction[] // Reacciones de usuarios al mensaje
@@ -1749,6 +1771,11 @@ model CommunityPost {
   isFeatured Boolean @default(false)
   status     String  @default("published") // draft, published, removed, flagged
 
+  // Etiquetas de contenido
+  isNSFW    Boolean @default(false) // Contenido NSFW (Not Safe For Work)
+  isSpoiler Boolean @default(false) // Contiene spoilers
+  metadata  Json?   @default("{}") // Metadata adicional (isOC, flair, imageMetadata, etc.)
+
   // Métricas de engagement
   upvotes      Int @default(0)
   downvotes    Int @default(0)
@@ -1783,6 +1810,7 @@ model CommunityPost {
   votes     PostVote[]
   awards    PostAward[]
   reports   PostReport[]
+  followers PostFollower[]
 
   @@index([authorId])
   @@index([communityId])
@@ -1804,6 +1832,9 @@ model CommunityComment {
   // Contenido
   content     String @db.Text
   contentType String @default("markdown")
+
+  // Multimedia
+  images Json @default("[]") // URLs de imágenes
 
   // Estado
   isEdited  Boolean @default(false)
@@ -2184,6 +2215,136 @@ model Follow {
   @@unique([followerId, followingId])
   @@index([followerId])
   @@index([followingId])
+}
+
+// SEGUIR POSTS
+model PostFollower {
+  id        String   @id @default(cuid())
+  userId    String   // Usuario que sigue el post
+  postId    String   // Post seguido
+
+  // Configuración
+  notificationsEnabled Boolean @default(true)
+  emailNotifications   Boolean @default(true) // Recibir emails sobre este post
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  user User          @relation("UserFollowedPosts", fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+}
+
+// PREFERENCIAS DE CONTENIDO
+model UserContentPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Preferencias implícitas basadas en acciones del usuario
+  // Almacena contadores de interés por tipo, tag y comunidad
+  // Formato: {"showcase": 5, "discussion": 3, ...}
+  preferredPostTypes   Json @default("{}")
+  preferredTags        Json @default("{}")
+  preferredCommunities Json @default("{}")
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación
+  user User @relation("UserContentPreferences", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// CONFIGURACIÓN DE NOTIFICACIONES EMAIL PARA POSTS SEGUIDOS
+model EmailNotificationConfig {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Frecuencia de notificaciones
+  frequency String @default("instant") // instant, daily, weekly, disabled
+
+  // Tipos de notificaciones a recibir
+  newComments      Boolean @default(true)
+  newReplies       Boolean @default(true)
+  postUpdates      Boolean @default(true)
+  digestSummary    Boolean @default(true)
+
+  // Configuración de digest
+  digestDay        String? // Para weekly: monday, tuesday, etc.
+  digestTime       String  @default("09:00") // Hora del día para enviar (formato HH:mm)
+  lastDigestSentAt DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación
+  user User @relation("UserEmailNotificationConfig", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([frequency])
+}
+
+// HISTORIAL DE ACCIONES DEL USUARIO (para analytics)
+model UserActionHistory {
+  id     String @id @default(cuid())
+  userId String
+
+  // Tipo de acción
+  action String // follow_post, unfollow_post, upvote, downvote, comment, save, view, etc.
+
+  // Contexto de la acción
+  targetType String? // post, comment, community, user, etc.
+  targetId   String?
+
+  // Metadata adicional (JSON flexible)
+  metadata Json? @default("{}")
+
+  // Timestamp
+  createdAt DateTime @default(now())
+
+  // Relación
+  user User @relation("UserActionHistory", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+// REGISTRO DE DIGESTS ENVIADOS
+model PostFollowDigest {
+  id     String @id @default(cuid())
+  userId String
+
+  // Tipo de digest
+  type String // daily, weekly
+
+  // Posts incluidos en el digest
+  postIds Json @default("[]") // Array de post IDs
+
+  // Estadísticas
+  totalNewComments Int @default(0)
+  totalNewReplies  Int @default(0)
+  postsCount       Int @default(0)
+
+  // Timestamps
+  periodStart DateTime
+  periodEnd   DateTime
+  sentAt      DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  // Relación
+  user User @relation("UserPostFollowDigests", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([sentAt])
 }
 
 // MENSAJERÍA DIRECTA
@@ -3897,4 +4058,330 @@ model GroupInvitation {
   @@index([inviteCode])
   @@index([status])
   @@index([expiresAt])
+}
+
+// ============================================================================
+// CONVERSATION TRACKING SYSTEM
+// Sistema de tracking de conversaciones para "Tu Círculo"
+// Similar a WhatsApp: mensajes sin leer, última interacción, etc.
+// ============================================================================
+
+model ConversationTracking {
+  id      String @id @default(cuid())
+  userId  String
+  agentId String
+
+  // Tracking de mensajes
+  lastMessageAt       DateTime @default(now())
+  lastSeenAt          DateTime @default(now())
+  unreadCount         Int      @default(0)
+  lastViewedMessageId String?
+
+  // Metadata de conversación
+  totalMessages Int     @default(0)
+  isPinned      Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, agentId])
+  @@index([userId, lastMessageAt])
+  @@index([userId, unreadCount])
+  @@index([agentId])
+}
+
+// ============================================================================
+// ADVANCED SECURITY SYSTEM
+// Sistema de detección de amenazas, honeypots, fingerprinting y alertas
+// ============================================================================
+
+// Client Fingerprinting - Identifica atacantes por múltiples señales
+model ClientFingerprint {
+  id String @id @default(cuid())
+
+  // Network fingerprinting
+  ipAddress    String
+  ipReputation String? // clean, suspicious, malicious
+  asn          String? // Autonomous System Number
+  country      String?
+  isp          String?
+
+  // HTTP fingerprinting
+  userAgent     String  @db.Text
+  acceptHeaders String? @db.Text
+  acceptLanguage String?
+  acceptEncoding String?
+
+  // TLS/SSL fingerprinting (JA3)
+  ja3Hash       String? // JA3 fingerprint hash
+  ja3String     String? @db.Text // Full JA3 string
+  tlsVersion    String?
+  cipherSuites  String? @db.Text
+
+  // Behavioral fingerprinting
+  requestPattern    Json? // Patrones de timing y orden de requests
+  mouseMovements    Json? // Datos de movimiento del mouse (si disponible)
+  keystrokeDynamics Json? // Patrones de tipeo
+  screenResolution  String?
+  timezone          String?
+  plugins           Json? // Browser plugins detectados
+
+  // Risk scoring
+  threatScore  Float   @default(0.0) // 0-100
+  isBot        Boolean @default(false)
+  isSuspicious Boolean @default(false)
+  isBlocked    Boolean @default(false)
+
+  // Tracking
+  firstSeen      DateTime  @default(now())
+  lastSeen       DateTime  @default(now())
+  requestCount   Int       @default(1)
+  blockedCount   Int       @default(0)
+  honeypotHits   Int       @default(0)
+
+  // Relations
+  threatDetections ThreatDetection[]
+  honeypotHits     HoneypotHit[]
+
+  @@index([ipAddress])
+  @@index([ja3Hash])
+  @@index([threatScore])
+  @@index([isSuspicious])
+  @@index([isBlocked])
+  @@index([lastSeen])
+}
+
+// Threat Detection - Registro de amenazas detectadas
+model ThreatDetection {
+  id String @id @default(cuid())
+
+  fingerprintId String?
+  fingerprint   ClientFingerprint? @relation(fields: [fingerprintId], references: [id], onDelete: SetNull)
+
+  // Threat information
+  threatType     String // brute_force, sql_injection, xss, path_traversal, api_abuse, etc.
+  severity       String // low, medium, high, critical
+  confidence     Float  @default(0.0) // 0-1
+  attackVector   String @db.Text // Descripción del vector de ataque
+
+  // Request details
+  method      String
+  path        String @db.Text
+  query       String? @db.Text
+  payload     String? @db.Text
+  headers     Json
+  ipAddress   String
+  userAgent   String  @db.Text
+
+  // Detection metadata
+  detectorName String // Nombre del detector que identificó la amenaza
+  ruleTriggered String? // Regla específica que se activó
+  indicators    Json // Indicadores de compromiso detectados
+
+  // Response
+  blocked      Boolean @default(false)
+  response     String? // Respuesta enviada al atacante
+  tarpitDelay  Int?    @default(0) // Delay en ms aplicado
+  honeypotUsed Boolean @default(false)
+
+  // Status
+  reviewed   Boolean @default(false)
+  falsePositive Boolean @default(false)
+  notes      String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  alerts ThreatAlert[]
+
+  @@index([fingerprintId])
+  @@index([threatType])
+  @@index([severity])
+  @@index([ipAddress])
+  @@index([blocked])
+  @@index([createdAt])
+  @@index([reviewed])
+}
+
+// Honeypot Hits - Registro de accesos a honeypots
+model HoneypotHit {
+  id String @id @default(cuid())
+
+  fingerprintId String?
+  fingerprint   ClientFingerprint? @relation(fields: [fingerprintId], references: [id], onDelete: SetNull)
+
+  // Honeypot information
+  honeypotType String // fake_api, fake_admin, fake_upload, fake_database, etc.
+  honeypotPath String @db.Text
+  honeypotName String // Nombre identificador del honeypot
+
+  // Request details
+  method    String
+  query     String? @db.Text
+  payload   String? @db.Text
+  headers   Json
+  ipAddress String
+  userAgent String  @db.Text
+
+  // Automated attack detection
+  isAutomated   Boolean @default(false) // Script/bot vs humano
+  scanningTools String[] // Herramientas detectadas (nmap, sqlmap, burp, etc.)
+
+  // Response given
+  fakeData     Json? // Datos falsos entregados al atacante
+  tarpitDelay   Int    @default(0) // Delay aplicado en ms
+  sessionId     String? // ID de sesión del atacante
+  subsequentHits Int    @default(0) // Hits adicionales del mismo atacante
+
+  createdAt DateTime @default(now())
+
+  @@index([fingerprintId])
+  @@index([honeypotType])
+  @@index([ipAddress])
+  @@index([createdAt])
+  @@index([isAutomated])
+}
+
+// Canary Tokens - Tokens trampa en datos sensibles
+model CanaryToken {
+  id String @id @default(cuid())
+
+  // Token information
+  tokenType    String // api_key, email, phone, url, file, database_query, etc.
+  tokenValue   String @unique // Valor del token trampa
+  tokenHash    String @unique // Hash del token para búsqueda rápida
+  description  String @db.Text // Descripción del contexto del token
+
+  // Location
+  placedIn     String @db.Text // Dónde fue colocado el token
+  dataContext  Json // Contexto adicional de dónde está el token
+
+  // Status
+  isActive     Boolean @default(true)
+  triggered    Boolean @default(false)
+  triggerCount Int     @default(0)
+
+  // Notifications
+  alertEmails   String[] // Emails a notificar cuando se active
+  alertWebhook  String? // Webhook a llamar cuando se active
+  lastTriggered DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  triggers CanaryTokenTrigger[]
+
+  @@index([tokenHash])
+  @@index([tokenType])
+  @@index([isActive])
+  @@index([triggered])
+}
+
+// Canary Token Triggers - Activaciones de canary tokens
+model CanaryTokenTrigger {
+  id String @id @default(cuid())
+
+  canaryTokenId String
+  canaryToken   CanaryToken @relation(fields: [canaryTokenId], references: [id], onDelete: Cascade)
+
+  // Trigger details
+  triggeredBy   String // Descripción de quién/qué activó el token
+  ipAddress     String
+  userAgent     String  @db.Text
+  requestPath   String? @db.Text
+  requestMethod String?
+  headers       Json
+
+  // Context
+  contextData   Json? // Datos adicionales del contexto
+  fingerprint   String? // Fingerprint del cliente si está disponible
+
+  // Response
+  alertSent     Boolean @default(false)
+  alertError    String? @db.Text
+  actionTaken   String? // Acción tomada (block, monitor, alert, etc.)
+
+  triggeredAt DateTime @default(now())
+
+  @@index([canaryTokenId])
+  @@index([ipAddress])
+  @@index([triggeredAt])
+}
+
+// Threat Alerts - Alertas de seguridad en tiempo real
+model ThreatAlert {
+  id String @id @default(cuid())
+
+  threatDetectionId String?
+  threatDetection   ThreatDetection? @relation(fields: [threatDetectionId], references: [id], onDelete: SetNull)
+
+  // Alert information
+  alertType    String // real_time, digest, critical, honeypot, canary
+  severity     String // low, medium, high, critical
+  title        String
+  description  String @db.Text
+  actionable   Boolean @default(true) // Requiere acción inmediata
+
+  // Alert channels
+  emailSent    Boolean @default(false)
+  slackSent    Boolean @default(false)
+  webhookSent  Boolean @default(false)
+  dashboardNotified Boolean @default(false)
+
+  // Status
+  acknowledged Boolean @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  resolved     Boolean @default(false)
+  resolvedAt   DateTime?
+  resolution   String? @db.Text
+
+  // Metadata
+  metadata     Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([threatDetectionId])
+  @@index([alertType])
+  @@index([severity])
+  @@index([acknowledged])
+  @@index([resolved])
+  @@index([createdAt])
+}
+
+// Attack Patterns - Patrones de ataque detectados
+model AttackPattern {
+  id String @id @default(cuid())
+
+  // Pattern identification
+  patternName   String @unique
+  patternType   String // brute_force, enumeration, injection, scanning, etc.
+  description   String @db.Text
+
+  // Detection rules
+  detectionRules Json // Reglas para detectar este patrón
+  indicators     Json // Indicadores de este patrón
+  thresholds     Json // Umbrales de detección
+
+  // Statistics
+  timesDetected Int      @default(0)
+  lastDetected  DateTime?
+  averageSeverity Float  @default(0.0)
+
+  // Mitigation
+  mitigationSteps Json // Pasos de mitigación recomendados
+  autoBlock       Boolean @default(false) // Bloquear automáticamente
+
+  isActive  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patternType])
+  @@index([isActive])
+  @@index([timesDetected])
 }

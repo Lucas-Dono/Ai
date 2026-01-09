@@ -29,7 +29,7 @@ const SHAPE_OPTIONS: { value: ImageShape; aspect: number }[] = [
   { value: 'square', aspect: 1 },      // 1:1 cuadrado
   { value: 'vertical', aspect: 3/4 },  // 3:4 vertical
   { value: 'horizontal', aspect: 16/9 }, // 16:9 horizontal
-  { value: 'banner', aspect: 5/1 },    // 5:1 banner
+  { value: 'banner', aspect: 4/1 },    // 4:1 banner (estándar web)
 ];
 
 export function CommunityImageUploader({
@@ -184,7 +184,7 @@ export function CommunityImageUploader({
         };
       case 'banner':
         return {
-          containerClass: isPreview ? 'w-64 h-14 mx-auto rounded-lg overflow-hidden border-2 border-primary' : 'w-full h-32 rounded-lg overflow-hidden',
+          containerClass: isPreview ? 'w-64 h-16 mx-auto rounded-lg overflow-hidden border-2 border-primary' : 'w-full aspect-[4/1] rounded-lg overflow-hidden',
           imageClass: `${baseClasses}`
         };
       default:

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,18 +10,40 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, Chrome, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useShakeOnError } from "@/hooks/useShake";
+import { getSecureCallbackUrl } from "@/lib/security/url-validation";
 
 export const dynamic = 'force-dynamic';
 
 export default function LoginPage() {
   const t = useTranslations("login");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { shakeClass } = useShakeOnError(!!error);
+
+  // Obtener y validar callbackUrl de manera segura
+  const [callbackUrl, setCallbackUrl] = useState("/dashboard");
+
+  // Demo migration params
+  const [fromDemo, setFromDemo] = useState(false);
+  const [demoSessionId, setDemoSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Validar callbackUrl al montar el componente
+    const secureUrl = getSecureCallbackUrl(searchParams, "/dashboard");
+    setCallbackUrl(secureUrl);
+
+    // Detectar si viene de demo
+    const isFromDemo = searchParams.get('fromDemo') === 'true';
+    const sessionId = searchParams.get('demoSessionId');
+
+    setFromDemo(isFromDemo);
+    setDemoSessionId(sessionId);
+  }, [searchParams]);
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +59,42 @@ export default function LoginPage() {
       if (result.error) {
         setError("Email o contraseña incorrectos");
       } else {
-        router.push("/dashboard");
+        // Si viene de demo, migrar mensajes y redirigir al chat de Luna
+        if (fromDemo && demoSessionId) {
+          try {
+            const migrateResponse = await fetch("/api/demo/migrate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                demoSessionId,
+              }),
+            });
+
+            if (migrateResponse.ok) {
+              const migrateData = await migrateResponse.json();
+
+              // Limpiar localStorage del demo
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('luna_demo_session');
+              }
+
+              // Redirigir al chat de Luna con indicador de continuación
+              router.push(`/agentes/${migrateData.agentId}?fromDemo=true`);
+              router.refresh();
+              return;
+            } else {
+              console.error("Error migrating demo:", await migrateResponse.text());
+              // Si falla la migración, seguir al callback normal
+            }
+          } catch (migrateError) {
+            console.error("Error migrating demo:", migrateError);
+            // Si falla la migración, seguir al callback normal
+          }
+        }
+
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (error) {
@@ -52,7 +109,7 @@ export default function LoginPage() {
     setLoading(true);
     await signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: callbackUrl,
     });
   };
 

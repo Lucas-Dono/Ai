@@ -1,0 +1,165 @@
+import { prisma } from '@/lib/prisma';
+
+export class PostFollowService {
+  /**
+   * Seguir un post
+   */
+  static async followPost(userId: string, postId: string) {
+    // Verificar que el post existe
+    const post = await prisma.communityPost.findUnique({
+      where: { id: postId },
+      include: { community: true }
+    });
+
+    if (!post) {
+      throw new Error('Post no encontrado');
+    }
+
+    // Verificar si ya está siguiendo
+    const existing = await prisma.postFollower.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId
+        }
+      }
+    });
+
+    if (existing) {
+      return existing; // Ya está siguiendo
+    }
+
+    // Crear el follow
+    const follow = await prisma.postFollower.create({
+      data: {
+        userId,
+        postId,
+        notificationsEnabled: true
+      }
+    });
+
+    return follow;
+  }
+
+  /**
+   * Dejar de seguir un post
+   */
+  static async unfollowPost(userId: string, postId: string) {
+    const deleted = await prisma.postFollower.deleteMany({
+      where: {
+        userId,
+        postId
+      }
+    });
+
+    return deleted.count > 0;
+  }
+
+  /**
+   * Verificar si un usuario está siguiendo un post
+   */
+  static async isFollowing(userId: string, postId: string): Promise<boolean> {
+    const follow = await prisma.postFollower.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId
+        }
+      }
+    });
+
+    return !!follow;
+  }
+
+  /**
+   * Obtener todos los seguidores de un post
+   */
+  static async getFollowers(postId: string) {
+    const followers = await prisma.postFollower.findMany({
+      where: { postId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true
+          }
+        }
+      }
+    });
+
+    return followers;
+  }
+
+  /**
+   * Obtener todos los posts que sigue un usuario
+   */
+  static async getFollowedPosts(userId: string) {
+    const follows = await prisma.postFollower.findMany({
+      where: { userId },
+      include: {
+        post: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true
+              }
+            },
+            community: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    return follows.map(f => f.post);
+  }
+
+  /**
+   * Alternar estado de notificaciones para un follow
+   */
+  static async toggleNotifications(userId: string, postId: string) {
+    const follow = await prisma.postFollower.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId
+        }
+      }
+    });
+
+    if (!follow) {
+      throw new Error('No estás siguiendo este post');
+    }
+
+    const updated = await prisma.postFollower.update({
+      where: {
+        userId_postId: {
+          userId,
+          postId
+        }
+      },
+      data: {
+        notificationsEnabled: !follow.notificationsEnabled
+      }
+    });
+
+    return updated;
+  }
+
+  /**
+   * Obtener conteo de seguidores de un post
+   */
+  static async getFollowerCount(postId: string): Promise<number> {
+    const count = await prisma.postFollower.count({
+      where: { postId }
+    });
+
+    return count;
+  }
+}

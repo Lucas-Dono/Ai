@@ -113,6 +113,14 @@ export const CommunityFeedScreen = () => {
       style={styles.postCard}
       onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
     >
+      {/* Following Badge */}
+      {item.isFollowing && (
+        <View style={styles.followingBadge}>
+          <Ionicons name="notifications" size={14} color="#3b82f6" />
+          <Text style={styles.followingBadgeText}>Siguiendo</Text>
+        </View>
+      )}
+
       {/* Community Badge */}
       {item.community && (
         <View style={styles.communityBadge}>
@@ -210,9 +218,17 @@ export const CommunityFeedScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Community</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
-          <Ionicons name="add-circle-outline" size={28} color={colors.primary[500]} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('FollowingPosts')}
+            style={styles.headerButton}
+          >
+            <Ionicons name="notifications-outline" size={24} color={colors.primary[500]} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
+            <Ionicons name="add-circle-outline" size={28} color={colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Feed Tabs */}
@@ -468,5 +484,29 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     color: colors.primary[300],
+  },
+  followingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: spacing.xs,
+  },
+  followingBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#3b82f6',
+    marginLeft: 4,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  headerButton: {
+    padding: 4,
   },
 });
