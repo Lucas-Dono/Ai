@@ -25,13 +25,13 @@ export const GET = withAdminAuth(async (request, { admin }) => {
 
     // Post Reports
     const postReportsWhere: any = {};
-    if (resolved === 'true') postReportsWhere.resolved = true;
-    if (resolved === 'false') postReportsWhere.resolved = false;
+    if (resolved === 'true') postReportsWhere.status = { in: ['action_taken', 'dismissed'] };
+    if (resolved === 'false') postReportsWhere.status = 'pending';
 
     // Comment Reports
     const commentReportsWhere: any = {};
-    if (resolved === 'true') commentReportsWhere.resolved = true;
-    if (resolved === 'false') commentReportsWhere.resolved = false;
+    if (resolved === 'true') commentReportsWhere.status = { in: ['action_taken', 'dismissed'] };
+    if (resolved === 'false') commentReportsWhere.status = 'pending';
 
     // Obtener reportes según el tipo
     let postReports: any[] = [];
@@ -116,9 +116,10 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         type: 'post',
         reason: r.reason,
         description: r.description,
-        resolved: r.resolved,
-        resolvedAt: r.resolvedAt,
-        resolvedBy: r.resolvedBy,
+        status: r.status,
+        reviewedAt: r.reviewedAt,
+        reviewedBy: r.reviewedBy,
+        action: r.action,
         createdAt: r.createdAt,
         content: r.post,
         reporter: r.reporter
@@ -128,9 +129,10 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         type: 'comment',
         reason: r.reason,
         description: r.description,
-        resolved: r.resolved,
-        resolvedAt: r.resolvedAt,
-        resolvedBy: r.resolvedBy,
+        status: r.status,
+        reviewedAt: r.reviewedAt,
+        reviewedBy: r.reviewedBy,
+        action: r.action,
         createdAt: r.createdAt,
         content: r.comment,
         reporter: r.reporter
@@ -203,9 +205,10 @@ export const POST = withAdminAuth(async (request, { admin }) => {
       const report = await prisma.postReport.update({
         where: { id: reportId },
         data: {
-          resolved: true,
-          resolvedAt: new Date(),
-          resolvedBy: admin.userId
+          status: action === 'reject' ? 'dismissed' : 'action_taken',
+          reviewedAt: new Date(),
+          reviewedBy: admin.userId,
+          action
         },
         include: {
           post: {
@@ -243,9 +246,10 @@ export const POST = withAdminAuth(async (request, { admin }) => {
       const report = await prisma.commentReport.update({
         where: { id: reportId },
         data: {
-          resolved: true,
-          resolvedAt: new Date(),
-          resolvedBy: admin.userId
+          status: action === 'reject' ? 'dismissed' : 'action_taken',
+          reviewedAt: new Date(),
+          reviewedBy: admin.userId,
+          action
         },
         include: {
           comment: {
