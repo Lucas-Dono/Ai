@@ -66,8 +66,14 @@ export async function calculateTarpitDelay(
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
-        honeypotHits: {
-          orderBy: { createdAt: 'desc' },
+        honeypotHitRecords: {
+          select: {
+            id: true,
+            type: true,
+            ipAddress: true,
+            detectedAt: true,
+          },
+          orderBy: { detectedAt: 'desc' },
           take: 5,
         },
       },
@@ -96,7 +102,7 @@ export async function calculateTarpitDelay(
 
     // Exponential backoff basado en intentos previos
     if (cfg.exponentialBackoff) {
-      const recentAttempts = fingerprint.threatDetections.length + fingerprint.honeypotHits.length;
+      const recentAttempts = (fingerprint.threatDetections?.length || 0) + (fingerprint.honeypotHits || 0);
 
       if (recentAttempts > 0) {
         // Multiplicar por 1.5^attempts (máximo 10 veces)

@@ -515,8 +515,14 @@ export async function getFingerprint(ipAddress: string, ja3Hash?: string) {
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
-        honeypotHits: {
-          orderBy: { createdAt: 'desc' },
+        honeypotHitRecords: {
+          select: {
+            id: true,
+            type: true,
+            ipAddress: true,
+            detectedAt: true,
+          },
+          orderBy: { detectedAt: 'desc' },
           take: 10,
         },
       },
@@ -585,7 +591,10 @@ export async function fingerprintRequest(
   // 4. Build complete fingerprint
   const fingerprint: FingerprintData = {
     ipAddress,
-    ...httpFingerprint,
+    userAgent: httpFingerprint.userAgent || 'unknown',
+    acceptHeaders: httpFingerprint.acceptHeaders,
+    acceptLanguage: httpFingerprint.acceptLanguage,
+    acceptEncoding: httpFingerprint.acceptEncoding,
     ...ja3Data,
     ...geoData,
     requestPattern: options.requestPattern,
