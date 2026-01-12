@@ -448,7 +448,10 @@ export async function calculateUserKPIs(userId: string) {
 
   // Relations (stages)
   const relations = await prisma.relation.findMany({
-    where: { userId },
+    where: {
+      targetId: userId,
+      targetType: "user"
+    },
     select: {
       stage: true,
       trust: true,

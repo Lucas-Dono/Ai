@@ -153,7 +153,7 @@ export class PostFollowEmailService {
           title: p.title,
           url: `${APP_URL}/community/post/${p.id}`,
           newCommentsCount: p.newCommentsCount,
-          community: p.community
+          community: p.community || undefined
         })),
         totalNewComments: activity.totalNewComments,
         unsubscribeUrl: `${APP_URL}/settings/notifications?unsubscribe=digest`,
@@ -234,7 +234,7 @@ export class PostFollowEmailService {
           title: p.title,
           url: `${APP_URL}/community/post/${p.id}`,
           newCommentsCount: p.newCommentsCount,
-          community: p.community
+          community: p.community || undefined
         })),
         totalNewComments: activity.totalNewComments,
         unsubscribeUrl: `${APP_URL}/settings/notifications?unsubscribe=digest`,

@@ -358,7 +358,7 @@ export function LandingDemoChat() {
                   eventType: LandingEventType.DEMO_SIGNUP,
                   metadata: {
                     action: 'create_account',
-                    sessionId,
+                    sessionId: sessionId || undefined,
                     messagesExchanged: messages.filter(m => m.role === 'user').length,
                   },
                 }).catch(() => {});
@@ -375,7 +375,7 @@ export function LandingDemoChat() {
                   eventType: LandingEventType.DEMO_SIGNUP,
                   metadata: {
                     action: 'login',
-                    sessionId,
+                    sessionId: sessionId || undefined,
                     messagesExchanged: messages.filter(m => m.role === 'user').length,
                   },
                 }).catch(() => {});

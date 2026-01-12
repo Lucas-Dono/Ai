@@ -265,6 +265,9 @@ model Agent {
   groupMemberships GroupMember[]  @relation("GroupMemberAgent")
   groupMessages    GroupMessage[] @relation("GroupMessageAgent")
 
+  // Sistema de mensajes proactivos
+  proactiveMessages ProactiveMessage[]
+
   // Sistema emocional avanzado
   personalityCore  PersonalityCore?
   internalState    InternalState?
@@ -1446,6 +1449,9 @@ model ProactiveMessage {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relaciones
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
   @@index([userId])

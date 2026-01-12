@@ -27,7 +27,6 @@ export function MetricsGridExample() {
         value="1,234"
         change={12.5}
         changeLabel="vs last month"
-        trend="up"
         icon={<UsersIcon className="w-5 h-5" />}
       />
 
@@ -36,7 +35,6 @@ export function MetricsGridExample() {
         value="3.2%"
         change={-0.5}
         changeLabel="vs last week"
-        trend="down"
         icon={<TrendingUpIcon className="w-5 h-5" />}
       />
 
@@ -44,7 +42,6 @@ export function MetricsGridExample() {
         title="MRR"
         value="$28,450"
         change={8.7}
-        trend="up"
         icon={<DollarSignIcon className="w-5 h-5" />}
       />
 
@@ -84,15 +81,17 @@ export function TimeSeriesExample() {
   ];
 
   return (
-    <TimeSeriesChart
-      title="Daily Signups vs Conversions"
-      data={timeSeriesData}
-      lines={[
-        { key: 'signups', name: 'Signups', color: '#3b82f6' },
-        { key: 'conversions', name: 'Conversions', color: '#10b981' }
-      ]}
-      height={400}
-    />
+    <div>
+      <h3 className="text-lg font-semibold mb-4">Daily Signups vs Conversions</h3>
+      <TimeSeriesChart
+        data={timeSeriesData}
+        dataKeys={[
+          { key: 'signups', label: 'Signups', color: '#3b82f6' },
+          { key: 'conversions', label: 'Conversions', color: '#10b981' }
+        ]}
+        height={400}
+      />
+    </div>
   );
 }
 

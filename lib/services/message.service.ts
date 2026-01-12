@@ -326,7 +326,7 @@ export class MessageService {
       const behaviorOrchestration = await behaviorOrchestrator.processIncomingMessage({
         agent,
         userMessage,
-        decryptedRecentMessages,
+        recentMessages: decryptedRecentMessages,
         dominantEmotion: (emotionalSummary.dominant[0] || 'joy') as any,
         emotionalState: {
           valence: emotionalSummary.pad.valence,
@@ -504,8 +504,8 @@ export class MessageService {
         // ⚠️ FALLBACK: Solo si no hay variant asignado (agentes antiguos)
         personalityTraits: !agent.personalityVariant ? (agent.personality || '') : undefined,
         relationshipStage: relation.stage,
-        decryptedRecentMessages: decryptedRecentMessages.map(m => m.content).slice(0, 5),
-        // ⚠️ nsfwMode eliminado - ahora se maneja con SFW Protection a nivel de usuario
+        recentMessages: decryptedRecentMessages.map(m => m.content).slice(0, 5),
+        nsfwMode: agent.nsfwMode,
         // ✅ NUEVO: Tier del usuario para clasificación inteligente
         userTier: userPlan === 'ultra' ? 'ultra' : userPlan === 'plus' ? 'plus' : 'free',
         characterInfo: characterOrigin ? {

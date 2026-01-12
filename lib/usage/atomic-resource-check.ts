@@ -26,7 +26,7 @@ export async function atomicCheckAgentLimit(
   });
 
   const limits = getTierLimits(userPlan);
-  const limit = limits.resources.maxAgents;
+  const limit = limits.resources.activeAgents;
 
   // Si el límite es -1, es ilimitado
   if (limit === -1) {

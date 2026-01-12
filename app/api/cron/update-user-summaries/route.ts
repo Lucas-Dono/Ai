@@ -367,7 +367,9 @@ export async function GET(request: NextRequest) {
       distinct: ['userId']
     });
 
-    const activeUserIds = recentMessages.map(m => m.userId);
+    const activeUserIds = recentMessages
+      .map(m => m.userId)
+      .filter((id): id is string => id !== null);
 
     if (activeUserIds.length === 0) {
       console.log('[CRON] No active users in the last hour, skipping');

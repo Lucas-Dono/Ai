@@ -47,26 +47,7 @@ export const GET = withAdminAuth(async (request, { admin }) => {
     const [agents, total] = await Promise.all([
       prisma.agent.findMany({
         where,
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          gender: true,
-          personality: true,
-          visibility: true,
-          nsfwMode: true,
-          nsfwLevel: true,
-          avatarUrl: true,
-          createdAt: true,
-          updatedAt: true,
-          owner: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
-              plan: true
-            }
-          },
+        include: {
           _count: {
             select: {
               messagesAsAgent: true

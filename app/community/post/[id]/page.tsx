@@ -66,6 +66,7 @@ interface Comment {
   userVote?: 'upvote' | 'downvote' | null;
   isEdited?: boolean;
   images?: string[];
+  replies?: Comment[];
 }
 
 export default function PostDetailPage() {

@@ -170,7 +170,7 @@ async function getTopAttackers(timeRange: { from: Date; to: Date }, limit: numbe
             threatType: true,
           },
         },
-        honeypotHits: {
+        honeypotHitRecords: {
           where: {
             createdAt: {
               gte: timeRange.from,
@@ -195,7 +195,7 @@ async function getTopAttackers(timeRange: { from: Date; to: Date }, limit: numbe
       isBlocked: fp.isBlocked,
       requestCount: fp.requestCount,
       threatCount: fp.threatDetections.length,
-      honeypotHits: fp.honeypotHits.length,
+      honeypotHits: fp.honeypotHitRecords.length,
       lastSeen: fp.lastSeen,
       threats: fp.threatDetections.map(t => ({
         severity: t.severity,

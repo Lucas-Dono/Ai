@@ -140,7 +140,7 @@ export function GroupCard({ group }: GroupCardProps) {
               </div>
               <div className="flex items-center gap-1" title="Mensajes">
                 <MessageCircle className="w-3 h-3" />
-                <span>{group._count?.messagesAsAgent || group.totalMessages || 0}</span>
+                <span>{group.totalMessages || group._count?.messages || 0}</span>
               </div>
             </div>
           </div>

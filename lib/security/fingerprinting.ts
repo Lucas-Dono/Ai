@@ -518,11 +518,10 @@ export async function getFingerprint(ipAddress: string, ja3Hash?: string) {
         honeypotHitRecords: {
           select: {
             id: true,
-            type: true,
             ipAddress: true,
-            detectedAt: true,
+            createdAt: true,
           },
-          orderBy: { detectedAt: 'desc' },
+          orderBy: { createdAt: 'desc' },
           take: 10,
         },
       },

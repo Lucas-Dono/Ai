@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CompanionCard } from '@/components/companions/CompanionCard';
+import type { CategoryKey } from '@/lib/categories';
 import { Carousel } from '@/components/ui/carousel';
 import { VIBE_CONFIGS, type VibeType } from '@/lib/vibes/config';
 
@@ -93,9 +94,9 @@ export function VibesSections() {
                   key={agent.id}
                   id={agent.id}
                   name={agent.name}
-                  description={agent.description}
+                  description={agent.description || undefined}
                   avatar={agent.avatar}
-                  categories={agent.categories}
+                  categories={agent.categories?.map(c => c as CategoryKey)}
                   generationTier={agent.generationTier}
                   index={idx}
                   onClick={() => router.push(`/agentes/${agent.id}`)}

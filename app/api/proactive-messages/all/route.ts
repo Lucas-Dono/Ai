@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
         agent: {
           userId: session.user.id,
         },
-        delivered: false,
+        status: {
+          in: ["pending", "sent"]
+        },
         OR: [
           { deliveredAt: null },
           {

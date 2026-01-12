@@ -69,11 +69,10 @@ export async function calculateTarpitDelay(
         honeypotHitRecords: {
           select: {
             id: true,
-            type: true,
             ipAddress: true,
-            detectedAt: true,
+            createdAt: true,
           },
-          orderBy: { detectedAt: 'desc' },
+          orderBy: { createdAt: 'desc' },
           take: 5,
         },
       },

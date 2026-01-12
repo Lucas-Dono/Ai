@@ -20,15 +20,50 @@ interface Pagination {
 }
 
 interface DashboardResponse {
-  stats: {
-    totalUsers: number;
-    totalAgents: number;
-    totalMessages: number;
-    activeUsersToday: number;
-    newUsersThisWeek: number;
-    revenue?: number;
+  // Usuarios
+  users: {
+    total: number;
+    growthRate: number;
+    today: number;
+    thisWeek: number;
+    thisMonth: number;
   };
-  trends?: any;
+
+  // Agentes
+  agents: {
+    total: number;
+    growthRate: number;
+  };
+
+  // Mensajes
+  messages: {
+    averagePerDay: number;
+    total?: number;
+  };
+
+  // Planes
+  plans: {
+    premium: number;
+    distribution: Array<{
+      plan: string;
+      count: number;
+      percentage: number;
+    }>;
+  };
+
+  // Moderación
+  moderation: {
+    pendingReports: number;
+  };
+
+  // Sistema
+  system: {
+    databaseSize: number;
+    activeConnections: number;
+    idleConnections: number;
+  };
+
+  // Metadata opcional
   timeRange?: { start: string; end: string };
 }
 
@@ -123,36 +158,81 @@ interface CertificatesResponse {
 }
 
 interface AnalyticsFunnelResponse {
-  data: {
-    visitors: number;
-    signups: number;
-    emailVerified: number;
-    firstAgent: number;
-    firstMessage: number;
-    conversionRate: number;
-  };
+  funnel: Array<{
+    stage: string;
+    count: number;
+    rate: number;
+  }>;
+  dropoff: Array<{
+    from: string;
+    to: string;
+    loss: number;
+    rate: number;
+  }>;
   timeRange: { start: string; end: string };
 }
 
 interface AnalyticsLandingResponse {
-  data: {
-    pageViews: number;
+  overview: {
+    totalViews: number;
     uniqueVisitors: number;
-    demoInteractions: number;
-    signupClicks: number;
-    bounceRate: number;
+  };
+  demo: {
+    starts: number;
+    startRate: number;
+    avgMessages: number;
+    completionRate: number;
+    conversionRate: number;
+    signupAfterDemo: number;
+  };
+  traffic: {
+    sources: Array<{
+      source: string;
+      visits: number;
+      signups: number;
+      conversionRate: number;
+    }>;
+    devices: Array<{
+      type: string;
+      count: number;
+    }>;
   };
   timeRange: { start: string; end: string };
 }
 
 interface AnalyticsConversionResponse {
-  data: {
-    freeToPaid: number;
-    plusToUltra: number;
-    churnRate: number;
-    revenue: number;
-    averageRevenuePerUser: number;
+  overview: {
+    freeUsers: number;
+    plusUsers: number;
+    ultraUsers: number;
   };
+  conversions: {
+    freeToPlus: {
+      count: number;
+      rate: number;
+      avgTimeToConvert: number;
+    };
+    freeToUltra: {
+      count: number;
+      rate: number;
+      avgTimeToConvert: number;
+    };
+    plusToUltra: {
+      count: number;
+      rate: number;
+      avgTimeToConvert: number;
+    };
+  };
+  revenue: {
+    mrr: number;
+    arr: number;
+    churnRate: number;
+  };
+  triggers?: Array<{
+    trigger: string;
+    conversions: number;
+    rate: number;
+  }>;
   timeRange: { start: string; end: string };
 }
 
@@ -380,7 +460,7 @@ export function useAnalyticsFunnel(days: number = 30) {
   );
 
   return {
-    funnel: data?.data,
+    funnel: data,
     timeRange: data?.timeRange,
     isLoading,
     isError: error,
@@ -398,7 +478,7 @@ export function useAnalyticsLanding(days: number = 30) {
   );
 
   return {
-    landing: data?.data,
+    landing: data,
     timeRange: data?.timeRange,
     isLoading,
     isError: error,
@@ -416,7 +496,7 @@ export function useAnalyticsConversion(days: number = 30) {
   );
 
   return {
-    conversion: data?.data,
+    conversion: data,
     timeRange: data?.timeRange,
     isLoading,
     isError: error,

@@ -46,18 +46,14 @@ export default function CertificatesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-600">Activos</p>
-          <p className="text-2xl font-bold text-green-600">{stats?.active || 0}</p>
+          <p className="text-sm text-gray-600">Por expirar</p>
+          <p className="text-2xl font-bold text-orange-600">{stats?.expiringSoon || 0}</p>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <p className="text-sm text-gray-600">Expirados</p>
-          <p className="text-2xl font-bold text-orange-600">{stats?.expired || 0}</p>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-600">Revocados</p>
-          <p className="text-2xl font-bold text-red-600">{stats?.revoked || 0}</p>
+          <p className="text-2xl font-bold text-red-600">{stats?.expired || 0}</p>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <p className="text-sm text-gray-600">Total</p>

@@ -111,6 +111,8 @@ describe("Behavior System Integration", () => {
         role: "user" as const,
         createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrás
         metadata: {},
+        iv: null,
+        authTag: null,
       };
 
       const triggers = await detector.detectTriggers(

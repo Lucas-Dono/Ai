@@ -77,7 +77,7 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
 
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: validateSocketOrigin,
+      origin: validateSocketOrigin as any,
       credentials: true,
     },
     path: "/api/socketio",

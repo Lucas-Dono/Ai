@@ -199,7 +199,7 @@ export async function validateAdminAccess(
       userId: certificate.adminAccess.userId,
       email: certificate.adminAccess.user.email,
       role: certificate.adminAccess.role,
-      certificateSerial: certSerial,
+      certificateSerial: certSerial || '',
       ipAddress,
       userAgent
     };

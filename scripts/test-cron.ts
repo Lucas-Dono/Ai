@@ -16,14 +16,13 @@
 import 'dotenv/config';
 
 const BASE_URL = process.env.APP_URL || 'http://localhost:3000';
-const CRON_SECRET = process.env.CRON_SECRET;
+const CRON_SECRET = process.env.CRON_SECRET || 'dev-secret';
 
-if (!CRON_SECRET) {
-  console.error('❌ Error: CRON_SECRET not configured in .env');
-  console.log('\nTo fix this:');
+if (!process.env.CRON_SECRET) {
+  console.warn('⚠️  Warning: CRON_SECRET not configured in .env, using dev-secret');
+  console.log('\nFor production:');
   console.log('1. Generate a secret: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
-  console.log('2. Add to .env: CRON_SECRET=your_generated_secret');
-  process.exit(1);
+  console.log('2. Add to .env: CRON_SECRET=your_generated_secret\n');
 }
 
 // ============================================================================

@@ -28,7 +28,7 @@ function createUpstashRateLimiter(requests: number, window: string) {
 
     return new Ratelimit({
       redis,
-      limiter: Ratelimit.slidingWindow(requests, window),
+      limiter: Ratelimit.slidingWindow(requests, window as any),
       analytics: true,
       prefix: "ratelimit",
     });

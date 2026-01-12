@@ -177,7 +177,8 @@
       "Bash(PGPASSWORD=b02483e2d89f4a60a7c85310126d61da psql:*)",
       "Bash(NODE_ENV=production npx next build:*)",
       "Bash(npm run type-check:*)",
-      "Bash(npm run)"
+      "Bash(npm run)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

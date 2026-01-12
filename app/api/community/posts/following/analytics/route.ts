@@ -116,8 +116,10 @@ export async function GET(request: NextRequest) {
     const engagementByTagMap: Record<string, number> = {};
     followedPosts.forEach(follow => {
       const tags = Array.isArray(follow.post.tags) ? follow.post.tags : [];
-      tags.forEach((tag: string) => {
-        engagementByTagMap[tag] = (engagementByTagMap[tag] || 0) + 1;
+      tags.forEach((tag) => {
+        if (typeof tag === 'string') {
+          engagementByTagMap[tag] = (engagementByTagMap[tag] || 0) + 1;
+        }
       });
     });
 

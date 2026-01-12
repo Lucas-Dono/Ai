@@ -61,7 +61,7 @@ export async function securityMiddleware(
       const honeypotResponse = await handleHoneypotRequest(request);
       if (honeypotResponse) {
         console.log('[SECURITY] Honeypot triggered, returning fake response');
-        return honeypotResponse;
+        return honeypotResponse as any;
       }
     }
 
@@ -216,7 +216,7 @@ export async function securityMiddleware(
           fingerprintData.dbRecord.id,
           threatScore,
           handler
-        );
+        ) as any;
       }
     }
 

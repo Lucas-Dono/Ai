@@ -323,6 +323,8 @@ describe("TriggerDetector", () => {
         conversationId: "conv-1",
         worldId: null,
         metadata: {},
+        iv: null,
+        authTag: null,
       };
 
       const triggers = await detector.detectTriggers(
@@ -349,6 +351,8 @@ describe("TriggerDetector", () => {
         conversationId: "conv-1",
         worldId: null,
         metadata: {},
+        iv: null,
+        authTag: null,
       };
 
       const triggers = await detector.detectTriggers(

@@ -592,9 +592,7 @@ export function DirectMessageChat({
         timestamp: new Date(),
         agentName,
         agentAvatar,
-        metadata: {
-          isDemoWelcome: true,
-        },
+        status: 'sent',
       };
 
       // Insertar el mensaje al inicio (después de los mensajes migrados)

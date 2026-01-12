@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CompanionCard } from '@/components/companions/CompanionCard';
+import type { CategoryKey } from '@/lib/categories';
 import { LoadingIndicator } from '@/components/ui/loading-indicator';
 import { Compass } from 'lucide-react';
 
@@ -94,9 +95,9 @@ export function DiscoveryFeed() {
             key={`${agent.id}-${idx}`}
             id={agent.id}
             name={agent.name}
-            description={agent.description}
+            description={agent.description || undefined}
             avatar={agent.avatar}
-            categories={agent.categories}
+            categories={agent.categories?.map(c => c as CategoryKey)}
             generationTier={agent.generationTier}
             index={idx}
             onClick={() => router.push(`/agentes/${agent.id}`)}
