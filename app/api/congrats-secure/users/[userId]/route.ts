@@ -35,7 +35,7 @@ export const GET = withAdminAuth(async (request, { admin, params }) => {
             createdAt: true,
             _count: {
               select: {
-                messages: true
+                messagesAsAgent: true
               }
             }
           },
