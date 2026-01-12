@@ -51,7 +51,7 @@ const ALLOWED_ORIGINS = [
  * Validar origen para CORS de Socket.IO
  * Implementa validación estricta, no usa wildcards
  */
-function validateSocketOrigin(origin: string, callback: (err: Error | null, success?: boolean) => void) {
+function validateSocketOrigin(origin: string, callback: (err: Error | null, allow?: boolean) => void) {
   // Desarrollo: permitir localhost y 127.0.0.1 con cualquier puerto
   if (process.env.NODE_ENV === 'development') {
     const localhostPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;

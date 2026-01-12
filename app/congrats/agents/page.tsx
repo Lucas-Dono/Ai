@@ -26,9 +26,9 @@ export default function AgentsPage() {
     },
     { key: 'visibility', label: 'Visibilidad' },
     {
-      key: 'messages',
+      key: 'messagesAsAgent',
       label: 'Mensajes',
-      render: (agent: any) => agent._count.messages
+      render: (agent: any) => agent._count.messagesAsAgent
     },
     {
       key: 'createdAt',

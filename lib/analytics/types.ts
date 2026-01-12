@@ -116,6 +116,9 @@ export interface BaseEventMetadata {
 
   // Timestamp
   timestamp?: string;
+
+  // Allow additional properties
+  [key: string]: any;
 }
 
 /**

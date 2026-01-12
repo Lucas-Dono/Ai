@@ -16,7 +16,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   // Rate limit para login: 5 intentos por 15 minutos por IP
   loginRatelimit = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(5, "15 m"),
+    limiter: Ratelimit.slidingWindow(5, "15m"),
     analytics: true,
     prefix: "ratelimit:login",
   });

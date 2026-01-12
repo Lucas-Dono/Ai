@@ -108,7 +108,7 @@ class InMemoryRateLimiter {
  */
 const RATE_LIMIT_CONFIGS = {
   // Login: 5 intentos por minuto por IP
-  login: { requests: 5, window: "1 m", windowMs: 60 * 1000 },
+  login: { requests: 5, window: "1m", windowMs: 60 * 1000 },
 
   // Registro: 3 cuentas por hora por IP
   register: { requests: 3, window: "1 h", windowMs: 60 * 60 * 1000 },
