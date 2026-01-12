@@ -170,7 +170,14 @@
       "Bash(./scripts/backup-database-simple.sh:*)",
       "Bash(npm run encrypt-messages:*)",
       "Bash(./scripts/verify-security-fixes.sh:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(dos2unix:*)",
+      "Bash(npm run admin:setup-ca:*)",
+      "Bash(npm run admin:generate-cert:*)",
+      "Bash(PGPASSWORD=b02483e2d89f4a60a7c85310126d61da psql:*)",
+      "Bash(NODE_ENV=production npx next build:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run)"
     ],
     "deny": [],
     "ask": []

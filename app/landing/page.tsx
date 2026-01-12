@@ -1,91 +1,30 @@
-import { Metadata } from "next";
+"use client";
+
+import { useEffect } from "react";
 import { LandingWrapper } from "@/components/landing/LandingWrapper";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
+import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { SocialProof } from "@/components/landing/SocialProof";
 import { FinalCTA } from "@/components/landing/FinalCTA";
-
-export const metadata: Metadata = {
-  title: "Crea IAs Emocionales con Memoria Real | IA Sin Censura",
-  description:
-    "Plataforma líder para crear compañeros virtuales con emociones reales, memoria de largo plazo y mundos interactivos. Sin censura, sin límites. Gratis para siempre.",
-  keywords: [
-    "AI companion",
-    "emotional AI",
-    "virtual friend",
-    "AI chat",
-    "uncensored AI",
-    "AI without restrictions",
-    "AI personality",
-    "custom AI",
-    "AI memory",
-    "AI emotions",
-    "NSFW AI",
-    "AI girlfriend",
-    "AI boyfriend",
-    "virtual world AI",
-    "AI characters",
-    "IA emocional",
-    "compañero virtual",
-    "chatbot inteligente",
-  ],
-  authors: [{ name: "Blaniel" }],
-  creator: "Blaniel",
-  publisher: "Blaniel",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Crea IAs que realmente te entienden | Emociones Reales",
-    description:
-      "Compañeros virtuales con emociones reales, memoria de largo plazo y mundos interactivos. Sin censura, sin límites.",
-    url: "/",
-    siteName: "Blaniel",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Blaniel - Emotional AI Companions",
-      },
-    ],
-    locale: "es_ES",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Crea IAs que realmente te entienden",
-    description:
-      "Compañeros virtuales con emociones reales, memoria de largo plazo. Sin censura, sin límites.",
-    images: ["/og-image.png"],
-    creator: "@circuitpromptai",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  verification: {
-    google: "your-google-verification-code",
-    yandex: "your-yandex-verification-code",
-  },
-};
+import { trackPageView, createScrollDepthTracker } from "@/lib/analytics/track-client";
 
 export default function LandingPage() {
+  // Track page view on mount
+  useEffect(() => {
+    trackPageView({
+      page: 'landing',
+      title: 'Crea IAs Emocionales con Memoria Real',
+    }).catch(() => {});
+  }, []);
+
+  // Track scroll depth
+  useEffect(() => {
+    const tracker = createScrollDepthTracker();
+    return () => tracker.cleanup();
+  }, []);
   // JSON-LD Structured Data for SEO
   const jsonLd = {
     "@context": "https://schema.org",
@@ -130,6 +69,7 @@ export default function LandingPage() {
         <div id="features">
           <FeaturesGrid />
         </div>
+        <InteractiveDemoSection />
         <HowItWorks />
         <ComparisonTable />
         <SocialProof />

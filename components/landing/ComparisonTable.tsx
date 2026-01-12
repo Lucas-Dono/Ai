@@ -1,9 +1,13 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Check, X, AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/analytics/track-client";
+import { LandingEventType } from "@/lib/analytics/types";
 
 type Status = boolean | "partial";
 
@@ -36,6 +40,47 @@ function StatusIcon({ status }: { status: Status }) {
 
 export function ComparisonTable() {
   const t = useTranslations("landing.comparison");
+  const router = useRouter();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
+
+  // Track when table comes into view
+  useEffect(() => {
+    if (!sectionRef.current || hasTrackedView) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasTrackedView) {
+            trackEvent({
+              eventType: LandingEventType.PLAN_VIEW,
+              metadata: {
+                section: 'comparison_table',
+              },
+            }).catch(() => {});
+            setHasTrackedView(true);
+          }
+        });
+      },
+      { threshold: 0.3 } // Trigger when 30% visible
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => observer.disconnect();
+  }, [hasTrackedView]);
+
+  const handlePlanSelect = (plan: string) => {
+    trackEvent({
+      eventType: LandingEventType.PLAN_SELECT,
+      metadata: {
+        plan,
+        section: 'comparison_table',
+      },
+    }).catch(() => {});
+
+    router.push('/dashboard');
+  };
 
   const comparisons: Comparison[] = [
     {
@@ -73,7 +118,7 @@ export function ComparisonTable() {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden bg-muted/30">
+    <section ref={sectionRef} className="py-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -257,7 +302,10 @@ export function ComparisonTable() {
             <p className="text-muted-foreground mb-6 text-sm">
               {t("cta.subtitle")}
             </p>
-            <button className="px-6 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-2xl transition-colors duration-200">
+            <button
+              onClick={() => handlePlanSelect('comparison_cta')}
+              className="px-6 py-2.5 bg-foreground hover:bg-foreground/90 text-background font-medium rounded-2xl transition-colors duration-200"
+            >
               {t("cta.button")}
             </button>
           </Card>

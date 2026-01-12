@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Brain, Clock, Globe, MessageSquare, Palette, Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
+import { trackEvent } from "@/lib/analytics/track-client";
+import { LandingEventType } from "@/lib/analytics/types";
 
 export function FeaturesGrid() {
   const t = useTranslations("landing.features");
@@ -48,17 +50,19 @@ export function FeaturesGrid() {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden">
+    <section className="pt-0 pb-12 sm:py-16 md:py-24 lg:py-32 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-left lg:text-center mb-12 lg:mb-16 max-w-3xl lg:mx-auto"
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
-            {t("title")}{" "}
+            <span className="text-[#EDEDED] lg:text-foreground">
+              {t("title")}{" "}
+            </span>
             <span className="text-muted-foreground">
               {t("titleHighlight")}
             </span>
@@ -80,7 +84,19 @@ export function FeaturesGrid() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
               >
-                <Card className="p-6 h-full border-border hover:border-foreground/20 transition-all duration-300 group bg-card/50 backdrop-blur-sm">
+                <Card
+                  className="p-6 h-full border-border hover:border-foreground/20 transition-all duration-300 group bg-card/50 backdrop-blur-sm cursor-pointer"
+                  onClick={() => {
+                    trackEvent({
+                      eventType: LandingEventType.FEATURE_CLICK,
+                      metadata: {
+                        featureName: feature.title,
+                        featureIndex: index,
+                        featureTier: feature.tier,
+                      },
+                    }).catch(() => {});
+                  }}
+                >
                   <div className="space-y-4">
                     {/* Icon */}
                     <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors duration-300">

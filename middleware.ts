@@ -165,6 +165,7 @@ export default async function middleware(req: NextRequest) {
     "/api/groups", // GROWTH: API pública de grupos (read-only)
     "/api/security", // Security API (TODO: proteger en producción)
     "/api/demo", // Demo chat system - Sin autenticación para visitantes de landing
+    "/api/cron", // CRON: Endpoints de cron jobs (autenticación propia via CRON_SECRET)
   ];
 
   // SECURITY FIX #5: Verificar coincidencia exacta o que sea subruta válida

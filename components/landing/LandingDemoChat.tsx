@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Send, Sparkles, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics/track-client";
+import { LandingEventType } from "@/lib/analytics/types";
 
 interface Message {
   id: string;
@@ -33,6 +35,9 @@ interface DemoSessionStorage {
 
 export function LandingDemoChat() {
   const t = useTranslations("landing.demoChat");
+
+  // Track if first message was sent (for demo_start event)
+  const [isFirstMessage, setIsFirstMessage] = useState(true);
 
   // Estado inicial desde localStorage o valores por defecto
   const [sessionId, setSessionId] = useState<string | null>(() => {
@@ -91,6 +96,7 @@ export function LandingDemoChat() {
 
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const [messagesRemaining, setMessagesRemaining] = useState(() => {
     if (typeof window === 'undefined') return 3;
@@ -175,10 +181,36 @@ export function LandingDemoChat() {
       timestamp: Date.now(),
     };
 
+    // Track demo_start on first message
+    if (isFirstMessage) {
+      trackEvent({
+        eventType: LandingEventType.DEMO_START,
+        metadata: {
+          firstMessageLength: input.length,
+        },
+      }).catch(() => {});
+      setIsFirstMessage(false);
+    }
+
+    // Track each demo message
+    trackEvent({
+      eventType: LandingEventType.DEMO_MESSAGE,
+      metadata: {
+        messageCount: messages.filter(m => m.role === 'user').length + 1,
+        messageLength: input.length,
+        remainingMessages: messagesRemaining - 1,
+      },
+    }).catch(() => {});
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsTyping(true);
     setError(null);
+
+    // Expandir el chat al enviar el primer mensaje
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
 
     try {
       const response = await fetch("/api/demo/chat", {
@@ -242,6 +274,14 @@ export function LandingDemoChat() {
 
       // Show signup prompt if limit reached
       if (data.shouldShowSignup) {
+        // Track demo limit reached
+        trackEvent({
+          eventType: LandingEventType.DEMO_LIMIT_REACHED,
+          metadata: {
+            totalMessages: messages.filter(m => m.role === 'user').length,
+          },
+        }).catch(() => {});
+
         setTimeout(() => {
           setShowSignupPrompt(true);
         }, 1500);
@@ -311,12 +351,36 @@ export function LandingDemoChat() {
           </ul>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href={`/registro?fromDemo=true${sessionId ? `&demoSessionId=${sessionId}` : ''}`}>
+            <Link
+              href={`/registro?fromDemo=true${sessionId ? `&demoSessionId=${sessionId}` : ''}`}
+              onClick={() => {
+                trackEvent({
+                  eventType: LandingEventType.DEMO_SIGNUP,
+                  metadata: {
+                    action: 'create_account',
+                    sessionId,
+                    messagesExchanged: messages.filter(m => m.role === 'user').length,
+                  },
+                }).catch(() => {});
+              }}
+            >
               <Button size="lg" className="bg-primary hover:bg-primary/90">
                 Crear cuenta gratis
               </Button>
             </Link>
-            <Link href={`/login?fromDemo=true${sessionId ? `&demoSessionId=${sessionId}` : ''}`}>
+            <Link
+              href={`/login?fromDemo=true${sessionId ? `&demoSessionId=${sessionId}` : ''}`}
+              onClick={() => {
+                trackEvent({
+                  eventType: LandingEventType.DEMO_SIGNUP,
+                  metadata: {
+                    action: 'login',
+                    sessionId,
+                    messagesExchanged: messages.filter(m => m.role === 'user').length,
+                  },
+                }).catch(() => {});
+              }}
+            >
               <Button size="lg" variant="outline">
                 Ya tengo cuenta
               </Button>
@@ -333,7 +397,18 @@ export function LandingDemoChat() {
 
   return (
     <Card className="relative rounded-2xl border-2 border-border shadow-2xl overflow-hidden bg-card">
-      <div className="aspect-[3/4] md:aspect-[4/3] min-h-[500px] md:min-h-0 flex flex-col">
+      <motion.div
+        className={`flex flex-col ${
+          isExpanded
+            ? "aspect-[5/3] md:aspect-[5/3]"
+            : "aspect-square md:aspect-[4/3]"
+        }`}
+        initial={false}
+        animate={{
+          height: isExpanded ? "auto" : undefined,
+        }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
           <div className="flex items-center gap-3">
@@ -369,7 +444,7 @@ export function LandingDemoChat() {
           className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-muted/10 to-transparent"
         >
           <AnimatePresence>
-            {messages.map((message) => (
+            {(isExpanded ? messages : messages.slice(0, 1)).map((message) => (
               <motion.div
                 key={message.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -459,7 +534,7 @@ export function LandingDemoChat() {
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
     </Card>
   );
 }

@@ -14,6 +14,7 @@ import { hybridEmotionalOrchestrator } from '@/lib/emotional-system/hybrid-orche
 import { getContextualModularPrompt } from '@/lib/behavior-system/prompts/modular-prompts';
 import { getRelationshipStage, shouldAdvanceStage } from '@/lib/relationship/stages';
 import { getPromptForStage, getPromptForMessageNumber } from '@/lib/relationship/prompt-generator';
+import { getRevelationMoment, generatePersonalizedRevelation } from '@/lib/relationship/revelation-moments';
 import { getEmotionalSummary } from '@/lib/emotions/system';
 import { interceptKnowledgeCommand, buildExpandedPrompt, logCommandUsage } from '@/lib/profile/knowledge-interceptor';
 import { getTopRelevantCommand } from '@/lib/profile/command-detector';
@@ -167,7 +168,7 @@ export class MessageService {
       // DESENCRIPTAR MENSAJES RECIENTES
       // Los mensajes están encriptados en BD, desencriptarlos para procesamiento
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      const decryptedRecentMessages = decryptedRecentMessages.map(msg => ({
+      const decryptedRecentMessages = recentMessages.map(msg => ({
         ...msg,
         content: decryptMessageIfNeeded(msg.content, msg.iv, msg.authTag),
       }));
@@ -246,6 +247,48 @@ export class MessageService {
         newTotalInteractions,
         relation.stage as RelationshipStage
       );
+
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // REVELATION MOMENTS (cuando avanza la etapa de relación)
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      let revelationContext = "";
+      let revelationMoment: ReturnType<typeof getRevelationMoment> = null;
+
+      if (stageChanged) {
+        revelationMoment = getRevelationMoment(
+          relation.stage as RelationshipStage,
+          newStage
+        );
+
+        if (revelationMoment) {
+          // Extraer personalidad Big Five del personaje (si está disponible)
+          const personality = agent.personalityCore ? {
+            extraversion: agent.personalityCore.extraversion,
+            neuroticism: agent.personalityCore.neuroticism,
+            agreeableness: agent.personalityCore.agreeableness,
+            openness: agent.personalityCore.openness,
+            conscientiousness: agent.personalityCore.conscientiousness,
+          } : undefined;
+
+          // Generar contexto personalizado de revelación
+          revelationContext = generatePersonalizedRevelation(
+            revelationMoment,
+            agent.name,
+            personality
+          );
+
+          log.info(
+            {
+              agentId,
+              fromStage: relation.stage,
+              toStage: newStage,
+              revelationType: revelationMoment.revelationType,
+              importance: revelationMoment.importance,
+            },
+            'Revelation moment detected - relationship stage advanced'
+          );
+        }
+      }
 
       // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       // EMOTIONAL SYSTEM PROCESSING
@@ -349,6 +392,11 @@ export class MessageService {
 
       if (peopleContext) {
         enhancedPrompt += peopleContext;
+      }
+
+      // Inyectar contexto de revelación si hubo cambio de stage
+      if (revelationContext) {
+        enhancedPrompt += '\n\n' + revelationContext;
       }
 
       // Add behavior system prompt
@@ -794,6 +842,13 @@ export class MessageService {
                     confidence: ref.confidence,
                   }))
                 : undefined,
+              // 🆕 Revelation Moment: Mark if this message contains a revelation
+              revelationMoment: revelationMoment ? {
+                fromStage: revelationMoment.fromStage,
+                toStage: revelationMoment.toStage,
+                revelationType: revelationMoment.revelationType,
+                importance: revelationMoment.importance,
+              } : undefined,
             } as any,
           },
         }),
@@ -825,6 +880,26 @@ export class MessageService {
             lastUpdated: new Date(),
           },
         }),
+        // Save revelation moment as episodic memory (if applicable)
+        ...(stageChanged && revelationMoment ? [
+          prisma.episodicMemory.create({
+            data: {
+              agentId,
+              event: `Momento de revelación: La relación avanzó a ${newStage}`,
+              userEmotion: 'connection',
+              characterEmotion: revelationMoment.revelationType,
+              emotionalValence: 0.8, // Positivo
+              importance: revelationMoment.importance / 5, // Normalizar a 0-1
+              metadata: {
+                type: 'revelation_moment',
+                fromStage: relation.stage,
+                toStage: newStage,
+                revelationType: revelationMoment.revelationType,
+                timestamp: new Date().toISOString(),
+              },
+            },
+          })
+        ] : []),
       ]);
 
       // Store embeddings SELECTIVAMENTE (solo mensajes importantes, no bloqueante)

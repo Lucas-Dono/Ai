@@ -144,7 +144,6 @@ export function FeaturesGrid() {
             })}
           </div>
         </div>
-        </div>
       </div>
     </section>
   );

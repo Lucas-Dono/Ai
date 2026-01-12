@@ -2,29 +2,25 @@
  * API Route: POST /api/analytics/track
  *
  * Endpoint para tracking de eventos de analytics desde el cliente.
- * Se usa para eventos que necesitan ser trackeados en el navegador
- * (como mobile sessions, client-side interactions, etc.)
+ * Soporta eventos anónimos (landing page) y autenticados (app).
+ *
+ * - Landing events (landing.*): No requieren autenticación
+ * - App events (app.*): Requieren autenticación
+ * - Conversion events (conversion.*): Requieren autenticación
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
+import {
+  LandingEventType,
+  AppEventType,
+  ConversionEventType,
+} from "@/lib/analytics/types";
 
 export async function POST(req: NextRequest) {
   try {
-    // Verificar autenticación (soporta web y mobile)
-    const user = await getAuthenticatedUser(req);
-    if (!user?.id) {
-      console.log('[Analytics Track] No user authenticated');
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    console.log('[Analytics Track] User authenticated:', user.id);
-
-    // Parsear body
+    // Parsear body primero
     const body = await req.json();
     console.log('[Analytics Track] Received body:', JSON.stringify(body));
 
@@ -50,14 +46,50 @@ export async function POST(req: NextRequest) {
 
     console.log('[Analytics Track] Validating eventType:', eventType);
 
-    // Validar que el eventType existe en el enum
-    const validEventTypes = Object.values(EventType);
-    if (!validEventTypes.includes(eventType as EventType)) {
-      console.log('[Analytics Track] Invalid eventType:', eventType, 'Valid types:', validEventTypes);
+    // Validar que el eventType existe en alguno de los enums
+    const allValidEventTypes = [
+      ...Object.values(EventType),
+      ...Object.values(LandingEventType),
+      ...Object.values(AppEventType),
+      ...Object.values(ConversionEventType),
+    ];
+
+    // Permitir cualquier string que siga el patrón namespace.event
+    // Esto da flexibilidad para nuevos eventos sin necesidad de actualizar el enum
+    const isValidPattern = /^(landing|app|conversion)\.[a-z_]+$/.test(eventType);
+
+    if (!isValidPattern && !allValidEventTypes.includes(eventType as any)) {
+      console.log('[Analytics Track] Invalid eventType:', eventType);
       return NextResponse.json(
-        { error: "Invalid event type", received: eventType, validTypes: validEventTypes },
+        {
+          error: "Invalid event type format",
+          received: eventType,
+          expected: "Format: namespace.event (e.g., landing.page_view, app.message_send)",
+        },
         { status: 400 }
       );
+    }
+
+    // Verificar autenticación solo para eventos que NO son de landing
+    const isLandingEvent = eventType.startsWith('landing.');
+
+    if (!isLandingEvent) {
+      // Para eventos de app, requerir autenticación
+      const user = await getAuthenticatedUser(req);
+      if (!user?.id) {
+        console.log('[Analytics Track] No user authenticated for non-landing event');
+        return NextResponse.json(
+          { error: "Unauthorized - authentication required for this event type" },
+          { status: 401 }
+        );
+      }
+      console.log('[Analytics Track] User authenticated:', user.id);
+
+      // Agregar userId al metadata si está autenticado
+      metadata.userId = user.id;
+    } else {
+      // Para eventos de landing, permitir anónimos
+      console.log('[Analytics Track] Landing event - allowing anonymous tracking');
     }
 
     // Track the event

@@ -19,10 +19,11 @@
       "getStarted": "Empezar gratis"
     },
     "hero": {
-      "badge": "Compañeros virtuales con psicología real",
-      "title": "Compañeros virtuales que",
-      "titleHighlight": "evolucionan contigo",
-      "subtitle": "Memoria ilimitada. Emociones reales. Relaciones que crecen. No son chatbots, son compañeros que te conocen de verdad.",
+      "badge": "Fundamentado en psicología conductual",
+      "title": "Crea IAs con",
+      "titleHighlight": "emociones reales",
+      "subtitle": "El único motor fundamentado en investigación psicológica. Memoria infinita y personalidades no censuradas.",
+      "emotionsStrong": "emociones reales",
       "ctaPrimary": "Crear tu compañero gratis",
       "trustLine": "Gratis para siempre • Sin tarjeta de crédito • Tus datos son privados",
       "chatPreview": {
@@ -34,6 +35,24 @@
         "memoryIndicator": "💭 Recuerda el examen de hace una semana",
         "emotionIndicator": "😊 Alegre y curiosa"
       }
+    },
+    "demoSection": {
+      "badge": "✨ Prueba en vivo",
+      "title": "Conversa con Luna 🌙",
+      "subtitle": "Experimenta la diferencia. Interactúa con una IA que realmente entiende emociones.",
+      "hint": "👆 Escribe un mensaje para expandir el chat y ver la magia en acción"
+    },
+    "demoChat": {
+      "initialMessage": "¡Hola! Soy Luna 🌙. Estoy aquí para acompañarte y escucharte. ¿Cómo estás hoy?",
+      "placeholder": "Escribe un mensaje...",
+      "placeholderLimitReached": "Límite alcanzado - Regístrate para continuar",
+      "placeholderWait": "Espera {seconds}s...",
+      "messagesRemaining": "{count} mensajes restantes",
+      "lastMessageDemo": "Último mensaje demo - Regístrate para continuar",
+      "signupPromptTitle": "¿Te gustó la experiencia?",
+      "signupPromptDescription": "Regístrate gratis para tener conversaciones ilimitadas con Luna y crear tus propios compañeros virtuales.",
+      "signupButton": "Crear cuenta gratis",
+      "continueButton": "Continuar conversando"
     },
     "problem": {
       "title": "¿Cansado de chatbots que",

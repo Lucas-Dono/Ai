@@ -9,8 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { demoSessionService } from '@/lib/services/demo-session.service';
 import { prisma } from '@/lib/prisma';
 import { apiLogger as log } from '@/lib/logging';
@@ -28,7 +27,7 @@ const migrationSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     // 1. Verificar autenticación
-    const session = await getServerSession(authOptions);
+    const session = await auth.api.getSession({ headers: req.headers });
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -90,26 +89,19 @@ export async function POST(req: NextRequest) {
     // 5. Verificar si ya se migraron estos mensajes (evitar duplicados)
     const existingRelation = await prisma.relation.findUnique({
       where: {
-        agentId_userId: {
-          agentId,
-          userId,
-        },
-      },
-      include: {
-        messages: {
-          take: 1,
-          orderBy: { createdAt: 'desc' },
+        subjectId_targetId: {
+          subjectId: agentId,
+          targetId: userId,
         },
       },
     });
 
-    // Si ya hay mensajes recientes, no migrar de nuevo
-    if (existingRelation && existingRelation.messages.length > 0) {
-      const lastMessage = existingRelation.messages[0];
+    // Si ya hay una relación reciente, no migrar de nuevo
+    if (existingRelation && existingRelation.lastInteractionAt) {
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
-      if (lastMessage.createdAt > fiveMinutesAgo) {
-        log.info({ userId, agentId }, 'Recent messages found, skipping migration');
+      if (existingRelation.lastInteractionAt > fiveMinutesAgo) {
+        log.info({ userId, agentId }, 'Recent interaction found, skipping migration');
         return NextResponse.json({
           success: true,
           agentId,
@@ -121,22 +113,25 @@ export async function POST(req: NextRequest) {
     // 6. Crear o actualizar relación
     const relation = await prisma.relation.upsert({
       where: {
-        agentId_userId: {
-          agentId,
-          userId,
+        subjectId_targetId: {
+          subjectId: agentId,
+          targetId: userId,
         },
       },
       update: {
-        lastInteraction: new Date(),
+        lastInteractionAt: new Date(),
       },
       create: {
-        agentId,
-        userId,
+        subjectId: agentId,
+        targetId: userId,
+        targetType: 'user',
         stage: 'stranger',
         totalInteractions: 0,
         trust: 0.5,
         affinity: 0.5,
         respect: 0.5,
+        privateState: {},
+        visibleState: {},
       },
     });
 

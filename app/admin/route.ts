@@ -3,6 +3,8 @@
  *
  * Este endpoint es un honeypot - parece un panel de admin real
  * pero está diseñado para detectar atacantes que escanean rutas comunes.
+ *
+ * NOTA: El panel admin REAL está en /congrats (protegido con mTLS en producción)
  */
 
 import { NextRequest } from 'next/server';

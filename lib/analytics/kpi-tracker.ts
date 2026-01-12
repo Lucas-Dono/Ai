@@ -16,6 +16,19 @@ import { prisma } from "@/lib/prisma";
 // ============================================================================
 
 export enum EventType {
+  // Landing Page
+  LANDING_PAGE_VIEW = "landing.page_view",
+  LANDING_SCROLL_DEPTH = "landing.scroll_depth",
+  LANDING_CTA_PRIMARY = "landing.cta_primary",
+  LANDING_CTA_SECONDARY = "landing.cta_secondary",
+  LANDING_DEMO_START = "landing.demo_start",
+  LANDING_DEMO_MESSAGE = "landing.demo_message",
+  LANDING_DEMO_LIMIT_REACHED = "landing.demo_limit_reached",
+  LANDING_DEMO_SIGNUP = "landing.demo_signup",
+  LANDING_FEATURE_CLICK = "landing.feature_click",
+  LANDING_PLAN_VIEW = "landing.plan_view",
+  LANDING_PLAN_SELECT = "landing.plan_select",
+
   // Compliance & Safety
   AGE_VERIFICATION_COMPLETED = "age_verification_completed",
   AGE_VERIFICATION_FAILED = "age_verification_failed",
