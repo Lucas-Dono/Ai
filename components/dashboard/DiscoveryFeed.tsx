@@ -1,6 +1,8 @@
 /**
  * Feed de Descubrimiento
  * Scroll infinito con mix aleatorio de vibes, historias y nuevos
+ *
+ * UPDATED: Vista móvil con grid de 2 columnas y MobileAgentCard
  */
 
 'use client';
@@ -8,6 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CompanionCard } from '@/components/companions/CompanionCard';
+import { MobileAgentCard } from '@/components/mobile';
 import type { CategoryKey } from '@/lib/categories';
 import { LoadingIndicator } from '@/components/ui/loading-indicator';
 import { Compass } from 'lucide-react';
@@ -88,11 +91,30 @@ export function DiscoveryFeed() {
         </div>
       </div>
 
-      {/* Grid de Agentes */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {/* Mobile Carousel */}
+      <div className="lg:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+        <div className="flex gap-3" style={{ paddingRight: '16px' }}>
+          {agents.map((agent, idx) => (
+            <MobileAgentCard
+              key={`mobile-${agent.id}-${idx}`}
+              id={agent.id}
+              name={agent.name}
+              description={agent.description || undefined}
+              avatar={agent.avatar || undefined}
+              featured={agent.generationTier === 'premium' || agent.generationTier === 'flagship'}
+              variant="carousel"
+              onPress={() => router.push(`/agentes/${agent.id}`)}
+              onChatPress={() => router.push(`/agentes/${agent.id}`)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Grid - Mantiene el diseño original */}
+      <div className="hidden lg:grid gap-6 grid-cols-3 xl:grid-cols-4">
         {agents.map((agent, idx) => (
           <CompanionCard
-            key={`${agent.id}-${idx}`}
+            key={`desktop-${agent.id}-${idx}`}
             id={agent.id}
             name={agent.name}
             description={agent.description || undefined}

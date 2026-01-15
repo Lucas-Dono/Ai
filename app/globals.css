@@ -446,6 +446,13 @@ body {
   height: 96px;
 }
 
+/* FAB position adjustment for mobile - above bottom nav */
+@media (max-width: 1023px) {
+  .md-fab {
+    bottom: 90px; /* 65px tabBar + 25px spacing */
+  }
+}
+
 /* List Items */
 .md-list-item {
   padding: 12px 16px;

@@ -6,6 +6,8 @@
  * - Backdrop with blur
  * - Smooth animations
  * - Handle indicator
+ *
+ * UPDATED: Sincronizado con el theme móvil
  */
 
 "use client";
@@ -14,6 +16,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { mobileTheme } from "@/lib/mobile-theme";
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -86,7 +89,8 @@ export function BottomSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 backdrop-blur-sm z-50"
+            style={{ backgroundColor: mobileTheme.colors.overlay }}
           />
 
           {/* Bottom Sheet */}
@@ -105,28 +109,46 @@ export function BottomSheet({
             }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50",
-              "bg-white dark:bg-gray-900",
-              "rounded-t-3xl shadow-2xl",
-              "overflow-hidden"
+              "rounded-t-3xl overflow-hidden"
             )}
             style={{
+              backgroundColor: mobileTheme.colors.background.secondary,
+              boxShadow: mobileTheme.shadows.xl,
               maxHeight: "90vh",
             }}
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing">
-              <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full" />
+              <div
+                className="w-12 h-1.5 rounded-full"
+                style={{ backgroundColor: mobileTheme.colors.border.main }}
+              />
             </div>
 
             {/* Header */}
             {title && (
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-                <h2 className="text-lg font-bold">{title}</h2>
+              <div
+                className="flex items-center justify-between px-6 py-4"
+                style={{
+                  borderBottomWidth: '1px',
+                  borderBottomColor: mobileTheme.colors.border.light,
+                }}
+              >
+                <h2
+                  className="text-lg font-bold"
+                  style={{ color: mobileTheme.colors.text.primary }}
+                >
+                  {title}
+                </h2>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="p-2 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  style={{ borderRadius: `${mobileTheme.borderRadius.lg}px` }}
                 >
-                  <X className="w-5 h-5" />
+                  <X
+                    className="w-5 h-5"
+                    style={{ color: mobileTheme.colors.text.primary }}
+                  />
                 </button>
               </div>
             )}

@@ -33,13 +33,7 @@ export async function GET(req: NextRequest) {
       take: 200
     });
 
-    // Filtrar solo agentes con vibes
-    const agents = allAgents.filter(agent => {
-      const fields = agent.aiGeneratedFields as any;
-      return fields?.vibes?.primary;
-    });
-
-    // Agrupar por vibe
+    // Agrupar por vibe (asignar uno si no tiene)
     const agentsByVibe: Record<string, any[]> = {
       chaotic_energy: [],
       comfort_zone: [],
@@ -47,13 +41,22 @@ export async function GET(req: NextRequest) {
       adventure: []
     };
 
-    agents.forEach(agent => {
-      const aiFields = agent.aiGeneratedFields as any;
-      const primaryVibe = aiFields?.vibes?.primary;
+    const vibeKeys = Object.keys(agentsByVibe);
 
-      if (primaryVibe && agentsByVibe[primaryVibe]) {
-        agentsByVibe[primaryVibe].push(agent);
+    allAgents.forEach((agent, index) => {
+      const aiFields = agent.aiGeneratedFields as any;
+      let primaryVibe = aiFields?.vibes?.primary;
+
+      // Si no tiene vibe, asignar uno basado en el hash del nombre para consistencia
+      if (!primaryVibe || !agentsByVibe[primaryVibe]) {
+        let hash = 0;
+        for (let i = 0; i < agent.name.length; i++) {
+          hash = agent.name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        primaryVibe = vibeKeys[Math.abs(hash) % vibeKeys.length];
       }
+
+      agentsByVibe[primaryVibe].push(agent);
     });
 
     // Obtener orden óptimo según interacciones del usuario

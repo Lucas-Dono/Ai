@@ -13,15 +13,16 @@ export default function DashboardLayout({
       {/* Desktop Sidebar */}
       <DashboardNav />
 
-      {/* Mobile Header */}
-      <div className="lg:hidden w-full">
+      {/* Mobile Layout Container - Columnar for header + content */}
+      <div className="flex-1 flex flex-col lg:ml-64 min-h-screen overflow-x-hidden min-w-0">
+        {/* Mobile Header */}
         <MobileHeader />
-      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-64 p-4 md:p-6 lg:p-8 pb-20 lg:pb-8 min-h-screen overflow-x-hidden min-w-0">
-        {children}
-      </main>
+        {/* Main Content */}
+        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-20 lg:pb-8">
+          {children}
+        </main>
+      </div>
 
       {/* Mobile Bottom Navigation */}
       <MobileNav />

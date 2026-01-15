@@ -21,20 +21,19 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useHaptic } from "@/hooks/useHaptic";
 import { scaleVariants, TRANSITIONS } from "@/lib/motion/system";
+import { mobileTheme } from "@/lib/mobile-theme";
 import {
   Home,
+  MessagesSquare,
   Users,
-  PlusCircle,
-  Bell,
   User,
-  MessageCircle,
-  Heart,
+  type LucideIcon,
 } from "lucide-react";
 
 interface NavItem {
   href: string;
   labelKey: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   badge?: number;
   matchPaths?: string[];
 }
@@ -47,22 +46,16 @@ const navItemsConfig: NavItem[] = [
     matchPaths: ["/dashboard"],
   },
   {
+    href: "/dashboard/grupos",
+    labelKey: "groups",
+    icon: MessagesSquare,
+    matchPaths: ["/dashboard/grupos"],
+  },
+  {
     href: "/community",
     labelKey: "community",
     icon: Users,
     matchPaths: ["/community"],
-  },
-  {
-    href: "/create-character",
-    labelKey: "create",
-    icon: PlusCircle,
-    matchPaths: ["/create-character"],
-  },
-  {
-    href: "/notifications",
-    labelKey: "notifications",
-    icon: Bell,
-    matchPaths: ["/notifications"],
   },
   {
     href: "/configuracion",
@@ -82,8 +75,18 @@ export function MobileNav() {
   };
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 shadow-2xl pb-safe">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl shadow-2xl pb-safe"
+      style={{
+        backgroundColor: mobileTheme.colors.background.secondary,
+        borderTopWidth: 1,
+        borderTopColor: mobileTheme.colors.border.light,
+      }}
+    >
+      <div
+        className="flex items-center justify-around px-2"
+        style={{ height: mobileTheme.tabBar.height }}
+      >
         {navItemsConfig.map((item) => {
           const isActive =
             item.matchPaths?.some((path) => pathname.startsWith(path)) ||
@@ -96,29 +99,22 @@ export function MobileNav() {
               onClick={handleNavClick}
               className="relative flex flex-col items-center justify-center flex-1 h-full min-w-[44px] touch-manipulation"
             >
-              <div className="relative">
-                {/* Active indicator background - usando motion system */}
-                {isActive && (
-                  <motion.div
-                    layoutId="mobile-nav-active"
-                    className="absolute inset-0 -m-2 bg-primary/10 rounded-2xl"
-                    transition={TRANSITIONS.standard}
-                  />
-                )}
-
+              <div className="relative flex flex-col items-center gap-1">
                 {/* Icon - usando scaleVariants del motion system */}
                 <motion.div
                   variants={scaleVariants}
                   whileTap="tap"
-                  className="relative z-10"
+                  className="relative"
                 >
                   <item.icon
-                    className={cn(
-                      "w-6 h-6 transition-colors",
-                      isActive
-                        ? "text-primary"
-                        : "text-gray-500 dark:text-gray-400"
-                    )}
+                    className="transition-all duration-200"
+                    size={isActive ? 28 : 24}
+                    strokeWidth={isActive ? 2.5 : 2}
+                    style={{
+                      color: isActive
+                        ? mobileTheme.colors.primary[500]
+                        : mobileTheme.colors.text.tertiary,
+                    }}
                   />
 
                   {/* Badge - usando scaleVariants */}
@@ -133,19 +129,21 @@ export function MobileNav() {
                     </motion.span>
                   )}
                 </motion.div>
-              </div>
 
-              {/* Label */}
-              <span
-                className={cn(
-                  "text-[11px] mt-1 font-medium transition-colors",
-                  isActive
-                    ? "text-primary"
-                    : "text-gray-500 dark:text-gray-400"
-                )}
-              >
-                {t(item.labelKey)}
-              </span>
+                {/* Label */}
+                <span
+                  className="transition-colors duration-200"
+                  style={{
+                    fontSize: mobileTheme.tabBar.labelFontSize,
+                    fontWeight: mobileTheme.tabBar.labelFontWeight,
+                    color: isActive
+                      ? mobileTheme.colors.primary[500]
+                      : mobileTheme.colors.text.tertiary,
+                  }}
+                >
+                  {t(item.labelKey)}
+                </span>
+              </div>
             </Link>
           );
         })}

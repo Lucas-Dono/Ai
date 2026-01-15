@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { DangerConfirmDialog } from "@/components/DangerConfirmDialog";
 import { signOut } from "@/lib/auth-client";
 import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
 import {
   User,
   Key,
@@ -36,11 +37,14 @@ import {
   Users,
   Trash2,
   Accessibility,
+  ChevronRight,
+  LogOut,
 } from "lucide-react";
 import { AccessibilitySettings } from "@/components/accessibility/AccessibilitySettings";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { SFWProtectionToggle } from "@/components/settings/SFWProtectionToggle";
+import { mobileTheme } from "@/lib/mobile-theme";
 
 interface UserProfile {
   id: string;
@@ -82,6 +86,9 @@ export default function ConfiguracionPage() {
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [agentUpdates, setAgentUpdates] = useState(true);
+
+  // Mobile active section state
+  const [mobileActiveSection, setMobileActiveSection] = useState<string | null>(null);
 
   // Fetch user profile
   useEffect(() => {
@@ -225,9 +232,290 @@ export default function ConfiguracionPage() {
     );
   }
 
+  // Mobile menu items
+  const mobileMenuItems = [
+    { id: 'profile', icon: User, label: t("tabs.profile"), color: mobileTheme.colors.primary[500] },
+    { id: 'plan', icon: Crown, label: t("tabs.plan"), color: '#F59E0B' },
+    { id: 'preferences', icon: Palette, label: t("tabs.preferences"), color: '#8B5CF6' },
+    { id: 'accessibility', icon: Accessibility, label: t("tabs.accessibility"), color: '#22C55E' },
+    { id: 'danger', icon: AlertTriangle, label: t("tabs.danger"), color: '#EF4444' },
+  ];
+
   return (
     <ErrorBoundary variant="page">
-    <div className="min-h-screen bg-background">
+      {/* Mobile View */}
+      <div
+        className="lg:hidden min-h-screen"
+        style={{ backgroundColor: mobileTheme.colors.background.primary }}
+      >
+        {/* Profile Header - Mobile */}
+        <div className="p-6 pb-4">
+          <div className="flex items-center gap-4 mb-6">
+            <Avatar className="h-20 w-20 border-2" style={{ borderColor: mobileTheme.colors.primary[500] }}>
+              <AvatarImage src={profile?.image || undefined} alt={userName} />
+              <AvatarFallback
+                className="text-xl font-bold"
+                style={{
+                  background: `linear-gradient(135deg, ${mobileTheme.colors.primary[500]}, ${mobileTheme.colors.secondary[500]})`,
+                  color: '#fff'
+                }}
+              >
+                {userName ? userName.charAt(0).toUpperCase() : session?.user?.email?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2
+                className="font-bold text-xl"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {userName || t("profile.avatar.noName")}
+              </h2>
+              <p
+                className="text-sm"
+                style={{ color: mobileTheme.colors.text.secondary }}
+              >
+                {profile?.email}
+              </p>
+              <Badge
+                className="mt-2"
+                style={{
+                  backgroundColor: profile?.plan === 'ultra'
+                    ? `linear-gradient(135deg, ${mobileTheme.colors.primary[600]}, ${mobileTheme.colors.secondary[600]})`
+                    : mobileTheme.colors.primary[500],
+                  background: profile?.plan === 'ultra'
+                    ? `linear-gradient(135deg, ${mobileTheme.colors.primary[600]}, ${mobileTheme.colors.secondary[600]})`
+                    : undefined,
+                  color: '#fff'
+                }}
+              >
+                {currentPlan.name}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Stats Row - Mobile */}
+          <div
+            className="grid grid-cols-3 gap-3 p-4 rounded-xl"
+            style={{ backgroundColor: mobileTheme.colors.background.card }}
+          >
+            <div className="text-center">
+              <p
+                className="text-2xl font-bold"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {stats.agentsCount}
+              </p>
+              <p
+                className="text-xs"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              >
+                Agentes
+              </p>
+            </div>
+            <div className="text-center">
+              <p
+                className="text-2xl font-bold"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {stats.worldsCount}
+              </p>
+              <p
+                className="text-xs"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              >
+                Mundos
+              </p>
+            </div>
+            <div className="text-center">
+              <p
+                className="text-2xl font-bold"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {stats.messagesThisMonth.toLocaleString()}
+              </p>
+              <p
+                className="text-xs"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              >
+                Mensajes
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Menu Items - Mobile */}
+        <div className="px-4 space-y-2">
+          {mobileMenuItems.map((item) => (
+            <motion.button
+              key={item.id}
+              onClick={() => setMobileActiveSection(mobileActiveSection === item.id ? null : item.id)}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-between p-4 rounded-xl transition-all"
+              style={{
+                backgroundColor: mobileActiveSection === item.id
+                  ? mobileTheme.colors.background.elevated
+                  : mobileTheme.colors.background.card,
+                border: `1px solid ${mobileActiveSection === item.id ? item.color : mobileTheme.colors.border.light}`
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: `${item.color}20` }}
+                >
+                  <item.icon size={20} style={{ color: item.color }} />
+                </div>
+                <span
+                  className="font-medium"
+                  style={{ color: mobileTheme.colors.text.primary }}
+                >
+                  {item.label}
+                </span>
+              </div>
+              <ChevronRight
+                size={20}
+                className="transition-transform"
+                style={{
+                  color: mobileTheme.colors.text.tertiary,
+                  transform: mobileActiveSection === item.id ? 'rotate(90deg)' : 'none'
+                }}
+              />
+            </motion.button>
+          ))}
+
+          {/* Expanded Sections */}
+          {mobileActiveSection === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl space-y-4"
+              style={{ backgroundColor: mobileTheme.colors.background.card }}
+            >
+              <div>
+                <Label
+                  className="text-sm mb-2 block"
+                  style={{ color: mobileTheme.colors.text.secondary }}
+                >
+                  {t("profile.form.nameLabel")}
+                </Label>
+                <Input
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder={t("profile.form.namePlaceholder")}
+                  className="bg-transparent border"
+                  style={{
+                    borderColor: mobileTheme.colors.border.light,
+                    color: mobileTheme.colors.text.primary
+                  }}
+                />
+              </div>
+              <Button
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="w-full"
+                style={{ backgroundColor: mobileTheme.colors.primary[500] }}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t("profile.actions.saving")}
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {t("profile.actions.save")}
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          )}
+
+          {mobileActiveSection === 'preferences' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl space-y-4"
+              style={{ backgroundColor: mobileTheme.colors.background.card }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p style={{ color: mobileTheme.colors.text.primary, fontWeight: 500 }}>
+                    {t("preferences.appearance.theme.title")}
+                  </p>
+                  <p style={{ color: mobileTheme.colors.text.tertiary, fontSize: 12 }}>
+                    {t("preferences.appearance.theme.description")}
+                  </p>
+                </div>
+                <ThemeToggle />
+              </div>
+              <Separator style={{ backgroundColor: mobileTheme.colors.border.light }} />
+              <SFWProtectionToggle />
+            </motion.div>
+          )}
+
+          {mobileActiveSection === 'danger' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl space-y-3"
+              style={{
+                backgroundColor: mobileTheme.colors.background.card,
+                border: '1px solid #EF444440'
+              }}
+            >
+              <Button
+                variant="outline"
+                className="w-full justify-start text-red-500 border-red-500/30"
+                onClick={() => setDeleteMessagesDialog(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                {t("danger.deleteMessages.button")}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-red-500 border-red-500/30"
+                onClick={() => setDeleteAgentsDialog(true)}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                {t("danger.deleteAgents.button")}
+              </Button>
+              <Button
+                variant="destructive"
+                className="w-full justify-start"
+                onClick={() => setDeleteAccountDialog(true)}
+              >
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                {t("danger.deleteAccount.button")}
+              </Button>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Sign Out Button - Mobile */}
+        <div className="p-4 mt-6">
+          <Button
+            variant="outline"
+            className="w-full"
+            style={{
+              borderColor: mobileTheme.colors.border.light,
+              color: mobileTheme.colors.text.secondary
+            }}
+            onClick={async () => {
+              await signOut();
+              window.location.href = "/";
+            }}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Cerrar sesión
+          </Button>
+        </div>
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden lg:block min-h-screen bg-background">
       <div className="max-w-6xl mx-auto p-6 lg:p-8 space-y-8">
         {/* Header */}
         <div className="space-y-2">

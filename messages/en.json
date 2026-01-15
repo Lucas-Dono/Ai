@@ -1634,15 +1634,15 @@
   },
   "mobileNav": {
     "home": "Home",
+    "groups": "Groups",
     "community": "Community",
-    "create": "Create",
-    "notifications": "Notifs",
     "profile": "Profile"
   },
   "mobileHeader": {
     "defaultUser": "User",
     "brand": "Blaniel",
     "viewProfile": "View profile",
+    "searchPlaceholder": "Search companions, worlds...",
     "menu": {
       "home": "Home",
       "settings": "Settings",
@@ -1875,6 +1875,7 @@
     "title": "Settings",
     "subtitle": "Manage your account, preferences and platform configuration",
     "loading": "Loading settings...",
+    "loadingSettings": "Loading your settings...",
     "tabs": {
       "profile": "Profile",
       "plan": "Plan",

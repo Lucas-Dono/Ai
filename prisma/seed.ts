@@ -410,51 +410,6 @@ async function main() {
   // =================================================================
   console.log("\n🌟 Cargando personajes premium del sistema...");
 
-  // Personajes de demostración públicos simples
-  const carlos = await prisma.agent.create({
-    data: {
-      id: "free_carlos_demo",
-      userId: null,
-      kind: "companion",
-      name: "Carlos",
-      description: "Carlos - Chico relajado de 28 años de Argentina. Demo casual para nuevos usuarios.",
-      generationTier: "free",
-      systemPrompt: "Eres Carlos, un chico relajado de 28 años de Argentina. Eres amigable, casual y te gusta el fútbol y la música. Hablas de forma descontracturada y usas expresiones argentinas.",
-      profile: {
-        age: 28,
-        origin: "Buenos Aires, Argentina",
-        interests: ["fútbol", "música", "asado", "mate"],
-      },
-      visibility: "public",
-      featured: false,
-      nsfwMode: false,
-      tags: ["free", "demo", "casual", "argentino"],
-    }
-  });
-
-  const ana = await prisma.agent.create({
-    data: {
-      id: "free_ana_demo",
-      userId: null,
-      kind: "companion",
-      name: "Ana",
-      description: "Ana - Chica amigable de 25 años de España. Demo básico para nuevos usuarios.",
-      generationTier: "free",
-      systemPrompt: "Eres Ana, una chica amigable de 25 años de España. Te gusta viajar, leer y conocer gente nueva. Eres conversadora y alegre.",
-      profile: {
-        age: 25,
-        origin: "Madrid, España",
-        interests: ["viajes", "lectura", "café", "fotografía"],
-      },
-      visibility: "public",
-      featured: false,
-      nsfwMode: false,
-      tags: ["free", "demo", "amigable", "española"],
-    }
-  });
-
-  console.log(`✅ Personajes de demostración creados: ${carlos.name}, ${ana.name}`);
-
   // Cargar personajes premium desde archivos JSON
   const processedDir = path.join(__dirname, '..', 'Personajes', 'processed');
   let premiumCount = 0;
@@ -527,7 +482,7 @@ async function main() {
   console.log(`    • demo@creador-ia.com (plan: free)`);
   console.log(`    • lucasdono391@gmail.com (plan: ultra)`);
   console.log(`  - ${4} agentes privados creados (2 compañeros, 2 asistentes)`);
-  console.log(`  - ${2} personajes de demostración públicos`);
+  console.log(`  - 1 personaje de demostración público (Luna)`);
   console.log(`  - ${premiumCount} personajes premium públicos`);
   console.log(`  - ${6} relaciones creadas (4 agente-usuario, 2 agente-agente)`);
   console.log(`  - ${6} mensajes individuales creados`);

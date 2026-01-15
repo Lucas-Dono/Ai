@@ -44,7 +44,7 @@ export const STORY_NICHE_CONFIGS: Record<StoryNicheType, StoryNicheConfig> = {
       en: 'HISTORICAL',
       es: 'HISTÓRICO'
     },
-    badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    badgeColor: 'bg-amber-600 text-white border-amber-700',
     borderColor: 'border-amber-500/50',
     bgColor: 'bg-amber-500/5'
   },
@@ -64,7 +64,7 @@ export const STORY_NICHE_CONFIGS: Record<StoryNicheType, StoryNicheConfig> = {
       en: 'ICON',
       es: 'ÍCONO'
     },
-    badgeColor: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    badgeColor: 'bg-purple-600 text-white border-purple-700',
     borderColor: 'border-purple-500/50',
     bgColor: 'bg-purple-500/5'
   },
@@ -84,7 +84,7 @@ export const STORY_NICHE_CONFIGS: Record<StoryNicheType, StoryNicheConfig> = {
       en: 'CONTROVERSIAL',
       es: 'POLÉMICO'
     },
-    badgeColor: 'bg-red-500/20 text-red-400 border-red-500/30',
+    badgeColor: 'bg-red-600 text-white border-red-700',
     borderColor: 'border-red-500/50',
     bgColor: 'bg-red-500/5'
   }
@@ -154,8 +154,13 @@ export const HISTORICAL_CHARACTER_MAPPING: Record<StoryNicheType, string[]> = {
 
 /**
  * Obtener configuración de un nicho
+ * @param nicheType - Tipo de nicho a obtener
+ * @returns Configuración del nicho, o 'pop_culture' como fallback si no existe
  */
-export function getStoryNicheConfig(nicheType: StoryNicheType): StoryNicheConfig {
+export function getStoryNicheConfig(nicheType: StoryNicheType | undefined | null): StoryNicheConfig {
+  if (!nicheType || !STORY_NICHE_CONFIGS[nicheType]) {
+    return STORY_NICHE_CONFIGS['pop_culture'];
+  }
   return STORY_NICHE_CONFIGS[nicheType];
 }
 

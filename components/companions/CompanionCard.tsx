@@ -6,16 +6,19 @@ import { Button } from "@/components/ui/button";
 import { getCharacterCategories, type CategoryKey } from "@/lib/categories";
 import { useLocale } from "next-intl";
 import { generateGradient } from "@/lib/utils";
+import { getStoryNicheConfig, type StoryNicheType } from "@/lib/stories/config";
 
 interface CompanionCardProps {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   avatar?: string | null;
   categories?: CategoryKey[];
   generationTier?: string | null;
+  storyNiche?: StoryNicheType | null;
   index?: number;
   onClick?: () => void;
+  width?: number;
 }
 
 const getTierBadge = (tier?: string | null) => {
@@ -46,11 +49,14 @@ export function CompanionCard({
   avatar,
   categories = [],
   generationTier,
+  storyNiche,
   index = 0,
-  onClick
+  onClick,
+  width
 }: CompanionCardProps) {
   const locale = useLocale();
   const tierBadge = getTierBadge(generationTier);
+  const nicheConfig = storyNiche ? getStoryNicheConfig(storyNiche) : null;
   const characterCategories = getCharacterCategories(categories);
 
   // Generar gradiente único basado en el nombre si no hay avatar
@@ -73,7 +79,7 @@ export function CompanionCard({
         ease: [0.4, 0, 0.2, 1]
       }}
       className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#141416] transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
-      style={{ aspectRatio: '3/5' }}
+      style={{ aspectRatio: '3/5', ...(width && { width: `${width}px` }) }}
       onClick={handleClick}
     >
       {/* Image Area */}
@@ -96,12 +102,20 @@ export function CompanionCard({
           <div className="absolute inset-x-0 bottom-0 h-[60px] bg-gradient-to-t from-[#141416] to-transparent pointer-events-none" />
         </div>
 
-        {/* Tier Badge */}
-        <span
-          className={`absolute top-3 left-3 z-10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded ${tierBadge.className}`}
-        >
-          {tierBadge.label}
-        </span>
+        {/* Badge: Niche o Tier */}
+        {nicheConfig ? (
+          <span
+            className={`absolute top-3 left-3 z-10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded ${nicheConfig.badgeColor} border`}
+          >
+            {nicheConfig.badge[locale as 'en' | 'es']}
+          </span>
+        ) : (
+          <span
+            className={`absolute top-3 left-3 z-10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded ${tierBadge.className}`}
+          >
+            {tierBadge.label}
+          </span>
+        )}
       </Link>
 
       {/* Content Area */}

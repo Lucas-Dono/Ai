@@ -1529,15 +1529,15 @@
   },
   "mobileNav": {
     "home": "Inicio",
+    "groups": "Grupos",
     "community": "Community",
-    "create": "Crear",
-    "notifications": "Notifs",
     "profile": "Perfil"
   },
   "mobileHeader": {
     "defaultUser": "Usuario",
     "brand": "Blaniel",
     "viewProfile": "Ver perfil",
+    "searchPlaceholder": "Buscar compañeros, mundos...",
     "menu": {
       "home": "Inicio",
       "settings": "Configuración",
@@ -1770,6 +1770,7 @@
     "title": "Configuración",
     "subtitle": "Administra tu cuenta, preferencias y configuración de la plataforma",
     "loading": "Cargando configuración...",
+    "loadingSettings": "Cargando tu configuración...",
     "tabs": {
       "profile": "Perfil",
       "plan": "Plan",

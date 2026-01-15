@@ -29,26 +29,29 @@ export async function GET(req: NextRequest) {
       take: 100
     });
 
-    // Filtrar solo agentes con story niche
-    const agents = allAgents.filter(agent => {
-      const fields = agent.aiGeneratedFields as any;
-      return fields?.storyNiche?.type;
-    });
-
-    // Agrupar por nicho
+    // Agrupar por nicho (asignar uno si no tiene)
     const agentsByStory: Record<string, any[]> = {
       war_figures: [],
       pop_culture: [],
       controversial: []
     };
 
-    agents.forEach(agent => {
-      const aiFields = agent.aiGeneratedFields as any;
-      const nicheType = aiFields?.storyNiche?.type as StoryNicheType;
+    const storyKeys = Object.keys(agentsByStory);
 
-      if (nicheType && agentsByStory[nicheType]) {
-        agentsByStory[nicheType].push(agent);
+    allAgents.forEach((agent) => {
+      const aiFields = agent.aiGeneratedFields as any;
+      let nicheType = aiFields?.storyNiche?.type as StoryNicheType;
+
+      // Si no tiene story niche, asignar uno basado en el hash del nombre
+      if (!nicheType || !agentsByStory[nicheType]) {
+        let hash = 0;
+        for (let i = 0; i < agent.name.length; i++) {
+          hash = agent.name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        nicheType = storyKeys[Math.abs(hash) % storyKeys.length] as StoryNicheType;
       }
+
+      agentsByStory[nicheType].push(agent);
     });
 
     return NextResponse.json({

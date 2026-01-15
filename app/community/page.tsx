@@ -1,5 +1,6 @@
 /**
  * Community Feed Page - Tech/Cyberpunk UI Design
+ * Con soporte para vista móvil sincronizada con la app React Native
  */
 
 "use client";
@@ -23,6 +24,7 @@ import {
   Shield,
   Zap,
   MoreHorizontal,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useFeed, type FeedFilter, type PostType } from "@/hooks/useFeed";
@@ -30,6 +32,7 @@ import { PostCard } from "@/components/community";
 import { usePopularCommunities } from "@/hooks/usePopularCommunities";
 import { PullToRefresh } from "@/components/mobile/PullToRefresh";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { mobileTheme } from "@/lib/mobile-theme";
 
 export default function CommunityPage() {
   const router = useRouter();
@@ -94,7 +97,357 @@ export default function CommunityPage() {
 
   return (
     <ErrorBoundary variant="page">
-      <div className="w-full min-h-screen bg-[#121212] text-neutral-200 font-sans selection:bg-[#6366f1] selection:text-white">
+      {/* Mobile View - Sincronizado con la app React Native */}
+      <div
+        className="lg:hidden w-full min-h-screen"
+        style={{ backgroundColor: mobileTheme.colors.background.primary }}
+      >
+        <PullToRefresh onRefresh={async () => { await refresh(); }}>
+          {/* Popular Communities - Carrusel horizontal */}
+          <section className="pt-4 pb-2">
+            <div
+              className="flex items-center justify-between mb-4"
+              style={{ paddingLeft: mobileTheme.spacing.lg, paddingRight: mobileTheme.spacing.lg }}
+            >
+              <div>
+                <h2
+                  className="font-bold"
+                  style={{
+                    fontSize: mobileTheme.typography.fontSize.xl,
+                    color: mobileTheme.colors.text.primary
+                  }}
+                >
+                  Comunidades
+                </h2>
+                <p style={{ fontSize: mobileTheme.typography.fontSize.sm, color: mobileTheme.colors.text.secondary }}>
+                  Únete a la conversación
+                </p>
+              </div>
+              <Link href="/community/explore">
+                <button
+                  className="flex items-center gap-1"
+                  style={{ color: mobileTheme.colors.primary[500], fontWeight: 600, fontSize: mobileTheme.typography.fontSize.sm }}
+                >
+                  Ver todo
+                  <ChevronRight size={16} strokeWidth={2.5} />
+                </button>
+              </Link>
+            </div>
+
+            {/* Carrusel de comunidades */}
+            <div
+              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+              style={{ paddingLeft: mobileTheme.spacing.lg, paddingRight: mobileTheme.spacing.lg }}
+            >
+              {communitiesLoading ? (
+                [1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="animate-pulse flex-shrink-0 snap-start"
+                    style={{
+                      width: 140,
+                      height: 120,
+                      backgroundColor: mobileTheme.colors.background.card,
+                      borderRadius: mobileTheme.borderRadius.lg
+                    }}
+                  />
+                ))
+              ) : popularCommunities.length === 0 ? (
+                <Link href={isAuthenticated ? "/community/communities/create" : "/login?callbackUrl=/community/communities/create"}>
+                  <div
+                    className="flex-shrink-0 snap-start flex flex-col items-center justify-center gap-2"
+                    style={{
+                      width: 140,
+                      height: 120,
+                      backgroundColor: mobileTheme.colors.background.card,
+                      borderRadius: mobileTheme.borderRadius.lg,
+                      border: `1px dashed ${mobileTheme.colors.border.light}`
+                    }}
+                  >
+                    <Plus size={24} style={{ color: mobileTheme.colors.primary[500] }} />
+                    <span style={{ fontSize: mobileTheme.typography.fontSize.sm, color: mobileTheme.colors.text.secondary }}>
+                      Crear comunidad
+                    </span>
+                  </div>
+                </Link>
+              ) : (
+                <>
+                  {popularCommunities.map((comm, index) => {
+                    const reputation = Math.min(95, 50 + (comm.memberCount / 100));
+                    const style = getReputationStyle(reputation);
+                    return (
+                      <Link key={comm.id} href={`/community/${comm.slug}`}>
+                        <motion.div
+                          className="flex-shrink-0 snap-start p-3 flex flex-col justify-between"
+                          style={{
+                            width: 140,
+                            height: 120,
+                            backgroundColor: mobileTheme.colors.background.card,
+                            borderRadius: mobileTheme.borderRadius.lg,
+                            border: `1px solid ${mobileTheme.colors.border.light}`
+                          }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-8 h-8 flex items-center justify-center font-bold"
+                              style={{
+                                backgroundColor: mobileTheme.colors.background.elevated,
+                                borderRadius: mobileTheme.borderRadius.sm,
+                                fontSize: mobileTheme.typography.fontSize.xs,
+                                color: mobileTheme.colors.primary[500]
+                              }}
+                            >
+                              {comm.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <span
+                              className="px-1.5 py-0.5 rounded font-bold"
+                              style={{
+                                fontSize: 10,
+                                color: mobileTheme.colors.primary[500],
+                                backgroundColor: `${mobileTheme.colors.primary[500]}20`
+                              }}
+                            >
+                              #{index + 1}
+                            </span>
+                          </div>
+                          <div>
+                            <h4
+                              className="font-medium truncate"
+                              style={{ fontSize: mobileTheme.typography.fontSize.sm, color: mobileTheme.colors.text.primary }}
+                            >
+                              {comm.name}
+                            </h4>
+                            <p style={{ fontSize: mobileTheme.typography.fontSize.xs, color: mobileTheme.colors.text.tertiary }}>
+                              {comm.memberCount.toLocaleString()} miembros
+                            </p>
+                          </div>
+                          {/* Barra de reputación */}
+                          <div
+                            className="w-full h-1 rounded-full overflow-hidden"
+                            style={{ backgroundColor: mobileTheme.colors.background.elevated }}
+                          >
+                            <div
+                              className={`h-full ${style.color}`}
+                              style={{ width: `${reputation}%` }}
+                            />
+                          </div>
+                        </motion.div>
+                      </Link>
+                    );
+                  })}
+                  <Link href={isAuthenticated ? "/community/communities/create" : "/login?callbackUrl=/community/communities/create"}>
+                    <div
+                      className="flex-shrink-0 snap-start flex flex-col items-center justify-center gap-2"
+                      style={{
+                        width: 100,
+                        height: 120,
+                        backgroundColor: 'transparent',
+                        borderRadius: mobileTheme.borderRadius.lg,
+                        border: `1px dashed ${mobileTheme.colors.border.light}`
+                      }}
+                    >
+                      <Plus size={20} style={{ color: mobileTheme.colors.primary[500] }} />
+                      <span style={{ fontSize: mobileTheme.typography.fontSize.xs, color: mobileTheme.colors.text.tertiary }}>
+                        Crear
+                      </span>
+                    </div>
+                  </Link>
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Filtros - Pills horizontales */}
+          <div
+            className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide"
+            style={{ paddingLeft: mobileTheme.spacing.lg, paddingRight: mobileTheme.spacing.lg }}
+          >
+            {filters.map((filter) => (
+              <motion.button
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full whitespace-nowrap transition-all"
+                style={{
+                  backgroundColor: activeFilter === filter.id ? mobileTheme.colors.primary[500] : mobileTheme.colors.background.card,
+                  color: activeFilter === filter.id ? '#fff' : mobileTheme.colors.text.secondary,
+                  fontSize: mobileTheme.typography.fontSize.sm,
+                  fontWeight: activeFilter === filter.id ? 600 : 500,
+                  border: `1px solid ${activeFilter === filter.id ? mobileTheme.colors.primary[500] : mobileTheme.colors.border.light}`
+                }}
+              >
+                <filter.icon size={14} />
+                {filter.label}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Tabs de tipo de contenido */}
+          <div
+            className="flex gap-1 overflow-x-auto scrollbar-hide mb-4"
+            style={{
+              paddingLeft: mobileTheme.spacing.lg,
+              paddingRight: mobileTheme.spacing.lg,
+              borderBottom: `1px solid ${mobileTheme.colors.border.light}`
+            }}
+          >
+            {viewTabs.map((item) => (
+              <button
+                key={item.type}
+                onClick={() => setActiveView(item.type)}
+                className="px-4 py-3 whitespace-nowrap transition-all"
+                style={{
+                  fontSize: mobileTheme.typography.fontSize.sm,
+                  fontWeight: activeView === item.type ? 600 : 400,
+                  color: activeView === item.type ? mobileTheme.colors.primary[500] : mobileTheme.colors.text.tertiary,
+                  borderBottom: activeView === item.type ? `2px solid ${mobileTheme.colors.primary[500]}` : '2px solid transparent'
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Guest Banner - Mobile */}
+          {!isAuthenticated && (
+            <div
+              className="mx-4 mb-4 p-4 rounded-xl flex items-center gap-3"
+              style={{
+                backgroundColor: mobileTheme.colors.background.card,
+                border: `1px solid ${mobileTheme.colors.border.light}`,
+                borderLeft: `3px solid ${mobileTheme.colors.primary[500]}`
+              }}
+            >
+              <Terminal size={20} style={{ color: mobileTheme.colors.primary[500] }} />
+              <div className="flex-1">
+                <p style={{ fontSize: mobileTheme.typography.fontSize.sm, color: mobileTheme.colors.text.primary, fontWeight: 500 }}>
+                  Modo Invitado
+                </p>
+                <p style={{ fontSize: mobileTheme.typography.fontSize.xs, color: mobileTheme.colors.text.tertiary }}>
+                  Inicia sesión para participar
+                </p>
+              </div>
+              <Link href="/login?callbackUrl=/community">
+                <button
+                  className="px-3 py-1.5 rounded-lg"
+                  style={{
+                    backgroundColor: mobileTheme.colors.primary[500],
+                    color: '#fff',
+                    fontSize: mobileTheme.typography.fontSize.sm,
+                    fontWeight: 600
+                  }}
+                >
+                  Acceder
+                </button>
+              </Link>
+            </div>
+          )}
+
+          {/* Feed de posts - Mobile */}
+          <div style={{ paddingLeft: mobileTheme.spacing.lg, paddingRight: mobileTheme.spacing.lg }}>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div
+                  className="animate-spin rounded-full h-8 w-8 border-b-2"
+                  style={{ borderColor: mobileTheme.colors.primary[500] }}
+                />
+              </div>
+            ) : posts.length === 0 ? (
+              <div
+                className="p-8 text-center flex flex-col items-center gap-4"
+                style={{
+                  backgroundColor: mobileTheme.colors.background.card,
+                  borderRadius: mobileTheme.borderRadius.lg
+                }}
+              >
+                <div
+                  className="p-4 rounded-xl"
+                  style={{ backgroundColor: mobileTheme.colors.background.elevated }}
+                >
+                  <MessageSquare size={32} style={{ color: mobileTheme.colors.primary[500] }} />
+                </div>
+                <div>
+                  <h3
+                    className="font-bold mb-1"
+                    style={{ color: mobileTheme.colors.text.primary, fontSize: mobileTheme.typography.fontSize.lg }}
+                  >
+                    Sin publicaciones
+                  </h3>
+                  <p style={{ color: mobileTheme.colors.text.secondary, fontSize: mobileTheme.typography.fontSize.sm }}>
+                    Sé el primero en compartir algo
+                  </p>
+                </div>
+                <Link href={isAuthenticated ? "/community/create" : "/login?callbackUrl=/community/create"}>
+                  <button
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl"
+                    style={{
+                      backgroundColor: mobileTheme.colors.primary[500],
+                      color: '#fff',
+                      fontWeight: 600
+                    }}
+                  >
+                    <Plus size={18} />
+                    Crear Post
+                  </button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4 pb-4">
+                <AnimatePresence mode="popLayout">
+                  {posts.map((post, index) => (
+                    <motion.div
+                      key={post.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ delay: index * 0.03 }}
+                    >
+                      <PostCard
+                        post={post}
+                        onVote={votePost}
+                        onSave={savePost}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {hasMore && (
+                  <button
+                    onClick={loadMore}
+                    disabled={loading}
+                    className="w-full py-3 rounded-xl transition-colors"
+                    style={{
+                      backgroundColor: mobileTheme.colors.background.card,
+                      color: mobileTheme.colors.text.secondary,
+                      border: `1px solid ${mobileTheme.colors.border.light}`
+                    }}
+                  >
+                    {loading ? 'Cargando...' : 'Cargar más'}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Botón flotante crear post */}
+          <Link href={isAuthenticated ? "/community/create" : "/login?callbackUrl=/community/create"}>
+            <motion.button
+              className="fixed bottom-20 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-30"
+              style={{
+                backgroundColor: mobileTheme.colors.primary[500],
+                boxShadow: `0 4px 14px ${mobileTheme.colors.primary[500]}60`
+              }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Plus size={24} color="#fff" />
+            </motion.button>
+          </Link>
+        </PullToRefresh>
+      </div>
+
+      {/* Desktop View - Diseño original cyberpunk */}
+      <div className="hidden lg:block w-full min-h-screen bg-[#121212] text-neutral-200 font-sans selection:bg-[#6366f1] selection:text-white">
 
         {/* Contenedor Principal con Max Width para pantallas muy grandes */}
         <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
@@ -138,7 +491,7 @@ export default function CommunityPage() {
           )}
 
           {/* --- TOOLBAR & FILTERS --- */}
-          <div className="flex flex-col lg:flex-row gap-6 mb-8 sticky top-0 z-20 bg-[#121212]/95 backdrop-blur-sm py-2 -my-2 lg:static lg:bg-transparent lg:py-0 lg:backdrop-blur-none">
+          <div className="flex flex-col lg:flex-row gap-6 mb-8">
 
             {/* Search Bar */}
             <div className="relative flex-grow lg:max-w-2xl">
