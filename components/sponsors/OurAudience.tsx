@@ -64,14 +64,14 @@ export function OurAudience() {
   ];
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden bg-muted/10">
+    <section className="py-12 md:py-24 sm:md:py-32 relative overflow-hidden bg-muted/10">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-center mb-8 md:mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Audiencia Target:{" "}
@@ -83,8 +83,8 @@ export function OurAudience() {
         </motion.div>
 
         {/* Key Stats Grid */}
-        <div className="max-w-6xl mx-auto mb-16">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="max-w-6xl mx-auto mb-6 md:mb-8 lg:mb-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -95,15 +95,15 @@ export function OurAudience() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                 >
-                  <Card className="p-6 border border-border hover:border-foreground/20 transition-all duration-300 bg-card/50 backdrop-blur-sm h-full">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-2xl bg-foreground/5 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5" strokeWidth={1.5} />
+                  <Card className="p-3 md:p-4 lg:p-6 border border-border hover:border-foreground/20 transition-all duration-300 bg-card/50 backdrop-blur-sm h-full">
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-2xl bg-foreground/5 flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1">
-                        <div className="text-3xl font-bold mb-1 text-foreground">{stat.value}</div>
-                        <div className="text-sm font-semibold mb-1 text-foreground">{stat.label}</div>
-                        <div className="text-xs text-foreground/60 font-medium">{stat.sublabel}</div>
+                        <div className="text-2xl md:text-3xl font-bold mb-1 text-foreground">{stat.value}</div>
+                        <div className="text-xs md:text-sm font-semibold mb-1 text-foreground">{stat.label}</div>
+                        <div className="text-[10px] md:text-xs text-foreground/60 font-medium">{stat.sublabel}</div>
                       </div>
                     </div>
                   </Card>
@@ -121,28 +121,28 @@ export function OurAudience() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="max-w-6xl mx-auto"
         >
-          <Card className="p-8 border border-border bg-card/50 backdrop-blur-sm">
-            <div className="mb-8">
-              <h3 className="text-2xl font-bold mb-2">Perfil Demográfico Target</h3>
-              <p className="text-sm text-muted-foreground">
+          <Card className="p-3 md:p-4 lg:p-8 border border-border bg-card/50 backdrop-blur-sm">
+            <div className="mb-3 md:mb-4 lg:mb-8">
+              <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2">Perfil Demográfico Target</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">
                 Basado en datos públicos de Character.AI (20M+ usuarios) y Replika (10M+ usuarios)
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
               {demographics.map((demo, index) => (
                 <div key={index}>
-                  <h4 className="text-sm font-bold mb-4 text-foreground uppercase tracking-wide">
+                  <h4 className="text-xs md:text-sm font-bold mb-2 md:mb-3 lg:mb-4 text-foreground uppercase tracking-wide">
                     {demo.category}
                   </h4>
-                  <div className="space-y-3">
+                  <div className="space-y-2 md:space-y-3">
                     {demo.segments.map((segment, segIndex) => (
-                      <div key={segIndex}>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-sm text-foreground/70 font-medium">
+                      <div key={segIndex} className={segIndex > 2 ? "hidden md:block" : ""}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs md:text-sm text-foreground/70 font-medium">
                             {segment.label}
                           </span>
-                          <span className="text-sm font-bold text-foreground">{segment.value}</span>
+                          <span className="text-xs md:text-sm font-bold text-foreground">{segment.value}</span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
@@ -159,15 +159,15 @@ export function OurAudience() {
           </Card>
         </motion.div>
 
-        {/* Behavioral Insights */}
+        {/* Behavioral Insights - oculto en mobile */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="max-w-6xl mx-auto mt-8"
+          className="hidden md:block max-w-6xl mx-auto mt-6 md:mt-8"
         >
-          <Card className="p-8 border border-border bg-blue-500/5 backdrop-blur-sm">
+          <Card className="p-6 md:p-8 border border-border bg-blue-500/5 backdrop-blur-sm">
             <div className="mb-6">
               <h3 className="text-xl font-bold mb-2">Benchmarks de Industria</h3>
               <p className="text-sm text-muted-foreground">Promedios del sector AI conversacional (Character.AI, Replika, Chai)</p>
@@ -248,7 +248,7 @@ export function OurAudience() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-center mt-12"
+          className="text-center mt-6 md:mt-12"
         >
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
             El sector de IA conversacional muestra <span className="text-foreground font-semibold">25-35 min promedio</span> por sesión -

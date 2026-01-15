@@ -69,14 +69,14 @@ export function FAQ() {
   ];
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden">
+    <section className="py-12 md:py-24 sm:md:py-32 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-center mb-8 md:mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Preguntas Frecuentes{" "}
@@ -94,15 +94,15 @@ export function FAQ() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="max-w-4xl mx-auto"
         >
-          <Card className="p-8 border border-border bg-card/50 backdrop-blur-sm">
+          <Card className="p-4 md:p-8 border border-border bg-card/50 backdrop-blur-sm">
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left hover:no-underline">
-                    <span className="font-semibold">{faq.question}</span>
+                  <AccordionTrigger className="text-left hover:no-underline text-sm md:text-base">
+                    <span className="font-semibold pr-2">{faq.question}</span>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="text-sm text-foreground/70 leading-relaxed pt-2">
+                    <div className="text-sm text-foreground/70 leading-relaxed pt-1 md:pt-2">
                       {faq.answer}
                     </div>
                   </AccordionContent>

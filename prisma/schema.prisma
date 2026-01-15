@@ -4688,3 +4688,19 @@ model UserAnalyticsSummary {
   @@index([acquisitionSource])
   @@index([acquisitionCampaign])
 }
+
+// ============================================
+// Talent Pool - Bolsa de Talento para Careers
+// ============================================
+model TalentPoolEntry {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  area         String   // 'engineering' | 'design' | 'community' | 'other'
+  portfolioUrl String?  // LinkedIn, GitHub, Portfolio, etc.
+  message      String?  @db.VarChar(500) // Mensaje breve opcional
+  createdAt    DateTime @default(now())
+
+  @@index([area])
+  @@index([createdAt])
+}

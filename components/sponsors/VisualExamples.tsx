@@ -101,14 +101,14 @@ export function VisualExamples() {
   const currentExample = examples[currentIndex];
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden">
+    <section className="py-12 md:py-24 sm:md:py-32 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-center mb-8 md:mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Ejemplos de{" "}
@@ -153,10 +153,10 @@ export function VisualExamples() {
               onMouseLeave={() => setIsPaused(false)}
             >
               <Card className="overflow-hidden border border-border hover:border-foreground/20 transition-all duration-300 bg-card/50 backdrop-blur-sm">
-                <div className="grid md:grid-cols-2 gap-0 min-h-[600px]">
+                <div className="grid md:grid-cols-2 gap-0 min-h-[500px] md:min-h-[700px]">
                   {/* Left: Visual Mockup */}
-                  <div className="relative bg-muted/20 p-8 flex items-center justify-center h-full">
-                    <div className="relative w-full max-w-sm">
+                  <div className="relative bg-muted/20 p-3 md:p-4 lg:p-8 flex items-center justify-center h-full">
+                    <div className="relative w-full max-w-xs md:max-w-sm">
                       {/* Image or placeholder */}
                       <div className="aspect-square rounded-2xl overflow-hidden relative group border-2 border-border">
                         {currentExample.image.src ? (
@@ -213,27 +213,27 @@ export function VisualExamples() {
                   </div>
 
                   {/* Right: Conversation + Metrics */}
-                  <div className="p-8 flex flex-col justify-between h-full">
+                  <div className="p-3 md:p-4 lg:p-8 flex flex-col justify-between h-full">
                     {/* Scenario */}
-                    <div className="mb-6">
-                      <div className="text-xs font-bold text-foreground/60 uppercase tracking-wide mb-2">
+                    <div className="mb-2 md:mb-3 lg:mb-6">
+                      <div className="text-xs font-bold text-foreground/60 uppercase tracking-wide mb-1 md:mb-2">
                         Escenario
                       </div>
-                      <div className="text-sm font-medium text-foreground">{currentExample.scenario}</div>
+                      <div className="text-xs md:text-sm font-medium text-foreground">{currentExample.scenario}</div>
                     </div>
 
                     {/* Conversation */}
-                    <div className="space-y-3 mb-6 flex-1">
-                      {/* User message */}
-                      <div className="space-y-1">
+                    <div className="space-y-2 md:space-y-3 mb-2 md:mb-3 lg:mb-6 flex-1">
+                      {/* User message - oculto en mobile */}
+                      <div className="hidden md:block space-y-1">
                         <div className="text-xs text-foreground/60 font-medium">Usuario:</div>
                         <div className="bg-muted/70 rounded-xl rounded-tr-sm px-4 py-2.5 text-sm text-foreground">
                           {currentExample.conversation.user}
                         </div>
                       </div>
 
-                      {/* AI response */}
-                      <div className="space-y-1">
+                      {/* AI response - oculto en mobile */}
+                      <div className="hidden md:block space-y-1">
                         <div className="text-xs text-foreground/60 font-medium">
                           {currentExample.character}:
                         </div>
@@ -244,19 +244,19 @@ export function VisualExamples() {
 
                       {/* Sponsored mention */}
                       <div className="space-y-1">
-                        <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-blue-500/40 rounded-xl rounded-tl-sm px-4 py-3 text-sm">
-                          <div className="mb-2">
-                            <Badge className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white">
+                        <div className="bg-blue-50 dark:bg-blue-950/30 border-2 border-blue-500/40 rounded-xl rounded-tl-sm px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm">
+                          <div className="mb-1.5 md:mb-2">
+                            <Badge className="text-[10px] md:text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white">
                               🏷️ Recomendación patrocinada
                             </Badge>
                           </div>
-                          <div className="text-foreground">{currentExample.conversation.sponsored}</div>
+                          <div className="text-foreground leading-relaxed">{currentExample.conversation.sponsored}</div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Metrics */}
-                    <div className="pt-6 border-t border-border">
+                    {/* Metrics - ocultas en mobile */}
+                    <div className="hidden md:block pt-6 border-t border-border">
                       <div className="text-xs font-bold text-foreground/60 uppercase tracking-wide mb-3">
                         Performance
                       </div>
@@ -308,7 +308,7 @@ export function VisualExamples() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-center mt-12"
+          className="text-center mt-6 md:mt-12"
         >
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto">
             Cada mención está cuidadosamente contextualizada para agregar valor genuino a la

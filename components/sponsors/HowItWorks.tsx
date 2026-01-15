@@ -33,14 +33,14 @@ export function HowItWorks() {
   ];
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden bg-muted/10">
+    <section className="py-12 md:py-24 sm:md:py-32 relative overflow-hidden bg-muted/10">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-center mb-8 md:mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Cómo Funciona{" "}
@@ -57,7 +57,7 @@ export function HowItWorks() {
           {/* Connection line */}
           <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-px bg-border -translate-y-1/2" />
 
-          <div className="grid lg:grid-cols-3 gap-8 relative z-10">
+          <div className="grid lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 relative z-10">
             {steps.map((step, index) => {
               const Icon = step.icon;
 
@@ -70,28 +70,28 @@ export function HowItWorks() {
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   className="relative"
                 >
-                  <Card className="p-6 h-full border border-border hover:border-foreground/20 transition-all duration-300 group bg-card/50 backdrop-blur-sm">
+                  <Card className="p-4 md:p-6 h-full border border-border hover:border-foreground/20 transition-all duration-300 group bg-card/50 backdrop-blur-sm">
                     {/* Step number */}
-                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-muted mb-6">
+                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-muted mb-3 md:mb-6">
                       <span className="text-base font-bold">{step.number}</span>
                     </div>
 
                     {/* Icon */}
-                    <div className="mb-6">
+                    <div className="mb-3 md:mb-6">
                       <div className="w-12 h-12 rounded-2xl bg-foreground/5 flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
                         <Icon className="w-6 h-6" strokeWidth={1.5} />
                       </div>
                     </div>
 
                     {/* Content */}
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-semibold">{step.title}</h3>
-                      <p className="text-sm text-foreground/70 leading-relaxed">
+                    <div className="space-y-2 md:space-y-4">
+                      <h3 className="text-lg md:text-xl font-semibold">{step.title}</h3>
+                      <p className="text-xs md:text-sm text-foreground/70 leading-relaxed">
                         {step.description}
                       </p>
 
                       {/* Highlight stat */}
-                      <div className="pt-4 border-t border-border">
+                      <div className="pt-2 md:pt-4 border-t border-border">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">{step.highlight}</span>
@@ -120,10 +120,10 @@ export function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-16 max-w-4xl mx-auto"
+          className="mt-8 md:mt-16 max-w-4xl mx-auto"
         >
-          <Card className="p-8 border border-border bg-card/50 backdrop-blur-sm">
-            <div className="grid md:grid-cols-2 gap-8">
+          <Card className="p-4 md:p-8 border border-border bg-card/50 backdrop-blur-sm">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8">
               {/* Display Ads */}
               <div>
                 <h4 className="text-sm font-bold text-foreground/60 mb-4 uppercase tracking-wide">

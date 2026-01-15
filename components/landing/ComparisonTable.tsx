@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { Check, X, AlertTriangle } from "lucide-react";
+import { Check, X, AlertTriangle, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics/track-client";
 import { LandingEventType } from "@/lib/analytics/types";
+import Image from "next/image";
 
 type Status = boolean | "partial";
 
@@ -156,8 +157,14 @@ export function ComparisonTable() {
                     </th>
                     <th className="p-5 text-center">
                       <div className="inline-flex flex-col items-center gap-2">
-                        <div className="w-10 h-10 rounded-2xl bg-foreground flex items-center justify-center text-background font-bold text-sm">
-                          AI
+                        <div className="w-10 h-10 rounded-2xl flex items-center justify-center p-2">
+                          <Image
+                            src="/logo.png"
+                            alt="Blaniel"
+                            width={32}
+                            height={32}
+                            className="w-full h-full object-contain"
+                          />
                         </div>
                         <span className="font-semibold text-sm">{t("table.us")}</span>
                       </div>
@@ -165,7 +172,7 @@ export function ComparisonTable() {
                     <th className="p-5 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center">
-                          <span className="text-xs font-medium">📱</span>
+                          <Users className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
                         </div>
                         <span className="font-medium text-xs text-muted-foreground">
                           {t("table.others")}
@@ -220,68 +227,67 @@ export function ComparisonTable() {
             </div>
           </Card>
 
-          {/* Mobile Horizontal Scroll Table */}
-          <div className="md:hidden">
-            <Card className="overflow-hidden border border-border">
-              {/* Scroll shadows para indicar scrollabilidad */}
-              <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-card via-card to-transparent pointer-events-none z-10" />
-                <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-card via-card to-transparent pointer-events-none z-10" />
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {comparisons.map((comparison, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <Card className="p-4 border border-border bg-card/50 backdrop-blur-sm">
+                  {/* Feature name */}
+                  <h3 className="text-sm font-semibold mb-3">
+                    {t(`features.feature${index + 1}`)}
+                  </h3>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[580px]">
-                    <thead className="bg-muted/50 border-b border-border">
-                      <tr>
-                        <th className="sticky left-0 z-20 bg-muted/50 text-left p-3 text-sm font-semibold min-w-[180px]">
-                          {t("table.feature")}
-                        </th>
-                        <th className="p-3 text-center min-w-[100px]">
-                          <div className="flex flex-col items-center gap-1">
-                            <div className="w-8 h-8 rounded-xl bg-foreground text-background text-xs font-bold flex items-center justify-center">
-                              AI
-                            </div>
-                            <span className="text-xs font-semibold">{t("table.us")}</span>
-                          </div>
-                        </th>
-                        <th className="p-3 text-center min-w-[100px]">
-                          <div className="flex flex-col items-center gap-1">
-                            <div className="w-8 h-8 rounded-xl bg-muted text-xs flex items-center justify-center">📱</div>
-                            <span className="text-xs text-muted-foreground">{t("table.others")}</span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {comparisons.map((comparison, index) => (
-                        <tr key={index} className="border-b border-border/50">
-                          <td className="sticky left-0 z-10 bg-card p-3 text-xs font-medium border-r border-border/30">
-                            {t(`features.feature${index + 1}`)}
-                          </td>
-                          <td className="p-3">
-                            <div className="flex justify-center">
-                              <StatusIcon status={comparison.us} />
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            <div className="flex justify-center">
-                              <StatusIcon status={comparison.others} />
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {/* Comparison */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Blaniel */}
+                    <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/50">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center p-1.5 mb-2">
+                        <Image
+                          src="/logo.png"
+                          alt="Blaniel"
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <span className="text-xs font-medium mb-2">{t("table.us")}</span>
+                      <StatusIcon status={comparison.us} />
+                    </div>
+
+                    {/* Others */}
+                    <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/30">
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center mb-2">
+                        <Users className="w-4 h-4 text-muted-foreground" strokeWidth={2} />
+                      </div>
+                      <span className="text-xs text-muted-foreground mb-2">{t("table.others")}</span>
+                      <StatusIcon status={comparison.others} />
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+
+            {/* Legend for mobile */}
+            <Card className="p-4 border border-border bg-muted/30">
+              <div className="flex flex-col gap-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <StatusIcon status={true} />
+                  <span className="text-muted-foreground font-medium">{t("legend.complete")}</span>
                 </div>
-              </div>
-
-              {/* Scroll indicator */}
-              <div className="p-2 bg-muted/30 border-t border-border text-center">
-                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  Desliza para comparar
-                </p>
+                <div className="flex items-center gap-2">
+                  <StatusIcon status="partial" />
+                  <span className="text-muted-foreground font-medium">{t("legend.partial")}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <StatusIcon status={false} />
+                  <span className="text-muted-foreground font-medium">{t("legend.unavailable")}</span>
+                </div>
               </div>
             </Card>
           </div>

@@ -22,7 +22,8 @@ export function RootLayoutWrapper({ children }: RootLayoutWrapperProps) {
   const isAgentChat = pathname?.startsWith('/agentes/') && !pathname.includes('/edit') && !pathname.includes('/behaviors') && !pathname.includes('/memory');
   const isGroupChat = pathname?.startsWith('/dashboard/grupos/') && pathname.split('/').length >= 4 && !pathname.includes('/configuracion') && !pathname.includes('/analytics');
   const isLanding = pathname?.startsWith('/landing') || pathname === '/';
-  const shouldHideFooter = isAgentChat || isGroupChat || isLanding;
+  const isCareerOrSponsor = pathname === '/careers' || pathname === '/sponsors';
+  const shouldHideFooter = isAgentChat || isGroupChat || isLanding || isCareerOrSponsor;
 
   // ANALYTICS TRACKING: Mobile Session Detection (Fase 6 - User Experience)
   useEffect(() => {

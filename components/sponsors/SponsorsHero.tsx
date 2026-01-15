@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export function SponsorsHero() {
   return (
-    <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-background to-muted/20 py-12 lg:py-16 max-h-[700px]:py-8 max-h-[700px]:lg:py-10">
+    <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-background to-muted/20 py-6 md:py-12 lg:py-16 max-h-[700px]:py-8 max-h-[700px]:lg:py-10">
       {/* Subtle grid background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -15,13 +15,13 @@ export function SponsorsHero() {
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-h-[700px]:gap-6 max-h-[700px]:lg:gap-8 items-center max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 max-h-[700px]:gap-6 max-h-[700px]:lg:gap-8 items-center max-w-7xl mx-auto">
           {/* Left Column - Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4 max-h-[700px]:space-y-3 lg:pr-8"
+            className="space-y-3 md:space-y-4 max-h-[700px]:space-y-3 lg:pr-8 text-center lg:text-left"
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30">
@@ -32,26 +32,26 @@ export function SponsorsHero() {
             </div>
 
             {/* Headline */}
-            <div className="space-y-2 max-h-[700px]:space-y-1.5">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl max-h-[700px]:text-4xl max-h-[700px]:sm:text-5xl max-h-[700px]:lg:text-6xl font-bold tracking-tight leading-[1.05]" style={{ textWrap: 'balance' } as React.CSSProperties}>
+            <div className="space-y-1.5 md:space-y-2 max-h-[700px]:space-y-1.5">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl max-h-[700px]:text-4xl max-h-[700px]:sm:text-5xl max-h-[700px]:lg:text-6xl font-bold tracking-tight leading-[1.05]" style={{ textWrap: 'balance' } as React.CSSProperties}>
                 Publicidad Nativa en Conversaciones de IA
               </h1>
 
               {/* Sub-headline */}
-              <p className="text-2xl sm:text-3xl max-h-[700px]:text-xl max-h-[700px]:sm:text-2xl font-semibold text-foreground/90 leading-snug max-w-2xl">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-h-[700px]:text-xl max-h-[700px]:sm:text-2xl font-semibold text-foreground/90 leading-snug max-w-2xl mx-auto lg:mx-0">
                 Integrada de forma orgánica cuando el usuario ya está comprometido.
               </p>
 
-              {/* Párrafo descriptivo */}
-              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl pt-0.5">
+              {/* Párrafo descriptivo - oculto en mobile */}
+              <p className="hidden md:block text-lg text-muted-foreground leading-relaxed max-w-2xl pt-0.5">
                 Un formato de publicidad contextual que se integra de manera natural en conversaciones activas de IA emocional.{" "}
                 <span className="text-foreground font-medium">Sin banners ignorados.</span>{" "}
                 <span className="text-foreground font-medium">Sin interrupciones.</span>{" "}
                 <span className="text-foreground font-medium">Solo relevancia en el momento correcto.</span>
               </p>
 
-              {/* Highlight box */}
-              <div className="p-3.5 max-h-[700px]:p-3 rounded-xl border border-border bg-muted/50 max-w-2xl mt-1.5 max-h-[700px]:mt-1">
+              {/* Highlight box - oculto en mobile */}
+              <div className="hidden md:block p-3.5 max-h-[700px]:p-3 rounded-xl border border-border bg-muted/50 max-w-2xl mt-1.5 max-h-[700px]:mt-1">
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   <span className="font-bold text-foreground">Los usuarios no odian la publicidad.</span>{" "}
                   Odian las interrupciones. Nuestra publicidad agrega valor cuando el usuario ya está buscando soluciones —{" "}
@@ -60,8 +60,8 @@ export function SponsorsHero() {
               </div>
             </div>
 
-            {/* Métricas */}
-            <div className="grid grid-cols-3 gap-6 max-h-[700px]:gap-4 pt-0">
+            {/* Métricas - ocultas en mobile */}
+            <div className="hidden md:grid grid-cols-3 gap-6 max-h-[700px]:gap-4 pt-0">
               <div className="space-y-1 max-h-[700px]:space-y-0.5">
                 <div className="text-4xl max-h-[700px]:text-3xl font-bold text-blue-600">25-35 min</div>
                 <div className="text-sm max-h-[700px]:text-xs text-muted-foreground">Sesión promedio (ref: Character.AI)</div>
@@ -77,19 +77,20 @@ export function SponsorsHero() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3 max-h-[700px]:gap-2 pt-0">
+            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 max-h-[700px]:gap-2 pt-0 justify-center lg:justify-start">
               <Button
                 size="lg"
-                className="h-14 max-h-[700px]:h-12 px-8 max-h-[700px]:px-6 text-lg max-h-[700px]:text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all"
+                className="h-11 md:h-14 max-h-[700px]:h-12 px-6 md:px-8 max-h-[700px]:px-6 text-base md:text-lg max-h-[700px]:text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all"
                 onClick={() => window.open("mailto:sponsors@blaniel.com?subject=Solicitud Early Access - Programa de Sponsors", "_blank")}
               >
                 <Sparkles className="mr-2 h-5 w-5 max-h-[700px]:h-4 max-h-[700px]:w-4" />
                 Solicitar Early Access
               </Button>
+              {/* Botón secundario - oculto en mobile */}
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 max-h-[700px]:h-12 px-8 max-h-[700px]:px-6 text-lg max-h-[700px]:text-base font-semibold border-2 hover:bg-muted transition-all"
+                className="hidden md:flex h-11 md:h-14 max-h-[700px]:h-12 px-6 md:px-8 max-h-[700px]:px-6 text-base md:text-lg max-h-[700px]:text-base font-semibold border-2 hover:bg-muted transition-all"
                 onClick={() => {
                   const calculator = document.getElementById("investment-calculator");
                   calculator?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -106,7 +107,7 @@ export function SponsorsHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="relative lg:ml-8 max-h-[700px]:hidden lg:max-h-[700px]:block"
+            className="hidden lg:block relative lg:ml-8"
           >
             {/* Main conversation mockup */}
             <div className="relative rounded-2xl border border-border shadow-2xl overflow-hidden bg-card max-h-[700px]:scale-95">

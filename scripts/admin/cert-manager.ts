@@ -9,18 +9,31 @@ import { join } from 'path';
 import { prisma } from '@/lib/prisma';
 import { randomBytes, hash } from '@/lib/admin/crypto';
 
-const PROJECT_ROOT = join(__dirname, '../..');
+const PROJECT_ROOT = process.cwd();
 const CERTS_DIR = join(PROJECT_ROOT, 'certs');
 const CA_DIR = join(CERTS_DIR, 'ca');
 const CLIENT_DIR = join(CERTS_DIR, 'client');
 const TEMP_DIR = join(CERTS_DIR, 'temp');
 
-// Asegurar que los directorios existen
-if (!existsSync(CLIENT_DIR)) {
-  mkdirSync(CLIENT_DIR, { recursive: true, mode: 0o700 });
-}
-if (!existsSync(TEMP_DIR)) {
-  mkdirSync(TEMP_DIR, { recursive: true, mode: 0o700 });
+// Lazy initialization para evitar errores durante build time
+let directoriesInitialized = false;
+function ensureDirectories(): void {
+  if (directoriesInitialized) return;
+
+  try {
+    if (!existsSync(CLIENT_DIR)) {
+      mkdirSync(CLIENT_DIR, { recursive: true, mode: 0o700 });
+    }
+    if (!existsSync(TEMP_DIR)) {
+      mkdirSync(TEMP_DIR, { recursive: true, mode: 0o700 });
+    }
+    directoriesInitialized = true;
+  } catch (error) {
+    // Durante build time, simplemente ignorar el error
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Could not initialize cert directories (build time):', error);
+    }
+  }
 }
 
 interface CertificateInfo {
@@ -59,6 +72,7 @@ export async function generateClientCertificate(
   isEmergency: boolean = false
 ): Promise<CertificateInfo> {
   try {
+    ensureDirectories();
     verifyCA();
 
     // 1. Buscar admin en BD
@@ -208,6 +222,7 @@ export async function revokeCertificate(
   reason: string
 ): Promise<void> {
   try {
+    ensureDirectories();
     // 1. Marcar como revocado en BD
     const cert = await prisma.adminCertificate.update({
       where: { serialNumber },

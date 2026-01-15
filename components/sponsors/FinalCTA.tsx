@@ -51,19 +51,19 @@ export function FinalCTA() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
-                  className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-12 p-6 rounded-2xl bg-muted/50"
+                  className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto mb-12 p-4 sm:p-6 rounded-2xl bg-muted/50"
                 >
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">25-35 min</div>
-                    <div className="text-xs text-muted-foreground">Sesión promedio</div>
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-xl sm:text-3xl md:text-3xl font-bold text-blue-600 whitespace-nowrap">25-35 min</div>
+                    <div className="text-[9px] sm:text-xs text-muted-foreground mt-2 whitespace-nowrap">Sesión promedio</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">70-80%</div>
-                    <div className="text-xs text-muted-foreground">Sentiment positivo</div>
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-xl sm:text-3xl md:text-3xl font-bold text-blue-600 whitespace-nowrap">70-80%</div>
+                    <div className="text-[9px] sm:text-xs text-muted-foreground mt-2 whitespace-nowrap">Sentiment positivo</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-blue-600">3-5x</div>
-                    <div className="text-xs text-muted-foreground">ROI proyectado</div>
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-xl sm:text-3xl md:text-3xl font-bold text-blue-600 whitespace-nowrap">3-5x</div>
+                    <div className="text-[9px] sm:text-xs text-muted-foreground mt-2 whitespace-nowrap">ROI proyectado</div>
                   </div>
                 </motion.div>
               </div>
@@ -148,56 +148,6 @@ export function FinalCTA() {
                 </Button>
               </motion.div>
 
-              {/* Quick FAQ */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="pt-8 border-t border-border"
-              >
-                <h3 className="text-sm font-bold text-center mb-6 text-foreground/60 uppercase tracking-wide">
-                  FAQ Rápido
-                </h3>
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 max-w-3xl mx-auto text-sm">
-                  <div>
-                    <p className="font-bold mb-1 text-foreground">¿Cuándo lanza?</p>
-                    <p className="text-foreground/70">
-                      Q2 2026. Early access disponible ahora para primeros sponsors.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-bold mb-1 text-foreground">¿Cuántos slots hay?</p>
-                    <p className="text-foreground/70">
-                      Limitado a 5-10 brands en fase beta para optimización dedicada
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-bold mb-1 text-foreground">¿Cuánto cuesta beta?</p>
-                    <p className="text-foreground/70">
-                      Desde $100/mes. Precios beta aumentarán post-lanzamiento.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-bold mb-1 text-foreground">¿Qué incluye early access?</p>
-                    <p className="text-foreground/70">
-                      Precios beta, input en roadmap, soporte dedicado, case study
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-bold mb-1 text-foreground">¿Cómo miden ROI?</p>
-                    <p className="text-foreground/70">
-                      Dashboard con impressions, engagement, sentiment, conversiones
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-bold mb-1 text-foreground">¿Requisitos para aplicar?</p>
-                    <p className="text-foreground/70">
-                      Producto relevante para tech early adopters, presupuesto mínimo
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
 
               {/* Bottom trust line */}
               <motion.div

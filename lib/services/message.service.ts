@@ -12,7 +12,7 @@ import { createMemoryManager } from '@/lib/memory/manager';
 import { behaviorOrchestrator } from '@/lib/behavior-system';
 import { hybridEmotionalOrchestrator } from '@/lib/emotional-system/hybrid-orchestrator';
 import { getContextualModularPrompt } from '@/lib/behavior-system/prompts/modular-prompts';
-import { getRelationshipStage, shouldAdvanceStage } from '@/lib/relationship/stages';
+import { getRelationshipStage, shouldAdvanceStage, getEvolutionLimitNotice, type UserPlan } from '@/lib/relationship/stages';
 import { getPromptForStage, getPromptForMessageNumber } from '@/lib/relationship/prompt-generator';
 import { getRevelationMoment, generatePersonalizedRevelation } from '@/lib/relationship/revelation-moments';
 import { getEmotionalSummary } from '@/lib/emotions/system';
@@ -80,6 +80,13 @@ interface ProcessMessageOutput {
     stage: string;
     totalInteractions: number;
     stageChanged: boolean;
+    evolutionLimit?: {
+      reached: boolean;
+      message: string;
+      currentStageName: string;
+      nextStageName: string | null;
+      upgradeOptions: { plan: string; stage: string }[];
+    };
   };
   behaviors: {
     active: string[];
@@ -992,6 +999,12 @@ export class MessageService {
           stage: newStage,
           totalInteractions: newTotalInteractions,
           stageChanged,
+          evolutionLimit: getEvolutionLimitNotice(
+            agent.name,
+            userPlan as UserPlan,
+            newStage as any,
+            trust
+          ) || undefined,
         },
         behaviors: {
           active: behaviorOrchestration.metadata.behaviorsActive,

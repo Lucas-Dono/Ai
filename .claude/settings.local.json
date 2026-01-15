@@ -178,7 +178,11 @@
       "Bash(NODE_ENV=production npx next build:*)",
       "Bash(npm run type-check:*)",
       "Bash(npm run)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(netstat:*)",
+      "Bash(timeout 90 npx tsx:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJkZWZhdWx0LXVzZXIiLCJlbWFpbCI6ImRlbW9AY3JlYWRvci1pYS5jb20iLCJuYW1lIjoiVXN1YXJpbyBEZW1vIiwicGxhbiI6ImZyZWUiLCJpYXQiOjE3NjgyNDIxMzksImV4cCI6MTc3MDgzNDEzOX0.POGD3tTwxJ7K7PM_kPJ4rUrwL5mTtpfns7iAMfeJtm8\" __NEW_LINE_b825b3e1304908b2__ AGENT_ID=\"cmka4xxci0004ijjp7ougflpp\" __NEW_LINE_b825b3e1304908b2__ echo \"Sending test message to agent...\" curl -s -X POST -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{\"\"\"\"content\"\"\"\": \"\"\"\"Hola! Cómo estás?\"\"\"\"}' \"http://localhost:3000/api/agents/$AGENT_ID/message\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJkZWZhdWx0LXVzZXIiLCJlbWFpbCI6ImRlbW9AY3JlYWRvci1pYS5jb20iLCJuYW1lIjoiVXN1YXJpbyBEZW1vIiwicGxhbiI6ImZyZWUiLCJpYXQiOjE3NjgyNDIxMzksImV4cCI6MTc3MDgzNDEzOX0.POGD3tTwxJ7K7PM_kPJ4rUrwL5mTtpfns7iAMfeJtm8\" __NEW_LINE_89bf30b80288106d__ AGENT_ID=\"cmka4xxci0004ijjp7ougflpp\" __NEW_LINE_89bf30b80288106d__ echo \"Sending test message to agent...\" timeout 15 curl -v -X POST -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{\"\"\"\"content\"\"\"\": \"\"\"\"Hola! Cómo estás?\"\"\"\"}' \"http://localhost:3000/api/agents/$AGENT_ID/message\")"
     ],
     "deny": [],
     "ask": []

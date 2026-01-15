@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 import {
-  Rocket,
-  Brain,
-  Lightbulb,
-  DollarSign,
-  Globe,
-  Users,
+  Cpu,
+  Package,
+  Target,
+  TrendingUp,
+  MapPin,
+  Sparkles,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
@@ -17,34 +17,34 @@ export function WhyBlaniel() {
 
   const benefits = [
     {
-      icon: Rocket,
-      title: t("realImpact.title"),
-      description: t("realImpact.description"),
+      icon: Cpu,
+      title: t("technology.title"),
+      description: t("technology.description"),
     },
     {
-      icon: Brain,
-      title: t("cutting-edge.title"),
-      description: t("cutting-edge.description"),
+      icon: Package,
+      title: t("product.title"),
+      description: t("product.description"),
     },
     {
-      icon: Lightbulb,
-      title: t("autonomy.title"),
-      description: t("autonomy.description"),
+      icon: Target,
+      title: t("impact.title"),
+      description: t("impact.description"),
     },
     {
-      icon: DollarSign,
-      title: t("compensation.title"),
-      description: t("compensation.description"),
+      icon: TrendingUp,
+      title: t("growth.title"),
+      description: t("growth.description"),
     },
     {
-      icon: Globe,
-      title: t("global.title"),
-      description: t("global.description"),
+      icon: MapPin,
+      title: t("remote.title"),
+      description: t("remote.description"),
     },
     {
-      icon: Users,
-      title: t("community.title"),
-      description: t("community.description"),
+      icon: Sparkles,
+      title: t("innovation.title"),
+      description: t("innovation.description"),
     },
   ];
 
@@ -59,7 +59,7 @@ export function WhyBlaniel() {
           className="text-center mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
-            {t("title")} <span className="text-muted-foreground">{t("titleHighlight")}</span>
+            <span className="text-muted-foreground">{t("title")}</span> {t("titleHighlight")}
           </h2>
           <p className="text-lg text-muted-foreground">
             {t("subtitle")}

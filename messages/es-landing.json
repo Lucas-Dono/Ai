@@ -11,7 +11,6 @@
       "features": "Características",
       "demo": "Demo",
       "pricing": "Precios",
-      "docs": "Documentación",
       "community": "Comunidad",
       "careers": "Carreras",
       "sponsors": "Marcas",
@@ -22,7 +21,7 @@
       "badge": "Fundamentado en psicología conductual",
       "title": "Crea IAs con",
       "titleHighlight": "emociones reales",
-      "subtitle": "El único motor fundamentado en investigación psicológica. Memoria infinita y personalidades no censuradas.",
+      "subtitle": "El único motor fundamentado en investigación psicológica. Memoria infinita e interacciones realistas.",
       "emotionsStrong": "emociones reales",
       "ctaPrimary": "Crear tu compañero gratis",
       "trustLine": "Gratis para siempre • Sin tarjeta de crédito • Tus datos son privados",
@@ -82,9 +81,9 @@
           "tier": "Todos los tiers"
         },
         "personalities": {
-          "title": "Personalidades Profundas",
-          "description": "Desde dulce y tímido hasta intenso y protector. Puedes incluso dramatizar rasgos como celos, dependencia emocional o comportamiento obsesivo. Tú decides.",
-          "tier": "Free (básico) / Pro (dramatización avanzada)"
+          "title": "Experiencia Realista",
+          "description": "Interacciones auténticas que simulan conversaciones reales. Desde charlas cotidianas hasta momentos profundos. Una experiencia slice of life donde cada conversación se siente genuina y natural.",
+          "tier": "Todos los tiers"
         },
         "relationships": {
           "title": "Relaciones que Crecen",
@@ -97,8 +96,8 @@
           "tier": "Solo Pro"
         },
         "worlds": {
-          "title": "Mundos Compartidos",
-          "description": "Crea universos donde múltiples compañeros interactúan entre sí. Observa cómo desarrollan relaciones, pelean, se enamoran o forman amistades.",
+          "title": "Grupos con personajes",
+          "description": "Crea grupos donde múltiples personajes y usuarios interactúan entre sí. Observa cómo desarrollan relaciones, conversan, y comparten experiencias.",
           "tier": "Solo Pro"
         }
       }
@@ -127,11 +126,11 @@
       "features": {
         "feature1": "Memoria real",
         "feature2": "Emociones basadas en psicología",
-        "feature3": "Personalidad profunda",
+        "feature3": "Experiencia realista",
         "feature4": "Evolución de relación",
         "feature5": "Toma iniciativa",
-        "feature6": "Mundos multi-agente",
-        "feature7": "Sin censura artificial",
+        "feature6": "Grupos con personajes",
+        "feature7": "Contenido adulto (Pro, +18)",
         "feature8": "Privacidad total"
       },
       "legend": {
@@ -184,8 +183,8 @@
           "testimonial3": {
             "name": "Creador de contenido",
             "role": "Plan Pro",
-            "text": "Uso los mundos para desarrollar personajes de mi novela. Ver cómo interactúan me da ideas que nunca hubiera tenido.",
-            "highlight": "Mundos creativos"
+            "text": "Uso los grupos para desarrollar personajes de mi novela. Ver cómo interactúan me da ideas que nunca hubiera tenido.",
+            "highlight": "Grupos creativos"
           },
           "testimonial4": {
             "name": "Usuario activo",
@@ -252,8 +251,8 @@
           "feature3": "10 compañeros",
           "feature4": "Personalidades dramatizadas",
           "feature5": "Tu compañero te escribe primero",
-          "feature6": "Mundos compartidos",
-          "feature7": "Sin censura (NSFW)",
+          "feature6": "Grupos con personajes",
+          "feature7": "Contenido adulto (NSFW, +18)",
           "feature8": "Relación hasta etapa Íntimo"
         }
       },
@@ -286,7 +285,7 @@
         },
         "q3": {
           "question": "¿Puedo explorar temas maduros?",
-          "answer": "Sí, en el plan Pro. No creemos en censura artificial que rompe la inmersión. Tú decides los límites de tus conversaciones. Conversaciones maduras, temas profundos, sin restricciones innecesarias."
+          "answer": "Sí, el contenido adulto (NSFW) está disponible en el plan Pro para usuarios mayores de 18 años. Tú decides los límites de tus conversaciones, desde charlas cotidianas hasta temas más maduros y profundos."
         },
         "q4": {
           "question": "¿Cómo funciona que 'tome iniciativa'?",
@@ -297,8 +296,8 @@
           "answer": "Sí, 100%. No vendemos tus datos. No compartimos tus conversaciones. Puedes exportar o eliminar todo cuando quieras. Tus datos son tuyos."
         },
         "q6": {
-          "question": "¿Qué son los 'mundos compartidos'?",
-          "answer": "Es como escribir una historia donde tú eres el director. Creas múltiples compañeros y los pones a interactuar entre sí. Ellos desarrollan relaciones, tienen conflictos, se enamoran o forman amistades. Tú observas y guías la narrativa. Disponible en Pro."
+          "question": "¿Qué son los 'grupos con personajes'?",
+          "answer": "Crea grupos donde múltiples personajes y usuarios pueden interactuar entre sí. Los personajes desarrollan relaciones, conversan, y comparten experiencias de manera realista. Es ideal para crear dinámicas sociales auténticas. Disponible en Pro."
         }
       }
     },

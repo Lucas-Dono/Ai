@@ -32,7 +32,7 @@ export function CareersHero() {
           {/* Headline */}
           <div className="space-y-4">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              {t("title")} <span className="text-muted-foreground">{t("titleHighlight")}</span>
+              <span className="text-muted-foreground">{t("title")}</span> {t("titleHighlight")}
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">

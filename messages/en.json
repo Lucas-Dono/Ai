@@ -15,8 +15,7 @@
       "careers": "Careers",
       "sponsors": "Sponsors",
       "login": "Sign in",
-      "getStarted": "Start for free",
-      "docs": "Docs"
+      "getStarted": "Start for free"
     },
     "hero": {
       "badge": "New generation of emotional AI",
@@ -121,15 +120,12 @@
       "features": "Features",
       "pricing": "Pricing",
       "demo": "Demo",
-      "documentation": "Documentation",
-      "marketplace": "Marketplace",
       "discord": "Discord",
       "twitter": "Twitter",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "cookies": "Cookie Policy",
-      "copyright": "© 2025 Blaniel. All rights reserved.",
-      "github": "GitHub"
+      "copyright": "© 2025 Blaniel. All rights reserved."
     },
     "liveDemo": {
       "badge": "Live test",
@@ -2398,14 +2394,12 @@
         "title": "Product",
         "features": "Features",
         "pricing": "Pricing",
-        "community": "Community",
-        "marketplace": "Marketplace"
+        "community": "Community"
       },
       "resources": {
         "title": "Resources",
         "help": "Help Center",
         "guides": "User Guides",
-        "api": "API Documentation",
         "status": "System Status"
       },
       "company": {
@@ -2427,7 +2421,6 @@
     "copyright": "© {year} Blaniel. All rights reserved.",
     "allRightsReserved": "All rights reserved",
     "socialLinks": {
-      "github": "Visit our GitHub",
       "twitter": "Follow us on Twitter",
       "email": "Contact support",
       "website": "Visit our website"
@@ -3279,6 +3272,119 @@
     "searchResultCard": {
       "age": "Age",
       "source": "Source"
+    }
+  },
+  "careers": {
+    "hero": {
+      "badge": "Talent for the future",
+      "title": "Be Part of",
+      "titleHighlight": "Our Future",
+      "subtitle": "Blaniel leads the next generation of emotional AI. Register your profile in our talent pool and we'll contact you when opportunities arise."
+    },
+    "why": {
+      "title": "Why",
+      "titleHighlight": "Blaniel?",
+      "subtitle": "A unique opportunity to be part of something revolutionary",
+      "technology": {
+        "title": "Cutting-Edge Technology",
+        "description": "OCC+Plutchik emotional system, multi-layer memory, and proactive behavior. Unique technology in the market."
+      },
+      "product": {
+        "title": "Established Product",
+        "description": "Complete and functional platform, ready to scale. Not a promise, it's a reality."
+      },
+      "impact": {
+        "title": "Real Impact",
+        "description": "Build meaningful human connections. Your work will have a direct impact on thousands of users."
+      },
+      "growth": {
+        "title": "Grow Together",
+        "description": "Opportunity to grow with the project from its early stages. Your contribution will be valued."
+      },
+      "remote": {
+        "title": "Remote Work",
+        "description": "Total flexibility. Work from anywhere in the world with adaptable schedules."
+      },
+      "innovation": {
+        "title": "Constant Innovation",
+        "description": "Always at the forefront of emotional AI. Interesting technical challenges and continuous learning."
+      }
+    },
+    "areas": {
+      "title": "Areas of Interest",
+      "subtitle": "These are the areas where we look for talent. Register your profile and we'll contact you when opportunities arise.",
+      "registerInterest": "Register interest",
+      "whatWeLookFor": "What we value",
+      "skills": "Technologies",
+      "engineering": {
+        "title": "Engineering",
+        "brief": "Full-stack development with React Native, Node.js and AI model integration.",
+        "description": "We're looking for engineers passionate about building emotional AI experiences. You'll work on the advanced emotional system, real-time conversation optimization, and new model integration.",
+        "req1": "Experience in full-stack development with React Native and Node.js",
+        "req2": "Knowledge of PostgreSQL databases and Prisma",
+        "req3": "Interest in AI, emotional systems, and cutting-edge technology",
+        "req4": "Ability to solve complex problems autonomously"
+      },
+      "design": {
+        "title": "UX/UI Design",
+        "brief": "Interface design that conveys emotions and creates genuine connections.",
+        "description": "We're looking for creative designers who can create beautiful interfaces that convey emotions. You'll work on user experience for both web and mobile.",
+        "req1": "Experience in UX/UI for mobile and web applications",
+        "req2": "Proficiency in Figma and design systems",
+        "req3": "Sensitivity to emotions and user psychology",
+        "req4": "Portfolio with user-centered interface projects"
+      },
+      "community": {
+        "title": "Community & Marketing",
+        "brief": "Community management and growth strategies on social media.",
+        "description": "We're looking for enthusiastic people to lead our communities on Discord, Reddit, and social media. You'll be the voice of Blaniel, cultivating a vibrant community.",
+        "req1": "Experience in community management or social media",
+        "req2": "Excellent written communication in English (Spanish is a plus)",
+        "req3": "Familiarity with Discord, Reddit, and AI platforms",
+        "req4": "Passion for communities and ability for authentic connection"
+      }
+    },
+    "talentPool": {
+      "title": "Join Our Talent Pool",
+      "subtitle": "Leave your details and be the first to know when we open new positions",
+      "form": {
+        "name": "Full name",
+        "namePlaceholder": "Your name",
+        "email": "Email",
+        "emailPlaceholder": "you@email.com",
+        "area": "Area of interest",
+        "areaPlaceholder": "Select an area",
+        "areaEngineering": "Engineering",
+        "areaDesign": "UX/UI Design",
+        "areaCommunity": "Community & Marketing",
+        "areaOther": "Other",
+        "portfolio": "LinkedIn, Portfolio or GitHub",
+        "portfolioPlaceholder": "https://...",
+        "portfolioHelper": "Optional - Share your work",
+        "message": "Brief message",
+        "messagePlaceholder": "Tell us briefly why you're interested in Blaniel...",
+        "messageHelper": "Optional - max. 500 characters",
+        "submit": "Register my profile",
+        "submitting": "Registering..."
+      },
+      "success": {
+        "title": "Registration successful!",
+        "message": "Thank you for your interest in Blaniel. We'll contact you when opportunities arise that match your profile.",
+        "another": "Register another profile"
+      },
+      "errors": {
+        "generic": "An error occurred. Please try again.",
+        "emailExists": "This email is already registered in our talent pool."
+      },
+      "privacy": "Your data is safe. We'll only use it to contact you about opportunities at Blaniel."
+    },
+    "finalCta": {
+      "badge": "Future opportunities",
+      "title": "Ready to be part of something big?",
+      "subtitle": "Blaniel is redefining human connections with AI. Register your profile today and be part of our growth.",
+      "button": "Register my profile",
+      "contact": "Questions? Write to",
+      "email": "jobs@blaniel.com"
     }
   }
 }

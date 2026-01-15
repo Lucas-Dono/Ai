@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Heart, Github, Twitter, Mail, Globe } from "lucide-react";
+import { Heart, Twitter, Mail, Globe } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
@@ -23,7 +23,6 @@ export function Footer() {
       links: [
         { label: t("sections.resources.help"), href: "/legal/ayuda" },
         { label: t("sections.resources.guides"), href: "/legal/ayuda" },
-        { label: t("sections.resources.api"), href: "/api/docs" },
         { label: t("sections.resources.status"), href: "/status" },
       ],
     },
@@ -46,12 +45,6 @@ export function Footer() {
   ];
 
   const socialLinks = [
-    {
-      href: "https://github.com/circuitprompt",
-      icon: Github,
-      label: t("socialLinks.github"),
-      ariaLabel: "GitHub"
-    },
     {
       href: "https://twitter.com/circuitprompt",
       icon: Twitter,

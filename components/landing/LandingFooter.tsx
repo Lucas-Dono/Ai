@@ -37,11 +37,6 @@ export function LandingFooter() {
                   {t("pricing")}
                 </Link>
               </li>
-              <li>
-                <Link href="/docs" className="hover:text-foreground transition-colors">
-                  {t("documentation")}
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -52,11 +47,6 @@ export function LandingFooter() {
               <li>
                 <Link href="/community" className="hover:text-foreground transition-colors">
                   {t("community")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/community/marketplace/characters" className="hover:text-foreground transition-colors">
-                  {t("marketplace")}
                 </Link>
               </li>
               <li>
@@ -133,14 +123,6 @@ export function LandingFooter() {
             {t("copyright")}
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <a
-              href="https://github.com/your-repo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              {t("github")}
-            </a>
             <a
               href="https://twitter.com/your-twitter"
               target="_blank"

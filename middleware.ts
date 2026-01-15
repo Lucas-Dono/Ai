@@ -155,6 +155,9 @@ export default async function middleware(req: NextRequest) {
     "/community", // GROWTH: Comunidad pública - comentar como anónimo (Discord-style)
     "/docs",
     "/legal",
+    "/terms", // Alias para /legal/terminos
+    "/privacy", // Alias para /legal/privacidad
+    "/cookies", // Alias para /legal/cookies
     "/pricing", // Página de precios pública
     "/sponsors", // Página de sponsors pública
     "/careers", // Página de carreras pública

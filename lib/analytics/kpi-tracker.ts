@@ -332,10 +332,7 @@ export async function getUserExperienceMetrics(
     where: {
       eventType: EventType.SESSION_STARTED,
       timestamp: { gte: sevenDaysAgo },
-      metadata: {
-        path: ["userId"],
-        array_contains: cohortUserIds.length > 0 ? cohortUserIds[0] : undefined,
-      },
+      userId: { in: cohortUserIds },
     },
   });
 

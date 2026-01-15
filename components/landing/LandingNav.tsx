@@ -25,7 +25,6 @@ export function LandingNav() {
   }, []);
 
   const navLinks = [
-    { href: "/docs", labelKey: "docs" },
     { href: "/pricing", labelKey: "pricing" },
     { href: "/community", labelKey: "community" },
     { href: "/careers", labelKey: "careers" },
@@ -97,18 +96,28 @@ export function LandingNav() {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+          {/* Mobile CTA + Menu Button */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link href="/registro">
+              <Button
+                size="sm"
+                className="bg-foreground text-background hover:bg-foreground/90 text-xs font-medium px-3 py-1.5 h-8"
+              >
+                {t("getStarted")}
+              </Button>
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -122,19 +131,27 @@ export function LandingNav() {
             transition={{ duration: 0.2 }}
             className="md:hidden border-t border-border bg-background"
           >
-            <div className="container mx-auto px-4 py-4 space-y-1">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-                >
-                  {t(link.labelKey)}
-                </a>
-              ))}
+            <div className="container mx-auto px-4 py-6">
+              {/* Navigation Links - Centered with bottom bars */}
+              <div className="space-y-1">
+                {navLinks.map((link, index) => (
+                  <div key={link.href} className="flex flex-col items-center">
+                    <a
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block py-3 text-sm font-medium text-foreground hover:text-primary transition-colors text-center w-full"
+                    >
+                      {t(link.labelKey)}
+                    </a>
+                    {index < navLinks.length - 1 && (
+                      <div className="w-full h-[1px] bg-border mt-2 mb-1" />
+                    )}
+                  </div>
+                ))}
+              </div>
 
-              <div className="pt-4 mt-4 border-t border-border space-y-2">
+              {/* CTA Buttons */}
+              <div className="pt-4 mt-4 border-t border-border space-y-2.5">
                 {/* Google Play Button Mobile - Only show if URL is configured */}
                 {googlePlayUrl && (
                   <a
@@ -154,14 +171,6 @@ export function LandingNav() {
                 <Link href="/login" className="block">
                   <Button variant="outline" size="sm" className="w-full text-sm font-medium border-border">
                     {t("login")}
-                  </Button>
-                </Link>
-                <Link href="/registro" className="block">
-                  <Button
-                    size="sm"
-                    className="w-full bg-foreground text-background hover:bg-foreground/90 text-sm font-medium"
-                  >
-                    {t("getStarted")}
                   </Button>
                 </Link>
               </div>

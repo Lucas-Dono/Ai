@@ -3,11 +3,18 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function CareersCTA() {
   const t = useTranslations("careers.finalCta");
+
+  const scrollToForm = () => {
+    const element = document.getElementById("talent-pool");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <section className="py-24 sm:py-32 relative overflow-hidden">
@@ -45,29 +52,26 @@ export function CareersCTA() {
                 </div>
 
                 {/* CTA */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                  <a href="mailto:jobs@blaniel.com">
-                    <Button className="h-12 px-8 bg-foreground text-background hover:bg-foreground/90 text-base font-medium gap-2">
-                      <Mail className="h-4 w-4" />
-                      {t("emailButton")}
-                    </Button>
-                  </a>
+                <div className="pt-4">
                   <Button
-                    variant="outline"
-                    className="h-12 px-8 border-border hover:bg-muted text-base font-medium gap-2"
+                    onClick={scrollToForm}
+                    className="h-12 px-8 bg-foreground text-background hover:bg-foreground/90 text-base font-medium gap-2"
                   >
-                    {t("learnMore")}
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowUp className="h-4 w-4" />
+                    {t("button")}
                   </Button>
                 </div>
 
-                {/* Support text */}
+                {/* Contact info */}
                 <div className="pt-8 border-t border-border/50">
                   <p className="text-sm text-muted-foreground">
-                    {t("supportText")}{" "}
-                    <span className="font-medium text-foreground">
-                      jobs@blaniel.com
-                    </span>
+                    {t("contact")}{" "}
+                    <a
+                      href={`mailto:${t("email")}`}
+                      className="font-medium text-foreground hover:underline"
+                    >
+                      {t("email")}
+                    </a>
                   </p>
                 </div>
               </motion.div>

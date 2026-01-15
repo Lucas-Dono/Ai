@@ -8,9 +8,9 @@ export function WhyItWorks() {
   const reasons = [
     {
       icon: Brain,
-      title: "Psicología del Contexto",
+      title: "Contexto Perfecto",
       description:
-        "Los humanos procesan recomendaciones 5x mejor cuando vienen integradas en una conversación relevante vs interrupciones externas. Tu marca aparece justo cuando el usuario está receptivo.",
+        "Las recomendaciones se procesan 5x mejor cuando vienen integradas en conversaciones relevantes. Tu marca aparece cuando el usuario está receptivo.",
       stat: "5x mejor procesamiento",
       color: "blue",
     },
@@ -18,7 +18,7 @@ export function WhyItWorks() {
       icon: Heart,
       title: "Trust por Asociación",
       description:
-        "Los usuarios ya confían en el personaje AI con quien están conversando. Cuando ese personaje menciona tu producto naturalmente, esa confianza se transfiere a tu marca.",
+        "Los usuarios confían en el personaje AI con quien conversan. Esa confianza se transfiere naturalmente a tu marca cuando la menciona.",
       stat: "70-80% sentiment positivo",
       color: "purple",
     },
@@ -26,15 +26,15 @@ export function WhyItWorks() {
       icon: MessageSquare,
       title: "Zero Ad Blindness",
       description:
-        "No es un banner que ignoran. No es un pop-up que cierran. Es parte de la conversación que están activamente leyendo y procesando. 100% de visibilidad garantizada.",
+        "No es un banner ignorado. Es parte de la conversación que están activamente leyendo. Visibilidad garantizada en cada mención.",
       stat: "100% visto",
       color: "emerald",
     },
     {
       icon: Users,
-      title: "High-Intent Audience",
+      title: "Audiencia Comprometida",
       description:
-        "Los usuarios que chatean 28 minutos promedio están altamente comprometidos, no scrolleando pasivamente. Están en modo de búsqueda activa de soluciones y recomendaciones.",
+        "Usuarios con 28 min promedio de sesión están altamente comprometidos, buscando activamente soluciones y recomendaciones.",
       stat: "28 min engagement",
       color: "orange",
     },
@@ -110,14 +110,14 @@ export function WhyItWorks() {
   };
 
   return (
-    <section className="py-24 sm:py-32 relative overflow-hidden">
+    <section className="py-12 md:py-24 sm:md:py-32 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-center mb-8 md:mb-16 max-w-3xl mx-auto"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Por Qué{" "}
@@ -131,10 +131,12 @@ export function WhyItWorks() {
         </motion.div>
 
         <div className="max-w-7xl mx-auto">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {reasons.map((reason, index) => {
               const Icon = reason.icon;
               const colors = colorClasses[reason.color as keyof typeof colorClasses];
+              // Ocultar tarjetas 5, 6, 7 (índices 4, 5, 6) en mobile
+              const isHiddenInMobile = index >= 4;
 
               return (
                 <motion.div
@@ -143,13 +145,14 @@ export function WhyItWorks() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className={isHiddenInMobile ? "hidden lg:block" : ""}
                 >
-                  <Card className="p-6 h-full border border-border hover:border-foreground/20 transition-all duration-300 bg-card/50 backdrop-blur-sm group">
-                    <div className={`w-12 h-12 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <Card className="p-5 md:p-6 h-full border border-border hover:border-foreground/20 transition-all duration-300 bg-card/50 backdrop-blur-sm group">
+                    <div className={`w-11 h-11 md:w-12 md:h-12 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform`}>
                       <Icon className={`w-6 h-6 ${colors.icon}`} strokeWidth={2} />
                     </div>
 
-                    <h3 className="text-lg font-bold text-foreground mb-3">
+                    <h3 className="text-lg font-bold text-foreground mb-2.5 md:mb-3">
                       {reason.title}
                     </h3>
 
@@ -170,13 +173,13 @@ export function WhyItWorks() {
           </div>
         </div>
 
-        {/* Research Note */}
+        {/* Research Note - oculta en mobile */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-center mt-12 max-w-3xl mx-auto"
+          className="hidden md:block text-center mt-12 max-w-3xl mx-auto"
         >
           <Card className="p-6 border border-border bg-muted/50">
             <p className="text-sm text-foreground/70">

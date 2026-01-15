@@ -3,36 +3,35 @@ import {
   CareersWrapper,
   CareersHero,
   WhyBlaniel,
-  OpenPositions,
-  HowToApply,
+  AreasOfInterest,
+  TalentPool,
   CareersCTA,
 } from "@/components/careers";
 
 export const metadata: Metadata = {
-  title: "Careers | Únete al Equipo - Blaniel",
+  title: "Careers | Sé Parte de Nuestro Futuro - Blaniel",
   description:
-    "Construye el futuro de las conexiones humanas con IA. Posiciones remotas en desarrollo, diseño y community. Únete al equipo Blaniel.",
+    "Únete a la próxima generación de IA emocional. Registra tu perfil en nuestra bolsa de talento y te contactaremos cuando surjan oportunidades.",
   keywords: [
     "careers",
-    "jobs",
-    "hiring",
+    "talent pool",
     "remote work",
-    "developer jobs",
-    "designer jobs",
-    "community manager",
-    "trabajos remotos",
-    "empleo",
+    "AI jobs",
+    "emotional AI",
+    "bolsa de talento",
+    "oportunidades",
     "desarrollo",
     "diseño",
+    "community",
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   alternates: {
     canonical: "/careers",
   },
   openGraph: {
-    title: "Careers - Únete al Equipo Blaniel",
+    title: "Careers - Sé Parte de Nuestro Futuro | Blaniel",
     description:
-      "Construye el futuro de las conexiones humanas con IA. Posiciones remotas disponibles.",
+      "Únete a la próxima generación de IA emocional. Registra tu perfil en nuestra bolsa de talento.",
     url: "/careers",
     siteName: "Blaniel",
     type: "website",
@@ -44,8 +43,8 @@ export default function CareersPage() {
     <CareersWrapper>
       <CareersHero />
       <WhyBlaniel />
-      <OpenPositions />
-      <HowToApply />
+      <AreasOfInterest />
+      <TalentPool />
       <CareersCTA />
     </CareersWrapper>
   );

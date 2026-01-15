@@ -181,7 +181,7 @@ export const FollowingPostsScreen = () => {
               </Text>
               <TouchableOpacity
                 style={styles.exploreButton}
-                onPress={() => navigation.navigate('CommunityFeed')}
+                onPress={() => navigation.navigate('MainTabs', { screen: 'Community' })}
               >
                 <Text style={styles.exploreButtonText}>Explorar Comunidad</Text>
               </TouchableOpacity>

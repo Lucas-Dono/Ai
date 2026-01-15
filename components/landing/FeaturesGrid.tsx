@@ -6,9 +6,77 @@ import { Card } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
 import { trackEvent } from "@/lib/analytics/track-client";
 import { LandingEventType } from "@/lib/analytics/types";
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback, useEffect, useState, useRef } from "react";
 
 export function FeaturesGrid() {
   const t = useTranslations("landing.features");
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true, // Cambiamos a loop para que el autoplay sea continuo
+    align: "start",
+    slidesToScroll: 1,
+  });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isAutoplayActive, setIsAutoplayActive] = useState(true);
+  const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  // Pausar autoplay por 40 segundos cuando el usuario interactúa
+  const pauseAutoplay = useCallback(() => {
+    setIsAutoplayActive(false);
+
+    // Limpiar timer de pausa anterior si existe
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+    }
+
+    // Reactivar después de 20 segundos
+    pauseTimerRef.current = setTimeout(() => {
+      setIsAutoplayActive(true);
+    }, 15000);
+  }, []);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  // Autoplay: avanzar cada 7.5 segundos
+  useEffect(() => {
+    if (!emblaApi || !isAutoplayActive) return;
+
+    autoplayTimerRef.current = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 7500);
+
+    return () => {
+      if (autoplayTimerRef.current) {
+        clearInterval(autoplayTimerRef.current);
+      }
+    };
+  }, [emblaApi, isAutoplayActive]);
+
+  // Detectar interacciones del usuario para pausar autoplay
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onPointerDown = () => pauseAutoplay();
+
+    emblaApi.on("pointerDown", onPointerDown);
+
+    return () => {
+      emblaApi.off("pointerDown", onPointerDown);
+    };
+  }, [emblaApi, pauseAutoplay]);
 
   const features = [
     {
@@ -72,7 +140,81 @@ export function FeaturesGrid() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
+        {/* Carrusel para móvil */}
+        <div className="sm:hidden max-w-7xl mx-auto">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <div
+                    key={index}
+                    className="flex-[0_0_85%] min-w-0 pl-4 first:pl-0"
+                  >
+                    <Card
+                      className="p-5 h-full border-border hover:border-foreground/20 transition-all duration-300 group bg-card/50 backdrop-blur-sm cursor-pointer"
+                      onClick={() => {
+                        trackEvent({
+                          eventType: LandingEventType.FEATURE_CLICK,
+                          metadata: {
+                            featureName: feature.title,
+                            featureIndex: index,
+                            featureTier: feature.tier,
+                          },
+                        }).catch(() => {});
+                      }}
+                    >
+                      <div className="space-y-3">
+                        {/* Icon */}
+                        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
+                          <Icon className="w-5 h-5" strokeWidth={1.5} />
+                        </div>
+
+                        {/* Content */}
+                        <div className="space-y-2">
+                          <h3 className="text-base font-semibold">
+                            {feature.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {feature.description}
+                          </p>
+                          {/* Tier badge */}
+                          <div className="pt-1">
+                            <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground">
+                              {feature.tier}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Dots de navegación */}
+          <div className="flex justify-center gap-2 mt-6">
+            {features.map((_, index) => (
+              <button
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === selectedIndex
+                    ? "bg-foreground w-6"
+                    : "bg-muted-foreground/30"
+                }`}
+                onClick={() => {
+                  emblaApi?.scrollTo(index);
+                  pauseAutoplay(); // Pausar cuando el usuario hace click en un dot
+                }}
+                aria-label={`Ir a slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Grid para tablet y desktop */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
           {features.map((feature, index) => {
             const Icon = feature.icon;
 
