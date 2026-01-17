@@ -16,9 +16,9 @@ import {
   Flag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { ImageUploader } from "@/components/community/ImageUploader";
+import { MentionInput, renderMentions } from "@/components/community/MentionInput";
 
 interface Comment {
   id: string;
@@ -92,6 +92,7 @@ function CommentItem({
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const [replyMentions, setReplyMentions] = useState<string[]>([]);
   const [replyImages, setReplyImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -103,6 +104,7 @@ function CommentItem({
       setSubmitting(true);
       await onReply(comment.id, replyContent, replyImages);
       setReplyContent("");
+      setReplyMentions([]);
       setReplyImages([]);
       setShowReplyForm(false);
     } catch (err) {
@@ -111,6 +113,11 @@ function CommentItem({
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleMentionChange = (value: string, mentions: string[]) => {
+    setReplyContent(value);
+    setReplyMentions(mentions);
   };
 
   if (comment.isDeleted) {
@@ -192,7 +199,7 @@ function CommentItem({
               transition={{ duration: 0.2 }}
             >
               <p className="text-sm text-foreground mb-3 whitespace-pre-wrap">
-                {comment.content}
+                {renderMentions(comment.content)}
               </p>
 
               {/* Images */}
@@ -288,12 +295,13 @@ function CommentItem({
                     className="mt-3 overflow-hidden"
                   >
                     <div className="bg-background/50 rounded-2xl p-3 border border-border/50 space-y-3">
-                      <Textarea
-                        placeholder="Escribe tu respuesta..."
+                      <MentionInput
+                        placeholder="Escribe tu respuesta... Usa @ para mencionar"
                         value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        rows={3}
-                        className="resize-none text-sm"
+                        onChange={handleMentionChange}
+                        minHeight={80}
+                        maxHeight={160}
+                        className="text-sm bg-background/80 border-border/50"
                       />
 
                       <ImageUploader
@@ -309,6 +317,8 @@ function CommentItem({
                           variant="outline"
                           onClick={() => {
                             setShowReplyForm(false);
+                            setReplyContent("");
+                            setReplyMentions([]);
                             setReplyImages([]);
                           }}
                           disabled={submitting}

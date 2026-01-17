@@ -810,6 +810,7 @@
     "groups": "Groups",
     "myProgress": "My Progress",
     "community": "Community",
+    "explore": "Explore",
     "billing": "Billing",
     "kpis": "Analytics",
     "settings": "Settings",
@@ -1635,6 +1636,7 @@
   "mobileNav": {
     "home": "Home",
     "groups": "Groups",
+    "explore": "Explore",
     "community": "Community",
     "profile": "Profile"
   },

@@ -39,14 +39,24 @@ app.prepare().then(() => {
   // Initialize Socket.IO only after Next.js is ready
   // We import dynamically to ensure the module is transpiled
   if (process.env.ENABLE_WEBSOCKETS !== "false") {
+    console.log("[Server] Initializing WebSocket support...");
     import("./lib/socket/server.mjs").then((module) => {
+      console.log("[Server] Socket.IO module loaded successfully");
       const { initSocketServer } = module;
-      initSocketServer(server);
-      console.log("[Server] WebSocket support enabled");
+      const io = initSocketServer(server);
+      if (io) {
+        console.log("[Server] WebSocket support enabled and ready");
+      } else {
+        console.error("[Server] Socket.IO returned null");
+      }
     }).catch((err) => {
       console.error("[Server] Failed to initialize Socket.IO:", err);
+      console.error("[Server] Error details:", err.message);
+      console.error("[Server] Stack:", err.stack);
       console.log("[Server] Starting without WebSocket support");
     });
+  } else {
+    console.log("[Server] WebSocket support disabled via ENABLE_WEBSOCKETS=false");
   }
 
   // Initialize Cron Jobs for World Management

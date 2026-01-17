@@ -103,8 +103,21 @@ export default function CommunityPage() {
         style={{ backgroundColor: mobileTheme.colors.background.primary }}
       >
         <PullToRefresh onRefresh={async () => { await refresh(); }}>
+          {/* Header de Community - Sincronizado con desktop */}
+          <section className="pt-6 pb-4" style={{ paddingLeft: mobileTheme.spacing.lg, paddingRight: mobileTheme.spacing.lg }}>
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 mb-1.5" style={{ color: mobileTheme.colors.text.primary }}>
+                <span style={{ color: mobileTheme.colors.primary[500], fontSize: '1.5rem' }}>///</span>
+                Community Hub
+              </h1>
+              <p className="font-mono text-xs" style={{ color: mobileTheme.colors.text.tertiary }}>
+                [SYSTEM]: Conecta, comparte y aprende con creadores de IAs.
+              </p>
+            </div>
+          </section>
+
           {/* Popular Communities - Carrusel horizontal */}
-          <section className="pt-4 pb-2">
+          <section className="pb-2">
             <div
               className="flex items-center justify-between mb-4"
               style={{ paddingLeft: mobileTheme.spacing.lg, paddingRight: mobileTheme.spacing.lg }}

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { MentionInput } from "@/components/community/MentionInput";
 
 interface Community {
   id: string;
@@ -73,6 +74,7 @@ export default function CreatePostPage() {
     isOC: false,
     flair: "",
     images: [] as ImageData[],
+    mentions: [] as string[],
   });
 
   // Tabs de tipo de post
@@ -146,11 +148,10 @@ export default function CreatePostPage() {
     }
   };
 
-  // Manejar cambio de contenido
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
+  // Manejar cambio de contenido con menciones
+  const handleContentChange = (value: string, mentions: string[]) => {
     if (value.length <= 5000) {
-      setFormData({ ...formData, content: value });
+      setFormData({ ...formData, content: value, mentions });
     }
   };
 
@@ -322,6 +323,7 @@ export default function CreatePostPage() {
           communityId: formData.communityId || null,
           isNSFW: formData.isNSFW || formData.images.some(img => img.isNSFW),
           images: formData.images.map(img => img.url),
+          mentions: formData.mentions, // IDs de usuarios mencionados
           metadata: {
             isOC: formData.isOC,
             flair: formData.flair,
@@ -670,14 +672,17 @@ export default function CreatePostPage() {
                       <label className="text-xs font-medium text-neutral-400">Contenido</label>
                       <span className="text-xs text-neutral-600">{formData.content.length}/5000</span>
                     </div>
-                    <textarea
-                      rows={8}
-                      placeholder="Escribe tu contenido aquí..."
+                    <MentionInput
                       value={formData.content}
                       onChange={handleContentChange}
+                      placeholder="Escribe tu contenido aquí... Usa @ para mencionar usuarios"
+                      minHeight={180}
+                      maxHeight={400}
                       className="w-full bg-[#121212] border border-[#333] rounded-lg p-3 text-white placeholder-neutral-600 focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none transition-all resize-y"
-                      required
-                    ></textarea>
+                    />
+                    <p className="text-xs text-neutral-500">
+                      Tip: Usa <span className="text-[#6366f1] font-medium">@usuario</span> para mencionar a alguien
+                    </p>
                   </div>
                 )}
 

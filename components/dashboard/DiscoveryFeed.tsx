@@ -101,6 +101,7 @@ export function DiscoveryFeed() {
               name={agent.name}
               description={agent.description || undefined}
               avatar={agent.avatar || undefined}
+              generationTier={agent.generationTier}
               featured={agent.generationTier === 'premium' || agent.generationTier === 'flagship'}
               variant="carousel"
               onPress={() => router.push(`/agentes/${agent.id}`)}

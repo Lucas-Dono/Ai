@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Users, Settings, Hash, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -9,31 +9,78 @@ import { GroupMemberList } from "./GroupMemberList";
 import { AddMembersDialog } from "./AddMembersDialog";
 import { Suspense } from "react";
 import { useRouter } from "next/navigation";
+import { useGroupSocket } from "@/hooks/useGroupSocket";
 
 interface GroupChatLayoutProps {
   group: any;
   members: any[];
   currentMember: any;
   currentUserId: string;
+  currentUserName: string | null;
   initialMessages: any[];
+  socketToken: string | null;
 }
 
 export function GroupChatLayout({
   group,
-  members,
+  members: initialMembers,
   currentMember,
   currentUserId,
+  currentUserName,
   initialMessages,
+  socketToken,
 }: GroupChatLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [addMembersOpen, setAddMembersOpen] = useState(false);
+  const [members, setMembers] = useState(initialMembers);
   const router = useRouter();
+
+  // Socket for real-time member updates
+  const { isConnected, onMemberJoined, onMemberLeft } = useGroupSocket(
+    group.id,
+    currentUserId,
+    { token: socketToken || undefined, userName: currentUserName || "Usuario" }
+  );
+
+  // Subscribe to member events
+  useEffect(() => {
+    if (!isConnected) return;
+
+    const unsubJoined = onMemberJoined((newMember) => {
+      setMembers((prev) => {
+        // Check if member already exists
+        if (prev.some((m) => m.id === newMember.memberId)) {
+          return prev;
+        }
+        // Add new member
+        return [...prev, {
+          id: newMember.memberId,
+          memberType: newMember.memberType,
+          role: newMember.role,
+          isActive: true,
+          isMuted: false,
+          totalMessages: 0,
+          user: newMember.user,
+          agent: newMember.agent,
+        }];
+      });
+    });
+
+    const unsubLeft = onMemberLeft((data) => {
+      setMembers((prev) => prev.filter((m) => m.id !== data.memberId));
+    });
+
+    return () => {
+      unsubJoined();
+      unsubLeft();
+    };
+  }, [isConnected, onMemberJoined, onMemberLeft]);
 
   const userCount = members.filter((m) => m.memberType === "user").length;
   const aiCount = members.filter((m) => m.memberType === "agent").length;
 
   const handleMemberAdded = () => {
-    // Refresh the page to show new member
+    // For agents added via dialog, refresh the page
     router.refresh();
   };
 
@@ -104,8 +151,10 @@ export function GroupChatLayout({
             <GroupMessageThread
               groupId={group.id}
               currentUserId={currentUserId}
+              currentUserName={currentUserName}
               initialMessages={initialMessages}
               groupName={group.name}
+              socketToken={socketToken}
             />
           </Suspense>
         </div>

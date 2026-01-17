@@ -19,6 +19,7 @@ export interface CreatePostData {
   sharedAgentId?: string; // For shared_agent posts
   isNSFW?: boolean; // Contenido NSFW
   isSpoiler?: boolean; // Contiene spoilers
+  mentions?: string[]; // IDs de usuarios mencionados
   metadata?: any; // Metadata adicional (isOC, flair, imageMetadata, etc.)
 }
 
@@ -94,6 +95,7 @@ export const PostService = {
         // sharedAgentId: data.sharedAgentId, // Field removed from schema
         isNSFW: data.isNSFW || false,
         isSpoiler: data.isSpoiler || false,
+        mentions: data.mentions || [],
         metadata: data.metadata || {},
         slug,
       },
@@ -122,6 +124,25 @@ export const PostService = {
         where: { id: communityId },
         data: { postCount: { increment: 1 } },
       });
+    }
+
+    // Enviar notificaciones a usuarios mencionados
+    if (data.mentions && data.mentions.length > 0) {
+      try {
+        const { NotificationService } = await import('@/lib/services/notification.service');
+        await NotificationService.notifyMentions(
+          data.mentions,
+          authorId,
+          post.author.name || 'Alguien',
+          post.author.image || null,
+          'post',
+          post.id,
+          data.content.slice(0, 100) // Preview del contenido
+        );
+      } catch (error) {
+        console.error('Error enviando notificaciones de menciones:', error);
+        // No fallar la creación del post si las notificaciones fallan
+      }
     }
 
     return post;

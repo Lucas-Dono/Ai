@@ -99,11 +99,15 @@ export function VibesSections() {
               </span>
             </div>
 
-            {/* Mobile Header */}
+            {/* Mobile Header - Con badge de contador */}
             <div className="lg:hidden mb-4">
               <MobileSectionHeader
                 title={config.title.es}
                 subtitle={config.subtitle.es}
+                badge={{
+                  text: `${agents.length} personajes`,
+                  className: `${config.bgColor} ${config.borderColor} border`
+                }}
               />
             </div>
 
@@ -136,6 +140,7 @@ export function VibesSections() {
                     name={agent.name}
                     description={agent.description || undefined}
                     avatar={agent.avatar || undefined}
+                    generationTier={agent.generationTier}
                     variant="carousel"
                     onPress={() => router.push(`/agentes/${agent.id}`)}
                     onChatPress={() => router.push(`/agentes/${agent.id}`)}

@@ -74,28 +74,28 @@ export const mobileColors = {
     dark: '#0284C7',
   },
 
-  // Backgrounds - Mobile usa tema oscuro por defecto
+  // Backgrounds - Mobile usa el mismo tema oscuro que desktop
   background: {
-    primary: '#0F172A',   // Fondo principal oscuro
-    secondary: '#1E293B', // Fondo secundario
-    tertiary: '#334155',  // Fondo terciario
-    card: '#1E293B',      // Fondo de cards
-    elevated: '#334155',  // Fondo elevado
+    primary: '#1C1C1C',   // Fondo principal oscuro (rgb(28, 28, 28))
+    secondary: '#202020', // Fondo secundario (rgb(32, 32, 32))
+    tertiary: '#282828',  // Fondo terciario (rgb(40, 40, 40))
+    card: '#141416',      // Fondo de cards - igual que desktop
+    elevated: '#27272a',  // Fondo elevado
   },
 
-  // Texto
+  // Texto - Sincronizado con desktop dark theme
   text: {
-    primary: '#F1F5F9',   // Texto principal (claro)
-    secondary: '#CBD5E1', // Texto secundario
-    tertiary: '#94A3B8',  // Texto terciario
-    disabled: '#64748B',  // Texto deshabilitado
+    primary: '#E6E6E6',   // Texto principal (claro) - rgb(230, 230, 230)
+    secondary: '#B4B4B4', // Texto secundario - rgb(180, 180, 180)
+    tertiary: '#94A3B8',  // Texto terciario - mantener para consistencia
+    disabled: '#787878',  // Texto deshabilitado - rgb(120, 120, 120)
   },
 
-  // Bordes
+  // Bordes - Sincronizado con desktop dark theme
   border: {
-    light: '#334155',
-    main: '#475569',
-    dark: '#1E293B',
+    light: '#464646',     // rgb(70, 70, 70) - border color del desktop
+    main: '#525252',      // Un poco más claro
+    dark: '#282828',      // rgb(40, 40, 40)
   },
 
   // Overlay
@@ -172,10 +172,10 @@ export const mobileShadows = {
 // Tab Bar configuration - Similar a MainTabs de la app móvil
 export const mobileTabBarConfig = {
   height: 65, // + safe area
-  backgroundColor: mobileColors.background.secondary,
-  borderTopColor: mobileColors.border.light,
-  activeTintColor: mobileColors.primary[500],
-  inactiveTintColor: mobileColors.text.tertiary,
+  backgroundColor: '#202020', // mobileColors.background.secondary
+  borderTopColor: '#464646', // mobileColors.border.light
+  activeTintColor: '#8B5CF6', // mobileColors.primary[500]
+  inactiveTintColor: '#94A3B8', // mobileColors.text.tertiary
   labelFontSize: 12,
   labelFontWeight: '600',
 } as const;
@@ -183,9 +183,9 @@ export const mobileTabBarConfig = {
 // Header configuration - Similar al header de la app móvil
 export const mobileHeaderConfig = {
   height: 56,
-  backgroundColor: mobileColors.background.secondary,
-  borderBottomColor: mobileColors.border.light,
-  titleColor: mobileColors.text.primary,
+  backgroundColor: '#202020', // mobileColors.background.secondary
+  borderBottomColor: '#464646', // mobileColors.border.light
+  titleColor: '#E6E6E6', // mobileColors.text.primary
   titleFontSize: 20,
   titleFontWeight: '700',
 } as const;
@@ -193,21 +193,21 @@ export const mobileHeaderConfig = {
 // Tailwind CSS classes para aplicar el theme móvil
 // Estas clases se usan con el prefijo "mobile:" en el responsive design
 export const mobileTailwindClasses = {
-  // Background classes
-  bgPrimary: 'bg-[#0F172A]',
-  bgSecondary: 'bg-[#1E293B]',
-  bgTertiary: 'bg-[#334155]',
-  bgCard: 'bg-[#1E293B]',
-  bgElevated: 'bg-[#334155]',
+  // Background classes - Sincronizadas con desktop dark theme
+  bgPrimary: 'bg-[#1C1C1C]',
+  bgSecondary: 'bg-[#202020]',
+  bgTertiary: 'bg-[#282828]',
+  bgCard: 'bg-[#141416]',
+  bgElevated: 'bg-[#27272a]',
 
-  // Text classes
-  textPrimary: 'text-[#F1F5F9]',
-  textSecondary: 'text-[#CBD5E1]',
+  // Text classes - Sincronizadas con desktop dark theme
+  textPrimary: 'text-[#E6E6E6]',
+  textSecondary: 'text-[#B4B4B4]',
   textTertiary: 'text-[#94A3B8]',
 
-  // Border classes
-  borderLight: 'border-[#334155]',
-  borderMain: 'border-[#475569]',
+  // Border classes - Sincronizadas con desktop dark theme
+  borderLight: 'border-[#464646]',
+  borderMain: 'border-[#525252]',
 
   // Primary color classes
   primaryBg: 'bg-[#8B5CF6]',

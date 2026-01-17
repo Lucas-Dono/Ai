@@ -12,7 +12,7 @@ import { Carousel } from '@/components/ui/carousel';
 import { STORY_NICHE_CONFIGS, type StoryNicheType } from '@/lib/stories/config';
 import type { CategoryKey } from '@/lib/categories';
 import { useIsDesktop } from '@/lib/hooks/use-media-query';
-import { MobileAgentCard } from '@/components/mobile';
+import { MobileAgentCard, MobileSectionHeader } from '@/components/mobile';
 
 interface Agent {
   id: string;
@@ -86,7 +86,8 @@ export function StoriesSection() {
 
         return (
           <section key={nicheId} className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
+            {/* Desktop Header */}
+            <div className="hidden lg:flex items-center gap-3 mb-4">
               <Icon className="w-6 h-6 text-amber-400" />
               <div>
                 <h2 className="text-2xl font-bold">{config.title.es}</h2>
@@ -95,6 +96,18 @@ export function StoriesSection() {
               <span className={`ml-auto text-xs font-bold px-3 py-1 rounded-full ${config.badgeColor} border`}>
                 {config.badge.es}
               </span>
+            </div>
+
+            {/* Mobile Header - Con badge sincronizado */}
+            <div className="lg:hidden mb-4">
+              <MobileSectionHeader
+                badge={{
+                  text: config.badge.es,
+                  className: config.badgeColor
+                }}
+                title={config.title.es}
+                subtitle={config.subtitle.es}
+              />
             </div>
 
             {isDesktop ? (
@@ -132,6 +145,7 @@ export function StoriesSection() {
                         name={agent.name}
                         description={agent.description || undefined}
                         avatar={agent.avatar || undefined}
+                        generationTier={agent.generationTier}
                         featured={isFeatured}
                         variant="carousel"
                         onPress={() => router.push(`/agentes/${agent.id}`)}

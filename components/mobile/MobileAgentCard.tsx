@@ -12,11 +12,37 @@ export interface MobileAgentCardProps {
   description?: string;
   avatar?: string;
   featured?: boolean;
+  generationTier?: string | null;
   onPress: () => void;
   onChatPress?: () => void;
   /** Variante de tamaño: 'grid' para layout 2 columnas, 'carousel' para scroll horizontal */
   variant?: 'grid' | 'carousel';
 }
+
+/**
+ * Obtiene el badge según el tier de generación
+ * Sincronizado con CompanionCard (desktop)
+ */
+const getTierBadge = (tier?: string | null) => {
+  switch (tier) {
+    case 'ultra':
+      return {
+        label: 'ULTRA',
+        className: 'bg-purple-600 text-white'
+      };
+    case 'plus':
+      return {
+        label: 'PLUS',
+        className: 'bg-blue-600 text-white'
+      };
+    case 'free':
+    default:
+      return {
+        label: 'FREE',
+        className: 'bg-gray-600 text-gray-200'
+      };
+  }
+};
 
 /**
  * Genera un gradiente de colores basado en el hash del nombre
@@ -63,6 +89,7 @@ export function MobileAgentCard({
   description,
   avatar,
   featured = false,
+  generationTier,
   onPress,
   onChatPress,
   variant = 'grid',
@@ -70,14 +97,15 @@ export function MobileAgentCard({
   const [imageError, setImageError] = useState(false);
   const [startColor, endColor] = generateGradient(name);
   const initials = getInitials(name);
+  const tierBadge = getTierBadge(generationTier);
 
-  // Dimensiones según variante
+  // Dimensiones según variante - Mejoradas para mejor legibilidad
   const isCarousel = variant === 'carousel';
-  const cardWidth = isCarousel ? 'w-[150px]' : 'w-full';
-  const cardHeight = isCarousel ? 'h-[200px]' : 'h-[260px]';
-  const imageHeight = isCarousel ? 'h-24' : 'h-36';
-  const contentHeight = isCarousel ? 'h-[104px]' : 'h-[116px]';
-  const initialsSize = isCarousel ? 'text-3xl' : 'text-5xl';
+  const cardWidth = isCarousel ? 'w-[180px]' : 'w-full';
+  const cardHeight = isCarousel ? 'h-[280px]' : 'h-[300px]';
+  const imageHeight = isCarousel ? 'h-36' : 'h-44';
+  const contentHeight = isCarousel ? 'h-[136px]' : 'h-[144px]';
+  const initialsSize = isCarousel ? 'text-4xl' : 'text-5xl';
 
   const handleChatPress = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -90,9 +118,8 @@ export function MobileAgentCard({
 
   return (
     <motion.div
-      className={`${cardWidth} ${cardHeight} rounded-2xl overflow-hidden cursor-pointer flex-shrink-0`}
+      className={`${cardWidth} ${cardHeight} rounded-2xl overflow-hidden cursor-pointer flex-shrink-0 bg-gradient-to-b from-[#141416] to-[#09090b]`}
       style={{
-        backgroundColor: mobileTheme.colors.background.card,
         boxShadow: mobileTheme.shadows.md,
       }}
       whileTap={{ scale: 0.95 }}
@@ -113,13 +140,8 @@ export function MobileAgentCard({
               sizes="(max-width: 768px) 50vw, 200px"
               priority={false}
             />
-            {/* Overlay gradient */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)`,
-              }}
-            />
+            {/* Gradient Overlay - Sincronizado con desktop */}
+            <div className={`absolute inset-x-0 bottom-0 ${isCarousel ? 'h-12' : 'h-[60px]'} bg-gradient-to-t from-[#141416] to-transparent pointer-events-none`} />
           </>
         ) : (
           <>
@@ -142,26 +164,28 @@ export function MobileAgentCard({
                 {initials}
               </span>
             </div>
-            {/* Overlay gradient */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%)`,
-              }}
-            />
+            {/* Gradient Overlay - Sincronizado con desktop */}
+            <div className={`absolute inset-x-0 bottom-0 ${isCarousel ? 'h-12' : 'h-[60px]'} bg-gradient-to-t from-[#141416] to-transparent pointer-events-none`} />
           </>
         )}
 
-        {/* Featured Badge */}
+        {/* Tier Badge - Sincronizado con desktop */}
+        <span
+          className={`absolute top-2 left-2 z-10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded ${tierBadge.className}`}
+        >
+          {tierBadge.label}
+        </span>
+
+        {/* Featured Badge (opcional, en esquina derecha) */}
         {featured && (
           <div
-            className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full backdrop-blur-sm"
+            className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full backdrop-blur-sm z-10"
             style={{
               backgroundColor: 'rgba(139, 92, 246, 0.9)',
             }}
           >
             <Star size={12} fill="currentColor" className="text-white" />
-            <span className="text-xs font-semibold text-white">
+            <span className="text-[9px] font-semibold text-white uppercase tracking-wider">
               Featured
             </span>
           </div>
@@ -169,26 +193,22 @@ export function MobileAgentCard({
       </div>
 
       {/* Content Section */}
-      <div className={`flex flex-col ${contentHeight} p-2 ${isCarousel ? 'p-2' : 'p-3'}`}>
+      <div className={`flex flex-col ${contentHeight} ${isCarousel ? 'p-3' : 'p-3.5'}`}>
         {/* Name */}
         <h3
-          className={`${isCarousel ? 'text-sm' : 'text-base'} font-semibold mb-1 truncate`}
+          className={`${isCarousel ? 'text-sm' : 'text-base'} font-semibold mb-1.5 line-clamp-1`}
           style={{ color: mobileTheme.colors.text.primary }}
           title={name}
         >
           {name}
         </h3>
 
-        {/* Description - solo en grid, oculto en carrusel */}
-        {description && !isCarousel && (
+        {/* Description - Visible en ambas variantes */}
+        {description && (
           <p
-            className="text-xs mb-3 flex-1"
+            className={`text-xs mb-3 flex-1 ${isCarousel ? 'line-clamp-2' : 'line-clamp-3'}`}
             style={{
               color: mobileTheme.colors.text.secondary,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
               lineHeight: '1.4',
             }}
             title={description}
@@ -197,18 +217,21 @@ export function MobileAgentCard({
           </p>
         )}
 
-        {/* Chat Button */}
+        {/* Chat Button - Sincronizado con desktop */}
         <motion.button
-          className={`flex items-center justify-center gap-1 ${isCarousel ? 'py-1.5 px-2 mt-auto' : 'py-2 px-3'} rounded-lg w-full`}
+          className={`flex items-center justify-center gap-1.5 ${isCarousel ? 'py-2 px-3' : 'py-2.5 px-3'} rounded-lg w-full transition-colors duration-150`}
           style={{
-            backgroundColor: mobileTheme.colors.primary[500],
-            color: mobileTheme.colors.text.primary,
+            backgroundColor: '#27272a',
+            color: '#E5E5E5',
           }}
           whileTap={{ scale: 0.95 }}
+          whileHover={{
+            backgroundColor: '#3f3f46',
+          }}
           onClick={handleChatPress}
         >
-          <MessageCircle size={isCarousel ? 14 : 16} />
-          <span className={`${isCarousel ? 'text-xs' : 'text-sm'} font-semibold`}>Chatear</span>
+          <MessageCircle size={isCarousel ? 15 : 16} />
+          <span className={`${isCarousel ? 'text-xs' : 'text-[13px]'} font-semibold`}>Chatear</span>
         </motion.button>
       </div>
     </motion.div>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingMenu } from "@/components/onboarding/OnboardingMenu";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { FriendRequestsPanel } from "@/components/social/FriendRequestsPanel";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { GroupsNavItem } from "@/components/dashboard/GroupsNavItem";
@@ -23,6 +24,7 @@ import {
   Users,
   BarChart3,
   Activity,
+  Compass,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -89,6 +91,7 @@ export function DashboardNav() {
     { href: "/dashboard/grupos", label: t("navigation.groups"), icon: Network },
     { href: "/dashboard/my-stats", label: t("navigation.myProgress"), icon: BarChart3 },
     { href: "/community", label: t("navigation.community"), icon: Users },
+    { href: "/explore", label: t("navigation.explore") || "Explorar", icon: Compass },
     { href: "/dashboard/billing", label: t("navigation.billing"), icon: CreditCard },
     { href: "/dashboard/kpis", label: t("navigation.kpis"), icon: Activity },
     { href: "/configuracion", label: t("navigation.settings"), icon: Settings },
@@ -163,7 +166,8 @@ export function DashboardNav() {
         </Link>
 
         <div className="flex gap-2 py-2">
-          <NotificationDropdown />
+          <FriendRequestsPanel popoverSide="top" popoverAlign="start" />
+          <NotificationDropdown popoverSide="top" popoverAlign="start" />
           <OnboardingMenu />
           <LanguageSwitcher variant="compact" />
         </div>

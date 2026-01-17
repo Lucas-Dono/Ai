@@ -1,6 +1,10 @@
+/**
+ * Agent Chat Layout - Layout para la página de chat con agentes
+ * Sincronizado con el sistema de layouts móvil
+ */
+
 import { DashboardNav } from "@/components/dashboard-nav";
 import { MobileNav } from "@/components/mobile/MobileNav";
-import { MobileHeader } from "@/components/mobile/MobileHeader";
 
 export default function AgentChatLayout({
   children,
@@ -12,18 +16,18 @@ export default function AgentChatLayout({
       {/* Desktop Sidebar */}
       <DashboardNav />
 
-      {/* Mobile Header */}
-      <div className="lg:hidden w-full">
-        <MobileHeader />
+      {/* Mobile Layout Container */}
+      <div className="flex-1 flex flex-col lg:ml-64 min-h-screen overflow-hidden min-w-0">
+        {/* Main Content - El chat maneja su propio header en móvil */}
+        <main className="flex-1 h-full overflow-hidden">
+          {children}
+        </main>
       </div>
 
-      {/* Main Content - Sin padding ya que el chat maneja su propio layout */}
-      <main className="flex-1 lg:ml-64 h-screen overflow-hidden min-w-0">
-        {children}
-      </main>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileNav />
+      {/* Mobile Bottom Navigation - Oculto en chat para dar más espacio */}
+      <div className="lg:hidden">
+        <MobileNav />
+      </div>
     </div>
   );
 }

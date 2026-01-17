@@ -4,29 +4,98 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { GroupMessageBubble } from "./GroupMessageBubble";
 import { GroupMessageInput } from "./GroupMessageInput";
 import { Loader2, AlertCircle, Hash } from "lucide-react";
+import { useGroupSocket } from "@/hooks/useGroupSocket";
+import type { GroupMessageEvent, GroupTypingEvent } from "@/lib/socket/events";
 
 interface GroupMessageThreadProps {
   groupId: string;
   currentUserId: string;
+  currentUserName: string | null;
   initialMessages?: any[];
   groupName?: string;
+  socketToken: string | null;
 }
 
 export function GroupMessageThread({
   groupId,
   currentUserId,
+  currentUserName,
   initialMessages = [],
   groupName = "este grupo",
+  socketToken,
 }: GroupMessageThreadProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [replyingTo, setReplyingTo] = useState<any>(null);
+  const [typingUsers, setTypingUsers] = useState<Map<string, string>>(new Map());
+  const [aiResponding, setAiResponding] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousScrollHeight = useRef<number>(0);
+
+  // Socket connection for real-time updates
+  const {
+    isConnected,
+    sendTyping,
+    onMessage,
+    onTyping,
+    onAIResponding,
+    onAIStopped,
+  } = useGroupSocket(groupId, currentUserId, {
+    token: socketToken || undefined,
+    userName: currentUserName || "Usuario",
+  });
+
+  // Subscribe to real-time messages
+  useEffect(() => {
+    if (!isConnected) return;
+
+    const unsubMessage = onMessage((message: GroupMessageEvent) => {
+      // Ignore own messages from socket - they're added via HTTP response
+      // This prevents duplicates since the same message arrives from both HTTP and socket
+      if (message.authorType === 'user' && message.authorId === currentUserId) {
+        return;
+      }
+
+      // Avoid duplicates by checking message ID
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) {
+          return prev;
+        }
+        return [...prev, message];
+      });
+    });
+
+    const unsubTyping = onTyping((event: GroupTypingEvent) => {
+      setTypingUsers((prev) => {
+        const updated = new Map(prev);
+        if (event.isTyping) {
+          updated.set(event.userId, event.userName);
+        } else {
+          updated.delete(event.userId);
+        }
+        return updated;
+      });
+    });
+
+    const unsubAIResponding = onAIResponding((data) => {
+      setAiResponding(data.agentName);
+    });
+
+    const unsubAIStopped = onAIStopped(() => {
+      setAiResponding(null);
+    });
+
+    return () => {
+      unsubMessage();
+      unsubTyping();
+      unsubAIResponding();
+      unsubAIStopped();
+    };
+  }, [isConnected, onMessage, onTyping, onAIResponding, onAIStopped]);
 
   // Load initial messages if not provided
   useEffect(() => {
@@ -214,6 +283,26 @@ export function GroupMessageThread({
             />
           ))}
 
+          {/* Typing indicator */}
+          {(typingUsers.size > 0 || aiResponding) && (
+            <div className="px-2 py-2 text-xs text-neutral-400 flex items-center gap-2">
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+              <span>
+                {aiResponding
+                  ? `${aiResponding} está pensando...`
+                  : typingUsers.size === 1
+                  ? `${Array.from(typingUsers.values())[0]} está escribiendo...`
+                  : typingUsers.size === 2
+                  ? `${Array.from(typingUsers.values()).join(" y ")} están escribiendo...`
+                  : `${typingUsers.size} personas están escribiendo...`}
+              </span>
+            </div>
+          )}
+
           {/* Scroll anchor */}
           <div ref={messagesEndRef} />
         </div>
@@ -223,6 +312,7 @@ export function GroupMessageThread({
       <GroupMessageInput
         groupId={groupId}
         onSend={handleSendMessage}
+        onTyping={sendTyping}
         replyingTo={replyingTo}
         onCancelReply={() => setReplyingTo(null)}
         placeholder="Envía un mensaje..."

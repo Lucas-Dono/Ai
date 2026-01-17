@@ -31,6 +31,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { renderMentions } from "@/components/community/MentionInput";
 
 interface PostCardProps {
   post: {
@@ -628,7 +629,7 @@ export function PostCard({ post, onVote, onSave, compact = false }: PostCardProp
               "text-muted-foreground mb-3",
               compact ? "line-clamp-2 text-xs" : "line-clamp-2 text-sm"
             )}>
-              {post.content}
+              {renderMentions(post.content)}
             </p>
           )}
         </Link>

@@ -18,7 +18,12 @@ import { useNotifications } from '@/hooks/use-notifications';
 import { getBadgeConfig, formatRelativeTime } from '@/types/notifications';
 import type { Notification } from '@/types/notifications';
 
-export function NotificationDropdown() {
+interface NotificationDropdownProps {
+  popoverSide?: "top" | "bottom";
+  popoverAlign?: "start" | "end";
+}
+
+export function NotificationDropdown({ popoverSide = "bottom", popoverAlign = "end" }: NotificationDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -89,11 +94,15 @@ export function NotificationDropdown() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            initial={{ opacity: 0, y: popoverSide === "top" ? 10 : -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            exit={{ opacity: 0, y: popoverSide === "top" ? 10 : -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-96 rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-2xl z-50"
+            className={cn(
+              "absolute w-96 rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-2xl z-50",
+              popoverSide === "top" ? "bottom-full mb-2" : "top-full mt-2",
+              popoverAlign === "start" ? "left-0" : "right-0"
+            )}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">

@@ -2,20 +2,37 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { GroupChatLayout } from "@/components/groups/GroupChatLayout";
+import { randomBytes } from "crypto";
 
 async function getGroupData(groupId: string, userId: string) {
-  // Verificar membresía
-  const member = await prisma.groupMember.findFirst({
-    where: {
-      groupId,
-      userId,
-      memberType: "user",
-      isActive: true,
-    },
-  });
+  // Verificar membresía y obtener apiKey del usuario
+  const [member, user] = await Promise.all([
+    prisma.groupMember.findFirst({
+      where: {
+        groupId,
+        userId,
+        memberType: "user",
+        isActive: true,
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { apiKey: true, name: true },
+    }),
+  ]);
 
   if (!member) {
     return null;
+  }
+
+  // Auto-generar apiKey si el usuario no tiene una (necesaria para WebSocket)
+  let socketToken = user?.apiKey;
+  if (!socketToken) {
+    socketToken = `sk_${randomBytes(32).toString("hex")}`;
+    await prisma.user.update({
+      where: { id: userId },
+      data: { apiKey: socketToken },
+    });
   }
 
   // Obtener grupo completo
@@ -102,6 +119,8 @@ async function getGroupData(groupId: string, userId: string) {
     group,
     messages,
     currentMember: member,
+    socketToken, // Auto-generado si no existía
+    userName: user?.name || null,
   };
 }
 
@@ -123,7 +142,7 @@ export default async function GrupoPage({
     redirect("/dashboard/grupos");
   }
 
-  const { group, messages, currentMember } = data;
+  const { group, messages, currentMember, socketToken, userName } = data;
 
   return (
     <GroupChatLayout
@@ -131,7 +150,9 @@ export default async function GrupoPage({
       members={group.members}
       currentMember={currentMember}
       currentUserId={session.user.id}
+      currentUserName={userName}
       initialMessages={messages}
+      socketToken={socketToken}
     />
   );
 }

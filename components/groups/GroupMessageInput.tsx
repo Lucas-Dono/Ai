@@ -6,6 +6,7 @@ import { Send, X, Paperclip, Smile } from "lucide-react";
 interface GroupMessageInputProps {
   groupId: string;
   onSend: (content: string, replyToId?: string) => Promise<void>;
+  onTyping?: (isTyping: boolean) => void;
   replyingTo?: {
     id: string;
     content: string;
@@ -19,6 +20,7 @@ interface GroupMessageInputProps {
 export function GroupMessageInput({
   groupId,
   onSend,
+  onTyping,
   replyingTo,
   onCancelReply,
   disabled = false,
@@ -27,6 +29,8 @@ export function GroupMessageInput({
   const [content, setContent] = useState("");
   const [isSending, setIsSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -46,9 +50,63 @@ export function GroupMessageInput({
     }
   }, [replyingTo]);
 
+  // Cleanup typing timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (isTypingRef.current && onTyping) {
+        onTyping(false);
+      }
+    };
+  }, [onTyping]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    setContent(newContent);
+
+    // Typing indicator logic
+    if (onTyping) {
+      // Clear existing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      // Send typing start if not already typing
+      if (newContent.length > 0 && !isTypingRef.current) {
+        isTypingRef.current = true;
+        onTyping(true);
+      }
+
+      // Set timeout to stop typing after 2 seconds of inactivity
+      if (newContent.length > 0) {
+        typingTimeoutRef.current = setTimeout(() => {
+          isTypingRef.current = false;
+          onTyping(false);
+        }, 2000);
+      } else {
+        // If content is empty, stop typing immediately
+        if (isTypingRef.current) {
+          isTypingRef.current = false;
+          onTyping(false);
+        }
+      }
+    }
+  };
+
   const handleSend = async () => {
     const trimmedContent = content.trim();
     if (!trimmedContent || isSending) return;
+
+    // Stop typing indicator
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    if (isTypingRef.current && onTyping) {
+      isTypingRef.current = false;
+      onTyping(false);
+    }
 
     setIsSending(true);
     try {
@@ -116,7 +174,7 @@ export function GroupMessageInput({
         <textarea
           ref={textareaRef}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled || isSending}

@@ -19,7 +19,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Menu, X, Sparkles, Settings, CreditCard, Shield, Search, Plus } from "lucide-react";
+import { Menu, X, Sparkles, Settings, CreditCard, Shield, Search, Plus, Users } from "lucide-react";
+import { FriendRequestsPanel } from "@/components/social/FriendRequestsPanel";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -92,37 +93,47 @@ export function MobileHeader({ title, showMenu = true }: MobileHeaderProps) {
           </Link>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-4">
-            {/* Botón Crear */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              transition={TRANSITIONS.fast}
-              className="p-2 flex items-center justify-center touch-manipulation"
-              aria-label="Create"
-              onClick={() => {
-                light();
-                // Navigate to create page
-              }}
-            >
-              <Plus
-                className="w-6 h-6"
-                style={{ color: mobileTheme.colors.text.primary }}
-              />
-            </motion.button>
+          <div className="flex items-center gap-3">
+            {/* Solicitudes de amistad */}
+            <FriendRequestsPanel
+              className="p-2 touch-manipulation"
+            />
 
-            {/* Botón Settings */}
-            <motion.button
-              onClick={toggleMenu}
-              whileTap={{ scale: 0.95 }}
-              transition={TRANSITIONS.fast}
-              className="p-2 flex items-center justify-center touch-manipulation"
-              aria-label="Settings"
-            >
-              <Settings
-                className="w-6 h-6"
-                style={{ color: mobileTheme.colors.text.primary }}
-              />
-            </motion.button>
+            {/* Botón Búsqueda */}
+            <Link href="/search">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                transition={TRANSITIONS.fast}
+                className="p-2 flex items-center justify-center touch-manipulation"
+                aria-label="Search"
+                onClick={() => {
+                  light();
+                }}
+              >
+                <Search
+                  className="w-6 h-6"
+                  style={{ color: mobileTheme.colors.text.primary }}
+                />
+              </motion.button>
+            </Link>
+
+            {/* Botón Crear */}
+            <Link href="/constructor">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                transition={TRANSITIONS.fast}
+                className="p-2 flex items-center justify-center touch-manipulation"
+                aria-label="Create"
+                onClick={() => {
+                  light();
+                }}
+              >
+                <Plus
+                  className="w-6 h-6"
+                  style={{ color: mobileTheme.colors.text.primary }}
+                />
+              </motion.button>
+            </Link>
           </div>
         </div>
 

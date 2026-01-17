@@ -4,6 +4,7 @@ import { crossContextMemoryService } from "./cross-context-memory.service";
 import { groupStoryEngineService } from "./group-story-engine.service";
 import { groupAIDirectorService } from "./group-ai-director.service";
 import { groupEmergentEventsService } from "./group-emergent-events.service";
+import { emitGroupMessage, emitGroupAIResponding, emitGroupAIStopped } from "@/lib/socket/server";
 
 interface AISelectionScore {
   member: any;
@@ -78,6 +79,9 @@ export class GroupMessageService {
         }
 
         try {
+          // Emit AI responding indicator
+          emitGroupAIResponding(groupId, aiMember.agentId, aiMember.agent.name);
+
           const response = await this.generateSingleAIResponse(
             aiMember.agent,
             triggeringMessage,
@@ -85,11 +89,32 @@ export class GroupMessageService {
             responses // Contexto de respuestas anteriores
           );
 
+          // Emit AI stopped indicator
+          emitGroupAIStopped(groupId, aiMember.agentId);
+
           if (response) {
             responses.push(response);
+
+            // Emit the new message to all group members
+            emitGroupMessage(groupId, {
+              id: response.id,
+              groupId,
+              authorType: "agent",
+              authorId: aiMember.agentId,
+              content: response.content,
+              createdAt: response.createdAt.toISOString(),
+              replyToId: response.replyToId || undefined,
+              agent: response.agent ? {
+                id: response.agent.id,
+                name: response.agent.name,
+                avatar: response.agent.avatar,
+              } : undefined,
+            });
           }
         } catch (error) {
           console.error(`Error generating response for AI ${aiMember.agentId}:`, error);
+          // Emit stopped even on error
+          emitGroupAIStopped(groupId, aiMember.agentId);
         }
       }
 

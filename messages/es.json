@@ -820,6 +820,7 @@
     "groups": "Grupos",
     "myProgress": "Mi Progreso",
     "community": "Comunidad",
+    "explore": "Explorar",
     "billing": "Facturación",
     "kpis": "Métricas",
     "settings": "Configuración",
@@ -1530,6 +1531,7 @@
   "mobileNav": {
     "home": "Inicio",
     "groups": "Grupos",
+    "explore": "Explorar",
     "community": "Community",
     "profile": "Perfil"
   },

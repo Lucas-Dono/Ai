@@ -22,7 +22,7 @@ import {
   Shield, Award, MessageCircle, Users,
   Sparkles, Frown, Angry, Siren, Meh, CircleOff,
   ThumbsUp, Clock, HeartHandshake, HelpCircle,
-  Flame
+  Flame, ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Message } from "@/components/chat/WhatsAppChat";
@@ -869,27 +869,35 @@ export function DirectMessageChat({
   };
 
   return (
-    <div className="flex w-full h-full min-h-screen bg-neutral-900 text-white font-sans overflow-hidden" style={{ backgroundColor: '#171717' }}>
+    <div className="flex w-full h-full min-h-screen lg:min-h-screen bg-neutral-900 text-white font-sans overflow-hidden" style={{ backgroundColor: '#171717' }}>
 
       {/* ÁREA CENTRAL: CHAT ACTIVO */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#171717] relative">
 
-        {/* Header del Chat */}
-        <header className="h-16 px-6 border-b border-white/5 flex items-center justify-between bg-neutral-900/50 backdrop-blur-md z-10">
-          <div className="flex items-center gap-3">
+        {/* Header del Chat - Mobile optimizado */}
+        <header className="h-14 lg:h-16 px-3 lg:px-6 border-b border-white/5 flex items-center justify-between bg-neutral-900/50 backdrop-blur-md z-10 shrink-0">
+          <div className="flex items-center gap-2 lg:gap-3">
+            {/* Botón volver - Solo en móvil */}
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="lg:hidden p-1.5 -ml-1 rounded-lg hover:bg-white/10 transition-colors text-neutral-400"
+            >
+              <ChevronLeft size={24} />
+            </button>
+
             <div className="relative">
               {agentAvatar ? (
-                <img src={agentAvatar} className="w-9 h-9 rounded-full object-cover" alt="Active" />
+                <img src={agentAvatar} className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover" alt="Active" />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs lg:text-sm font-bold">
                   {agentName[0]}
                 </div>
               )}
             </div>
             <div>
               <h2 className="font-bold text-white text-sm flex items-center gap-2">
-                {agentName}
-                <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-400 text-[10px] rounded font-medium border border-indigo-500/20">IA</span>
+                <span className="truncate max-w-[120px] lg:max-w-none">{agentName}</span>
+                <span className="hidden sm:inline px-1.5 py-0.5 bg-indigo-500/10 text-indigo-400 text-[10px] rounded font-medium border border-indigo-500/20">IA</span>
               </h2>
               <p className="text-xs text-green-400/80 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
@@ -898,10 +906,11 @@ export function DirectMessageChat({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 text-neutral-400 relative">
+          <div className="flex items-center gap-0.5 lg:gap-1 text-neutral-400 relative">
+            {/* Toggle panel - Solo en desktop */}
             <button
               onClick={() => setShowRightPanel(!showRightPanel)}
-              className={`p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer ${showRightPanel ? 'text-indigo-400 bg-indigo-500/10' : ''}`}
+              className={`hidden lg:block p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer ${showRightPanel ? 'text-indigo-400 bg-indigo-500/10' : ''}`}
               title="Ver memoria e info"
             >
               <Activity size={20} />
@@ -934,9 +943,9 @@ export function DirectMessageChat({
           />
         )}
 
-        {/* Area de Mensajes */}
-        <div ref={messagesContainerRef} className="flex-1 p-6 overflow-y-auto flex flex-col gap-6">
-          <div className="text-center text-xs text-neutral-600 my-4">Hoy</div>
+        {/* Area de Mensajes - Mobile optimizado */}
+        <div ref={messagesContainerRef} className="flex-1 p-3 lg:p-6 overflow-y-auto flex flex-col gap-4 lg:gap-6">
+          <div className="text-center text-xs text-neutral-600 my-2 lg:my-4">Hoy</div>
 
           {messages.map((msg) => (
             msg.type === "agent" ? (
@@ -1020,18 +1029,18 @@ export function DirectMessageChat({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
+        {/* Input Area - Mobile optimizado con espacio para nav inferior */}
         {!showVoiceRecorder && !showImageUploader && !showStickerGifPicker && (
-          <div className="p-4 pt-2 pb-6 md:pb-4">
-            <div className="max-w-4xl mx-auto bg-[#262626] border border-neutral-800 rounded-xl p-2 flex items-end gap-2 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/10 transition-all shadow-lg">
+          <div className="p-2 lg:p-4 pt-2 pb-20 lg:pb-4 shrink-0">
+            <div className="max-w-4xl mx-auto bg-[#262626] border border-neutral-800 rounded-xl p-1.5 lg:p-2 flex items-end gap-1 lg:gap-2 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/10 transition-all shadow-lg">
               <button
                 onClick={() => setShowImageUploader(true)}
                 className="p-2 text-neutral-400 hover:text-white transition-colors rounded-lg hover:bg-neutral-800 cursor-pointer"
               >
-                <Paperclip size={20}/>
+                <Paperclip size={18} className="lg:w-5 lg:h-5"/>
               </button>
               <textarea
-                placeholder={`Escribe un mensaje a ${agentName}...`}
+                placeholder={`Mensaje...`}
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => {
@@ -1041,13 +1050,13 @@ export function DirectMessageChat({
                   }
                 }}
                 rows={1}
-                className="flex-1 bg-transparent border-none focus:ring-0 text-white text-sm resize-none py-2.5 max-h-32 min-h-[44px] placeholder-neutral-500"
+                className="flex-1 bg-transparent border-none focus:ring-0 text-white text-sm resize-none py-2 lg:py-2.5 max-h-24 lg:max-h-32 min-h-[40px] lg:min-h-[44px] placeholder-neutral-500"
               />
               <button
                 onClick={() => setShowStickerGifPicker(true)}
-                className="p-2 text-neutral-400 hover:text-yellow-400 transition-colors rounded-lg hover:bg-neutral-800 cursor-pointer"
+                className="hidden sm:block p-2 text-neutral-400 hover:text-yellow-400 transition-colors rounded-lg hover:bg-neutral-800 cursor-pointer"
               >
-                <Smile size={20}/>
+                <Smile size={18} className="lg:w-5 lg:h-5"/>
               </button>
               <button
                 onClick={sendMessage}
@@ -1105,8 +1114,12 @@ export function DirectMessageChat({
         )}
       </div>
 
-      {/* PANEL DERECHO: INFO CONTEXTUAL */}
-      {showRightPanel && <AIPersonaPanel agentState={agentState} agentName={agentName} agentAvatar={agentAvatar} />}
+      {/* PANEL DERECHO: INFO CONTEXTUAL - Solo en desktop */}
+      {showRightPanel && (
+        <div className="hidden lg:block">
+          <AIPersonaPanel agentState={agentState} agentName={agentName} agentAvatar={agentAvatar} />
+        </div>
+      )}
 
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (

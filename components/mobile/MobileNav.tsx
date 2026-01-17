@@ -27,6 +27,7 @@ import {
   MessagesSquare,
   Users,
   User,
+  Compass,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,6 +51,12 @@ const navItemsConfig: NavItem[] = [
     labelKey: "groups",
     icon: MessagesSquare,
     matchPaths: ["/dashboard/grupos"],
+  },
+  {
+    href: "/explore",
+    labelKey: "explore",
+    icon: Compass,
+    matchPaths: ["/explore", "/friends"],
   },
   {
     href: "/community",

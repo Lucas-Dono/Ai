@@ -8,6 +8,7 @@ import {
 } from "@/lib/redis/group-ratelimit";
 import { groupMessageService } from "@/lib/groups/group-message.service";
 import { sendGroupMessageNotifications } from "@/lib/groups/group-notification.service";
+import { emitGroupMessage } from "@/lib/socket/server";
 
 /**
  * POST /api/groups/[id]/messages
@@ -160,7 +161,39 @@ export async function POST(
             image: true,
           },
         },
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            authorType: true,
+            user: { select: { name: true } },
+            agent: { select: { name: true } },
+          },
+        },
       },
+    });
+
+    // 8.5. Emit real-time event to group members
+    emitGroupMessage(groupId, {
+      id: userMessage.id,
+      groupId,
+      authorType: "user",
+      authorId: userId,
+      content: userMessage.content,
+      createdAt: userMessage.createdAt.toISOString(),
+      replyToId: userMessage.replyToId || undefined,
+      user: userMessage.user ? {
+        id: userMessage.user.id,
+        name: userMessage.user.name,
+        image: userMessage.user.image,
+      } : undefined,
+      replyTo: userMessage.replyTo ? {
+        id: userMessage.replyTo.id,
+        content: userMessage.replyTo.content,
+        authorType: userMessage.replyTo.authorType as 'user' | 'agent',
+        user: userMessage.replyTo.user ? { name: userMessage.replyTo.user.name } : undefined,
+        agent: userMessage.replyTo.agent ? { name: userMessage.replyTo.agent.name } : undefined,
+      } : undefined,
     });
 
     // 9. Actualizar estadísticas (en paralelo)

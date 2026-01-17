@@ -479,4 +479,158 @@ export const NotificationService = {
 
     return { count: result.count };
   },
+
+  // ============================================
+  // Notificaciones de Sistema Social
+  // ============================================
+
+  /**
+   * Notificar solicitud de amistad recibida
+   */
+  async notifyFriendRequest(
+    addresseeId: string,
+    requesterId: string,
+    requesterName: string | null,
+    requesterAvatar: string | null
+  ) {
+    await this.createNotification({
+      userId: addresseeId,
+      type: 'friend_request',
+      title: 'Nueva solicitud de amistad',
+      message: `${requesterName || 'Alguien'} quiere ser tu amigo`,
+      actionUrl: '/friends?tab=requests',
+      metadata: {
+        actorId: requesterId,
+        actorName: requesterName,
+        actorAvatar: requesterAvatar,
+        relatedType: 'friendship',
+      },
+    });
+  },
+
+  /**
+   * Notificar solicitud de amistad aceptada
+   */
+  async notifyFriendRequestAccepted(
+    requesterId: string,
+    addresseeId: string,
+    addresseeName: string | null,
+    addresseeAvatar: string | null
+  ) {
+    await this.createNotification({
+      userId: requesterId,
+      type: 'friend_request_accepted',
+      title: 'Solicitud aceptada',
+      message: `${addresseeName || 'Alguien'} aceptó tu solicitud de amistad`,
+      actionUrl: `/profile/${addresseeId}`,
+      metadata: {
+        actorId: addresseeId,
+        actorName: addresseeName,
+        actorAvatar: addresseeAvatar,
+        relatedType: 'friendship',
+      },
+    });
+  },
+
+  /**
+   * Notificar mención en post o comentario
+   */
+  async notifyMention(
+    mentionedId: string,
+    mentionerId: string,
+    mentionerName: string | null,
+    mentionerAvatar: string | null,
+    contextType: 'post' | 'comment',
+    contextId: string,
+    contextTitle: string,
+    preview: string
+  ) {
+    const typeLabel = contextType === 'post' ? 'un post' : 'un comentario';
+
+    await this.createNotification({
+      userId: mentionedId,
+      type: 'mention',
+      title: `Te mencionaron en ${typeLabel}`,
+      message: `${mentionerName || 'Alguien'}: "${preview.substring(0, 100)}${preview.length > 100 ? '...' : ''}"`,
+      actionUrl: contextType === 'post'
+        ? `/community/post/${contextId}`
+        : `/community/post/${contextId}#comment-${contextId}`,
+      metadata: {
+        actorId: mentionerId,
+        actorName: mentionerName,
+        actorAvatar: mentionerAvatar,
+        relatedId: contextId,
+        relatedType: contextType,
+      },
+    });
+  },
+
+  /**
+   * Notificar múltiples menciones
+   */
+  async notifyMentions(
+    mentionedIds: string[],
+    mentionerId: string,
+    mentionerName: string | null,
+    mentionerAvatar: string | null,
+    contextType: 'post' | 'comment',
+    contextId: string,
+    preview: string
+  ) {
+    if (mentionedIds.length === 0) return { count: 0 };
+
+    // Filtrar al autor si se menciona a sí mismo
+    const filteredIds = mentionedIds.filter(id => id !== mentionerId);
+    if (filteredIds.length === 0) return { count: 0 };
+
+    const typeLabel = contextType === 'post' ? 'un post' : 'un comentario';
+
+    const notifications = filteredIds.map(userId => ({
+      userId,
+      type: 'mention',
+      title: `Te mencionaron en ${typeLabel}`,
+      message: `${mentionerName || 'Alguien'}: "${preview.substring(0, 100)}${preview.length > 100 ? '...' : ''}"`,
+      actionUrl: contextType === 'post'
+        ? `/community/post/${contextId}`
+        : `/community/post/${contextId}#comment-${contextId}`,
+      metadata: {
+        actorId: mentionerId,
+        actorName: mentionerName,
+        actorAvatar: mentionerAvatar,
+        relatedId: contextId,
+        relatedType: contextType,
+      },
+    }));
+
+    const result = await this.createBulkNotifications(notifications);
+    return { count: result.count };
+  },
+
+  /**
+   * Notificar invitación a grupo
+   */
+  async notifyGroupInvitation(
+    inviteeId: string,
+    inviterId: string,
+    inviterName: string | null,
+    inviterAvatar: string | null,
+    groupId: string,
+    groupName: string,
+    inviteCode: string
+  ) {
+    await this.createNotification({
+      userId: inviteeId,
+      type: 'group_invitation',
+      title: 'Invitación a grupo',
+      message: `${inviterName || 'Alguien'} te invitó al grupo "${groupName}"`,
+      actionUrl: `/dashboard/grupos/${groupId}?invite=${inviteCode}`,
+      metadata: {
+        actorId: inviterId,
+        actorName: inviterName,
+        actorAvatar: inviterAvatar,
+        relatedId: groupId,
+        relatedType: 'group',
+      },
+    });
+  },
 };

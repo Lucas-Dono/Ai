@@ -48,6 +48,11 @@ export interface ClientToServerEvents {
   // Agent events
   "agent:subscribe": (data: { agentId: string; userId: string }) => void;
   "agent:unsubscribe": (data: { agentId: string; userId: string }) => void;
+
+  // Group events
+  "group:join": (data: { groupId: string; userId: string }) => void;
+  "group:leave": (data: { groupId: string; userId: string }) => void;
+  "group:typing": (data: { groupId: string; userId: string; userName: string; isTyping: boolean }) => void;
 }
 
 // Server -> Client Events
@@ -84,6 +89,14 @@ export interface ServerToClientEvents {
 
   // Relation/Emotional state updates
   "relation:updated": (data: RelationUpdateEvent) => void;
+
+  // Group events
+  "group:message": (data: GroupMessageEvent) => void;
+  "group:typing": (data: GroupTypingEvent) => void;
+  "group:member:joined": (data: GroupMemberEvent) => void;
+  "group:member:left": (data: { groupId: string; memberId: string; memberType: 'user' | 'agent' }) => void;
+  "group:ai:responding": (data: { groupId: string; agentId: string; agentName: string }) => void;
+  "group:ai:stopped": (data: { groupId: string; agentId: string }) => void;
 }
 
 // Event payload interfaces
@@ -218,11 +231,65 @@ export interface Reaction {
   reacted: boolean;
 }
 
+// Group event interfaces
+export interface GroupMessageEvent {
+  id: string;
+  groupId: string;
+  authorType: 'user' | 'agent';
+  authorId: string;
+  content: string;
+  createdAt: string;
+  replyToId?: string;
+  user?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+  agent?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+  replyTo?: {
+    id: string;
+    content: string;
+    authorType: 'user' | 'agent';
+    user?: { name: string | null };
+    agent?: { name: string };
+  };
+}
+
+export interface GroupTypingEvent {
+  groupId: string;
+  userId: string;
+  userName: string;
+  isTyping: boolean;
+  timestamp: number;
+}
+
+export interface GroupMemberEvent {
+  groupId: string;
+  memberId: string;
+  memberType: 'user' | 'agent';
+  role: string;
+  user?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+  agent?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+}
+
 // Room naming conventions
 export const getRoomName = {
   agent: (agentId: string) => `agent:${agentId}`,
   user: (userId: string) => `user:${userId}`,
   chat: (agentId: string, userId: string) => `chat:${agentId}:${userId}`,
+  group: (groupId: string) => `group:${groupId}`,
   global: () => "global",
 };
 

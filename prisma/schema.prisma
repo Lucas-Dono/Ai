@@ -122,6 +122,17 @@ model User {
   userSessions         UserSession[]         @relation("UserSessions")
   userAnalyticsSummary UserAnalyticsSummary? @relation("UserAnalyticsSummary")
 
+  // Social System - Friendships
+  friendshipsInitiated Friendship[] @relation("FriendshipRequester")
+  friendshipsReceived  Friendship[] @relation("FriendshipAddressee")
+
+  // Social System - Follows
+  following Follow[] @relation("UserFollowing")
+  followers Follow[] @relation("UserFollowers")
+
+  // Mention Privacy Setting
+  mentionPrivacy String @default("anyone") // "anyone" | "friends" | "no_one"
+
   @@index([email])
   @@index([mercadopagoCustomerId])
   @@index([apiKey])
@@ -1779,6 +1790,9 @@ model CommunityPost {
   tags        Json    @default("[]") // Array de tags
   communityId String? // Null = post global
 
+  // Menciones de usuarios
+  mentions Json @default("[]") // Array de userIds mencionados
+
   // Estado
   isPinned   Boolean @default(false)
   isLocked   Boolean @default(false) // No más comentarios
@@ -1849,6 +1863,9 @@ model CommunityComment {
 
   // Multimedia
   images Json @default("[]") // URLs de imágenes
+
+  // Menciones de usuarios
+  mentions Json @default("[]") // Array de userIds mencionados
 
   // Estado
   isEdited  Boolean @default(false)
@@ -2225,6 +2242,9 @@ model Follow {
   followingId String
 
   createdAt DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
   @@index([followerId])
@@ -4703,4 +4723,35 @@ model TalentPoolEntry {
 
   @@index([area])
   @@index([createdAt])
+}
+
+// ============================================
+// Social System - Friendships (Amigos cercanos)
+// ============================================
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String           // Usuario que envía la solicitud
+  addresseeId String           // Usuario que recibe la solicitud
+  status      FriendshipStatus @default(PENDING)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  respondedAt DateTime? // Fecha de respuesta (aceptado/rechazado)
+
+  requester User @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+  @@index([requesterId, status])
+  @@index([addresseeId, status])
 }
