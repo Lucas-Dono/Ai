@@ -50,7 +50,7 @@ export async function GET(
     // Obtener todos los triggers ordenados por fecha
     const allTriggers = await prisma.behaviorTriggerLog.findMany({
       where: {
-        message: { agentId },
+        Message: { agentId },
         behaviorType: {
           in: behaviorProfiles.map((p) => p.behaviorType),
         },

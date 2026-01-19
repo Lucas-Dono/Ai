@@ -6,21 +6,20 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 
 // GET /api/groups/[id]/seeds - Semillas activas
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth.api.getSession({ headers: req.headers });
     if (!session?.user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const groupId = params.id;
+    const { id: groupId } = await params;
 
     // Verificar que el usuario es miembro del grupo
     const membership = await prisma.groupMember.findFirst({
