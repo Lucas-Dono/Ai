@@ -9,105 +9,96 @@ export const SavedPostService = {
    * Guardar un post
    */
   async savePost(userId: string, postId: string, collectionName?: string): Promise<any> {
-    // TODO: SavedPost model removed - need to implement alternative
-    throw new Error('SavedPost functionality disabled - model removed');
+    // Verificar que el post existe
+    const post = await prisma.communityPost.findUnique({
+      where: { id: postId },
+      select: { id: true },
+    });
 
-    // // Verificar que el post existe
-    // const post = await prisma.communityPost.findUnique({
-    //   where: { id: postId },
-    //   select: { id: true },
-    // });
+    if (!post) {
+      throw new Error('Post no encontrado');
+    }
 
-    // if (!post) {
-    //   throw new Error('Post no encontrado');
-    // }
+    // Crear o actualizar saved post
+    const savedPost = await prisma.savedPost.upsert({
+      where: {
+        userId_postId: {
+          userId,
+          postId,
+        },
+      },
+      update: {
+        collectionName,
+      },
+      create: {
+        userId,
+        postId,
+        collectionName,
+      },
+      include: {
+        Post: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            type: true,
+            score: true,
+            commentCount: true,
+            createdAt: true,
+            User: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            Community: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                icon: true,
+                primaryColor: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    // // Crear o actualizar saved post
-    // const savedPost = await prisma.savedPost.upsert({
-    //   where: {
-    //     userId_postId: {
-    //       userId,
-    //       postId,
-    //     },
-    //   },
-    //   update: {
-    //     collectionName,
-    //   },
-    //   create: {
-    //     userId,
-    //     postId,
-    //     collectionName,
-    //   },
-    //   include: {
-    //     post: {
-    //       select: {
-    //         id: true,
-    //         title: true,
-    //         content: true,
-    //         type: true,
-    //         score: true,
-    //         commentCount: true,
-    //         createdAt: true,
-    //         author: {
-    //           select: {
-    //             id: true,
-    //             name: true,
-    //             image: true,
-    //           },
-    //         },
-    //         community: {
-    //           select: {
-    //             id: true,
-    //             name: true,
-    //             slug: true,
-    //             icon: true,
-    //             primaryColor: true,
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // });
-
-    // return savedPost;
+    return savedPost;
   },
 
   /**
    * Remover un post guardado
    */
   async unsavePost(userId: string, postId: string) {
-    // TODO: SavedPost model removed - need to implement alternative
-    throw new Error('SavedPost functionality disabled - model removed');
+    await prisma.savedPost.delete({
+      where: {
+        userId_postId: {
+          userId,
+          postId,
+        },
+      },
+    });
 
-    // await prisma.savedPost.delete({
-    //   where: {
-    //     userId_postId: {
-    //       userId,
-    //       postId,
-    //     },
-    //   },
-    // });
-
-    // return { success: true };
+    return { success: true };
   },
 
   /**
    * Verificar si un post está guardado
    */
   async isPostSaved(userId: string, postId: string): Promise<boolean> {
-    // TODO: SavedPost model removed - need to implement alternative
-    return false;
+    const savedPost = await prisma.savedPost.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId,
+        },
+      },
+    });
 
-    // const savedPost = await prisma.savedPost.findUnique({
-    //   where: {
-    //     userId_postId: {
-    //       userId,
-    //       postId,
-    //     },
-    //   },
-    // });
-
-    // return !!savedPost;
+    return !!savedPost;
   },
 
   /**
@@ -118,127 +109,120 @@ export const SavedPostService = {
     page?: number;
     limit?: number;
   }) {
-    // TODO: SavedPost model removed - need to implement alternative
-    return [];
+    // Limitar paginación para prevenir abuso
+    const page = Math.max(1, Math.min(filters?.page || 1, 1000));
+    const limit = Math.max(1, Math.min(filters?.limit || 25, 100));
+    const skip = (page - 1) * limit;
 
-    // // Limitar paginación para prevenir abuso
-    // const page = Math.max(1, Math.min(filters?.page || 1, 1000));
-    // const limit = Math.max(1, Math.min(filters?.limit || 25, 100));
-    // const skip = (page - 1) * limit;
+    const where: any = { userId };
 
-    // const where: any = { userId };
+    if (filters?.collectionName) {
+      where.collectionName = filters.collectionName;
+    }
 
-    // if (filters?.collectionName) {
-    //   where.collectionName = filters.collectionName;
-    // }
+    const savedPosts = await prisma.savedPost.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip,
+      take: limit,
+      include: {
+        Post: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            type: true,
+            score: true,
+            commentCount: true,
+            images: true,
+            tags: true,
+            createdAt: true,
+            status: true,
+            User: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            Community: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                icon: true,
+                primaryColor: true,
+              },
+            },
+            _count: {
+              select: {
+                CommunityComment: true,
+                PostVote: true,
+                PostAward: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    // const savedPosts = await prisma.savedPost.findMany({
-    //   where,
-    //   orderBy: {
-    //     savedAt: 'desc',
-    //   },
-    //   skip,
-    //   take: limit,
-    //   include: {
-    //     post: {
-    //       select: {
-    //         id: true,
-    //         title: true,
-    //         content: true,
-    //         type: true,
-    //         score: true,
-    //         commentCount: true,
-    //         images: true,
-    //         tags: true,
-    //         createdAt: true,
-    //         status: true,
-    //         author: {
-    //           select: {
-    //             id: true,
-    //             name: true,
-    //             image: true,
-    //           },
-    //         },
-    //         community: {
-    //           select: {
-    //             id: true,
-    //             name: true,
-    //             slug: true,
-    //             icon: true,
-    //             primaryColor: true,
-    //           },
-    //         },
-    //         _count: {
-    //           select: {
-    //             comments: true,
-    //             votes: true,
-    //             awards: true,
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // });
+    // Filtrar posts removidos/baneados (solo mostrar published)
+    const filteredPosts = savedPosts.filter(
+      (sp: any) => sp.Post && sp.Post.status === 'published'
+    );
 
-    // // Filtrar posts removidos/baneados (solo mostrar published)
-    // const filteredPosts = savedPosts.filter(
-    //   (sp: any) => sp.post && sp.post.status === 'published'
-    // );
-
-    // return filteredPosts;
+    return filteredPosts;
   },
 
   /**
    * Obtener colecciones de un usuario
    */
   async getCollections(userId: string) {
-    // TODO: SavedPost model removed - need to implement alternative
-    return [];
+    const collections = await prisma.savedPost.groupBy({
+      by: ['collectionName'],
+      where: {
+        userId,
+        collectionName: {
+          not: null,
+        },
+      },
+      _count: true,
+    });
 
-    // const collections = await prisma.savedPost.groupBy({
-    //   by: ['collectionName'],
-    //   where: {
-    //     userId,
-    //     collectionName: {
-    //       not: null,
-    //     },
-    //   },
-    //   _count: true,
-    // });
-
-    // return collections.map((c: any) => ({
-    //   name: c.collectionName,
-    //   count: c._count,
-    // }));
+    return collections.map((c: any) => ({
+      name: c.collectionName,
+      count: c._count,
+    }));
   },
 
   /**
    * Obtener estadísticas de saved posts
    */
   async getStats(userId: string) {
-    // TODO: El modelo SavedPost no existe en el schema actual
-    // const [total, withCollection] = await Promise.all([
-    //   prisma.savedPost.count({
-    //     where: { userId },
-    //   }),
-    //   prisma.savedPost.count({
-    //     where: {
-    //       userId,
-    //       collectionName: {
-    //         not: null,
-    //       },
-    //     },
-    //   }),
-    // ]);
+    const [total, withCollection] = await Promise.all([
+      prisma.savedPost.count({
+        where: { userId },
+      }),
+      prisma.savedPost.count({
+        where: {
+          userId,
+          collectionName: {
+            not: null,
+          },
+        },
+      }),
+    ]);
 
-    // const collections = await this.getCollections(userId);
+    const collections = await this.getCollections(userId);
 
     return {
-      total: 0,
-      withCollection: 0,
-      withoutCollection: 0,
-      collectionsCount: 0,
-      collections: [],
+      total,
+      withCollection,
+      withoutCollection: total - withCollection,
+      collectionsCount: collections.length,
+      collections,
     };
   },
 };
