@@ -238,6 +238,8 @@ export interface GroupMessageEvent {
   authorType: 'user' | 'agent';
   authorId: string;
   content: string;
+  contentType?: string;
+  mediaUrl?: string;
   createdAt: string;
   replyToId?: string;
   user?: {

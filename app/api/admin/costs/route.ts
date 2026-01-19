@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from "@/lib/auth-server";
+import { withAdminAuth } from '@/lib/admin/middleware';
 import {
   getCostSummary,
   getDailyCosts,
@@ -13,29 +13,8 @@ import {
 } from '@/lib/cost-tracking/tracker';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+export const GET = withAdminAuth(async (request, { admin }) => {
   try {
-    const user = await getAuthenticatedUser(request);
-
-    if (!user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin (you can add admin field to User model)
-    const dbUser = await prisma.user.findUnique({
-      where: { email: user.email },
-      select: { id: true, email: true },
-    });
-
-    if (!dbUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // TODO: Add admin check here
-    // For now, allow any authenticated user to view costs
-    // if (!user.isAdmin) {
-    //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    // }
 
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId') || undefined;
@@ -104,4 +83,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

@@ -33,6 +33,239 @@ export interface VeniceRequestBody {
   stream?: boolean;
 }
 
+/**
+ * Tipos de errores que puede devolver Venice API
+ */
+enum VeniceErrorType {
+  SERVER_OVERLOAD = "SERVER_OVERLOAD",     // Servidor saturado, esperar y reintentar
+  QUOTA_ERROR = "QUOTA_ERROR",             // Error de rate limit, rotar key
+  INSUFFICIENT_CREDITS = "INSUFFICIENT_CREDITS", // Sin créditos, fallar definitivamente
+  SERVER_ERROR = "SERVER_ERROR",           // Error 500, reintentar
+  UNKNOWN = "UNKNOWN"                      // Otros errores, fallar
+}
+
+/**
+ * Clasifica el tipo de error basándose en el código de estado y mensaje
+ */
+function classifyVeniceError(statusCode: number, errorText: string): VeniceErrorType {
+  const lowerError = errorText.toLowerCase();
+
+  // Error 500 - Problema del servidor
+  if (statusCode === 500 || statusCode === 502 || statusCode === 503) {
+    return VeniceErrorType.SERVER_ERROR;
+  }
+
+  // Error 429 - Puede ser saturación o quota
+  if (statusCode === 429) {
+    // Mensajes que indican saturación temporal del servidor
+    if (
+      lowerError.includes('overload') ||
+      lowerError.includes('saturado') ||
+      lowerError.includes('busy') ||
+      lowerError.includes('too many requests') ||
+      lowerError.includes('try again later') ||
+      lowerError.includes('intente más tarde') ||
+      lowerError.includes('please retry')
+    ) {
+      return VeniceErrorType.SERVER_OVERLOAD;
+    }
+
+    // Mensajes que indican falta de créditos
+    if (
+      lowerError.includes('insufficient credits') ||
+      lowerError.includes('créditos insuficientes') ||
+      lowerError.includes('no credits') ||
+      lowerError.includes('balance')
+    ) {
+      return VeniceErrorType.INSUFFICIENT_CREDITS;
+    }
+
+    // Otros mensajes de quota/rate limit (asumir que es quota de API key)
+    if (
+      lowerError.includes('quota') ||
+      lowerError.includes('rate limit') ||
+      lowerError.includes('rate-limited')
+    ) {
+      return VeniceErrorType.QUOTA_ERROR;
+    }
+
+    // Si es 429 pero no podemos clasificarlo, asumir sobrecarga
+    return VeniceErrorType.SERVER_OVERLOAD;
+  }
+
+  // Error 403 - Usualmente es problema de autenticación o quota
+  if (statusCode === 403) {
+    if (lowerError.includes('insufficient credits') || lowerError.includes('créditos insuficientes')) {
+      return VeniceErrorType.INSUFFICIENT_CREDITS;
+    }
+    return VeniceErrorType.QUOTA_ERROR;
+  }
+
+  return VeniceErrorType.UNKNOWN;
+}
+
+/**
+ * Espera un número específico de milisegundos
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Estados del Circuit Breaker
+ */
+enum CircuitState {
+  CLOSED = "CLOSED",       // Funcionando normalmente
+  OPEN = "OPEN",           // Servidor saturado, pausado
+  HALF_OPEN = "HALF_OPEN"  // Probando si el servidor se recuperó
+}
+
+/**
+ * Circuit Breaker global para coordinar pausas entre todos los usuarios
+ */
+class VeniceCircuitBreaker {
+  private state: CircuitState = CircuitState.CLOSED;
+  private openedAt: number = 0;
+  private failureCount: number = 0;
+  private readonly cooldownMs: number = 30000; // 30 segundos
+  private readonly maxFailures: number = 15;
+  private lastSuccessAt: number = Date.now();
+  private waitingPromises: Array<() => void> = [];
+
+  /**
+   * Verifica si el circuito permite hacer una llamada
+   */
+  async canAttempt(): Promise<boolean> {
+    const now = Date.now();
+
+    switch (this.state) {
+      case CircuitState.CLOSED:
+        // Funcionando normalmente
+        return true;
+
+      case CircuitState.OPEN:
+        // Verificar si ya pasó el tiempo de cooldown
+        if (now - this.openedAt >= this.cooldownMs) {
+          console.log('[Venice Circuit Breaker] ⚡ Cambiando a HALF_OPEN, probando conexión...');
+          this.state = CircuitState.HALF_OPEN;
+          return true;
+        }
+
+        // Aún en cooldown, esperar
+        const remainingMs = this.cooldownMs - (now - this.openedAt);
+        console.log(`[Venice Circuit Breaker] 🔴 Circuito ABIERTO. Esperando ${Math.ceil(remainingMs / 1000)}s antes de reintentar...`);
+
+        // Esperar hasta que termine el cooldown
+        await sleep(remainingMs);
+        return this.canAttempt(); // Recursivamente verificar de nuevo
+
+      case CircuitState.HALF_OPEN:
+        // Solo permitir un intento a la vez en modo HALF_OPEN
+        // Otros usuarios esperan a ver el resultado
+        if (this.waitingPromises.length > 0) {
+          console.log('[Venice Circuit Breaker] 🟡 Esperando resultado del intento de prueba...');
+          await new Promise<void>(resolve => {
+            this.waitingPromises.push(resolve);
+          });
+          // Después de esperar, verificar recursivamente el nuevo estado
+          return this.canAttempt();
+        }
+        return true;
+    }
+  }
+
+  /**
+   * Registra un intento exitoso
+   */
+  recordSuccess(): void {
+    const wasOpen = this.state !== CircuitState.CLOSED;
+
+    this.state = CircuitState.CLOSED;
+    this.failureCount = 0;
+    this.lastSuccessAt = Date.now();
+
+    if (wasOpen) {
+      console.log('[Venice Circuit Breaker] ✅ Circuito CERRADO. Servidor funcionando normalmente.');
+
+      // Notificar a todos los usuarios esperando
+      this.waitingPromises.forEach(resolve => resolve());
+      this.waitingPromises = [];
+    }
+  }
+
+  /**
+   * Registra un fallo por saturación del servidor
+   */
+  recordServerOverload(): void {
+    this.failureCount++;
+
+    console.log(`[Venice Circuit Breaker] ⚠️  Saturación detectada (${this.failureCount}/${this.maxFailures})`);
+
+    if (this.failureCount >= this.maxFailures) {
+      console.log('[Venice Circuit Breaker] 🛑 Máximo de reintentos alcanzado. Deteniendo intentos.');
+      this.state = CircuitState.OPEN;
+      this.openedAt = Date.now();
+
+      // Rechazar todos los usuarios esperando en HALF_OPEN
+      this.waitingPromises.forEach(resolve => resolve());
+      this.waitingPromises = [];
+
+      throw new Error(`Servidor de Venice saturado después de ${this.maxFailures} intentos (${Math.ceil(this.failureCount * this.cooldownMs / 60000)} minutos). Por favor, intente más tarde.`);
+    }
+
+    // Si estamos en HALF_OPEN y falló, volver a OPEN
+    if (this.state === CircuitState.HALF_OPEN) {
+      console.log('[Venice Circuit Breaker] 🔴 Intento de prueba falló. Volviendo a OPEN.');
+      this.state = CircuitState.OPEN;
+      this.openedAt = Date.now();
+
+      // Rechazar usuarios esperando
+      this.waitingPromises.forEach(resolve => resolve());
+      this.waitingPromises = [];
+    } else if (this.state === CircuitState.CLOSED) {
+      // Primer fallo, abrir el circuito
+      console.log('[Venice Circuit Breaker] 🔴 Abriendo circuito. Entrando en modo de pausa.');
+      this.state = CircuitState.OPEN;
+      this.openedAt = Date.now();
+    }
+  }
+
+  /**
+   * Obtiene el estado actual del circuito
+   */
+  getState(): CircuitState {
+    return this.state;
+  }
+
+  /**
+   * Obtiene estadísticas del circuito
+   */
+  getStats(): { state: string; failureCount: number; maxFailures: number; cooldownSeconds: number } {
+    return {
+      state: this.state,
+      failureCount: this.failureCount,
+      maxFailures: this.maxFailures,
+      cooldownSeconds: this.cooldownMs / 1000
+    };
+  }
+
+  /**
+   * Resetea el circuito (útil para testing)
+   */
+  reset(): void {
+    this.state = CircuitState.CLOSED;
+    this.failureCount = 0;
+    this.openedAt = 0;
+    this.waitingPromises = [];
+    console.log('[Venice Circuit Breaker] 🔄 Circuito reseteado manualmente.');
+  }
+}
+
+/**
+ * Instancia global del circuit breaker
+ */
+const globalCircuitBreaker = new VeniceCircuitBreaker();
+
 export class VeniceClient {
   private apiKeys: string[];
   private currentKeyIndex: number = 0;
@@ -50,7 +283,7 @@ export class VeniceClient {
     }
 
     this.baseURL = config.baseURL || "https://api.venice.ai/api/v1";
-    this.defaultModel = config.defaultModel || "llama-3.3-70b";
+    this.defaultModel = config.defaultModel || "venice-uncensored";
 
     console.log('[Venice] 🏝️  Inicializando cliente privado...');
     console.log('[Venice] API Keys disponibles:', this.apiKeys.length);
@@ -83,93 +316,162 @@ export class VeniceClient {
   }
 
   /**
-   * Genera respuesta del LLM con rotación automática de API keys
+   * Método privado para ejecutar llamadas a Venice API con reintentos inteligentes y circuit breaker
    */
-  async generate(request: LLMRequest): Promise<LLMResponse> {
-    const startTime = Date.now();
+  private async executeWithRetry(body: VeniceRequestBody): Promise<any> {
     let lastError: Error | null = null;
-    const maxRetries = this.apiKeys.length;
+    const maxKeyRetries = this.apiKeys.length;
+    const maxServerErrorRetries = 3;
+
+    let serverErrorAttempts = 0;
 
     // Intentar con cada API key disponible
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const messages: VeniceMessage[] = [
-          {
-            role: "user",
-            content: request.prompt,
-          },
-        ];
+    for (let keyAttempt = 0; keyAttempt < maxKeyRetries; keyAttempt++) {
+      // Resetear contadores al cambiar de key
+      serverErrorAttempts = 0;
 
-        const body: VeniceRequestBody = {
-          model: request.model || this.defaultModel,
-          messages,
-          temperature: request.temperature ?? 0.8,
-          max_tokens: request.maxTokens ?? 1000,
-          top_p: 0.9,
-          stop: request.stopSequences,
-        };
-
-        const currentKey = this.getCurrentApiKey();
-        console.log(`[Venice] 🚀 Sending request to ${body.model} with API key #${this.currentKeyIndex + 1}...`);
-
-        const response = await fetch(`${this.baseURL}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentKey}`,
-          },
-          body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`[Venice] ❌ Error ${response.status}:`, errorText);
-
-          // Detectar errores de cuota (429, 403, o mensajes de quota/rate limit)
-          const isQuotaError = response.status === 429 ||
-                               response.status === 403 ||
-                               errorText.toLowerCase().includes('quota') ||
-                               errorText.toLowerCase().includes('rate limit') ||
-                               errorText.toLowerCase().includes('rate-limited') ||
-                               errorText.toLowerCase().includes('insufficient credits');
-
-          if (isQuotaError && this.rotateApiKey()) {
-            console.log('[Venice] 💳 Error de cuota detectado, intentando con siguiente API key...');
-            lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
-            continue; // Reintentar con siguiente key
+      // Bucle de reintentos para errores temporales
+      while (true) {
+        try {
+          // Verificar el circuit breaker antes de intentar
+          const canProceed = await globalCircuitBreaker.canAttempt();
+          if (!canProceed) {
+            throw new Error('Circuit breaker rechazó el intento');
           }
 
-          throw new Error(`Venice API error: ${response.status} - ${errorText}`);
+          const currentKey = this.getCurrentApiKey();
+          console.log(`[Venice] 🚀 Sending request to ${body.model} with API key #${this.currentKeyIndex + 1}...`);
+
+          const response = await fetch(`${this.baseURL}/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${currentKey}`,
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            const errorType = classifyVeniceError(response.status, errorText);
+
+            console.error(`[Venice] ❌ Error ${response.status} (${errorType}):`, errorText);
+
+            // Manejar según el tipo de error
+            switch (errorType) {
+              case VeniceErrorType.SERVER_OVERLOAD:
+                // Registrar en el circuit breaker (maneja pausas globalmente)
+                globalCircuitBreaker.recordServerOverload();
+                // Continuar para reintentar (el circuit breaker controlará las pausas)
+                continue;
+
+              case VeniceErrorType.SERVER_ERROR:
+                serverErrorAttempts++;
+                if (serverErrorAttempts <= maxServerErrorRetries) {
+                  const backoffMs = Math.pow(2, serverErrorAttempts - 1) * 1000; // 1s, 2s, 4s
+                  console.log(`[Venice] 🔄 Error del servidor. Reintentando en ${backoffMs/1000}s (${serverErrorAttempts}/${maxServerErrorRetries})...`);
+                  await sleep(backoffMs);
+                  continue; // Reintentar con la misma key
+                } else {
+                  console.log('[Venice] ⚠️  Máximo de reintentos por error del servidor alcanzado. Intentando con siguiente API key...');
+                  lastError = new Error(`Server error after ${maxServerErrorRetries} retries`);
+                  break; // Pasar a la siguiente key
+                }
+
+              case VeniceErrorType.QUOTA_ERROR:
+                if (this.rotateApiKey()) {
+                  console.log('[Venice] 💳 Error de rate limit detectado, intentando con siguiente API key...');
+                  lastError = new Error(`Rate limit exceeded on key #${this.currentKeyIndex}`);
+                  break; // Pasar a la siguiente key
+                } else {
+                  throw new Error("Todas las API keys han alcanzado su rate limit. Por favor, espere un momento antes de reintentar.");
+                }
+
+              case VeniceErrorType.INSUFFICIENT_CREDITS:
+                console.error('[Venice] 💰 Créditos insuficientes detectados.');
+                throw new Error("Créditos insuficientes en Venice AI. Por favor, agregue más créditos a su cuenta.");
+
+              case VeniceErrorType.UNKNOWN:
+              default:
+                throw new Error(`Venice API error: ${response.status} - ${errorText}`);
+            }
+          } else {
+            // Respuesta exitosa - registrar en el circuit breaker
+            const data = await response.json();
+            globalCircuitBreaker.recordSuccess();
+            return data;
+          }
+        } catch (error) {
+          // Si es un error de fetch (network) o parsing, lanzar inmediatamente
+          if (error instanceof TypeError || (error as any).name === 'SyntaxError') {
+            console.error("[Venice] ❌ Network or parsing error:", error);
+            throw error;
+          }
+
+          // Si es un error que lanzamos nosotros, propagar
+          if (error instanceof Error &&
+              (error.message.includes('Créditos insuficientes') ||
+               error.message.includes('Venice API error') ||
+               error.message.includes('rate limit') ||
+               error.message.includes('Servidor de Venice saturado'))) {
+            throw error;
+          }
+
+          lastError = error as Error;
+          break; // Pasar a la siguiente key
         }
 
-        const data = await response.json();
+        // Salir del bucle while si rompimos el switch
+        break;
+      }
 
-        const elapsedMs = Date.now() - startTime;
-        console.log(`[Venice] ✅ Response received in ${elapsedMs}ms`);
-
-        return {
-          text: data.choices[0]?.message?.content || "",
-          model: data.model,
-          usage: {
-            promptTokens: data.usage?.prompt_tokens || 0,
-            completionTokens: data.usage?.completion_tokens || 0,
-            totalTokens: data.usage?.total_tokens || 0,
-          },
-        };
-      } catch (error) {
-        lastError = error as Error;
-
-        // Si no es error de cuota, lanzar inmediatamente
-        if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
-          console.error("[Venice] ❌ Generation error:", error);
-          throw error;
-        }
+      // Si llegamos aquí y no hay lastError, algo salió mal
+      if (!lastError) {
+        lastError = new Error('Unknown error occurred');
       }
     }
 
     // Si llegamos aquí, todas las keys fallaron
-    console.error('[Venice] ❌ Todas las API keys agotaron su cuota');
-    throw new Error("Todas las API keys de Venice han agotado su cuota. Por favor, agregue más créditos o keys.");
+    console.error('[Venice] ❌ Todas las API keys fallaron después de múltiples reintentos');
+    throw new Error("Todas las API keys de Venice han fallado. Por favor, verifique su cuenta o intente más tarde.");
+  }
+
+  /**
+   * Genera respuesta del LLM con manejo inteligente de errores y reintentos
+   */
+  async generate(request: LLMRequest): Promise<LLMResponse> {
+    const startTime = Date.now();
+
+    const messages: VeniceMessage[] = [
+      {
+        role: "user",
+        content: request.prompt,
+      },
+    ];
+
+    const body: VeniceRequestBody = {
+      model: request.model || this.defaultModel,
+      messages,
+      temperature: request.temperature ?? 0.8,
+      max_tokens: request.maxTokens ?? 1000,
+      top_p: 0.9,
+      stop: request.stopSequences,
+    };
+
+    const data = await this.executeWithRetry(body);
+
+    const elapsedMs = Date.now() - startTime;
+    console.log(`[Venice] ✅ Response received in ${elapsedMs}ms`);
+
+    return {
+      text: data.choices[0]?.message?.content || "",
+      model: data.model,
+      usage: {
+        promptTokens: data.usage?.prompt_tokens || 0,
+        completionTokens: data.usage?.completion_tokens || 0,
+        totalTokens: data.usage?.total_tokens || 0,
+      },
+    };
   }
 
   /**
@@ -184,85 +486,32 @@ export class VeniceClient {
   }): Promise<string> {
     const { systemPrompt, messages, temperature, maxTokens, model } = options;
 
-    let lastError: Error | null = null;
-    const maxRetries = this.apiKeys.length;
+    const veniceMessages: VeniceMessage[] = [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      ...messages.map(m => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      })),
+    ];
 
-    // Intentar con cada API key disponible
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const veniceMessages: VeniceMessage[] = [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          ...messages.map(m => ({
-            role: m.role as "user" | "assistant",
-            content: m.content,
-          })),
-        ];
+    const body: VeniceRequestBody = {
+      model: model || this.defaultModel,
+      messages: veniceMessages,
+      temperature: temperature ?? 0.9,
+      max_tokens: maxTokens ?? 1000,
+      top_p: 0.9,
+    };
 
-        const body: VeniceRequestBody = {
-          model: model || this.defaultModel,
-          messages: veniceMessages,
-          temperature: temperature ?? 0.9,
-          max_tokens: maxTokens ?? 1000,
-          top_p: 0.9,
-        };
+    const data = await this.executeWithRetry(body);
 
-        const currentKey = this.getCurrentApiKey();
-        console.log(`[Venice] 🚀 Generating with ${messages.length} messages using API key #${this.currentKeyIndex + 1}...`);
-
-        const response = await fetch(`${this.baseURL}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentKey}`,
-          },
-          body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`[Venice] ❌ Error ${response.status}:`, errorText);
-
-          // Detectar errores de cuota
-          const isQuotaError = response.status === 429 ||
-                               response.status === 403 ||
-                               errorText.toLowerCase().includes('quota') ||
-                               errorText.toLowerCase().includes('rate limit') ||
-                               errorText.toLowerCase().includes('rate-limited') ||
-                               errorText.toLowerCase().includes('insufficient credits');
-
-          if (isQuotaError && this.rotateApiKey()) {
-            console.log('[Venice] 💳 Error de cuota detectado en generateWithMessages, intentando con siguiente API key...');
-            lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
-            continue; // Reintentar con siguiente key
-          }
-
-          throw new Error(`Venice API error: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-
-        return data.choices[0]?.message?.content || "";
-      } catch (error) {
-        lastError = error as Error;
-
-        // Si no es error de cuota, lanzar inmediatamente
-        if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
-          console.error("[Venice] ❌ Generation error:", error);
-          throw error;
-        }
-      }
-    }
-
-    // Si llegamos aquí, todas las keys fallaron
-    console.error('[Venice] ❌ Todas las API keys agotaron su cuota en generateWithMessages');
-    throw new Error("Todas las API keys de Venice han agotado su cuota. Por favor, agregue más créditos o keys.");
+    return data.choices[0]?.message?.content || "";
   }
 
   /**
-   * Genera respuesta con system prompt + user message con rotación automática de API keys
+   * Genera respuesta con system prompt + user message con manejo inteligente de reintentos
    */
   async generateWithSystemPrompt(
     systemPrompt: string,
@@ -273,89 +522,36 @@ export class VeniceClient {
       maxTokens?: number;
     }
   ): Promise<LLMResponse> {
-    let lastError: Error | null = null;
-    const maxRetries = this.apiKeys.length;
+    const messages: VeniceMessage[] = [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: userMessage,
+      },
+    ];
 
-    // Intentar con cada API key disponible
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const messages: VeniceMessage[] = [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userMessage,
-          },
-        ];
+    const body: VeniceRequestBody = {
+      model: options?.model || this.defaultModel,
+      messages,
+      temperature: options?.temperature ?? 0.8,
+      max_tokens: options?.maxTokens ?? 1000,
+      top_p: 0.9,
+    };
 
-        const body: VeniceRequestBody = {
-          model: options?.model || this.defaultModel,
-          messages,
-          temperature: options?.temperature ?? 0.8,
-          max_tokens: options?.maxTokens ?? 1000,
-          top_p: 0.9,
-        };
+    const data = await this.executeWithRetry(body);
 
-        const currentKey = this.getCurrentApiKey();
-        console.log(`[Venice] 🚀 Generating with system prompt using API key #${this.currentKeyIndex + 1}...`);
-
-        const response = await fetch(`${this.baseURL}/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentKey}`,
-          },
-          body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`[Venice] ❌ Error ${response.status}:`, errorText);
-
-          // Detectar errores de cuota
-          const isQuotaError = response.status === 429 ||
-                               response.status === 403 ||
-                               errorText.toLowerCase().includes('quota') ||
-                               errorText.toLowerCase().includes('rate limit') ||
-                               errorText.toLowerCase().includes('rate-limited') ||
-                               errorText.toLowerCase().includes('insufficient credits');
-
-          if (isQuotaError && this.rotateApiKey()) {
-            console.log('[Venice] 💳 Error de cuota detectado en generateWithSystemPrompt, intentando con siguiente API key...');
-            lastError = new Error(`Quota exceeded on key #${this.currentKeyIndex}`);
-            continue; // Reintentar con siguiente key
-          }
-
-          throw new Error(`Venice API error: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-
-        return {
-          text: data.choices[0]?.message?.content || "",
-          model: data.model,
-          usage: {
-            promptTokens: data.usage?.prompt_tokens || 0,
-            completionTokens: data.usage?.completion_tokens || 0,
-            totalTokens: data.usage?.total_tokens || 0,
-          },
-        };
-      } catch (error) {
-        lastError = error as Error;
-
-        // Si no es error de cuota, lanzar inmediatamente
-        if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
-          console.error("[Venice] ❌ Generation error:", error);
-          throw error;
-        }
-      }
-    }
-
-    // Si llegamos aquí, todas las keys fallaron
-    console.error('[Venice] ❌ Todas las API keys agotaron su cuota en generateWithSystemPrompt');
-    throw new Error("Todas las API keys de Venice han agotado su cuota. Por favor, agregue más créditos o keys.");
+    return {
+      text: data.choices[0]?.message?.content || "",
+      model: data.model,
+      usage: {
+        promptTokens: data.usage?.prompt_tokens || 0,
+        completionTokens: data.usage?.completion_tokens || 0,
+        totalTokens: data.usage?.total_tokens || 0,
+      },
+    };
   }
 
   /**
@@ -444,6 +640,18 @@ export function getVeniceClient(): VeniceClient {
   }
 
   return veniceClient;
+}
+
+/**
+ * Obtiene el circuit breaker global de Venice
+ * Útil para monitoreo, estadísticas, o reseteo manual en testing
+ */
+export function getVeniceCircuitBreaker() {
+  return {
+    getState: () => globalCircuitBreaker.getState(),
+    getStats: () => globalCircuitBreaker.getStats(),
+    reset: () => globalCircuitBreaker.reset(),
+  };
 }
 
 /**

@@ -9,6 +9,8 @@ interface GroupMessageBubbleProps {
   message: {
     id: string;
     content: string;
+    contentType?: string;
+    mediaUrl?: string | null;
     authorType: string;
     isSystemMessage?: boolean;
     createdAt: Date;
@@ -101,7 +103,7 @@ export function GroupMessageBubble({
         {/* Author name and timestamp */}
         <div className="flex items-baseline gap-2 mb-1">
           <span className={`font-medium text-sm ${isAIMessage ? 'text-indigo-400' : 'text-white'}`}>
-            {isOwnMessage ? "Tu (Usuario)" : authorName || "Usuario"}
+            {isOwnMessage ? `Tú (${authorName || "Usuario"})` : authorName || "Usuario"}
           </span>
           <span className="text-[10px] text-neutral-500">
             {formatDistanceToNow(new Date(message.createdAt), {
@@ -131,7 +133,32 @@ export function GroupMessageBubble({
               : 'bg-[#262626] text-neutral-100 rounded-tl-sm border border-neutral-700'
             }`}
         >
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          {/* Render based on content type */}
+          {message.contentType === "gif" && message.mediaUrl ? (
+            <div className="max-w-xs">
+              <img
+                src={message.mediaUrl}
+                alt="GIF"
+                className="rounded-lg w-full"
+                loading="lazy"
+              />
+            </div>
+          ) : message.contentType === "sticker" ? (
+            <div className="text-6xl">{message.content}</div>
+          ) : message.contentType === "emoji" ? (
+            <div className="text-4xl">{message.content}</div>
+          ) : message.contentType === "image" && message.mediaUrl ? (
+            <div className="max-w-sm">
+              <img
+                src={message.mediaUrl}
+                alt="Imagen"
+                className="rounded-lg w-full"
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          )}
         </div>
       </div>
     </div>

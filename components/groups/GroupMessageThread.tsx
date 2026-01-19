@@ -179,7 +179,12 @@ export function GroupMessageThread({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = async (content: string, replyToId?: string) => {
+  const handleSendMessage = async (
+    content: string,
+    replyToId?: string,
+    contentType?: string,
+    mediaUrl?: string
+  ) => {
     try {
       const response = await fetch(`/api/groups/${groupId}/messages`, {
         method: "POST",
@@ -187,6 +192,8 @@ export function GroupMessageThread({
         body: JSON.stringify({
           content,
           replyToId,
+          contentType: contentType || "text",
+          mediaUrl,
         }),
       });
 

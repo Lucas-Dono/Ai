@@ -17,6 +17,29 @@ export interface TrackInteractionParams {
   liked?: boolean;
   shared?: boolean;
   metadata?: Record<string, any>;
+  userAgent?: string;
+}
+
+/**
+ * Detecta el tipo de dispositivo desde el user-agent
+ */
+function detectDeviceType(userAgent?: string): "mobile" | "tablet" | "desktop" {
+  if (!userAgent) return "desktop";
+
+  const ua = userAgent.toLowerCase();
+
+  // Detectar tablet
+  if (/(ipad|tablet|playbook|silk)|(android(?!.*mobile))/i.test(ua)) {
+    return "tablet";
+  }
+
+  // Detectar mobile
+  if (/mobile|iphone|ipod|android|blackberry|opera mini|opera mobi|skyfire|maemo|windows phone|palm|iemobile|symbian|symbianos|fennec/i.test(ua)) {
+    return "mobile";
+  }
+
+  // Por defecto desktop
+  return "desktop";
 }
 
 /**
@@ -56,7 +79,7 @@ export async function trackInteraction(params: TrackInteractionParams) {
         shared: params.shared || false,
         timeOfDay,
         dayOfWeek,
-        deviceType: "desktop", // TODO: Detectar desde user-agent
+        deviceType: detectDeviceType(params.userAgent),
         metadata: params.metadata || {},
       },
     });

@@ -13,53 +13,19 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from "@/lib/auth-server";
+import { withAdminAuth } from '@/lib/admin/middleware';
 import { DatabaseBackupService } from '@/lib/services/database-backup.service';
 import { createLogger } from '@/lib/logging/logger';
-import { prisma } from '@/lib/prisma';
 
 const log = createLogger('AdminBackups');
-
-// Helper: Verificar autenticación de admin
-async function verifyAdminAuth(req: NextRequest) {
-  const user = await getAuthenticatedUser(req);
-
-  if (!user?.email) {
-    return { authorized: false, error: 'Unauthorized' };
-  }
-
-  // Verificar que el usuario existe
-  const dbUser = await prisma.user.findUnique({
-    where: { email: user.email },
-    select: { id: true, email: true },
-  });
-
-  if (!dbUser) {
-    return { authorized: false, error: 'User not found' };
-  }
-
-  // TODO: Add proper admin role check when role field is added to User model
-  // For now, only allow specific admin emails
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-  if (!adminEmails.includes(dbUser.email)) {
-    return { authorized: false, error: 'Forbidden - Admin access required' };
-  }
-
-  return { authorized: true, userId: dbUser.id };
-}
 
 /**
  * GET /api/admin/backups
  * Lista todos los backups disponibles
  */
-export async function GET(req: NextRequest) {
+export const GET = withAdminAuth(async (req, { admin }) => {
   try {
-    const auth = await verifyAdminAuth(req);
-    if (!auth.authorized) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-
-    log.info({ userId: auth.userId }, 'Admin listing backups');
+    log.info({ userId: admin.userId, email: admin.email }, 'Admin listing backups');
 
     const [stats, backups] = await Promise.all([
       DatabaseBackupService.getBackupStats(),
@@ -97,20 +63,15 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * POST /api/admin/backups
  * Crea un nuevo backup manualmente
  */
-export async function POST(req: NextRequest) {
+export const POST = withAdminAuth(async (req, { admin }) => {
   try {
-    const auth = await verifyAdminAuth(req);
-    if (!auth.authorized) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-
-    log.info({ userId: auth.userId }, 'Admin creating manual backup');
+    log.info({ userId: admin.userId, email: admin.email }, 'Admin creating manual backup');
 
     const result = await DatabaseBackupService.createBackup();
 
@@ -147,7 +108,7 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // Helper functions
 function formatBytes(bytes: number): string {

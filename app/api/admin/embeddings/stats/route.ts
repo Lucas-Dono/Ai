@@ -6,24 +6,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthSession } from '@/lib/middleware/auth-helper';
+import { withAdminAuth } from '@/lib/admin/middleware';
 import { embeddingQueue } from '@/lib/embeddings/queue-manager';
 import { redis } from '@/lib/redis/config';
 import { isQwenModelLoaded } from '@/lib/memory/qwen-embeddings';
+import { optimizedVectorSearch } from '@/lib/memory/optimized-vector-search';
 
-export async function GET(request: NextRequest) {
+export const GET = withAdminAuth(async (request, { admin }) => {
   try {
-    // Verificar autenticación (solo admin)
-    const session = await getAuthSession(request);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    // TODO: Verificar que sea admin (agregar campo isAdmin en User)
-    // const isAdmin = session.user.isAdmin;
-    // if (!isAdmin) {
-    //   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    // }
 
     // Obtener estadísticas de la cola
     const queueStats = await embeddingQueue.getStats();
@@ -58,7 +48,7 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * Obtener estadísticas de rate limiting
@@ -91,12 +81,21 @@ async function getRateLimitStats() {
  * Obtener estadísticas de caché
  */
 async function getCacheStats() {
-  // Obtener keys de caché
+  // Obtener keys de caché de embeddings
   const cacheKeys = await redis.keys('embeddings:cache:*');
+
+  // Obtener stats del vector search cache
+  const vectorSearchStats = optimizedVectorSearch.getCacheStats();
 
   return {
     totalCached: cacheKeys?.length || 0,
-    // TODO: Agregar hit rate si es posible
+    vectorSearch: {
+      size: vectorSearchStats.size,
+      maxSize: vectorSearchStats.maxSize,
+      hitRate: vectorSearchStats.hitRate,
+      hits: vectorSearchStats.hits,
+      misses: vectorSearchStats.misses,
+    },
   };
 }
 

@@ -2,10 +2,17 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, X, Paperclip, Smile } from "lucide-react";
+import { EmojiPickerComponent } from "@/components/chat/EmojiPickerComponent";
+import { StickerGifPicker } from "@/components/chat/StickerGifPicker";
 
 interface GroupMessageInputProps {
   groupId: string;
-  onSend: (content: string, replyToId?: string) => Promise<void>;
+  onSend: (
+    content: string,
+    replyToId?: string,
+    contentType?: string,
+    mediaUrl?: string
+  ) => Promise<void>;
   onTyping?: (isTyping: boolean) => void;
   replyingTo?: {
     id: string;
@@ -28,6 +35,8 @@ export function GroupMessageInput({
 }: GroupMessageInputProps) {
   const [content, setContent] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showStickerGifPicker, setShowStickerGifPicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
@@ -95,9 +104,15 @@ export function GroupMessageInput({
     }
   };
 
-  const handleSend = async () => {
-    const trimmedContent = content.trim();
-    if (!trimmedContent || isSending) return;
+  const handleSend = async (
+    messageContent?: string,
+    messageContentType?: string,
+    messageMediaUrl?: string
+  ) => {
+    const contentToSend = messageContent || content.trim();
+    const contentTypeToSend = messageContentType || "text";
+
+    if (!contentToSend || isSending) return;
 
     // Stop typing indicator
     if (typingTimeoutRef.current) {
@@ -110,7 +125,7 @@ export function GroupMessageInput({
 
     setIsSending(true);
     try {
-      await onSend(trimmedContent, replyingTo?.id);
+      await onSend(contentToSend, replyingTo?.id, contentTypeToSend, messageMediaUrl);
       setContent("");
       if (onCancelReply) {
         onCancelReply();
@@ -120,6 +135,17 @@ export function GroupMessageInput({
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setContent((prev) => prev + emoji);
+    setShowEmojiPicker(false);
+    textareaRef.current?.focus();
+  };
+
+  const handleStickerOrGifSend = async (url: string, type: "sticker" | "gif") => {
+    await handleSend(type === "sticker" ? url : "GIF", type, url);
+    setShowStickerGifPicker(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -166,35 +192,64 @@ export function GroupMessageInput({
       )}
 
       {/* Input area */}
-      <div className="max-w-4xl mx-auto flex items-end gap-3 bg-neutral-800/50 p-2 rounded-xl border border-neutral-700 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/20 transition-all">
-        <button className="p-2 text-neutral-400 hover:text-white hover:bg-neutral-700 rounded-lg transition-colors">
-          <Paperclip size={20} />
-        </button>
-
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled || isSending}
-          className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder-neutral-500 resize-none py-2 max-h-32 min-h-[44px] focus:outline-none"
-          rows={1}
-        />
-
-        <div className="flex items-center gap-1">
-          <button className="p-2 text-neutral-400 hover:text-yellow-400 hover:bg-neutral-700 rounded-lg transition-colors">
-            <Smile size={20} />
-          </button>
+      <div className="max-w-4xl mx-auto relative">
+        <div className="flex items-end gap-3 bg-neutral-800/50 p-2 rounded-xl border border-neutral-700 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/20 transition-all">
           <button
-            onClick={handleSend}
-            disabled={!content.trim() || disabled || isSending}
-            className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600"
-            title="Enviar (Enter)"
+            onClick={() => setShowStickerGifPicker(!showStickerGifPicker)}
+            className="p-2 text-neutral-400 hover:text-white hover:bg-neutral-700 rounded-lg transition-colors"
+            title="Stickers y GIFs"
           >
-            <Send size={18} className={isSending ? "animate-pulse" : ""} />
+            <Paperclip size={20} />
           </button>
+
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled || isSending}
+            className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder-neutral-500 resize-none py-2 max-h-32 min-h-[44px] focus:outline-none"
+            rows={1}
+          />
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              className="p-2 text-neutral-400 hover:text-yellow-400 hover:bg-neutral-700 rounded-lg transition-colors"
+              title="Emojis"
+            >
+              <Smile size={20} />
+            </button>
+            <button
+              onClick={() => handleSend()}
+              disabled={!content.trim() || disabled || isSending}
+              className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600"
+              title="Enviar (Enter)"
+            >
+              <Send size={18} className={isSending ? "animate-pulse" : ""} />
+            </button>
+          </div>
         </div>
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div className="absolute bottom-full mb-2 right-0 z-50">
+            <div className="bg-neutral-900 rounded-lg shadow-xl border border-neutral-700 p-2">
+              <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
+            </div>
+          </div>
+        )}
+
+        {/* Sticker & GIF Picker */}
+        {showStickerGifPicker && (
+          <div className="absolute bottom-full mb-2 left-0 z-50">
+            <StickerGifPicker
+              onSend={handleStickerOrGifSend}
+              onClose={() => setShowStickerGifPicker(false)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

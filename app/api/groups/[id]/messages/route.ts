@@ -34,11 +34,28 @@ export async function POST(
 
     // 1. Parse request body
     const body = await req.json();
-    const { content, replyToId } = body;
+    const { content, replyToId, contentType = "text", mediaUrl } = body;
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json(
         { error: "El contenido del mensaje es requerido" },
+        { status: 400 }
+      );
+    }
+
+    // Validar contentType
+    const validContentTypes = ["text", "emoji", "gif", "sticker", "image"];
+    if (!validContentTypes.includes(contentType)) {
+      return NextResponse.json(
+        { error: "Tipo de contenido no válido" },
+        { status: 400 }
+      );
+    }
+
+    // Validar mediaUrl si el contentType lo requiere
+    if (["gif", "sticker", "image"].includes(contentType) && !mediaUrl) {
+      return NextResponse.json(
+        { error: "Se requiere mediaUrl para este tipo de contenido" },
         { status: 400 }
       );
     }
@@ -149,7 +166,8 @@ export async function POST(
         authorType: "user",
         userId,
         content: content.trim(),
-        contentType: "text",
+        contentType,
+        mediaUrl: mediaUrl || null,
         turnNumber: nextTurnNumber,
         replyToId: replyToId || null,
       },
@@ -180,6 +198,8 @@ export async function POST(
       authorType: "user",
       authorId: userId,
       content: userMessage.content,
+      contentType: userMessage.contentType,
+      mediaUrl: userMessage.mediaUrl || undefined,
       createdAt: userMessage.createdAt.toISOString(),
       replyToId: userMessage.replyToId || undefined,
       user: userMessage.user ? {

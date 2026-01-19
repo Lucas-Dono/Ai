@@ -6,6 +6,7 @@ import { AccessibilitySkipLink } from "@/components/ui/accessibility-skip-link";
 import { IntlProvider } from "@/components/providers/intl-provider";
 import { getMessages } from "@/lib/i18n/get-messages";
 import { AccessibilityFilters } from "@/components/accessibility/AccessibilityFilters";
+import { DirectorDevTools } from "@/components/dev/DirectorDevTools";
 
 export const metadata: Metadata = {
   title: "Blaniel - Create emotional AIs with real memory",
@@ -55,6 +56,7 @@ export default async function RootLayout({
       <body className="antialiased overflow-x-hidden">
         <AccessibilitySkipLink />
         <AccessibilityFilters />
+        <DirectorDevTools />
         <IntlProvider messagesPromise={messagesPromise}>
           <Providers>
             <RootLayoutWrapper>

@@ -138,6 +138,8 @@ export class OptimizedVectorSearch {
   private embeddingCache: Map<string, { embedding: number[]; timestamp: number }> =
     new Map();
   private readonly MAX_CACHE_SIZE = 1000;
+  private cacheHits = 0;
+  private cacheMisses = 0;
 
   /**
    * Genera o recupera del cache el embedding de un texto
@@ -147,6 +149,7 @@ export class OptimizedVectorSearch {
     config: Required<VectorSearchConfig>
   ): Promise<number[]> {
     if (!config.useCache) {
+      this.cacheMisses++;
       return generateEmbedding(text);
     }
 
@@ -155,6 +158,7 @@ export class OptimizedVectorSearch {
     const cached = this.embeddingCache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < config.cacheTTL * 1000) {
+      this.cacheHits++;
       return cached.embedding;
     }
 
@@ -172,6 +176,7 @@ export class OptimizedVectorSearch {
           timestamp: Date.now(),
         });
 
+        this.cacheHits++;
         return embedding;
       }
     } catch (error) {
@@ -179,6 +184,7 @@ export class OptimizedVectorSearch {
     }
 
     // Generate new embedding
+    this.cacheMisses++;
     const embedding = await generateEmbedding(text);
 
     // Cache in memory
@@ -435,12 +441,27 @@ export class OptimizedVectorSearch {
     size: number;
     maxSize: number;
     hitRate: number;
+    hits: number;
+    misses: number;
   } {
+    const totalRequests = this.cacheHits + this.cacheMisses;
+    const hitRate = totalRequests > 0 ? this.cacheHits / totalRequests : 0;
+
     return {
       size: this.embeddingCache.size,
       maxSize: this.MAX_CACHE_SIZE,
-      hitRate: 0, // TODO: Track hits/misses
+      hitRate: parseFloat(hitRate.toFixed(4)),
+      hits: this.cacheHits,
+      misses: this.cacheMisses,
     };
+  }
+
+  /**
+   * Reset cache stats
+   */
+  resetCacheStats(): void {
+    this.cacheHits = 0;
+    this.cacheMisses = 0;
   }
 }
 
