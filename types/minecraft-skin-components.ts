@@ -30,6 +30,7 @@ export enum ComponentCategory {
   HAIR_BACK = 'hair_back',     // Pelo trasero
   HAIR_TOP = 'hair_top',       // Pelo superior
   HAIR_SIDES = 'hair_sides',   // Pelo lateral
+  HAIR_BODY = 'hair_body',     // Pelo cayendo sobre cuerpo (para pelo largo)
   FACIAL_HAIR = 'facial_hair', // Barba/bigote
 
   // CUERPO
@@ -214,6 +215,7 @@ export interface ComponentLibrary {
   [ComponentCategory.HAIR_BACK]: ComponentMetadata[];
   [ComponentCategory.HAIR_TOP]: ComponentMetadata[];
   [ComponentCategory.HAIR_SIDES]: ComponentMetadata[];
+  [ComponentCategory.HAIR_BODY]: ComponentMetadata[];
   [ComponentCategory.FACIAL_HAIR]: ComponentMetadata[];
   [ComponentCategory.TORSO_BASE]: ComponentMetadata[];
   [ComponentCategory.ARMS_BASE]: ComponentMetadata[];

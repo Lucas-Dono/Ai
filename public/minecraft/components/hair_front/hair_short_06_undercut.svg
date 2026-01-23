@@ -1,0 +1,43 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con mucho volumen arriba -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Volumen pronunciado -->
+      <rect x="41" y="0" width="6" height="2" fill="#909090" class="colorizable-hair"/>
+      <rect x="42" y="1" width="4" height="2" fill="#959595" class="colorizable-hair"/>
+      <!-- Centro con altura -->
+      <rect x="43" y="2" width="2" height="4" fill="#959595" class="colorizable-hair"/>
+
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con contraste marcado -->
+      <!-- Parte superior con volumen -->
+      <rect x="32" y="8" width="8" height="2" fill="#909090" class="colorizable-hair"/>
+      <rect x="33" y="10" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- Transición abrupta (undercut) -->
+      <rect x="34" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Lados rapados -->
+      <rect x="35" y="12" width="1" height="2" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con volumen alto -->
+      <rect x="40" y="8" width="8" height="2" fill="#909090" class="colorizable-hair"/>
+      <!-- Volumen frontal pronunciado -->
+      <rect x="41" y="10" width="6" height="1" fill="#959595" class="colorizable-hair"/>
+      <rect x="42" y="11" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="43" y="12" width="2" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con contraste marcado -->
+      <!-- Parte superior con volumen -->
+      <rect x="48" y="8" width="8" height="2" fill="#909090" class="colorizable-hair"/>
+      <rect x="50" y="10" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- Transición abrupta (undercut) -->
+      <rect x="52" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Lados rapados -->
+      <rect x="52" y="12" width="1" height="2" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con volumen arriba -->
+      <rect x="56" y="8" width="8" height="3" fill="#909090" class="colorizable-hair"/>
+      <rect x="57" y="11" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="59" y="12" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+    </svg>
+  

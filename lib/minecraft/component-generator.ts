@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import { ComponentCategory, UVRegion } from '@/types/minecraft-skin-components';
+import * as HairLib from './hairstyles-library';
 
 // ============================================================================
 // CONSTANTES DE MINECRAFT
@@ -358,6 +359,178 @@ export function generateHairBack_01(): string {
       <!-- Cubriendo parte trasera de la cabeza -->
       <rect x="0" y="0" width="8" height="3" fill="#808080" class="colorizable-hair"/>
       <rect x="1" y="3" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+    </svg>
+  `;
+}
+
+// ============================================================================
+// PEINADOS CORTOS - SISTEMA COMPLETO
+// ============================================================================
+
+/**
+ * Genera sprite de pelo corto - Tipo 1: Pixie Cut
+ * Estilo: Corto en espalda y lados, ligeramente más largo arriba con flequillo muy corto
+ * Género: Femenino
+ * Inspiración: Audrey Hepburn, Michelle Williams, Charlize Theron
+ */
+export function generateHairShort_01_Pixie(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con volumen en corona -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="42" y="1" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <!-- Centro más oscuro para profundidad -->
+      <rect x="43" y="2" width="2" height="4" fill="#707070" class="colorizable-hair"/>
+      <rect x="44" y="3" width="1" height="2" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío para pixie) -->
+
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho muy corto -->
+      <!-- Cobertura superior corta -->
+      <rect x="32" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Transición sutil hacia abajo -->
+      <rect x="33" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="34" y="12" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo corto estilizado -->
+      <rect x="40" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Flequillo texturizado -->
+      <rect x="41" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="43" y="10" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="45" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Puntas del flequillo -->
+      <rect x="41" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="43" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="46" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo muy corto -->
+      <!-- Cobertura superior corta -->
+      <rect x="48" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="49" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Transición sutil hacia abajo -->
+      <rect x="51" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="52" y="12" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera muy corta -->
+      <rect x="56" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="57" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="58" y="11" width="4" height="1" fill="#606060" class="colorizable-hair"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de pelo corto - Tipo 2: Bob Cut Corto
+ * Estilo: Corte recto a la altura de la mandíbula, sin capas, con línea limpia
+ * Género: Femenino
+ * Inspiración: Anna Wintour, Rihanna, Zendaya
+ */
+export function generateHairShort_02_BobCut(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con cobertura completa -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <!-- Línea de parte central -->
+      <rect x="43" y="1" width="2" height="6" fill="#707070" class="colorizable-hair" opacity="0.4"/>
+      <!-- Volumen lateral -->
+      <rect x="40" y="2" width="2" height="4" fill="#909090" class="colorizable-hair"/>
+      <rect x="46" y="2" width="2" height="4" fill="#909090" class="colorizable-hair"/>
+
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con corte recto -->
+      <!-- Cobertura superior -->
+      <rect x="32" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Volumen medio -->
+      <rect x="32" y="11" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Línea de corte recta -->
+      <rect x="32" y="13" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra inferior -->
+      <rect x="33" y="14" width="5" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo lateral opcional -->
+      <rect x="40" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Flequillo lateral barrido -->
+      <rect x="40" y="11" width="3" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="41" y="13" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con corte recto -->
+      <!-- Cobertura superior -->
+      <rect x="48" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Volumen medio -->
+      <rect x="48" y="11" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Línea de corte recta -->
+      <rect x="49" y="13" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra inferior -->
+      <rect x="50" y="14" width="5" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con línea de nuca -->
+      <rect x="56" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="57" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="58" y="13" width="4" height="1" fill="#606060" class="colorizable-hair"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de pelo corto - Tipo 3: Buzz Cut
+ * Estilo: Muy corto, uniforme, cortado con máquina, estilo militar
+ * Género: Masculino
+ * Inspiración: Militar, deportistas, Jason Statham
+ */
+export function generateHairShort_03_BuzzCut(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con textura uniforme -->
+      <rect x="40" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura de pelo muy corto con puntos -->
+      <rect x="41" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="43" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="45" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="42" y="3" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="44" y="3" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="46" y="3" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="41" y="5" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="43" y="5" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="45" y="5" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho muy corto uniforme -->
+      <rect x="32" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura uniforme -->
+      <rect x="33" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="35" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="37" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="34" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente uniforme sin flequillo -->
+      <rect x="40" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura sutil -->
+      <rect x="41" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="43" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="45" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="42" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="44" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo muy corto uniforme -->
+      <rect x="48" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura uniforme -->
+      <rect x="49" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="51" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="53" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="50" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera uniforme -->
+      <rect x="56" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura -->
+      <rect x="57" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="59" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="61" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="58" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
     </svg>
   `;
 }
@@ -1273,11 +1446,37 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
   { id: 'mouth_02', category: ComponentCategory.MOUTH, generator: generateMouth_02, filename: 'mouth_02.svg' },
   { id: 'mouth_03', category: ComponentCategory.MOUTH, generator: generateMouth_03, filename: 'mouth_03.svg' },
 
-  // PELO
+  // PELO - COMPONENTES ANTIGUOS (Legacy)
   { id: 'hair_front_01', category: ComponentCategory.HAIR_FRONT, generator: generateHairFront_01, filename: 'hair_front_01.svg' },
   { id: 'hair_front_02', category: ComponentCategory.HAIR_FRONT, generator: generateHairFront_02, filename: 'hair_front_02.svg' },
   { id: 'hair_top_01', category: ComponentCategory.HAIR_TOP, generator: generateHairTop_01, filename: 'hair_top_01.svg' },
   { id: 'hair_back_01', category: ComponentCategory.HAIR_BACK, generator: generateHairBack_01, filename: 'hair_back_01.svg' },
+
+  // PELO - PEINADOS CORTOS (Short)
+  { id: 'hair_short_01_pixie', category: ComponentCategory.HAIR_FRONT, generator: generateHairShort_01_Pixie, filename: 'hair_short_01_pixie.svg' },
+  { id: 'hair_short_02_bob', category: ComponentCategory.HAIR_FRONT, generator: generateHairShort_02_BobCut, filename: 'hair_short_02_bob.svg' },
+  { id: 'hair_short_03_buzz', category: ComponentCategory.HAIR_FRONT, generator: generateHairShort_03_BuzzCut, filename: 'hair_short_03_buzz.svg' },
+  { id: 'hair_short_04_crew', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairShort_04_CrewCut, filename: 'hair_short_04_crew.svg' },
+  { id: 'hair_short_05_caesar', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairShort_05_CaesarCut, filename: 'hair_short_05_caesar.svg' },
+  { id: 'hair_short_06_undercut', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairShort_06_Undercut, filename: 'hair_short_06_undercut.svg' },
+  { id: 'hair_short_07_bowl', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairShort_07_BowlCut, filename: 'hair_short_07_bowl.svg' },
+  { id: 'hair_short_08_slicked', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairShort_08_SlickedBack, filename: 'hair_short_08_slicked.svg' },
+
+  // PELO - PEINADOS MEDIOS (Medium)
+  { id: 'hair_medium_01_lob', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairMedium_01_Lob, filename: 'hair_medium_01_lob.svg' },
+  { id: 'hair_medium_03_shag', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairMedium_03_Shag, filename: 'hair_medium_03_shag.svg' },
+
+  // PELO - PEINADOS LARGOS (Long) - HEAD
+  { id: 'hair_long_01_straight', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairLong_01, filename: 'hair_long_01_straight.svg' },
+  { id: 'hair_long_02_wavy', category: ComponentCategory.HAIR_FRONT, generator: HairLib.generateHairLong_02, filename: 'hair_long_02_wavy.svg' },
+
+  // PELO - PEINADOS LARGOS (Long) - BODY (pelo cayendo en espalda/hombros)
+  { id: 'hair_long_body_01_straight', category: ComponentCategory.HAIR_BODY, generator: HairLib.generateHairLongBody_01, filename: 'hair_long_body_01_straight.svg' },
+  { id: 'hair_long_body_02_wavy', category: ComponentCategory.HAIR_BODY, generator: HairLib.generateHairLongBody_02, filename: 'hair_long_body_02_wavy.svg' },
+
+  // PELO - PEINADOS RECOGIDOS (Updos)
+  { id: 'hair_updo_01_high_ponytail', category: ComponentCategory.HAIR_BACK, generator: HairLib.generateHairUpdo_01_HighPonytail, filename: 'hair_updo_01_high_ponytail.svg' },
+  { id: 'hair_updo_05_messy_bun', category: ComponentCategory.HAIR_BACK, generator: HairLib.generateHairUpdo_05_MessyBun, filename: 'hair_updo_05_messy_bun.svg' },
 
   // CUERPO BASE
   { id: 'torso_slim_01', category: ComponentCategory.TORSO_BASE, generator: generateTorso_Slim_01, filename: 'torso_slim_01.svg' },

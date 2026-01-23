@@ -1,0 +1,34 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- BODY_BACK (4x12) at (32,20) - Pelo ondulado cayendo en espalda -->
+      <rect x="32" y="20" width="4" height="12" fill="#808080" class="colorizable-hair"/>
+      <!-- Patrón de ondas verticales -->
+      <rect x="32" y="21" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="33" y="22" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="32" y="23" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="33" y="25" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="32" y="27" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="33" y="29" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Puntas onduladas -->
+      <rect x="32" y="30" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="34" y="31" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- BODY_RIGHT (4x12) at (16,20) - Lado derecho ondulado -->
+      <rect x="16" y="20" width="4" height="9" fill="#808080" class="colorizable-hair"/>
+      <!-- Ondas -->
+      <rect x="17" y="21" width="2" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="17" y="23" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="17" y="25" width="2" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="17" y="27" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="17" y="28" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- BODY_LEFT (4x12) at (28,20) - Lado izquierdo ondulado -->
+      <rect x="28" y="20" width="4" height="9" fill="#808080" class="colorizable-hair"/>
+      <!-- Ondas -->
+      <rect x="29" y="21" width="2" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="29" y="23" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="29" y="25" width="2" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="29" y="27" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="30" y="28" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+    </svg>
+  

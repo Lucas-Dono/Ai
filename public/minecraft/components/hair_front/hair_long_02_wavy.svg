@@ -1,0 +1,47 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con volumen ondulado -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Raya irregular (ondas) -->
+      <rect x="42" y="0" width="1" height="3" fill="#707070" class="colorizable-hair"/>
+      <rect x="43" y="2" width="2" height="3" fill="#707070" class="colorizable-hair"/>
+      <rect x="44" y="4" width="1" height="3" fill="#707070" class="colorizable-hair"/>
+      <!-- Volumen -->
+      <rect x="40" y="0" width="8" height="2" fill="#909090" class="colorizable-hair"/>
+
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con ondas -->
+      <rect x="32" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Patrón de ondas -->
+      <rect x="33" y="9" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="34" y="10" width="3" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="33" y="11" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="12" width="5" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="33" y="13" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="34" y="14" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente ondulado -->
+      <rect x="40" y="8" width="8" height="5" fill="#808080" class="colorizable-hair"/>
+      <!-- Ondas frontales -->
+      <rect x="41" y="9" width="2" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="45" y="9" width="2" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="42" y="10" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="41" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con ondas -->
+      <rect x="48" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Patrón de ondas -->
+      <rect x="51" y="9" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="51" y="10" width="3" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="51" y="11" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="51" y="12" width="5" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="52" y="13" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="52" y="14" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera ondulada -->
+      <rect x="56" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Ondas de volumen -->
+      <rect x="57" y="9" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="58" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="57" y="13" width="6" height="2" fill="#707070" class="colorizable-hair"/>
+    </svg>
+  
