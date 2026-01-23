@@ -164,6 +164,176 @@ async function main() {
   await fs.writeFile(path.join(SKINS_OUTPUT_DIR, 'variation_example.png'), skin3);
   console.log('    ✓ Variación de color generada\n');
 
+  // Ejemplo 4: Remera sola (manga corta, antebrazo y manos visibles)
+  const config4: SkinConfiguration = {
+    bodyGenes: {
+      height: 'average',
+      build: 'slim',
+      armModel: 'slim',
+      chest: 'small',
+      hips: 'average',
+      shoulders: 'narrow',
+      headSize: 'normal',
+      legLength: 'normal',
+    },
+    facialGenes: {
+      faceShape: 'oval',
+      eyeSize: 'large',
+      eyeSpacing: 'normal',
+      noseSize: 'small',
+      mouthWidth: 'normal',
+      jawline: 'soft',
+      eyeExpression: 'happy',
+      mouthExpression: 'smile',
+    },
+    colors: {
+      skinTone: '#F5D7B1',
+      skinShadow: '#E5C7A1',
+      skinHighlight: '#FFE7C1',
+      hairPrimary: '#FF6B9D',
+      eyeColor: '#4169E1',
+      eyeWhite: '#FFFFFF',
+      eyePupil: '#000000',
+      clothingPrimary: '#FFFFFF',
+      clothingSecondary: '#FF1493',
+    },
+    components: {
+      eyes: 'eyes_03',
+      mouth: 'mouth_01',
+      torso: 'torso_slim_01',
+      arms: 'arms_slim_01',
+      legs: 'legs_average_01',
+      hairFront: 'hair_front_02',
+      hairTop: 'hair_top_01',
+      hairBack: 'hair_back_01',
+      tShirt: 't_shirt_01', // Remera manga corta
+      pants: 'pants_01',
+      shoes: 'shoes_01', // Zapatillas
+    },
+    style: ComponentStyle.PIXEL,
+    version: 1,
+    generatedAt: new Date().toISOString(),
+  };
+
+  console.log('  → Generando "tshirt_example.png" (remera con antebrazo visible)...');
+  const skin4 = await assembleSkin(config4, COMPONENTS_OUTPUT_DIR);
+  await fs.writeFile(path.join(SKINS_OUTPUT_DIR, 'tshirt_example.png'), skin4);
+  console.log('    ✓ Skin con remera generada\n');
+
+  // Ejemplo 5: Remera + Chaqueta (combinación de capas)
+  const config5: SkinConfiguration = {
+    bodyGenes: {
+      height: 'tall',
+      build: 'athletic',
+      armModel: 'classic',
+      chest: 'flat',
+      hips: 'narrow',
+      shoulders: 'broad',
+      headSize: 'normal',
+      legLength: 'long',
+    },
+    facialGenes: {
+      faceShape: 'square',
+      eyeSize: 'medium',
+      eyeSpacing: 'wide',
+      noseSize: 'medium',
+      mouthWidth: 'normal',
+      jawline: 'defined',
+      eyeExpression: 'neutral',
+      mouthExpression: 'neutral',
+    },
+    colors: {
+      skinTone: '#D4A574',
+      skinShadow: '#B8895E',
+      skinHighlight: '#F0C18A',
+      hairPrimary: '#2C1810',
+      eyeColor: '#654321',
+      eyeWhite: '#FFFFFF',
+      eyePupil: '#000000',
+      clothingPrimary: '#FF6B35', // Remera naranja
+      clothingSecondary: '#1A1A2E', // Chaqueta negra
+    },
+    components: {
+      eyes: 'eyes_01',
+      mouth: 'mouth_02',
+      torso: 'torso_athletic_01',
+      arms: 'arms_classic_01',
+      legs: 'legs_long_01',
+      hairFront: 'hair_front_01',
+      hairBack: 'hair_back_01',
+      tShirt: 't_shirt_02', // Remera deportiva
+      jacket: 'jacket_01', // Chaqueta encima
+      pants: 'pants_01',
+      shoes: 'shoes_02', // Zapatos formales
+      glasses: 'glasses_01',
+    },
+    style: ComponentStyle.PIXEL,
+    version: 1,
+    generatedAt: new Date().toISOString(),
+  };
+
+  console.log('  → Generando "layered_example.png" (remera + chaqueta + zapatos)...');
+  const skin5 = await assembleSkin(config5, COMPONENTS_OUTPUT_DIR);
+  await fs.writeFile(path.join(SKINS_OUTPUT_DIR, 'layered_example.png'), skin5);
+  console.log('    ✓ Skin con capas generada\n');
+
+  // Ejemplo 6: Outfit completo con guantes y botas
+  const config6: SkinConfiguration = {
+    bodyGenes: {
+      height: 'average',
+      build: 'athletic',
+      armModel: 'classic',
+      chest: 'medium',
+      hips: 'average',
+      shoulders: 'average',
+      headSize: 'normal',
+      legLength: 'normal',
+    },
+    facialGenes: {
+      faceShape: 'oval',
+      eyeSize: 'medium',
+      eyeSpacing: 'normal',
+      noseSize: 'medium',
+      mouthWidth: 'normal',
+      jawline: 'normal',
+      eyeExpression: 'happy',
+      mouthExpression: 'smile',
+    },
+    colors: {
+      skinTone: '#C68642',
+      skinShadow: '#A67C52',
+      skinHighlight: '#D69C6E',
+      hairPrimary: '#8B4513',
+      eyeColor: '#228B22',
+      eyeWhite: '#FFFFFF',
+      eyePupil: '#000000',
+      clothingPrimary: '#2F4F4F', // Verde oscuro
+      clothingSecondary: '#8B4513', // Marrón para accesorios
+    },
+    components: {
+      eyes: 'eyes_02',
+      mouth: 'mouth_03',
+      torso: 'torso_average_01',
+      arms: 'arms_classic_01',
+      legs: 'legs_average_01',
+      hairFront: 'hair_front_01',
+      hairTop: 'hair_top_01',
+      hairBack: 'hair_back_01',
+      shirt: 'shirt_01',
+      pants: 'pants_01',
+      gloves: 'gloves_02', // Guantes de cuero
+      boots: 'boots_01', // Botas altas
+    },
+    style: ComponentStyle.PIXEL,
+    version: 1,
+    generatedAt: new Date().toISOString(),
+  };
+
+  console.log('  → Generando "accessories_example.png" (con guantes y botas)...');
+  const skin6 = await assembleSkin(config6, COMPONENTS_OUTPUT_DIR);
+  await fs.writeFile(path.join(SKINS_OUTPUT_DIR, 'accessories_example.png'), skin6);
+  console.log('    ✓ Skin con accesorios completos generada\n');
+
   // ====================================================================
   // PASO 3: Estadísticas
   // ====================================================================

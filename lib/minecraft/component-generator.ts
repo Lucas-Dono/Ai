@@ -702,43 +702,43 @@ export function generateShirt_01(): string {
       <!-- BODY BACK (8x12) at (32,20) -->
       <rect x="32" y="20" width="8" height="12" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- MANGAS BRAZO DERECHO (todas las caras) -->
+      <!-- MANGAS BRAZO DERECHO (dejan 3px para manos) -->
       <!-- ARM_R_TOP (4x4) at (44,16) -->
       <rect x="44" y="16" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
 
       <!-- ARM_R_BOTTOM (4x4) at (48,16) -->
       <rect x="48" y="16" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- ARM_R_RIGHT (4x12) at (40,20) -->
-      <rect x="40" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+      <!-- ARM_R_RIGHT (4x9) at (40,20) - Solo 9px, deja 3px para manos -->
+      <rect x="40" y="20" width="4" height="9" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- ARM_R_FRONT (4x12) at (44,20) -->
-      <rect x="44" y="20" width="4" height="12" fill="#808080" class="colorizable-clothing"/>
+      <!-- ARM_R_FRONT (4x9) at (44,20) -->
+      <rect x="44" y="20" width="4" height="9" fill="#808080" class="colorizable-clothing"/>
 
-      <!-- ARM_R_LEFT (4x12) at (48,20) -->
-      <rect x="48" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+      <!-- ARM_R_LEFT (4x9) at (48,20) -->
+      <rect x="48" y="20" width="4" height="9" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- ARM_R_BACK (4x12) at (52,20) -->
-      <rect x="52" y="20" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- ARM_R_BACK (4x9) at (52,20) -->
+      <rect x="52" y="20" width="4" height="9" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- MANGAS BRAZO IZQUIERDO (todas las caras) -->
+      <!-- MANGAS BRAZO IZQUIERDO (dejan 3px para manos) -->
       <!-- ARM_L_TOP (4x4) at (36,48) -->
       <rect x="36" y="48" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
 
       <!-- ARM_L_BOTTOM (4x4) at (40,48) -->
       <rect x="40" y="48" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- ARM_L_RIGHT (4x12) at (32,52) -->
-      <rect x="32" y="52" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+      <!-- ARM_L_RIGHT (4x9) at (32,52) - Solo 9px, deja 3px para manos -->
+      <rect x="32" y="52" width="4" height="9" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- ARM_L_FRONT (4x12) at (36,52) -->
-      <rect x="36" y="52" width="4" height="12" fill="#808080" class="colorizable-clothing"/>
+      <!-- ARM_L_FRONT (4x9) at (36,52) -->
+      <rect x="36" y="52" width="4" height="9" fill="#808080" class="colorizable-clothing"/>
 
-      <!-- ARM_L_LEFT (4x12) at (40,52) -->
-      <rect x="40" y="52" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+      <!-- ARM_L_LEFT (4x9) at (40,52) -->
+      <rect x="40" y="52" width="4" height="9" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- ARM_L_BACK (4x12) at (44,52) -->
-      <rect x="44" y="52" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- ARM_L_BACK (4x9) at (44,52) -->
+      <rect x="44" y="52" width="4" height="9" fill="#606060" class="colorizable-clothing"/>
     </svg>
   `;
 }
@@ -750,35 +750,35 @@ export function generateShirt_01(): string {
 export function generatePants_01(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- LEG RIGHT (todas las caras) -->
-      <!-- LEG_R_RIGHT (4x12) at (0,20) -->
-      <rect x="0" y="20" width="4" height="12" fill="#505050" class="colorizable-clothing"/>
+      <!-- LEG RIGHT (dejan 2px para pies) -->
+      <!-- LEG_R_RIGHT (4x10) at (0,20) - Solo 10px, deja 2px para pies -->
+      <rect x="0" y="20" width="4" height="10" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- LEG_R_FRONT (4x12) at (4,20) -->
-      <rect x="4" y="20" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- LEG_R_FRONT (4x10) at (4,20) -->
+      <rect x="4" y="20" width="4" height="10" fill="#606060" class="colorizable-clothing"/>
       <!-- Costura -->
-      <rect x="5" y="20" width="2" height="12" fill="#505050" class="colorizable-clothing" opacity="0.7"/>
+      <rect x="5" y="20" width="2" height="10" fill="#505050" class="colorizable-clothing" opacity="0.7"/>
 
-      <!-- LEG_R_LEFT (4x12) at (8,20) -->
-      <rect x="8" y="20" width="4" height="12" fill="#505050" class="colorizable-clothing"/>
+      <!-- LEG_R_LEFT (4x10) at (8,20) -->
+      <rect x="8" y="20" width="4" height="10" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- LEG_R_BACK (4x12) at (12,20) -->
-      <rect x="12" y="20" width="4" height="12" fill="#404040" class="colorizable-clothing"/>
+      <!-- LEG_R_BACK (4x10) at (12,20) -->
+      <rect x="12" y="20" width="4" height="10" fill="#404040" class="colorizable-clothing"/>
 
-      <!-- LEG LEFT (todas las caras) -->
-      <!-- LEG_L_RIGHT (4x12) at (16,52) -->
-      <rect x="16" y="52" width="4" height="12" fill="#505050" class="colorizable-clothing"/>
+      <!-- LEG LEFT (dejan 2px para pies) -->
+      <!-- LEG_L_RIGHT (4x10) at (16,52) - Solo 10px, deja 2px para pies -->
+      <rect x="16" y="52" width="4" height="10" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- LEG_L_FRONT (4x12) at (20,52) -->
-      <rect x="20" y="52" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- LEG_L_FRONT (4x10) at (20,52) -->
+      <rect x="20" y="52" width="4" height="10" fill="#606060" class="colorizable-clothing"/>
       <!-- Costura -->
-      <rect x="21" y="52" width="2" height="12" fill="#505050" class="colorizable-clothing" opacity="0.7"/>
+      <rect x="21" y="52" width="2" height="10" fill="#505050" class="colorizable-clothing" opacity="0.7"/>
 
-      <!-- LEG_L_LEFT (4x12) at (24,52) -->
-      <rect x="24" y="52" width="4" height="12" fill="#505050" class="colorizable-clothing"/>
+      <!-- LEG_L_LEFT (4x10) at (24,52) -->
+      <rect x="24" y="52" width="4" height="10" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- LEG_L_BACK (4x12) at (28,52) -->
-      <rect x="28" y="52" width="4" height="12" fill="#404040" class="colorizable-clothing"/>
+      <!-- LEG_L_BACK (4x10) at (28,52) -->
+      <rect x="28" y="52" width="4" height="10" fill="#404040" class="colorizable-clothing"/>
     </svg>
   `;
 }
@@ -808,49 +808,403 @@ export function generateJacket_01(): string {
       <!-- BODY BACK (8x12) at (32,20) -->
       <rect x="32" y="20" width="8" height="12" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- MANGAS BRAZO DERECHO (todas las caras) -->
+      <!-- MANGAS BRAZO DERECHO (dejan 3px para manos) -->
       <!-- ARM_R_TOP (4x4) at (44,16) -->
       <rect x="44" y="16" width="4" height="4" fill="#707070" class="colorizable-clothing"/>
 
       <!-- ARM_R_BOTTOM (4x4) at (48,16) -->
       <rect x="48" y="16" width="4" height="4" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- ARM_R_RIGHT (4x12) at (40,20) -->
-      <rect x="40" y="20" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- ARM_R_RIGHT (4x9) at (40,20) - Solo 9px, deja 3px para manos -->
+      <rect x="40" y="20" width="4" height="9" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- ARM_R_FRONT (4x12) at (44,20) -->
-      <rect x="44" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+      <!-- ARM_R_FRONT (4x9) at (44,20) -->
+      <rect x="44" y="20" width="4" height="9" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- ARM_R_LEFT (4x12) at (48,20) -->
-      <rect x="48" y="20" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- ARM_R_LEFT (4x9) at (48,20) -->
+      <rect x="48" y="20" width="4" height="9" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- ARM_R_BACK (4x12) at (52,20) -->
-      <rect x="52" y="20" width="4" height="12" fill="#505050" class="colorizable-clothing"/>
+      <!-- ARM_R_BACK (4x9) at (52,20) -->
+      <rect x="52" y="20" width="4" height="9" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- MANGAS BRAZO IZQUIERDO (todas las caras) -->
+      <!-- MANGAS BRAZO IZQUIERDO (dejan 3px para manos) -->
       <!-- ARM_L_TOP (4x4) at (36,48) -->
       <rect x="36" y="48" width="4" height="4" fill="#707070" class="colorizable-clothing"/>
 
       <!-- ARM_L_BOTTOM (4x4) at (40,48) -->
       <rect x="40" y="48" width="4" height="4" fill="#505050" class="colorizable-clothing"/>
 
-      <!-- ARM_L_RIGHT (4x12) at (32,52) -->
-      <rect x="32" y="52" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- ARM_L_RIGHT (4x9) at (32,52) - Solo 9px, deja 3px para manos -->
+      <rect x="32" y="52" width="4" height="9" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- ARM_L_FRONT (4x12) at (36,52) -->
-      <rect x="36" y="52" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+      <!-- ARM_L_FRONT (4x9) at (36,52) -->
+      <rect x="36" y="52" width="4" height="9" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- ARM_L_LEFT (4x12) at (40,52) -->
-      <rect x="40" y="52" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- ARM_L_LEFT (4x9) at (40,52) -->
+      <rect x="40" y="52" width="4" height="9" fill="#606060" class="colorizable-clothing"/>
 
-      <!-- ARM_L_BACK (4x12) at (44,52) -->
-      <rect x="44" y="52" width="4" height="12" fill="#505050" class="colorizable-clothing"/>
+      <!-- ARM_L_BACK (4x9) at (44,52) -->
+      <rect x="44" y="52" width="4" height="9" fill="#505050" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de remera/camiseta - Tipo 1: Manga corta básica
+ * Cubre torso y brazos solo hasta el codo (~6px)
+ */
+export function generateTShirt_01(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- BODY RIGHT (4x12) at (16,20) -->
+      <rect x="16" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- BODY FRONT (8x12) at (20,20) -->
+      <rect x="20" y="20" width="8" height="12" fill="#808080" class="colorizable-clothing"/>
+      <!-- Cuello redondo -->
+      <rect x="22" y="20" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- BODY LEFT (4x12) at (28,20) -->
+      <rect x="28" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- BODY BACK (8x12) at (32,20) -->
+      <rect x="32" y="20" width="8" height="12" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- MANGAS CORTAS BRAZO DERECHO (solo 6px desde hombro) -->
+      <!-- ARM_R_TOP (4x4) at (44,16) -->
+      <rect x="44" y="16" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BOTTOM (4x4) at (48,16) -->
+      <rect x="48" y="16" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_RIGHT (4x6) at (40,20) - Solo 6px, manga corta -->
+      <rect x="40" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_R_FRONT (4x6) at (44,20) -->
+      <rect x="44" y="20" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <!-- Dobladillo de manga -->
+      <rect x="44" y="25" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_LEFT (4x6) at (48,20) -->
+      <rect x="48" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x6) at (52,20) -->
+      <rect x="52" y="20" width="4" height="6" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- MANGAS CORTAS BRAZO IZQUIERDO (solo 6px desde hombro) -->
+      <!-- ARM_L_TOP (4x4) at (36,48) -->
+      <rect x="36" y="48" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BOTTOM (4x4) at (40,48) -->
+      <rect x="40" y="48" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_RIGHT (4x6) at (32,52) - Solo 6px, manga corta -->
+      <rect x="32" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_L_FRONT (4x6) at (36,52) -->
+      <rect x="36" y="52" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <!-- Dobladillo de manga -->
+      <rect x="36" y="57" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_LEFT (4x6) at (40,52) -->
+      <rect x="40" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x6) at (44,52) -->
+      <rect x="44" y="52" width="4" height="6" fill="#606060" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de remera/camiseta - Tipo 2: Remera deportiva
+ * Con franjas en los hombros
+ */
+export function generateTShirt_02(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- BODY RIGHT (4x12) at (16,20) -->
+      <rect x="16" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- BODY FRONT (8x12) at (20,20) -->
+      <rect x="20" y="20" width="8" height="12" fill="#808080" class="colorizable-clothing"/>
+      <!-- Cuello en V -->
+      <rect x="23" y="20" width="1" height="2" fill="#606060" class="colorizable-clothing"/>
+      <rect x="24" y="20" width="1" height="2" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- BODY LEFT (4x12) at (28,20) -->
+      <rect x="28" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- BODY BACK (8x12) at (32,20) -->
+      <rect x="32" y="20" width="8" height="12" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- MANGAS CORTAS CON FRANJAS -->
+      <!-- ARM_R_TOP (4x4) at (44,16) -->
+      <rect x="44" y="16" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BOTTOM (4x4) at (48,16) -->
+      <rect x="48" y="16" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_RIGHT (4x6) at (40,20) -->
+      <rect x="40" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+      <!-- Franja horizontal -->
+      <rect x="40" y="21" width="4" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_R_FRONT (4x6) at (44,20) -->
+      <rect x="44" y="20" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <rect x="44" y="21" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_LEFT (4x6) at (48,20) -->
+      <rect x="48" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+      <rect x="48" y="21" width="4" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x6) at (52,20) -->
+      <rect x="52" y="20" width="4" height="6" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_TOP (4x4) at (36,48) -->
+      <rect x="36" y="48" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BOTTOM (4x4) at (40,48) -->
+      <rect x="40" y="48" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_RIGHT (4x6) at (32,52) -->
+      <rect x="32" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+      <rect x="32" y="53" width="4" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_L_FRONT (4x6) at (36,52) -->
+      <rect x="36" y="52" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <rect x="36" y="53" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_LEFT (4x6) at (40,52) -->
+      <rect x="40" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+      <rect x="40" y="53" width="4" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x6) at (44,52) -->
+      <rect x="44" y="52" width="4" height="6" fill="#606060" class="colorizable-clothing"/>
     </svg>
   `;
 }
 
 // ============================================================================
-// BIBLIOTECA DE SPRITES - ACCESORIOS
+// BIBLIOTECA DE SPRITES - ACCESORIOS (EXTREMIDADES)
+// ============================================================================
+
+/**
+ * Genera sprite de guantes - Tipo 1: Guantes básicos
+ * Cubren solo las manos (últimos 3px de los brazos)
+ */
+export function generateGloves_01(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- GUANTE BRAZO DERECHO (solo manos, últimos 3px) -->
+      <!-- ARM_R_RIGHT (4x3) at (40,29) -->
+      <rect x="40" y="29" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_R_FRONT (4x3) at (44,29) -->
+      <rect x="44" y="29" width="4" height="3" fill="#606060" class="colorizable-clothing"/>
+      <!-- Detalle de muñeca -->
+      <rect x="44" y="29" width="4" height="1" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- ARM_R_LEFT (4x3) at (48,29) -->
+      <rect x="48" y="29" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x3) at (52,29) -->
+      <rect x="52" y="29" width="4" height="3" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- GUANTE BRAZO IZQUIERDO (solo manos, últimos 3px) -->
+      <!-- ARM_L_RIGHT (4x3) at (32,61) -->
+      <rect x="32" y="61" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_L_FRONT (4x3) at (36,61) -->
+      <rect x="36" y="61" width="4" height="3" fill="#606060" class="colorizable-clothing"/>
+      <!-- Detalle de muñeca -->
+      <rect x="36" y="61" width="4" height="1" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- ARM_L_LEFT (4x3) at (40,61) -->
+      <rect x="40" y="61" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x3) at (44,61) -->
+      <rect x="44" y="61" width="4" height="3" fill="#404040" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de guantes - Tipo 2: Guantes de cuero/trabajo
+ */
+export function generateGloves_02(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- GUANTE BRAZO DERECHO -->
+      <!-- ARM_R_RIGHT (4x3) at (40,29) -->
+      <rect x="40" y="29" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+      <!-- Costuras -->
+      <rect x="41" y="29" width="1" height="3" fill="#4A3022" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_R_FRONT (4x3) at (44,29) -->
+      <rect x="44" y="29" width="4" height="3" fill="#6B4E3D" class="colorizable-clothing"/>
+      <rect x="45" y="29" width="1" height="3" fill="#5C4033" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_R_LEFT (4x3) at (48,29) -->
+      <rect x="48" y="29" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x3) at (52,29) -->
+      <rect x="52" y="29" width="4" height="3" fill="#4A3022" class="colorizable-clothing"/>
+
+      <!-- GUANTE BRAZO IZQUIERDO -->
+      <!-- ARM_L_RIGHT (4x3) at (32,61) -->
+      <rect x="32" y="61" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+      <rect x="33" y="61" width="1" height="3" fill="#4A3022" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_L_FRONT (4x3) at (36,61) -->
+      <rect x="36" y="61" width="4" height="3" fill="#6B4E3D" class="colorizable-clothing"/>
+      <rect x="37" y="61" width="1" height="3" fill="#5C4033" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_L_LEFT (4x3) at (40,61) -->
+      <rect x="40" y="61" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x3) at (44,61) -->
+      <rect x="44" y="61" width="4" height="3" fill="#4A3022" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de zapatos/zapatillas - Tipo 1: Zapatillas deportivas
+ * Cubren solo los pies (últimos 2px de las piernas)
+ */
+export function generateShoes_01(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- ZAPATO PIERNA DERECHA (últimos 2px) -->
+      <!-- LEG_R_RIGHT (4x2) at (0,30) -->
+      <rect x="0" y="30" width="4" height="2" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- LEG_R_FRONT (4x2) at (4,30) -->
+      <rect x="4" y="30" width="4" height="2" fill="#505050" class="colorizable-clothing"/>
+      <!-- Suela -->
+      <rect x="4" y="31" width="4" height="1" fill="#303030"/>
+      <!-- Rayas deportivas -->
+      <rect x="5" y="30" width="2" height="1" fill="#FFFFFF" opacity="0.7"/>
+
+      <!-- LEG_R_LEFT (4x2) at (8,30) -->
+      <rect x="8" y="30" width="4" height="2" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- LEG_R_BACK (4x2) at (12,30) -->
+      <rect x="12" y="30" width="4" height="2" fill="#303030" class="colorizable-clothing"/>
+
+      <!-- ZAPATO PIERNA IZQUIERDA (últimos 2px) -->
+      <!-- LEG_L_RIGHT (4x2) at (16,62) -->
+      <rect x="16" y="62" width="4" height="2" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- LEG_L_FRONT (4x2) at (20,62) -->
+      <rect x="20" y="62" width="4" height="2" fill="#505050" class="colorizable-clothing"/>
+      <!-- Suela -->
+      <rect x="20" y="63" width="4" height="1" fill="#303030"/>
+      <!-- Rayas deportivas -->
+      <rect x="21" y="62" width="2" height="1" fill="#FFFFFF" opacity="0.7"/>
+
+      <!-- LEG_L_LEFT (4x2) at (24,62) -->
+      <rect x="24" y="62" width="4" height="2" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- LEG_L_BACK (4x2) at (28,62) -->
+      <rect x="28" y="62" width="4" height="2" fill="#303030" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de zapatos - Tipo 2: Zapatos formales
+ */
+export function generateShoes_02(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- ZAPATO PIERNA DERECHA -->
+      <!-- LEG_R_RIGHT (4x2) at (0,30) -->
+      <rect x="0" y="30" width="4" height="2" fill="#1A1A1A" class="colorizable-clothing"/>
+
+      <!-- LEG_R_FRONT (4x2) at (4,30) -->
+      <rect x="4" y="30" width="4" height="2" fill="#2A2A2A" class="colorizable-clothing"/>
+      <!-- Suela -->
+      <rect x="4" y="31" width="4" height="1" fill="#0A0A0A"/>
+      <!-- Brillo -->
+      <rect x="5" y="30" width="1" height="1" fill="#FFFFFF" opacity="0.3"/>
+
+      <!-- LEG_R_LEFT (4x2) at (8,30) -->
+      <rect x="8" y="30" width="4" height="2" fill="#1A1A1A" class="colorizable-clothing"/>
+
+      <!-- LEG_R_BACK (4x2) at (12,30) -->
+      <rect x="12" y="30" width="4" height="2" fill="#0F0F0F" class="colorizable-clothing"/>
+
+      <!-- ZAPATO PIERNA IZQUIERDA -->
+      <!-- LEG_L_RIGHT (4x2) at (16,62) -->
+      <rect x="16" y="62" width="4" height="2" fill="#1A1A1A" class="colorizable-clothing"/>
+
+      <!-- LEG_L_FRONT (4x2) at (20,62) -->
+      <rect x="20" y="62" width="4" height="2" fill="#2A2A2A" class="colorizable-clothing"/>
+      <!-- Suela -->
+      <rect x="20" y="63" width="4" height="1" fill="#0A0A0A"/>
+      <!-- Brillo -->
+      <rect x="21" y="62" width="1" height="1" fill="#FFFFFF" opacity="0.3"/>
+
+      <!-- LEG_L_LEFT (4x2) at (24,62) -->
+      <rect x="24" y="62" width="4" height="2" fill="#1A1A1A" class="colorizable-clothing"/>
+
+      <!-- LEG_L_BACK (4x2) at (28,62) -->
+      <rect x="28" y="62" width="4" height="2" fill="#0F0F0F" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de botas - Tipo 1: Botas altas
+ * Cubren más de la pierna (últimos 4px)
+ */
+export function generateBoots_01(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- BOTA PIERNA DERECHA (últimos 4px) -->
+      <!-- LEG_R_RIGHT (4x4) at (0,28) -->
+      <rect x="0" y="28" width="4" height="4" fill="#3D2817" class="colorizable-clothing"/>
+      <!-- Hebilla -->
+      <rect x="1" y="29" width="2" height="1" fill="#C0C0C0" opacity="0.8"/>
+
+      <!-- LEG_R_FRONT (4x4) at (4,28) -->
+      <rect x="4" y="28" width="4" height="4" fill="#4A3022" class="colorizable-clothing"/>
+      <!-- Suela gruesa -->
+      <rect x="4" y="31" width="4" height="1" fill="#1A1A1A"/>
+      <!-- Costura -->
+      <rect x="5" y="28" width="2" height="4" fill="#3D2817" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- LEG_R_LEFT (4x4) at (8,28) -->
+      <rect x="8" y="28" width="4" height="4" fill="#3D2817" class="colorizable-clothing"/>
+
+      <!-- LEG_R_BACK (4x4) at (12,28) -->
+      <rect x="12" y="28" width="4" height="4" fill="#2C1810" class="colorizable-clothing"/>
+
+      <!-- BOTA PIERNA IZQUIERDA (últimos 4px) -->
+      <!-- LEG_L_RIGHT (4x4) at (16,60) -->
+      <rect x="16" y="60" width="4" height="4" fill="#3D2817" class="colorizable-clothing"/>
+      <!-- Hebilla -->
+      <rect x="17" y="61" width="2" height="1" fill="#C0C0C0" opacity="0.8"/>
+
+      <!-- LEG_L_FRONT (4x4) at (20,60) -->
+      <rect x="20" y="60" width="4" height="4" fill="#4A3022" class="colorizable-clothing"/>
+      <!-- Suela gruesa -->
+      <rect x="20" y="63" width="4" height="1" fill="#1A1A1A"/>
+      <!-- Costura -->
+      <rect x="21" y="60" width="2" height="4" fill="#3D2817" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- LEG_L_LEFT (4x4) at (24,60) -->
+      <rect x="24" y="60" width="4" height="4" fill="#3D2817" class="colorizable-clothing"/>
+
+      <!-- LEG_L_BACK (4x4) at (28,60) -->
+      <rect x="28" y="60" width="4" height="4" fill="#2C1810" class="colorizable-clothing"/>
+    </svg>
+  `;
+}
+
+// ============================================================================
+// BIBLIOTECA DE SPRITES - ACCESORIOS (CABEZA)
 // ============================================================================
 
 /**
@@ -934,14 +1288,25 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
   { id: 'legs_average_01', category: ComponentCategory.LEGS_BASE, generator: generateLegs_Average_01, filename: 'legs_average_01.svg' },
   { id: 'legs_long_01', category: ComponentCategory.LEGS_BASE, generator: generateLegs_Long_01, filename: 'legs_long_01.svg' },
 
-  // ROPA
+  // ROPA - SUPERIOR
+  { id: 't_shirt_01', category: ComponentCategory.T_SHIRT, generator: generateTShirt_01, filename: 't_shirt_01.svg' },
+  { id: 't_shirt_02', category: ComponentCategory.T_SHIRT, generator: generateTShirt_02, filename: 't_shirt_02.svg' },
   { id: 'shirt_01', category: ComponentCategory.SHIRT, generator: generateShirt_01, filename: 'shirt_01.svg' },
-  { id: 'pants_01', category: ComponentCategory.PANTS, generator: generatePants_01, filename: 'pants_01.svg' },
   { id: 'jacket_01', category: ComponentCategory.JACKET, generator: generateJacket_01, filename: 'jacket_01.svg' },
 
-  // ACCESORIOS
+  // ROPA - INFERIOR
+  { id: 'pants_01', category: ComponentCategory.PANTS, generator: generatePants_01, filename: 'pants_01.svg' },
+
+  // ACCESORIOS - CABEZA
   { id: 'glasses_01', category: ComponentCategory.GLASSES, generator: generateGlasses_01, filename: 'glasses_01.svg' },
   { id: 'hat_01', category: ComponentCategory.HAT, generator: generateHat_01, filename: 'hat_01.svg' },
+
+  // ACCESORIOS - EXTREMIDADES
+  { id: 'gloves_01', category: ComponentCategory.GLOVES, generator: generateGloves_01, filename: 'gloves_01.svg' },
+  { id: 'gloves_02', category: ComponentCategory.GLOVES, generator: generateGloves_02, filename: 'gloves_02.svg' },
+  { id: 'shoes_01', category: ComponentCategory.SHOES, generator: generateShoes_01, filename: 'shoes_01.svg' },
+  { id: 'shoes_02', category: ComponentCategory.SHOES, generator: generateShoes_02, filename: 'shoes_02.svg' },
+  { id: 'boots_01', category: ComponentCategory.BOOTS, generator: generateBoots_01, filename: 'boots_01.svg' },
 ];
 
 /**

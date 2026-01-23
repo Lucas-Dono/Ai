@@ -38,7 +38,8 @@ export enum ComponentCategory {
   LEGS_BASE = 'legs_base',     // Piernas base (piel)
 
   // ROPA - SUPERIOR
-  SHIRT = 'shirt',             // Camisa/blusa
+  T_SHIRT = 't_shirt',         // Remera/camiseta (manga corta)
+  SHIRT = 'shirt',             // Camisa/blusa (manga larga)
   JACKET = 'jacket',           // Chaqueta/campera
   VEST = 'vest',               // Chaleco
   DRESS_TOP = 'dress_top',     // Parte superior de vestido
@@ -55,6 +56,7 @@ export enum ComponentCategory {
   EARRINGS = 'earrings',       // Aretes
   GLOVES = 'gloves',           // Guantes (overlay en manos)
   SHOES = 'shoes',             // Zapatos (overlay en pies)
+  BOOTS = 'boots',             // Botas (cubren más de la pierna)
 
   // EXTRAS
   TATTOO = 'tattoo',           // Tatuajes
@@ -271,21 +273,23 @@ export interface SkinConfiguration {
     legs: string;              // ID: "legs_average_01"
 
     // ROPA
-    shirt?: string;            // Opcional
-    jacket?: string;           // Opcional
-    vest?: string;             // Opcional
+    tShirt?: string;           // Opcional (remera/camiseta manga corta)
+    shirt?: string;            // Opcional (camisa manga larga)
+    jacket?: string;           // Opcional (chaqueta/campera)
+    vest?: string;             // Opcional (chaleco)
     dressTop?: string;         // Opcional (excluye shirt/jacket)
-    pants?: string;            // Opcional
+    pants?: string;            // Opcional (pantalones)
     skirt?: string;            // Opcional (excluye pants)
     dressBottom?: string;      // Opcional (excluye pants/skirt)
 
     // ACCESORIOS
-    glasses?: string;          // Opcional
-    hat?: string;              // Opcional
-    necklace?: string;         // Opcional
-    earrings?: string;         // Opcional
-    gloves?: string;           // Opcional
-    shoes?: string;            // Opcional
+    glasses?: string;          // Opcional (lentes)
+    hat?: string;              // Opcional (sombrero/gorra)
+    necklace?: string;         // Opcional (collar)
+    earrings?: string;         // Opcional (aretes)
+    gloves?: string;           // Opcional (guantes)
+    shoes?: string;            // Opcional (zapatos/zapatillas)
+    boots?: string;            // Opcional (botas, excluye shoes)
 
     // EXTRAS
     tattoo?: string;           // Opcional
@@ -359,6 +363,7 @@ export const SkinConfigurationSchema = z.object({
     torso: z.string(),
     arms: z.string(),
     legs: z.string(),
+    tShirt: z.string().optional(),
     shirt: z.string().optional(),
     jacket: z.string().optional(),
     vest: z.string().optional(),
@@ -372,6 +377,7 @@ export const SkinConfigurationSchema = z.object({
     earrings: z.string().optional(),
     gloves: z.string().optional(),
     shoes: z.string().optional(),
+    boots: z.string().optional(),
     tattoo: z.string().optional(),
     scars: z.string().optional(),
     makeup: z.string().optional(),

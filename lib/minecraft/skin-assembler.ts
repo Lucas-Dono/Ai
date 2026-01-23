@@ -128,7 +128,7 @@ export async function assembleSkin(
     // 4. CAPA BASE: Piel del cuerpo (torso, brazos, piernas)
     await addBodyBaseLayers(layers, config, componentsBaseDir);
 
-    // 5. CAPA: Ropa (camisas, pantalones, etc.)
+    // 5. CAPA: Ropa (remeras, camisas, chaquetas, pantalones)
     await addClothingLayers(layers, config, componentsBaseDir);
 
     // 6. CAPA: Cabeza (ojos, boca, nariz en regiones UV de cabeza)
@@ -137,8 +137,11 @@ export async function assembleSkin(
     // 7. CAPA: Pelo (overlay de cabeza)
     await addHairLayers(layers, config, componentsBaseDir);
 
-    // 8. CAPA: Accesorios (lentes, sombreros, etc.)
-    await addAccessoryLayers(layers, config, componentsBaseDir);
+    // 8. CAPA: Accesorios extremidades (guantes, zapatos/botas)
+    await addExtremityAccessories(layers, config, componentsBaseDir);
+
+    // 9. CAPA: Accesorios cabeza (lentes, sombreros)
+    await addHeadAccessories(layers, config, componentsBaseDir);
 
     // 8. Componer todas las capas
     console.log(`[Skin Assembler] Componiendo ${layers.length} capas...`);
@@ -222,8 +225,14 @@ async function addBodyBaseLayers(
 }
 
 /**
- * Agrega capas de ropa
+ * Agrega capas de ropa en orden correcto
  * Los sprites de ropa ahora son de 64x64 completos con todas las caras
+ *
+ * Orden de capas (de abajo hacia arriba):
+ * 1. Remera/T-shirt (manga corta)
+ * 2. Camisa (manga larga) - se puede combinar con remera
+ * 3. Chaqueta/Jacket - capa superior
+ * 4. Pantalones
  */
 async function addClothingLayers(
   layers: sharp.OverlayOptions[],
@@ -232,10 +241,24 @@ async function addClothingLayers(
 ): Promise<void> {
   const { colors, components } = config;
 
-  // Camisa (sprite completo 64x64)
+  // 1. Remera/T-shirt (manga corta, capa base)
+  if (components.tShirt) {
+    const tShirtPath = path.join(baseDir, ComponentCategory.T_SHIRT, `${components.tShirt}.png`);
+    const recoloredTShirt = await recolorImage(tShirtPath, colors.clothingPrimary);
+    layers.push({
+      input: recoloredTShirt,
+      top: 0,
+      left: 0,
+    });
+  }
+
+  // 2. Camisa (manga larga, sobre remera si existe)
   if (components.shirt) {
     const shirtPath = path.join(baseDir, ComponentCategory.SHIRT, `${components.shirt}.png`);
-    const recoloredShirt = await recolorImage(shirtPath, colors.clothingPrimary);
+    const recoloredShirt = await recolorImage(
+      shirtPath,
+      components.tShirt ? (colors.clothingSecondary || colors.clothingPrimary) : colors.clothingPrimary
+    );
     layers.push({
       input: recoloredShirt,
       top: 0,
@@ -243,7 +266,7 @@ async function addClothingLayers(
     });
   }
 
-  // Chaqueta (sprite completo 64x64, sobre camisa)
+  // 3. Chaqueta/Jacket (capa superior)
   if (components.jacket) {
     const jacketPath = path.join(baseDir, ComponentCategory.JACKET, `${components.jacket}.png`);
     const recoloredJacket = await recolorImage(
@@ -257,7 +280,7 @@ async function addClothingLayers(
     });
   }
 
-  // Pantalones (sprite completo 64x64)
+  // 4. Pantalones
   if (components.pants) {
     const pantsPath = path.join(baseDir, ComponentCategory.PANTS, `${components.pants}.png`);
     const recoloredPants = await recolorImage(pantsPath, colors.clothingPrimary);
@@ -381,9 +404,50 @@ async function addHairLayers(
 }
 
 /**
- * Agrega accesorios (lentes, sombreros, etc.)
+ * Agrega accesorios de extremidades (guantes, zapatos, botas)
  */
-async function addAccessoryLayers(
+async function addExtremityAccessories(
+  layers: sharp.OverlayOptions[],
+  config: SkinConfiguration,
+  baseDir: string
+): Promise<void> {
+  const { colors, components } = config;
+
+  // Guantes (cubren solo las manos)
+  if (components.gloves) {
+    const glovesPath = path.join(baseDir, ComponentCategory.GLOVES, `${components.gloves}.png`);
+    const recoloredGloves = await recolorImage(glovesPath, colors.clothingSecondary || colors.clothingPrimary);
+    layers.push({
+      input: recoloredGloves,
+      top: 0,
+      left: 0,
+    });
+  }
+
+  // Zapatos o Botas (cubren solo los pies)
+  if (components.shoes) {
+    const shoesPath = path.join(baseDir, ComponentCategory.SHOES, `${components.shoes}.png`);
+    const recoloredShoes = await recolorImage(shoesPath, colors.clothingSecondary || colors.clothingPrimary);
+    layers.push({
+      input: recoloredShoes,
+      top: 0,
+      left: 0,
+    });
+  } else if (components.boots) {
+    const bootsPath = path.join(baseDir, ComponentCategory.BOOTS, `${components.boots}.png`);
+    const recoloredBoots = await recolorImage(bootsPath, colors.clothingSecondary || colors.clothingPrimary);
+    layers.push({
+      input: recoloredBoots,
+      top: 0,
+      left: 0,
+    });
+  }
+}
+
+/**
+ * Agrega accesorios de cabeza (lentes, sombreros)
+ */
+async function addHeadAccessories(
   layers: sharp.OverlayOptions[],
   config: SkinConfiguration,
   baseDir: string
