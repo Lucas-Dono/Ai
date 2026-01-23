@@ -73,12 +73,17 @@ export async function POST(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
     const body = await req.json();
+    console.log('[Minecraft Chat] Body recibido:', JSON.stringify(body, null, 2));
+
     const validation = minecraftChatSchema.safeParse(body);
 
     if (!validation.success) {
+      console.log('[Minecraft Chat] Validation failed:', JSON.stringify(validation.error, null, 2));
       const error = formatZodError(validation.error);
       return NextResponse.json(error, { status: 400 });
     }
+
+    console.log('[Minecraft Chat] Validation passed, processing message...');
 
     const { message, context } = validation.data;
 
