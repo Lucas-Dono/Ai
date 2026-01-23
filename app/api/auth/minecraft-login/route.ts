@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
-import { verifyPassword } from '@/lib/auth';
 import { generateToken } from '@/lib/jwt';
-import { formatZodError } from '@/lib/utils/validation';
+import { formatZodError } from '@/lib/validation/schemas';
+import bcrypt from 'bcryptjs';
 
 /**
  * POST /api/auth/minecraft-login
@@ -11,7 +11,7 @@ import { formatZodError } from '@/lib/utils/validation';
  * Endpoint de autenticación específico para integraciones externas (Minecraft, CLI, etc.)
  *
  * Diferencias con /api/auth/login normal:
- * - Retorna JWT de larga duración (90 días) en lugar de session cookie
+ * - Retorna JWT de larga duración (30 días) en lugar de session cookie
  * - Incluye datos completos del usuario (agentes, plan, etc.)
  * - Diseñado para clients que no soportan cookies
  */
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const passwordValid = await verifyPassword(password, user.password);
+    const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
       return NextResponse.json(
         { error: 'Email o contraseña incorrectos' },
@@ -79,15 +79,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generar JWT de larga duración (90 días)
-    const token = await generateToken(
-      {
-        userId: user.id,
-        email: user.email,
-        purpose: 'minecraft-integration',
-      },
-      '90d' // 90 días
-    );
+    // Generar JWT de larga duración (30 días por defecto en generateToken)
+    const token = await generateToken({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      plan: user.plan,
+    });
 
     // Registrar login exitoso
     console.log(`[Minecraft Login] Usuario autenticado: ${user.email}`);
@@ -95,7 +93,7 @@ export async function POST(req: NextRequest) {
     // Retornar JWT + datos del usuario
     return NextResponse.json({
       token,
-      expiresIn: 90 * 24 * 60 * 60, // 90 días en segundos
+      expiresIn: 30 * 24 * 60 * 60, // 30 días en segundos
       user: {
         id: user.id,
         email: user.email,
