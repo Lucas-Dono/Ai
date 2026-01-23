@@ -75,7 +75,7 @@ public class AgentChatScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         // Fondo oscuro
-        this.renderBackground(context, mouseX, mouseY, delta);
+        this.renderBackground(context);
 
         // Título
         context.drawCenteredTextWithShadow(

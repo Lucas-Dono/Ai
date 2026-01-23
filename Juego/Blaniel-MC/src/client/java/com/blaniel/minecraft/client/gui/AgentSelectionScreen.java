@@ -44,7 +44,7 @@ public class AgentSelectionScreen extends Screen {
 
         client.getAvailableAgents().thenAccept(response -> {
             if (response != null && response.agents != null) {
-                this.agents = response.agents;
+                this.agents = java.util.Arrays.asList(response.agents);
                 this.loading = false;
                 // Reconstruir botones en el thread principal
                 if (this.client != null) {
@@ -152,7 +152,7 @@ public class AgentSelectionScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         // Fondo oscuro
-        this.renderBackground(context, mouseX, mouseY, delta);
+        this.renderBackground(context);
 
         // Título
         context.drawCenteredTextWithShadow(

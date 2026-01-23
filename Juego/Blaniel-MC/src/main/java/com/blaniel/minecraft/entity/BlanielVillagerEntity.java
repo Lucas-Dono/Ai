@@ -67,30 +67,33 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 */
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		if (this.getWorld().isClient) {
-			// Lado del cliente - abrir GUI
-			if (!blanielAgentId.isEmpty()) {
-				openChatScreen();
-			}
-		} else {
+		if (!this.getWorld().isClient) {
 			// Lado del servidor
 			if (blanielAgentId.isEmpty()) {
 				player.sendMessage(Text.literal("§c[Blaniel] §fEste aldeano no tiene un agente asignado"), false);
 				player.sendMessage(Text.literal("§7Abre la UI con tecla K para asignar un agente"), false);
+			} else {
+				// Enviar packet al cliente para abrir GUI
+				if (player instanceof net.minecraft.server.network.ServerPlayerEntity) {
+					net.minecraft.server.network.ServerPlayerEntity serverPlayer =
+						(net.minecraft.server.network.ServerPlayerEntity) player;
+
+					net.minecraft.network.PacketByteBuf byteBuf =
+						net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+					byteBuf.writeInt(this.getId());
+					byteBuf.writeString(this.blanielAgentId);
+					byteBuf.writeString(this.blanielAgentName);
+
+					net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
+						serverPlayer,
+						com.blaniel.minecraft.network.NetworkHandler.OPEN_CHAT_PACKET,
+						byteBuf
+					);
+				}
 			}
 		}
 
 		return ActionResult.SUCCESS;
-	}
-
-	/**
-	 * Abrir pantalla de chat (lado del cliente)
-	 */
-	private void openChatScreen() {
-		if (this.getWorld().isClient) {
-			net.minecraft.client.MinecraftClient client = net.minecraft.client.MinecraftClient.getInstance();
-			client.setScreen(new com.blaniel.minecraft.client.gui.AgentChatScreen(this));
-		}
 	}
 
 	/**
