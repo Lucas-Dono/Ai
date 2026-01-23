@@ -24,6 +24,10 @@ public class BlanielCommands {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 
 		dispatcher.register(CommandManager.literal("blaniel")
+			// /blaniel login
+			.then(CommandManager.literal("login")
+				.executes(BlanielCommands::openLoginScreen)
+			)
 			// /blaniel spawn <agentId>
 			.then(CommandManager.literal("spawn")
 				.then(CommandManager.argument("agentId", StringArgumentType.string())
@@ -268,6 +272,24 @@ public class BlanielCommands {
 
 		source.sendFeedback(
 			() -> Text.literal("§a[Blaniel] §fAPI URL configurada: " + url),
+			false
+		);
+
+		return 1;
+	}
+
+	/**
+	 * /blaniel login
+	 */
+	private static int openLoginScreen(CommandContext<ServerCommandSource> context) {
+		ServerCommandSource source = context.getSource();
+
+		source.sendFeedback(
+			() -> Text.literal("§a[Blaniel] §fPara iniciar sesión, presiona la tecla 'L' en el juego"),
+			false
+		);
+		source.sendFeedback(
+			() -> Text.literal("§7O abre el menú del mod desde Opciones > Mods > Blaniel MC"),
 			false
 		);
 
