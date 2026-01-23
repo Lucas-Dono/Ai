@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/jwt';
 import { formatZodError } from '@/lib/validation/schemas';
-import bcrypt from 'bcryptjs';
+import { verifyPassword } from 'better-auth/crypto';
 
 /**
  * POST /api/auth/minecraft-login
@@ -86,8 +86,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('[Minecraft Login] Verificando contraseña con bcrypt...');
-    const passwordValid = await bcrypt.compare(password, user.password);
+    console.log('[Minecraft Login] Verificando contraseña con better-auth...');
+    const passwordValid = await verifyPassword({
+      password: password,
+      hash: user.password,
+    });
     console.log('[Minecraft Login] Password valid:', passwordValid ? 'SÍ ✅' : 'NO ❌');
 
     if (!passwordValid) {
