@@ -492,7 +492,7 @@ export function generateHairLongBody_01(): string {
 
 /**
  * Genera sprite de pelo largo (cabeza) - Tipo 2: Wavy Long Hair (Ondulado)
- * Ondas naturales con movimiento y volumen
+ * Ondas naturales con movimiento y volumen, flequillo lateral que NO tapa ojos
  */
 export function generateHairLong_02(): string {
   return `
@@ -506,40 +506,76 @@ export function generateHairLong_02(): string {
       <!-- Volumen -->
       <rect x="40" y="0" width="8" height="2" fill="#909090" class="colorizable-hair"/>
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con ondas -->
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con ondas cayendo -->
       <rect x="32" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <!-- Patrón de ondas -->
-      <rect x="33" y="9" width="4" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="34" y="10" width="3" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="33" y="11" width="4" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="32" y="12" width="5" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="33" y="13" width="3" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="34" y="14" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Marco superior -->
+      <rect x="33" y="9" width="5" height="1" fill="#909090" class="colorizable-hair"/>
+      <!-- Ondas laterales -->
+      <rect x="32" y="10" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="10" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="11" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="34" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="32" y="12" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="12" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="13" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="34" y="13" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="32" y="14" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="14" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="15" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="15" width="2" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente ondulado -->
-      <rect x="40" y="8" width="8" height="5" fill="#808080" class="colorizable-hair"/>
-      <!-- Ondas frontales -->
-      <rect x="41" y="9" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="45" y="9" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="42" y="10" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="41" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Flequillo lateral LIGERO que NO tapa ojos -->
+      <!-- Solo marco superior y flequillo en las esquinas -->
+      <rect x="40" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="41" y="8" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="42" y="9" width="4" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con ondas -->
+      <!-- Flequillo lateral derecho (no tapa ojos) -->
+      <rect x="40" y="10" width="2" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="40" y="11" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+
+      <!-- Flequillo lateral izquierdo (no tapa ojos) -->
+      <rect x="46" y="10" width="2" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="47" y="11" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+
+      <!-- Mechones sueltos laterales -->
+      <rect x="40" y="13" width="1" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="47" y="13" width="1" height="2" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con ondas cayendo -->
       <rect x="48" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <!-- Patrón de ondas -->
-      <rect x="51" y="9" width="4" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="51" y="10" width="3" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="51" y="11" width="4" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="51" y="12" width="5" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="52" y="13" width="3" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="52" y="14" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Marco superior -->
+      <rect x="50" y="9" width="5" height="1" fill="#909090" class="colorizable-hair"/>
+      <!-- Ondas laterales -->
+      <rect x="49" y="10" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="51" y="10" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="50" y="11" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="52" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="49" y="12" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="52" y="12" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="50" y="13" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="52" y="13" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="49" y="14" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="52" y="14" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="51" y="15" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="53" y="15" width="2" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera ondulada -->
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera ondulada con volumen -->
       <rect x="56" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <!-- Ondas de volumen -->
+      <!-- Marco superior con volumen -->
       <rect x="57" y="9" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="58" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="57" y="13" width="6" height="2" fill="#707070" class="colorizable-hair"/>
+      <!-- Ondas verticales -->
+      <rect x="56" y="10" width="8" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="58" y="10" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="56" y="11" width="8" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="59" y="11" width="3" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="56" y="12" width="8" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="58" y="12" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="56" y="13" width="8" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="59" y="13" width="3" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="56" y="14" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="58" y="14" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="59" y="15" width="3" height="1" fill="#707070" class="colorizable-hair"/>
     </svg>
   `;
 }

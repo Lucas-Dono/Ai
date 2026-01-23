@@ -391,6 +391,17 @@ async function addHairLayers(
     });
   }
 
+  // Pelo cayendo en cuerpo (para pelo largo que cae en espalda/hombros)
+  if (components.hairBody) {
+    const hairBodyPath = path.join(baseDir, ComponentCategory.HAIR_BODY, `${components.hairBody}.png`);
+    const recoloredHairBody = await recolorImage(hairBodyPath, colors.hairPrimary);
+    layers.push({
+      input: recoloredHairBody,
+      top: 0,
+      left: 0,
+    });
+  }
+
   // Barba/bigote
   if (components.facialHair) {
     const facialHairPath = path.join(baseDir, ComponentCategory.FACIAL_HAIR, `${components.facialHair}.png`);

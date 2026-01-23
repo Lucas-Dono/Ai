@@ -267,6 +267,7 @@ export interface SkinConfiguration {
     hairBack?: string;         // Opcional
     hairTop?: string;          // Opcional
     hairSides?: string;        // Opcional
+    hairBody?: string;         // Opcional (pelo largo cayendo en cuerpo)
     facialHair?: string;       // Opcional (barba/bigote)
 
     // CUERPO BASE
@@ -361,6 +362,7 @@ export const SkinConfigurationSchema = z.object({
     hairBack: z.string().optional(),
     hairTop: z.string().optional(),
     hairSides: z.string().optional(),
+    hairBody: z.string().optional(),
     facialHair: z.string().optional(),
     torso: z.string(),
     arms: z.string(),
