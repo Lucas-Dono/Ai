@@ -149,6 +149,7 @@ model Agent {
   externalSourceUrl        String?
   aiGeneratedFields        Json?
   userEditedFields         Json?
+  metadata                 Json?
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime
   Team                     Team?                     @relation(fields: [teamId], references: [id])

@@ -22,6 +22,7 @@ import {
   generateImportantPeopleFromProfile,
   generateEpisodicMemoriesFromProfile,
 } from './generation.service';
+import { analyzeSkinTraits } from '@/lib/minecraft/skin-trait-analyzer';
 
 const prisma = new PrismaClient();
 
@@ -127,6 +128,34 @@ export async function createCharacter(
     });
 
     reportProgress(onProgress, 'agent', 65, 'Personaje creado!');
+
+    // Step 5.5: Generate Minecraft skin traits (67%)
+    let minecraftSkinTraits = null;
+    if (draft.referenceImage) {
+      try {
+        reportProgress(onProgress, 'minecraft-skin', 67, 'Generando skin de Minecraft...');
+        minecraftSkinTraits = await analyzeSkinTraits(draft.referenceImage);
+
+        // Actualizar metadata del agente con los traits
+        await prisma.agent.update({
+          where: { id: agent.id },
+          data: {
+            metadata: {
+              minecraft: {
+                compatible: true,
+                skinTraits: minecraftSkinTraits,
+                generatedAt: new Date().toISOString(),
+              },
+            },
+          },
+        });
+
+        console.log('[Minecraft] Skin traits generados:', minecraftSkinTraits);
+      } catch (error) {
+        console.error('[Minecraft] Error generando skin traits:', error);
+        // No es crítico, continuar sin skin
+      }
+    }
 
     // Step 6: Create Relation (User ↔ Agent) (70%)
     reportProgress(onProgress, 'relation', 70, 'Creando relación...');
