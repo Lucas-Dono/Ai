@@ -67,19 +67,30 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 */
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
-		if (!this.getWorld().isClient) {
+		if (this.getWorld().isClient) {
+			// Lado del cliente - abrir GUI
+			if (!blanielAgentId.isEmpty()) {
+				openChatScreen();
+			}
+		} else {
 			// Lado del servidor
 			if (blanielAgentId.isEmpty()) {
 				player.sendMessage(Text.literal("§c[Blaniel] §fEste aldeano no tiene un agente asignado"), false);
-				player.sendMessage(Text.literal("§7Usa: /blaniel assign <agentId>"), false);
-			} else {
-				player.sendMessage(Text.literal("§a[Blaniel] §fHabla con " + blanielAgentName), false);
-				player.sendMessage(Text.literal("§7Usa: /blaniel chat <mensaje>"), false);
-				// TODO: Abrir GUI de chat
+				player.sendMessage(Text.literal("§7Abre la UI con tecla K para asignar un agente"), false);
 			}
 		}
 
 		return ActionResult.SUCCESS;
+	}
+
+	/**
+	 * Abrir pantalla de chat (lado del cliente)
+	 */
+	private void openChatScreen() {
+		if (this.getWorld().isClient) {
+			net.minecraft.client.MinecraftClient client = net.minecraft.client.MinecraftClient.getInstance();
+			client.setScreen(new com.blaniel.minecraft.client.gui.AgentChatScreen(this));
+		}
 	}
 
 	/**

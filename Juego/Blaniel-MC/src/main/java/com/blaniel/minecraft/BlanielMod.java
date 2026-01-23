@@ -56,6 +56,9 @@ public class BlanielMod implements ModInitializer {
 			BlanielCommands.register(dispatcher);
 		});
 
+		// Registrar network handlers
+		com.blaniel.minecraft.network.NetworkHandler.registerServerReceivers();
+
 		LOGGER.info("Blaniel Minecraft Integration cargado exitosamente");
 	}
 }
