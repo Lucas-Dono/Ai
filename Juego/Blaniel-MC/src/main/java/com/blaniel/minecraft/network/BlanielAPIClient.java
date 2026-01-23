@@ -20,8 +20,9 @@ public class BlanielAPIClient {
 	private static final Gson GSON = new Gson();
 
 	// Cliente HTTP compartido con configuración optimizada
+	// Usamos HTTP/1.1 para compatibilidad con servidores de desarrollo (localhost sin TLS)
 	private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-		.version(HttpClient.Version.HTTP_2)
+		.version(HttpClient.Version.HTTP_1_1)
 		.connectTimeout(Duration.ofSeconds(10))
 		.build();
 
@@ -44,10 +45,16 @@ public class BlanielAPIClient {
 			body.addProperty("email", email);
 			body.addProperty("password", password);
 
+			String url = baseUrl + "/api/auth/minecraft-login";
+			System.out.println("[Blaniel API] Login request to: " + url);
+			System.out.println("[Blaniel API] Request body: " + body.toString());
+
 			// Construir request
 			HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(baseUrl + "/api/auth/minecraft-login"))
+				.uri(URI.create(url))
 				.header("Content-Type", "application/json")
+				.header("Accept", "application/json")
+				.header("User-Agent", "BlanielMinecraft/0.1.0")
 				.POST(HttpRequest.BodyPublishers.ofString(body.toString()))
 				.timeout(Duration.ofSeconds(30))
 				.build();
@@ -55,9 +62,12 @@ public class BlanielAPIClient {
 			// Ejecutar request (async nativo)
 			return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 				.thenApply(response -> {
+					System.out.println("[Blaniel API] Response status: " + response.statusCode());
 					String responseBody = response.body();
+					System.out.println("[Blaniel API] Response body: " + responseBody);
 
 					if (response.statusCode() != 200) {
+						System.err.println("[Blaniel API] Login failed with status: " + response.statusCode());
 						LoginResponse errorResponse = new LoginResponse();
 						errorResponse.success = false;
 						errorResponse.error = parseErrorMessage(responseBody);
@@ -66,6 +76,7 @@ public class BlanielAPIClient {
 
 					LoginResponse loginResponse = GSON.fromJson(responseBody, LoginResponse.class);
 					loginResponse.success = true;
+					System.out.println("[Blaniel API] Login successful for: " + loginResponse.user.email);
 					return loginResponse;
 				})
 				.exceptionally(e -> {
@@ -131,6 +142,8 @@ public class BlanielAPIClient {
 				.uri(URI.create(baseUrl + "/api/v1/minecraft/agents/" + agentId + "/chat"))
 				.header("Authorization", "Bearer " + jwtToken)
 				.header("Content-Type", "application/json")
+				.header("Accept", "application/json")
+				.header("User-Agent", "BlanielMinecraft/0.1.0")
 				.POST(HttpRequest.BodyPublishers.ofString(body.toString()))
 				.timeout(Duration.ofSeconds(30))
 				.build();
@@ -181,6 +194,8 @@ public class BlanielAPIClient {
 			HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(baseUrl + "/api/v1/minecraft/agents"))
 				.header("Authorization", "Bearer " + jwtToken)
+				.header("Accept", "application/json")
+				.header("User-Agent", "BlanielMinecraft/0.1.0")
 				.GET()
 				.timeout(Duration.ofSeconds(15))
 				.build();
