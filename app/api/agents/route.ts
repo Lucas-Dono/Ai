@@ -10,6 +10,7 @@ import type { BehaviorType } from "@prisma/client";
 import type { ProfileData } from "@/types/prisma-json";
 import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
 import { sanitizeAndValidateName } from "@/lib/security/unicode-sanitizer";
+import { nanoid } from "nanoid";
 
 export async function POST(req: NextRequest) {
   try {
@@ -130,6 +131,7 @@ export async function POST(req: NextRequest) {
         // Crear agente dentro de la transacción
         const newAgent = await tx.agent.create({
           data: {
+            id: nanoid(),
             userId,
             kind,
             name,
@@ -143,6 +145,7 @@ export async function POST(req: NextRequest) {
             systemPrompt,
             visibility: "private",
             nsfwMode: nsfwMode || false,
+            updatedAt: new Date(),
           },
         });
 
@@ -187,6 +190,7 @@ export async function POST(req: NextRequest) {
     console.log('[API] Creando relación inicial...');
     await prisma.relation.create({
       data: {
+        id: nanoid(),
         subjectId: agent.id,
         targetId: userId,
         targetType: "user",
@@ -195,6 +199,7 @@ export async function POST(req: NextRequest) {
         respect: 0.5,
         privateState: { love: 0, curiosity: 0 },
         visibleState: { trust: 0.5, affinity: 0.5, respect: 0.5 },
+        updatedAt: new Date(),
       },
     });
     console.log('[API] Relación creada');
@@ -240,6 +245,7 @@ export async function POST(req: NextRequest) {
       // Crear BehaviorProfile
       await prisma.behaviorProfile.create({
         data: {
+          id: nanoid(),
           agentId: agent.id,
           behaviorType: behaviorType as BehaviorType,
           baseIntensity: 0.3, // Intensidad inicial moderada
@@ -249,6 +255,7 @@ export async function POST(req: NextRequest) {
           triggers: [],
           phaseStartedAt: new Date(),
           phaseHistory: [],
+          updatedAt: new Date(),
         },
       });
 
@@ -257,12 +264,14 @@ export async function POST(req: NextRequest) {
       // Crear BehaviorProgressionState inicial
       await prisma.behaviorProgressionState.create({
         data: {
+          id: nanoid(),
           agentId: agent.id,
           totalInteractions: 0,
           positiveInteractions: 0,
           negativeInteractions: 0,
           currentIntensities: { [behaviorType]: 0.3 },
           lastCalculatedAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 
@@ -460,6 +469,7 @@ async function processAgentMultimediaInBackground(
         // Crear InternalState con campos correctos
         await prisma.internalState.create({
           data: {
+            id: nanoid(),
             agentId: agentId,
             currentEmotions: {}, // Emociones iniciales vacías
             activeGoals: [], // Goals iniciales vacíos
@@ -541,7 +551,7 @@ export async function GET(req: NextRequest) {
       include: {
         _count: {
           select: {
-            reviews: true,
+            Review: true,
           },
         },
       },
@@ -557,7 +567,7 @@ export async function GET(req: NextRequest) {
       return {
         ...agentData,
         isPublic: agent.visibility === 'public',
-        reviewCount: _count?.reviews || 0,
+        reviewCount: _count?.Review || 0,
       };
     });
 

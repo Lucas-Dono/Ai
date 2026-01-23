@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { subDays, startOfDay, endOfDay } from 'date-fns';
+import { nanoid } from 'nanoid';
 
 // ============================================================================
 // SECURITY: Verificación de autorización
@@ -376,7 +377,11 @@ export async function GET(request: NextRequest) {
 
     const result = await prisma.dailyKPI.upsert({
       where: { date: yesterday },
-      create: kpiData,
+      create: {
+        id: nanoid(),
+        updatedAt: new Date(),
+        ...kpiData
+      },
       update: kpiData
     });
 

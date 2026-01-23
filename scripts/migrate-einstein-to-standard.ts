@@ -10,7 +10,7 @@ async function migrateEinstein() {
 
   const einstein = await prisma.agent.findFirst({
     where: { name: { contains: 'Einstein' } },
-    include: { semanticMemory: true },
+    include: { SemanticMemory: true },
   });
 
   if (!einstein) {
@@ -500,13 +500,13 @@ async function migrateEinstein() {
   };
 
   // Actualizar worldKnowledge
-  if (!einstein.semanticMemory) {
+  if (!einstein.SemanticMemory) {
     console.error('❌ Einstein no tiene SemanticMemory');
     process.exit(1);
   }
 
   await prisma.semanticMemory.update({
-    where: { id: einstein.semanticMemory.id },
+    where: { id: einstein.SemanticMemory.id },
     data: {
       worldKnowledge: standardWorldKnowledge,
     },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
+import { nanoid } from "nanoid";
 
 /**
  * PATCH /api/groups/[id]/members/[memberId]
@@ -42,7 +43,7 @@ export async function PATCH(
     const targetMember = await prisma.groupMember.findUnique({
       where: { id: memberId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -136,7 +137,7 @@ export async function PATCH(
       where: { id: memberId },
       data: updateData,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -199,7 +200,7 @@ export async function DELETE(
     const targetMember = await prisma.groupMember.findUnique({
       where: { id: memberId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -265,9 +266,11 @@ export async function DELETE(
     const actionText = isSelfLeaving ? "salió del grupo" : "fue removido del grupo";
     await prisma.groupMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId,
         authorType: "user",
-        content: `${targetMember.user?.name} ${actionText}`,
+        content: `${targetMember.User?.name} ${actionText}`,
         contentType: "system",
         isSystemMessage: true,
         turnNumber: (await prisma.groupMessage.count({ where: { groupId } })) + 1,

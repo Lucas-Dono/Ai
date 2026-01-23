@@ -21,6 +21,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAlerts } from "@/lib/analytics/kpi-tracker";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest) {
     try {
       await prisma.analyticsEvent.create({
         data: {
+          id: nanoid(),
           eventType: "alerts_checked",
           metadata: {
             alertsCount: alerts.length,

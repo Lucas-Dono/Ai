@@ -30,6 +30,7 @@ import { VoiceRecorder } from "@/components/chat/VoiceRecorder";
 import { ImageUploader } from "@/components/chat/ImageUploader";
 import { StickerGifPicker } from "@/components/chat/StickerGifPicker";
 import { ChatSearch } from "@/components/chat/ChatSearch";
+import { AgentInfoModal } from "@/components/chat/AgentInfoModal";
 
 interface DirectMessageChatProps {
   agentId: string;
@@ -80,7 +81,8 @@ const HeaderDropdown = ({
   onSearch,
   onExport,
   onReset,
-  onDelete
+  onDelete,
+  onOpenAgentInfo
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -89,6 +91,7 @@ const HeaderDropdown = ({
   onExport?: () => void;
   onReset?: () => void;
   onDelete?: () => void;
+  onOpenAgentInfo?: () => void;
 }) => {
   if (!isOpen) return null;
 
@@ -101,9 +104,7 @@ const HeaderDropdown = ({
     {
       icon: User,
       label: "Ver más información",
-      onClick: () => {
-        window.location.href = `/agentes/${agentId}`;
-      }
+      onClick: onOpenAgentInfo
     },
     {
       icon: Brain,
@@ -494,6 +495,7 @@ export function DirectMessageChat({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [showAgentInfoModal, setShowAgentInfoModal] = useState(false);
 
   // Agent state
   const [agentState, setAgentState] = useState<AgentState>({
@@ -930,6 +932,10 @@ export function DirectMessageChat({
               onSearch={() => setShowSearch(true)}
               onReset={() => setShowResetConfirm(true)}
               onDelete={() => setShowDeleteConfirm(true)}
+              onOpenAgentInfo={() => {
+                setIsMenuOpen(false);
+                setShowAgentInfoModal(true);
+              }}
             />
           </div>
         </header>
@@ -1214,6 +1220,14 @@ export function DirectMessageChat({
           </motion.div>
         </div>
       )}
+
+      {/* Modal de Información del Agente */}
+      <AgentInfoModal
+        agentId={agentId}
+        open={showAgentInfoModal}
+        onOpenChange={setShowAgentInfoModal}
+        currentUserId={userId}
+      />
     </div>
   );
 }

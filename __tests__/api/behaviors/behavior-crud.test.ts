@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { BehaviorType } from "@prisma/client";
 import { DELETE, PATCH } from "@/app/api/agents/[id]/behaviors/[behaviorId]/route";
 import { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
 
 describe("Behavior CRUD operations", () => {
   let testAgentId: string;
@@ -23,14 +24,14 @@ describe("Behavior CRUD operations", () => {
 
     if (existingUser) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { userId: existingUser.id } },
+        where: { Message: { userId: existingUser.id } },
       });
       await prisma.message.deleteMany({ where: { userId: existingUser.id } });
       await prisma.behaviorProgressionState.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.behaviorProfile.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.agent.deleteMany({ where: { userId: existingUser.id } });
       await prisma.user.delete({ where: { id: existingUser.id } });
@@ -41,12 +42,14 @@ describe("Behavior CRUD operations", () => {
         id: "test-user-crud",
         email: "test-crud@test.com",
         name: "Test User CRUD",
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
 
     const testAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "companion",
         name: "Test Agent CRUD",
@@ -54,6 +57,7 @@ describe("Behavior CRUD operations", () => {
         personality: "Test",
         systemPrompt: "Test",
         profile: { age: 25 },
+        updatedAt: new Date(),
       },
     });
     testAgentId = testAgent.id;
@@ -62,7 +66,7 @@ describe("Behavior CRUD operations", () => {
   afterAll(async () => {
     if (testAgentId) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { agentId: testAgentId } },
+        where: { Message: { agentId: testAgentId } },
       });
       await prisma.message.deleteMany({ where: { agentId: testAgentId } });
       await prisma.behaviorProgressionState.deleteMany({
@@ -84,6 +88,7 @@ describe("Behavior CRUD operations", () => {
       // Create behavior to delete
       const behavior = await prisma.behaviorProfile.create({
         data: {
+          id: nanoid(),
           agentId: testAgentId,
           behaviorType: BehaviorType.YANDERE_OBSESSIVE,
           baseIntensity: 0.5,
@@ -93,6 +98,7 @@ describe("Behavior CRUD operations", () => {
           volatility: 0.5,
           thresholdForDisplay: 0.3,
           triggers: [],
+          updatedAt: new Date(),
         },
       });
 
@@ -135,6 +141,7 @@ describe("Behavior CRUD operations", () => {
       // Create another agent and behavior
       const otherAgent = await prisma.agent.create({
         data: {
+          id: nanoid(),
           userId: testUserId,
           kind: "assistant",
           name: "Other Agent",
@@ -142,11 +149,13 @@ describe("Behavior CRUD operations", () => {
           personality: "Test",
           systemPrompt: "Test",
           profile: { age: 30 },
+          updatedAt: new Date(),
         },
       });
 
       const otherBehavior = await prisma.behaviorProfile.create({
         data: {
+          id: nanoid(),
           agentId: otherAgent.id,
           behaviorType: BehaviorType.ANXIOUS_ATTACHMENT,
           baseIntensity: 0.4,
@@ -156,6 +165,7 @@ describe("Behavior CRUD operations", () => {
           volatility: 0.5,
           thresholdForDisplay: 0.3,
           triggers: [],
+          updatedAt: new Date(),
         },
       });
 
@@ -183,6 +193,7 @@ describe("Behavior CRUD operations", () => {
       // Create a behavior for update tests
       const behavior = await prisma.behaviorProfile.create({
         data: {
+          id: nanoid(),
           agentId: testAgentId,
           behaviorType: BehaviorType.BORDERLINE_PD,
           baseIntensity: 0.4,
@@ -192,6 +203,7 @@ describe("Behavior CRUD operations", () => {
           thresholdForDisplay: 0.3,
           currentPhase: 1,
           triggers: [],
+          updatedAt: new Date(),
         },
       });
       testBehaviorId = behavior.id;

@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 
 export interface AdminContext {
   adminAccessId: string;
@@ -57,11 +58,11 @@ export async function validateAdminAccess(
 
       const adminAccess = await prisma.adminAccess.findFirst({
         where: {
-          user: { email: devAdminEmail },
+          User: { email: devAdminEmail },
           enabled: true
         },
         include: {
-          certificates: {
+          AdminCertificate: {
             where: {
               revokedAt: null,
               expiresAt: { gt: new Date() }
@@ -69,9 +70,9 @@ export async function validateAdminAccess(
             orderBy: { issuedAt: 'desc' },
             take: 1,
             include: {
-              adminAccess: {
+              AdminAccess: {
                 include: {
-                  user: {
+                  User: {
                     select: { id: true, email: true, name: true }
                   }
                 }
@@ -81,7 +82,7 @@ export async function validateAdminAccess(
         }
       });
 
-      if (!adminAccess || adminAccess.certificates.length === 0) {
+      if (!adminAccess || adminAccess.AdminCertificate.length === 0) {
         throw new AdminAuthError(
           'No hay certificado activo para este admin',
           401,
@@ -89,7 +90,7 @@ export async function validateAdminAccess(
         );
       }
 
-      certificate = adminAccess.certificates[0];
+      certificate = adminAccess.AdminCertificate[0];
       certSerial = certificate.serialNumber;
       certFingerprint = certificate.fingerprint;
 
@@ -115,9 +116,9 @@ export async function validateAdminAccess(
       certificate = await prisma.adminCertificate.findUnique({
         where: { serialNumber: certSerial! },
         include: {
-          adminAccess: {
+          AdminAccess: {
             include: {
-              user: {
+              User: {
                 select: {
                   id: true,
                   email: true,
@@ -168,7 +169,7 @@ export async function validateAdminAccess(
     }
 
     // 6. Verificar que AdminAccess está habilitado
-    if (!certificate.adminAccess.enabled) {
+    if (!certificate.AdminAccess.enabled) {
       throw new AdminAuthError(
         'Acceso admin deshabilitado',
         403,
@@ -185,7 +186,7 @@ export async function validateAdminAccess(
 
     // 8. Actualizar último login
     await prisma.adminAccess.update({
-      where: { id: certificate.adminAccess.id },
+      where: { id: certificate.AdminAccess.id },
       data: {
         lastLoginAt: new Date(),
         lastLoginIp: ipAddress,
@@ -195,10 +196,10 @@ export async function validateAdminAccess(
 
     // 9. Retornar contexto admin
     return {
-      adminAccessId: certificate.adminAccess.id,
-      userId: certificate.adminAccess.userId,
-      email: certificate.adminAccess.user.email,
-      role: certificate.adminAccess.role,
+      adminAccessId: certificate.AdminAccess.id,
+      userId: certificate.AdminAccess.userId,
+      email: certificate.AdminAccess.User.email,
+      role: certificate.AdminAccess.role,
       certificateSerial: certSerial || '',
       ipAddress,
       userAgent
@@ -259,6 +260,7 @@ export function withAdminAuth(
 
           await prisma.auditLog.create({
             data: {
+              id: nanoid(),
               adminAccessId: 'system',
               action: 'admin.access_denied',
               targetType: 'AdminAccess',

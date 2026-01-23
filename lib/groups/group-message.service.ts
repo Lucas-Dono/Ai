@@ -5,6 +5,7 @@ import { groupStoryEngineService } from "./group-story-engine.service";
 import { groupAIDirectorService } from "./group-ai-director.service";
 import { groupEmergentEventsService } from "./group-emergent-events.service";
 import { emitGroupMessage, emitGroupAIResponding, emitGroupAIStopped } from "@/lib/socket/server";
+import { nanoid } from "nanoid";
 
 interface AISelectionScore {
   member: any;
@@ -104,10 +105,10 @@ export class GroupMessageService {
               content: response.content,
               createdAt: response.createdAt.toISOString(),
               replyToId: response.replyToId || undefined,
-              agent: response.agent ? {
-                id: response.agent.id,
-                name: response.agent.name,
-                avatar: response.agent.avatar,
+              agent: response.Agent ? {
+                id: response.Agent.id,
+                name: response.Agent.name,
+                avatar: response.Agent.avatar,
               } : undefined,
             });
           }
@@ -282,8 +283,8 @@ export class GroupMessageService {
         orderBy: { createdAt: "desc" },
         take: 20,
         include: {
-          user: { select: { name: true, id: true } },
-          agent: { select: { name: true, id: true } },
+          User: { select: { name: true, id: true } },
+          Agent: { select: { name: true, id: true } },
         },
       });
 
@@ -335,6 +336,7 @@ export class GroupMessageService {
       // 6. Guardar mensaje de la IA
       const aiMessage = await prisma.groupMessage.create({
         data: {
+          id: nanoid(),
           groupId: group.id,
           authorType: "agent",
           agentId: agent.id,
@@ -349,9 +351,10 @@ export class GroupMessageService {
                 dominance: agent.internalState.moodDominance,
               } as any)
             : null,
+          updatedAt: new Date(),
         },
         include: {
-          agent: {
+          Agent: {
             select: {
               id: true,
               name: true,
@@ -466,8 +469,8 @@ export class GroupMessageService {
 
     // Conversación reciente
     prompt += `\n=== CONVERSACIÓN RECIENTE ===\n`;
-    recentMessages.forEach((msg) => {
-      const author = msg.authorType === "user" ? msg.user?.name : msg.agent?.name;
+    recentMessages.forEach((msg: any) => {
+      const author = msg.authorType === "user" ? msg.User?.name : msg.Agent?.name;
       const prefix = msg.isSystemMessage ? "[SISTEMA]" : `${author}:`;
       prompt += `${prefix} ${msg.content}\n`;
     });
@@ -611,16 +614,16 @@ export class GroupMessageService {
       const group = await prisma.group.findUnique({
         where: { id: groupId },
         include: {
-          members: {
+          GroupMember: {
             where: { isActive: true },
             include: {
-              agent: {
+              Agent: {
                 include: {
-                  personalityCore: true,
-                  internalState: true,
+                  PersonalityCore: true,
+                  InternalState: true,
                 },
               },
-              user: {
+              User: {
                 select: {
                   id: true,
                   name: true,
@@ -628,17 +631,27 @@ export class GroupMessageService {
               },
             },
           },
-          simulationState: true,
+          GroupSimulationState: true,
         },
       });
 
-      // Add membershipId to agents for easier access
+      // Normalize to use 'members' for easier access in the rest of the code
       if (group) {
-        group.members.forEach((member: any) => {
-          if (member.agent) {
-            member.agent.membershipId = member.id;
-          }
-        });
+        const normalizedGroup = {
+          ...group,
+          members: group.GroupMember.map((member: any) => ({
+            ...member,
+            agent: member.Agent ? {
+              ...member.Agent,
+              personalityCore: member.Agent.PersonalityCore,
+              internalState: member.Agent.InternalState,
+              membershipId: member.id,
+            } : null,
+            user: member.User,
+          })),
+          simulationState: group.GroupSimulationState,
+        };
+        return normalizedGroup;
       }
 
       return group;

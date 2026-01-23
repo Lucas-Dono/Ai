@@ -364,7 +364,7 @@ export async function getBondSummary(userId: string, agentId: string) {
         status: { in: ["active", "dormant", "fragile", "at_risk"] },
       },
       include: {
-        agent: {
+        Agent: {
           select: { name: true, avatar: true },
         },
       },
@@ -382,8 +382,8 @@ export async function getBondSummary(userId: string, agentId: string) {
       durationDays: bond.durationDays,
       rarityTier: bond.rarityTier,
       totalInteractions: bond.totalInteractions,
-      agentName: bond.agent.name,
-      agentAvatar: bond.agent.avatar,
+      agentName: bond.Agent.name,
+      agentAvatar: bond.Agent.avatar,
     };
   } catch (error) {
     console.error("[Bond Orchestrator] Error getting bond summary:", error);

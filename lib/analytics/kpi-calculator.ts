@@ -450,7 +450,7 @@ export async function calculateUserKPIs(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
-      agents: {
+      Agent: {
         select: {
           id: true,
           name: true,
@@ -458,7 +458,7 @@ export async function calculateUserKPIs(userId: string) {
           createdAt: true
         }
       },
-      userSessions: {
+      UserSession: {
         orderBy: { startedAt: 'asc' },
         take: 1,
         select: {
@@ -489,13 +489,13 @@ export async function calculateUserKPIs(userId: string) {
   });
 
   const favoriteAgentId = messagesByAgent[0]?.agentId;
-  const favoriteAgent = user.agents.find(a => a.id === favoriteAgentId);
+  const favoriteAgent = user.Agent.find((a: { id: string }) => a.id === favoriteAgentId);
 
   // Bonds
   const bonds = await prisma.symbolicBond.findMany({
     where: { userId },
     include: {
-      agent: {
+      Agent: {
         select: { id: true, name: true }
       }
     }
@@ -531,8 +531,8 @@ export async function calculateUserKPIs(userId: string) {
   }, {} as Record<string, number>);
 
   // Journey timestamps
-  const firstSession = user.userSessions[0];
-  const firstAgent = user.agents.sort((a, b) =>
+  const firstSession = user.UserSession[0];
+  const firstAgent = user.Agent.sort((a: { createdAt: Date }, b: { createdAt: Date }) =>
     a.createdAt.getTime() - b.createdAt.getTime()
   )[0];
 
@@ -585,7 +585,7 @@ export async function calculateUserKPIs(userId: string) {
       lastActive: summary?.lastActiveAt || user.updatedAt
     },
     agents: {
-      total: user.agents.length,
+      total: user.Agent.length,
       favorite: favoriteAgent ? {
         id: favoriteAgent.id,
         name: favoriteAgent.name,
@@ -595,7 +595,7 @@ export async function calculateUserKPIs(userId: string) {
           : 0
       } : null,
       all: messagesByAgent.map(m => {
-        const agent = user.agents.find(a => a.id === m.agentId);
+        const agent = user.Agent.find((a: { id: string }) => a.id === m.agentId);
         return {
           id: m.agentId,
           name: agent?.name || 'Unknown',
@@ -614,7 +614,7 @@ export async function calculateUserKPIs(userId: string) {
         : 0,
       details: bonds.map(b => ({
         agentId: b.agentId,
-        agentName: b.agent.name,
+        agentName: b.Agent.name,
         tier: b.rarityTier,
         affinity: b.affinityLevel,
         status: b.status

@@ -12,21 +12,21 @@ async function getInvitationData(code: string, userId: string) {
   const invitation = await prisma.groupInvitation.findUnique({
     where: { inviteCode: code },
     include: {
-      group: {
+      Group: {
         select: {
           id: true,
           name: true,
           description: true,
           createdAt: true,
           _count: {
-            select: { members: true },
+            select: { GroupMember: true },
           },
         },
       },
-      inviter: {
+      User_GroupInvitation_inviterIdToUser: {
         select: { id: true, name: true, image: true },
       },
-      invitee: {
+      User_GroupInvitation_inviteeIdToUser: {
         select: { id: true, name: true },
       },
     },

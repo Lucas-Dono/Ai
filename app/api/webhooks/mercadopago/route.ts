@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { preApprovalClient, paymentClient } from "@/lib/mercadopago/config";
 import { syncSubscription } from "@/lib/mercadopago/subscription";
 import { prisma } from "@/lib/prisma";
@@ -281,6 +282,7 @@ async function handlePaymentEvent(paymentId: string) {
     await prisma.payment.upsert({
       where: { mercadopagoPaymentId: String(payment.id) },
       create: {
+        id: nanoid(),
         userId,
         mercadopagoPaymentId: String(payment.id),
         amount: payment.transaction_amount || 0,
@@ -314,6 +316,7 @@ async function handlePaymentEvent(paymentId: string) {
         if (payment.transaction_amount) {
           await prisma.invoice.create({
             data: {
+              id: nanoid(),
               userId,
               mercadopagoPaymentId: String(payment.id),
               amount: payment.transaction_amount,

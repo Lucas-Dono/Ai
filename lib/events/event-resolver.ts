@@ -8,6 +8,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type { Agent, ScheduledEvent, PersonalityCore, InternalState } from "@prisma/client";
 
 // ============================================================================
@@ -244,6 +245,7 @@ async function applyConsequences(
   // 3. Create episodic memory
   await prisma.episodicMemory.create({
     data: {
+      id: nanoid(),
       agentId: agent.id,
       event: `${event.title}: ${outcome.description}`,
       userEmotion: wasSuccess ? "joy" : "distress",
@@ -302,10 +304,10 @@ export async function resolveOverdueEvents(): Promise<{
       },
     },
     include: {
-      agent: {
+      Agent: {
         include: {
-          personalityCore: true,
-          internalState: true,
+          PersonalityCore: true,
+          InternalState: true,
         },
       },
     },
@@ -316,7 +318,12 @@ export async function resolveOverdueEvents(): Promise<{
 
   for (const event of overdueEvents) {
     try {
-      await resolveEvent(event, event.agent);
+      const agentWithRelations = {
+        ...event.Agent,
+        personalityCore: event.Agent.PersonalityCore,
+        internalState: event.Agent.InternalState,
+      } as AgentWithRelations;
+      await resolveEvent(event, agentWithRelations);
       resolved++;
     } catch (error) {
       console.error(`Failed to resolve event ${event.id}:`, error);

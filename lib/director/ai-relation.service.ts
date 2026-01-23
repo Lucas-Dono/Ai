@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type { AIRelation, UpdateRelationInput } from "./types";
 
 class AIRelationService {
@@ -34,6 +35,8 @@ class AIRelationService {
       if (!relation) {
         relation = await prisma.aIRelation.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             groupId,
             agentAId: firstId,
             agentBId: secondId,

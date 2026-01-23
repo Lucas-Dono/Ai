@@ -18,6 +18,7 @@
 
 import { CompleteCharacterState, ResponseGenerationOutput } from "./types";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { AppraisalEngine } from "./modules/appraisal/engine";
 import { EmotionGenerator } from "./modules/emotion/generator";
 import { EmotionDecaySystem } from "./modules/emotion/decay";
@@ -251,15 +252,15 @@ export class EmotionalSystemOrchestrator {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        personalityCore: true,
-        internalState: true,
-        episodicMemories: {
+        PersonalityCore: true,
+        InternalState: true,
+        EpisodicMemory: {
           orderBy: { createdAt: "desc" },
           take: 50,
         },
-        semanticMemory: true,
-        proceduralMemory: true,
-        characterGrowth: true,
+        SemanticMemory: true,
+        ProceduralMemory: true,
+        CharacterGrowth: true,
       },
     });
 
@@ -269,10 +270,12 @@ export class EmotionalSystemOrchestrator {
 
     // If agent is missing emotional system components (e.g., system/public agents),
     // create them with default values
-    if (!agent.personalityCore) {
+    if (!agent.PersonalityCore) {
       console.log(`[Orchestrator] Creating default personalityCore for agent ${agentId}`);
-      agent.personalityCore = await prisma.personalityCore.create({
+      agent.PersonalityCore = await prisma.personalityCore.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId,
           openness: 0.5,
           conscientiousness: 0.5,
@@ -293,10 +296,11 @@ export class EmotionalSystemOrchestrator {
       });
     }
 
-    if (!agent.internalState) {
+    if (!agent.InternalState) {
       console.log(`[Orchestrator] Creating default internalState for agent ${agentId}`);
-      agent.internalState = await prisma.internalState.create({
+      agent.InternalState = await prisma.internalState.create({
         data: {
+          id: nanoid(),
           agentId,
           currentEmotions: {
             joy: 0.5,
@@ -322,83 +326,83 @@ export class EmotionalSystemOrchestrator {
     }
 
     // Construir working memory desde conversation buffer
-    const conversationBuffer = agent.internalState.conversationBuffer as any[];
+    const conversationBuffer = agent.InternalState.conversationBuffer as any[];
 
     return {
       agentId: agent.id,
       personalityCore: {
         bigFive: {
-          openness: agent.personalityCore.openness,
-          conscientiousness: agent.personalityCore.conscientiousness,
-          extraversion: agent.personalityCore.extraversion,
-          agreeableness: agent.personalityCore.agreeableness,
-          neuroticism: agent.personalityCore.neuroticism,
+          openness: agent.PersonalityCore.openness,
+          conscientiousness: agent.PersonalityCore.conscientiousness,
+          extraversion: agent.PersonalityCore.extraversion,
+          agreeableness: agent.PersonalityCore.agreeableness,
+          neuroticism: agent.PersonalityCore.neuroticism,
         },
-        coreValues: agent.personalityCore.coreValues as any[],
-        moralSchemas: agent.personalityCore.moralSchemas as any[],
-        backstory: agent.personalityCore.backstory || undefined,
-        baselineEmotions: agent.personalityCore.baselineEmotions as any,
+        coreValues: agent.PersonalityCore.coreValues as any[],
+        moralSchemas: agent.PersonalityCore.moralSchemas as any[],
+        backstory: agent.PersonalityCore.backstory || undefined,
+        baselineEmotions: agent.PersonalityCore.baselineEmotions as any,
       },
       internalState: {
-        emotions: agent.internalState.currentEmotions as any,
-        currentEmotions: agent.internalState.currentEmotions as any,
+        emotions: agent.InternalState.currentEmotions as any,
+        currentEmotions: agent.InternalState.currentEmotions as any,
         mood: {
-          valence: agent.internalState.moodValence,
-          arousal: agent.internalState.moodArousal,
-          dominance: agent.internalState.moodDominance,
+          valence: agent.InternalState.moodValence,
+          arousal: agent.InternalState.moodArousal,
+          dominance: agent.InternalState.moodDominance,
         },
         emotionDynamics: {
-          decayRate: agent.internalState.emotionDecayRate,
-          inertia: agent.internalState.emotionInertia,
+          decayRate: agent.InternalState.emotionDecayRate,
+          inertia: agent.InternalState.emotionInertia,
         },
         needs: {
-          connection: agent.internalState.needConnection,
-          autonomy: agent.internalState.needAutonomy,
-          competence: agent.internalState.needCompetence,
-          novelty: agent.internalState.needNovelty,
+          connection: agent.InternalState.needConnection,
+          autonomy: agent.InternalState.needAutonomy,
+          competence: agent.InternalState.needCompetence,
+          novelty: agent.InternalState.needNovelty,
         },
-        goals: agent.internalState.activeGoals as any[],
+        goals: agent.InternalState.activeGoals as any[],
         conversationBuffer: conversationBuffer || [],
-        lastUpdated: agent.internalState.lastUpdated,
-        moodValence: agent.internalState.moodValence,
-        moodArousal: agent.internalState.moodArousal,
-        moodDominance: agent.internalState.moodDominance,
-        emotionDecayRate: agent.internalState.emotionDecayRate,
-        emotionInertia: agent.internalState.emotionInertia,
-        needConnection: agent.internalState.needConnection,
-        needAutonomy: agent.internalState.needAutonomy,
-        needCompetence: agent.internalState.needCompetence,
-        needNovelty: agent.internalState.needNovelty,
-        activeGoals: agent.internalState.activeGoals as any[],
+        lastUpdated: agent.InternalState.lastUpdated,
+        moodValence: agent.InternalState.moodValence,
+        moodArousal: agent.InternalState.moodArousal,
+        moodDominance: agent.InternalState.moodDominance,
+        emotionDecayRate: agent.InternalState.emotionDecayRate,
+        emotionInertia: agent.InternalState.emotionInertia,
+        needConnection: agent.InternalState.needConnection,
+        needAutonomy: agent.InternalState.needAutonomy,
+        needCompetence: agent.InternalState.needCompetence,
+        needNovelty: agent.InternalState.needNovelty,
+        activeGoals: agent.InternalState.activeGoals as any[],
       },
       workingMemory: {
         conversationBuffer: conversationBuffer || [],
-        activeGoals: agent.internalState.activeGoals as any[],
+        activeGoals: agent.InternalState.activeGoals as any[],
         currentContext: "Conversación actual",
       },
-      episodicMemories: agent.episodicMemories as any[],
+      episodicMemories: agent.EpisodicMemory as any[],
       semanticMemory: {
-        userFacts: agent.semanticMemory?.userFacts as any || {},
-        userPreferences: agent.semanticMemory?.userPreferences as any || {},
-        relationshipStage: (agent.semanticMemory?.relationshipStage as any) || "first_meeting",
+        userFacts: agent.SemanticMemory?.userFacts as any || {},
+        userPreferences: agent.SemanticMemory?.userPreferences as any || {},
+        relationshipStage: (agent.SemanticMemory?.relationshipStage as any) || "first_meeting",
       },
       proceduralMemory: {
-        behavioralPatterns: agent.proceduralMemory?.behavioralPatterns as any || {},
-        userTriggers: agent.proceduralMemory?.userTriggers as any || {},
-        effectiveStrategies: agent.proceduralMemory?.effectiveStrategies as any || {},
+        behavioralPatterns: agent.ProceduralMemory?.behavioralPatterns as any || {},
+        userTriggers: agent.ProceduralMemory?.userTriggers as any || {},
+        effectiveStrategies: agent.ProceduralMemory?.effectiveStrategies as any || {},
       },
       characterGrowth: {
         relationshipDynamics: {
-          trustLevel: agent.characterGrowth?.trustLevel || 0.4,
-          intimacyLevel: agent.characterGrowth?.intimacyLevel || 0.3,
-          positiveEventsCount: agent.characterGrowth?.positiveEventsCount || 0,
-          negativeEventsCount: agent.characterGrowth?.negativeEventsCount || 0,
-          conflictHistory: (agent.characterGrowth?.conflictHistory as any[]) || [],
+          trustLevel: agent.CharacterGrowth?.trustLevel || 0.4,
+          intimacyLevel: agent.CharacterGrowth?.intimacyLevel || 0.3,
+          positiveEventsCount: agent.CharacterGrowth?.positiveEventsCount || 0,
+          negativeEventsCount: agent.CharacterGrowth?.negativeEventsCount || 0,
+          conflictHistory: (agent.CharacterGrowth?.conflictHistory as any[]) || [],
         },
-        personalityDrift: agent.characterGrowth?.personalityDrift as any,
-        learnedUserPatterns: agent.characterGrowth?.learnedUserPatterns as any,
-        conversationCount: agent.characterGrowth?.conversationCount || 0,
-        lastSignificantEvent: agent.characterGrowth?.lastSignificantEvent || undefined,
+        personalityDrift: agent.CharacterGrowth?.personalityDrift as any,
+        learnedUserPatterns: agent.CharacterGrowth?.learnedUserPatterns as any,
+        conversationCount: agent.CharacterGrowth?.conversationCount || 0,
+        lastSignificantEvent: agent.CharacterGrowth?.lastSignificantEvent || undefined,
       },
     };
   }

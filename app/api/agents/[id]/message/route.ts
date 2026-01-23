@@ -67,7 +67,7 @@ export const GET = withAuth(async (req, { params, user }) => {
       skip: offset,
       take: limit,
       include: {
-        agent: {
+        Agent: {
           select: {
             name: true,
             avatar: true,
@@ -94,8 +94,8 @@ export const GET = withAuth(async (req, { params, user }) => {
         role: msg.role,
         metadata: msg.metadata,
         createdAt: msg.createdAt,
-        agentName: msg.agent?.name || null,
-        agentAvatar: msg.agent?.avatar || null,
+        agentName: msg.Agent?.name || null,
+        agentAvatar: msg.Agent?.avatar || null,
       })),
       pagination: createPaginationResult({ limit, offset }, totalCount, messages.length),
     });

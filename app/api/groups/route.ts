@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { checkFeature } from "@/lib/feature-flags";
@@ -104,6 +105,8 @@ export async function POST(req: NextRequest) {
         // 3.3. Crear grupo dentro de la transacción
         const group = await tx.group.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             name: name.trim(),
             description: description?.trim() || null,
             creatorId: user.id,
@@ -117,6 +120,8 @@ export async function POST(req: NextRequest) {
         // 3.4. Añadir creador como owner
         await tx.groupMember.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             groupId: group.id,
             memberType: "user",
             userId: user.id,
@@ -132,6 +137,7 @@ export async function POST(req: NextRequest) {
         // 3.5. Crear estado de simulación inicial
         await tx.groupSimulationState.create({
           data: {
+            id: nanoid(),
             groupId: group.id,
             currentTurn: 0,
             totalMessages: 0,
@@ -216,7 +222,7 @@ export async function GET(req: NextRequest) {
     const groups = await prisma.group.findMany({
       where: {
         status: "ACTIVE",
-        members: {
+        GroupMember: {
           some: {
             userId: user.id,
             isActive: true,
@@ -224,24 +230,24 @@ export async function GET(req: NextRequest) {
         },
       },
       include: {
-        creator: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        members: {
+        GroupMember: {
           where: { isActive: true },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true,
               },
             },
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,
@@ -252,8 +258,8 @@ export async function GET(req: NextRequest) {
         },
         _count: {
           select: {
-            messages: true,
-            members: true,
+            GroupMessage: true,
+            GroupMember: true,
           },
         },
       },
@@ -264,8 +270,8 @@ export async function GET(req: NextRequest) {
     const groupsWithStats = await Promise.all(
       groups.map(async (group) => {
         // Encontrar el miembro actual
-        const currentMember = group.members.find(
-          (m) => m.userId === user.id && m.memberType === "user"
+        const currentMember = group.GroupMember.find(
+          (m: any) => m.userId === user.id && m.memberType === "user"
         );
 
         return {

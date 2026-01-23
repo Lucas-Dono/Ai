@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { stripe, getPlanFromPriceId } from "./config";
 import { billingLogger as log } from "@/lib/logging/loggers";
 import type Stripe from "stripe";
+import { nanoid } from "nanoid";
 
 /**
  * Sincroniza una suscripción de Stripe con la BD local
@@ -71,6 +72,7 @@ export async function syncStripeSubscription(
     } else {
       await prisma.subscription.create({
         data: {
+          id: nanoid(),
           userId,
           status: subscription.status,
           currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
@@ -86,6 +88,7 @@ export async function syncStripeSubscription(
             ? new Date((subscription as any).canceled_at * 1000)
             : null,
           metadata: subscription.metadata as any,
+          updatedAt: new Date(),
         },
       });
     }
@@ -205,6 +208,7 @@ export async function handleSubscriptionRenewal(
     // NOTA: Este código es legacy de Stripe. El sistema ahora usa Paddle/MercadoPago
     await prisma.invoice.create({
       data: {
+        id: nanoid(),
         userId,
         mercadopagoPaymentId: invoice.id, // Usar el campo correcto
         amount: (invoice as any).amount_paid,
@@ -252,6 +256,7 @@ export async function handlePaymentFailed(
     // NOTA: Este código es legacy de Stripe. El sistema ahora usa Paddle/MercadoPago
     await prisma.invoice.create({
       data: {
+        id: nanoid(),
         userId,
         mercadopagoPaymentId: invoice.id, // Usar el campo correcto
         amount: (invoice as any).amount_due,

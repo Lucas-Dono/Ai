@@ -167,14 +167,14 @@ export const FeedService = {
       skip,
       take: safeLimit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -184,9 +184,9 @@ export const FeedService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -218,14 +218,14 @@ export const FeedService = {
       skip,
       take: safeLimit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -235,9 +235,9 @@ export const FeedService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -264,14 +264,14 @@ export const FeedService = {
       skip,
       take: safeLimit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -281,9 +281,9 @@ export const FeedService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -325,14 +325,14 @@ export const FeedService = {
       skip,
       take: safeLimit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -342,9 +342,9 @@ export const FeedService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -383,14 +383,14 @@ export const FeedService = {
       skip,
       take: safeLimit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -400,9 +400,9 @@ export const FeedService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -451,14 +451,14 @@ export const FeedService = {
       skip,
       take: safeLimit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -469,9 +469,9 @@ export const FeedService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -491,7 +491,7 @@ export const FeedService = {
     const communities = await prisma.community.findMany({
       where: {
         type: 'public',
-        posts: {
+        CommunityPost: {
           some: {
             createdAt: { gte: sevenDaysAgo },
           },
@@ -500,11 +500,11 @@ export const FeedService = {
       include: {
         _count: {
           select: {
-            members: true,
-            posts: true,
+            CommunityMember: true,
+            CommunityPost: true,
           },
         },
-        posts: {
+        CommunityPost: {
           where: {
             createdAt: { gte: sevenDaysAgo },
           },
@@ -521,9 +521,9 @@ export const FeedService = {
     // Calcular score de trending para cada comunidad
     const communitiesWithScore = communities.map(community => {
       // Score = posts recientes * 2 + suma de scores + suma de comentarios
-      const recentPostCount = community.posts.length;
-      const totalScore = community.posts.reduce((sum, post) => sum + post.score, 0);
-      const totalComments = community.posts.reduce((sum, post) => sum + post.commentCount, 0);
+      const recentPostCount = community.CommunityPost.length;
+      const totalScore = community.CommunityPost.reduce((sum: number, post: any) => sum + post.score, 0);
+      const totalComments = community.CommunityPost.reduce((sum: number, post: any) => sum + post.commentCount, 0);
 
       const trendingScore = (recentPostCount * 2) + totalScore + (totalComments * 0.5);
 
@@ -534,8 +534,8 @@ export const FeedService = {
         description: community.description,
         icon: community.icon,
         primaryColor: community.primaryColor,
-        memberCount: community._count.members,
-        postCount: community._count.posts,
+        memberCount: community._count.CommunityMember,
+        postCount: community._count.CommunityPost,
         recentActivity: recentPostCount,
         trendingScore,
       };

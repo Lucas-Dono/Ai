@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { nanoid } from "nanoid";
 
 /**
  * PARTE 2: Rutinas, Metas, Eventos y Perfiles Ultra para Sophie Müller
@@ -30,6 +31,8 @@ async function main() {
 
   const routine = await prisma.characterRoutine.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       userId,
       timezone: "Europe/Berlin",
@@ -232,6 +235,8 @@ async function main() {
   for (const template of [...weekdayTemplates, ...weekendTemplates]) {
     await prisma.routineTemplate.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         routineId: routine.id,
         ...template,
       },
@@ -339,7 +344,13 @@ async function main() {
   ];
 
   for (const goal of goals) {
-    await prisma.personalGoal.create({ data: goal });
+    await prisma.personalGoal.create({
+      data: {
+        id: nanoid(),
+        updatedAt: new Date(),
+        ...goal
+      }
+    });
   }
 
   console.log(`✅ ${goals.length} PersonalGoals creados\n`);
@@ -372,7 +383,13 @@ async function main() {
   ];
 
   for (const event of events) {
-    await prisma.scheduledEvent.create({ data: event });
+    await prisma.scheduledEvent.create({
+      data: {
+        id: nanoid(),
+        updatedAt: new Date(),
+        ...event
+      }
+    });
   }
 
   console.log(`✅ ${events.length} ScheduledEvents creados\n`);
@@ -401,7 +418,13 @@ async function main() {
   ];
 
   for (const event of importantEvents) {
-    await prisma.importantEvent.create({ data: event });
+    await prisma.importantEvent.create({
+      data: {
+        id: nanoid(),
+        updatedAt: new Date(),
+        ...event
+      }
+    });
   }
 
   console.log(`✅ ${importantEvents.length} ImportantEvents creados\n`);
@@ -430,7 +453,13 @@ async function main() {
   ];
 
   for (const person of importantPeople) {
-    await prisma.importantPerson.create({ data: person });
+    await prisma.importantPerson.create({
+      data: {
+        id: nanoid(),
+        updatedAt: new Date(),
+        ...person
+      }
+    });
   }
 
   console.log(`✅ ${importantPeople.length} ImportantPeople creados\n`);

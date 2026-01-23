@@ -9,6 +9,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { calculateGenuinenessScore } from "./anti-gaming-detector";
 
 export interface FraudSignal {
@@ -267,7 +268,7 @@ export async function analyzeUserHistoryForFraud(
   const allBonds = await prisma.symbolicBond.findMany({
     where: { userId },
     include: {
-      agent: {
+      Agent: {
         select: { name: true },
       },
     },
@@ -371,6 +372,7 @@ export async function autoBlockFraudulentUser(
   // Crear log de moderación
   await prisma.moderationAction.create({
     data: {
+      id: nanoid(),
       moderatorId: "fraud_detection_system",
       targetType: "user",
       targetId: userId,
@@ -394,6 +396,7 @@ export async function autoBlockFraudulentUser(
     // Crear legacy
     await prisma.bondLegacy.create({
       data: {
+        id: nanoid(),
         userId,
         agentId: bond.agentId,
         tier: bond.tier,

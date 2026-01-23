@@ -5,6 +5,7 @@
 
 import { prisma } from "@/lib/prisma";
 import log from "@/lib/logging/logger";
+import { nanoid } from "nanoid";
 
 /**
  * Calcular y actualizar el leaderboard de retention
@@ -24,7 +25,7 @@ export async function updateRetentionLeaderboard(): Promise<{
     // Obtener todos los usuarios con bonds
     const usersWithBonds = await prisma.user.findMany({
       where: {
-        symbolicBonds: {
+        SymbolicBond: {
           some: {},
         },
       },
@@ -59,6 +60,7 @@ export async function updateRetentionLeaderboard(): Promise<{
             lastUpdated: now,
           },
           create: {
+            id: nanoid(),
             userId: user.id,
             activeBondsCount: metrics.activeBondsCount,
             averageBondDuration: metrics.averageBondDuration,
@@ -293,7 +295,7 @@ export async function getRetentionLeaderboard(options: {
       orderBy: { [rankField]: "asc" },
       take: limit,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -312,7 +314,7 @@ export async function getRetentionLeaderboard(options: {
           periodEnd: latestEntry.periodEnd,
         },
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -329,8 +331,8 @@ export async function getRetentionLeaderboard(options: {
 
     return entries.map((entry) => ({
       userId: entry.userId,
-      userName: entry.user.name || "Usuario Anónimo",
-      userImage: entry.user.image,
+      userName: entry.User?.name || "Usuario Anónimo",
+      userImage: entry.User?.image,
       rank: entry[rankField],
       activeBondsCount: entry.activeBondsCount,
       averageBondDuration: entry.averageBondDuration,

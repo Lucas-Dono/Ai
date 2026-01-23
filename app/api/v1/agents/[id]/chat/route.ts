@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
@@ -158,6 +159,7 @@ export async function POST(
     // Save user message
     await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         userId,
         role: "user",
@@ -177,6 +179,8 @@ export async function POST(
     if (!relation) {
       relation = await prisma.relation.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           subjectId: agentId,
           targetId: userId,
           targetType: "user",
@@ -375,6 +379,7 @@ export async function POST(
     // Save response
     await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         role: "assistant",
         content: response,

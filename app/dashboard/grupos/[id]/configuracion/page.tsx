@@ -24,7 +24,7 @@ async function getGroupSettings(groupId: string, userId: string) {
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     include: {
-      creator: {
+      User: {
         select: {
           plan: true,
         },
@@ -38,7 +38,7 @@ async function getGroupSettings(groupId: string, userId: string) {
 
   return {
     group,
-    userPlan: group.creator.plan || "free",
+    userPlan: group.User.plan || "free",
   };
 }
 

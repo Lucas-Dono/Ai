@@ -12,6 +12,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('RememberInterceptor');
@@ -419,6 +420,8 @@ export async function renewRecurringEvents(): Promise<void> {
 
       return prisma.importantEvent.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: event.agentId,
           userId: event.userId,
           eventDate: nextDate,
@@ -502,6 +505,8 @@ export async function checkAndRenewPastRecurringEvents(
         // Create next year's occurrence
         await prisma.importantEvent.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             agentId: event.agentId,
             userId: event.userId,
             eventDate: nextDate,

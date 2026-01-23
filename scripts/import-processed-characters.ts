@@ -148,6 +148,7 @@ async function importCharacter(jsonPath: string): Promise<void> {
       await prisma.agent.create({
         data: {
           id: data.id,
+          updatedAt: new Date(),
           userId: null,
           teamId: null,
           generationTier: 'ultra',

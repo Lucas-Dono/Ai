@@ -14,6 +14,7 @@
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/logger';
 import { getUpcomingEvents } from '@/lib/events/remember-interceptor';
+import { nanoid } from 'nanoid';
 
 const log = createLogger('TriggerDetector');
 
@@ -43,6 +44,8 @@ export async function detectTriggers(
   if (!config) {
     config = await prisma.proactiveConfig.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId,
       },
@@ -355,6 +358,8 @@ export async function getOrCreateProactiveConfig(
   if (!config) {
     config = await prisma.proactiveConfig.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId,
       },

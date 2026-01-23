@@ -53,17 +53,17 @@ export async function GET(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        members: {
+        GroupMember: {
           where: { isActive: true },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true,
               },
             },
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,
@@ -132,7 +132,7 @@ export async function GET(
     const activityScore = calculateActivityScore(totalMessages, group.createdAt);
     const balanceScore = calculateBalanceScore(messagesByMember);
     const engagementRate = calculateEngagementRate(
-      group.members.length,
+      group.GroupMember.length,
       totalMessages
     );
 
@@ -142,7 +142,7 @@ export async function GET(
     return NextResponse.json({
       overview: {
         totalMessages,
-        totalMembers: group.members.length,
+        totalMembers: group.GroupMember.length,
         activityScore,
         balanceScore,
         engagementRate,
@@ -486,7 +486,7 @@ async function analyzeRelationships(groupId: string, startDate?: Date) {
       authorType: true,
       userId: true,
       agentId: true,
-      replyTo: {
+      GroupMessage: {
         select: {
           authorType: true,
           userId: true,
@@ -500,10 +500,10 @@ async function analyzeRelationships(groupId: string, startDate?: Date) {
   const interactions = new Map<string, Map<string, number>>();
 
   messages.forEach((msg) => {
-    if (!msg.replyTo) return;
+    if (!msg.GroupMessage) return;
 
     const fromId = msg.userId || msg.agentId;
-    const toId = msg.replyTo.userId || msg.replyTo.agentId;
+    const toId = msg.GroupMessage.userId || msg.GroupMessage.agentId;
 
     if (!fromId || !toId) return;
 

@@ -37,8 +37,8 @@ export class VoiceService {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        voiceConfig: true,
-        internalState: true,
+        VoiceConfig: true,
+        InternalState: true,
       },
     });
 
@@ -46,7 +46,7 @@ export class VoiceService {
       throw new Error(`Agent ${agentId} not found`);
     }
 
-    if (!agent.voiceConfig) {
+    if (!agent.VoiceConfig) {
       throw new Error(`Agent ${agentId} has no voice configuration`);
     }
 
@@ -56,9 +56,9 @@ export class VoiceService {
       currentEmotion: emotion,
       intensity: intensityNumber,
       mood: {
-        valence: agent.internalState?.moodValence || 0,
-        arousal: agent.internalState?.moodArousal || 0.5,
-        dominance: agent.internalState?.moodDominance || 0.5,
+        valence: agent.InternalState?.moodValence || 0,
+        arousal: agent.InternalState?.moodArousal || 0.5,
+        dominance: agent.InternalState?.moodDominance || 0.5,
       },
       // Parámetros de ElevenLabs calculados
       stability: this.calculateStability(emotion, intensityNumber),
@@ -71,7 +71,7 @@ export class VoiceService {
     const elevenlabs = getElevenLabsClient();
     const voiceResult = await elevenlabs.generateSpeech(
       text,
-      agent.voiceConfig.voiceId,
+      agent.VoiceConfig.voiceId,
       modulation
     );
 

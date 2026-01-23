@@ -12,6 +12,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/logger';
+import { nanoid } from 'nanoid';
 
 const log = createLogger('PersonInterceptor');
 
@@ -162,6 +163,8 @@ async function savePersonCommands(
         // Create new person
         await prisma.importantPerson.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             agentId,
             userId,
             name: cmd.name,

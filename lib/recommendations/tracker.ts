@@ -4,6 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export interface TrackInteractionParams {
   userId: string;
@@ -67,6 +68,7 @@ export async function trackInteraction(params: TrackInteractionParams) {
     // Crear interacción
     const interaction = await prisma.userInteraction.create({
       data: {
+        id: nanoid(),
         userId: params.userId,
         itemType: params.itemType,
         itemId: params.itemId,
@@ -107,7 +109,11 @@ async function updateUserProfile(userId: string) {
 
     if (!profile) {
       profile = await prisma.userProfile.create({
-        data: { userId },
+        data: {
+          id: nanoid(),
+          userId,
+          updatedAt: new Date(),
+        },
       });
     }
 
@@ -213,7 +219,7 @@ export async function getUserInteractionHistory(
     orderBy: { createdAt: "desc" },
     take: limit,
     include: {
-      user: {
+      User: {
         select: {
           id: true,
           email: true,
@@ -234,7 +240,11 @@ export async function getUserProfile(userId: string) {
 
   if (!profile) {
     profile = await prisma.userProfile.create({
-      data: { userId },
+      data: {
+        id: nanoid(),
+        userId,
+        updatedAt: new Date(),
+      },
     });
   }
 

@@ -9,6 +9,7 @@
  * 5. Building reminder context for prompts
  */
 
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 import {
   interceptRememberCommands,
@@ -24,7 +25,7 @@ async function setupTestAgent() {
   // Use an existing agent from the database
   const agent = await prisma.agent.findFirst({
     include: {
-      user: true,
+      User: true,
     },
   });
 
@@ -153,6 +154,8 @@ async function testRecentPastEvents() {
 
   await prisma.importantEvent.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId: TEST_AGENT_ID,
       userId: TEST_USER_ID,
       eventDate: yesterday,

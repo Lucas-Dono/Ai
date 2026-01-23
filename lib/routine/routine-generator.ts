@@ -7,6 +7,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
+import { nanoid } from "nanoid";
 import type {
   RoutineGenerationInput,
   GeneratedRoutine,
@@ -397,8 +398,8 @@ export async function generateAndSaveRoutine(
   const agent = await prisma.agent.findUnique({
     where: { id: agentId },
     include: {
-      personalityCore: true,
-      user: {
+      PersonalityCore: true,
+      User: {
         select: { plan: true },
       },
     },
@@ -409,7 +410,7 @@ export async function generateAndSaveRoutine(
   }
 
   // 2. Check if user has premium plan
-  if (agent.user && !["plus", "ultra"].includes(agent.user.plan)) {
+  if (agent.User && !["plus", "ultra"].includes(agent.User.plan)) {
     throw new Error("Routine system requires Plus or Ultra plan");
   }
 
@@ -417,15 +418,15 @@ export async function generateAndSaveRoutine(
   const profile = agent.profile as any;
   const occupation = profile?.occupation?.current || "Unknown";
   const hobbies = profile?.interests?.hobbies || [];
-  const backstory = agent.personalityCore?.backstory || undefined;
+  const backstory = agent.PersonalityCore?.backstory || undefined;
 
-  const personalityTraits = agent.personalityCore
+  const personalityTraits = agent.PersonalityCore
     ? {
-        openness: agent.personalityCore.openness,
-        conscientiousness: agent.personalityCore.conscientiousness,
-        extraversion: agent.personalityCore.extraversion,
-        agreeableness: agent.personalityCore.agreeableness,
-        neuroticism: agent.personalityCore.neuroticism,
+        openness: agent.PersonalityCore.openness,
+        conscientiousness: agent.PersonalityCore.conscientiousness,
+        extraversion: agent.PersonalityCore.extraversion,
+        agreeableness: agent.PersonalityCore.agreeableness,
+        neuroticism: agent.PersonalityCore.neuroticism,
       }
     : undefined;
 
@@ -444,8 +445,11 @@ export async function generateAndSaveRoutine(
   const generated = await generateRoutineWithAI(generationInput);
 
   // 5. Save to database
+  const routineId = nanoid();
   const routine = await prisma.characterRoutine.create({
     data: {
+      id: routineId,
+      updatedAt: new Date(),
       agentId,
       userId,
       timezone: generated.timezone,
@@ -455,23 +459,28 @@ export async function generateAndSaveRoutine(
       generatedByAI: true,
       generationPrompt: generated.metadata.generationPrompt,
       lastRegenerated: new Date(),
-      templates: {
-        create: generated.templates.map((t) => ({
-          name: t.name,
-          description: t.description,
-          type: t.type,
-          startTime: t.startTime,
-          endTime: t.endTime,
-          daysOfWeek: t.daysOfWeek,
-          priority: t.priority,
-          isFlexible: t.isFlexible,
-          allowVariations: true,
-          variationParameters: (t.variationParameters || {}) as any,
-          moodImpact: (t.moodImpact || {}) as any,
-          location: t.location,
-        })),
-      },
     },
+  });
+
+  // Create templates separately
+  await prisma.routineTemplate.createMany({
+    data: generated.templates.map((t) => ({
+      id: nanoid(),
+      updatedAt: new Date(),
+      routineId,
+      name: t.name,
+      description: t.description,
+      type: t.type,
+      startTime: t.startTime,
+      endTime: t.endTime,
+      daysOfWeek: t.daysOfWeek,
+      priority: t.priority,
+      isFlexible: t.isFlexible,
+      allowVariations: true,
+      variationParameters: (t.variationParameters || {}) as any,
+      moodImpact: (t.moodImpact || {}) as any,
+      location: t.location,
+    })),
   });
 
   console.log(`[RoutineGenerator] ✅ Routine created: ${routine.id}`);
@@ -494,12 +503,12 @@ export async function regenerateRoutine(
   const routine = await prisma.characterRoutine.findUnique({
     where: { id: routineId },
     include: {
-      agent: {
+      Agent: {
         include: {
-          personalityCore: true,
+          PersonalityCore: true,
         },
       },
-      templates: true,
+      RoutineTemplate: true,
     },
   });
 
@@ -520,22 +529,22 @@ export async function regenerateRoutine(
   });
 
   // Generate new routine
-  const agent = routine.agent;
-  const profile = agent.profile as any;
+  const agent = routine.Agent;
+  const profile = agent?.profile as any;
 
   const generationInput: RoutineGenerationInput = {
-    agentId: agent.id,
+    agentId: agent?.id || '',
     occupation: profile?.occupation?.current || "Unknown",
-    personalityTraits: agent.personalityCore
+    personalityTraits: agent?.PersonalityCore
       ? {
-          openness: agent.personalityCore.openness,
-          conscientiousness: agent.personalityCore.conscientiousness,
-          extraversion: agent.personalityCore.extraversion,
-          agreeableness: agent.personalityCore.agreeableness,
-          neuroticism: agent.personalityCore.neuroticism,
+          openness: agent.PersonalityCore.openness,
+          conscientiousness: agent.PersonalityCore.conscientiousness,
+          extraversion: agent.PersonalityCore.extraversion,
+          agreeableness: agent.PersonalityCore.agreeableness,
+          neuroticism: agent.PersonalityCore.neuroticism,
         }
       : undefined,
-    backstory: agent.personalityCore?.backstory || undefined,
+    backstory: agent?.PersonalityCore?.backstory || undefined,
     hobbies: profile?.interests?.hobbies || [],
     timezone: routine.timezone,
     customPrompt: options?.customPrompt,
@@ -546,6 +555,8 @@ export async function regenerateRoutine(
   // Create new templates
   await prisma.routineTemplate.createMany({
     data: generated.templates.map((t) => ({
+      id: nanoid(),
+      updatedAt: new Date(),
       routineId,
       name: t.name,
       description: t.description,

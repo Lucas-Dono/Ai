@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
@@ -13,13 +14,13 @@ export async function GET(req: NextRequest) {
     where: {
       OR: [
         { ownerId: user.id },
-        { members: { some: { userId: user.id } } },
+        { TeamMember: { some: { userId: user.id } } },
       ],
     },
     include: {
-      owner: { select: { name: true, email: true, image: true } },
+      User: { select: { name: true, email: true, image: true } },
       _count: {
-        select: { members: true, agents: true },
+        select: { TeamMember: true, Agent: true },
       },
     },
     orderBy: { createdAt: "desc" },
@@ -45,20 +46,23 @@ export async function POST(req: NextRequest) {
   // Create team and add owner as member
   const team = await prisma.team.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       name,
       description,
       ownerId: user.id,
-      members: {
+      TeamMember: {
         create: {
+          id: nanoid(),
           userId: user.id,
           role: "owner",
         },
       },
     },
     include: {
-      owner: { select: { name: true, email: true, image: true } },
+      User: { select: { name: true, email: true, image: true } },
       _count: {
-        select: { members: true, agents: true },
+        select: { TeamMember: true, Agent: true },
       },
     },
   });

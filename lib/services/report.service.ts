@@ -2,6 +2,7 @@
  * Report Service - Sistema de reportes y moderación
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -57,6 +58,7 @@ export const ReportService = {
     // Crear reporte con descripción sanitizada
     const report = await prisma.postReport.create({
       data: {
+        id: nanoid(),
         postId: data.postId,
         reporterId: data.reporterId,
         reason: data.reason,
@@ -64,7 +66,7 @@ export const ReportService = {
         status: 'pending',
       },
       include: {
-        post: {
+        CommunityPost: {
           select: {
             id: true,
             title: true,
@@ -72,14 +74,14 @@ export const ReportService = {
             authorId: true,
             communityId: true,
             createdAt: true,
-            author: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true,
               },
             },
-            community: {
+            Community: {
               select: {
                 id: true,
                 name: true,
@@ -88,7 +90,7 @@ export const ReportService = {
             },
           },
         },
-        reporter: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -140,6 +142,7 @@ export const ReportService = {
     // Crear reporte con descripción sanitizada
     const report = await prisma.commentReport.create({
       data: {
+        id: nanoid(),
         commentId: data.commentId,
         reporterId: data.reporterId,
         reason: data.reason,
@@ -147,21 +150,21 @@ export const ReportService = {
         status: 'pending',
       },
       include: {
-        comment: {
+        CommunityComment: {
           select: {
             id: true,
             content: true,
             authorId: true,
             postId: true,
             createdAt: true,
-            author: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true,
               },
             },
-            post: {
+            CommunityPost: {
               select: {
                 id: true,
                 title: true,
@@ -170,7 +173,7 @@ export const ReportService = {
             },
           },
         },
-        reporter: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -206,12 +209,12 @@ export const ReportService = {
       const postReports = await prisma.postReport.findMany({
         where: {
           status,
-          post: {
+          CommunityPost: {
             communityId,
           },
         },
         include: {
-          post: {
+          CommunityPost: {
             select: {
               id: true,
               title: true,
@@ -219,14 +222,14 @@ export const ReportService = {
               authorId: true,
               communityId: true,
               createdAt: true,
-              author: {
+              User: {
                 select: {
                   id: true,
                   name: true,
                   image: true,
                 },
               },
-              community: {
+              Community: {
                 select: {
                   id: true,
                   name: true,
@@ -235,7 +238,7 @@ export const ReportService = {
               },
             },
           },
-          reporter: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -256,33 +259,33 @@ export const ReportService = {
       const commentReports = await prisma.commentReport.findMany({
         where: {
           status,
-          comment: {
-            post: {
+          CommunityComment: {
+            CommunityPost: {
               communityId,
             },
           },
         },
         include: {
-          comment: {
+          CommunityComment: {
             select: {
               id: true,
               content: true,
               authorId: true,
               postId: true,
               createdAt: true,
-              author: {
+              User: {
                 select: {
                   id: true,
                   name: true,
                   image: true,
                 },
               },
-              post: {
+              CommunityPost: {
                 select: {
                   id: true,
                   title: true,
                   communityId: true,
-                  community: {
+                  Community: {
                     select: {
                       id: true,
                       name: true,
@@ -293,7 +296,7 @@ export const ReportService = {
               },
             },
           },
-          reporter: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -327,7 +330,7 @@ export const ReportService = {
     const report = await prisma.postReport.findUnique({
       where: { id: data.reportId },
       include: {
-        post: {
+        CommunityPost: {
           select: {
             id: true,
             authorId: true,
@@ -373,11 +376,11 @@ export const ReportService = {
 
       case 'ban':
         // Banear usuario de la comunidad
-        if (report.post.communityId) {
+        if (report.CommunityPost.communityId) {
           await prisma.communityMember.updateMany({
             where: {
-              communityId: report.post.communityId,
-              userId: report.post.authorId,
+              communityId: report.CommunityPost.communityId,
+              userId: report.CommunityPost.authorId,
             },
             data: {
               isBanned: true,
@@ -412,11 +415,11 @@ export const ReportService = {
     const report = await prisma.commentReport.findUnique({
       where: { id: data.reportId },
       include: {
-        comment: {
+        CommunityComment: {
           select: {
             id: true,
             authorId: true,
-            post: {
+            CommunityPost: {
               select: {
                 communityId: true,
               },
@@ -460,12 +463,12 @@ export const ReportService = {
 
       case 'ban':
         // Banear usuario de la comunidad
-        const communityId = report.comment.post.communityId;
+        const communityId = report.CommunityComment.CommunityPost.communityId;
         if (communityId) {
           await prisma.communityMember.updateMany({
             where: {
               communityId,
-              userId: report.comment.authorId,
+              userId: report.CommunityComment.authorId,
             },
             data: {
               isBanned: true,
@@ -496,7 +499,7 @@ export const ReportService = {
       prisma.postReport.count({
         where: {
           status: 'pending',
-          post: {
+          CommunityPost: {
             communityId,
           },
         },
@@ -505,8 +508,8 @@ export const ReportService = {
       prisma.commentReport.count({
         where: {
           status: 'pending',
-          comment: {
-            post: {
+          CommunityComment: {
+            CommunityPost: {
               communityId,
             },
           },
@@ -519,7 +522,7 @@ export const ReportService = {
           reviewedAt: {
             gte: new Date(new Date().setHours(0, 0, 0, 0)),
           },
-          post: {
+          CommunityPost: {
             communityId,
           },
         },

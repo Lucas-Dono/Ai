@@ -9,6 +9,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export enum AuditAction {
   BOND_ESTABLISHED = "bond_established",
@@ -48,6 +49,7 @@ export async function logAudit(entry: Omit<AuditEntry, "timestamp">) {
     // Guardar en tabla Log
     await prisma.log.create({
       data: {
+        id: nanoid(),
         userId: entry.userId || null,
         agentId: entry.agentId || null,
         action: entry.action,

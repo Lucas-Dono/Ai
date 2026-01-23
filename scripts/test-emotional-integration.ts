@@ -5,6 +5,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { nanoid } from "nanoid";
 import { createEmotionalAgent } from "../lib/emotional-system/utils/initialization";
 import { getEmotionalSystemOrchestrator } from "../lib/emotional-system/orchestrator";
 
@@ -27,6 +28,8 @@ async function testEmotionalSystem() {
     if (!testUser) {
       testUser = await prisma.user.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           email: "test-emotional@example.com",
           name: "Test User (Emotional System)",
         },
@@ -91,13 +94,13 @@ async function testEmotionalSystem() {
     const finalAgent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        internalState: true,
-        characterGrowth: true,
-        episodicMemories: {
+        InternalState: true,
+        CharacterGrowth: true,
+        EpisodicMemory: {
           orderBy: { createdAt: "desc" },
           take: 3,
         },
-        semanticMemory: true,
+        SemanticMemory: true,
       },
     });
 
@@ -106,14 +109,14 @@ async function testEmotionalSystem() {
     }
 
     console.log("📊 Final Emotional State:");
-    console.log(`   Mood Valence: ${finalAgent.internalState?.moodValence.toFixed(2)}`);
-    console.log(`   Mood Arousal: ${finalAgent.internalState?.moodArousal.toFixed(2)}`);
-    console.log(`   Mood Dominance: ${finalAgent.internalState?.moodDominance.toFixed(2)}`);
-    console.log(`   Trust Level: ${finalAgent.characterGrowth?.trustLevel.toFixed(2)}`);
-    console.log(`   Intimacy Level: ${finalAgent.characterGrowth?.intimacyLevel.toFixed(2)}`);
-    console.log(`   Conversation Count: ${finalAgent.characterGrowth?.conversationCount}`);
-    console.log(`   Memories Stored: ${finalAgent.episodicMemories.length}`);
-    console.log(`   Relationship Stage: ${finalAgent.semanticMemory?.relationshipStage}`);
+    console.log(`   Mood Valence: ${finalAgent.InternalState?.moodValence.toFixed(2)}`);
+    console.log(`   Mood Arousal: ${finalAgent.InternalState?.moodArousal.toFixed(2)}`);
+    console.log(`   Mood Dominance: ${finalAgent.InternalState?.moodDominance.toFixed(2)}`);
+    console.log(`   Trust Level: ${finalAgent.CharacterGrowth?.trustLevel.toFixed(2)}`);
+    console.log(`   Intimacy Level: ${finalAgent.CharacterGrowth?.intimacyLevel.toFixed(2)}`);
+    console.log(`   Conversation Count: ${finalAgent.CharacterGrowth?.conversationCount}`);
+    console.log(`   Memories Stored: ${finalAgent.EpisodicMemory.length}`);
+    console.log(`   Relationship Stage: ${finalAgent.SemanticMemory?.relationshipStage}`);
 
     const totalTime = Date.now() - startTime;
 

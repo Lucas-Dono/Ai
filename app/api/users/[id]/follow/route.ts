@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { nanoid } from 'nanoid';
 import { getAuthSession } from '@/lib/middleware/auth-helper';
 import { prisma } from '@/lib/prisma';
 
@@ -42,6 +43,7 @@ export async function POST(
       // Follow
       await prisma.follow.create({
         data: {
+          id: nanoid(),
           followerId,
           followingId,
         },

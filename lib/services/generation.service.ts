@@ -9,6 +9,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from "nanoid";
 import type { AgentProfileV2 } from '@/types/agent-profile';
 
 const prisma = new PrismaClient();
@@ -162,6 +163,8 @@ export async function generateImportantEventsFromProfile(
     try {
       await prisma.importantEvent.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId,
           userId: agentId, // Self-referential para eventos del agente
           ...event,
@@ -422,6 +425,8 @@ export async function generateImportantPeopleFromProfile(
     try {
       await prisma.importantPerson.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId,
           userId: agentId, // Self-referential para personas del agente
           ...person,
@@ -510,6 +515,7 @@ export async function generateEpisodicMemoriesFromProfile(
     try {
       await prisma.episodicMemory.create({
         data: {
+          id: nanoid(),
           agentId,
           event: memory.content, // Required field
           ...memory,

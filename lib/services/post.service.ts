@@ -2,6 +2,7 @@
  * Post Service - Gestión de posts y discusiones
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
@@ -81,6 +82,8 @@ export const PostService = {
 
     const post = await prisma.communityPost.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         authorId,
         title: data.title,
         content: data.content,
@@ -100,14 +103,14 @@ export const PostService = {
         slug,
       },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -133,8 +136,8 @@ export const PostService = {
         await NotificationService.notifyMentions(
           data.mentions,
           authorId,
-          post.author.name || 'Alguien',
-          post.author.image || null,
+          post.User.name || 'Alguien',
+          post.User.image || null,
           'post',
           post.id,
           data.content.slice(0, 100) // Preview del contenido
@@ -162,14 +165,14 @@ export const PostService = {
     const post = await prisma.communityPost.findUnique({
       where: { id: postId },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -179,9 +182,9 @@ export const PostService = {
         },
         _count: {
           select: {
-            comments: true,
-            votes: true,
-            awards: true,
+            CommunityComment: true,
+            PostVote: true,
+            PostAward: true,
           },
         },
       },
@@ -372,6 +375,7 @@ export const PostService = {
     // Crear nuevo voto
     await prisma.postVote.create({
       data: {
+        id: nanoid(),
         postId,
         userId,
         voteType,
@@ -406,6 +410,7 @@ export const PostService = {
 
     const award = await prisma.postAward.create({
       data: {
+        id: nanoid(),
         postId,
         giverId,
         awardType,
@@ -492,14 +497,14 @@ export const PostService = {
         skip,
         take: limit,
         include: {
-          author: {
+          User: {
             select: {
               id: true,
               name: true,
               image: true,
             },
           },
-          community: {
+          Community: {
             select: {
               id: true,
               name: true,
@@ -509,9 +514,9 @@ export const PostService = {
           },
           _count: {
             select: {
-              comments: true,
-              votes: true,
-              awards: true,
+              CommunityComment: true,
+              PostVote: true,
+              PostAward: true,
             },
           },
         },
@@ -608,6 +613,7 @@ export const PostService = {
   ) {
     const report = await prisma.postReport.create({
       data: {
+        id: nanoid(),
         postId,
         reporterId,
         reason,

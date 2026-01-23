@@ -7,6 +7,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { BondTier } from "@prisma/client";
+import { nanoid } from "nanoid";
 
 // ============================================================================
 // TIPOS Y CONFIGURACIONES
@@ -98,6 +99,8 @@ export async function getOrCreateBondConfig(agentId: string) {
     // Crear configuración por defecto
     config = await prisma.agentBondConfig.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         slotsPerTier: DEFAULT_SLOTS_PER_TIER as any,
         tierRequirements: DEFAULT_TIER_REQUIREMENTS as any,
@@ -177,6 +180,8 @@ export async function attemptEstablishBond(
     // Crear bond directamente
     const bond = await prisma.symbolicBond.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         agentId,
         tier,
@@ -203,6 +208,7 @@ export async function attemptEstablishBond(
     // Crear notificación
     await prisma.bondNotification.create({
       data: {
+        id: nanoid(),
         userId,
         bondId: bond.id,
         type: "milestone_reached",
@@ -221,6 +227,8 @@ export async function attemptEstablishBond(
 
     const queueEntry = await prisma.bondQueue.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         agentId,
         tier,
@@ -233,6 +241,7 @@ export async function attemptEstablishBond(
     // Notificar que entró en cola
     await prisma.bondNotification.create({
       data: {
+        id: nanoid(),
         userId,
         type: "queue_position_update",
         title: "Agregado a la cola",
@@ -451,6 +460,7 @@ export async function processAllBondDecay() {
     if (shouldNotify) {
       await prisma.bondNotification.create({
         data: {
+          id: nanoid(),
           userId: bond.userId,
           bondId: bond.id,
           type: "bond_at_risk",
@@ -487,6 +497,7 @@ export async function releaseBond(bondId: string, reason: string) {
 
   await prisma.bondLegacy.create({
     data: {
+      id: nanoid(),
       userId: bond.userId,
       agentId: bond.agentId,
       tier: bond.tier,
@@ -521,6 +532,7 @@ export async function releaseBond(bondId: string, reason: string) {
   // Notificar usuario
   await prisma.bondNotification.create({
     data: {
+      id: nanoid(),
       userId: bond.userId,
       type: "bond_released",
       title: "Vínculo liberado",
@@ -575,6 +587,7 @@ async function processQueue(agentId: string, tier: BondTier) {
   // Notificar usuario
   await prisma.bondNotification.create({
     data: {
+      id: nanoid(),
       userId: nextInQueue.userId,
       type: "slot_available",
       title: "¡Slot disponible!",
@@ -611,6 +624,8 @@ export async function claimQueueSlot(userId: string, queueId: string) {
   // Crear el bond
   const bond = await prisma.symbolicBond.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId,
       agentId: queueEntry.agentId,
       tier: queueEntry.tier,
@@ -653,7 +668,7 @@ export async function getUserBonds(userId: string) {
   return await prisma.symbolicBond.findMany({
     where: { userId },
     include: {
-      agent: {
+      Agent: {
         select: {
           id: true,
           name: true,
@@ -673,7 +688,7 @@ export async function getUserBondLegacy(userId: string) {
   return await prisma.bondLegacy.findMany({
     where: { userId },
     include: {
-      agent: {
+      Agent: {
         select: {
           id: true,
           name: true,

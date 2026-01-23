@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const bond = await prisma.symbolicBond.findUnique({
     where: { id },
     include: {
-      agent: {
+      Agent: {
         select: { name: true },
       },
     },
@@ -29,8 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${bond.agent.name} - Vínculo ${bond.tier}`,
-    description: `Detalles de tu vínculo ${bond.tier} con ${bond.agent.name}. Rareza: ${bond.rarityTier}.`,
+    title: `${bond.Agent.name} - Vínculo ${bond.tier}`,
+    description: `Detalles de tu vínculo ${bond.tier} con ${bond.Agent.name}. Rareza: ${bond.rarityTier}.`,
   };
 }
 

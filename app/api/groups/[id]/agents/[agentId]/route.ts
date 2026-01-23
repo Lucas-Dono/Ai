@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
+import { nanoid } from "nanoid";
 
 /**
  * DELETE /api/groups/[id]/agents/[agentId]
@@ -47,7 +48,7 @@ export async function DELETE(
         isActive: true,
       },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -82,9 +83,11 @@ export async function DELETE(
     // 5. Crear mensaje de sistema
     await prisma.groupMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId,
         authorType: "user",
-        content: `${agentMember.agent?.name} fue removido del grupo`,
+        content: `${agentMember.Agent?.name} fue removido del grupo`,
         contentType: "system",
         isSystemMessage: true,
         turnNumber: (await prisma.groupMessage.count({ where: { groupId } })) + 1,
@@ -187,7 +190,7 @@ export async function PATCH(
       where: { id: agentMember.id },
       data: updateData,
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,

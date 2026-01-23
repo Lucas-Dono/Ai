@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
@@ -42,6 +43,8 @@ export async function GET(req: NextRequest) {
     if (!progress) {
       progress = await prisma.onboardingProgress.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           completedTours: [],
           currentTour: null,
@@ -144,6 +147,8 @@ export async function POST(req: NextRequest) {
     const progress = await prisma.onboardingProgress.upsert({
       where: { userId },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         completedTours: completedTours || [],
         currentTour: currentTour || null,
@@ -196,6 +201,8 @@ export async function DELETE(req: NextRequest) {
     const progress = await prisma.onboardingProgress.upsert({
       where: { userId },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         completedTours: [],
         currentTour: null,

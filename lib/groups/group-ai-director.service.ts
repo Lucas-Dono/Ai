@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
+import { nanoid } from "nanoid";
 
 /**
  * Group AI Director Service
@@ -40,14 +41,14 @@ export class GroupAIDirectorService {
       const group = await prisma.group.findUnique({
         where: { id: groupId },
         include: {
-          members: {
+          GroupMember: {
             where: { isActive: true, memberType: "agent" },
             include: {
-              agent: {
+              Agent: {
                 select: {
                   id: true,
                   name: true,
-                  personalityCore: true,
+                  PersonalityCore: true,
                 },
               },
             },
@@ -69,7 +70,7 @@ export class GroupAIDirectorService {
           isSystemMessage: false,
         },
         include: {
-          agent: { select: { id: true, name: true } },
+          Agent: { select: { id: true, name: true } },
         },
         orderBy: { createdAt: "desc" },
         take: 50,
@@ -157,9 +158,9 @@ export class GroupAIDirectorService {
     let totalAIMessages = 0;
 
     messages.forEach((msg) => {
-      if (msg.authorType === "agent" && msg.agent?.id) {
-        const count = messageCounts.get(msg.agent.id) || 0;
-        messageCounts.set(msg.agent.id, count + 1);
+      if (msg.authorType === "agent" && msg.Agent?.id) {
+        const count = messageCounts.get(msg.Agent.id) || 0;
+        messageCounts.set(msg.Agent.id, count + 1);
         totalAIMessages++;
       }
     });
@@ -259,9 +260,9 @@ export class GroupAIDirectorService {
       const messageCounts = new Map<string, number>();
 
       recentMessages.forEach((msg) => {
-        if (msg.authorType === "agent" && msg.agent?.id) {
-          const count = messageCounts.get(msg.agent.id) || 0;
-          messageCounts.set(msg.agent.id, count + 1);
+        if (msg.authorType === "agent" && msg.Agent?.id) {
+          const count = messageCounts.get(msg.Agent.id) || 0;
+          messageCounts.set(msg.Agent.id, count + 1);
         }
       });
 

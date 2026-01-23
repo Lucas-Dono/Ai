@@ -16,6 +16,7 @@ import { prisma } from '@/lib/prisma';
 import { getLLMProvider } from '@/lib/llm/provider';
 import { getAIHordeClient } from '@/lib/visual-system/ai-horde-client';
 import { createLogger } from '@/lib/logger';
+import { nanoid } from 'nanoid';
 
 const log = createLogger('AsyncImageGenerator');
 
@@ -383,6 +384,7 @@ Tu mensaje:`;
 
     await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: options.agentId,
         userId: options.userId,
         role: 'assistant',

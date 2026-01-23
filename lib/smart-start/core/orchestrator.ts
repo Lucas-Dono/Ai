@@ -20,6 +20,7 @@ import { getCharacterExtractor } from '../search/character-extractor';
 import { getAIService } from '../services/ai-service';
 import { getValidationService } from '../services/validation-service';
 import { PromptBuilder } from '../prompts/generator';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -71,12 +72,14 @@ export class SmartStartOrchestrator {
   async createSession(userId: string): Promise<SmartStartSession> {
     const session = await prisma.smartStartSession.create({
       data: {
+        id: nanoid(),
         userId,
         // Flow starts with 'type' - user chooses existing vs original character
         currentStep: 'type',
         startedAt: new Date(),
         timeSpentPerStep: {},
         interactionEvents: [],
+        updatedAt: new Date(),
       },
     });
 

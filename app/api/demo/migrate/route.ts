@@ -15,6 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { apiLogger as log } from '@/lib/logging';
 import { z } from 'zod';
 import { encryptMessage } from '@/lib/encryption/message-encryption';
+import { nanoid } from 'nanoid';
 
 const migrationSchema = z.object({
   demoSessionId: z.string().uuid(),
@@ -122,6 +123,7 @@ export async function POST(req: NextRequest) {
         lastInteractionAt: new Date(),
       },
       create: {
+        id: nanoid(),
         subjectId: agentId,
         targetId: userId,
         targetType: 'user',
@@ -132,6 +134,7 @@ export async function POST(req: NextRequest) {
         respect: 0.5,
         privateState: {},
         visibleState: {},
+        updatedAt: new Date(),
       },
     });
 
@@ -148,6 +151,7 @@ export async function POST(req: NextRequest) {
 
       await prisma.message.create({
         data: {
+          id: nanoid(),
           agentId,
           userId,
           role: msg.role,

@@ -11,6 +11,7 @@
  * 7. Verificar relaciones IA-IA
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { conversationalDirectorService } from "@/lib/director";
 import type { DirectorInput } from "@/lib/director/types";
@@ -30,6 +31,8 @@ async function testDirectorE2E() {
     console.log("📝 Creando usuario de prueba...");
     const testUser = await prisma.user.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         email: `test-director-${Date.now()}@test.com`,
         name: "Test Director User",
       },
@@ -44,11 +47,14 @@ async function testDirectorE2E() {
     for (const name of agentNames) {
       const agent = await prisma.agent.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           name,
           userId: testUser.id,
           systemPrompt: `Eres ${name}, una IA amigable y conversadora.`,
-          model: "gpt-4",
-          visibility: "PRIVATE",
+          visibility: "private",
+          kind: "companion",
+          profile: {},
         },
       });
       testAgentIds.push(agent.id);
@@ -60,10 +66,12 @@ async function testDirectorE2E() {
     console.log("👥 Creando grupo de prueba...");
     const testGroup = await prisma.group.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
+        creatorId: testUser.id,
         name: "Grupo Test Director",
         description: "Grupo para testing del director conversacional",
-        directorVersion: 1, // Activar director
-        directorSettings: {},
+        directorEnabled: true,
       },
     });
     testGroupId = testGroup.id;
@@ -74,9 +82,12 @@ async function testDirectorE2E() {
     console.log("👤 Agregando miembro humano...");
     await prisma.groupMember.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId: testGroup.id,
+        memberType: "user",
         userId: testUser.id,
-        role: "ADMIN",
+        role: "admin",
       },
     });
     console.log(`  ✓ Usuario agregado al grupo`);
@@ -87,9 +98,12 @@ async function testDirectorE2E() {
     for (const agentId of testAgentIds) {
       await prisma.groupMember.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           groupId: testGroup.id,
+          memberType: "agent",
           agentId,
-          role: "MEMBER",
+          role: "member",
         },
       });
     }
@@ -99,6 +113,8 @@ async function testDirectorE2E() {
     // 6. Crear estado de escena para el grupo
     await prisma.groupSceneState.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId: testGroup.id,
         currentSceneCode: null,
         currentStep: 0,
@@ -115,9 +131,13 @@ async function testDirectorE2E() {
     // Mensaje 1: Usuario saluda
     const message1 = await prisma.groupMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId: testGroup.id,
+        authorType: "user",
         userId: testUser.id,
         content: "Hola a todos! ¿Cómo están hoy?",
+        turnNumber: 1,
       },
     });
     console.log(`  📨 Mensaje 1: "${message1.content}"`);
@@ -127,17 +147,19 @@ async function testDirectorE2E() {
       groupId: testGroup.id,
       bufferedMessages: [
         {
-          messageId: message1.id,
+          id: message1.id,
+          groupId: testGroup.id,
+          userId: testUser.id!,
+          userName: testUser.name!,
           content: message1.content,
-          authorId: testUser.id!,
-          authorName: testUser.name!,
           timestamp: message1.createdAt,
+          mentionedAgents: [],
         },
       ],
       groupContext: {
-        activeAgents: testAgentIds.map((id, idx) => ({
-          agentId: id,
-          agentName: agentNames[idx],
+        aiMembers: testAgentIds.map((id, idx) => ({
+          id,
+          name: agentNames[idx],
           personality: {
             openness: 0.7,
             conscientiousness: 0.6,
@@ -146,10 +168,10 @@ async function testDirectorE2E() {
             neuroticism: 0.3,
           },
         })),
+        recentMessages: [],
+        currentEnergy: 0.6,
+        currentTension: 0.2,
         participationBalance: 0.5,
-        conversationEnergy: 0.6,
-        narrativeTension: 0.2,
-        recentTopics: ["saludos"],
       },
       sceneState: {
         currentSceneCode: null,

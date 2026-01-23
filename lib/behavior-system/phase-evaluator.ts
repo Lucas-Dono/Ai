@@ -361,7 +361,7 @@ export class PhaseEvaluator {
 
     const count = await prisma.behaviorTriggerLog.count({
       where: {
-        message: {
+        Message: {
           agentId: agentId,
         },
         triggerType: triggerType,

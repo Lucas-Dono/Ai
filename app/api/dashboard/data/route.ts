@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
           gender: true,
           _count: {
             select: {
-              reviews: true
+              Review: true
             }
           }
         },
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       userId ? prisma.agent.findMany({
         where: {
           userId,
-          messagesAsAgent: {
+          Message: {
             some: {
               userId
             }
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
           kind: true,
         },
         orderBy: {
-          messagesAsAgent: {
+          Message: {
             _count: 'desc'
           }
         },
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
           plan: true,
           _count: {
             select: {
-              agents: true
+              Agent: true
             }
           }
         }
@@ -109,7 +109,7 @@ export async function GET(req: NextRequest) {
       recentAgents: recentAgents || [],
       stats: userStats ? {
         plan: userStats.plan,
-        totalAgents: userStats._count.agents
+        totalAgents: userStats._count.Agent
       } : null,
       timestamp: new Date().toISOString(),
       // Cache hint para el cliente

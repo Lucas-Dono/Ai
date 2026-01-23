@@ -44,13 +44,13 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         prisma.postReport.findMany({
           where: postReportsWhere,
           include: {
-            post: {
+            CommunityPost: {
               select: {
                 id: true,
                 title: true,
                 content: true,
                 type: true,
-                author: {
+                User: {
                   select: {
                     id: true,
                     email: true,
@@ -59,7 +59,7 @@ export const GET = withAdminAuth(async (request, { admin }) => {
                 }
               }
             },
-            reporter: {
+            User: {
               select: {
                 id: true,
                 email: true,
@@ -80,11 +80,11 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         prisma.commentReport.findMany({
           where: commentReportsWhere,
           include: {
-            comment: {
+            CommunityComment: {
               select: {
                 id: true,
                 content: true,
-                author: {
+                User: {
                   select: {
                     id: true,
                     email: true,
@@ -93,7 +93,7 @@ export const GET = withAdminAuth(async (request, { admin }) => {
                 }
               }
             },
-            reporter: {
+            User: {
               select: {
                 id: true,
                 email: true,
@@ -121,8 +121,8 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         reviewedBy: r.reviewedBy,
         action: r.action,
         createdAt: r.createdAt,
-        content: r.post,
-        reporter: r.reporter
+        content: r.CommunityPost,
+        reporter: r.User
       })),
       ...commentReports.map((r: any) => ({
         id: r.id,
@@ -134,8 +134,8 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         reviewedBy: r.reviewedBy,
         action: r.action,
         createdAt: r.createdAt,
-        content: r.comment,
-        reporter: r.reporter
+        content: r.CommunityComment,
+        reporter: r.User
       }))
     ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -211,7 +211,7 @@ export const POST = withAdminAuth(async (request, { admin }) => {
           action
         },
         include: {
-          post: {
+          CommunityPost: {
             select: {
               id: true,
               authorId: true
@@ -223,7 +223,7 @@ export const POST = withAdminAuth(async (request, { admin }) => {
       // Tomar acción según lo especificado
       if (action === 'delete_content') {
         await prisma.communityPost.delete({
-          where: { id: report.post.id }
+          where: { id: report.CommunityPost.id }
         });
       } else if (action === 'ban_user') {
         // Implementar ban de usuario (agregar campo en User si no existe)
@@ -234,7 +234,7 @@ export const POST = withAdminAuth(async (request, { admin }) => {
       await logAuditAction(admin, {
         action: AuditAction.MODERATION_APPROVE,
         targetType: AuditTargetType.POST,
-        targetId: report.post.id,
+        targetId: report.CommunityPost.id,
         details: {
           reportId,
           action,
@@ -252,7 +252,7 @@ export const POST = withAdminAuth(async (request, { admin }) => {
           action
         },
         include: {
-          comment: {
+          CommunityComment: {
             select: {
               id: true,
               authorId: true
@@ -264,7 +264,7 @@ export const POST = withAdminAuth(async (request, { admin }) => {
       // Tomar acción según lo especificado
       if (action === 'delete_content') {
         await prisma.communityComment.delete({
-          where: { id: report.comment.id }
+          where: { id: report.CommunityComment.id }
         });
       } else if (action === 'ban_user') {
         // Implementar ban de usuario
@@ -274,7 +274,7 @@ export const POST = withAdminAuth(async (request, { admin }) => {
       await logAuditAction(admin, {
         action: AuditAction.MODERATION_APPROVE,
         targetType: AuditTargetType.COMMENT,
-        targetId: report.comment.id,
+        targetId: report.CommunityComment.id,
         details: {
           reportId,
           action,

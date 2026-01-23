@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { atomicCheckGroupAILimit } from "@/lib/usage/atomic-resource-check";
+import { nanoid } from "nanoid";
 
 /**
  * POST /api/groups/[id]/agents
@@ -43,7 +44,7 @@ export async function POST(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        creator: {
+        User: {
           select: { plan: true },
         },
       },
@@ -56,7 +57,7 @@ export async function POST(
       );
     }
 
-    const creatorPlan = group.creator.plan || "free";
+    const creatorPlan = group.User?.plan || "free";
 
     // 3. Parse request body
     const body = await req.json();
@@ -122,7 +123,7 @@ export async function POST(
             importanceLevel,
           },
           include: {
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,
@@ -156,6 +157,8 @@ export async function POST(
         // 8.2. Crear nuevo miembro (agente)
         const member = await tx.groupMember.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             groupId,
             memberType: "agent",
             agentId,
@@ -164,7 +167,7 @@ export async function POST(
             importanceLevel,
           },
           include: {
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,
@@ -186,6 +189,8 @@ export async function POST(
         const messageCount = await tx.groupMessage.count({ where: { groupId } });
         await tx.groupMessage.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             groupId,
             authorType: "user",
             content: `${agent.name} se unió al grupo`,
@@ -288,12 +293,12 @@ export async function GET(
         isActive: true,
       },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
             avatar: true,
-            personalityCore: true,
+            PersonalityCore: true,
           },
         },
       },

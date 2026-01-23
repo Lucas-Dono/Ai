@@ -3,6 +3,7 @@
  * Analiza todos los mensajes existentes y crea registros de tracking
  */
 
+import { nanoid } from 'nanoid';
 import { prisma } from '../lib/prisma';
 
 async function populateConversationTracking() {
@@ -96,6 +97,8 @@ async function populateConversationTracking() {
           // Crear nuevo registro
           await prisma.conversationTracking.create({
             data: {
+              id: nanoid(),
+              updatedAt: new Date(),
               userId,
               agentId,
               totalMessages: _count.id,

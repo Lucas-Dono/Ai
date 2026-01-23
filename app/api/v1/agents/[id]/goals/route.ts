@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { withAPIAuth } from "@/lib/api/auth";
 
@@ -149,6 +150,8 @@ export async function POST(
     // Create goal
     const goal = await prisma.personalGoal.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         title,
         description,

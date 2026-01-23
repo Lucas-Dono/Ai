@@ -121,7 +121,7 @@ export async function getPersonalOverview(userId: string): Promise<PersonalOverv
     prisma.relation.findMany({
       where: { targetId: userId, targetType: "user" },
       include: {
-        subjectAgent: { select: { id: true, name: true, createdAt: true } },
+        Agent: { select: { id: true, name: true, createdAt: true } },
       },
     }),
     prisma.usage.findMany({
@@ -492,7 +492,7 @@ export async function getRelationshipProgress(userId: string): Promise<Relations
   const relations = await prisma.relation.findMany({
     where: { targetId: userId, targetType: "user" },
     include: {
-      subjectAgent: {
+      Agent: {
         select: {
           id: true,
           name: true,
@@ -529,7 +529,7 @@ export async function getRelationshipProgress(userId: string): Promise<Relations
       progressToNext = 100;
     }
 
-    const daysSinceCreation = differenceInDays(new Date(), rel.subjectAgent.createdAt);
+    const daysSinceCreation = rel.Agent ? differenceInDays(new Date(), rel.Agent.createdAt) : 0;
 
     // Generate milestones
     const milestones: string[] = [];
@@ -539,8 +539,8 @@ export async function getRelationshipProgress(userId: string): Promise<Relations
     if (avgScore > 0.7) milestones.push("Close Relationship");
 
     return {
-      agentId: rel.subjectAgent.id,
-      agentName: rel.subjectAgent.name,
+      agentId: rel.Agent?.id || rel.subjectId,
+      agentName: rel.Agent?.name || "Unknown",
       currentStage,
       trust,
       affinity,
@@ -655,11 +655,11 @@ export async function getCommunityImpact(userId: string): Promise<CommunityImpac
   const [posts, comments, sharedAgents] = await Promise.all([
     prisma.communityPost.findMany({
       where: { authorId: userId },
-      include: { votes: true },
+      select: { upvotes: true, downvotes: true },
     }),
     prisma.communityComment.findMany({
       where: { authorId: userId },
-      include: { votes: true },
+      select: { upvotes: true, downvotes: true },
     }),
     prisma.agent.count({
       where: { userId, visibility: "public" },
@@ -667,15 +667,11 @@ export async function getCommunityImpact(userId: string): Promise<CommunityImpac
   ]);
 
   const postKarma = posts.reduce((sum, post) => {
-    const upvotes = post.votes.filter(v => v.voteType === "upvote").length;
-    const downvotes = post.votes.filter(v => v.voteType === "downvote").length;
-    return sum + (upvotes - downvotes);
+    return sum + (post.upvotes - post.downvotes);
   }, 0);
 
   const commentKarma = comments.reduce((sum, comment) => {
-    const upvotes = comment.votes.filter(v => v.voteType === "upvote").length;
-    const downvotes = comment.votes.filter(v => v.voteType === "downvote").length;
-    return sum + (upvotes - downvotes);
+    return sum + (comment.upvotes - comment.downvotes);
   }, 0);
 
   return {
@@ -683,7 +679,7 @@ export async function getCommunityImpact(userId: string): Promise<CommunityImpac
     commentKarma,
     aisShared: sharedAgents,
     aisImported: 0, // Would need to track clones
-    helpfulAnswers: comments.filter(c => c.votes.some(v => v.voteType === "upvote")).length,
+    helpfulAnswers: comments.filter(c => c.upvotes > 0).length,
     followersThisMonth: 0, // Would need followers system
   };
 }

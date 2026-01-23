@@ -19,13 +19,13 @@
  */
 
 interface DirectorGlobal {
-  status: (groupId?: string) => Promise<void>;
-  scene: (groupId?: string) => Promise<void>;
-  seeds: (filter?: string, groupId?: string) => Promise<void>;
-  relations: (agentIdOrGroupId?: string, groupId?: string) => Promise<void>;
-  history: (limitOrGroupId?: number | string, groupId?: string) => Promise<void>;
-  metrics: (groupId?: string) => Promise<void>;
-  catalog: (category?: string) => Promise<void>;
+  status: (groupId?: string) => Promise<unknown>;
+  scene: (groupId?: string) => Promise<unknown>;
+  seeds: (filter?: string, groupId?: string) => Promise<unknown>;
+  relations: (agentIdOrGroupId?: string, groupId?: string) => Promise<unknown>;
+  history: (limitOrGroupId?: number | string, groupId?: string) => Promise<unknown>;
+  metrics: (groupId?: string) => Promise<unknown>;
+  catalog: (category?: string) => Promise<unknown>;
   debug: () => void;
   help: () => void;
   _currentGroupId?: string;

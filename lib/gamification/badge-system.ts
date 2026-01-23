@@ -4,6 +4,7 @@
 
 import { prisma } from "@/lib/prisma";
 import log from "@/lib/logging/logger";
+import { nanoid } from "nanoid";
 
 // Definición de badges disponibles
 export const BADGE_DEFINITIONS = {
@@ -144,6 +145,7 @@ async function awardBadge(
     // Crear badge
     await prisma.bondBadge.create({
       data: {
+        id: nanoid(),
         userId,
         badgeType,
         tier,
@@ -188,6 +190,8 @@ export async function awardPoints(
         lifetimePointsEarned: { increment: points },
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         totalPoints: points,
         availablePoints: points,
@@ -198,6 +202,7 @@ export async function awardPoints(
     // Registrar acción
     await prisma.rewardAction.create({
       data: {
+        id: nanoid(),
         userId,
         actionType,
         pointsEarned: points,
@@ -336,6 +341,8 @@ export async function trackNotificationResponse(
         },
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         notificationsResponded: 1,
         averageResponseTime: responseTime,
@@ -391,6 +398,8 @@ export async function updateUserStreak(userId: string): Promise<void> {
       // Crear nuevo registro
       await prisma.userRewards.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           currentStreak: 1,
           longestStreak: 1,

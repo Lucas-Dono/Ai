@@ -4,6 +4,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -193,6 +194,8 @@ async function main() {
     try {
       const created_event = await prisma.importantEvent.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId,
           userId, // Self-referential para eventos de Sophie
           ...event,

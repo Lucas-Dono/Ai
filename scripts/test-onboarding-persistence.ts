@@ -3,6 +3,7 @@
  * Tests the database persistence of onboarding progress
  */
 
+import { nanoid } from 'nanoid';
 import { prisma } from '../lib/prisma';
 
 async function testOnboardingPersistence() {
@@ -13,6 +14,8 @@ async function testOnboardingPersistence() {
   const testUser = await prisma.user.upsert({
     where: { email: 'test-onboarding@example.com' },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       email: 'test-onboarding@example.com',
       name: 'Test Onboarding User',
       plan: 'free',
@@ -25,6 +28,8 @@ async function testOnboardingPersistence() {
   console.log('\nTest 2: Creating onboarding progress...');
   const progress = await prisma.onboardingProgress.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId: testUser.id,
       completedTours: ['welcome', 'first-agent'],
       currentTour: 'community-interaction',
@@ -75,6 +80,8 @@ async function testOnboardingPersistence() {
   const upserted = await prisma.onboardingProgress.upsert({
     where: { userId: testUser.id },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId: testUser.id,
       completedTours: [],
       badges: [],
@@ -95,6 +102,8 @@ async function testOnboardingPersistence() {
   const newProgress = await prisma.onboardingProgress.upsert({
     where: { userId: testUser.id },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId: testUser.id,
       completedTours: ['welcome'],
       badges: ['explorer'],

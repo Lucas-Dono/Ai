@@ -11,6 +11,7 @@
 import { PrismaClient } from "@prisma/client";
 import { createEmotionalAgent } from "../lib/emotional-system/utils/initialization";
 import { getVisualGenerationService } from "../lib/visual-system/visual-generation-service";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -31,6 +32,8 @@ async function testVisualSystem() {
     if (!testUser) {
       testUser = await prisma.user.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           email: "test-visual@example.com",
           name: "Test User (Visual System)",
         },

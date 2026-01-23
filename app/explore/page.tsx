@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,10 +15,14 @@ import {
   Clock,
   Loader2,
   RefreshCw,
+  SlidersHorizontal,
+  X,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { UserCard, UserCardSkeleton, FriendshipStatus } from "@/components/social/UserCard";
 import { useFriendship } from "@/hooks/useFriendship";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -36,7 +41,9 @@ interface Agent {
   name: string;
   avatar: string | null;
   description: string | null;
-  categories: string[];
+  tags: string[] | null;
+  gender: string | null;
+  generationTier: string | null;
   kind: string;
   rating: number | null;
   cloneCount: number;
@@ -120,9 +127,12 @@ function AgentCard({ agent }: { agent: Agent }) {
 }
 
 export default function ExplorePage() {
+  const searchParams = useSearchParams();
+  const queryFromUrl = searchParams.get("q") || "";
+
   const [activeTab, setActiveTab] = useState<"all" | "users" | "agents">("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(queryFromUrl);
+  const [debouncedQuery, setDebouncedQuery] = useState(queryFromUrl);
   const [users, setUsers] = useState<User[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
@@ -132,6 +142,36 @@ export default function ExplorePage() {
   const [hasMoreUsers, setHasMoreUsers] = useState(true);
   const [hasMoreAgents, setHasMoreAgents] = useState(true);
 
+  // Filtros
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [selectedGender, setSelectedGender] = useState<"male" | "female" | "non-binary" | "">("");
+  const [selectedTier, setSelectedTier] = useState<"free" | "ultra" | "">("");
+
+  // Grupos de tags para filtrar (basados en análisis real de la BD)
+  const tagGroups = [
+    { label: "Histórico", tag: "historical-figure" },
+    { label: "Científico", tag: "scientist" },
+    { label: "Artista", tag: "artist" },
+    { label: "Escritor", tag: "writer" },
+    { label: "Músico", tag: "musician" },
+    { label: "Filósofo", tag: "philosopher" },
+    { label: "Mentor", tag: "mentor" },
+    { label: "Genio", tag: "genius" },
+    { label: "Creativo", tag: "creative" },
+    { label: "Espiritual", tag: "spiritual" },
+    { label: "Romántico", tag: "romantic" },
+    { label: "Intelectual", tag: "intellectual" },
+  ];
+
+  // Initialize search query from URL
+  useEffect(() => {
+    if (queryFromUrl) {
+      setSearchQuery(queryFromUrl);
+      setDebouncedQuery(queryFromUrl);
+    }
+  }, [queryFromUrl]);
+
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -140,7 +180,7 @@ export default function ExplorePage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Reset pagination when query changes
+  // Reset pagination when query or filters change
   useEffect(() => {
     setUsersPage(1);
     setAgentsPage(1);
@@ -148,7 +188,7 @@ export default function ExplorePage() {
     setAgents([]);
     setHasMoreUsers(true);
     setHasMoreAgents(true);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, selectedTag, selectedGender, selectedTier]);
 
   // Fetch users
   const fetchUsers = useCallback(async (page: number, reset = false) => {
@@ -189,6 +229,9 @@ export default function ExplorePage() {
         page: page.toString(),
         limit: "20",
         ...(debouncedQuery && { q: debouncedQuery }),
+        ...(selectedTag && { tag: selectedTag }),
+        ...(selectedGender && { gender: selectedGender }),
+        ...(selectedTier && { tier: selectedTier }),
       });
 
       const response = await fetch(`/api/explore/agents?${params}`);
@@ -206,9 +249,9 @@ export default function ExplorePage() {
     } finally {
       setIsLoadingAgents(false);
     }
-  }, [debouncedQuery, isLoadingAgents]);
+  }, [debouncedQuery, selectedTag, selectedGender, selectedTier, isLoadingAgents]);
 
-  // Initial fetch
+  // Fetch when filters change
   useEffect(() => {
     if (activeTab === "users" || activeTab === "all") {
       fetchUsers(1, true);
@@ -216,7 +259,8 @@ export default function ExplorePage() {
     if (activeTab === "agents" || activeTab === "all") {
       fetchAgents(1, true);
     }
-  }, [debouncedQuery, activeTab]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, activeTab, selectedTag, selectedGender, selectedTier]);
 
   const handleLoadMoreUsers = () => {
     const nextPage = usersPage + 1;
@@ -243,6 +287,14 @@ export default function ExplorePage() {
     }
   };
 
+  const clearFilters = () => {
+    setSelectedTag("");
+    setSelectedGender("");
+    setSelectedTier("");
+  };
+
+  const activeFiltersCount = [selectedTag, selectedGender, selectedTier].filter(Boolean).length;
+
   return (
     <div className="container max-w-4xl mx-auto py-6 px-4">
       {/* Header */}
@@ -257,7 +309,7 @@ export default function ExplorePage() {
       </div>
 
       {/* Search bar */}
-      <div className="relative mb-6">
+      <div className="relative mb-4">
         <Search className="absolute left-3 top-3 text-muted-foreground w-5 h-5" />
         <Input
           type="text"
@@ -274,6 +326,129 @@ export default function ExplorePage() {
         >
           <RefreshCw className={cn("w-4 h-4", (isLoadingUsers || isLoadingAgents) && "animate-spin")} />
         </Button>
+      </div>
+
+      {/* Filters button and panel */}
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowFilters(!showFilters)}
+          className="mb-4"
+        >
+          <SlidersHorizontal className="w-4 h-4 mr-2" />
+          Filtros
+          {activeFiltersCount > 0 && (
+            <span className="ml-2 px-1.5 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">
+              {activeFiltersCount}
+            </span>
+          )}
+          {showFilters ? (
+            <ChevronUp className="w-4 h-4 ml-2" />
+          ) : (
+            <ChevronDown className="w-4 h-4 ml-2" />
+          )}
+        </Button>
+
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="p-4 border border-border rounded-lg bg-card space-y-4">
+                {/* Tipo/Rol */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tipo</label>
+                  <div className="flex flex-wrap gap-2">
+                    {tagGroups.map((group) => {
+                      const isSelected = selectedTag === group.tag;
+                      return (
+                        <button
+                          key={group.tag}
+                          onClick={() => setSelectedTag(isSelected ? "" : group.tag)}
+                          className={cn(
+                            "px-3 py-2 rounded-lg border text-sm transition-all",
+                            isSelected
+                              ? "border-primary bg-primary/10 text-primary border-2"
+                              : "border-border hover:border-primary/50"
+                          )}
+                        >
+                          {group.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Género */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Género</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: "male", label: "Masculino" },
+                      { value: "female", label: "Femenino" },
+                      { value: "non-binary", label: "No binario" },
+                    ].map((gender) => (
+                      <button
+                        key={gender.value}
+                        onClick={() => setSelectedGender(selectedGender === gender.value ? "" : gender.value as any)}
+                        className={cn(
+                          "px-3 py-2 rounded-lg border text-sm transition-all",
+                          selectedGender === gender.value
+                            ? "border-primary bg-primary/10 text-primary border-2"
+                            : "border-border hover:border-primary/50"
+                        )}
+                      >
+                        {gender.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tier */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Nivel</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: "free", label: "Gratis" },
+                      { value: "ultra", label: "Ultra" },
+                    ].map((tier) => (
+                      <button
+                        key={tier.value}
+                        onClick={() => setSelectedTier(selectedTier === tier.value ? "" : tier.value as any)}
+                        className={cn(
+                          "px-3 py-2 rounded-lg border text-sm transition-all",
+                          selectedTier === tier.value
+                            ? "border-primary bg-primary/10 text-primary border-2"
+                            : "border-border hover:border-primary/50"
+                        )}
+                      >
+                        {tier.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Limpiar filtros */}
+                {activeFiltersCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="w-full"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Limpiar filtros
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Tabs */}

@@ -10,6 +10,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { getLLMProvider } from "@/lib/llm/provider";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -104,6 +105,7 @@ export async function initializeSemanticMemory(
     // Crear SemanticMemory
     await prisma.semanticMemory.create({
       data: {
+        id: nanoid(),
         agentId,
         userFacts: {}, // Se llenará con interacciones
         userPreferences: {}, // Se llenará con interacciones
@@ -217,6 +219,7 @@ export async function generateEpisodicMemories(
     for (const memory of memories) {
       await prisma.episodicMemory.create({
         data: {
+          id: nanoid(),
           agentId,
           event: memory.event,
           characterEmotion: memory.characterEmotion,
@@ -368,6 +371,8 @@ export async function initializePersonalityCore(
     // Crear PersonalityCore
     await prisma.personalityCore.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         openness: bigFive.openness,
         conscientiousness: bigFive.conscientiousness,

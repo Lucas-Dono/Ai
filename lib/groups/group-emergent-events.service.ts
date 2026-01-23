@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
+import { nanoid } from "nanoid";
 
 /**
  * Group Emergent Events Service
@@ -51,17 +52,17 @@ export class GroupEmergentEventsService {
       const group = await prisma.group.findUnique({
         where: { id: groupId },
         include: {
-          members: {
+          GroupMember: {
             where: { isActive: true },
             include: {
-              agent: {
+              Agent: {
                 select: {
                   id: true,
                   name: true,
-                  personalityCore: true,
+                  PersonalityCore: true,
                 },
               },
-              user: {
+              User: {
                 select: {
                   id: true,
                   name: true,
@@ -168,19 +169,19 @@ export class GroupEmergentEventsService {
     const conversationSummary = recentMessages
       .reverse()
       .slice(-10)
-      .map((m) => {
+      .map((m: any) => {
         const author =
-          m.authorType === "user" ? m.user?.name : m.agent?.name || "Unknown";
+          m.authorType === "user" ? m.User?.name : m.Agent?.name || "Unknown";
         return `${author}: ${m.content}`;
       })
       .join("\n");
 
-    const aiPersonalities = group.members
-      .filter((m: any) => m.memberType === "agent" && m.agent)
-      .map((m: { agentId: string; agent: { name: string; personalityCore?: { traits?: any } } }) => ({
+    const aiPersonalities = group.GroupMember
+      .filter((m: any) => m.memberType === "agent" && m.Agent)
+      .map((m: { agentId: string; Agent: { name: string; PersonalityCore?: { traits?: any } | null } | null }) => ({
         id: m.agentId,
-        name: m.agent.name,
-        traits: m.agent.personalityCore?.traits || [],
+        name: m.Agent?.name,
+        traits: m.Agent?.PersonalityCore?.traits || [],
       }));
 
     const prompt = `Basado en esta conversación grupal, genera un evento emergente interesante:
@@ -316,12 +317,14 @@ El evento debe:
 
     await prisma.groupMessage.create({
       data: {
+        id: nanoid(),
         groupId,
         authorType: "user",
         content: `✨ **${event.title}**: ${event.description}`,
         contentType: "system",
         isSystemMessage: true,
         turnNumber,
+        updatedAt: new Date(),
       },
     });
 
@@ -397,10 +400,10 @@ El evento debe:
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        members: {
+        GroupMember: {
           where: { isActive: true, memberType: "agent" },
           include: {
-            agent: { select: { id: true, name: true } },
+            Agent: { select: { id: true, name: true } },
           },
         },
       },
@@ -408,7 +411,7 @@ El evento debe:
 
     if (!group) return null;
 
-    const aiIds = group.members.map((m) => m.agentId!);
+    const aiIds = group.GroupMember.map((m) => m.agentId!);
 
     // Create event based on type
     const eventTemplates: Record<

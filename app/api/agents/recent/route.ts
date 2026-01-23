@@ -34,7 +34,7 @@ export async function GET() {
       select: {
         agentId: true,
         createdAt: true,
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -54,9 +54,9 @@ export async function GET() {
 
     // Filtrar solo los agentes válidos (que existen) y de tipo companion
     const recentAgents = recentMessages
-      .filter((msg) => msg.agent && msg.agent.kind === "companion")
+      .filter((msg) => msg.Agent && msg.Agent.kind === "companion")
       .map((msg) => ({
-        ...msg.agent,
+        ...msg.Agent,
         lastMessageAt: msg.createdAt,
       }));
 

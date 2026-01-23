@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       select: {
         plan: true,
         createdAt: true,
-        subscriptions: {
+        Subscription: {
           where: {
             status: "active",
           },

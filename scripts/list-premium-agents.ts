@@ -12,23 +12,23 @@ async function main() {
 
   const agents = await prisma.agent.findMany({
     where: {
-      user: {
+      User: {
         plan: {
           in: ['plus', 'ultra']
         }
       }
     },
     include: {
-      user: {
+      User: {
         select: {
           email: true,
           plan: true,
         }
       },
-      personalityCore: true,
-      characterRoutine: {
+      PersonalityCore: true,
+      CharacterRoutine: {
         include: {
-          templates: true,
+          RoutineTemplate: true,
         }
       }
     },
@@ -47,7 +47,7 @@ async function main() {
     console.log('-'.repeat(80));
     console.log(`   ID: ${agent.id}`);
     console.log(`   Kind: ${agent.kind}`);
-    console.log(`   User: ${agent.user?.email} (${agent.user?.plan})`);
+    console.log(`   User: ${agent.User?.email} (${agent.User?.plan})`);
     console.log();
 
     // Basic Identity
@@ -69,13 +69,13 @@ async function main() {
     }
 
     // Personality
-    if (agent.personalityCore) {
+    if (agent.PersonalityCore) {
       console.log('   🧠 Personality (Big Five):');
-      console.log(`      Openness: ${agent.personalityCore.openness}/100`);
-      console.log(`      Conscientiousness: ${agent.personalityCore.conscientiousness}/100`);
-      console.log(`      Extraversion: ${agent.personalityCore.extraversion}/100`);
-      console.log(`      Agreeableness: ${agent.personalityCore.agreeableness}/100`);
-      console.log(`      Neuroticism: ${agent.personalityCore.neuroticism}/100`);
+      console.log(`      Openness: ${agent.PersonalityCore.openness}/100`);
+      console.log(`      Conscientiousness: ${agent.PersonalityCore.conscientiousness}/100`);
+      console.log(`      Extraversion: ${agent.PersonalityCore.extraversion}/100`);
+      console.log(`      Agreeableness: ${agent.PersonalityCore.agreeableness}/100`);
+      console.log(`      Neuroticism: ${agent.PersonalityCore.neuroticism}/100`);
       console.log();
     }
 
@@ -102,16 +102,16 @@ async function main() {
     }
 
     // Existing Routine
-    if (agent.characterRoutine) {
+    if (agent.CharacterRoutine) {
       console.log('   ✅ HAS ROUTINE:');
-      console.log(`      Templates: ${agent.characterRoutine.templates.length}`);
-      console.log(`      Realism: ${agent.characterRoutine.realismLevel}`);
-      console.log(`      Timezone: ${agent.characterRoutine.timezone}`);
+      console.log(`      Templates: ${agent.CharacterRoutine.RoutineTemplate.length}`);
+      console.log(`      Realism: ${agent.CharacterRoutine.realismLevel}`);
+      console.log(`      Timezone: ${agent.CharacterRoutine.timezone}`);
       console.log();
 
-      if (agent.characterRoutine.templates.length > 0) {
+      if (agent.CharacterRoutine.RoutineTemplate.length > 0) {
         console.log('      Events:');
-        for (const template of agent.characterRoutine.templates) {
+        for (const template of agent.CharacterRoutine.RoutineTemplate) {
           console.log(`         - ${template.name} (${template.type}): ${template.startTime} - ${template.endTime}`);
         }
         console.log();
@@ -126,7 +126,7 @@ async function main() {
   }
 
   // Summary
-  const withRoutine = agents.filter(a => a.characterRoutine !== null).length;
+  const withRoutine = agents.filter(a => a.CharacterRoutine !== null).length;
   const withoutRoutine = agents.length - withRoutine;
 
   console.log('SUMMARY:');

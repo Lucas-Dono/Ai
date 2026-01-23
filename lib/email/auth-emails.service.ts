@@ -8,6 +8,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 import { sendEmail } from './index';
 import { render } from '@react-email/components';
 import { emailLogger as log } from '@/lib/logging/loggers';
@@ -51,6 +52,8 @@ export async function sendEmailVerification(userId: string, email: string, userN
     // Save verification token to database
     await prisma.verification.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         identifier: email,
         value: token,
         expiresAt,
@@ -188,6 +191,8 @@ export async function sendPasswordReset(
     // Save reset token to database
     await prisma.verification.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         identifier: `password_reset:${email}`,
         value: token,
         expiresAt,

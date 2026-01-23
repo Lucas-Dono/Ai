@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
@@ -39,6 +40,8 @@ export async function POST(
       // Crear agente clonado
       const newClone = await tx.agent.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId: user.id,
           name: `${original.name} (Clone)`,
           kind: original.kind,
@@ -64,6 +67,7 @@ export async function POST(
         }),
         tx.agentClone.create({
           data: {
+            id: nanoid(),
             originalAgentId: originalId,
             clonedByUserId: user.id,
             clonedAgentId: newClone.id,

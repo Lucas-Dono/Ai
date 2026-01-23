@@ -5,6 +5,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { SCENE_EXAMPLES_BY_CATEGORY } from "./templates/scene-examples";
 import { validateScenes } from "./validation/scene-validator";
 
@@ -81,6 +82,8 @@ async function generateCatalog() {
       // Insertar escena
       await prisma.scene.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           code: scene.code,
           name: scene.name,
           category: scene.category,
@@ -96,7 +99,7 @@ async function generateCatalog() {
           participantRoles: scene.participantRoles,
           interventionSequence: scene.interventionSequence,
           consequences: scene.consequences,
-          variations: null,
+          variations: undefined,
           usageCount: 0,
           successRate: 0.5,
           avgEngagement: 0.5,

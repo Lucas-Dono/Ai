@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { SeedStatus } from "@prisma/client";
 import type { CreateSeedInput, TensionSeed } from "./types";
 
@@ -35,6 +36,7 @@ class TensionSeedService {
 
       const seed = await prisma.tensionSeed.create({
         data: {
+          id: nanoid(),
           groupId: data.groupId,
           type: data.type,
           title: data.title,

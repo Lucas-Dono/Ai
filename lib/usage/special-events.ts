@@ -10,6 +10,8 @@
  * - Crear FOMO con duración limitada
  */
 
+import { nanoid } from "nanoid";
+
 export interface SpecialEvent {
   id: string;
   name: string;
@@ -270,12 +272,14 @@ export async function activateEventForUser(
   // Crear grant temporal
   await prisma.tempTierGrant.create({
     data: {
+      id: nanoid(),
       userId,
       eventId: event.id,
       fromTier: event.benefits.tier,
       toTier: event.benefits.tempUpgradeTo,
       expiresAt,
       active: true,
+      updatedAt: new Date(),
     },
   });
 

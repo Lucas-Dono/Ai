@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 
 export interface CreateCommentData {
   postId: string;
@@ -15,7 +16,7 @@ export const CommentService = {
   async createComment(authorId: string, data: CreateCommentData) {
     const post = await prisma.communityPost.findUnique({
       where: { id: data.postId },
-      include: { community: true },
+      include: { Community: true },
     });
 
     if (!post) throw new Error('Post no encontrado');
@@ -38,6 +39,8 @@ export const CommentService = {
 
     const comment = await prisma.communityComment.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         postId: data.postId,
         authorId,
         content: data.content,
@@ -46,7 +49,7 @@ export const CommentService = {
         images: data.images || [],
       },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -83,8 +86,8 @@ export const CommentService = {
         data.postId,
         post.title,
         authorId,
-        comment.author.name || 'Usuario',
-        comment.author.image || null,
+        comment.User?.name || 'Usuario',
+        comment.User?.image || null,
         data.content
       );
     } catch (error) {
@@ -133,7 +136,7 @@ export const CommentService = {
       },
       orderBy,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -142,10 +145,10 @@ export const CommentService = {
         },
         _count: {
           select: {
-            replies: true,
+            other_CommunityComment: true,
           },
         },
-        votes: {
+        CommentVote: {
           select: {
             voteType: true,
             userId: true,
@@ -187,7 +190,7 @@ export const CommentService = {
       },
       orderBy: { score: 'desc' },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -196,7 +199,7 @@ export const CommentService = {
         },
         _count: {
           select: {
-            replies: true,
+            other_CommunityComment: true,
           },
         },
       },
@@ -249,7 +252,7 @@ export const CommentService = {
     }
 
     await prisma.commentVote.create({
-      data: { commentId, userId, voteType },
+      data: { id: nanoid(), commentId, userId, voteType },
     });
 
     const increment = voteType === 'upvote' ? 1 : -1;
@@ -271,11 +274,11 @@ export const CommentService = {
   async markAsAcceptedAnswer(commentId: string, userId: string) {
     const comment = await prisma.communityComment.findUnique({
       where: { id: commentId },
-      include: { post: true },
+      include: { CommunityPost: true },
     });
 
     if (!comment) throw new Error('Comentario no encontrado');
-    if (comment.post.authorId !== userId) {
+    if (comment.CommunityPost.authorId !== userId) {
       throw new Error('Solo el autor del post puede aceptar respuestas');
     }
 
@@ -304,18 +307,18 @@ export const CommentService = {
   async deleteComment(commentId: string, userId: string) {
     const comment = await prisma.communityComment.findUnique({
       where: { id: commentId },
-      include: { post: { include: { community: true } } },
+      include: { CommunityPost: { include: { Community: true } } },
     });
 
     if (!comment) throw new Error('Comentario no encontrado');
 
     let canDelete = comment.authorId === userId;
 
-    if (!canDelete && comment.post.communityId) {
+    if (!canDelete && comment.CommunityPost.communityId) {
       const member = await prisma.communityMember.findUnique({
         where: {
           communityId_userId: {
-            communityId: comment.post.communityId,
+            communityId: comment.CommunityPost.communityId,
             userId,
           },
         },

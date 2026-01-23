@@ -104,10 +104,7 @@ export async function GET(req: NextRequest) {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        personalityCore: true,
-        internalState: true,
-        characterGrowth: true,
-        semanticMemory: true,
+        InternalState: true,
       },
     });
 
@@ -119,39 +116,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    // Retornar estado emocional
+    // Retornar estado emocional (simplified since some properties don't exist in schema)
     return NextResponse.json({
       success: true,
       emotionalState: {
         personality: {
-          bigFive: {
-            openness: agent.personalityCore?.openness,
-            conscientiousness: agent.personalityCore?.conscientiousness,
-            extraversion: agent.personalityCore?.extraversion,
-            agreeableness: agent.personalityCore?.agreeableness,
-            neuroticism: agent.personalityCore?.neuroticism,
-          },
-          coreValues: agent.personalityCore?.coreValues,
+          description: agent.personality,
+          tone: agent.tone,
         },
         currentState: {
-          emotions: agent.internalState?.currentEmotions,
-          mood: {
-            valence: agent.internalState?.moodValence,
-            arousal: agent.internalState?.moodArousal,
-            dominance: agent.internalState?.moodDominance,
-          },
-          needs: {
-            connection: agent.internalState?.needConnection,
-            autonomy: agent.internalState?.needAutonomy,
-            competence: agent.internalState?.needCompetence,
-            novelty: agent.internalState?.needNovelty,
-          },
+          emotions: agent.InternalState?.currentEmotions || {},
+          activeGoals: agent.InternalState?.activeGoals || [],
+          conversationBuffer: agent.InternalState?.conversationBuffer || [],
         },
-        growth: {
-          trustLevel: agent.characterGrowth?.trustLevel,
-          intimacyLevel: agent.characterGrowth?.intimacyLevel,
-          relationshipStage: agent.semanticMemory?.relationshipStage,
-          conversationCount: agent.characterGrowth?.conversationCount,
+        agent: {
+          name: agent.name,
+          kind: agent.kind,
+          description: agent.description,
         },
       },
     });

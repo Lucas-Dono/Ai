@@ -12,6 +12,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 import { fingerprintRequest } from './fingerprinting';
 import { detectScanningTools } from './threat-detection';
 
@@ -271,13 +272,14 @@ export async function logHoneypotHit(
 
     await prisma.honeypotHit.create({
       data: {
-        fingerprintId,
+        id: nanoid(),
+        fingerprintId: fingerprintId || null,
         honeypotType: config.type,
         honeypotPath: config.path,
         honeypotName: config.name,
         method: request.method,
-        query: query || undefined,
-        payload,
+        query: query || null,
+        payload: payload || null,
         headers,
         ipAddress,
         userAgent,

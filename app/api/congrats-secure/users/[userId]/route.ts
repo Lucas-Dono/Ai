@@ -25,7 +25,7 @@ export const GET = withAdminAuth(async (request, { admin, params }) => {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        agents: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -35,22 +35,22 @@ export const GET = withAdminAuth(async (request, { admin, params }) => {
             createdAt: true,
             _count: {
               select: {
-                messagesAsAgent: true
+                Message: true
               }
             }
           },
           orderBy: { createdAt: 'desc' },
           take: 10
         },
-        subscriptions: {
+        Subscription: {
           orderBy: { createdAt: 'desc' },
           take: 5
         },
-        payments: {
+        Payment: {
           orderBy: { createdAt: 'desc' },
           take: 10
         },
-        communityPosts: {
+        CommunityPost: {
           select: {
             id: true,
             title: true,
@@ -58,8 +58,8 @@ export const GET = withAdminAuth(async (request, { admin, params }) => {
             createdAt: true,
             _count: {
               select: {
-                comments: true,
-                awards: true
+                CommunityComment: true,
+                PostAward: true
               }
             }
           },
@@ -68,9 +68,9 @@ export const GET = withAdminAuth(async (request, { admin, params }) => {
         },
         _count: {
           select: {
-            agents: true,
-            communityPosts: true,
-            communityComments: true
+            Agent: true,
+            CommunityPost: true,
+            CommunityComment: true
           }
         }
       }

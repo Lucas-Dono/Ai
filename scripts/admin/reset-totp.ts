@@ -20,22 +20,22 @@ async function main() {
   try {
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { adminAccess: true }
+      include: { AdminAccess: true }
     });
 
-    if (!user || !user.adminAccess) {
+    if (!user || !user.AdminAccess) {
       console.error(`❌ Usuario ${email} no tiene acceso admin`);
       process.exit(1);
     }
 
     // Eliminar backup codes antiguos
     await prisma.adminBackupCode.deleteMany({
-      where: { adminAccessId: user.adminAccess.id }
+      where: { adminAccessId: user.AdminAccess.id }
     });
 
     // Eliminar TOTP secret
     await prisma.adminAccess.update({
-      where: { id: user.adminAccess.id },
+      where: { id: user.AdminAccess.id },
       data: { totpSecret: null }
     });
 

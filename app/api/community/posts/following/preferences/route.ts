@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/middleware/auth-helper';
 import { UserPreferenceService } from '@/lib/services/user-preference.service';
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 
 /**
  * GET /api/community/posts/following/preferences - Obtener preferencias del usuario
@@ -30,12 +31,14 @@ export async function GET(request: NextRequest) {
       // Crear configuración por defecto
       emailConfig = await prisma.emailNotificationConfig.create({
         data: {
+          id: nanoid(),
           userId,
           frequency: 'instant',
           newComments: true,
           newReplies: true,
           postUpdates: true,
-          digestSummary: true
+          digestSummary: true,
+          updatedAt: new Date()
         }
       });
     }
@@ -83,7 +86,9 @@ export async function PATCH(request: NextRequest) {
       await prisma.emailNotificationConfig.upsert({
         where: { userId },
         create: {
+          id: nanoid(),
           userId,
+          updatedAt: new Date(),
           ...body.emailConfig
         },
         update: body.emailConfig

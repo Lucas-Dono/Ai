@@ -13,6 +13,7 @@ import { getHuggingFaceSpacesClient } from "./huggingface-spaces-client";
 import { getFastSDLocalClient } from "./fastsd-local-client";
 import { getAIHordeClient } from "./ai-horde-client";
 import { trackImageGeneration } from "@/lib/cost-tracking/tracker";
+import { nanoid } from "nanoid";
 
 export type ContentType = "sfw" | "suggestive" | "nsfw";
 export type UserTier = "free" | "plus" | "ultra";
@@ -303,6 +304,7 @@ export class VisualGenerationService {
 
     await prisma.visualExpression.create({
       data: {
+        id: nanoid(),
         agentId,
         emotionType,
         intensity,
@@ -549,6 +551,7 @@ export class VisualGenerationService {
     // Crear CharacterAppearance
     await prisma.characterAppearance.create({
       data: {
+        id: nanoid(),
         agentId,
         basePrompt,
         style,
@@ -561,6 +564,7 @@ export class VisualGenerationService {
         seed: Math.floor(Math.random() * 1000000),
         preferredProvider: "huggingface", // Por ahora forzar HF
         totalGenerations: 0,
+        updatedAt: new Date(),
       },
     });
 

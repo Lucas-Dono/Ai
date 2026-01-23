@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { withAPIAuth } from "@/lib/api/auth";
 
@@ -166,6 +167,8 @@ export async function POST(
     // Create event
     const event = await prisma.scheduledEvent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         title,
         description,

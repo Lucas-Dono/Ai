@@ -8,6 +8,7 @@ import { PLANS } from "@/lib/mercadopago/config";
 import { getEffectiveTier } from "./special-events";
 import { getTierLimits, isUnlimited } from "./tier-limits";
 import { getWeeklyUsage } from "./daily-limits";
+import { nanoid } from "nanoid";
 
 // ============================================================================
 // CONFIGURACIÓN DE LÍMITES POR TIER
@@ -310,6 +311,7 @@ export async function trackTokenUsage(
   // Registrar input tokens
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType: inputType,
       quantity: inputTokens,
@@ -323,6 +325,7 @@ export async function trackTokenUsage(
   // Registrar output tokens
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType: outputType,
       quantity: outputTokens,

@@ -92,7 +92,7 @@ class GroupDispositionService {
         select: {
           id: true,
           name: true,
-          personalityCore: {
+          PersonalityCore: {
             select: {
               extraversion: true,
               agreeableness: true,
@@ -202,7 +202,7 @@ class GroupDispositionService {
     }
 
     // 8. Personality - Extraversión (0-10 puntos)
-    const extraversion = agent.personalityCore?.extraversion ?? 50;
+    const extraversion = agent.PersonalityCore?.extraversion ?? 50;
     breakdown.personality = (extraversion / 100) * 10;
     if (extraversion > 70) {
       reasons.push("personalidad extrovertida");

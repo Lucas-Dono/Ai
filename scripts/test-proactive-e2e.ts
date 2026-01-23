@@ -14,6 +14,7 @@
  *   npx tsx scripts/test-proactive-e2e.ts
  */
 
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 import { processAllAgents, processAgent } from '@/lib/proactive/proactive-service';
 import { detectTriggers } from '@/lib/proactive/trigger-detector';
@@ -57,14 +58,14 @@ async function findTestAgent(): Promise<{ agentId: string; userId: string } | nu
   // Buscar un agente con mensajes existentes (relación activa)
   const agentWithMessages = await prisma.agent.findFirst({
     where: {
-      messagesAsAgent: {
+      Message: {
         some: {
           role: 'user',
         },
       },
     },
     include: {
-      messagesAsAgent: {
+      Message: {
         where: { role: 'user' },
         orderBy: { createdAt: 'desc' },
         take: 1,
@@ -73,10 +74,10 @@ async function findTestAgent(): Promise<{ agentId: string; userId: string } | nu
     },
   });
 
-  if (agentWithMessages && agentWithMessages.messagesAsAgent[0]?.userId) {
+  if (agentWithMessages && agentWithMessages.Message[0]?.userId) {
     return {
       agentId: agentWithMessages.id,
-      userId: agentWithMessages.messagesAsAgent[0].userId,
+      userId: agentWithMessages.Message[0].userId,
     };
   }
 
@@ -99,6 +100,8 @@ async function setupProactiveConfig(agentId: string, userId: string) {
       eventRemindersEnabled: true,
     },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       userId,
       enabled: true,

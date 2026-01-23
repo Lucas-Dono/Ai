@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     // del usuario en una sola llamada con JOIN
     const messages = await prisma.proactiveMessage.findMany({
       where: {
-        agent: {
+        Agent: {
           userId: session.user.id,
         },
         status: {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         ]
       },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -56,9 +56,9 @@ export async function GET(req: NextRequest) {
     // Mapear a formato esperado por el frontend
     const formattedMessages = messages.map(msg => ({
       id: msg.id,
-      agentId: msg.agent.id,
-      agentName: msg.agent.name,
-      agentAvatar: msg.agent.avatar,
+      agentId: msg.Agent.id,
+      agentName: msg.Agent.name,
+      agentAvatar: msg.Agent.avatar,
       content: msg.content,
       triggerType: msg.triggerType,
       createdAt: msg.createdAt.toISOString(),

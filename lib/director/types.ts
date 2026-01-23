@@ -75,10 +75,14 @@ export interface Scene {
 // ============================================================================
 
 export interface BufferedMessage {
+  id: string;
+  groupId: string;
   userId: string;
   userName: string;
   content: string;
-  timestamp: Date;
+  timestamp: number | Date;
+  mentionedAgents: string[];
+  replyToId?: string;
 }
 
 export interface GroupContextForDirector {

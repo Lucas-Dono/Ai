@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
+import { nanoid } from "nanoid";
 
 interface RelevantMemory {
   memory: any;
@@ -122,6 +123,7 @@ export class CrossContextMemoryService {
       // 2. Crear memoria
       const memory = await prisma.crossContextMemory.create({
         data: {
+          id: nanoid(),
           agentId: params.agentId,
           sourceType: params.sourceType,
           sourceUserId: params.sourceUserId || null,
@@ -133,6 +135,7 @@ export class CrossContextMemoryService {
           importance: params.importance,
           embedding: embedding,
           happenedAt: new Date(),
+          updatedAt: new Date(),
         },
       });
 

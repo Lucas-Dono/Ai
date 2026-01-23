@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 
 export interface CreateCharacterData {
   name: string;
@@ -39,6 +40,8 @@ export const MarketplaceCharacterService = {
   async createCharacter(authorId: string, data: CreateCharacterData) {
     const character = await prisma.marketplaceCharacter.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         authorId,
         name: data.name,
         description: data.description,
@@ -51,7 +54,7 @@ export const MarketplaceCharacterService = {
         status: 'pending',
       },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -84,7 +87,7 @@ export const MarketplaceCharacterService = {
       where: { id: characterId },
       data,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -104,14 +107,14 @@ export const MarketplaceCharacterService = {
     const character = await prisma.marketplaceCharacter.findUnique({
       where: { id: characterId },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        ratings: {
+        CharacterRating: {
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
@@ -202,7 +205,7 @@ export const MarketplaceCharacterService = {
         take: limit,
         orderBy,
         include: {
-          author: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -250,6 +253,7 @@ export const MarketplaceCharacterService = {
       // Registrar descarga
       await prisma.characterDownload.create({
         data: {
+          id: nanoid(),
           characterId,
           userId,
         },
@@ -268,7 +272,7 @@ export const MarketplaceCharacterService = {
     return prisma.marketplaceCharacter.findUnique({
       where: { id: characterId },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -308,6 +312,8 @@ export const MarketplaceCharacterService = {
         },
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         characterId,
         userId,
         rating,
@@ -471,6 +477,8 @@ export const MarketplaceCharacterService = {
     // Crear agente basado en el personaje
     const agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         name: agentName || character.name,
         description: character.description || '',

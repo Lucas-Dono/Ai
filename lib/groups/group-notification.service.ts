@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 /**
  * Group Notification Service
@@ -28,9 +29,9 @@ export async function sendGroupMessageNotifications(
         isMuted: false, // No notificar a miembros silenciados
       },
       include: {
-        user: {
+        User: {
           include: {
-            notificationPreferences: true,
+            NotificationPreferences: true,
           },
         },
       },
@@ -66,6 +67,7 @@ async function createInAppNotifications(
 
     await prisma.notification.createMany({
       data: members.map((member) => ({
+        id: nanoid(),
         recipientId: member.userId!,
         type: "group_message",
         title: `Nuevo mensaje en ${group.name}`,
@@ -92,13 +94,13 @@ async function sendPushNotifications(
 ): Promise<void> {
   const pushTasks = members
     .filter((member) => {
-      const prefs = member.user?.notificationPreferences;
+      const prefs = (member as any).User?.NotificationPreferences;
       return prefs?.pushNotificationsEnabled ?? true; // Default: enabled
     })
     .map(async (member) => {
       try {
         // Get push subscription from user metadata
-        const pushSubscription = member.user?.metadata?.pushSubscription;
+        const pushSubscription = (member as any).User?.metadata?.pushSubscription;
         if (!pushSubscription) {
           return;
         }
@@ -201,6 +203,7 @@ export async function sendMemberJoinedNotifications(
 
     await prisma.notification.createMany({
       data: members.map((member) => ({
+        id: nanoid(),
         recipientId: member.userId!,
         type: "group_member_added",
         title: `Nuevo miembro en ${group.name}`,
@@ -243,6 +246,7 @@ export async function sendMemberLeftNotifications(
 
     await prisma.notification.createMany({
       data: members.map((member) => ({
+        id: nanoid(),
         recipientId: member.userId!,
         type: "group_member_removed",
         title: `Cambio en ${group.name}`,
@@ -275,6 +279,7 @@ export async function sendGroupInvitationNotification(
 
     await prisma.notification.create({
       data: {
+        id: nanoid(),
         recipientId: inviteeUserId,
         type: "group_invitation",
         title: "Nueva invitación a grupo",
@@ -290,11 +295,11 @@ export async function sendGroupInvitationNotification(
     // También enviar push notification si está habilitado
     const invitee = await prisma.user.findUnique({
       where: { id: inviteeUserId },
-      include: { notificationPreferences: true },
+      include: { NotificationPreferences: true },
     });
 
-    if (invitee?.notificationPreferences?.pushNotifications) {
-      const pushSubscription = (invitee.notificationPreferences as any)?.pushSubscription;
+    if (invitee?.NotificationPreferences?.pushNotifications) {
+      const pushSubscription = (invitee.NotificationPreferences as any)?.pushSubscription;
       if (pushSubscription) {
         await sendWebPushNotification(pushSubscription, {
           title: "Invitación a grupo",
@@ -344,6 +349,7 @@ export async function sendGroupSettingsChangedNotification(
 
     await prisma.notification.createMany({
       data: members.map((member) => ({
+        id: nanoid(),
         recipientId: member.userId!,
         type: "group_settings_changed",
         title: `Configuración actualizada en ${group.name}`,

@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardNav } from "@/components/dashboard-nav";
 import { MobileNav } from "@/components/mobile/MobileNav";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
@@ -9,7 +11,7 @@ export default function ExploreLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Sin botón de búsqueda en explore */}
       <DashboardNav />
 
       {/* Mobile Layout Container */}

@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export interface SyncInput {
   agentId: string;
@@ -42,6 +43,8 @@ class RelationSyncService {
         // Crear relacion si no existe
         relation = await prisma.relation.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             subjectId: agentId,
             targetId: userId,
             targetType: "user",
@@ -180,6 +183,8 @@ class RelationSyncService {
 
     // Build create data (cannot use increment in create)
     const createData: Record<string, unknown> = {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       userId,
       lastSeenAt: new Date(),
@@ -201,6 +206,8 @@ class RelationSyncService {
         agentId_userId: { agentId, userId },
       },
       create: createData as {
+        id: string;
+        updatedAt: Date;
         agentId: string;
         userId: string;
         lastSeenAt: Date;

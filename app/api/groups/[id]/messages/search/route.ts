@@ -63,14 +63,14 @@ export async function GET(
       orderBy: { createdAt: "desc" },
       take: 50, // Limit results
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,

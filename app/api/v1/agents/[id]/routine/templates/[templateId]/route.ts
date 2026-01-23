@@ -27,12 +27,12 @@ export async function PATCH(
     const template = await prisma.routineTemplate.findFirst({
       where: {
         id: templateId,
-        routine: {
+        CharacterRoutine: {
           agentId,
         },
       },
       include: {
-        routine: true,
+        CharacterRoutine: true,
       },
     });
 
@@ -101,7 +101,7 @@ export async function DELETE(
     const template = await prisma.routineTemplate.findFirst({
       where: {
         id: templateId,
-        routine: {
+        CharacterRoutine: {
           agentId,
         },
       },

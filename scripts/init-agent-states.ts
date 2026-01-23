@@ -8,6 +8,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -16,11 +17,11 @@ async function initAgentStates() {
 
   // 1. Obtener agentes sin InternalState
   const agentsWithoutState = await prisma.agent.findMany({
-    where: { internalState: null },
+    where: { InternalState: null },
     select: {
       id: true,
       name: true,
-      personalityCore: {
+      PersonalityCore: {
         select: {
           extraversion: true,
           neuroticism: true,
@@ -42,9 +43,9 @@ async function initAgentStates() {
   for (const agent of agentsWithoutState) {
     try {
       // Valores base con ligera variación según personalidad
-      const extraversion = agent.personalityCore?.extraversion ?? 50;
-      const neuroticism = agent.personalityCore?.neuroticism ?? 50;
-      const openness = agent.personalityCore?.openness ?? 50;
+      const extraversion = agent.PersonalityCore?.extraversion ?? 50;
+      const neuroticism = agent.PersonalityCore?.neuroticism ?? 50;
+      const openness = agent.PersonalityCore?.openness ?? 50;
 
       // Calcular mood inicial basado en personalidad
       // Extraversión alta = valence más positiva
@@ -55,6 +56,7 @@ async function initAgentStates() {
 
       await prisma.internalState.create({
         data: {
+          id: nanoid(),
           agentId: agent.id,
           // Emociones iniciales neutrales
           currentEmotions: {

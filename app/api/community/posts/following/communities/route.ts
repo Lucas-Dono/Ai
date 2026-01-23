@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         communityId: { not: null }
       },
       select: {
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
     // Filtrar comunidades únicas
     const communitiesMap = new Map();
     posts.forEach(post => {
-      if (post.community) {
-        communitiesMap.set(post.community.id, post.community);
+      if (post.Community) {
+        communitiesMap.set(post.Community.id, post.Community);
       }
     });
 

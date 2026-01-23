@@ -9,6 +9,7 @@
 import * as speakeasy from 'speakeasy';
 import * as qrcodeTerminal from 'qrcode-terminal';
 import * as bcrypt from 'bcryptjs';
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 import { encrypt, randomBytes } from '@/lib/admin/crypto';
 
@@ -24,6 +25,7 @@ async function generateBackupCodes(adminAccessId: string): Promise<string[]> {
     const codeHash = await bcrypt.hash(code, 10);
     await prisma.adminBackupCode.create({
       data: {
+        id: nanoid(),
         adminAccessId,
         codeHash,
       }
@@ -48,7 +50,7 @@ async function main() {
     // 1. Buscar o crear AdminAccess
     let user = await prisma.user.findUnique({
       where: { email },
-      include: { adminAccess: true }
+      include: { AdminAccess: true }
     });
 
     if (!user) {
@@ -56,13 +58,15 @@ async function main() {
       process.exit(1);
     }
 
-    let adminAccess = user.adminAccess;
+    let adminAccess = user.AdminAccess;
 
     // Si no tiene AdminAccess, crearlo
     if (!adminAccess) {
       console.log('📝 Creando acceso admin...');
       adminAccess = await prisma.adminAccess.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId: user.id,
           role: 'admin',
           enabled: true,
@@ -106,6 +110,7 @@ async function main() {
     // 5. Log de auditoría
     await prisma.auditLog.create({
       data: {
+        id: nanoid(),
         adminAccessId: adminAccess.id,
         action: 'totp.setup',
         targetType: 'AdminAccess',

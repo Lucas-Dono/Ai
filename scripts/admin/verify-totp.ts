@@ -14,23 +14,23 @@ async function verifyTOTP(email: string, token: string): Promise<boolean> {
     // 1. Obtener admin
     const admin = await prisma.user.findUnique({
       where: { email },
-      include: { adminAccess: true }
+      include: { AdminAccess: true }
     });
 
-    if (!admin?.adminAccess) {
+    if (!admin?.AdminAccess) {
       return false;
     }
 
-    if (!admin.adminAccess.enabled) {
+    if (!admin.AdminAccess.enabled) {
       return false;
     }
 
-    if (!admin.adminAccess.totpSecret) {
+    if (!admin.AdminAccess.totpSecret) {
       return false;
     }
 
     // 2. Descifrar secret TOTP
-    const secret = decrypt(admin.adminAccess.totpSecret);
+    const secret = decrypt(admin.AdminAccess.totpSecret);
 
     // 3. Verificar token
     const verified = speakeasy.totp.verify({

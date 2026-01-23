@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
@@ -160,6 +161,8 @@ export async function POST(req: NextRequest) {
           // Crear agente dentro de la transacción
           const newAgent = await tx.agent.create({
             data: {
+              id: nanoid(),
+              updatedAt: new Date(),
               userId,
               kind: "companion", // Smart Start always creates companions
               generationTier: tier,
@@ -180,6 +183,8 @@ export async function POST(req: NextRequest) {
           if (tier === 'ultra' && personalityCore) {
             await tx.psychologicalProfile.create({
               data: {
+                id: nanoid(),
+                updatedAt: new Date(),
                 agentId: newAgent.id,
                 attachmentStyle: personalityCore.attachmentStyle || 'secure',
                 attachmentDescription: personalityCore.attachmentDescription,
@@ -217,7 +222,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          agent: {
+          Agent: {
             id: agent.id,
             name: agent.name,
             description: agent.description,

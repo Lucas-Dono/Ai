@@ -12,8 +12,8 @@ async function cleanup() {
       },
     },
     include: {
-      personalityCore: true,
-      internalState: true,
+      PersonalityCore: true,
+      InternalState: true,
     },
   });
 
@@ -23,10 +23,10 @@ async function cleanup() {
   }
 
   console.log(`📋 Agent encontrado: ${agent.id}`);
-  console.log(`   - PersonalityCore: ${agent.personalityCore ? '✅' : '❌'}`);
-  console.log(`   - InternalState: ${agent.internalState ? '✅' : '❌'}`);
+  console.log(`   - PersonalityCore: ${agent.PersonalityCore ? '✅' : '❌'}`);
+  console.log(`   - InternalState: ${agent.InternalState ? '✅' : '❌'}`);
 
-  if (!agent.internalState) {
+  if (!agent.InternalState) {
     console.log('🗑️  Eliminando Agent parcial...');
     await prisma.agent.delete({
       where: { id: agent.id },

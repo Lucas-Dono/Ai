@@ -9,6 +9,7 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { NotificationService } from '@/lib/services/notification.service';
+import { nanoid } from "nanoid";
 
 // GET - Buscar usuarios para invitar
 export async function GET(
@@ -32,7 +33,7 @@ export async function GET(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        members: {
+        GroupMember: {
           where: { memberType: 'user' },
           select: { userId: true },
         },
@@ -44,9 +45,9 @@ export async function GET(
     }
 
     // Obtener IDs de usuarios ya en el grupo
-    const existingUserIds = group.members
-      .filter((m) => m.userId)
-      .map((m) => m.userId as string);
+    const existingUserIds = group.GroupMember
+      .filter((m: any) => m.userId)
+      .map((m: any) => m.userId as string);
 
     // Incluir al usuario actual
     existingUserIds.push(session.user.id);
@@ -60,14 +61,14 @@ export async function GET(
         ],
       },
       include: {
-        requester: { select: { id: true, name: true, image: true, email: true } },
-        addressee: { select: { id: true, name: true, image: true, email: true } },
+        User_Friendship_requesterIdToUser: { select: { id: true, name: true, image: true, email: true } },
+        User_Friendship_addresseeIdToUser: { select: { id: true, name: true, image: true, email: true } },
       },
     });
 
     // Mapear amigos (excluyendo los que ya están en el grupo)
     const friends = friendships
-      .map((f) => (f.requesterId === session.user.id ? f.addressee : f.requester))
+      .map((f) => (f.requesterId === session.user.id ? f.User_Friendship_addresseeIdToUser : f.User_Friendship_requesterIdToUser))
       .filter((friend) => !existingUserIds.includes(friend.id));
 
     // Filtrar por búsqueda
@@ -112,7 +113,7 @@ export async function GET(
         inviteCode: true,
         createdAt: true,
         expiresAt: true,
-        invitee: {
+        User_GroupInvitation_inviteeIdToUser: {
           select: { id: true, name: true, image: true, email: true },
         },
       },
@@ -129,7 +130,7 @@ export async function GET(
     );
 
     // Agregar info de invitación a amigos y otros usuarios
-    const friendsWithInviteStatus = filteredFriends.map((f) => ({
+    const friendsWithInviteStatus = filteredFriends.map((f: any) => ({
       ...f,
       isFriend: true,
       pendingInvitation: invitedUsersMap.get(f.id) || null,
@@ -149,7 +150,7 @@ export async function GET(
         inviteCode: inv.inviteCode,
         createdAt: inv.createdAt,
         expiresAt: inv.expiresAt,
-        user: inv.invitee,
+        user: inv.User_GroupInvitation_inviteeIdToUser,
       })),
     });
   } catch (error) {
@@ -190,7 +191,7 @@ export async function POST(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        members: {
+        GroupMember: {
           where: {
             memberType: 'user',
             userId: session.user.id,
@@ -204,7 +205,7 @@ export async function POST(
     }
 
     // Verificar que el usuario actual es miembro del grupo
-    if (group.members.length === 0 && group.creatorId !== session.user.id) {
+    if (group.GroupMember.length === 0 && group.creatorId !== session.user.id) {
       return NextResponse.json(
         { error: 'No tienes permiso para invitar a este grupo' },
         { status: 403 }
@@ -249,6 +250,7 @@ export async function POST(
     // Crear la invitación
     const invitation = await prisma.groupInvitation.create({
       data: {
+        id: nanoid(),
         groupId,
         inviterId: session.user.id,
         inviteeId: userId,
@@ -257,9 +259,9 @@ export async function POST(
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 días
       },
       include: {
-        invitee: { select: { id: true, name: true } },
-        inviter: { select: { id: true, name: true, image: true } },
-        group: { select: { id: true, name: true } },
+        User_GroupInvitation_inviteeIdToUser: { select: { id: true, name: true } },
+        User_GroupInvitation_inviterIdToUser: { select: { id: true, name: true, image: true } },
+        Group: { select: { id: true, name: true } },
       },
     });
 
@@ -269,12 +271,12 @@ export async function POST(
         userId,
         type: 'group_invitation',
         title: 'Invitación a grupo',
-        message: `${invitation.inviter.name || 'Alguien'} te invitó al grupo "${group.name}"`,
+        message: `${invitation.User_GroupInvitation_inviterIdToUser?.name || 'Alguien'} te invitó al grupo "${group.name}"`,
         actionUrl: `/dashboard/grupos/invitaciones/${inviteCode}`,
         metadata: {
           actorId: session.user.id,
-          actorName: invitation.inviter.name,
-          actorAvatar: invitation.inviter.image,
+          actorName: invitation.User_GroupInvitation_inviterIdToUser?.name,
+          actorAvatar: invitation.User_GroupInvitation_inviterIdToUser?.image,
           relatedId: invitation.id,
           relatedType: 'group_invitation',
         },
@@ -288,7 +290,7 @@ export async function POST(
       invitation: {
         id: invitation.id,
         inviteCode: invitation.inviteCode,
-        invitee: invitation.invitee,
+        invitee: invitation.User_GroupInvitation_inviteeIdToUser,
       },
     });
   } catch (error) {
@@ -336,7 +338,7 @@ export async function DELETE(
         id: true,
         inviterId: true,
         inviteCode: true,
-        invitee: { select: { name: true } },
+        User_GroupInvitation_inviteeIdToUser: { select: { name: true } },
       },
     });
 
@@ -394,7 +396,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: `Invitación a ${invitation.invitee?.name || 'usuario'} cancelada`,
+      message: `Invitación a ${invitation.User_GroupInvitation_inviteeIdToUser?.name || 'usuario'} cancelada`,
     });
   } catch (error) {
     console.error('Error cancelando invitación:', error);

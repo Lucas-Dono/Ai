@@ -47,7 +47,7 @@ export async function POST(
       const report = await prisma.postReport.findUnique({
         where: { id: id },
         include: {
-          post: {
+          CommunityPost: {
             select: { communityId: true },
           },
         },
@@ -60,14 +60,14 @@ export async function POST(
         );
       }
 
-      communityId = report.post.communityId;
+      communityId = report.CommunityPost.communityId;
     } else if (type === 'comment') {
       const report = await prisma.commentReport.findUnique({
         where: { id: id },
         include: {
-          comment: {
+          CommunityComment: {
             select: {
-              post: {
+              CommunityPost: {
                 select: { communityId: true },
               },
             },
@@ -82,7 +82,7 @@ export async function POST(
         );
       }
 
-      communityId = report.comment.post.communityId;
+      communityId = report.CommunityComment.CommunityPost.communityId;
     } else {
       return NextResponse.json(
         { error: 'Tipo inválido' },

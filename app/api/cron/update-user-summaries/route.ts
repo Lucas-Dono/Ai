@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { subHours } from 'date-fns';
+import { nanoid } from 'nanoid';
 
 // ============================================================================
 // SECURITY: Verificación de autorización
@@ -318,7 +319,10 @@ async function updateUserAnalyticsSummary(userId: string): Promise<boolean> {
 
     await prisma.userAnalyticsSummary.upsert({
       where: { userId },
-      create: summaryData,
+      create: {
+        id: nanoid(),
+        ...summaryData
+      },
       update: summaryData
     });
 

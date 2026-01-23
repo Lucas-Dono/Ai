@@ -26,7 +26,7 @@ export async function GET(
     const agent = await prisma.agent.findFirst({
       where: { id: agentId, userId },
       include: {
-        user: {
+        User: {
           select: { plan: true },
         },
       },
@@ -37,7 +37,7 @@ export async function GET(
     }
 
     // Check premium access
-    if (!["plus", "ultra"].includes(agent.user?.plan || "free")) {
+    if (!["plus", "ultra"].includes(agent.User?.plan || "free")) {
       return NextResponse.json(
         {
           error: "Routine system requires Plus or Ultra plan",
@@ -52,7 +52,7 @@ export async function GET(
     const routine = await prisma.characterRoutine.findUnique({
       where: { agentId },
       include: {
-        templates: {
+        RoutineTemplate: {
           orderBy: { startTime: "asc" },
         },
       },
@@ -102,7 +102,7 @@ export async function GET(
         createdAt: routine.createdAt,
         updatedAt: routine.updatedAt,
       },
-      templates: routine.templates,
+      templates: routine.RoutineTemplate,
       currentState: {
         currentActivity: currentState.currentActivity,
         nextActivity: currentState.nextActivity,
@@ -121,7 +121,7 @@ export async function GET(
         notes: i.notes,
       })),
       stats: {
-        totalTemplates: routine.templates.length,
+        totalTemplates: routine.RoutineTemplate.length,
         todayTotal: todayInstances.length,
         todayCompleted: todayInstances.filter((i) => i.status === "completed")
           .length,
@@ -147,7 +147,7 @@ export async function POST(
     const agent = await prisma.agent.findFirst({
       where: { id: agentId, userId },
       include: {
-        user: {
+        User: {
           select: { plan: true },
         },
       },
@@ -158,7 +158,7 @@ export async function POST(
     }
 
     // Check premium access
-    if (!["plus", "ultra"].includes(agent.user?.plan || "free")) {
+    if (!["plus", "ultra"].includes(agent.User?.plan || "free")) {
       return NextResponse.json(
         {
           error: "Routine system requires Plus or Ultra plan",
@@ -197,7 +197,7 @@ export async function POST(
     const routine = await prisma.characterRoutine.findUnique({
       where: { id: routineId },
       include: {
-        templates: true,
+        RoutineTemplate: true,
       },
     });
 

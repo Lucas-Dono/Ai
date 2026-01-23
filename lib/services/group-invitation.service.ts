@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 import { NotificationService } from './notification.service';
 import { emitGroupMemberJoined } from '@/lib/socket/server';
 
@@ -14,21 +15,21 @@ export const GroupInvitationService = {
     return prisma.groupInvitation.findUnique({
       where: { inviteCode },
       include: {
-        group: {
+        Group: {
           select: {
             id: true,
             name: true,
             description: true,
             createdAt: true,
             _count: {
-              select: { members: true },
+              select: { GroupMember: true },
             },
           },
         },
-        inviter: {
+        User_GroupInvitation_inviterIdToUser: {
           select: { id: true, name: true, image: true },
         },
-        invitee: {
+        User_GroupInvitation_inviteeIdToUser: {
           select: { id: true, name: true, image: true },
         },
       },
@@ -42,17 +43,17 @@ export const GroupInvitationService = {
     return prisma.groupInvitation.findUnique({
       where: { id: invitationId },
       include: {
-        group: {
+        Group: {
           select: {
             id: true,
             name: true,
             description: true,
           },
         },
-        inviter: {
+        User_GroupInvitation_inviterIdToUser: {
           select: { id: true, name: true, image: true },
         },
-        invitee: {
+        User_GroupInvitation_inviteeIdToUser: {
           select: { id: true, name: true },
         },
       },
@@ -122,13 +123,15 @@ export const GroupInvitationService = {
           acceptedAt: new Date(),
         },
         include: {
-          group: { select: { id: true, name: true } },
-          inviter: { select: { id: true, name: true } },
-          invitee: { select: { id: true, name: true, image: true } },
+          Group: { select: { id: true, name: true } },
+          User_GroupInvitation_inviterIdToUser: { select: { id: true, name: true } },
+          User_GroupInvitation_inviteeIdToUser: { select: { id: true, name: true, image: true } },
         },
       }),
       prisma.groupMember.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           groupId: invitation.groupId,
           userId,
           memberType: 'user',
@@ -145,8 +148,8 @@ export const GroupInvitationService = {
       role: 'member',
       user: {
         id: userId,
-        name: updatedInvitation.invitee?.name || null,
-        image: updatedInvitation.invitee?.image || null,
+        name: updatedInvitation.User_GroupInvitation_inviteeIdToUser?.name || null,
+        image: updatedInvitation.User_GroupInvitation_inviteeIdToUser?.image || null,
       },
     });
 
@@ -156,11 +159,11 @@ export const GroupInvitationService = {
         userId: invitation.inviterId,
         type: 'group_invitation_accepted',
         title: 'Invitación aceptada',
-        message: `${updatedInvitation.invitee?.name || 'El usuario'} aceptó tu invitación al grupo "${invitation.group.name}"`,
+        message: `${updatedInvitation.User_GroupInvitation_inviteeIdToUser?.name || 'El usuario'} aceptó tu invitación al grupo "${invitation.Group.name}"`,
         actionUrl: `/dashboard/grupos/${invitation.groupId}`,
         metadata: {
           actorId: userId,
-          actorName: updatedInvitation.invitee?.name,
+          actorName: updatedInvitation.User_GroupInvitation_inviteeIdToUser?.name,
           relatedId: invitation.groupId,
           relatedType: 'group',
         },
@@ -233,15 +236,15 @@ export const GroupInvitationService = {
       prisma.groupInvitation.findMany({
         where,
         include: {
-          group: {
+          Group: {
             select: {
               id: true,
               name: true,
               description: true,
-              _count: { select: { members: true } },
+              _count: { select: { GroupMember: true } },
             },
           },
-          inviter: {
+          User_GroupInvitation_inviterIdToUser: {
             select: { id: true, name: true, image: true },
           },
         },

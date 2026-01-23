@@ -274,6 +274,7 @@ async function processCharacterFolder(folderName: string): Promise<void> {
       await prisma.agent.create({
         data: {
           id,
+          updatedAt: new Date(),
           userId: null,
           teamId: null,
           kind: 'companion',

@@ -8,13 +8,13 @@ async function main() {
 
   const agents = await prisma.agent.findMany({
     include: {
-      user: {
+      User: {
         select: {
           email: true,
           plan: true,
         }
       },
-      personalityCore: true,
+      PersonalityCore: true,
     },
     orderBy: {
       createdAt: 'desc'
@@ -31,7 +31,7 @@ async function main() {
     console.log(`${i + 1}. ${agent.name}`);
     console.log(`   ID: ${agent.id}`);
     console.log(`   Kind: ${agent.kind}`);
-    console.log(`   User: ${agent.user?.email || 'NO USER'} (${agent.user?.plan || 'NO PLAN'})`);
+    console.log(`   User: ${agent.User?.email || 'NO USER'} (${agent.User?.plan || 'NO PLAN'})`);
     console.log(`   Created: ${agent.createdAt.toISOString().split('T')[0]}`);
     console.log();
   }
@@ -39,7 +39,7 @@ async function main() {
   // Count by plan
   const allAgents = await prisma.agent.findMany({
     include: {
-      user: {
+      User: {
         select: {
           plan: true,
         }
@@ -48,7 +48,7 @@ async function main() {
   });
 
   const byPlan = allAgents.reduce((acc, agent) => {
-    const plan = agent.user?.plan || 'no_user';
+    const plan = agent.User?.plan || 'no_user';
     acc[plan] = (acc[plan] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

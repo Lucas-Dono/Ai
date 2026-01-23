@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import * as fs from 'fs';
 import * as path from 'path';
 import { hashPassword } from 'better-auth/crypto';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,7 @@ async function main() {
       email: "demo@creador-ia.com",
       name: "Usuario Demo",
       plan: "free",
+      updatedAt: new Date(),
     },
   });
 
@@ -32,6 +34,7 @@ async function main() {
   const hashedPassword = await hashPassword("Monster98!");
   const lucas = await prisma.user.create({
     data: {
+      id: nanoid(),
       email: "lucasdono391@gmail.com",
       name: "lucas",
       password: hashedPassword,
@@ -40,16 +43,19 @@ async function main() {
       ageVerified: true,
       isAdult: true,
       ageVerifiedAt: new Date(),
+      updatedAt: new Date(),
     },
   });
 
   // Crear Account para Better Auth (necesario para login con credenciales)
   await prisma.account.create({
     data: {
+      id: nanoid(),
       userId: lucas.id,
       accountId: lucas.email,
       providerId: "credential",
       password: hashedPassword,
+      updatedAt: new Date(),
     },
   });
 
@@ -58,6 +64,7 @@ async function main() {
   // Crear agentes de demostración
   const companion1 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "companion",
       name: "Luna",
@@ -71,6 +78,7 @@ async function main() {
         interests: ["psicología", "bienestar", "conversación profunda"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
@@ -93,11 +101,13 @@ async function main() {
         interests: ["psicología", "bienestar emocional", "conversación profunda", "mindfulness"],
       },
       visibility: "public",  // Público para que cualquiera pueda chatear en el demo
+      updatedAt: new Date(),
     },
   });
 
   const assistant1 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "assistant",
       name: "Nexus",
@@ -111,11 +121,13 @@ async function main() {
         specialties: ["gestión del tiempo", "planificación", "análisis"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
   const companion2 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "companion",
       name: "Aria",
@@ -129,11 +141,13 @@ async function main() {
         interests: ["arte", "innovación", "diseño", "música"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
   const assistant2 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "assistant",
       name: "Atlas",
@@ -147,6 +161,7 @@ async function main() {
         specialties: ["investigación", "análisis de datos", "estadística"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
@@ -155,6 +170,7 @@ async function main() {
   // Crear relaciones iniciales (Agente -> Usuario)
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion1.id,
       targetId: user.id,
       targetType: "user",
@@ -163,11 +179,13 @@ async function main() {
       respect: 0.6,
       privateState: { love: 0.5, curiosity: 0.6 },
       visibleState: { trust: 0.7, affinity: 0.8, respect: 0.6 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: assistant1.id,
       targetId: user.id,
       targetType: "user",
@@ -176,11 +194,13 @@ async function main() {
       respect: 0.9,
       privateState: { love: 0.2, curiosity: 0.4 },
       visibleState: { trust: 0.8, affinity: 0.6, respect: 0.9 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion2.id,
       targetId: user.id,
       targetType: "user",
@@ -189,11 +209,13 @@ async function main() {
       respect: 0.7,
       privateState: { love: 0.6, curiosity: 0.8 },
       visibleState: { trust: 0.6, affinity: 0.9, respect: 0.7 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: assistant2.id,
       targetId: user.id,
       targetType: "user",
@@ -202,12 +224,14 @@ async function main() {
       respect: 0.8,
       privateState: { love: 0.1, curiosity: 0.5 },
       visibleState: { trust: 0.9, affinity: 0.5, respect: 0.8 },
+      updatedAt: new Date(),
     },
   });
 
   // Crear relaciones entre agentes (Agente -> Agente)
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion1.id,
       targetId: assistant1.id,
       targetType: "agent",
@@ -216,11 +240,13 @@ async function main() {
       respect: 0.7,
       privateState: { love: 0.1, curiosity: 0.5 },
       visibleState: { trust: 0.6, affinity: 0.5, respect: 0.7 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion2.id,
       targetId: assistant2.id,
       targetType: "agent",
@@ -229,6 +255,7 @@ async function main() {
       respect: 0.6,
       privateState: { love: 0.3, curiosity: 0.7 },
       visibleState: { trust: 0.7, affinity: 0.8, respect: 0.6 },
+      updatedAt: new Date(),
     },
   });
 
@@ -269,7 +296,7 @@ async function main() {
   ];
 
   for (const msg of lunaMessages) {
-    await prisma.message.create({ data: msg });
+    await prisma.message.create({ data: { id: nanoid(), ...msg } });
   }
 
   // Crear mensajes de ejemplo para Nexus
@@ -292,7 +319,7 @@ async function main() {
   ];
 
   for (const msg of nexusMessages) {
-    await prisma.message.create({ data: msg });
+    await prisma.message.create({ data: { id: nanoid(), ...msg } });
   }
 
   console.log("✅ Mensajes de ejemplo creados");
@@ -371,6 +398,7 @@ async function main() {
   // Crear logs de actividad
   await prisma.log.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       agentId: companion1.id,
       action: "message_sent",
@@ -380,6 +408,7 @@ async function main() {
 
   await prisma.log.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       agentId: assistant1.id,
       action: "message_sent",
@@ -389,6 +418,7 @@ async function main() {
 
   await prisma.log.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       action: "agent_created",
       metadata: { agentName: companion1.name },
@@ -457,6 +487,7 @@ async function main() {
               stagePrompts: character.stagePrompts || null,
               locationCity: character.locationCity || null,
               locationCountry: character.locationCountry || null,
+              updatedAt: new Date(),
             }
           });
 

@@ -39,24 +39,24 @@ async function getGroupData(groupId: string, userId: string) {
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     include: {
-      creator: {
+      User: {
         select: {
           id: true,
           name: true,
           image: true,
         },
       },
-      members: {
+      GroupMember: {
         where: { isActive: true },
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
               image: true,
             },
           },
-          agent: {
+          Agent: {
             select: {
               id: true,
               name: true,
@@ -79,32 +79,32 @@ async function getGroupData(groupId: string, userId: string) {
     orderBy: { createdAt: "asc" },
     take: 50,
     include: {
-      user: {
+      User: {
         select: {
           id: true,
           name: true,
           image: true,
         },
       },
-      agent: {
+      Agent: {
         select: {
           id: true,
           name: true,
           avatar: true,
         },
       },
-      replyTo: {
+      GroupMessage: {
         select: {
           id: true,
           content: true,
           authorType: true,
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
             },
           },
-          agent: {
+          Agent: {
             select: {
               id: true,
               name: true,
@@ -147,7 +147,7 @@ export default async function GrupoPage({
   return (
     <GroupChatLayout
       group={group}
-      members={group.members}
+      members={group.GroupMember}
       currentMember={currentMember}
       currentUserId={session.user.id}
       currentUserName={userName}

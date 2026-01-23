@@ -9,7 +9,7 @@ async function getGroups(userId: string) {
   const groups = await prisma.group.findMany({
     where: {
       status: "ACTIVE",
-      members: {
+      GroupMember: {
         some: {
           userId,
           isActive: true,
@@ -17,24 +17,24 @@ async function getGroups(userId: string) {
       },
     },
     include: {
-      creator: {
+      User: {
         select: {
           id: true,
           name: true,
           image: true,
         },
       },
-      members: {
+      GroupMember: {
         where: { isActive: true },
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
               image: true,
             },
           },
-          agent: {
+          Agent: {
             select: {
               id: true,
               name: true,
@@ -45,8 +45,8 @@ async function getGroups(userId: string) {
       },
       _count: {
         select: {
-          messages: true,
-          members: true,
+          GroupMessage: true,
+          GroupMember: true,
         },
       },
     },
@@ -56,8 +56,8 @@ async function getGroups(userId: string) {
   // Add user-specific data (role, unreadCount, etc.)
   const groupsWithUserData = await Promise.all(
     groups.map(async (group) => {
-      const currentMember = group.members.find(
-        (m) => m.userId === userId && m.memberType === "user"
+      const currentMember = group.GroupMember.find(
+        (m: { userId: string | null; memberType: string }) => m.userId === userId && m.memberType === "user"
       );
 
       return {

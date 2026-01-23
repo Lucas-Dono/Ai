@@ -235,7 +235,8 @@ RESPUESTA: Solo el código (ej: COT_001) o NONE`;
         maxTokens: 10, // Solo necesitamos el código
       });
 
-      return response.trim();
+      const responseText = typeof response === 'string' ? response : (response as any).text || (response as any).content || '';
+      return responseText.trim();
     } catch (error) {
       console.error("[Director] Error llamando modelo:", error);
       return "NONE";

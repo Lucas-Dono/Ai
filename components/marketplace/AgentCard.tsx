@@ -15,6 +15,7 @@ interface AgentCardProps {
     description: string | null;
     avatar: string | null;
     kind: string;
+    gender?: string | null;
     rating: number | null;
     cloneCount: number;
     featured: boolean;
@@ -155,9 +156,14 @@ export function AgentCard({ agent, onViewDetails, onClone, showVisibilityBadge =
         </p>
 
         <div className="flex items-center gap-2 mt-3">
-          <Badge variant={agent.kind === "companion" ? "secondary" : "outline"}>
-            {agent.kind}
-          </Badge>
+          {agent.gender && (
+            <Badge variant="secondary" className="capitalize">
+              {agent.gender === "male" ? "Masculino" :
+               agent.gender === "female" ? "Femenino" :
+               agent.gender === "non-binary" ? "No binario" :
+               agent.gender}
+            </Badge>
+          )}
           {tags.slice(0, 2).map((tag: string, idx: number) => (
             <Badge key={idx} variant="outline" className="text-xs">
               {tag}

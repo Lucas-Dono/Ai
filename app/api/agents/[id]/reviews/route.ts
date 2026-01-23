@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 // GET /api/agents/[id]/reviews - Obtener reviews de un agente
 export async function GET(
@@ -14,7 +15,7 @@ export async function GET(
     const reviews = await prisma.review.findMany({
       where: { agentId },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -136,10 +137,12 @@ export async function POST(
         comment: comment || null,
       },
       create: {
+        id: nanoid(),
         agentId,
         userId: dbUser.id,
         rating,
         comment: comment || null,
+        updatedAt: new Date(),
       },
     });
 

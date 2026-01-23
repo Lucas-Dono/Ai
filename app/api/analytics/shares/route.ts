@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         userId: true,
         agentId: true,
-        agent: {
+        Agent: {
           select: {
             name: true,
             avatar: true,
@@ -97,8 +97,8 @@ export async function GET(request: NextRequest) {
       if (!sharesByAgent[event.agentId]) {
         sharesByAgent[event.agentId] = {
           count: 0,
-          name: event.agent.name,
-          avatar: event.agent.avatar,
+          name: event.Agent.name,
+          avatar: event.Agent.avatar,
         };
       }
       sharesByAgent[event.agentId].count++;

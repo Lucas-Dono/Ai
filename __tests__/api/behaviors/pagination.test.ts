@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { BehaviorType } from "@prisma/client";
 import { GET } from "@/app/api/agents/[id]/behaviors/route";
 import { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
 
 // Mock next-auth
 vi.mock("@/lib/auth", () => ({
@@ -30,14 +31,14 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
 
     if (existingUser) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { userId: existingUser.id } },
+        where: { Message: { userId: existingUser.id } },
       });
       await prisma.message.deleteMany({ where: { userId: existingUser.id } });
       await prisma.behaviorProgressionState.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.behaviorProfile.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.agent.deleteMany({ where: { userId: existingUser.id } });
       await prisma.user.delete({ where: { id: existingUser.id } });
@@ -49,6 +50,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
         id: "test-user-pagination",
         email: "test-pagination@test.com",
         name: "Test User Pagination",
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
@@ -56,6 +58,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
     // Create agent
     const agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "companion",
         name: "Pagination Test Agent",
@@ -64,6 +67,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
         systemPrompt: "Test",
         profile: { age: 25 },
         nsfwMode: true,
+        updatedAt: new Date(),
       },
     });
     testAgentId = agent.id;
@@ -71,6 +75,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
     // Create behavior
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
         baseIntensity: 0.5,
@@ -80,6 +85,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
         volatility: 0.5,
         thresholdForDisplay: 0.3,
         triggers: [],
+        updatedAt: new Date(),
       },
     });
 
@@ -87,6 +93,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
     for (let i = 0; i < 75; i++) {
       const message = await prisma.message.create({
         data: {
+          id: nanoid(),
           agentId: testAgentId,
           userId: testUserId,
           content: `Test message ${i}`,
@@ -96,6 +103,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
 
       const trigger = await prisma.behaviorTriggerLog.create({
         data: {
+          id: nanoid(),
           messageId: message.id,
           triggerType: "abandonment_signal",
           behaviorType: BehaviorType.YANDERE_OBSESSIVE,
@@ -111,7 +119,7 @@ describe("GET /api/agents/[id]/behaviors - Pagination", () => {
   afterAll(async () => {
     if (testAgentId) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { agentId: testAgentId } },
+        where: { Message: { agentId: testAgentId } },
       });
       await prisma.message.deleteMany({ where: { agentId: testAgentId } });
       await prisma.behaviorProgressionState.deleteMany({

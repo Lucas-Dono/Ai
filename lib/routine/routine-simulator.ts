@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type {
   SimulationInput,
   SimulationOutput,
@@ -298,12 +299,12 @@ export async function simulateInstance(
   const template = await prisma.routineTemplate.findUnique({
     where: { id: templateId },
     include: {
-      routine: {
+      CharacterRoutine: {
         include: {
-          agent: {
+          Agent: {
             include: {
-              personalityCore: true,
-              internalState: true,
+              PersonalityCore: true,
+              InternalState: true,
             },
           },
         },
@@ -315,8 +316,8 @@ export async function simulateInstance(
     throw new Error("Template not found");
   }
 
-  const agent = template.routine.agent;
-  if (!agent.personalityCore) {
+  const agent = template.CharacterRoutine?.Agent;
+  if (!agent?.PersonalityCore) {
     throw new Error("Agent missing personality core");
   }
 
@@ -340,24 +341,24 @@ export async function simulateInstance(
     templateId,
     date,
     personalityCore: {
-      openness: agent.personalityCore.openness,
-      conscientiousness: agent.personalityCore.conscientiousness,
-      extraversion: agent.personalityCore.extraversion,
-      agreeableness: agent.personalityCore.agreeableness,
-      neuroticism: agent.personalityCore.neuroticism,
+      openness: agent.PersonalityCore.openness,
+      conscientiousness: agent.PersonalityCore.conscientiousness,
+      extraversion: agent.PersonalityCore.extraversion,
+      agreeableness: agent.PersonalityCore.agreeableness,
+      neuroticism: agent.PersonalityCore.neuroticism,
     },
-    internalState: agent.internalState
+    internalState: agent.InternalState
       ? {
-          moodValence: agent.internalState.moodValence,
-          moodArousal: agent.internalState.moodArousal,
-          moodDominance: agent.internalState.moodDominance,
-          needConnection: agent.internalState.needConnection,
-          needAutonomy: agent.internalState.needAutonomy,
-          needCompetence: agent.internalState.needCompetence,
-          needNovelty: agent.internalState.needNovelty,
+          moodValence: agent.InternalState.moodValence,
+          moodArousal: agent.InternalState.moodArousal,
+          moodDominance: agent.InternalState.moodDominance,
+          needConnection: agent.InternalState.needConnection,
+          needAutonomy: agent.InternalState.needAutonomy,
+          needCompetence: agent.InternalState.needCompetence,
+          needNovelty: agent.InternalState.needNovelty,
         }
       : undefined,
-    variationIntensity: template.routine.variationIntensity,
+    variationIntensity: template.CharacterRoutine?.variationIntensity || 0.5,
   };
 
   const variations = template.allowVariations
@@ -390,6 +391,8 @@ export async function simulateInstance(
   // 7. Create instance in database
   const instance = await prisma.routineInstance.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       templateId,
       routineId: template.routineId,
       agentId,

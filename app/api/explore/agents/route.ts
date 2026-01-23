@@ -22,7 +22,9 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('q') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    const category = searchParams.get('category') || '';
+    const tag = searchParams.get('tag') || ''; // Tag para filtrar
+    const gender = searchParams.get('gender') || ''; // male, female, non-binary
+    const tier = searchParams.get('tier') || ''; // free, ultra
     const sort = searchParams.get('sort') || 'popular'; // popular, recent, name
 
     // Construir filtro de búsqueda
@@ -34,7 +36,9 @@ export async function GET(request: NextRequest) {
           { description: { contains: query, mode: 'insensitive' } },
         ],
       }),
-      ...(category && { categories: { has: category } }),
+      ...(tag && { tags: { array_contains: tag } }),
+      ...(gender && { gender }),
+      ...(tier && { generationTier: tier }),
     };
 
     // Ordenamiento
@@ -56,13 +60,15 @@ export async function GET(request: NextRequest) {
           name: true,
           avatar: true,
           description: true,
-          categories: true,
+          tags: true,
+          gender: true,
+          generationTier: true,
           kind: true,
           rating: true,
           cloneCount: true,
           featured: true,
           createdAt: true,
-          user: {
+          User: {
             select: {
               id: true,
               name: true,

@@ -6,6 +6,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 import { getLLMProvider } from '@/lib/llm/provider';
 import { getVeniceClient } from '@/lib/emotional-system/llm/venice';
 import { createMemoryManager } from '@/lib/memory/manager';
@@ -125,12 +126,12 @@ export class MessageService {
         prisma.agent.findUnique({
           where: { id: agentId },
           include: {
-            personalityCore: true,
-            internalState: true,
-            semanticMemory: true,
-            characterGrowth: true,
-            behaviorProfiles: true,
-            user: {
+            PersonalityCore: true,
+            InternalState: true,
+            SemanticMemory: true,
+            CharacterGrowth: true,
+            BehaviorProfile: true,
+            User: {
               select: {
                 location: true,
               },
@@ -212,6 +213,7 @@ export class MessageService {
       const [userMessage, relation] = await Promise.all([
         prisma.message.create({
           data: {
+            id: nanoid(),
             agentId,
             userId,
             role: 'user',
@@ -269,12 +271,12 @@ export class MessageService {
 
         if (revelationMoment) {
           // Extraer personalidad Big Five del personaje (si está disponible)
-          const personality = agent.personalityCore ? {
-            extraversion: agent.personalityCore.extraversion,
-            neuroticism: agent.personalityCore.neuroticism,
-            agreeableness: agent.personalityCore.agreeableness,
-            openness: agent.personalityCore.openness,
-            conscientiousness: agent.personalityCore.conscientiousness,
+          const personality = agent.PersonalityCore ? {
+            extraversion: agent.PersonalityCore.extraversion,
+            neuroticism: agent.PersonalityCore.neuroticism,
+            agreeableness: agent.PersonalityCore.agreeableness,
+            openness: agent.PersonalityCore.openness,
+            conscientiousness: agent.PersonalityCore.conscientiousness,
           } : undefined;
 
           // Generar contexto personalizado de revelación
@@ -375,8 +377,8 @@ export class MessageService {
 
       // Weather context (if user has location configured)
       let weatherContext: string | undefined;
-      if (agent.user?.location) {
-        const weather = await getUserWeather(agent.user.location);
+      if (agent.User?.location) {
+        const weather = await getUserWeather(agent.User.location);
         if (weather) {
           weatherContext = buildWeatherPrompt(weather);
         }
@@ -750,7 +752,7 @@ export class MessageService {
       // Content moderation for behaviors
       if (behaviorOrchestration.activeBehaviors.length > 0) {
         const primaryBehavior = behaviorOrchestration.activeBehaviors[0];
-        const behaviorProfile = agent.behaviorProfiles.find(
+        const behaviorProfile = agent.BehaviorProfile.find(
           bp => bp.behaviorType === primaryBehavior.behaviorType
         );
 
@@ -816,6 +818,7 @@ export class MessageService {
       const [assistantMessage] = await Promise.all([
         prisma.message.create({
           data: {
+            id: nanoid(),
             agentId,
             userId, // Important: Include userId so messages are scoped to user
             role: 'assistant',
@@ -891,6 +894,7 @@ export class MessageService {
         ...(stageChanged && revelationMoment ? [
           prisma.episodicMemory.create({
             data: {
+              id: nanoid(),
               agentId,
               event: `Momento de revelación: La relación avanzó a ${newStage}`,
               userEmotion: 'connection',
@@ -1040,6 +1044,8 @@ export class MessageService {
 
     return prisma.relation.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         subjectId: agentId,
         targetId: userId,
         targetType: 'user',
@@ -1071,6 +1077,8 @@ export class MessageService {
     // Create new bond starting as ACQUAINTANCE
     return prisma.symbolicBond.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId,
         tier: 'ACQUAINTANCE',
@@ -1292,9 +1300,9 @@ export class MessageService {
       const agent = await prisma.agent.findUnique({
         where: { id: agentId },
         include: {
-          personalityCore: true,
-          internalState: true,
-          semanticMemory: true,
+          PersonalityCore: true,
+          InternalState: true,
+          SemanticMemory: true,
         },
       });
 

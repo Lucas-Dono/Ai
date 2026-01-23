@@ -17,6 +17,7 @@ interface AnalyticsData {
     id: string;
     name: string;
     kind: string;
+    gender?: string;
     nsfwMode: boolean;
   }>;
   totalAgents: number;
@@ -38,6 +39,7 @@ interface AnalyticsData {
     id: string;
     name: string;
     kind: string;
+    gender?: string;
     nsfwMode: boolean;
     behaviorCount: number;
     triggerCount: number;
@@ -281,7 +283,14 @@ export default function AnalyticsDashboardPage() {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="font-semibold text-lg">{agent.name}</h3>
-                          <p className="text-sm text-muted-foreground">{agent.kind}</p>
+                          {agent.gender && (
+                            <p className="text-sm text-muted-foreground capitalize">
+                              {agent.gender === "male" ? "Masculino" :
+                               agent.gender === "female" ? "Femenino" :
+                               agent.gender === "non-binary" ? "No binario" :
+                               agent.gender}
+                            </p>
+                          )}
                         </div>
                         <div className="flex gap-2">
                           {agent.nsfwMode && (

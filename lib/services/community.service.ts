@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 import type { Prisma } from '@prisma/client';
 
 export interface CreateCommunityData {
@@ -48,6 +49,8 @@ export const CommunityService = {
 
     const community = await prisma.community.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         ownerId,
         name: data.name,
         slug: data.slug,
@@ -60,7 +63,7 @@ export const CommunityService = {
         primaryColor: data.primaryColor || '#8B5CF6',
       },
       include: {
-        owner: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -73,6 +76,7 @@ export const CommunityService = {
     // Agregar al owner como miembro con rol owner
     await prisma.communityMember.create({
       data: {
+        id: nanoid(),
         communityId: community.id,
         userId: ownerId,
         role: 'owner',
@@ -98,7 +102,7 @@ export const CommunityService = {
     const community = await prisma.community.findUnique({
       where: { id: communityId },
       include: {
-        owner: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -107,8 +111,8 @@ export const CommunityService = {
         },
         _count: {
           select: {
-            members: true,
-            posts: true,
+            CommunityMember: true,
+            CommunityPost: true,
           },
         },
       },
@@ -145,7 +149,7 @@ export const CommunityService = {
     const community = await prisma.community.findUnique({
       where: { slug },
       include: {
-        owner: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -154,8 +158,8 @@ export const CommunityService = {
         },
         _count: {
           select: {
-            members: true,
-            posts: true,
+            CommunityMember: true,
+            CommunityPost: true,
           },
         },
       },
@@ -244,6 +248,7 @@ export const CommunityService = {
 
     const member = await prisma.communityMember.create({
       data: {
+        id: nanoid(),
         communityId,
         userId,
         role: 'member',
@@ -537,7 +542,7 @@ export const CommunityService = {
         skip,
         take: limit,
         include: {
-          owner: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -546,8 +551,8 @@ export const CommunityService = {
           },
           _count: {
             select: {
-              members: true,
-              posts: true,
+              CommunityMember: true,
+              CommunityPost: true,
             },
           },
         },
@@ -573,9 +578,9 @@ export const CommunityService = {
     const memberships = await prisma.communityMember.findMany({
       where: { userId },
       include: {
-        community: {
+        Community: {
           include: {
-            owner: {
+            User: {
               select: {
                 id: true,
                 name: true,
@@ -584,8 +589,8 @@ export const CommunityService = {
             },
             _count: {
               select: {
-                members: true,
-                posts: true,
+                CommunityMember: true,
+                CommunityPost: true,
               },
             },
           },
@@ -595,7 +600,7 @@ export const CommunityService = {
     });
 
     return memberships.map(m => ({
-      ...m.community,
+      ...m.Community,
       memberRole: m.role,
       joinedAt: m.joinedAt,
     }));
@@ -613,7 +618,7 @@ export const CommunityService = {
       take: limit,
       orderBy: { memberCount: 'desc' },
       include: {
-        owner: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -622,8 +627,8 @@ export const CommunityService = {
         },
         _count: {
           select: {
-            members: true,
-            posts: true,
+            CommunityMember: true,
+            CommunityPost: true,
           },
         },
       },

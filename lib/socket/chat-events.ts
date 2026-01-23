@@ -6,6 +6,7 @@
 
 import { Server as SocketServer, Socket } from "socket.io";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 /**
  * Register basic chat events (placeholder)
@@ -69,6 +70,7 @@ export function registerReactionEvents(io: SocketServer, socket: Socket) {
           // Agregar nueva reacción
           await prisma.reaction.create({
             data: {
+              id: nanoid(),
               messageId: data.messageId,
               emoji: data.emoji,
               userId: data.userId,

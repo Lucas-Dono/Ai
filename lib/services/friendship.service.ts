@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 import { FriendshipStatus } from '@prisma/client';
 import { NotificationService } from './notification.service';
 
@@ -134,15 +135,17 @@ export const FriendshipService = {
     // Crear la solicitud
     const friendship = await prisma.friendship.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         requesterId,
         addresseeId,
         status: 'PENDING',
       },
       include: {
-        requester: {
+        User_Friendship_requesterIdToUser: {
           select: { id: true, name: true, image: true },
         },
-        addressee: {
+        User_Friendship_addresseeIdToUser: {
           select: { id: true, name: true, image: true },
         },
       },
@@ -154,12 +157,12 @@ export const FriendshipService = {
         userId: addresseeId,
         type: 'friend_request',
         title: 'Nueva solicitud de amistad',
-        message: `${friendship.requester.name || 'Alguien'} quiere ser tu amigo`,
+        message: `${friendship.User_Friendship_requesterIdToUser.name || 'Alguien'} quiere ser tu amigo`,
         actionUrl: '/friends?tab=requests',
         metadata: {
           actorId: requesterId,
-          actorName: friendship.requester.name,
-          actorAvatar: friendship.requester.image,
+          actorName: friendship.User_Friendship_requesterIdToUser.name,
+          actorAvatar: friendship.User_Friendship_requesterIdToUser.image,
           relatedId: friendship.id,
           relatedType: 'friendship',
         },
@@ -182,8 +185,8 @@ export const FriendshipService = {
     const friendship = await prisma.friendship.findUnique({
       where: { id: friendshipId },
       include: {
-        requester: { select: { id: true, name: true, image: true } },
-        addressee: { select: { id: true, name: true, image: true } },
+        User_Friendship_requesterIdToUser: { select: { id: true, name: true, image: true } },
+        User_Friendship_addresseeIdToUser: { select: { id: true, name: true, image: true } },
       },
     });
 
@@ -207,8 +210,8 @@ export const FriendshipService = {
         respondedAt: new Date(),
       },
       include: {
-        requester: { select: { id: true, name: true, image: true } },
-        addressee: { select: { id: true, name: true, image: true } },
+        User_Friendship_requesterIdToUser: { select: { id: true, name: true, image: true } },
+        User_Friendship_addresseeIdToUser: { select: { id: true, name: true, image: true } },
       },
     });
 
@@ -218,12 +221,12 @@ export const FriendshipService = {
         userId: friendship.requesterId,
         type: 'friend_request_accepted',
         title: 'Solicitud aceptada',
-        message: `${friendship.addressee.name || 'Alguien'} aceptó tu solicitud de amistad`,
+        message: `${friendship.User_Friendship_addresseeIdToUser.name || 'Alguien'} aceptó tu solicitud de amistad`,
         actionUrl: `/profile/${friendship.addresseeId}`,
         metadata: {
           actorId: friendship.addresseeId,
-          actorName: friendship.addressee.name,
-          actorAvatar: friendship.addressee.image,
+          actorName: friendship.User_Friendship_addresseeIdToUser.name,
+          actorAvatar: friendship.User_Friendship_addresseeIdToUser.image,
           relatedId: friendship.id,
           relatedType: 'friendship',
         },
@@ -379,6 +382,8 @@ export const FriendshipService = {
       // Crear nueva relación de bloqueo
       await prisma.friendship.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           requesterId: blockerId,
           addresseeId: blockedId,
           status: 'BLOCKED',
@@ -441,8 +446,8 @@ export const FriendshipService = {
       prisma.friendship.findMany({
         where,
         include: {
-          requester: { select: { id: true, name: true, image: true, email: true } },
-          addressee: { select: { id: true, name: true, image: true, email: true } },
+          User_Friendship_requesterIdToUser: { select: { id: true, name: true, image: true, email: true } },
+          User_Friendship_addresseeIdToUser: { select: { id: true, name: true, image: true, email: true } },
         },
         skip: (page - 1) * limit,
         take: limit,
@@ -453,7 +458,7 @@ export const FriendshipService = {
 
     // Mapear para obtener el amigo (el otro usuario)
     let friends = friendships.map((f) => {
-      const friend = f.requesterId === userId ? f.addressee : f.requester;
+      const friend = f.requesterId === userId ? f.User_Friendship_addresseeIdToUser : f.User_Friendship_requesterIdToUser;
       return {
         id: f.id,
         status: f.status,
@@ -504,7 +509,7 @@ export const FriendshipService = {
       prisma.friendship.findMany({
         where,
         include: {
-          requester: { select: { id: true, name: true, image: true, email: true } },
+          User_Friendship_requesterIdToUser: { select: { id: true, name: true, image: true, email: true } },
         },
         skip: (page - 1) * limit,
         take: limit,
@@ -517,7 +522,7 @@ export const FriendshipService = {
       requests: requests.map((r) => ({
         id: r.id,
         createdAt: r.createdAt,
-        user: r.requester,
+        user: r.User_Friendship_requesterIdToUser,
       })),
       total,
       page,
@@ -546,7 +551,7 @@ export const FriendshipService = {
       prisma.friendship.findMany({
         where,
         include: {
-          addressee: { select: { id: true, name: true, image: true, email: true } },
+          User_Friendship_addresseeIdToUser: { select: { id: true, name: true, image: true, email: true } },
         },
         skip: (page - 1) * limit,
         take: limit,
@@ -559,7 +564,7 @@ export const FriendshipService = {
       requests: requests.map((r) => ({
         id: r.id,
         createdAt: r.createdAt,
-        user: r.addressee,
+        user: r.User_Friendship_addresseeIdToUser,
       })),
       total,
     };
@@ -575,13 +580,13 @@ export const FriendshipService = {
         status: 'BLOCKED',
       },
       include: {
-        addressee: { select: { id: true, name: true, image: true } },
+        User_Friendship_addresseeIdToUser: { select: { id: true, name: true, image: true } },
       },
     });
 
     return blocked.map((b) => ({
       id: b.id,
-      user: b.addressee,
+      user: b.User_Friendship_addresseeIdToUser,
       blockedAt: b.updatedAt,
     }));
   },

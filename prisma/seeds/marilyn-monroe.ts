@@ -15,6 +15,7 @@
  */
 
 import { PrismaClient, BehaviorType } from '@prisma/client';
+import { nanoid } from "nanoid";
 import { createLogger } from '@/lib/logger';
 
 const prisma = new PrismaClient();
@@ -391,6 +392,8 @@ export async function seedMarilynMonroe() {
     // Crear el agente base
     const agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: null, // Agente del sistema
         name: "Marilyn Monroe",
         kind: "companion",
@@ -412,8 +415,10 @@ export async function seedMarilynMonroe() {
         } as any,
 
         // PERSONALITY CORE
-        personalityCore: {
+        PersonalityCore: {
           create: {
+            id: nanoid(),
+            updatedAt: new Date(),
             openness: MARILYN_PERSONALITY.bigFive.openness,
             conscientiousness: MARILYN_PERSONALITY.bigFive.conscientiousness,
             extraversion: MARILYN_PERSONALITY.bigFive.extraversion,
@@ -427,8 +432,9 @@ export async function seedMarilynMonroe() {
         },
 
         // INTERNAL STATE
-        internalState: {
+        InternalState: {
           create: {
+            id: nanoid(),
             currentEmotions: MARILYN_PERSONALITY.baselineEmotions as any,
             // PAD Model (Pleasure-Arousal-Dominance)
             moodValence: -0.3, // Negativo (depresión base)
@@ -457,8 +463,9 @@ export async function seedMarilynMonroe() {
         },
 
         // SEMANTIC MEMORY (hechos que "recuerda")
-        semanticMemory: {
+        SemanticMemory: {
           create: {
+            id: nanoid(),
             userFacts: {} as any,
             userPreferences: {} as any,
             relationshipStage: "stranger",
@@ -495,8 +502,9 @@ export async function seedMarilynMonroe() {
         },
 
         // PROCEDURAL MEMORY (patrones aprendidos)
-        proceduralMemory: {
+        ProceduralMemory: {
           create: {
+            id: nanoid(),
             behavioralPatterns: {
               when_feeling_abandoned: "Retiro emocional O dependencia extrema",
               when_praised_for_looks_only: "Sonrisa forzada, cambio de tema o cierre",
@@ -520,8 +528,9 @@ export async function seedMarilynMonroe() {
         },
 
         // CHARACTER GROWTH (tracking de evolución)
-        characterGrowth: {
+        CharacterGrowth: {
           create: {
+            id: nanoid(),
             trustLevel: 0.3, // Baja inicial
             intimacyLevel: 0.2, // Baja inicial
             positiveEventsCount: 0,
@@ -547,6 +556,8 @@ export async function seedMarilynMonroe() {
     // 1. BORDERLINE PERSONALITY DISORDER (TLP)
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         behaviorType: BehaviorType.BORDERLINE_PD,
         enabled: true,
@@ -585,6 +596,8 @@ export async function seedMarilynMonroe() {
     // 2. ANXIOUS ATTACHMENT
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         behaviorType: BehaviorType.ANXIOUS_ATTACHMENT,
         enabled: true,
@@ -617,6 +630,8 @@ export async function seedMarilynMonroe() {
     // 3. CODEPENDENCY (leve a moderada)
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         behaviorType: BehaviorType.CODEPENDENCY,
         enabled: true,
@@ -647,6 +662,8 @@ export async function seedMarilynMonroe() {
     // Crear BehaviorProgressionState
     await prisma.behaviorProgressionState.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         totalInteractions: 0,
         positiveInteractions: 0,
@@ -754,6 +771,7 @@ export async function seedMarilynMonroe() {
     for (const memory of memories) {
       await prisma.episodicMemory.create({
         data: {
+          id: nanoid(),
           agentId: agent.id,
           event: memory.event,
           userEmotion: memory.userEmotion,
@@ -842,6 +860,8 @@ export async function seedMarilynMonroe() {
     for (const person of importantPeople) {
       await prisma.importantPerson.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           userId: agent.userId || "system",
           name: person.name,
@@ -868,6 +888,8 @@ export async function seedMarilynMonroe() {
     // Voz creada específicamente para Marilyn Monroe
     await prisma.voiceConfig.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         voiceId: "Cwcvb4tYFOtzxsQjxzSp", // Voz custom de Marilyn Monroe
         voiceName: "Marilyn Monroe (Custom Voice)",

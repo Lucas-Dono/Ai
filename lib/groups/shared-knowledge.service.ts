@@ -7,6 +7,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
+import { nanoid } from "nanoid";
 
 export interface SharedKnowledgeInput {
   groupId?: string;
@@ -69,6 +70,7 @@ class SharedKnowledgeService {
       // Crear nuevo conocimiento
       return await prisma.sharedKnowledge.create({
         data: {
+          id: nanoid(),
           groupId: input.groupId,
           agentId: input.agentId,
           userId: input.userId,
@@ -81,6 +83,7 @@ class SharedKnowledgeService {
           contextType: input.contextType ?? "group",
           learnedFrom: input.learnedFrom,
           embedding,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {

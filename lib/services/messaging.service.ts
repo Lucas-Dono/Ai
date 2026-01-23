@@ -2,6 +2,7 @@
  * Messaging Service - Sistema de mensajería directa
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 export interface CreateConversationData {
@@ -43,7 +44,7 @@ export const MessagingService = {
           type: 'direct',
         },
         include: {
-          messages: {
+          DirectMessage: {
             orderBy: { createdAt: 'desc' },
             take: 1,
           },
@@ -64,6 +65,8 @@ export const MessagingService = {
     // Crear nueva conversación
     const conversation = await prisma.directConversation.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         type,
         name: options?.name,
         icon: options?.icon,
@@ -71,7 +74,7 @@ export const MessagingService = {
         lastMessageAt: new Date(),
       },
       include: {
-        messages: true,
+        DirectMessage: true,
       },
     });
 
@@ -99,6 +102,8 @@ export const MessagingService = {
     // Crear mensaje
     const message = await prisma.directMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         conversationId: data.conversationId,
         senderId: data.senderId,
         recipientId: data.recipientId,
@@ -174,7 +179,7 @@ export const MessagingService = {
     // (JSON has operator is not supported)
     const allConversations = await prisma.directConversation.findMany({
       include: {
-        messages: {
+        DirectMessage: {
           orderBy: { createdAt: 'desc' },
           take: 1,
           where: {
@@ -394,7 +399,7 @@ export const MessagingService = {
         createdAt: 'desc',
       },
       include: {
-        conversation: true,
+        DirectConversation: true,
       },
     });
 

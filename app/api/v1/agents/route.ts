@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { withAPIAuth } from "@/lib/api/auth";
@@ -212,6 +213,8 @@ export async function POST(req: NextRequest) {
         // Crear agente dentro de la transacción
         const newAgent = await tx.agent.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             userId,
             kind,
             generationTier: tier, // Store which tier was used to generate this agent
@@ -247,6 +250,8 @@ export async function POST(req: NextRequest) {
     if (tier === 'ultra' && extendedProfile.psychologicalProfile) {
       await prisma.psychologicalProfile.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           attachmentStyle: extendedProfile.psychologicalProfile.attachmentStyle || 'secure',
           attachmentDescription: extendedProfile.psychologicalProfile.attachmentDescription,
@@ -273,6 +278,8 @@ export async function POST(req: NextRequest) {
     if (tier === 'ultra' && extendedProfile.deepRelationalPatterns) {
       await prisma.deepRelationalPatterns.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           givingLoveLanguages: extendedProfile.deepRelationalPatterns.givingLoveLanguages || [],
           receivingLoveLanguages: extendedProfile.deepRelationalPatterns.receivingLoveLanguages || [],
@@ -304,6 +311,8 @@ export async function POST(req: NextRequest) {
     if (tier === 'ultra' && extendedProfile.philosophicalFramework) {
       await prisma.philosophicalFramework.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           optimismLevel: extendedProfile.philosophicalFramework.optimismLevel || 50,
           worldviewType: extendedProfile.philosophicalFramework.worldviewType,
@@ -338,6 +347,8 @@ export async function POST(req: NextRequest) {
     // Create initial relation
     await prisma.relation.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         subjectId: agent.id,
         targetId: userId,
         targetType: "user",

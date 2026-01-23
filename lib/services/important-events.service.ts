@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 
 export interface CreateEventData {
   eventDate: Date;
@@ -54,6 +55,8 @@ export const ImportantEventsService = {
 
     const event = await prisma.importantEvent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId,
         eventDate: data.eventDate,

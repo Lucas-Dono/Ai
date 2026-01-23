@@ -12,6 +12,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from "nanoid";
 import type { CharacterDraft } from './validation.service';
 import { validateDraft } from './validation.service';
 import { generateProfileV2 } from './profile-generation-v2.service';
@@ -103,6 +104,8 @@ export async function createCharacter(
 
     const agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         kind: 'companion',
         generationTier: tier,
@@ -130,6 +133,8 @@ export async function createCharacter(
 
     await prisma.relation.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         subjectId: agent.id,
         targetId: userId,
         targetType: 'user',
@@ -147,6 +152,8 @@ export async function createCharacter(
 
       await prisma.behaviorProfile.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           behaviorType: draft.initialBehavior as any,
           baseIntensity: 0.3,
@@ -161,6 +168,8 @@ export async function createCharacter(
 
       await prisma.behaviorProgressionState.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           totalInteractions: 0,
           positiveInteractions: 0,
@@ -187,6 +196,7 @@ export async function createCharacter(
     reportProgress(onProgress, 'state', 95, 'Inicializando estado interno...');
     await prisma.internalState.create({
       data: {
+        id: nanoid(),
         agentId: agent.id,
         currentEmotions: {},
         activeGoals: [],

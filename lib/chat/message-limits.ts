@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type { MessageLimitStatus, UserTier } from "./types";
 import { TIER_LIMITS, getLimitReachedMessage } from "./tier-limits";
 
@@ -50,6 +51,8 @@ export async function checkMessageLimit(
     // Crear tracking para hoy
     tracking = await prisma.messageTracking.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         agentId,
         date: today,

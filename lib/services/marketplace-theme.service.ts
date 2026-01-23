@@ -2,6 +2,7 @@
  * Servicio para el Marketplace de Temas
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
@@ -54,6 +55,8 @@ export const MarketplaceThemeService = {
 
     const theme = await prisma.marketplaceTheme.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         authorId,
         name: themeData.name,
         description: themeData.description,
@@ -71,7 +74,7 @@ export const MarketplaceThemeService = {
         status: 'approved', // Auto-aprobar por ahora, podemos agregar moderación después
       },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -147,7 +150,7 @@ export const MarketplaceThemeService = {
         skip,
         take: limit,
         include: {
-          author: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -156,8 +159,8 @@ export const MarketplaceThemeService = {
           },
           _count: {
             select: {
-              ratings: true,
-              downloads: true,
+              MarketplaceThemeRating: true,
+              MarketplaceThemeDownload: true,
             },
           },
         },
@@ -183,21 +186,21 @@ export const MarketplaceThemeService = {
     const theme = await prisma.marketplaceTheme.findUnique({
       where: { id: themeId },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        ratings: {
+        MarketplaceThemeRating: {
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
         _count: {
           select: {
-            ratings: true,
-            downloads: true,
+            MarketplaceThemeRating: true,
+            MarketplaceThemeDownload: true,
           },
         },
       },
@@ -221,6 +224,7 @@ export const MarketplaceThemeService = {
     // Registrar la descarga
     await prisma.marketplaceThemeDownload.create({
       data: {
+        id: nanoid(),
         themeId,
         userId,
         platform,
@@ -264,6 +268,8 @@ export const MarketplaceThemeService = {
         },
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         themeId,
         userId,
         rating,
@@ -305,6 +311,8 @@ export const MarketplaceThemeService = {
   ) {
     const report = await prisma.marketplaceThemeReport.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         themeId,
         userId,
         reason,
@@ -325,8 +333,8 @@ export const MarketplaceThemeService = {
       include: {
         _count: {
           select: {
-            ratings: true,
-            downloads: true,
+            MarketplaceThemeRating: true,
+            MarketplaceThemeDownload: true,
           },
         },
       },
@@ -348,7 +356,7 @@ export const MarketplaceThemeService = {
       orderBy: { downloadCount: 'desc' },
       take: limit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -373,7 +381,7 @@ export const MarketplaceThemeService = {
       orderBy: { downloadCount: 'desc' },
       take: limit,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,

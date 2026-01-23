@@ -50,7 +50,7 @@ export const GET = withAdminAuth(async (request, { admin }) => {
         include: {
           _count: {
             select: {
-              messagesAsAgent: true
+              Message: true
             }
           }
         },

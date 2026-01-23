@@ -64,8 +64,8 @@ export async function GET(
         status: invitation.status,
         expiresAt: invitation.expiresAt,
         createdAt: invitation.createdAt,
-        group: invitation.group,
-        inviter: invitation.inviter,
+        group: (invitation as any).Group,
+        inviter: (invitation as any).Inviter,
       },
     });
   } catch (error) {

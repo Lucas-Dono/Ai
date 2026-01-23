@@ -18,6 +18,7 @@ import {
   updateBondRarity,
 } from "@/lib/services/symbolic-bonds.service";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 // Check if Redis is configured for BullMQ
 const isRedisConfigured = !!(process.env.REDIS_URL || (process.env.REDIS_HOST && process.env.REDIS_PORT));
@@ -357,6 +358,7 @@ async function processQueueOffers() {
       // Notificar
       await prisma.bondNotification.create({
         data: {
+          id: nanoid(),
           userId: nextInLine.userId,
           type: "slot_available",
           title: "¡Slot disponible!",

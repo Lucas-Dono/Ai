@@ -2,6 +2,7 @@
  * Reputation Service - Sistema de reputación y gamificación
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 export interface BadgeDefinition {
@@ -61,7 +62,7 @@ export const ReputationService = {
     let reputation = await prisma.userReputation.findUnique({
       where: { userId },
       include: {
-        badges: {
+        UserBadge: {
           orderBy: { awardedAt: 'desc' },
         },
       },
@@ -69,8 +70,12 @@ export const ReputationService = {
 
     if (!reputation) {
       reputation = await prisma.userReputation.create({
-        data: { userId },
-        include: { badges: true },
+        data: {
+          id: nanoid(),
+          updatedAt: new Date(),
+          userId,
+        },
+        include: { UserBadge: true },
       });
     }
 
@@ -92,6 +97,8 @@ export const ReputationService = {
     const reputation = await prisma.userReputation.upsert({
       where: { userId },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         totalPoints: points,
         level: this.calculateLevel(points),
@@ -121,7 +128,7 @@ export const ReputationService = {
    */
   async checkAndAwardBadges(userId: string) {
     const reputation = await this.getUserReputation(userId);
-    const existingBadges = reputation.badges.map(b => b.badgeName);
+    const existingBadges = reputation.UserBadge.map(b => b.badgeName);
 
     // Obtener estadísticas del usuario
     const stats = await this.getUserStats(userId);
@@ -146,6 +153,7 @@ export const ReputationService = {
       if (shouldAward) {
         await prisma.userBadge.create({
           data: {
+            id: nanoid(),
             userId,
             reputationId: reputation.id,
             badgeType: 'special',
@@ -215,7 +223,7 @@ export const ReputationService = {
       prisma.agent.count({ where: { userId } }),
       prisma.directMessage.count({ where: { senderId: userId } }),
       Promise.resolve(0), // prisma.world.count({ where: { userId } }), // World model removed
-      prisma.behaviorProfile.count({ where: { agent: { userId } } }),
+      prisma.behaviorProfile.count({ where: { Agent: { userId } } }),
       prisma.importantEvent.count({ where: { userId } }),
       prisma.communityPost.count({ where: { authorId: userId, status: 'published' } }),
       prisma.communityComment.count({ where: { authorId: userId, status: 'published' } }),
@@ -244,7 +252,7 @@ export const ReputationService = {
         where: { userId, visibility: "public" },
         _sum: { cloneCount: true },
       }),
-      prisma.review.count({ where: { agent: { userId } } }),
+      prisma.review.count({ where: { Agent: { userId } } }),
       prisma.userReputation.findUnique({
         where: { userId },
         select: { currentStreak: true },
@@ -345,7 +353,7 @@ export const ReputationService = {
       ],
       take: limit,
       include: {
-        badges: {
+        UserBadge: {
           orderBy: { awardedAt: 'desc' },
           take: 5,
         },

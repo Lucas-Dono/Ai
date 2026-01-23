@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ async function main() {
     const einstein = await prisma.agent.findFirst({
       where: { name: "Albert Einstein" },
       include: {
-        voiceConfig: true,
+        VoiceConfig: true,
       }
     });
 
@@ -30,7 +31,7 @@ async function main() {
     console.log('✅ Encontrado Albert Einstein');
     console.log(`   ID: ${einstein.id}`);
     console.log(`   Avatar actual: ${einstein.avatar}`);
-    console.log(`   Voz actual: ${einstein.voiceConfig?.voiceId || 'N/A'}`);
+    console.log(`   Voz actual: ${einstein.VoiceConfig?.voiceId || 'N/A'}`);
     console.log('');
 
     // Actualizar avatar si es necesario
@@ -46,11 +47,11 @@ async function main() {
     }
 
     // Actualizar configuración de voz
-    if (einstein.voiceConfig) {
-      if (einstein.voiceConfig.voiceId !== "0geCr4xSMhS4uwbapqVu") {
+    if (einstein.VoiceConfig) {
+      if (einstein.VoiceConfig.voiceId !== "0geCr4xSMhS4uwbapqVu") {
         console.log('🎤 Actualizando voz...');
         await prisma.voiceConfig.update({
-          where: { id: einstein.voiceConfig.id },
+          where: { id: einstein.VoiceConfig.id },
           data: {
             voiceId: "0geCr4xSMhS4uwbapqVu",
             voiceName: "Einstein Voice (Eleven Labs)",
@@ -66,6 +67,8 @@ async function main() {
       console.log('🎤 Creando configuración de voz...');
       await prisma.voiceConfig.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: einstein.id,
           voiceId: "0geCr4xSMhS4uwbapqVu",
           voiceName: "Einstein Voice (Eleven Labs)",

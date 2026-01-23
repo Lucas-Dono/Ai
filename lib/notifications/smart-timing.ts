@@ -8,6 +8,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { defaultLogger as log } from "@/lib/logging/logger";
+import { nanoid } from "nanoid";
 
 interface SmartTimingResult {
   shouldSendNow: boolean;
@@ -165,6 +166,8 @@ export async function trackUserActivity(userId: string): Promise<void> {
       // Crear preferencias si no existen
       await prisma.notificationPreferences.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           lastActiveHours: { [new Date().getHours()]: 1 },
         },

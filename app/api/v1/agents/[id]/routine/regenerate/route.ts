@@ -47,7 +47,7 @@ export async function POST(
     const updated = await prisma.characterRoutine.findUnique({
       where: { id: routine.id },
       include: {
-        templates: true,
+        RoutineTemplate: true,
       },
     });
 

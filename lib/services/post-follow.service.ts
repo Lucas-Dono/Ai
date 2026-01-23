@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 export class PostFollowService {
@@ -8,7 +9,7 @@ export class PostFollowService {
     // Verificar que el post existe
     const post = await prisma.communityPost.findUnique({
       where: { id: postId },
-      include: { community: true }
+      include: { Community: true }
     });
 
     if (!post) {
@@ -32,6 +33,8 @@ export class PostFollowService {
     // Crear el follow
     const follow = await prisma.postFollower.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         postId,
         notificationsEnabled: true
@@ -78,7 +81,7 @@ export class PostFollowService {
     const followers = await prisma.postFollower.findMany({
       where: { postId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -99,16 +102,16 @@ export class PostFollowService {
     const follows = await prisma.postFollower.findMany({
       where: { userId },
       include: {
-        post: {
+        CommunityPost: {
           include: {
-            author: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true
               }
             },
-            community: true
+            Community: true
           }
         }
       },
@@ -117,7 +120,7 @@ export class PostFollowService {
       }
     });
 
-    return follows.map(f => f.post);
+    return follows.map(f => f.CommunityPost);
   }
 
   /**

@@ -2,6 +2,7 @@
  * Research Service - Sistema de investigación colaborativa
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 export interface CreateProjectData {
@@ -54,6 +55,8 @@ export const ResearchService = {
 
     const project = await prisma.researchProject.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         leadAuthorId,
         title: data.title,
         slug,
@@ -63,7 +66,7 @@ export const ResearchService = {
         status: 'draft',
       },
       include: {
-        leadAuthor: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -76,6 +79,7 @@ export const ResearchService = {
     // Añadir líder como colaborador
     await prisma.researchContributor.create({
       data: {
+        id: nanoid(),
         projectId: project.id,
         userId: leadAuthorId,
         role: 'lead',
@@ -105,19 +109,19 @@ export const ResearchService = {
       where: { id: projectId },
       data,
       include: {
-        leadAuthor: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        contributors: true,
+        ResearchContributor: true,
       },
     });
 
     // Fetch user data for contributors separately
-    const contributorUserIds = updated.contributors.map(c => c.userId);
+    const contributorUserIds = updated.ResearchContributor.map(c => c.userId);
     const users = await prisma.user.findMany({
       where: { id: { in: contributorUserIds } },
       select: { id: true, name: true, image: true },
@@ -126,7 +130,7 @@ export const ResearchService = {
 
     return {
       ...updated,
-      contributors: updated.contributors.map(c => ({
+      contributors: updated.ResearchContributor.map(c => ({
         ...c,
         user: usersMap.get(c.userId) || null,
       })),
@@ -140,20 +144,20 @@ export const ResearchService = {
     const project = await prisma.researchProject.findUnique({
       where: { id: projectId },
       include: {
-        leadAuthor: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        contributors: {
+        ResearchContributor: {
           orderBy: { addedAt: 'asc' },
         },
-        datasets: {
+        ResearchDataset: {
           orderBy: { uploadedAt: 'desc' },
         },
-        reviews: {
+        ResearchReview: {
           orderBy: { createdAt: 'desc' },
         },
       },
@@ -166,15 +170,15 @@ export const ResearchService = {
     // Verificar si es público o si el usuario es colaborador
     // Los proyectos con status "published" son públicos
     if (project.status !== 'published') {
-      const isContributor = project.contributors.some(c => c.userId === userId);
+      const isContributor = project.ResearchContributor.some(c => c.userId === userId);
       if (!isContributor) {
         throw new Error('Este proyecto es privado');
       }
     }
 
     // Fetch user data for contributors and reviewers separately
-    const contributorUserIds = project.contributors.map(c => c.userId);
-    const reviewerUserIds = project.reviews.map(r => r.reviewerId);
+    const contributorUserIds = project.ResearchContributor.map(c => c.userId);
+    const reviewerUserIds = project.ResearchReview.map(r => r.reviewerId);
     const allUserIds = [...new Set([...contributorUserIds, ...reviewerUserIds])];
 
     const users = await prisma.user.findMany({
@@ -185,11 +189,11 @@ export const ResearchService = {
 
     return {
       ...project,
-      contributors: project.contributors.map(c => ({
+      contributors: project.ResearchContributor.map(c => ({
         ...c,
         user: usersMap.get(c.userId) || null,
       })),
-      reviews: project.reviews.map(r => ({
+      reviews: project.ResearchReview.map(r => ({
         ...r,
         reviewer: usersMap.get(r.reviewerId) || null,
       })),
@@ -247,7 +251,7 @@ export const ResearchService = {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
-          leadAuthor: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -256,9 +260,9 @@ export const ResearchService = {
           },
           _count: {
             select: {
-              contributors: true,
-              datasets: true,
-              reviews: true,
+              ResearchContributor: true,
+              ResearchDataset: true,
+              ResearchReview: true,
             },
           },
         },
@@ -307,6 +311,7 @@ export const ResearchService = {
     // Crear solicitud (como contributor pendiente)
     const contributor = await prisma.researchContributor.create({
       data: {
+        id: nanoid(),
         projectId,
         userId,
         role: 'pending',
@@ -404,6 +409,7 @@ export const ResearchService = {
 
     const dataset = await prisma.researchDataset.create({
       data: {
+        id: nanoid(),
         projectId,
         uploaderId: userId,
         name: data.name,
@@ -458,6 +464,7 @@ export const ResearchService = {
         })
       : await prisma.researchReview.create({
           data: {
+            id: nanoid(),
             projectId,
             reviewerId,
             rating,

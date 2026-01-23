@@ -32,9 +32,10 @@ import { mobileTheme } from "@/lib/mobile-theme";
 interface MobileHeaderProps {
   title?: string;
   showMenu?: boolean;
+  onSearchClick?: () => void;
 }
 
-export function MobileHeader({ title, showMenu = true }: MobileHeaderProps) {
+export function MobileHeader({ title, showMenu = true, onSearchClick }: MobileHeaderProps) {
   const t = useTranslations("mobileHeader");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -138,42 +139,33 @@ export function MobileHeader({ title, showMenu = true }: MobileHeaderProps) {
         </div>
 
         {/* Segunda fila: Barra de búsqueda */}
-        <div className="px-6 pb-4">
-          <div
-            className="flex items-center gap-2 px-4 py-2.5"
-            style={{
-              backgroundColor: mobileTheme.colors.background.elevated,
-              borderRadius: `${mobileTheme.borderRadius.lg}px`,
-            }}
-          >
-            <Search
-              className="w-5 h-5 flex-shrink-0"
-              style={{ color: mobileTheme.colors.text.tertiary }}
-            />
-            <input
-              type="text"
-              placeholder={t("searchPlaceholder") || "Buscar compañeros, mundos..."}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent outline-none text-base placeholder:text-[#94A3B8]"
-              style={{
-                color: mobileTheme.colors.text.primary,
+        {onSearchClick && (
+          <div className="px-6 pb-4">
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                light();
+                onSearchClick();
               }}
-            />
-            {searchQuery && (
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setSearchQuery("")}
-                className="p-1"
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-left"
+              style={{
+                backgroundColor: mobileTheme.colors.background.elevated,
+                borderRadius: `${mobileTheme.borderRadius.lg}px`,
+              }}
+            >
+              <Search
+                className="w-5 h-5 flex-shrink-0"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              />
+              <span
+                className="flex-1 text-base"
+                style={{ color: mobileTheme.colors.text.tertiary }}
               >
-                <X
-                  className="w-5 h-5"
-                  style={{ color: mobileTheme.colors.text.tertiary }}
-                />
-              </motion.button>
-            )}
+                {t("searchPlaceholder") || "Buscar compañeros, mundos..."}
+              </span>
+            </motion.button>
           </div>
-        </div>
+        )}
       </header>
 
       {/* Mobile Menu Drawer */}

@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { nanoid } from "nanoid";
 import type {
   TrackServerEventParams,
   EventType,
@@ -57,6 +58,7 @@ export async function trackServerEvent({
     // Guardar en BD
     await prisma.analyticsEvent.create({
       data: {
+        id: nanoid(),
         eventType,
         metadata: enrichedMetadata as any,
         timestamp: new Date(),
@@ -86,6 +88,7 @@ export async function trackServerEventsBatch(
   try {
     await prisma.analyticsEvent.createMany({
       data: events.map((event) => ({
+        id: nanoid(),
         eventType: event.eventType,
         metadata: {
           ...event.metadata,

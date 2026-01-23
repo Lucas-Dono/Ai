@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         kind: true,
+        gender: true,
         nsfwMode: true,
         createdAt: true,
       },
@@ -64,7 +65,7 @@ export async function GET(req: NextRequest) {
     // Obtener todos los triggers
     const allTriggers = await prisma.behaviorTriggerLog.findMany({
       where: {
-        message: {
+        Message: {
           agentId: { in: agentIds },
         },
       },
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
         triggerType: true,
         weight: true,
         createdAt: true,
-        message: {
+        Message: {
           select: {
             agentId: true,
           },
@@ -141,7 +142,7 @@ export async function GET(req: NextRequest) {
         (p) => p.agentId === agent.id
       );
       const agentTriggers = allTriggers.filter(
-        (t) => t.message.agentId === agent.id
+        (t) => t.Message.agentId === agent.id
       );
 
       const avgIntensity =
@@ -160,6 +161,7 @@ export async function GET(req: NextRequest) {
         id: agent.id,
         name: agent.name,
         kind: agent.kind,
+        gender: agent.gender,
         nsfwMode: agent.nsfwMode,
         behaviorCount: agentBehaviors.length,
         triggerCount: agentTriggers.length,

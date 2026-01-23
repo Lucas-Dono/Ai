@@ -2,6 +2,7 @@
  * Marketplace Prompt Service - Marketplace de prompts
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 export interface CreatePromptData {
@@ -33,6 +34,8 @@ export const MarketplacePromptService = {
   async createPrompt(authorId: string, data: CreatePromptData) {
     const prompt = await prisma.marketplacePrompt.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         authorId,
         name: data.title,
         description: data.description,
@@ -43,7 +46,7 @@ export const MarketplacePromptService = {
         status: 'pending',
       },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -76,7 +79,7 @@ export const MarketplacePromptService = {
       where: { id: promptId },
       data,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -96,14 +99,14 @@ export const MarketplacePromptService = {
     const prompt = await prisma.marketplacePrompt.findUnique({
       where: { id: promptId },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        ratings: {
+        PromptRating: {
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
@@ -192,7 +195,7 @@ export const MarketplacePromptService = {
         take: limit,
         orderBy,
         include: {
-          author: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -240,6 +243,7 @@ export const MarketplacePromptService = {
       // Registrar descarga
       await prisma.promptDownload.create({
         data: {
+          id: nanoid(),
           promptId,
           userId,
         },
@@ -258,7 +262,7 @@ export const MarketplacePromptService = {
     return prisma.marketplacePrompt.findUnique({
       where: { id: promptId },
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -298,6 +302,8 @@ export const MarketplacePromptService = {
         },
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         promptId,
         userId,
         rating,

@@ -15,6 +15,7 @@ import {
 } from "./tier-limits";
 import { shouldCountMessage } from "./smart-counting";
 import { getEffectiveTier } from "./special-events";
+import { nanoid } from "nanoid";
 
 interface DailyUsage {
   userId: string;
@@ -333,6 +334,7 @@ export async function trackMessageUsage(
 
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType: isRewarded ? "rewarded_messages" : "message",
       quantity: 1,
@@ -359,6 +361,7 @@ export async function trackImageAnalysisUsage(
 ): Promise<void> {
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType: isRewarded ? "rewarded_images" : "image_analysis",
       quantity: 1,
@@ -459,6 +462,7 @@ export async function canSendVoiceMessage(
 export async function trackVoiceMessageUsage(userId: string): Promise<void> {
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType: "voice_message",
       quantity: 1,
@@ -627,6 +631,7 @@ async function getMonthlyRewardedImageUsage(userId: string): Promise<number> {
 export async function trackWorldMessageUsage(userId: string): Promise<void> {
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType: "world_message",
       quantity: 1,

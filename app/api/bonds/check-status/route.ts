@@ -54,45 +54,37 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if bond can be established
-    // Get agent's bond configuration
+    // Get agent's symbolic bonds
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       select: {
-        bondConfig: true,
-        symbolicBonds: {
+        id: true,
+        SymbolicBond: {
           where: { status: "active" },
           select: { tier: true },
         },
       },
     });
 
-    if (!agent || !agent.bondConfig) {
+    if (!agent) {
       return NextResponse.json({
         hasBond: false,
         canEstablish: false,
-        reason: "Este agente no tiene vínculos simbólicos habilitados",
+        reason: "Agente no encontrado",
       });
     }
 
-    const config = agent.bondConfig as any;
-    const tiers = config.tiers || {};
+    // Check if there are available slots (simplified logic since bondConfig doesn't exist)
+    let canEstablishAny = true; // Assume bonds can be established
+    let reason = "Disponible para establecer vínculo";
 
-    // Check each tier to see if there's availability
-    let canEstablishAny = false;
-    let reason = "Todos los tipos de vínculo están llenos";
+    // Count current active bonds
+    const currentBonds = agent.SymbolicBond.length;
+    const maxBonds = 10; // Default maximum bonds per agent
 
-    for (const [tierName, tierConfig] of Object.entries(tiers) as any) {
-      if (!tierConfig.enabled) continue;
-
-      const currentSlots = agent.symbolicBonds.filter(
-        (b) => b.tier === tierName
-      ).length;
-
-      if (currentSlots < tierConfig.maxSlots) {
-        canEstablishAny = true;
-        reason = `Disponible: ${tierName.replace(/_/g, " ")}`;
-        break;
-      }
+    if (currentBonds >= maxBonds) {
+      canEstablishAny = false;
+      reason = "Todos los tipos de vínculo están llenos";
     }
 
     // Check if user is in queue

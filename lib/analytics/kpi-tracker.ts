@@ -10,6 +10,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 // ============================================================================
 // TIPOS Y ENUMS
@@ -93,6 +94,7 @@ export async function trackEvent(
   try {
     await prisma.analyticsEvent.create({
       data: {
+        id: nanoid(),
         eventType,
         metadata: metadata as any,
         timestamp: new Date(),
@@ -113,6 +115,7 @@ export async function trackEventsBatch(
   try {
     await prisma.analyticsEvent.createMany({
       data: events.map((e) => ({
+        id: nanoid(),
         eventType: e.eventType,
         metadata: e.metadata as any,
         timestamp: new Date(),

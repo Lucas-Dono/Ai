@@ -3,6 +3,7 @@
  * Basado en su systemPrompt existente
  */
 
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 
 const agentId = 'cmi3l240x0001ijyeo5p9ixex';
@@ -233,8 +234,13 @@ async function fixSophieComplete() {
     // Eliminar personas existentes primero
     await prisma.importantPerson.deleteMany({ where: { agentId } });
 
-    // Crear nuevas personas
-    await prisma.importantPerson.createMany({ data: people });
+    // Crear nuevas personas con id y updatedAt
+    const peopleWithIds = people.map(p => ({
+      ...p,
+      id: nanoid(),
+      updatedAt: new Date(),
+    }));
+    await prisma.importantPerson.createMany({ data: peopleWithIds });
 
     console.log(`✅ Creadas ${people.length} personas importantes\n`);
 
@@ -352,8 +358,13 @@ async function fixSophieComplete() {
     // Eliminar memorias existentes primero
     await prisma.episodicMemory.deleteMany({ where: { agentId } });
 
-    // Crear nuevas memorias
-    await prisma.episodicMemory.createMany({ data: memories });
+    // Crear nuevas memorias con id y updatedAt
+    const memoriesWithIds = memories.map(m => ({
+      ...m,
+      id: nanoid(),
+      updatedAt: new Date(),
+    }));
+    await prisma.episodicMemory.createMany({ data: memoriesWithIds });
 
     console.log(`✅ Creadas ${memories.length} memorias episódicas\n`);
 
@@ -364,8 +375,8 @@ async function fixSophieComplete() {
       where: { id: agentId },
       select: {
         profile: true,
-        episodicMemories: { take: 3 },
-        importantPeople: { take: 3 },
+        EpisodicMemory: { take: 3 },
+        ImportantPerson: { take: 3 },
       }
     });
 
@@ -378,8 +389,8 @@ async function fixSophieComplete() {
     console.log(`  ✅ Daily Routine: ${profileData?.dailyRoutine ? 'Sí' : 'No'}`);
     console.log();
 
-    console.log(`Total memorias episódicas: ${updatedAgent?.episodicMemories.length || 0}`);
-    console.log(`Total personas importantes: ${updatedAgent?.importantPeople.length || 0}`);
+    console.log(`Total memorias episódicas: ${updatedAgent?.EpisodicMemory.length || 0}`);
+    console.log(`Total personas importantes: ${updatedAgent?.ImportantPerson.length || 0}`);
     console.log();
 
     console.log('🎉 ¡Sophie Müller está completa!\n');

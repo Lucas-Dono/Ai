@@ -363,7 +363,7 @@ export async function getAgentStats(
   const agents = await prisma.agent.findMany({
     where: { userId },
     include: {
-      messagesAsAgent: {
+      Message: {
         where: { createdAt: { gte: start, lte: end } },
         select: {
           role: true,
@@ -372,39 +372,39 @@ export async function getAgentStats(
           userId: true,
         },
       },
-      relationsSubject: {
+      Relation: {
         where: { updatedAt: { gte: start, lte: end } },
       },
     },
   });
 
   const stats: AgentStats[] = agents.map((agent) => {
-    const messages = agent.messagesAsAgent;
-    const assistantMessages = messages.filter((m) => m.role === "assistant");
+    const messages = agent.Message;
+    const assistantMessages = messages.filter((m: { role: string }) => m.role === "assistant");
 
     const messageCount = messages.length;
-    const tokenCount = assistantMessages.reduce((sum, m) => {
+    const tokenCount = assistantMessages.reduce((sum: number, m: { metadata: any }) => {
       const metadata = m.metadata as any;
       return sum + (metadata?.tokensUsed || 0);
     }, 0);
 
     const avgResponseLength =
       assistantMessages.length > 0
-        ? assistantMessages.reduce((sum, m) => sum + m.content.length, 0) /
+        ? assistantMessages.reduce((sum: number, m: { content: string }) => sum + m.content.length, 0) /
           assistantMessages.length
         : 0;
 
     // Calculate avg sentiment from relations
-    const relations = agent.relationsSubject;
+    const relations = agent.Relation;
     const avgSentiment =
       relations.length > 0
         ? relations.reduce(
-            (sum, r) => sum + (r.trust + r.affinity + r.respect) / 3,
+            (sum: number, r: { trust: number; affinity: number; respect: number }) => sum + (r.trust + r.affinity + r.respect) / 3,
             0
           ) / relations.length
         : 0.5;
 
-    const uniqueUsers = new Set(messages.map((m) => m.userId).filter(Boolean)).size;
+    const uniqueUsers = new Set(messages.map((m: { userId: string | null }) => m.userId).filter(Boolean)).size;
 
     return {
       agentId: agent.id,

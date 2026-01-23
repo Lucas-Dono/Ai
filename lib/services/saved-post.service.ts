@@ -2,6 +2,7 @@
  * Saved Post Service - Guardar posts para leer después
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 export const SavedPostService = {
@@ -31,6 +32,7 @@ export const SavedPostService = {
         collectionName,
       },
       create: {
+        id: nanoid(),
         userId,
         postId,
         collectionName,

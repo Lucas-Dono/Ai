@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 import {
   NarrativeArcDetector,
   DetectedArcEvent,
@@ -104,12 +105,14 @@ export const LifeEventsTimelineService = {
 
     await prisma.importantEvent.create({
       data: {
+        id: nanoid(),
         agentId,
         userId,
         eventDate: event.timestamp,
         type: this.mapCategoryToEventType(event.category),
         description: event.message,
         priority: 'medium',
+        updatedAt: new Date(),
         metadata: {
           narrativeState: event.state,
           narrativeTheme: theme,
@@ -139,12 +142,14 @@ export const LifeEventsTimelineService = {
 
     await prisma.importantEvent.create({
       data: {
+        id: nanoid(),
         agentId,
         userId,
         eventDate: event.timestamp,
         type: this.mapCategoryToEventType(event.category),
         description: event.message,
         priority: 'medium',
+        updatedAt: new Date(),
         metadata: {
           arcId,
           narrativeState: event.state,

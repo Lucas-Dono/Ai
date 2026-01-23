@@ -11,6 +11,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -50,6 +51,8 @@ export async function sendAlert(config: AlertConfig): Promise<void> {
     // Crear registro en base de datos
     const alert = await prisma.threatAlert.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         threatDetectionId: config.threatDetectionId,
         alertType: config.type,
         severity: config.severity,
@@ -395,7 +398,7 @@ export async function getRecentAlerts(
         acknowledged: filters?.acknowledged,
       },
       include: {
-        threatDetection: {
+        ThreatDetection: {
           select: {
             threatType: true,
             ipAddress: true,

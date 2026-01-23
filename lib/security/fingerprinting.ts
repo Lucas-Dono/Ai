@@ -11,6 +11,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -453,8 +454,9 @@ export async function upsertFingerprint(
       // Crear nuevo
       return await prisma.clientFingerprint.create({
         data: {
+          id: nanoid(),
           ipAddress: data.ipAddress,
-          ipReputation: undefined, // Se actualizará con checkIPReputation
+          ipReputation: null, // Se actualizará con checkIPReputation
           asn: data.asn,
           country: data.country,
           isp: data.isp,
@@ -511,11 +513,11 @@ export async function getFingerprint(ipAddress: string, ja3Hash?: string) {
         ].filter(obj => Object.keys(obj).length > 0),
       },
       include: {
-        threatDetections: {
+        ThreatDetection: {
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
-        honeypotHitRecords: {
+        HoneypotHit: {
           select: {
             id: true,
             ipAddress: true,

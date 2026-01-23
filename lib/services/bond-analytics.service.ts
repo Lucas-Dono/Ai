@@ -10,6 +10,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export interface GlobalBondStats {
   totalBonds: number;
@@ -362,6 +363,7 @@ export async function trackBondAnalyticsEvent(
   try {
     await prisma.log.create({
       data: {
+        id: nanoid(),
         userId,
         action: `analytics_${eventType}`,
         metadata: {

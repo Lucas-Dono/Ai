@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 /**
  * Sistema de Disponibilidad Inteligente
@@ -99,6 +100,8 @@ export async function markUnavailable(
   await prisma.agentAvailability.upsert({
     where: { agentId },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       available: false,
       blockedUntil,
@@ -209,6 +212,8 @@ export async function markAvailable(agentId: string): Promise<void> {
   await prisma.agentAvailability.upsert({
     where: { agentId },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       available: true,
     },
@@ -235,6 +240,8 @@ export async function applyCooldown(
   await prisma.agentAvailability.upsert({
     where: { agentId },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       available: false,
       blockedUntil,

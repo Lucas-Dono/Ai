@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 
 export interface ConversationTrackingData {
   userId: string;
@@ -41,6 +42,8 @@ export class ConversationTrackingService {
       },
       update: {},
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId,
         agentId,
         lastMessageAt: new Date(),
@@ -109,7 +112,7 @@ export class ConversationTrackingService {
       ],
       take: limit,
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -122,14 +125,14 @@ export class ConversationTrackingService {
     });
 
     return conversations.map(conv => {
-      const aiFields = conv.agent.aiGeneratedFields as any;
-      const staticDescription = aiFields?.staticDescription || conv.agent.description || `Chat con ${conv.agent.name}`;
+      const aiFields = conv.Agent.aiGeneratedFields as any;
+      const staticDescription = aiFields?.staticDescription || conv.Agent.description || `Chat con ${conv.Agent.name}`;
 
       return {
         id: conv.id,
-        agentId: conv.agent.id,
-        agentName: conv.agent.name,
-        agentAvatar: conv.agent.avatar,
+        agentId: conv.Agent.id,
+        agentName: conv.Agent.name,
+        agentAvatar: conv.Agent.avatar,
         staticDescription,
         unreadCount: conv.unreadCount,
         lastMessageAt: conv.lastMessageAt,

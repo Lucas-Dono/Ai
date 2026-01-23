@@ -16,7 +16,7 @@ export async function GET(
         id: true,
         name: true,
         rating: true,
-        reviews: {
+        Review: {
           select: {
             rating: true,
           },
@@ -31,16 +31,16 @@ export async function GET(
       );
     }
 
-    const totalReviews = agent.reviews.length;
+    const totalReviews = agent.Review.length;
     const averageRating = agent.rating || 0;
 
     // Calcular distribución de ratings
     const ratingDistribution = {
-      5: agent.reviews.filter((r) => r.rating === 5).length,
-      4: agent.reviews.filter((r) => r.rating === 4).length,
-      3: agent.reviews.filter((r) => r.rating === 3).length,
-      2: agent.reviews.filter((r) => r.rating === 2).length,
-      1: agent.reviews.filter((r) => r.rating === 1).length,
+      5: agent.Review.filter((r) => r.rating === 5).length,
+      4: agent.Review.filter((r) => r.rating === 4).length,
+      3: agent.Review.filter((r) => r.rating === 3).length,
+      2: agent.Review.filter((r) => r.rating === 2).length,
+      1: agent.Review.filter((r) => r.rating === 1).length,
     };
 
     return NextResponse.json({

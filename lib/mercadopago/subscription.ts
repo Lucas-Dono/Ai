@@ -1,5 +1,6 @@
 import { preApprovalClient, customerClient, PLANS, MERCADOPAGO_URLS } from "./config";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 // Crear o recuperar cliente de Mercado Pago
 export async function getOrCreateMercadoPagoCustomer(
@@ -164,6 +165,8 @@ export async function syncSubscription(
   await prisma.subscription.upsert({
     where: { mercadopagoPreapprovalId: preapprovalData.id },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId,
       mercadopagoPreapprovalId: preapprovalData.id,
       status: preapprovalData.status,

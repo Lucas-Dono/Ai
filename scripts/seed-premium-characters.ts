@@ -95,6 +95,7 @@ async function seedPremiumCharacters() {
         await prisma.agent.create({
           data: {
             id: character.id,
+            updatedAt: new Date(),
             userId: null, // Personajes públicos del sistema
             teamId: null,
             kind: character.kind,

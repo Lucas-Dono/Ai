@@ -158,7 +158,7 @@ async function getTopAttackers(timeRange: { from: Date; to: Date }, limit: numbe
         ],
       },
       include: {
-        threatDetections: {
+        ThreatDetection: {
           where: {
             createdAt: {
               gte: timeRange.from,
@@ -170,7 +170,7 @@ async function getTopAttackers(timeRange: { from: Date; to: Date }, limit: numbe
             threatType: true,
           },
         },
-        honeypotHitRecords: {
+        HoneypotHit: {
           where: {
             createdAt: {
               gte: timeRange.from,
@@ -194,10 +194,10 @@ async function getTopAttackers(timeRange: { from: Date; to: Date }, limit: numbe
       isBot: fp.isBot,
       isBlocked: fp.isBlocked,
       requestCount: fp.requestCount,
-      threatCount: fp.threatDetections.length,
-      honeypotHits: fp.honeypotHitRecords.length,
+      threatCount: fp.ThreatDetection.length,
+      honeypotHits: fp.HoneypotHit.length,
       lastSeen: fp.lastSeen,
-      threats: fp.threatDetections.map(t => ({
+      threats: fp.ThreatDetection.map((t: { severity: string; threatType: string }) => ({
         severity: t.severity,
         type: t.threatType,
       })),
@@ -211,15 +211,6 @@ async function getTopAttackers(timeRange: { from: Date; to: Date }, limit: numbe
 async function getRecentThreats(limit: number) {
   try {
     return await prisma.threatDetection.findMany({
-      include: {
-        fingerprint: {
-          select: {
-            ipAddress: true,
-            country: true,
-            isBot: true,
-          },
-        },
-      },
       orderBy: {
         createdAt: 'desc',
       },

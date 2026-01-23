@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
         ],
       },
       include: {
-        personalityCore: true,
-        internalState: true,
-        semanticMemory: true,
+        PersonalityCore: true,
+        InternalState: true,
+        SemanticMemory: true,
       },
     });
 

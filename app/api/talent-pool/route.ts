@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
     // Crear entrada
     const entry = await prisma.talentPoolEntry.create({
       data: {
+        id: nanoid(),
         email: validatedData.email,
         name: validatedData.name,
         area: validatedData.area,

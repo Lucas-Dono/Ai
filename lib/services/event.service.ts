@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 
 export interface CreateEventData {
   title: string;
@@ -51,6 +52,8 @@ export const EventService = {
 
     const event = await prisma.communityEvent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         organizerId,
         communityId: data.communityId,
         title: data.title,
@@ -63,14 +66,14 @@ export const EventService = {
         status: data.startDate > new Date() ? 'upcoming' : 'ongoing',
       },
       include: {
-        organizer: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -103,21 +106,21 @@ export const EventService = {
       where: { id: eventId },
       data,
       include: {
-        organizer: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
             slug: true,
           },
         },
-        registrations: true,
+        EventRegistration: true,
       },
     });
 
@@ -131,14 +134,14 @@ export const EventService = {
     const event = await prisma.communityEvent.findUnique({
       where: { id: eventId },
       include: {
-        organizer: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -146,7 +149,7 @@ export const EventService = {
             memberCount: true,
           },
         },
-        registrations: {
+        EventRegistration: {
           orderBy: { createdAt: 'asc' },
         },
       },
@@ -189,14 +192,14 @@ export const EventService = {
         take: limit,
         orderBy: { startDate: 'asc' },
         include: {
-          organizer: {
+          User: {
             select: {
               id: true,
               name: true,
               image: true,
             },
           },
-          community: {
+          Community: {
             select: {
               id: true,
               name: true,
@@ -205,7 +208,7 @@ export const EventService = {
           },
           _count: {
             select: {
-              registrations: true,
+              EventRegistration: true,
             },
           },
         },
@@ -229,7 +232,7 @@ export const EventService = {
       where: { id: eventId },
       include: {
         _count: {
-          select: { registrations: true },
+          select: { EventRegistration: true },
         },
       },
     });
@@ -242,7 +245,7 @@ export const EventService = {
       throw new Error('Este evento ya finalizó');
     }
 
-    if (event.maxParticipants && event._count.registrations >= event.maxParticipants) {
+    if (event.maxParticipants && event._count.EventRegistration >= event.maxParticipants) {
       throw new Error('Evento lleno');
     }
 
@@ -262,6 +265,7 @@ export const EventService = {
 
     const registration = await prisma.eventRegistration.create({
       data: {
+        id: nanoid(),
         eventId,
         userId,
       },

@@ -8,6 +8,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 import type {
   GodModeConfig,
   SharedMemory,
@@ -101,6 +102,8 @@ export async function initializeGodMode({
       // Create new bond
       await prisma.symbolicBond.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           agentId,
           tier: bondTier as any,
@@ -137,6 +140,8 @@ async function injectSharedMemories(
   characterName: string
 ): Promise<void> {
   const events = memories.map((memory) => ({
+    id: nanoid(),
+    updatedAt: new Date(),
     agentId,
     userId,
     eventDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000), // Random past date

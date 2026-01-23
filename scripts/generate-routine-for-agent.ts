@@ -102,7 +102,7 @@ function detectTimezone(profile: any): string {
 async function generateForAgent(agent: any): Promise<void> {
   console.log(`\n📝 Generating routine for: ${agent.name}`);
   console.log(`   ID: ${agent.id}`);
-  console.log(`   User: ${agent.user?.email} (${agent.user?.plan})`);
+  console.log(`   User: ${agent.User?.email} (${agent.User?.plan})`);
 
   // Check if already has routine
   const existingRoutine = await prisma.characterRoutine.findUnique({
@@ -116,8 +116,8 @@ async function generateForAgent(agent: any): Promise<void> {
   }
 
   // Check premium status
-  if (!['plus', 'ultra'].includes(agent.user?.plan || '')) {
-    console.log(`   ❌ User is not premium (plan: ${agent.user?.plan})`);
+  if (!['plus', 'ultra'].includes(agent.User?.plan || '')) {
+    console.log(`   ❌ User is not premium (plan: ${agent.User?.plan})`);
     console.log(`   Skipping...`);
     return;
   }
@@ -148,14 +148,14 @@ async function generateForAgent(agent: any): Promise<void> {
     const routine = await prisma.characterRoutine.findUnique({
       where: { id: routineId },
       include: {
-        templates: true,
+        RoutineTemplate: true,
       },
     });
 
     if (routine) {
-      console.log(`   📋 Templates created: ${routine.templates.length}`);
+      console.log(`   📋 Templates created: ${routine.RoutineTemplate.length}`);
       console.log('\n   Templates:');
-      for (const template of routine.templates) {
+      for (const template of routine.RoutineTemplate) {
         console.log(`      - ${template.name} (${template.type}): ${template.startTime} - ${template.endTime}`);
       }
     }
@@ -177,14 +177,14 @@ async function main() {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             plan: true,
             email: true,
           },
         },
-        personalityCore: true,
+        PersonalityCore: true,
       },
     });
 
@@ -196,19 +196,19 @@ async function main() {
   } else if (userEmail) {
     const userAgents = await prisma.agent.findMany({
       where: {
-        user: {
+        User: {
           email: userEmail,
         },
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             plan: true,
             email: true,
           },
         },
-        personalityCore: true,
+        PersonalityCore: true,
       },
     });
 

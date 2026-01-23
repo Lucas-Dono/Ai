@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
@@ -26,6 +27,8 @@ export async function GET(request: NextRequest) {
     if (!preferences) {
       preferences = await prisma.notificationPreferences.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId: user.id,
         },
       });
@@ -103,6 +106,8 @@ export async function PUT(request: NextRequest) {
       where: { userId: user.id },
       update: body,
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: user.id,
         ...body,
       },
@@ -170,7 +175,7 @@ export async function POST(request: NextRequest) {
 
     if (!preferences) {
       preferences = await prisma.notificationPreferences.create({
-        data: { userId: user.id },
+        data: { id: nanoid(), updatedAt: new Date(), userId: user.id },
       });
     }
 

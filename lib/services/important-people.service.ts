@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from "nanoid";
 
 export interface CreatePersonData {
   name: string;
@@ -47,6 +48,8 @@ export const ImportantPeopleService = {
 
     const person = await prisma.importantPerson.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId,
         name: data.name,

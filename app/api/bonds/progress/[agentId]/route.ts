@@ -51,7 +51,7 @@ export async function GET(
         agentId,
       },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,

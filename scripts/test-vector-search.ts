@@ -5,6 +5,7 @@
 
 import { optimizedVectorSearch, cosineSimilarity } from '../lib/memory/optimized-vector-search';
 import { prisma } from '../lib/prisma';
+import { nanoid } from 'nanoid';
 
 async function setupTestData(agentId: string, userId: string) {
   console.log('📝 Setting up test data...\n');
@@ -14,6 +15,7 @@ async function setupTestData(agentId: string, userId: string) {
     where: { id: agentId },
     create: {
       id: agentId,
+      updatedAt: new Date(),
       name: 'Test Agent',
       personality: 'friendly',
       userId,
@@ -29,6 +31,7 @@ async function setupTestData(agentId: string, userId: string) {
     where: { id: userId },
     create: {
       id: userId,
+      updatedAt: new Date(),
       email: 'test@example.com',
       name: 'Test User',
     },
@@ -52,6 +55,7 @@ async function setupTestData(agentId: string, userId: string) {
   for (const content of testMessages) {
     await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         userId,
         content,
@@ -88,6 +92,7 @@ async function setupTestData(agentId: string, userId: string) {
   for (const memory of testMemories) {
     await prisma.episodicMemory.create({
       data: {
+        id: nanoid(),
         agentId,
         ...memory,
       },

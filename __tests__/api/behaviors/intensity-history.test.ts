@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { BehaviorType } from "@prisma/client";
 import { GET } from "@/app/api/agents/[id]/behaviors/intensity-history/route";
 import { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
 
 describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
   let testAgentId: string;
@@ -22,14 +23,14 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
 
     if (existingUser) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { userId: existingUser.id } },
+        where: { Message: { userId: existingUser.id } },
       });
       await prisma.message.deleteMany({ where: { userId: existingUser.id } });
       await prisma.behaviorProgressionState.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.behaviorProfile.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.agent.deleteMany({ where: { userId: existingUser.id } });
       await prisma.user.delete({ where: { id: existingUser.id } });
@@ -41,12 +42,14 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
         id: "test-user-intensity",
         email: "test-intensity@test.com",
         name: "Test User Intensity",
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
 
     const testAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "companion",
         name: "Test Agent Intensity",
@@ -54,6 +57,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
         personality: "Test",
         systemPrompt: "Test",
         profile: { age: 25, background: "Test" },
+        updatedAt: new Date(),
       },
     });
     testAgentId = testAgent.id;
@@ -61,6 +65,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
     // Create behavior profile
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
         baseIntensity: 0.3,
@@ -71,12 +76,14 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
         thresholdForDisplay: 0.3,
         triggers: [],
         createdAt: new Date("2024-01-01"),
+        updatedAt: new Date(),
       },
     });
 
     // Create messages and triggers for history
     const msg1 = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         userId: testUserId,
         content: "Test message 1",
@@ -87,6 +94,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
 
     const msg2 = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         userId: testUserId,
         content: "Test message 2",
@@ -97,6 +105,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: msg1.id,
         triggerType: "abandonment_signal",
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
@@ -108,6 +117,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: msg2.id,
         triggerType: "criticism",
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
@@ -121,7 +131,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
   afterAll(async () => {
     if (testAgentId) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { agentId: testAgentId } },
+        where: { Message: { agentId: testAgentId } },
       });
       await prisma.message.deleteMany({ where: { agentId: testAgentId } });
       await prisma.behaviorProgressionState.deleteMany({
@@ -188,6 +198,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
   it("should return empty data for agent with no behaviors", async () => {
     const emptyAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "assistant",
         name: "Empty Agent",
@@ -195,6 +206,7 @@ describe("GET /api/agents/[id]/behaviors/intensity-history", () => {
         personality: "Test",
         systemPrompt: "Test",
         profile: { age: 30 },
+        updatedAt: new Date(),
       },
     });
 

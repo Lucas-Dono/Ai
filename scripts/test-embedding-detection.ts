@@ -55,7 +55,7 @@ async function testEmbeddingDetection() {
         OR: [
           { name: 'Test Embeddings Agent' },
           {
-            semanticMemory: {
+            SemanticMemory: {
               worldKnowledge: {
                 not: {},
               },
@@ -64,7 +64,7 @@ async function testEmbeddingDetection() {
         ],
       },
       include: {
-        semanticMemory: true,
+        SemanticMemory: true,
       },
       orderBy: { createdAt: 'desc' },
     });

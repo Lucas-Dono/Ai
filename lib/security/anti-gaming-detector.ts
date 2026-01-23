@@ -10,6 +10,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 // @ts-expect-error - string-similarity doesn't have type definitions
 import stringSimilarity from "string-similarity";
 
@@ -330,6 +331,7 @@ export async function flagUserForReview(
   // En producción, crear entry en ModerationAction
   await prisma.moderationAction.create({
     data: {
+      id: nanoid(),
       moderatorId: "system", // Sistema automático
       targetType: "user",
       targetId: userId,

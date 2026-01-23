@@ -34,7 +34,7 @@ export async function withTeamPermission(
       },
     },
     include: {
-      team: true,
+      Team: true,
     },
   });
 
@@ -62,7 +62,7 @@ export async function withTeamPermission(
       userId: session.user.id,
       teamId,
       role: membership.role as TeamRole,
-      team: membership.team,
+      team: membership.Team,
     },
   };
 }

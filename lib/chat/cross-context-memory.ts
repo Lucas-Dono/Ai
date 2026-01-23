@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type { UserTier } from "./types";
 
 /**
@@ -53,6 +54,8 @@ export async function createMemoryFromWorldInteraction(
 ): Promise<void> {
   await prisma.crossContextMemory.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       sourceType: "group_interaction",
       sourceGroupId: worldId,
@@ -76,6 +79,8 @@ export async function createMemoryFromIndividualChat(
 ): Promise<void> {
   await prisma.crossContextMemory.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       sourceType: "individual_chat",
       sourceUserId: userId,
@@ -190,6 +195,8 @@ export async function updateTemporalContext(
       },
     },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       userId,
       ...updates,

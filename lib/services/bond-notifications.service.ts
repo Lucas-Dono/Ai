@@ -9,6 +9,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { emitBondUpdated, emitSlotAvailable, emitRankChanged, emitMilestoneReached, emitBondAtRisk } from "@/lib/websocket/bonds-events";
 
 export enum BondNotificationType {
@@ -43,6 +44,7 @@ export async function createBondNotification(data: NotificationData) {
   try {
     const notification = await prisma.notification.create({
       data: {
+        id: nanoid(),
         recipientId: data.userId,
         type: data.type,
         title: data.title,

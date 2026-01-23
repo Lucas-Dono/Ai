@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -84,7 +85,7 @@ async function main() {
   const publicAgentsWithoutConfig = await prisma.agent.findMany({
     where: {
       visibility: "public",
-      bondConfig: null,
+      AgentBondConfig: null,
     },
     select: {
       id: true,
@@ -129,6 +130,8 @@ async function main() {
     try {
       await prisma.agentBondConfig.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           ...config,
         },
@@ -176,6 +179,8 @@ export async function configureSpecificAgent(
     // Create
     await prisma.agentBondConfig.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         ...config,
       },

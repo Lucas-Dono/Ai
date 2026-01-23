@@ -17,6 +17,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import { nanoid } from 'nanoid';
 import { sendAlert } from './alerting';
 
 const prisma = new PrismaClient();
@@ -148,6 +149,7 @@ export async function createCanaryToken(config: CanaryTokenConfig): Promise<{
 
     const canaryToken = await prisma.canaryToken.create({
       data: {
+        id: nanoid(),
         tokenType: config.type,
         tokenValue,
         tokenHash,
@@ -159,6 +161,7 @@ export async function createCanaryToken(config: CanaryTokenConfig): Promise<{
         isActive: true,
         triggered: false,
         triggerCount: 0,
+        updatedAt: new Date(),
       },
     });
 
@@ -220,6 +223,7 @@ export async function checkAndTriggerCanaryToken(
     // Registrar el trigger
     await prisma.canaryTokenTrigger.create({
       data: {
+        id: nanoid(),
         canaryTokenId: canaryToken.id,
         triggeredBy: context.triggeredBy,
         ipAddress: context.ipAddress,
@@ -228,7 +232,7 @@ export async function checkAndTriggerCanaryToken(
         requestMethod: context.requestMethod,
         headers: context.headers || {},
         contextData: context.contextData,
-        fingerprint: undefined, // TODO: Obtener fingerprint si está disponible
+        fingerprint: null, // TODO: Obtener fingerprint si está disponible
         alertSent: false,
       },
     });
@@ -500,7 +504,7 @@ export async function listCanaryTokens(): Promise<any[]> {
   try {
     return await prisma.canaryToken.findMany({
       include: {
-        triggers: {
+        CanaryTokenTrigger: {
           orderBy: { triggeredAt: 'desc' },
           take: 5,
         },
@@ -543,7 +547,7 @@ export async function getCanaryStats(timeRange: { from: Date; to: Date }) {
         },
       },
       include: {
-        canaryToken: {
+        CanaryToken: {
           select: {
             tokenType: true,
             description: true,
@@ -556,7 +560,7 @@ export async function getCanaryStats(timeRange: { from: Date; to: Date }) {
     const uniqueIPs = new Set<string>();
 
     for (const trigger of triggers) {
-      const type = trigger.canaryToken.tokenType;
+      const type = trigger.CanaryToken.tokenType;
       byType[type] = (byType[type] || 0) + 1;
       uniqueIPs.add(trigger.ipAddress);
     }

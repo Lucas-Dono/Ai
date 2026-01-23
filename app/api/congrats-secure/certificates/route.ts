@@ -28,9 +28,9 @@ export const GET = withAdminAuth(async (request, { admin }) => {
     const certificates = await prisma.adminCertificate.findMany({
       where,
       include: {
-        adminAccess: {
+        AdminAccess: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 email: true,
@@ -164,7 +164,7 @@ export const DELETE = withAdminAuth(async (request, { admin }) => {
     // Verificar que el certificado pertenece al admin (o es super admin)
     const cert = await prisma.adminCertificate.findUnique({
       where: { serialNumber },
-      include: { adminAccess: true }
+      include: { AdminAccess: true }
     });
 
     if (!cert) {

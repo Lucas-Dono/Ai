@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { BehaviorType } from "@prisma/client";
 import { POST } from "@/app/api/agents/[id]/behaviors/reset/route";
 import { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
 
 describe("POST /api/agents/[id]/behaviors/reset", () => {
   let testAgentId: string;
@@ -21,14 +22,14 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
 
     if (existingUser) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { userId: existingUser.id } },
+        where: { Message: { userId: existingUser.id } },
       });
       await prisma.message.deleteMany({ where: { userId: existingUser.id } });
       await prisma.behaviorProgressionState.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.behaviorProfile.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.agent.deleteMany({ where: { userId: existingUser.id } });
       await prisma.user.delete({ where: { id: existingUser.id } });
@@ -39,12 +40,14 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
         id: "test-user-reset",
         email: "test-reset@test.com",
         name: "Test User Reset",
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
 
     const testAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "companion",
         name: "Test Agent Reset",
@@ -52,6 +55,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
         personality: "Test",
         systemPrompt: "Test",
         profile: { age: 25 },
+        updatedAt: new Date(),
       },
     });
     testAgentId = testAgent.id;
@@ -60,7 +64,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
   afterAll(async () => {
     if (testAgentId) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { agentId: testAgentId } },
+        where: { Message: { agentId: testAgentId } },
       });
       await prisma.message.deleteMany({ where: { agentId: testAgentId } });
       await prisma.behaviorProgressionState.deleteMany({
@@ -81,6 +85,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
     // Create behaviors and progression state
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
         baseIntensity: 0.5,
@@ -90,16 +95,19 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
         volatility: 0.5,
         thresholdForDisplay: 0.3,
         triggers: [],
+        updatedAt: new Date(),
       },
     });
 
     await prisma.behaviorProgressionState.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         totalInteractions: 100,
         positiveInteractions: 60,
         negativeInteractions: 40,
         currentIntensities: { YANDERE_OBSESSIVE: 0.7 },
+        updatedAt: new Date(),
       },
     });
 
@@ -153,6 +161,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
   it("should handle agent with no behaviors gracefully", async () => {
     const emptyAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "assistant",
         name: "Empty Agent",
@@ -160,6 +169,7 @@ describe("POST /api/agents/[id]/behaviors/reset", () => {
         personality: "Test",
         systemPrompt: "Test",
         profile: { age: 30 },
+        updatedAt: new Date(),
       },
     });
 

@@ -3,6 +3,7 @@
  * Maneja el envío de notificaciones por email cuando hay actividad en posts seguidos
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { newCommentEmailTemplate, digestEmailTemplate, type NewCommentEmailData, type DigestEmailData } from '@/lib/email/templates/post-follow-templates';
@@ -24,7 +25,7 @@ export class PostFollowEmailService {
         prisma.communityPost.findUnique({
           where: { id: postId },
           include: {
-            community: {
+            Community: {
               select: { name: true, slug: true }
             }
           }
@@ -32,7 +33,7 @@ export class PostFollowEmailService {
         prisma.communityComment.findUnique({
           where: { id: commentId },
           include: {
-            author: {
+            User: {
               select: { name: true }
             }
           }
@@ -51,12 +52,12 @@ export class PostFollowEmailService {
           userId: { not: commentAuthorId } // No notificar al autor del comentario
         },
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               email: true,
               name: true,
-              emailNotificationConfig: true
+              EmailNotificationConfig: true
             }
           }
         }
@@ -64,7 +65,7 @@ export class PostFollowEmailService {
 
       // Enviar emails basados en la configuración de cada usuario
       const emailPromises = followers.map(async (follower) => {
-        const config = follower.user.emailNotificationConfig;
+        const config = follower.User.EmailNotificationConfig;
 
         // Verificar si el usuario quiere recibir notificaciones de nuevos comentarios
         if (!config?.newComments) {
@@ -77,16 +78,16 @@ export class PostFollowEmailService {
           const postUrl = `${APP_URL}/community/post/${postId}#comment-${commentId}`;
 
           const emailData: NewCommentEmailData = {
-            userName: follower.user.name || 'Usuario',
+            userName: follower.User.name || 'Usuario',
             postTitle: post.title,
             postUrl,
-            commentAuthor: comment.author.name || 'Alguien',
+            commentAuthor: comment.User.name || 'Alguien',
             commentContent: comment.content,
             unsubscribeUrl
           };
 
           return sendEmail({
-            to: follower.user.email,
+            to: follower.User.email,
             subject: `Nuevo comentario en "${post.title}"`,
             html: newCommentEmailTemplate(emailData)
           });
@@ -121,7 +122,7 @@ export class PostFollowEmailService {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         include: {
-          emailNotificationConfig: true
+          EmailNotificationConfig: true
         }
       });
 
@@ -129,7 +130,7 @@ export class PostFollowEmailService {
         throw new Error('Usuario no encontrado');
       }
 
-      const config = user.emailNotificationConfig;
+      const config = user.EmailNotificationConfig;
 
       // Verificar si el usuario quiere recibir digests
       if (!config || config.frequency !== 'daily' || !config.digestSummary) {
@@ -153,7 +154,7 @@ export class PostFollowEmailService {
           title: p.title,
           url: `${APP_URL}/community/post/${p.id}`,
           newCommentsCount: p.newCommentsCount,
-          community: p.community || undefined
+          community: p.Community || undefined
         })),
         totalNewComments: activity.totalNewComments,
         unsubscribeUrl: `${APP_URL}/settings/notifications?unsubscribe=digest`,
@@ -169,6 +170,7 @@ export class PostFollowEmailService {
       // Registrar digest enviado
       await prisma.postFollowDigest.create({
         data: {
+          id: nanoid(),
           userId,
           type: 'daily',
           postIds: activity.posts.map(p => p.id),
@@ -202,7 +204,7 @@ export class PostFollowEmailService {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         include: {
-          emailNotificationConfig: true
+          EmailNotificationConfig: true
         }
       });
 
@@ -210,7 +212,7 @@ export class PostFollowEmailService {
         throw new Error('Usuario no encontrado');
       }
 
-      const config = user.emailNotificationConfig;
+      const config = user.EmailNotificationConfig;
 
       // Verificar si el usuario quiere recibir digests
       if (!config || config.frequency !== 'weekly' || !config.digestSummary) {
@@ -234,7 +236,7 @@ export class PostFollowEmailService {
           title: p.title,
           url: `${APP_URL}/community/post/${p.id}`,
           newCommentsCount: p.newCommentsCount,
-          community: p.community || undefined
+          community: p.Community || undefined
         })),
         totalNewComments: activity.totalNewComments,
         unsubscribeUrl: `${APP_URL}/settings/notifications?unsubscribe=digest`,
@@ -250,6 +252,7 @@ export class PostFollowEmailService {
       // Registrar digest enviado
       await prisma.postFollowDigest.create({
         data: {
+          id: nanoid(),
           userId,
           type: 'weekly',
           postIds: activity.posts.map(p => p.id),
@@ -323,7 +326,7 @@ export class PostFollowEmailService {
       select: {
         id: true,
         title: true,
-        community: {
+        Community: {
           select: {
             name: true,
             slug: true
@@ -356,6 +359,8 @@ export class PostFollowEmailService {
     if (!config) {
       config = await prisma.emailNotificationConfig.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           frequency: 'instant',
           newComments: true,

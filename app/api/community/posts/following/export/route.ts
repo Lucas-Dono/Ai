@@ -27,14 +27,14 @@ export async function GET(request: NextRequest) {
       prisma.postFollower.findMany({
         where: { userId },
         include: {
-          post: {
+          CommunityPost: {
             select: {
               id: true,
               title: true,
               type: true,
               tags: true,
               createdAt: true,
-              community: {
+              Community: {
                 select: { name: true, slug: true }
               }
             }
@@ -59,9 +59,9 @@ export async function GET(request: NextRequest) {
       },
       followedPosts: followedPosts.map(f => ({
         postId: f.postId,
-        postTitle: f.post.title,
-        postType: f.post.type,
-        community: f.post.community?.name,
+        postTitle: f.CommunityPost.title,
+        postType: f.CommunityPost.type,
+        community: f.CommunityPost.Community?.name,
         followedAt: f.createdAt,
         notificationsEnabled: f.notificationsEnabled,
         emailNotifications: f.emailNotifications

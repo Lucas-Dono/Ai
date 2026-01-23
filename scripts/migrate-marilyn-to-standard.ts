@@ -13,7 +13,7 @@ async function migrateMarilyn() {
 
   const marilyn = await prisma.agent.findFirst({
     where: { name: { contains: 'Marilyn' } },
-    include: { semanticMemory: true },
+    include: { SemanticMemory: true },
   });
 
   if (!marilyn) {
@@ -24,7 +24,7 @@ async function migrateMarilyn() {
   console.log(`✅ Encontrada: ${marilyn.name}\n`);
 
   // Datos actuales de Marilyn
-  const currentData = marilyn.semanticMemory?.worldKnowledge as any;
+  const currentData = marilyn.SemanticMemory?.worldKnowledge as any;
 
   // Nueva estructura estándar SUPER DETALLADA
   const standardWorldKnowledge = {
@@ -507,13 +507,13 @@ async function migrateMarilyn() {
   };
 
   // Actualizar worldKnowledge
-  if (!marilyn.semanticMemory) {
+  if (!marilyn.SemanticMemory) {
     console.error('❌ Marilyn no tiene SemanticMemory');
     process.exit(1);
   }
 
   await prisma.semanticMemory.update({
-    where: { id: marilyn.semanticMemory.id },
+    where: { id: marilyn.SemanticMemory.id },
     data: {
       worldKnowledge: standardWorldKnowledge,
     },

@@ -7,6 +7,7 @@
  * Uso: npx tsx scripts/test-behavior-system.ts
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from "../lib/prisma";
 import { BehaviorType } from "@prisma/client";
 
@@ -76,6 +77,8 @@ const agent = await prisma.agent.create({
     if (!profile) {
       profile = await prisma.behaviorProfile.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: testAgent.id,
           behaviorType: config.behaviorType,
           baseIntensity: 0.3,
@@ -106,6 +109,8 @@ const agent = await prisma.agent.create({
   if (!progressionState) {
     progressionState = await prisma.behaviorProgressionState.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: testAgent.id,
         totalInteractions: 0,
         positiveInteractions: 0,
@@ -186,7 +191,7 @@ const agent = await prisma.agent.create({
 
   const triggerCount = await prisma.behaviorTriggerLog.count({
     where: {
-      message: {
+      Message: {
         agentId: testAgent.id
       }
     }

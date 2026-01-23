@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { nanoid } from "nanoid";
 import { getAuthSession } from '@/lib/middleware/auth-helper';
 import { ReputationService } from '@/lib/services/reputation.service';
 import { prisma } from '@/lib/prisma';
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
         if (reputation) {
           await prisma.userBadge.create({
             data: {
+              id: nanoid(),
               userId,
               reputationId: reputation.id,
               badgeName: badge.name,

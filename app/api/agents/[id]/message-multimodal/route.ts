@@ -48,8 +48,7 @@ export async function POST(
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        internalState: true,
-        voiceConfig: true,
+        InternalState: true,
       },
     });
 
@@ -90,7 +89,7 @@ export async function POST(
       messageLength: agentResponse.text.length,
       emotion: agentResponse.emotion,
       userTier,
-      hasVoice: !!agent.voiceConfig,
+      hasVoice: true, // Voice is available for all agents
     });
 
     console.log(`[MultimodalAPI] Modalities:`, modalityDecision);

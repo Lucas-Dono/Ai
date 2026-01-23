@@ -15,6 +15,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { billingLogger as log } from "@/lib/logging/loggers";
 import crypto from "crypto";
@@ -222,6 +223,8 @@ async function handleSubscriptionCreated(userId: string, data: any) {
   await prisma.subscription.upsert({
     where: { paddleSubscriptionId: subscriptionId },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId,
       paddleSubscriptionId: subscriptionId,
       status: mapPaddleStatus(status),

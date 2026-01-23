@@ -62,11 +62,11 @@ export async function calculateTarpitDelay(
     const fingerprint = await prisma.clientFingerprint.findUnique({
       where: { id: fingerprintId },
       include: {
-        threatDetections: {
+        ThreatDetection: {
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
-        honeypotHitRecords: {
+        HoneypotHit: {
           select: {
             id: true,
             ipAddress: true,
@@ -101,7 +101,7 @@ export async function calculateTarpitDelay(
 
     // Exponential backoff basado en intentos previos
     if (cfg.exponentialBackoff) {
-      const recentAttempts = (fingerprint.threatDetections?.length || 0) + (fingerprint.honeypotHits || 0);
+      const recentAttempts = (fingerprint.ThreatDetection?.length || 0) + (fingerprint.honeypotHits || 0);
 
       if (recentAttempts > 0) {
         // Multiplicar por 1.5^attempts (máximo 10 veces)

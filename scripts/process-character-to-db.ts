@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 import { parseMarkdownCharacter, detectFormat, type MarkdownCharacter } from './parse-markdown-character';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -426,6 +427,8 @@ async function processCharacter(characterName: string, filePath: string) {
     // Crear en DB
     const agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: null, // Agente público
         ...mapped.agent,
         tags: mapped.agent.tags,
@@ -438,6 +441,8 @@ async function processCharacter(characterName: string, filePath: string) {
     if (mapped.personalityCore) {
       await prisma.personalityCore.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           ...mapped.personalityCore,
         },
@@ -449,6 +454,7 @@ async function processCharacter(characterName: string, filePath: string) {
     if (mapped.internalState) {
       await prisma.internalState.create({
         data: {
+          id: nanoid(),
           agentId: agent.id,
           ...mapped.internalState,
         },
@@ -460,6 +466,8 @@ async function processCharacter(characterName: string, filePath: string) {
     if (mapped.appearance) {
       await prisma.characterAppearance.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           ...mapped.appearance,
         },

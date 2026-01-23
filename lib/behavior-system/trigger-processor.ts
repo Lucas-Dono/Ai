@@ -15,6 +15,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { BehaviorType } from "@prisma/client";
 import type { TriggerDetectionResult, BehaviorProfile } from "./types";
 
@@ -161,6 +162,8 @@ export async function logTriggers(
     // Crear un log entry por cada behavior type afectado por cada trigger
     const logEntries = triggers.flatMap((trigger) =>
       trigger.behaviorTypes.map((behaviorType) => ({
+        id: nanoid(),
+        updatedAt: new Date(),
         messageId: messageId,
         behaviorType: behaviorType,
         triggerType: trigger.triggerType,
@@ -214,6 +217,8 @@ async function updateProgressionState(
     await prisma.behaviorProgressionState.upsert({
       where: { agentId: agentId },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agentId,
         totalInteractions: 1,
         positiveInteractions: hasPositiveTrigger && !hasNegativeTrigger ? 1 : 0,
@@ -242,7 +247,7 @@ export async function getRecentTriggers(agentId: string, limit: number = 50) {
   try {
     const triggers = await prisma.behaviorTriggerLog.findMany({
       where: {
-        message: {
+        Message: {
           agentId: agentId,
         },
       },
@@ -251,7 +256,7 @@ export async function getRecentTriggers(agentId: string, limit: number = 50) {
       },
       take: limit,
       include: {
-        message: {
+        Message: {
           select: {
             id: true,
             content: true,

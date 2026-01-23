@@ -4,6 +4,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { generateProfileEmbeddings } from '@/lib/profile/profile-embeddings';
+import { nanoid } from 'nanoid';
 
 async function createTestAgent() {
   console.log('🔧 Creando agente de prueba con estructura worldKnowledge completa...\n');
@@ -19,14 +20,17 @@ async function createTestAgent() {
   // Create test agent
   const agent = await prisma.agent.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       name: 'Test Embeddings Agent',
       description: 'Agent for testing embeddings system',
       systemPrompt: 'You are a helpful assistant.',
       userId: user.id,
       kind: 'companion',
       profile: {},
-      semanticMemory: {
+      SemanticMemory: {
         create: {
+          id: nanoid(),
           userFacts: {},
           userPreferences: {},
           relationshipStage: 'first_meeting',
@@ -229,8 +233,9 @@ async function createTestAgent() {
           },
         },
       },
-      internalState: {
+      InternalState: {
         create: {
+          id: nanoid(),
           currentEmotions: { joy: 0.5, curiosity: 0.6 },
           activeGoals: [],
           conversationBuffer: [],

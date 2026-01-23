@@ -10,6 +10,7 @@
 
 import { EpisodicMemory, EmotionState } from "../../types";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
 import { createLogger } from "@/lib/logger";
 
@@ -290,6 +291,7 @@ export class MemoryRetrievalSystem {
 
       const memory = await prisma.episodicMemory.create({
         data: {
+          id: nanoid(),
           agentId: params.agentId,
           event: params.event,
           userEmotion: params.userEmotion,

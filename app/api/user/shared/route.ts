@@ -32,21 +32,21 @@ export async function GET(req: NextRequest) {
     const [charactersDownloads, promptsDownloads, themesDownloads] = await Promise.all([
       prisma.characterDownload.count({
         where: {
-          character: {
+          MarketplaceCharacter: {
             authorId: currentUser.id,
           },
         },
       }),
       prisma.promptDownload.count({
         where: {
-          prompt: {
+          MarketplacePrompt: {
             authorId: currentUser.id,
           },
         },
       }),
       prisma.marketplaceThemeDownload.count({
         where: {
-          theme: {
+          MarketplaceTheme: {
             authorId: currentUser.id,
           },
         },
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     const [characterRatings, promptRatings, themeRatings] = await Promise.all([
       prisma.characterRating.aggregate({
         where: {
-          character: {
+          MarketplaceCharacter: {
             authorId: currentUser.id,
           },
           rating: { gte: 4 }, // Contar solo ratings positivos como "likes"
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       }),
       prisma.promptRating.aggregate({
         where: {
-          prompt: {
+          MarketplacePrompt: {
             authorId: currentUser.id,
           },
           rating: { gte: 4 },
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
     // Calcular estadísticas totales
     const stats = {
       totalShared: charactersCount + promptsCount + themesCount,
-      totalLikes: characterRatings._count + promptRatings._count,
+      totalLikes: (characterRatings._count ?? 0) + (promptRatings._count ?? 0),
       totalDownloads: charactersDownloads + promptsDownloads + themesDownloads,
       totalComments: 0, // TODO: Implementar cuando haya sistema de comentarios
       reputation: 0, // TODO: Implementar sistema de reputación
@@ -100,11 +100,11 @@ export async function GET(req: NextRequest) {
           name: true,
           category: true,
           createdAt: true,
-          ratings: {
+          CharacterRating: {
             where: { rating: { gte: 4 } },
             select: { id: true },
           },
-          downloads: {
+          CharacterDownload: {
             select: { id: true },
           },
         },
@@ -118,8 +118,8 @@ export async function GET(req: NextRequest) {
           type: 'character' as const,
           name: c.name,
           category: c.category,
-          likes: c.ratings.length,
-          downloads: c.downloads.length,
+          likes: c.CharacterRating.length,
+          downloads: c.CharacterDownload.length,
           views: 0, // TODO: Implementar tracking de vistas
           comments: 0, // TODO: Implementar comentarios
           createdAt: c.createdAt.toISOString(),
@@ -135,11 +135,11 @@ export async function GET(req: NextRequest) {
           name: true,
           category: true,
           createdAt: true,
-          ratings: {
+          PromptRating: {
             where: { rating: { gte: 4 } },
             select: { id: true },
           },
-          downloads: {
+          PromptDownload: {
             select: { id: true },
           },
         },
@@ -153,8 +153,8 @@ export async function GET(req: NextRequest) {
           type: 'prompt' as const,
           name: p.name,
           category: p.category,
-          likes: p.ratings.length,
-          downloads: p.downloads.length,
+          likes: p.PromptRating.length,
+          downloads: p.PromptDownload.length,
           views: 0,
           comments: 0,
           createdAt: p.createdAt.toISOString(),
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
           category: true,
           createdAt: true,
           rating: true,
-          downloads: {
+          MarketplaceThemeDownload: {
             select: { id: true },
           },
         },
@@ -186,7 +186,7 @@ export async function GET(req: NextRequest) {
           name: t.name,
           category: t.category || 'general',
           likes: Math.floor((t.rating || 0) * 10), // Aproximar likes del rating
-          downloads: t.downloads.length,
+          downloads: t.MarketplaceThemeDownload.length,
           views: 0,
           comments: 0,
           createdAt: t.createdAt.toISOString(),

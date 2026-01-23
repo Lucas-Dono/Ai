@@ -65023,7 +65023,6 @@ export const SCENE_EXAMPLES_BY_CATEGORY: Record<SceneCategory, SceneTemplate[]> 
       maxAIs: 4,
       duration: "medium",
     },
-  ,
   {
     code: "DESC_006",
     name: "Identidad falsa expuesta",
@@ -69956,7 +69955,6 @@ export const SCENE_EXAMPLES_BY_CATEGORY: Record<SceneCategory, SceneTemplate[]> 
       maxAIs: 2,
       duration: "short",
     },
-  ,
   {
     code: "REC_006",
     name: "Perdón después de la traición",
@@ -71783,7 +71781,6 @@ export const SCENE_EXAMPLES_BY_CATEGORY: Record<SceneCategory, SceneTemplate[]> 
       maxAIs: 3,
       duration: "short",
     },
-  ,
   {
     code: "PRO_002",
     name: "Torneo de improvisación",

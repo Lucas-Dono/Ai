@@ -45,26 +45,26 @@ async function getEligibleAgents() {
     where: {
       AND: [
         {
-          user: {
+          User: {
             plan: {
               in: ['plus', 'ultra']
             }
           }
         },
         {
-          characterRoutine: null // Don't have routine yet
+          CharacterRoutine: null // Don't have routine yet
         }
       ]
     },
     include: {
-      user: {
+      User: {
         select: {
           id: true,
           plan: true,
           email: true,
         }
       },
-      personalityCore: true,
+      PersonalityCore: true,
     },
     orderBy: {
       createdAt: 'desc' // Newest first
@@ -79,7 +79,7 @@ async function getEligibleAgents() {
 async function migrateAgent(agent: any): Promise<{ success: boolean; error?: string }> {
   try {
     console.log(`  📝 Generating routine for: ${agent.name}`);
-    console.log(`     User: ${agent.user?.email} (${agent.user?.plan})`);
+    console.log(`     User: ${agent.User?.email} (${agent.User?.plan})`);
 
     if (isDryRun) {
       console.log(`     ⚠️  DRY RUN - Would generate routine`);

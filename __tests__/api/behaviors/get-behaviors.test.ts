@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { BehaviorType } from "@prisma/client";
 import { GET } from "@/app/api/agents/[id]/behaviors/route";
 import { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
 
 describe("GET /api/agents/[id]/behaviors", () => {
   let testAgentId: string;
@@ -26,7 +27,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
       // Delete related data first
       await prisma.behaviorTriggerLog.deleteMany({
         where: {
-          message: {
+          Message: {
             userId: existingUser.id,
           },
         },
@@ -38,7 +39,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
 
       await prisma.behaviorProgressionState.deleteMany({
         where: {
-          agent: {
+          Agent: {
             userId: existingUser.id,
           },
         },
@@ -46,7 +47,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
 
       await prisma.behaviorProfile.deleteMany({
         where: {
-          agent: {
+          Agent: {
             userId: existingUser.id,
           },
         },
@@ -67,12 +68,14 @@ describe("GET /api/agents/[id]/behaviors", () => {
         id: "test-user-behaviors-get",
         email: "test-behaviors-get@test.com",
         name: "Test User",
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
 
     const testAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "companion",
         name: "Test Agent for Behaviors GET",
@@ -81,6 +84,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
         systemPrompt: "Test prompt",
         profile: { age: 25, background: "Test" },
         nsfwMode: true,
+        updatedAt: new Date(),
       },
     });
     testAgentId = testAgent.id;
@@ -88,6 +92,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     // Crear BehaviorProfile
     const behaviorProfile = await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
         baseIntensity: 0.5,
@@ -114,6 +119,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
           },
         ],
         interactionsSincePhaseStart: 45,
+        updatedAt: new Date(),
       },
     });
     testBehaviorProfileId = behaviorProfile.id;
@@ -121,6 +127,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     // Crear BehaviorProgressionState
     await prisma.behaviorProgressionState.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         totalInteractions: 95,
         positiveInteractions: 60,
@@ -128,12 +135,14 @@ describe("GET /api/agents/[id]/behaviors", () => {
         currentIntensities: {
           YANDERE_OBSESSIVE: 0.65,
         },
+        updatedAt: new Date(),
       },
     });
 
     // Crear mensajes y triggers para historial
     const message1 = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         userId: testUserId,
         content: "Necesito espacio",
@@ -143,6 +152,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
 
     const message2 = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: testAgentId,
         userId: testUserId,
         content: "Eres muy intenso",
@@ -152,6 +162,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: message1.id,
         triggerType: "abandonment_signal",
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
@@ -162,6 +173,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: message2.id,
         triggerType: "criticism",
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
@@ -176,7 +188,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     if (testAgentId) {
       await prisma.behaviorTriggerLog.deleteMany({
         where: {
-          message: {
+          Message: {
             agentId: testAgentId,
           },
         },
@@ -271,6 +283,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
     // Crear agente sin behaviors
     const emptyAgent = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "assistant",
         name: "Empty Agent",
@@ -278,6 +291,7 @@ describe("GET /api/agents/[id]/behaviors", () => {
         personality: "Test",
         systemPrompt: "Test",
         profile: { age: 30, background: "Test" },
+        updatedAt: new Date(),
       },
     });
 

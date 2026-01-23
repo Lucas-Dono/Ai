@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { checkTierRateLimit } from "@/lib/redis/ratelimit";
+import { nanoid } from "nanoid";
 import {
   checkAllGroupLimits,
   incrementGroupMessageCount,
@@ -162,6 +163,8 @@ export async function POST(
     // 8. Guardar mensaje del usuario
     const userMessage = await prisma.groupMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId,
         authorType: "user",
         userId,
@@ -172,20 +175,20 @@ export async function POST(
         replyToId: replyToId || null,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        replyTo: {
+        GroupMessage: {
           select: {
             id: true,
             content: true,
             authorType: true,
-            user: { select: { name: true } },
-            agent: { select: { name: true } },
+            User: { select: { name: true } },
+            Agent: { select: { name: true } },
           },
         },
       },
@@ -202,17 +205,17 @@ export async function POST(
       mediaUrl: userMessage.mediaUrl || undefined,
       createdAt: userMessage.createdAt.toISOString(),
       replyToId: userMessage.replyToId || undefined,
-      user: userMessage.user ? {
-        id: userMessage.user.id,
-        name: userMessage.user.name,
-        image: userMessage.user.image,
+      user: userMessage.User ? {
+        id: userMessage.User.id,
+        name: userMessage.User.name,
+        image: userMessage.User.image,
       } : undefined,
-      replyTo: userMessage.replyTo ? {
-        id: userMessage.replyTo.id,
-        content: userMessage.replyTo.content,
-        authorType: userMessage.replyTo.authorType as 'user' | 'agent',
-        user: userMessage.replyTo.user ? { name: userMessage.replyTo.user.name } : undefined,
-        agent: userMessage.replyTo.agent ? { name: userMessage.replyTo.agent.name } : undefined,
+      replyTo: userMessage.GroupMessage ? {
+        id: userMessage.GroupMessage.id,
+        content: userMessage.GroupMessage.content,
+        authorType: userMessage.GroupMessage.authorType as 'user' | 'agent',
+        user: userMessage.GroupMessage.User ? { name: userMessage.GroupMessage.User.name } : undefined,
+        agent: userMessage.GroupMessage.Agent ? { name: userMessage.GroupMessage.Agent.name } : undefined,
       } : undefined,
     });
 
@@ -346,32 +349,32 @@ export async function GET(
       orderBy: { createdAt: before ? "desc" : "asc" },
       take: limit,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
             avatar: true,
           },
         },
-        replyTo: {
+        GroupMessage: {
           select: {
             id: true,
             content: true,
             authorType: true,
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
               },
             },
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,

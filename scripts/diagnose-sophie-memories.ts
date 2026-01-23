@@ -19,9 +19,9 @@ async function diagnoseSophie() {
         id: true,
         name: true,
         profile: true,
-        episodicMemories: true,
-        importantPeople: true,
-        importantEvents: true,
+        EpisodicMemory: true,
+        ImportantPerson: true,
+        ImportantEvent: true,
       }
     });
 

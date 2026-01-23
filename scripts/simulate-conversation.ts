@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 import {
   getRelationshipStageComplete,
   getRelationshipStageByTrust,
@@ -111,6 +112,8 @@ async function getOrCreateRelation() {
   if (!bond) {
     bond = await prisma.symbolicBond.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: USER_ID,
         agentId: AGENT_ID,
         tier: 'ACQUAINTANCE',

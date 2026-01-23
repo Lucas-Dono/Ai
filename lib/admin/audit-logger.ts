@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 import type { AdminContext } from './middleware';
 
 /**
@@ -82,6 +83,7 @@ export async function logAuditAction(
   try {
     await prisma.auditLog.create({
       data: {
+        id: nanoid(),
         adminAccessId: admin.adminAccessId,
         action: data.action,
         targetType: data.targetType,
@@ -111,6 +113,7 @@ export async function logSystemAction(
   try {
     await prisma.auditLog.create({
       data: {
+        id: nanoid(),
         adminAccessId: 'system',
         action,
         targetType,
@@ -183,9 +186,9 @@ export async function getAuditLogs(params: {
       take: params.limit || 100,
       skip: params.offset || 0,
       include: {
-        adminAccess: {
+        AdminAccess: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 email: true,

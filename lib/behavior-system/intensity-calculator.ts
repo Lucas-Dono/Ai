@@ -12,6 +12,7 @@
 
 import { BehaviorType, BehaviorProfile } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { BehaviorIntensityResult, BehaviorIntensityParams } from "./types";
 
 /**
@@ -140,7 +141,7 @@ export class IntensityCalculator {
 
     const triggers = await prisma.behaviorTriggerLog.findMany({
       where: {
-        message: {
+        Message: {
           agentId: agentId,
         },
         behaviorType: behaviorType,
@@ -294,6 +295,8 @@ export class IntensityCalculator {
         lastCalculatedAt: new Date(),
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         currentIntensities: intensities,
         lastCalculatedAt: new Date(),

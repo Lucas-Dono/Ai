@@ -63,7 +63,7 @@ async function testKnowledgeRetrieval() {
   const agent = await prisma.agent.findFirst({
     orderBy: { createdAt: "desc" },
     include: {
-      semanticMemory: true,
+      SemanticMemory: true,
     },
   });
 
@@ -77,7 +77,7 @@ async function testKnowledgeRetrieval() {
   console.log();
 
   // Verificar que tenga SemanticMemory
-  if (!agent.semanticMemory) {
+  if (!agent.SemanticMemory) {
     console.log("⚠️  Este agente no tiene SemanticMemory inicializada");
     console.log("   Es probable que sea un agente viejo creado antes del nuevo sistema");
     return;
@@ -125,7 +125,7 @@ async function testKnowledgeRetrieval() {
   console.log();
 
   // Estimar tamaño total del profile si se cargara completo
-  const worldKnowledge = agent.semanticMemory.worldKnowledge as any;
+  const worldKnowledge = agent.SemanticMemory.worldKnowledge as any;
   const profileJson = JSON.stringify(worldKnowledge, null, 2);
   const totalProfileChars = profileJson.length;
   const totalProfileTokens = Math.ceil(totalProfileChars / 4);

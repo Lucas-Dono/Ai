@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -129,6 +130,7 @@ Responde SOLO con un JSON válido en este formato exacto:
     // Step 3: Guardar mensaje en base de datos
     const message = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         userId: user.id,
         content: transcribedText,

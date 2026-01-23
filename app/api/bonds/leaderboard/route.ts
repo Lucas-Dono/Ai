@@ -35,14 +35,14 @@ export async function GET(request: NextRequest) {
       ],
       take: limit,
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -58,12 +58,12 @@ export async function GET(request: NextRequest) {
       const durationDays = Math.floor(durationMs / (1000 * 60 * 60 * 24));
 
       return {
-        userId: bond.user.id,
-        userName: bond.user.name || "Usuario Anónimo",
-        userImage: bond.user.image,
-        agentId: bond.agent.id,
-        agentName: bond.agent.name,
-        agentAvatar: bond.agent.avatar,
+        userId: bond.User.id,
+        userName: bond.User.name || "Usuario Anónimo",
+        userImage: bond.User.image,
+        agentId: bond.Agent.id,
+        agentName: bond.Agent.name,
+        agentAvatar: bond.Agent.avatar,
         tier: bond.tier,
         rarityScore: bond.rarityScore,
         rarityTier: bond.rarityTier,

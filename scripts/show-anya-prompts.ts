@@ -28,8 +28,8 @@ async function main() {
       createdAt: "desc",
     },
     include: {
-      internalState: true,
-      behaviorProfiles: true,
+      InternalState: true,
+      BehaviorProfile: true,
     },
   });
 
@@ -100,13 +100,13 @@ async function main() {
   }
 
   // 3. BEHAVIORS ACTIVOS
-  if (agent.behaviorProfiles && agent.behaviorProfiles.length > 0) {
+  if (agent.BehaviorProfile && agent.BehaviorProfile.length > 0) {
     console.log("━".repeat(80));
     console.log("3️⃣  BEHAVIORS ACTIVOS");
     console.log("━".repeat(80));
     console.log();
 
-    for (const behavior of agent.behaviorProfiles) {
+    for (const behavior of agent.BehaviorProfile) {
       console.log(`📌 Behavior: ${behavior.behaviorType}`);
       console.log(`   Intensidad base: ${(behavior.baseIntensity * 100).toFixed(1)}%`);
       console.log(`   Fase actual: ${behavior.currentPhase}`);

@@ -10,13 +10,14 @@ import { Loader2 } from 'lucide-react';
 function CreateCharacterContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode');
+  const cloneId = searchParams.get('cloneId');
 
   if (mode === 'smart-start') {
     return <SmartStartWizard />;
   }
 
   if (mode === 'manual') {
-    return <CharacterCreatorExample />;
+    return <CharacterCreatorExample cloneId={cloneId} />;
   }
 
   // Default: Show method selector

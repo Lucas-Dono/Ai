@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { prisma } from "../lib/prisma";
 
 /**
@@ -57,7 +58,13 @@ async function main() {
   ];
 
   for (const event of newEvents) {
-    await prisma.scheduledEvent.create({ data: event });
+    await prisma.scheduledEvent.create({
+      data: {
+        ...event,
+        id: nanoid(),
+        updatedAt: new Date(),
+      },
+    });
   }
 
   console.log(`✅ ${newEvents.length} nuevos ScheduledEvents creados (fechas futuras)\n`);

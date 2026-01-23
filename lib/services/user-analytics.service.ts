@@ -72,7 +72,7 @@ export const UserAnalyticsService = {
       // Total de awards recibidos
       prisma.postAward.count({
         where: {
-          post: {
+          CommunityPost: {
             authorId: userId,
           },
         },

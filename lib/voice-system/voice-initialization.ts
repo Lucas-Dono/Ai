@@ -8,6 +8,7 @@
 import { PrismaClient } from "@prisma/client";
 import { getElevenLabsClient, type VoiceCharacteristics } from "./elevenlabs-client";
 import type { BigFiveTraits } from "../emotional-system/types";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -80,6 +81,7 @@ export async function initializeVoiceConfig(
     // Crear configuración de voz en la base de datos
     await prisma.voiceConfig.create({
       data: {
+        id: nanoid(),
         agentId: params.agentId,
         voiceId,
         voiceName,
@@ -106,6 +108,7 @@ export async function initializeVoiceConfig(
 
         totalVoiceGenerations: 0,
         totalTranscriptions: 0,
+        updatedAt: new Date(),
       },
     });
 

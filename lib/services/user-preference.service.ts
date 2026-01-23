@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 
 interface PreferenceUpdate {
@@ -23,6 +24,8 @@ export class UserPreferenceService {
     if (!preferences) {
       preferences = await prisma.userContentPreference.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           preferredPostTypes: {},
           preferredTags: {},
@@ -78,6 +81,8 @@ export class UserPreferenceService {
       // Crear preferencias vacías si no existen
       preferences = await prisma.userContentPreference.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId,
           preferredPostTypes: {},
           preferredTags: {},

@@ -8,6 +8,7 @@ import {
   isBondMuted,
   shouldSendBasedOnFrequency,
 } from "@/lib/notifications/smart-timing";
+import { nanoid } from "nanoid";
 
 /**
  * GET /api/cron/check-bonds-at-risk
@@ -41,14 +42,14 @@ export async function GET(request: NextRequest) {
         status: "active",
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             email: true,
             name: true,
           },
         },
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -178,12 +179,12 @@ export async function GET(request: NextRequest) {
         try {
           await notifyBondAtRisk(
             bond.userId,
-            bond.agent.name,
+            bond.Agent.name,
             riskStatus,
             daysSinceInteraction
           );
           log.info(
-            { userId: bond.userId, agentName: bond.agent.name, riskStatus },
+            { userId: bond.userId, agentName: bond.Agent.name, riskStatus },
             "Web push notification sent"
           );
         } catch (error) {
@@ -197,12 +198,12 @@ export async function GET(request: NextRequest) {
         try {
           await PushNotificationServerService.sendBondAtRiskNotification(
             bond.userId,
-            bond.agent.name,
+            bond.Agent.name,
             riskStatus,
             daysSinceInteraction
           );
           log.info(
-            { userId: bond.userId, agentName: bond.agent.name, riskStatus },
+            { userId: bond.userId, agentName: bond.Agent.name, riskStatus },
             "Mobile push notification sent"
           );
         } catch (error) {
@@ -215,16 +216,17 @@ export async function GET(request: NextRequest) {
         // Crear notificación en base de datos
         await prisma.bondNotification.create({
           data: {
+            id: nanoid(),
             userId: bond.userId,
             bondId: bond.id,
             type: "bond_at_risk",
             title: `Vínculo en estado: ${riskStatus}`,
-            message: `Tu vínculo con ${bond.agent.name} necesita atención. ${daysSinceInteraction} días sin interactuar.`,
+            message: `Tu vínculo con ${bond.Agent.name} necesita atención. ${daysSinceInteraction} días sin interactuar.`,
             metadata: {
               riskStatus,
               daysSinceInteraction,
-              agentId: bond.agent.id,
-              agentName: bond.agent.name,
+              agentId: bond.Agent.id,
+              agentName: bond.Agent.name,
             },
           },
         });

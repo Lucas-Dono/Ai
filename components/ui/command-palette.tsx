@@ -16,7 +16,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
@@ -432,6 +433,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         aria-label="Command Palette"
         role="dialog"
       >
+        <VisuallyHidden>
+          <DialogTitle>Command Palette</DialogTitle>
+        </VisuallyHidden>
         {/* Header con búsqueda */}
         <div className="border-b border-border p-4">
           <div className="relative">

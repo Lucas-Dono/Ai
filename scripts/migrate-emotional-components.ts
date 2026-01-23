@@ -7,6 +7,7 @@
 
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 
 interface CharacterJSON {
@@ -65,8 +66,8 @@ async function migrateCharacter(character: CharacterJSON) {
   const agent = await prisma.agent.findUnique({
     where: { id: character.id },
     include: {
-      personalityCore: true,
-      internalState: true,
+      PersonalityCore: true,
+      InternalState: true,
     },
   });
 
@@ -95,10 +96,10 @@ async function migrateCharacter(character: CharacterJSON) {
   };
 
   // Crear o actualizar PersonalityCore
-  if (agent.personalityCore) {
+  if (agent.PersonalityCore) {
     console.log(`   🔄 Actualizando PersonalityCore existente...`);
     await prisma.personalityCore.update({
-      where: { id: agent.personalityCore.id },
+      where: { id: agent.PersonalityCore.id },
       data: {
         openness: bigFiveInt.openness,
         conscientiousness: bigFiveInt.conscientiousness,
@@ -114,6 +115,8 @@ async function migrateCharacter(character: CharacterJSON) {
     console.log(`   ✨ Creando nuevo PersonalityCore...`);
     await prisma.personalityCore.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         openness: bigFiveInt.openness,
         conscientiousness: bigFiveInt.conscientiousness,

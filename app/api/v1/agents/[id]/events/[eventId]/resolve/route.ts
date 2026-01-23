@@ -21,8 +21,8 @@ export async function POST(
         userId,
       },
       include: {
-        personalityCore: true,
-        internalState: true,
+        PersonalityCore: true,
+        InternalState: true,
       },
     });
 
@@ -71,7 +71,13 @@ export async function POST(
 
     // Resolve the event
     try {
-      const resolvedEvent = await resolveEvent(event, agent);
+      // Map Prisma relation names to expected format
+      const agentWithRelations = {
+        ...agent,
+        personalityCore: agent.PersonalityCore,
+        internalState: agent.InternalState,
+      };
+      const resolvedEvent = await resolveEvent(event, agentWithRelations as any);
 
       return NextResponse.json({
         success: true,

@@ -2,6 +2,7 @@
  * Notification Service - Sistema de notificaciones
  */
 
+import { nanoid } from "nanoid";
 import { prisma } from '@/lib/prisma';
 import { PushNotificationServerService } from './push-notification-server.service';
 
@@ -21,6 +22,7 @@ export const NotificationService = {
   async createNotification(data: CreateNotificationData) {
     const notification = await prisma.notification.create({
       data: {
+        id: nanoid(),
         recipientId: data.userId,
         type: data.type,
         title: data.title,
@@ -60,6 +62,7 @@ export const NotificationService = {
   async createBulkNotifications(notifications: CreateNotificationData[]) {
     const created = await prisma.notification.createMany({
       data: notifications.map(n => ({
+        id: nanoid(),
         recipientId: n.userId,
         type: n.type,
         title: n.title,
@@ -357,7 +360,7 @@ export const NotificationService = {
     const event = await prisma.communityEvent.findUnique({
       where: { id: eventId },
       include: {
-        registrations: {
+        EventRegistration: {
           select: { userId: true },
         },
       },
@@ -365,7 +368,7 @@ export const NotificationService = {
 
     if (!event) return;
 
-    const notifications = event.registrations.map(reg => ({
+    const notifications = event.EventRegistration.map(reg => ({
       userId: reg.userId,
       type: 'event_reminder',
       title: 'Recordatorio de evento',

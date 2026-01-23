@@ -225,7 +225,7 @@ export class BehaviorPhaseManager {
   ): Promise<Record<string, number>> {
     const triggers = await prisma.behaviorTriggerLog.findMany({
       where: {
-        message: {
+        Message: {
           agentId: agentId,
         },
         createdAt: {

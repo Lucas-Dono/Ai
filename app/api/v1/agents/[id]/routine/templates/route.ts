@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { withAPIAuth } from "@/lib/api/auth";
 import type { CreateTemplateRequest } from "@/types/routine";
@@ -39,6 +40,8 @@ export async function POST(
     // Create template
     const template = await prisma.routineTemplate.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         routineId: routine.id,
         name: body.name,
         description: body.description,

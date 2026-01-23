@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PLANS, getPlanLimit } from "@/lib/mercadopago/config";
 import { Prisma } from "@prisma/client";
+import { nanoid } from "nanoid";
 
 export type ResourceType = "message" | "agent" | "world" | "api_call" | "tokens";
 
@@ -14,6 +15,7 @@ export async function trackUsage(
 ): Promise<void> {
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType,
       resourceId,

@@ -193,12 +193,12 @@ export async function checkTrialSubscriptions() {
         lte: now,
       },
       // User is now on free plan
-      user: {
+      User: {
         plan: 'free',
       },
     },
     include: {
-      user: {
+      User: {
         select: {
           id: true,
         },
@@ -207,7 +207,7 @@ export async function checkTrialSubscriptions() {
   });
 
   for (const sub of trialsEnded) {
-    await triggerTrialEndingSequence(sub.user.id, -1);
+    await triggerTrialEndingSequence(sub.User.id, -1);
   }
 
   console.log(

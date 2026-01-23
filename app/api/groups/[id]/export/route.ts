@@ -46,22 +46,22 @@ export async function GET(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        creator: {
+        User: {
           select: {
             id: true,
             name: true,
           },
         },
-        members: {
+        GroupMember: {
           where: { isActive: true },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
               },
             },
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,
@@ -84,13 +84,13 @@ export async function GET(
       where: { groupId },
       orderBy: { createdAt: "asc" },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
           },
         },
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -115,16 +115,16 @@ export async function GET(
               createdAt: group.createdAt,
               totalMessages: messages.length,
             },
-            members: group.members.map((m) => ({
+            members: group.GroupMember.map((m: any) => ({
               type: m.memberType,
-              name: m.memberType === "user" ? m.user?.name : m.agent?.name,
+              name: m.memberType === "user" ? m.User?.name : m.Agent?.name,
               role: m.role,
               totalMessages: m.totalMessages,
             })),
             messages: messages.map((m) => ({
               id: m.id,
               author:
-                m.authorType === "user" ? m.user?.name : m.agent?.name,
+                m.authorType === "user" ? m.User?.name : m.Agent?.name,
               authorType: m.authorType,
               content: m.content,
               timestamp: m.createdAt,
@@ -197,8 +197,8 @@ function generateTextExport(group: any, messages: any[]): string {
     } else {
       const author =
         message.authorType === "user"
-          ? message.user?.name || "Usuario"
-          : message.agent?.name || "IA";
+          ? message.User?.name || "Usuario"
+          : message.Agent?.name || "IA";
       const timestamp = new Date(message.createdAt).toLocaleString();
 
       text += `[${timestamp}] ${author}:\n`;
@@ -229,8 +229,8 @@ function generateMarkdownExport(group: any, messages: any[]): string {
     } else {
       const author =
         message.authorType === "user"
-          ? message.user?.name || "Usuario"
-          : `**${message.agent?.name || "IA"}** 🤖`;
+          ? message.User?.name || "Usuario"
+          : `**${message.Agent?.name || "IA"}**`;
       const timestamp = new Date(message.createdAt).toLocaleString();
 
       md += `### ${author}\n`;

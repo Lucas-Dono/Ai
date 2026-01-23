@@ -23,7 +23,7 @@ let TEST_USER_ID: string;
 async function setupTestAgent() {
   const agent = await prisma.agent.findFirst({
     include: {
-      user: true,
+      User: true,
     },
   });
 

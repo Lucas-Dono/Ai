@@ -8,6 +8,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type {
   SceneExecutionPlan,
   Scene,
@@ -302,6 +303,7 @@ class SceneExecutorService {
     try {
       await prisma.sceneExecution.create({
         data: {
+          id: nanoid(),
           groupId,
           sceneId: scene.id,
           sceneCode: scene.code,

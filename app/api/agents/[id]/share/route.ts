@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import logger from "@/lib/logging/logger";
 import { getAuthenticatedUser } from "@/lib/auth-server";
+import { nanoid } from "nanoid";
 /**
  * POST /api/agents/[id]/share
  * Track when an agent is shared
@@ -47,6 +48,7 @@ export async function POST(
     // Store share event in database for analytics
     const shareEvent = await prisma.shareEvent.create({
       data: {
+        id: nanoid(),
         agentId,
         userId: userId || null,
         method,

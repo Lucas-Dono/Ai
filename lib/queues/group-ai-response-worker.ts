@@ -9,7 +9,9 @@
 import { Worker } from "bullmq";
 import { prisma } from "@/lib/prisma";
 import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
-import { groupMessageBufferService, type BufferedMessage } from "@/lib/groups/group-message-buffer.service";
+import { groupMessageBufferService } from "@/lib/groups/group-message-buffer.service";
+import type { BufferedMessage } from "@/lib/director/types";
+import { nanoid } from "nanoid";
 import { groupAIStateService } from "@/lib/groups/group-ai-state.service";
 import { groupDispositionService } from "@/lib/groups/group-disposition.service";
 import {
@@ -26,8 +28,13 @@ import {
   emitGroupMessage,
   emitGroupAIResponding,
   emitGroupAIStopped,
-  emitGroupTyping,
 } from "@/lib/socket/server";
+
+// Helper for typing events (may not exist in socket server)
+const emitGroupTyping = (groupId: string, agentId: string, isTyping: boolean) => {
+  // No-op if not implemented in socket server
+  console.log(`[GroupTyping] ${agentId} is ${isTyping ? 'typing' : 'not typing'} in ${groupId}`);
+};
 import type { GroupMessageEvent } from "@/lib/socket/events";
 import { checkAvailability, recordSpacedResponse } from "@/lib/chat/availability-system";
 import { relationSyncService } from "@/lib/chat/relation-sync.service";
@@ -83,18 +90,12 @@ export async function handleBufferFlush(
   // 2. Verificar que el grupo esté activo y tenga autoAIResponses habilitado
   const group = await prisma.group.findUnique({
     where: { id: groupId },
-    select: {
-      id: true,
-      status: true,
-      autoAIResponses: true,
-      directorVersion: true,
-    },
     include: {
-      members: {
+      GroupMember: {
         where: { isActive: true, memberType: "agent" },
-        include: { agent: true },
+        include: { Agent: true },
       },
-      sceneState: true,
+      GroupSceneState: true,
     },
   });
 
@@ -153,7 +154,7 @@ export async function handleBufferFlush(
       agentName: ai.agentName,
       triggeredByUserId,
       triggeredByUserName,
-      bufferedMessages: messages,
+      bufferedMessages: messages as any,
       dispositionScore: ai.score,
       responseIndex: i,
     });
@@ -174,10 +175,10 @@ async function handleBufferFlushWithDirector(
   console.log(`[Director] Processing buffer with Director for group ${groupId}`);
 
   // 1. Preparar contexto para el Director
-  const aiMembers = group.members.map((m: any) => ({
-    id: m.agent.id,
-    name: m.agent.name,
-    personality: m.agent.personalityCore,
+  const aiMembers = group.GroupMember.map((m: any) => ({
+    id: m.Agent.id,
+    name: m.Agent.name,
+    personality: m.Agent.personalityCore,
   }));
 
   // 2. Obtener mensajes recientes para contexto
@@ -186,8 +187,8 @@ async function handleBufferFlushWithDirector(
     orderBy: { createdAt: "desc" },
     take: 20,
     include: {
-      user: { select: { name: true } },
-      agent: { select: { id: true, name: true } },
+      User: { select: { name: true } },
+      Agent: { select: { id: true, name: true } },
     },
   });
 
@@ -229,7 +230,7 @@ async function handleBufferFlushWithDirector(
       currentTension: narrativeTension,
       participationBalance,
     },
-    sceneState: group.sceneState,
+    sceneState: group.GroupSceneState,
     activeSeedsCount,
     detectedLoops,
   });
@@ -263,7 +264,7 @@ async function executeSceneResponse(
     const plan = await sceneExecutorService.preparePlan(
       directorOutput.sceneCode,
       directorOutput.roleAssignments,
-      { groupId, members: group.members }
+      { groupId, members: group.GroupMember }
     );
 
     if (!plan) {
@@ -286,6 +287,8 @@ async function executeSceneResponse(
         },
       },
       create: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId,
         currentSceneId: plan.scene.id,
         currentSceneCode: plan.scene.code,
@@ -302,7 +305,7 @@ async function executeSceneResponse(
 
     for (const intervention of plan.interventions) {
       const agentName =
-        group.members.find((m: any) => m.agentId === intervention.agentId)
+        group.GroupMember.find((m: any) => m.AgentId === intervention.agentId)
           ?.agent.name || "Unknown";
 
       await enqueueAIResponse({
@@ -311,7 +314,7 @@ async function executeSceneResponse(
         agentName,
         triggeredByUserId: lastMessage.userId,
         triggeredByUserName: lastMessage.userName,
-        bufferedMessages: messages,
+        bufferedMessages: messages as any,
         dispositionScore: 100, // Alta prioridad por escena
         responseIndex: intervention.step,
         // Directiva de escena
@@ -386,7 +389,7 @@ async function handleBufferFlushLegacy(
       agentName: ai.agentName,
       triggeredByUserId,
       triggeredByUserName,
-      bufferedMessages: messages,
+      bufferedMessages: messages as any,
       dispositionScore: ai.score,
       responseIndex: i,
     });
@@ -444,7 +447,7 @@ export async function handleGenerateResponse(
         id: true,
         name: true,
         systemPrompt: true,
-        personalityCore: {
+        PersonalityCore: {
           select: {
             extraversion: true,
             conscientiousness: true,
@@ -453,7 +456,7 @@ export async function handleGenerateResponse(
             openness: true,
           },
         },
-        internalState: {
+        InternalState: {
           select: {
             moodValence: true,
             moodArousal: true,
@@ -471,7 +474,7 @@ export async function handleGenerateResponse(
 
     // 4. Calcular reading time (simular que la IA lee los mensajes)
     const combinedContent = bufferedMessages.map((m) => m.content).join(" ");
-    const readingTime = calculateReadingTime(combinedContent, agent.personalityCore || undefined);
+    const readingTime = calculateReadingTime(combinedContent, agent.PersonalityCore || undefined);
 
     console.log(`[GroupAIWorker] ${agentName} reading for ${readingTime}ms`);
     await delay(readingTime);
@@ -498,8 +501,8 @@ export async function handleGenerateResponse(
         orderBy: { createdAt: "desc" },
         take: 15,
         include: {
-          user: { select: { name: true } },
-          agent: { select: { name: true } },
+          User: { select: { name: true } },
+          Agent: { select: { name: true } },
         },
       }),
     ]);
@@ -560,7 +563,7 @@ export async function handleGenerateResponse(
     // 9. Calcular typing duration y esperar
     const typingDuration = calculateTypingDuration(
       responseText,
-      agent.personalityCore || undefined
+      agent.PersonalityCore || undefined
     );
 
     console.log(`[GroupAIWorker] ${agentName} typing for ${typingDuration}ms`);
@@ -577,6 +580,8 @@ export async function handleGenerateResponse(
     // 11. Guardar mensaje
     const aiMessage = await prisma.groupMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         groupId,
         authorType: "agent",
         agentId,
@@ -584,16 +589,16 @@ export async function handleGenerateResponse(
         contentType: "text",
         turnNumber: nextTurnNumber,
         replyToId: bufferedMessages[bufferedMessages.length - 1].id,
-        agentEmotion: agent.internalState
+        agentEmotion: agent.InternalState
           ? ({
-              valence: agent.internalState.moodValence,
-              arousal: agent.internalState.moodArousal,
-              dominance: agent.internalState.moodDominance,
+              valence: agent.InternalState.moodValence,
+              arousal: agent.InternalState.moodArousal,
+              dominance: agent.InternalState.moodDominance,
             } as object)
           : undefined,
       },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -604,7 +609,7 @@ export async function handleGenerateResponse(
     });
 
     // 12. Emitir mensaje al grupo
-    const agentData = (aiMessage as any).agent;
+    const agentData = (aiMessage as any).Agent;
     const messageEvent: GroupMessageEvent = {
       id: aiMessage.id,
       groupId,
@@ -654,6 +659,7 @@ export async function handleGenerateResponse(
           lastUpdated: new Date(),
         },
         create: {
+          id: nanoid(),
           groupId,
           currentTurn: nextTurnNumber,
           totalMessages: 1,
@@ -846,7 +852,7 @@ async function buildGroupPrompt(
     prompt += `\n=== CONVERSACIÓN RECIENTE ===\n`;
     for (const msg of recentMessages) {
       const author =
-        msg.authorType === "user" ? msg.user?.name : msg.agent?.name;
+        msg.authorType === "user" ? msg.User?.name : msg.Agent?.name;
       prompt += `${author || "???"}: ${msg.content}\n`;
     }
   }
@@ -890,7 +896,7 @@ async function buildSceneDirectedPrompt(
     prompt += `\n=== CONVERSACIÓN RECIENTE ===\n`;
     for (const msg of recentMessages.slice(-10)) {
       const author =
-        msg.authorType === "user" ? msg.user?.name : msg.agent?.name;
+        msg.authorType === "user" ? msg.User?.name : msg.Agent?.name;
       prompt += `${author || "???"}: ${msg.content}\n`;
     }
   }

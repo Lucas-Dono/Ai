@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
+import { nanoid } from "nanoid";
 
 /**
  * Group Story Engine Service
@@ -36,14 +37,14 @@ export class GroupStoryEngineService {
       const group = await prisma.group.findUnique({
         where: { id: groupId },
         include: {
-          members: {
+          GroupMember: {
             where: { isActive: true, memberType: "agent" },
             include: {
-              agent: {
+              Agent: {
                 select: {
                   id: true,
                   name: true,
-                  personalityCore: true,
+                  PersonalityCore: true,
                 },
               },
             },
@@ -85,10 +86,10 @@ export class GroupStoryEngineService {
    */
   private async generateStoryArc(group: any): Promise<StoryArc> {
     // Get AI personalities for context
-    const aiPersonalities = group.members
+    const aiPersonalities = group.GroupMember
       .map((m: any) => ({
-        name: m.agent?.name,
-        traits: m.agent?.personalityCore?.traits || [],
+        name: m.Agent?.name,
+        traits: m.Agent?.PersonalityCore?.traits || [],
       }))
       .filter((ai: any) => ai.name);
 
@@ -263,7 +264,7 @@ Retorna un JSON con la siguiente estructura:
       const group = await prisma.group.findUnique({
         where: { id: groupId },
         include: {
-          members: {
+          GroupMember: {
             where: { isActive: true, memberType: "agent" },
           },
         },
@@ -292,12 +293,14 @@ Retorna un JSON con la siguiente estructura:
       // Create system message announcing new beat
       await prisma.groupMessage.create({
         data: {
+          id: nanoid(),
           groupId,
           authorType: "user",
           content: `📖 Nuevo capítulo: ${nextBeat.description}`,
           contentType: "system",
           isSystemMessage: true,
           turnNumber: (await prisma.groupMessage.count({ where: { groupId } })) + 1,
+          updatedAt: new Date(),
         },
       });
 
@@ -317,16 +320,16 @@ Retorna un JSON con la siguiente estructura:
       orderBy: { createdAt: "desc" },
       take: 20,
       include: {
-        user: { select: { name: true } },
-        agent: { select: { name: true } },
+        User: { select: { name: true } },
+        Agent: { select: { name: true } },
       },
     });
 
     const venice = getVeniceClient();
     const prompt = `Basado en esta conversación reciente, genera el siguiente beat narrativo:
 
-${recentMessages.reverse().map((m) => {
-  const author = m.authorType === "user" ? m.user?.name : m.agent?.name;
+${recentMessages.reverse().map((m: any) => {
+  const author = m.authorType === "user" ? m.User?.name : m.Agent?.name;
   return `${author}: ${m.content}`;
 }).join("\n")}
 

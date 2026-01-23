@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 /**
  * Mood System Enhancement
@@ -41,6 +42,7 @@ export async function getOrCreateInternalState(agentId: string) {
   if (!state) {
     state = await prisma.internalState.create({
       data: {
+        id: nanoid(),
         agentId,
         currentEmotions: {},
         moodValence: 0.0,

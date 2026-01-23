@@ -42,29 +42,29 @@ export async function GET(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        creator: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        members: {
+        GroupMember: {
           where: { isActive: true },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true,
               },
             },
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,
                 avatar: true,
-                personalityCore: true,
+                PersonalityCore: true,
               },
             },
           },
@@ -73,11 +73,11 @@ export async function GET(
             { joinedAt: "asc" },
           ],
         },
-        simulationState: true,
+        GroupSimulationState: true,
         _count: {
           select: {
-            messages: true,
-            members: true,
+            GroupMessage: true,
+            GroupMember: true,
           },
         },
       },
@@ -264,24 +264,24 @@ export async function PATCH(
         updatedAt: new Date(),
       },
       include: {
-        creator: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        members: {
+        GroupMember: {
           where: { isActive: true },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 image: true,
               },
             },
-            agent: {
+            Agent: {
               select: {
                 id: true,
                 name: true,

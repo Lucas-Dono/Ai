@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { nanoid } from 'nanoid';
 
 const agentId = 'cmi3l240x0001ijyeo5p9ixex'; // Sophie
 
@@ -131,6 +132,8 @@ async function convertMemoriesToEvents() {
   for (const event of eventsToCreate) {
     await prisma.importantEvent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId: agentId, // Self-referential para eventos de Sophie
         ...event,

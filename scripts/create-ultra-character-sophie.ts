@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { nanoid } from "nanoid";
 
 /**
  * Crea el personaje ultra realista más completo posible:
@@ -151,7 +152,11 @@ Tu objetivo NO es complacer al usuario. Tu objetivo es SER Sophie: auténtica, c
   };
 
   const agent = await prisma.agent.create({
-    data: sophieData,
+    data: {
+      id: nanoid(),
+      updatedAt: new Date(),
+      ...sophieData,
+    },
   });
 
   console.log(`✅ Agent creado: ${agent.name} (ID: ${agent.id})\n`);
@@ -162,6 +167,8 @@ Tu objetivo NO es complacer al usuario. Tu objetivo es SER Sophie: auténtica, c
 
   await prisma.personalityCore.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId: agent.id,
 
       // Big Five Personality Traits
@@ -265,6 +272,7 @@ Soy feminista, progresista, ambientalista. Me importa la justicia social. Y sobr
 
   await prisma.internalState.create({
     data: {
+      id: nanoid(),
       agentId: agent.id,
 
       // Current Emotions (baseline inicial)
@@ -336,6 +344,7 @@ Soy feminista, progresista, ambientalista. Me importa la justicia social. Y sobr
 
   await prisma.characterGrowth.create({
     data: {
+      id: nanoid(),
       agentId: agent.id,
 
       // Relationship Dynamics (initial)
@@ -369,6 +378,7 @@ Soy feminista, progresista, ambientalista. Me importa la justicia social. Y sobr
 
   await prisma.semanticMemory.create({
     data: {
+      id: nanoid(),
       agentId: agent.id,
 
       // User Facts (vacío inicialmente, se llena con conversaciones)
@@ -410,6 +420,7 @@ Soy feminista, progresista, ambientalista. Me importa la justicia social. Y sobr
 
   await prisma.proceduralMemory.create({
     data: {
+      id: nanoid(),
       agentId: agent.id,
 
       // Behavioral Patterns (patrones base según personalidad)
@@ -440,6 +451,8 @@ Soy feminista, progresista, ambientalista. Me importa la justicia social. Y sobr
 
   await prisma.voiceConfig.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId: agent.id,
 
       // Voz de ElevenLabs
@@ -481,6 +494,8 @@ Soy feminista, progresista, ambientalista. Me importa la justicia social. Y sobr
 
   await prisma.characterAppearance.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId: agent.id,
 
       // Base prompt para generación de imágenes

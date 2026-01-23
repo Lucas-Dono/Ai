@@ -48,8 +48,8 @@ export async function processInteractionForBond(
     const bond = await prisma.symbolicBond.findUnique({
       where: { id: bondId },
       include: {
-        user: true,
-        agent: true,
+        User: true,
+        Agent: true,
       },
     });
 
@@ -290,8 +290,8 @@ export async function recalculateBondRarityWithQuality(
     const bond = await prisma.symbolicBond.findUnique({
       where: { id: bondId },
       include: {
-        user: true,
-        agent: true,
+        User: true,
+        Agent: true,
       },
     });
 

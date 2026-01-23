@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { nanoid } from "nanoid";
 import { generateToken } from "@/lib/jwt";
 
 const prisma = new PrismaClient();
@@ -133,6 +134,8 @@ async function getOrCreateTestData() {
   if (!user) {
     user = await prisma.user.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         email: "demo@creador-ia.com",
         name: "Usuario Demo",
         plan: "free",
@@ -151,6 +154,8 @@ async function getOrCreateTestData() {
   if (!agent) {
     agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: user.id,
         kind: "companion",
         name: "Luna",
@@ -176,6 +181,8 @@ async function getOrCreateTestData() {
   if (!bond) {
     bond = await prisma.symbolicBond.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: user.id,
         agentId: agent.id,
         affinityLevel: 0,

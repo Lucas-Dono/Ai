@@ -5,6 +5,7 @@ import { z } from "zod";
 import { checkRegisterRateLimit, getClientIp } from "@/lib/auth/rate-limit";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";
 import { sendEmailVerification } from "@/lib/email/auth-emails.service";
+import { nanoid } from "nanoid";
 
 const registerSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -128,6 +129,7 @@ export async function POST(req: Request) {
     try {
       user = await prisma.user.create({
         data: {
+          id: nanoid(),
           email,
           password: hashedPassword,
           name,
@@ -137,6 +139,7 @@ export async function POST(req: Request) {
           ageVerified: true,
           isAdult: isAdult,
           ageVerifiedAt: new Date(),
+          updatedAt: new Date(),
         },
         select: {
           id: true,

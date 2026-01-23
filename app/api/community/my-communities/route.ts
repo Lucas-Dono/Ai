@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         isBanned: false, // Excluir comunidades donde está baneado
       },
       include: {
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,
@@ -39,14 +39,14 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: {
-        community: {
+        Community: {
           name: 'asc',
         },
       },
     });
 
     // Mapear a formato simple
-    const communities = memberships.map(m => m.community);
+    const communities = memberships.map(m => m.Community);
 
     return NextResponse.json({ communities });
   } catch (error: any) {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
     // Store feedback in database
     await prisma.genreDetectionFeedback.create({
       data: {
+        id: nanoid(),
         sessionId,
         searchResultId,
         detectedGenre,

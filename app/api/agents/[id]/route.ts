@@ -17,14 +17,9 @@ export const GET = withOwnership(
       const agent = await prisma.agent.findUnique({
         where: { id: resource.id },
         include: {
-          messagesAsAgent: {
+          Message: {
             orderBy: { createdAt: "asc" },
             take: 50,
-          },
-          _count: {
-            select: {
-              reviews: true,
-            },
           },
         },
       });
@@ -34,12 +29,16 @@ export const GET = withOwnership(
         return errorResponse("Agent not found", 404);
       }
 
+      // Get review count separately
+      const reviewCount = await prisma.review.count({
+        where: { agentId: resource.id },
+      });
+
       // Mapear agent para incluir isPublic y reviewCount
-      const { _count, ...agentData } = agent;
       const mappedAgent = {
-        ...agentData,
+        ...agent,
         isPublic: agent.visibility === 'public',
-        reviewCount: _count?.reviews || 0,
+        reviewCount,
       };
 
       log.info({ agentId: resource.id, visibility: agent.visibility }, 'Agent details fetched successfully');

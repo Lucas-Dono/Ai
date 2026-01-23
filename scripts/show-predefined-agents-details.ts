@@ -8,7 +8,7 @@ async function main() {
       }
     },
     include: {
-      personalityCore: true,
+      PersonalityCore: true,
     },
     orderBy: {
       createdAt: 'desc'
@@ -69,13 +69,13 @@ async function main() {
     }
 
     // Personality
-    if (agent.personalityCore) {
+    if (agent.PersonalityCore) {
       console.log('🧠 PERSONALITY (BIG FIVE):');
-      console.log(`   Openness: ${agent.personalityCore.openness}/100`);
-      console.log(`   Conscientiousness: ${agent.personalityCore.conscientiousness}/100 ${getConscientiousnessNote(agent.personalityCore.conscientiousness)}`);
-      console.log(`   Extraversion: ${agent.personalityCore.extraversion}/100`);
-      console.log(`   Agreeableness: ${agent.personalityCore.agreeableness}/100`);
-      console.log(`   Neuroticism: ${agent.personalityCore.neuroticism}/100`);
+      console.log(`   Openness: ${agent.PersonalityCore.openness}/100`);
+      console.log(`   Conscientiousness: ${agent.PersonalityCore.conscientiousness}/100 ${getConscientiousnessNote(agent.PersonalityCore.conscientiousness)}`);
+      console.log(`   Extraversion: ${agent.PersonalityCore.extraversion}/100`);
+      console.log(`   Agreeableness: ${agent.PersonalityCore.agreeableness}/100`);
+      console.log(`   Neuroticism: ${agent.PersonalityCore.neuroticism}/100`);
       console.log();
     }
 

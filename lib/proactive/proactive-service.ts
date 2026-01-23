@@ -10,6 +10,7 @@ import { createLogger } from '@/lib/logger';
 import { detectTriggers, updateLastProactiveMessage } from './trigger-detector';
 import { generateProactiveMessage } from './message-generator';
 import type { ProactiveTrigger } from '@/lib/proactive-behavior/trigger-detector';
+import { nanoid } from 'nanoid';
 
 const log = createLogger('ProactiveService');
 
@@ -47,7 +48,7 @@ export async function processAllAgents(): Promise<ProcessAllAgentsResult> {
         enabled: true,
       },
       include: {
-        agent: true,
+        Agent: true,
       },
     });
 
@@ -125,6 +126,8 @@ export async function processAgent(
     // Save proactive message record
     const proactiveMessage = await prisma.proactiveMessage.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         userId,
         triggerType: trigger.type,
@@ -137,6 +140,7 @@ export async function processAgent(
     // Create actual message in chat
     const message = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         role: 'assistant',
         content: messageContent,

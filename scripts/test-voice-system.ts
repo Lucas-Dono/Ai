@@ -12,6 +12,7 @@ import { getVoiceConfig } from "../lib/voice-system/voice-initialization";
 import { getEmotionalSystemOrchestrator } from "../lib/emotional-system/orchestrator";
 import fs from "fs";
 import path from "path";
+import { nanoid } from "nanoid";
 
 const prisma = new PrismaClient();
 
@@ -32,6 +33,8 @@ async function testVoiceSystem() {
     if (!testUser) {
       testUser = await prisma.user.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           email: "test-voice@example.com",
           name: "Test User (Voice System)",
         },
@@ -191,21 +194,21 @@ async function testVoiceSystem() {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        personalityCore: true,
+        PersonalityCore: true,
       },
     });
 
-    if (agent?.personalityCore) {
+    if (agent?.PersonalityCore) {
       console.log(`   ✅ Personality traits:`);
-      console.log(`      Openness: ${agent.personalityCore.openness}/100`);
-      console.log(`      Conscientiousness: ${agent.personalityCore.conscientiousness}/100`);
-      console.log(`      Extraversion: ${agent.personalityCore.extraversion}/100`);
-      console.log(`      Agreeableness: ${agent.personalityCore.agreeableness}/100`);
-      console.log(`      Neuroticism: ${agent.personalityCore.neuroticism}/100\n`);
+      console.log(`      Openness: ${agent.PersonalityCore.openness}/100`);
+      console.log(`      Conscientiousness: ${agent.PersonalityCore.conscientiousness}/100`);
+      console.log(`      Extraversion: ${agent.PersonalityCore.extraversion}/100`);
+      console.log(`      Agreeableness: ${agent.PersonalityCore.agreeableness}/100`);
+      console.log(`      Neuroticism: ${agent.PersonalityCore.neuroticism}/100\n`);
 
       console.log(`   🎯 Mapped to voice:`);
-      console.log(`      High agreeableness (${agent.personalityCore.agreeableness}) → Warm, empathetic voice`);
-      console.log(`      High extraversion (${agent.personalityCore.extraversion}) → Energetic, expressive voice`);
+      console.log(`      High agreeableness (${agent.PersonalityCore.agreeableness}) → Warm, empathetic voice`);
+      console.log(`      High extraversion (${agent.PersonalityCore.extraversion}) → Energetic, expressive voice`);
     }
 
     const totalTime = Date.now() - startTime;

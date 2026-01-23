@@ -6,6 +6,7 @@
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { getUserProfile, getUserInteractionHistory } from "./tracker";
+import { nanoid } from "nanoid";
 
 export interface Recommendation {
   itemType: "agent" | "world";
@@ -113,7 +114,7 @@ async function generateCandidates(userId: string): Promise<{
     },
     take: 30,
     include: {
-      _count: { select: { reviews: true } },
+      _count: { select: { Review: true } },
     },
   });
 
@@ -128,7 +129,7 @@ async function generateCandidates(userId: string): Promise<{
     orderBy: { rating: "desc" },
     take: 20,
     include: {
-      _count: { select: { reviews: true } },
+      _count: { select: { Review: true } },
     },
   });
 
@@ -145,7 +146,7 @@ async function generateCandidates(userId: string): Promise<{
     orderBy: { createdAt: "desc" },
     take: 15,
     include: {
-      _count: { select: { reviews: true } },
+      _count: { select: { Review: true } },
     },
   });
 
@@ -155,7 +156,7 @@ async function generateCandidates(userId: string): Promise<{
       id: { in: collaborativeAgentIds },
     },
     include: {
-      _count: { select: { reviews: true } },
+      _count: { select: { Review: true } },
     },
   });
 
@@ -362,6 +363,7 @@ export async function generateRecommendations(
   // Guardar en cache (24 horas)
   await prisma.recommendationCache.create({
     data: {
+      id: nanoid(),
       userId,
       recommendations: recommendations as any,
       algorithm: "hybrid",

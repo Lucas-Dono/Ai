@@ -95,7 +95,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         content: true,
         upvotes: true,
         createdAt: true,
-        post: {
+        CommunityPost: {
           select: {
             id: true,
             title: true,

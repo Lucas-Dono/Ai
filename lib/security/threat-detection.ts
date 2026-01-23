@@ -5,6 +5,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -289,15 +290,16 @@ export async function logThreat(
 
     await prisma.threatDetection.create({
       data: {
-        fingerprintId,
+        id: nanoid(),
+        fingerprintId: fingerprintId || null,
         threatType: detection.threatType,
         severity: detection.severity,
         confidence: detection.confidence,
         attackVector: detection.attackVector,
         method: request.method,
         path: url.pathname,
-        query: url.search || undefined,
-        payload,
+        query: url.search || null,
+        payload: payload || null,
         headers,
         ipAddress,
         userAgent,
@@ -305,7 +307,7 @@ export async function logThreat(
         ruleTriggered: detection.threatType,
         indicators: detection.indicators,
         blocked: detection.blocked || false,
-        response: detection.response,
+        response: detection.response || null,
         tarpitDelay: detection.tarpitDelay || 0,
         honeypotUsed: detection.honeypotUsed || false,
       },

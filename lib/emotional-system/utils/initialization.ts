@@ -5,6 +5,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { BigFiveTraits, CoreValue, MoralSchema, Goal } from "../types";
 import { initializeVoiceConfig } from "../../voice-system/voice-initialization";
 import { getVisualGenerationService } from "../../visual-system/visual-generation-service";
@@ -76,6 +77,8 @@ export async function initializeEmotionalSystem(params: CharacterInitParams): Pr
 
     await prisma.personalityCore.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         openness: defaultPersonality.openness,
         conscientiousness: defaultPersonality.conscientiousness,
@@ -107,6 +110,7 @@ export async function initializeEmotionalSystem(params: CharacterInitParams): Pr
 
     await prisma.internalState.create({
       data: {
+        id: nanoid(),
         agentId,
         currentEmotions: baselineEmotions,
         moodValence: 0.0,
@@ -126,6 +130,7 @@ export async function initializeEmotionalSystem(params: CharacterInitParams): Pr
     // 3. Crear SemanticMemory
     await prisma.semanticMemory.create({
       data: {
+        id: nanoid(),
         agentId,
         userFacts: {},
         userPreferences: {},
@@ -136,6 +141,7 @@ export async function initializeEmotionalSystem(params: CharacterInitParams): Pr
     // 4. Crear ProceduralMemory
     await prisma.proceduralMemory.create({
       data: {
+        id: nanoid(),
         agentId,
         behavioralPatterns: {},
         userTriggers: {},
@@ -146,6 +152,7 @@ export async function initializeEmotionalSystem(params: CharacterInitParams): Pr
     // 5. Crear CharacterGrowth
     await prisma.characterGrowth.create({
       data: {
+        id: nanoid(),
         agentId,
         trustLevel: 0.4,
         intimacyLevel: 0.3,
@@ -277,6 +284,8 @@ export async function createEmotionalAgent(params: {
   // Crear agente base
   const agent = await prisma.agent.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId,
       name,
       kind,

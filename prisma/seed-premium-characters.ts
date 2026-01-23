@@ -6,6 +6,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -1365,6 +1366,7 @@ async function seedPremiumCharacters() {
       email: 'system@platform.internal',
       name: 'Sistema',
       plan: 'ultra', // Sistema tiene acceso completo
+      updatedAt: new Date(),
     },
   });
 
@@ -1379,9 +1381,11 @@ async function seedPremiumCharacters() {
         where: { id: char.id },
         update: {
           ...char,
+          updatedAt: new Date(),
         },
         create: {
           ...char,
+          updatedAt: new Date(),
         },
       });
 
@@ -1400,9 +1404,11 @@ async function seedPremiumCharacters() {
         where: { id: char.id },
         update: {
           ...char,
+          updatedAt: new Date(),
         },
         create: {
           ...char,
+          updatedAt: new Date(),
         },
       });
 

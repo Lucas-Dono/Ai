@@ -20,6 +20,7 @@ import { getLLMProvider } from '@/lib/llm/provider';
 import { getPromptForStage } from '@/lib/relationship/prompt-generator';
 import { buildPeopleContext } from '@/lib/people/person-interceptor';
 import { createLogger } from '@/lib/logger';
+import { nanoid } from 'nanoid';
 import type { ProactiveTrigger } from '@/lib/proactive-behavior/trigger-detector';
 import type { ProactiveContext } from '@/lib/proactive-behavior/context-builder';
 import { contextBuilder } from '@/lib/proactive-behavior/context-builder';
@@ -327,7 +328,7 @@ async function generateWithLLM(
   const agent = await prisma.agent.findUnique({
     where: { id: context.trigger.context.unresolvedTopic?.agentId || '' },
     include: {
-      personalityCore: true,
+      PersonalityCore: true,
     },
   });
 
@@ -493,6 +494,7 @@ async function trackProactiveMessage(
   // Esto se usa para evitar cooldown y para analytics
   await prisma.message.create({
     data: {
+      id: nanoid(),
       agentId,
       userId,
       role: 'assistant',

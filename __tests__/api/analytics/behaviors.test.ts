@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { BehaviorType } from "@prisma/client";
 import { GET } from "@/app/api/analytics/behaviors/route";
 import { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
 
 // Mock next-auth
 vi.mock("@/lib/auth", () => ({
@@ -30,14 +31,14 @@ describe("GET /api/analytics/behaviors", () => {
 
     if (existingUser) {
       await prisma.behaviorTriggerLog.deleteMany({
-        where: { message: { userId: existingUser.id } },
+        where: { Message: { userId: existingUser.id } },
       });
       await prisma.message.deleteMany({ where: { userId: existingUser.id } });
       await prisma.behaviorProgressionState.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.behaviorProfile.deleteMany({
-        where: { agent: { userId: existingUser.id } },
+        where: { Agent: { userId: existingUser.id } },
       });
       await prisma.agent.deleteMany({ where: { userId: existingUser.id } });
       await prisma.user.delete({ where: { id: existingUser.id } });
@@ -49,6 +50,7 @@ describe("GET /api/analytics/behaviors", () => {
         id: "test-user-analytics",
         email: "test-analytics@test.com",
         name: "Test User Analytics",
+        updatedAt: new Date(),
       },
     });
     testUserId = testUser.id;
@@ -56,6 +58,7 @@ describe("GET /api/analytics/behaviors", () => {
     // Create agent 1
     const agent1 = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "companion",
         name: "Agent 1",
@@ -64,6 +67,7 @@ describe("GET /api/analytics/behaviors", () => {
         systemPrompt: "Test",
         profile: { age: 25 },
         nsfwMode: true,
+        updatedAt: new Date(),
       },
     });
     testAgent1Id = agent1.id;
@@ -71,6 +75,7 @@ describe("GET /api/analytics/behaviors", () => {
     // Create agent 2
     const agent2 = await prisma.agent.create({
       data: {
+        id: nanoid(),
         userId: testUserId,
         kind: "assistant",
         name: "Agent 2",
@@ -79,6 +84,7 @@ describe("GET /api/analytics/behaviors", () => {
         systemPrompt: "Test",
         profile: { age: 30 },
         nsfwMode: false,
+        updatedAt: new Date(),
       },
     });
     testAgent2Id = agent2.id;
@@ -86,6 +92,7 @@ describe("GET /api/analytics/behaviors", () => {
     // Create behaviors for agent 1
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgent1Id,
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
         baseIntensity: 0.6,
@@ -95,11 +102,13 @@ describe("GET /api/analytics/behaviors", () => {
         volatility: 0.5,
         thresholdForDisplay: 0.3,
         triggers: [],
+        updatedAt: new Date(),
       },
     });
 
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgent1Id,
         behaviorType: BehaviorType.ANXIOUS_ATTACHMENT,
         baseIntensity: 0.5,
@@ -109,12 +118,14 @@ describe("GET /api/analytics/behaviors", () => {
         volatility: 0.5,
         thresholdForDisplay: 0.3,
         triggers: [],
+        updatedAt: new Date(),
       },
     });
 
     // Create behavior for agent 2
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
         agentId: testAgent2Id,
         behaviorType: BehaviorType.BORDERLINE_PD,
         baseIntensity: 0.4,
@@ -124,12 +135,14 @@ describe("GET /api/analytics/behaviors", () => {
         volatility: 0.5,
         thresholdForDisplay: 0.3,
         triggers: [],
+        updatedAt: new Date(),
       },
     });
 
     // Create messages and triggers
     const msg1 = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: testAgent1Id,
         userId: testUserId,
         content: "Test message 1",
@@ -139,6 +152,7 @@ describe("GET /api/analytics/behaviors", () => {
 
     const msg2 = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId: testAgent2Id,
         userId: testUserId,
         content: "Test message 2",
@@ -148,6 +162,7 @@ describe("GET /api/analytics/behaviors", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: msg1.id,
         triggerType: "abandonment_signal",
         behaviorType: BehaviorType.YANDERE_OBSESSIVE,
@@ -158,6 +173,7 @@ describe("GET /api/analytics/behaviors", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: msg1.id,
         triggerType: "criticism",
         behaviorType: BehaviorType.ANXIOUS_ATTACHMENT,
@@ -168,6 +184,7 @@ describe("GET /api/analytics/behaviors", () => {
 
     await prisma.behaviorTriggerLog.create({
       data: {
+        id: nanoid(),
         messageId: msg2.id,
         triggerType: "abandonment_signal",
         behaviorType: BehaviorType.BORDERLINE_PD,
@@ -181,7 +198,7 @@ describe("GET /api/analytics/behaviors", () => {
     if (testAgent1Id || testAgent2Id) {
       await prisma.behaviorTriggerLog.deleteMany({
         where: {
-          message: {
+          Message: {
             agentId: { in: [testAgent1Id, testAgent2Id].filter(Boolean) },
           },
         },

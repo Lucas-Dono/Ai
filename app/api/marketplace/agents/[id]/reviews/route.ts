@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export async function GET(
   req: NextRequest,
@@ -42,6 +43,8 @@ export async function POST(
       agentId_userId: { agentId: id, userId: user.id },
     },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId: id,
       userId: user.id,
       rating,

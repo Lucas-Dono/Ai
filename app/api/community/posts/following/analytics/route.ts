@@ -39,9 +39,9 @@ export async function GET(request: NextRequest) {
     const followedPosts = await prisma.postFollower.findMany({
       where: { userId },
       include: {
-        post: {
+        CommunityPost: {
           include: {
-            community: {
+            Community: {
               select: { name: true }
             }
           }
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     // Engagement por tipo de post
     const engagementByTypeMap: Record<string, number> = {};
     followedPosts.forEach(follow => {
-      const type = follow.post.type;
+      const type = follow.CommunityPost.type;
       engagementByTypeMap[type] = (engagementByTypeMap[type] || 0) + 1;
     });
 
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     // Engagement por comunidad
     const engagementByCommunityMap: Record<string, number> = {};
     followedPosts.forEach(follow => {
-      const communityName = follow.post.community?.name || 'Sin comunidad';
+      const communityName = follow.CommunityPost.Community?.name || 'Sin comunidad';
       engagementByCommunityMap[communityName] = (engagementByCommunityMap[communityName] || 0) + 1;
     });
 
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     // Engagement por tag
     const engagementByTagMap: Record<string, number> = {};
     followedPosts.forEach(follow => {
-      const tags = Array.isArray(follow.post.tags) ? follow.post.tags : [];
+      const tags = Array.isArray(follow.CommunityPost.tags) ? follow.CommunityPost.tags : [];
       tags.forEach((tag) => {
         if (typeof tag === 'string') {
           engagementByTagMap[tag] = (engagementByTagMap[tag] || 0) + 1;
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
     });
 
     const totalEngagement = followedPosts.reduce((sum, follow) => {
-      return sum + follow.post.upvotes + follow.post.commentCount;
+      return sum + follow.CommunityPost.upvotes + follow.CommunityPost.commentCount;
     }, 0);
 
     return NextResponse.json({
@@ -189,8 +189,8 @@ async function generateActivityTimeline(
           gte: date,
           lt: nextDate
         },
-        post: {
-          followers: {
+        CommunityPost: {
+          PostFollower: {
             some: { userId }
           }
         }

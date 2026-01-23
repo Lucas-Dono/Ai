@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { getLLMProvider } from "@/lib/llm/provider";
 import type { UserTier } from "./types";
 
@@ -150,12 +151,14 @@ export async function extractAndStoreSemanticFacts(
   await prisma.semanticMemory.upsert({
     where: { agentId },
     create: {
+      id: nanoid(),
       agentId,
       userFacts: allFacts,
       userPreferences: {},
     },
     update: {
       userFacts: allFacts,
+      lastUpdated: new Date(),
     },
   });
 
@@ -284,6 +287,8 @@ async function getOrCreateSummary(
   // Guardar en DB para reutilizar
   await prisma.conversationSummary.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId,
       userId: userId || null,
       summary,

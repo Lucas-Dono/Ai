@@ -87,8 +87,8 @@ export class ContextBuilder {
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        personalityCore: true,
-        user: {
+        PersonalityCore: true,
+        User: {
           select: { name: true },
         },
       },
@@ -139,10 +139,10 @@ export class ContextBuilder {
 
     return {
       agentName: agent.name,
-      agentPersonality: agent.personalityCore
-        ? `openness:${agent.personalityCore.openness} extraversion:${agent.personalityCore.extraversion}`
+      agentPersonality: agent.PersonalityCore
+        ? `openness:${agent.PersonalityCore.openness} extraversion:${agent.PersonalityCore.extraversion}`
         : 'friendly',
-      userName: agent.user?.name || undefined,
+      userName: agent.User?.name || undefined,
 
       relationshipStage,
       daysTogether,

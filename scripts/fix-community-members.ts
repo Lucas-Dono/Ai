@@ -3,6 +3,7 @@
  * y asegurar que los owners estén agregados como miembros
  */
 
+import { nanoid } from 'nanoid';
 import { prisma } from '../lib/prisma';
 
 async function fixCommunityMembers() {
@@ -10,24 +11,25 @@ async function fixCommunityMembers() {
 
   const communities = await prisma.community.findMany({
     include: {
-      members: true,
-      owner: true,
+      CommunityMember: true,
+      User: true,
     },
   });
 
   for (const community of communities) {
     console.log(`📋 Comunidad: ${community.name} (${community.slug})`);
-    console.log(`   Owner: ${community.owner.name}`);
-    console.log(`   Miembros actuales: ${community.members.length}`);
+    console.log(`   Owner: ${community.User.name}`);
+    console.log(`   Miembros actuales: ${community.CommunityMember.length}`);
     console.log(`   Contador: ${community.memberCount}`);
 
     // Verificar si el owner es miembro
-    const ownerIsMember = community.members.some(m => m.userId === community.ownerId);
+    const ownerIsMember = community.CommunityMember.some((m: any) => m.userId === community.ownerId);
 
     if (!ownerIsMember) {
       console.log('   ⚠️  Owner no es miembro, agregando...');
       await prisma.communityMember.create({
         data: {
+          id: nanoid(),
           communityId: community.id,
           userId: community.ownerId,
           role: 'owner',
@@ -40,7 +42,7 @@ async function fixCommunityMembers() {
     }
 
     // Actualizar contador
-    const realCount = ownerIsMember ? community.members.length : community.members.length + 1;
+    const realCount = ownerIsMember ? community.CommunityMember.length : community.CommunityMember.length + 1;
 
     if (community.memberCount !== realCount) {
       console.log(`   📊 Actualizando contador: ${community.memberCount} → ${realCount}`);

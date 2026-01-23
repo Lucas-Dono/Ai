@@ -116,9 +116,9 @@ class RoleAssigner {
     }
 
     // Factor 2: Participación reciente (dar oportunidad a los callados)
-    const avgParticipation =
-      aiMembers.reduce((sum, ai) => sum + ai.recentParticipation, 0) /
-      aiMembers.length;
+    // Note: We use recentMessages to estimate participation if not available
+    const totalParticipation = recentMessages.length || 1;
+    const avgParticipation = totalParticipation / (recentMessages.length ? 5 : 1);
 
     if (agent.recentParticipation < avgParticipation * 0.5) {
       score += 5; // Bonus para IAs calladas

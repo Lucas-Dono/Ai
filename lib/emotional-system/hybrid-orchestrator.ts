@@ -20,6 +20,7 @@ import { DyadCalculator, DyadResult } from "./modules/emotion/dyad-calculator";
 import { EmotionalSystemOrchestrator } from "./orchestrator";
 import { ResponseGenerationOutput } from "./types";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export interface HybridProcessingResult {
   // Estado emocional unificado (Plutchik)
@@ -115,7 +116,8 @@ export class HybridEmotionalOrchestrator {
 
       internalState = await prisma.internalState.create({
         data: {
-          agent: { connect: { id: agentId } },
+          id: nanoid(),
+          agentId,
           currentEmotions: neutralState as any,
           moodValence: 0.0,
           moodArousal: 0.5,

@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { getFastSDLocalClient } from "@/lib/visual-system/fastsd-local-client";
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
-      include: { fastsdInstallation: true },
+      include: { FastSDInstallation: true },
     });
 
     if (!dbUser) {
@@ -35,10 +36,10 @@ export async function GET(request: NextRequest) {
     const systemInfo = await fastsd.getSystemInfo();
 
     // Actualizar registro en BD si es necesario
-    if (dbUser.fastsdInstallation) {
+    if (dbUser.FastSDInstallation) {
       if (
-        systemInfo.installed !== dbUser.fastsdInstallation.installed ||
-        systemInfo.running !== dbUser.fastsdInstallation.serverRunning
+        systemInfo.installed !== dbUser.FastSDInstallation.installed ||
+        systemInfo.running !== dbUser.FastSDInstallation.serverRunning
       ) {
         await prisma.fastSDInstallation.update({
           where: { userId: dbUser.id },
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
       version: systemInfo.version,
       installPath: systemInfo.installPath,
       availableModels: systemInfo.availableModels,
-      dbRecord: dbUser.fastsdInstallation,
+      dbRecord: dbUser.FastSDInstallation,
     });
   } catch (error: any) {
     console.error("[FastSD Install API] Error:", error);
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     const dbUser = await prisma.user.findUnique({
       where: { email: user.email },
-      include: { fastsdInstallation: true },
+      include: { FastSDInstallation: true },
     });
 
     if (!dbUser) {
@@ -101,11 +102,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear o actualizar registro de instalación
-    let installation = dbUser.fastsdInstallation;
+    let installation = dbUser.FastSDInstallation;
 
     if (!installation) {
       installation = await prisma.fastSDInstallation.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           userId: dbUser.id,
           userApprovedInstallation: true,
           installationRequestedAt: new Date(),

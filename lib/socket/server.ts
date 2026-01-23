@@ -21,6 +21,7 @@ import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { createMemoryManager } from "@/lib/memory/manager";
 import { warmupQwenModel } from "@/lib/memory/qwen-embeddings";
+import { nanoid } from "nanoid";
 
 type SocketServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 type AuthenticatedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -348,6 +349,7 @@ async function handleChatMessage(
   // Save user message
   const userMessage = await prisma.message.create({
     data: {
+      id: nanoid(),
       agentId,
       userId,
       role: "user",
@@ -378,6 +380,7 @@ async function handleChatMessage(
   if (!relation) {
     relation = await prisma.relation.create({
       data: {
+        id: nanoid(),
         subjectId: agentId,
         targetId: userId,
         targetType: "user",
@@ -386,6 +389,7 @@ async function handleChatMessage(
         respect: 0.5,
         privateState: { love: 0, curiosity: 0 },
         visibleState: { trust: 0.5, affinity: 0.5, respect: 0.5 },
+        updatedAt: new Date(),
       },
     });
   }
@@ -514,6 +518,7 @@ async function handleChatMessage(
     // Save assistant message
     const assistantMessage = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         role: "assistant",
         content: fullResponse,

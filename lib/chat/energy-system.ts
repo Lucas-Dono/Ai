@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import type { EnergyState, UserTier } from "./types";
 import { TIER_LIMITS } from "./tier-limits";
 
@@ -34,6 +35,8 @@ export async function getEnergyState(agentId: string, userId: string): Promise<E
     // Crear nuevo estado
     energyState = await prisma.agentEnergyState.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId,
         current: 100,
         max: 100,

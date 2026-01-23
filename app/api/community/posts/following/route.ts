@@ -99,14 +99,14 @@ export async function GET(request: NextRequest) {
     const posts = await prisma.communityPost.findMany({
       where,
       include: {
-        author: {
+        User: {
           select: {
             id: true,
             name: true,
             image: true
           }
         },
-        community: {
+        Community: {
           select: {
             id: true,
             name: true,

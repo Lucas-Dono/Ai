@@ -53,7 +53,7 @@ export async function GET(request: NextRequest, { params }: Params) {
         status: "active",
       },
       include: {
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -98,9 +98,9 @@ export async function GET(request: NextRequest, { params }: Params) {
       durationDays: bond.durationDays,
       affinityLevel: bond.affinityLevel,
       agent: {
-        id: bond.agent.id,
-        name: bond.agent.name,
-        avatar: bond.agent.avatar,
+        id: bond.Agent.id,
+        name: bond.Agent.name,
+        avatar: bond.Agent.avatar,
       },
     }));
 

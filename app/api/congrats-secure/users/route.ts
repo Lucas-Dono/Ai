@@ -62,8 +62,8 @@ export const GET = withAdminAuth(async (request, { admin }) => {
           updatedAt: true,
           _count: {
             select: {
-              agents: true,
-              communityPosts: true
+              Agent: true,
+              CommunityPost: true
             }
           }
         },

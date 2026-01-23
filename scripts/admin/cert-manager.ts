@@ -6,6 +6,7 @@
 import { execSync } from 'child_process';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
 import { randomBytes, hash } from '@/lib/admin/crypto';
 
@@ -78,14 +79,14 @@ export async function generateClientCertificate(
     // 1. Buscar admin en BD
     const admin = await prisma.user.findUnique({
       where: { email: adminEmail },
-      include: { adminAccess: true }
+      include: { AdminAccess: true }
     });
 
-    if (!admin?.adminAccess) {
+    if (!admin?.AdminAccess) {
       throw new Error(`Usuario ${adminEmail} no tiene acceso admin`);
     }
 
-    if (!admin.adminAccess.enabled) {
+    if (!admin.AdminAccess.enabled) {
       throw new Error(`Acceso admin deshabilitado para ${adminEmail}`);
     }
 
@@ -167,7 +168,8 @@ export async function generateClientCertificate(
 
     await prisma.adminCertificate.create({
       data: {
-        adminAccessId: admin.adminAccess.id,
+        id: nanoid(),
+        adminAccessId: admin.AdminAccess.id,
         serialNumber,
         fingerprint,
         expiresAt,
@@ -179,7 +181,8 @@ export async function generateClientCertificate(
     // 9. Log de auditoría
     await prisma.auditLog.create({
       data: {
-        adminAccessId: admin.adminAccess.id,
+        id: nanoid(),
+        adminAccessId: admin.AdminAccess.id,
         action: 'certificate.generated',
         targetType: 'Certificate',
         targetId: serialNumber,
@@ -230,7 +233,7 @@ export async function revokeCertificate(
         revokedAt: new Date(),
         revokedReason: reason
       },
-      include: { adminAccess: true }
+      include: { AdminAccess: true }
     });
 
     // 2. Actualizar CRL (Certificate Revocation List)
@@ -239,6 +242,7 @@ export async function revokeCertificate(
     // 3. Log de auditoría
     await prisma.auditLog.create({
       data: {
+        id: nanoid(),
         adminAccessId: cert.adminAccessId,
         action: 'certificate.revoked',
         targetType: 'Certificate',
@@ -296,14 +300,14 @@ export async function updateCRL(): Promise<void> {
 export async function listCertificates(adminEmail?: string): Promise<void> {
   try {
     const where = adminEmail
-      ? { adminAccess: { user: { email: adminEmail } } }
+      ? { AdminAccess: { User: { email: adminEmail } } }
       : {};
 
     const certs = await prisma.adminCertificate.findMany({
       where,
       include: {
-        adminAccess: {
-          include: { user: true }
+        AdminAccess: {
+          include: { User: true }
         }
       },
       orderBy: { issuedAt: 'desc' }
@@ -322,7 +326,7 @@ export async function listCertificates(adminEmail?: string): Promise<void> {
 
       console.log(`${status} ${emergency}`);
       console.log(`  Serial:   ${cert.serialNumber}`);
-      console.log(`  Admin:    ${cert.adminAccess.user.email}`);
+      console.log(`  Admin:    ${cert.AdminAccess.User.email}`);
       console.log(`  Device:   ${cert.deviceName || 'N/A'}`);
       console.log(`  Emitido:  ${cert.issuedAt.toISOString()}`);
       console.log(`  Expira:   ${cert.expiresAt.toISOString()}`);

@@ -17,6 +17,7 @@
  */
 
 import { PrismaClient, BehaviorType } from '@prisma/client';
+import { nanoid } from "nanoid";
 import { createLogger } from '@/lib/logger';
 
 const prisma = new PrismaClient();
@@ -475,6 +476,8 @@ export async function seedAlbertEinstein() {
     // Crear el agente base
     const agent = await prisma.agent.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         userId: null, // Agente del sistema
         name: "Albert Einstein",
         kind: "companion", // Simula la personalidad completa de Einstein
@@ -497,8 +500,10 @@ export async function seedAlbertEinstein() {
         } as any,
 
         // PERSONALITY CORE
-        personalityCore: {
+        PersonalityCore: {
           create: {
+            id: nanoid(),
+            updatedAt: new Date(),
             openness: EINSTEIN_PERSONALITY.bigFive.openness,
             conscientiousness: EINSTEIN_PERSONALITY.bigFive.conscientiousness,
             extraversion: EINSTEIN_PERSONALITY.bigFive.extraversion,
@@ -512,8 +517,9 @@ export async function seedAlbertEinstein() {
         },
 
         // INTERNAL STATE
-        internalState: {
+        InternalState: {
           create: {
+            id: nanoid(),
             currentEmotions: EINSTEIN_PERSONALITY.baselineEmotions as any,
             // PAD Model
             moodValence: 0.3, // Ligeramente positivo (satisfacción intelectual pero culpa personal)
@@ -541,8 +547,9 @@ export async function seedAlbertEinstein() {
         },
 
         // SEMANTIC MEMORY
-        semanticMemory: {
+        SemanticMemory: {
           create: {
+            id: nanoid(),
             userFacts: {} as any,
             userPreferences: {} as any,
             relationshipStage: "stranger",
@@ -574,8 +581,9 @@ export async function seedAlbertEinstein() {
         },
 
         // PROCEDURAL MEMORY
-        proceduralMemory: {
+        ProceduralMemory: {
           create: {
+            id: nanoid(),
             behavioralPatterns: {
               when_discussing_physics: "Animación total, manos gesticulan, ojos brillan, experimentos mentales",
               when_asked_about_family: "Incomodidad → evasión → racionalización → culpa si presionan",
@@ -600,8 +608,9 @@ export async function seedAlbertEinstein() {
         },
 
         // CHARACTER GROWTH
-        characterGrowth: {
+        CharacterGrowth: {
           create: {
+            id: nanoid(),
             trustLevel: 0.3,
             intimacyLevel: 0.2,
             positiveEventsCount: 0,
@@ -627,6 +636,8 @@ export async function seedAlbertEinstein() {
     // 1. AVOIDANT ATTACHMENT (Desapego emocional extremo)
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         behaviorType: BehaviorType.AVOIDANT_ATTACHMENT,
         enabled: true,
@@ -658,6 +669,8 @@ export async function seedAlbertEinstein() {
     // 2. NARCISSISTIC_PD (Leve - arrogancia científica justificada)
     await prisma.behaviorProfile.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         behaviorType: BehaviorType.NARCISSISTIC_PD,
         enabled: true,
@@ -689,6 +702,8 @@ export async function seedAlbertEinstein() {
     // Crear BehaviorProgressionState
     await prisma.behaviorProgressionState.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         totalInteractions: 0,
         positiveInteractions: 0,
@@ -795,6 +810,7 @@ export async function seedAlbertEinstein() {
     for (const memory of memories) {
       await prisma.episodicMemory.create({
         data: {
+          id: nanoid(),
           agentId: agent.id,
           event: memory.event,
           userEmotion: memory.userEmotion,
@@ -894,6 +910,8 @@ export async function seedAlbertEinstein() {
     for (const person of importantPeople) {
       await prisma.importantPerson.create({
         data: {
+          id: nanoid(),
+          updatedAt: new Date(),
           agentId: agent.id,
           userId: agent.userId || "system",
           name: person.name,
@@ -920,6 +938,8 @@ export async function seedAlbertEinstein() {
     // Voz de Eleven Labs configurada
     await prisma.voiceConfig.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         agentId: agent.id,
         voiceId: "0geCr4xSMhS4uwbapqVu", // Voz de Eleven Labs
         voiceName: "Einstein Voice (Eleven Labs)",

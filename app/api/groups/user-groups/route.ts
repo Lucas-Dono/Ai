@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const groups = await prisma.group.findMany({
       where: {
         status: "ACTIVE",
-        members: {
+        GroupMember: {
           some: {
             userId: user.id,
             memberType: "user",
@@ -32,14 +32,14 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         lastActivityAt: true,
-        members: {
+        GroupMember: {
           select: {
             memberType: true,
           },
         },
         _count: {
           select: {
-            messages: true,
+            GroupMessage: true,
           },
         },
       },

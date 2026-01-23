@@ -66,7 +66,7 @@ export async function GET(
       take: validatedLimit + 1, // +1 para saber si hay más páginas
       ...(cursor && { cursor: { id: cursor }, skip: 1 }), // Si hay cursor, empezar desde ahí
       include: {
-        message: {
+        Message: {
           select: {
             id: true,
             content: true,
@@ -196,10 +196,10 @@ export async function GET(
         detectedText: trigger.detectedText,
         detectedAt: trigger.createdAt,
         message: {
-          id: trigger.message.id,
-          content: trigger.message.content,
-          createdAt: trigger.message.createdAt,
-          role: trigger.message.role,
+          id: trigger.Message.id,
+          content: trigger.Message.content,
+          createdAt: trigger.Message.createdAt,
+          role: trigger.Message.role,
         },
       })),
       stats,

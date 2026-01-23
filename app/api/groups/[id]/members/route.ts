@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUser } from "@/lib/auth-helper";
 import { atomicCheckGroupUserLimit } from "@/lib/usage/atomic-resource-check";
@@ -46,7 +47,7 @@ export async function GET(
         isActive: true,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
@@ -54,12 +55,12 @@ export async function GET(
             email: true,
           },
         },
-        agent: {
+        Agent: {
           select: {
             id: true,
             name: true,
             avatar: true,
-            personalityCore: true,
+            PersonalityCore: true,
           },
         },
       },
@@ -122,7 +123,7 @@ export async function POST(
     const group = await prisma.group.findUnique({
       where: { id: groupId },
       include: {
-        creator: {
+        User: {
           select: { plan: true },
         },
       },
@@ -135,7 +136,7 @@ export async function POST(
       );
     }
 
-    const creatorPlan = group.creator.plan || "free";
+    const creatorPlan = group.User?.plan || "free";
 
     // 3. Parse request body
     const body = await req.json();
@@ -185,7 +186,7 @@ export async function POST(
             joinedAt: new Date(),
           },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
@@ -211,6 +212,8 @@ export async function POST(
         // 6.2. Crear nuevo miembro
         const member = await tx.groupMember.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             groupId,
             memberType: "user",
             userId: newUserId,
@@ -218,7 +221,7 @@ export async function POST(
             isActive: true,
           },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
@@ -240,6 +243,8 @@ export async function POST(
         const messageCount = await tx.groupMessage.count({ where: { groupId } });
         await tx.groupMessage.create({
           data: {
+            id: nanoid(),
+            updatedAt: new Date(),
             groupId,
             authorType: "user",
             content: `${newUser.name} se unió al grupo`,
