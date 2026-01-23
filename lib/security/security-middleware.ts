@@ -8,6 +8,9 @@
  * - Tarpit
  * - Canary tokens
  * - Alerting
+ *
+ * NOTA: Por defecto usa MVP_SECURITY_CONFIG (todo deshabilitado)
+ * Ver mvp-config.ts para habilitar features según etapa.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,6 +21,7 @@ import { applyTarpit } from './tarpit';
 import { canaryTokenMiddleware } from './canary-tokens';
 import { sendAlert, AlertTemplates } from './alerting';
 import { blockFingerprint } from './fingerprinting';
+import { getSecurityConfig } from './mvp-config';
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -33,15 +37,9 @@ export interface SecurityConfig {
   autoBlockThreshold?: number; // Threat score threshold for auto-block
 }
 
-const DEFAULT_CONFIG: SecurityConfig = {
-  enableFingerprinting: true,
-  enableHoneypots: true,
-  enableTarpit: true,
-  enableCanaryTokens: true,
-  enableThreatDetection: true,
-  autoBlock: true,
-  autoBlockThreshold: 80,
-};
+// DEFAULT: MVP mode (todo deshabilitado)
+// Cambiar en mvp-config.ts cuando lances a producción
+const DEFAULT_CONFIG: SecurityConfig = getSecurityConfig();
 
 /**
  * Middleware principal de seguridad
