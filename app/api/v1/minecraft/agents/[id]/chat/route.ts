@@ -34,6 +34,7 @@ const minecraftChatSchema = z.object({
       'walking',
       'running',
       'trading',
+      'talking',
     ]).optional(),
     nearbyPlayers: z.array(z.string()).optional(), // Lista de usernames
     timeOfDay: z.number().min(0).max(24000).optional(), // Minecraft ticks
