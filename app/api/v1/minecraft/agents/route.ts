@@ -67,7 +67,9 @@ export async function GET(req: NextRequest) {
         InternalState: {
           select: {
             currentEmotions: true,
-            mood: true,
+            moodValence: true,
+            moodArousal: true,
+            moodDominance: true,
           },
         },
       },
