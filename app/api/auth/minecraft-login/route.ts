@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         image: true,
         plan: true,
         password: true,
-        agents: {
+        Agent: {
           select: {
             id: true,
             name: true,
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
         image: user.image,
         plan: user.plan,
       },
-      agents: user.agents.map(agent => ({
+      agents: user.Agent.map(agent => ({
         id: agent.id,
         name: agent.name,
         gender: agent.gender,
