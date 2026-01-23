@@ -3,6 +3,7 @@ package com.blaniel.minecraft.command;
 import com.blaniel.minecraft.BlanielMod;
 import com.blaniel.minecraft.entity.BlanielVillagerEntity;
 import com.blaniel.minecraft.network.BlanielAPIClient;
+import com.blaniel.minecraft.skin.BlanielSkinManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -54,11 +55,13 @@ public class BlanielCommands {
 						.executes(BlanielCommands::setApiUrl)
 					)
 				)
-//				.then(CommandManager.literal("apiKey")
-//					.then(CommandManager.argument("key", StringArgumentType.string())
-//						.executes(BlanielCommands::setApiKey)
-//					)
-//				)
+			)
+			// /blaniel clearcache [agentId]
+			.then(CommandManager.literal("clearcache")
+				.executes(BlanielCommands::clearAllSkinCache)
+				.then(CommandManager.argument("agentId", StringArgumentType.string())
+					.executes(BlanielCommands::clearSkinCache)
+				)
 			)
 		);
 	}
@@ -275,19 +278,35 @@ public class BlanielCommands {
 	}
 
 	/**
-	 * /blaniel config apiKey <key>
+	 * /blaniel clearcache <agentId>
 	 */
-//	private static int setJwtToken(CommandContext<ServerCommandSource> context) {
-//		String key = StringArgumentType.getString(context, "key");
-//		ServerCommandSource source = context.getSource();
-//
-//		BlanielMod.CONFIG.setJwtToken(key);
-//
-//		source.sendFeedback(
-//			() -> Text.literal("§a[Blaniel] §fJWT Token configurada"),
-//			false
-//		);
-//
-//		return 1;
-//	}
+	private static int clearSkinCache(CommandContext<ServerCommandSource> context) {
+		String agentId = StringArgumentType.getString(context, "agentId");
+		ServerCommandSource source = context.getSource();
+
+		BlanielSkinManager.clearCache(agentId);
+
+		source.sendFeedback(
+			() -> Text.literal("§a[Blaniel] §fCaché de skin eliminado para: " + agentId),
+			false
+		);
+
+		return 1;
+	}
+
+	/**
+	 * /blaniel clearcache
+	 */
+	private static int clearAllSkinCache(CommandContext<ServerCommandSource> context) {
+		ServerCommandSource source = context.getSource();
+
+		BlanielSkinManager.clearAllCache();
+
+		source.sendFeedback(
+			() -> Text.literal("§a[Blaniel] §fTodo el caché de skins eliminado"),
+			false
+		);
+
+		return 1;
+	}
 }

@@ -2,6 +2,8 @@ package com.blaniel.minecraft.entity;
 
 import com.blaniel.minecraft.BlanielMod;
 import com.blaniel.minecraft.network.BlanielAPIClient;
+import com.blaniel.minecraft.skin.BlanielSkinManager;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -23,6 +25,9 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	// ID del agente de Blaniel asociado
 	private String blanielAgentId = "";
 	private String blanielAgentName = "Aldeano";
+
+	// GameProfile personalizado para skin custom
+	private GameProfile customGameProfile = null;
 
 	// Cliente de API
 	private final BlanielAPIClient apiClient;
@@ -177,6 +182,11 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 		if (nbt.contains("BlanielAgentName")) {
 			this.blanielAgentName = nbt.getString("BlanielAgentName");
 		}
+
+		// Cargar skin custom si hay agente asignado
+		if (!this.blanielAgentId.isEmpty() && this.getWorld().isClient) {
+			loadCustomSkin();
+		}
 	}
 
 	// Getters y Setters
@@ -186,6 +196,36 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 
 	public void setBlanielAgentId(String blanielAgentId) {
 		this.blanielAgentId = blanielAgentId;
+
+		// Cargar skin custom cuando se asigna un agente
+		if (!blanielAgentId.isEmpty() && this.getWorld().isClient) {
+			loadCustomSkin();
+		}
+	}
+
+	/**
+	 * Cargar skin personalizada del agente desde Blaniel API
+	 */
+	private void loadCustomSkin() {
+		String apiUrl = BlanielMod.CONFIG.getApiUrl();
+		String jwtToken = BlanielMod.CONFIG.getJwtToken();
+
+		if (apiUrl.isEmpty() || jwtToken.isEmpty()) {
+			BlanielMod.LOGGER.warn("No se puede cargar skin: API no configurada");
+			return;
+		}
+
+		BlanielMod.LOGGER.info("Cargando skin para agente: {} ({})", blanielAgentName, blanielAgentId);
+
+		BlanielSkinManager.loadSkin(blanielAgentId, blanielAgentName, apiUrl, jwtToken)
+			.thenAccept(profile -> {
+				this.customGameProfile = profile;
+				BlanielMod.LOGGER.info("Skin cargada exitosamente para: {}", blanielAgentName);
+			})
+			.exceptionally(ex -> {
+				BlanielMod.LOGGER.error("Error cargando skin: {}", ex.getMessage());
+				return null;
+			});
 	}
 
 	public String getBlanielAgentName() {
@@ -194,5 +234,12 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 
 	public void setBlanielAgentName(String blanielAgentName) {
 		this.blanielAgentName = blanielAgentName;
+	}
+
+	/**
+	 * Obtener GameProfile personalizado (para renderer)
+	 */
+	public GameProfile getCustomGameProfile() {
+		return customGameProfile;
 	}
 }
