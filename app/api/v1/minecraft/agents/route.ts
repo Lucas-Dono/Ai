@@ -43,9 +43,13 @@ export async function GET(req: NextRequest) {
     console.log('[Minecraft Agents] User found:', user.id);
 
     // Obtener agentes del usuario con datos mínimos
+    // Incluye: agentes privados del usuario + agentes públicos de la empresa (userId null)
     const agents = await prisma.agent.findMany({
       where: {
-        userId: user.id,
+        OR: [
+          { userId: user.id },      // Agentes privados del usuario
+          { userId: null },          // Agentes públicos de la empresa
+        ],
         // Excluir agentes marcados como no disponibles para Minecraft
         // (opcional: agregar campo isMinecraftEnabled en el futuro)
       },
