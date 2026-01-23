@@ -25,13 +25,16 @@ public class BlanielModClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		BlanielMod.LOGGER.info("========================================");
 		BlanielMod.LOGGER.info("Inicializando Blaniel MC (Cliente)");
+		BlanielMod.LOGGER.info("========================================");
 
 		// Registrar renderer para BlanielVillager
 		EntityRendererRegistry.register(
 			BlanielMod.BLANIEL_VILLAGER,
 			BlanielVillagerRenderer::new
 		);
+		BlanielMod.LOGGER.info("✓ Renderer registrado");
 
 		// Registrar keybinding para abrir login (tecla K)
 		loginKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -40,13 +43,23 @@ public class BlanielModClient implements ClientModInitializer {
 			GLFW.GLFW_KEY_K,
 			"category.blaniel-mc.general"
 		));
+		BlanielMod.LOGGER.info("✓ Keybinding registrado (tecla K)");
 
 		// Listener para cuando se presiona la tecla
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (loginKeyBinding.wasPressed()) {
+				BlanielMod.LOGGER.info("¡Tecla K presionada!");
 				// Solo abrir si no hay ninguna pantalla abierta
 				if (client.currentScreen == null) {
-					client.setScreen(new LoginScreen(null));
+					BlanielMod.LOGGER.info("Abriendo LoginScreen desde keybinding...");
+					try {
+						client.setScreen(new LoginScreen(null));
+						BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente");
+					} catch (Exception e) {
+						BlanielMod.LOGGER.error("✗ Error al abrir LoginScreen: " + e.getMessage(), e);
+					}
+				} else {
+					BlanielMod.LOGGER.info("No se abre LoginScreen porque ya hay una pantalla abierta: " + client.currentScreen.getClass().getSimpleName());
 				}
 			}
 		});
@@ -56,16 +69,28 @@ public class BlanielModClient implements ClientModInitializer {
 			dispatcher.register(ClientCommandManager.literal("blaniel")
 				.then(ClientCommandManager.literal("login")
 					.executes(context -> {
+						BlanielMod.LOGGER.info("Comando /blaniel login ejecutado");
 						// Abrir pantalla de login en el thread principal
 						var client = context.getSource().getClient();
 						client.execute(() -> {
-							client.setScreen(new LoginScreen(null));
+							BlanielMod.LOGGER.info("Abriendo LoginScreen desde comando...");
+							try {
+								client.setScreen(new LoginScreen(null));
+								BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente desde comando");
+							} catch (Exception e) {
+								BlanielMod.LOGGER.error("✗ Error al abrir LoginScreen desde comando: " + e.getMessage(), e);
+							}
 						});
 						context.getSource().sendFeedback(Text.literal("§a[Blaniel] §fAbriendo pantalla de login..."));
 						return Command.SINGLE_SUCCESS;
 					})
 				)
 			);
+			BlanielMod.LOGGER.info("✓ Comando /blaniel login registrado");
 		});
+
+		BlanielMod.LOGGER.info("========================================");
+		BlanielMod.LOGGER.info("✓ Blaniel MC Cliente inicializado");
+		BlanielMod.LOGGER.info("========================================");
 	}
 }

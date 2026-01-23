@@ -27,11 +27,13 @@ public class LoginScreen extends Screen {
 	public LoginScreen(Screen parent) {
 		super(Text.literal("Iniciar Sesión en Blaniel"));
 		this.parent = parent;
+		BlanielMod.LOGGER.info("LoginScreen constructor llamado (parent: " + (parent != null ? parent.getClass().getSimpleName() : "null") + ")");
 	}
 
 	@Override
 	protected void init() {
 		super.init();
+		BlanielMod.LOGGER.info("LoginScreen.init() llamado (width: " + this.width + ", height: " + this.height + ")");
 
 		int centerX = this.width / 2;
 		int startY = this.height / 2 - 60;
