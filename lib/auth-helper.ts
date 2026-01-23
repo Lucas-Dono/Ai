@@ -15,12 +15,14 @@ interface AuthenticatedUser {
 }
 
 /**
- * Obtiene el usuario autenticado desde NextAuth (web) o JWT (mobile)
+ * Obtiene el usuario autenticado desde:
+ * 1. API Key (para integraciones externas como Minecraft)
+ * 2. JWT (mobile)
+ * 3. NextAuth/better-auth (web)
  */
 export async function getAuthenticatedUser(req: NextRequest): Promise<AuthenticatedUser | null> {
   console.log('[AuthHelper] Attempting authentication...');
 
-  // PRIMERO: Intentar autenticación con JWT (mobile) - más rápido y directo
   const authHeader = req.headers.get('Authorization');
   console.log('[AuthHelper] Authorization header:', authHeader ? `${authHeader.substring(0, 30)}...` : 'MISSING');
 
@@ -29,13 +31,12 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
     console.log('[AuthHelper] Extracted token:', token ? `${token.substring(0, 30)}...` : 'NONE');
 
     if (token) {
-      const payload = await verifyToken(token);
-      console.log('[AuthHelper] Token payload:', payload ? `userId: ${payload.userId}` : 'INVALID');
+      // PRIMERO: Intentar con API Key (si empieza con "blnl_")
+      if (token.startsWith('blnl_')) {
+        console.log('[AuthHelper] Detected API Key format');
 
-      if (payload) {
-        // Verificar que el usuario existe en la base de datos
         const user = await prisma.user.findUnique({
-          where: { id: payload.userId },
+          where: { apiKey: token },
           select: {
             id: true,
             email: true,
@@ -45,18 +46,43 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
         });
 
         if (user) {
-          console.log('[AuthHelper] ✅ Authenticated via JWT:', user.email);
+          console.log('[AuthHelper] ✅ Authenticated via API Key:', user.email);
           return user;
         } else {
-          console.log('[AuthHelper] ❌ JWT valid but user not found in database');
+          console.log('[AuthHelper] ❌ API Key not found or invalid');
         }
-      } else {
-        console.log('[AuthHelper] ❌ Token verification failed');
+      }
+      // SEGUNDO: Intentar con JWT (mobile)
+      else {
+        const payload = await verifyToken(token);
+        console.log('[AuthHelper] Token payload:', payload ? `userId: ${payload.userId}` : 'INVALID');
+
+        if (payload) {
+          // Verificar que el usuario existe en la base de datos
+          const user = await prisma.user.findUnique({
+            where: { id: payload.userId },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              plan: true,
+            },
+          });
+
+          if (user) {
+            console.log('[AuthHelper] ✅ Authenticated via JWT:', user.email);
+            return user;
+          } else {
+            console.log('[AuthHelper] ❌ JWT valid but user not found in database');
+          }
+        } else {
+          console.log('[AuthHelper] ❌ Token verification failed');
+        }
       }
     }
   }
 
-  // SEGUNDO: Intentar autenticación con better-auth (web) - solo si no hay JWT
+  // TERCERO: Intentar autenticación con better-auth (web) - solo si no hay API Key/JWT
   try {
     const session = await auth.api.getSession({ headers: req.headers });
     if (session?.user?.id) {
@@ -73,6 +99,6 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
     console.log('[AuthHelper] better-auth failed:', error);
   }
 
-  console.log('[AuthHelper] ❌ Authentication failed - no valid JWT or NextAuth session');
+  console.log('[AuthHelper] ❌ Authentication failed - no valid API Key, JWT, or NextAuth session');
   return null;
 }
