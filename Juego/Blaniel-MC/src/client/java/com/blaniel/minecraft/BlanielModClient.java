@@ -1,11 +1,15 @@
 package com.blaniel.minecraft;
 
+import com.mojang.brigadier.Command;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import com.blaniel.minecraft.BlanielMod;
@@ -29,11 +33,11 @@ public class BlanielModClient implements ClientModInitializer {
 			BlanielVillagerRenderer::new
 		);
 
-		// Registrar keybinding para abrir login (tecla L)
+		// Registrar keybinding para abrir login (tecla K)
 		loginKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 			"key.blaniel-mc.open_login",
 			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_L,
+			GLFW.GLFW_KEY_K,
 			"category.blaniel-mc.general"
 		));
 
@@ -45,6 +49,20 @@ public class BlanielModClient implements ClientModInitializer {
 					client.setScreen(new LoginScreen(null));
 				}
 			}
+		});
+
+		// Registrar comando del cliente para abrir login
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(ClientCommandManager.literal("blaniel")
+				.then(ClientCommandManager.literal("login")
+					.executes(context -> {
+						// Abrir pantalla de login
+						context.getSource().getClient().setScreen(new LoginScreen(null));
+						context.getSource().sendFeedback(Text.literal("§a[Blaniel] §fAbriendo pantalla de login..."));
+						return Command.SINGLE_SUCCESS;
+					})
+				)
+			);
 		});
 	}
 }
