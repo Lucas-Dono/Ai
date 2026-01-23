@@ -506,6 +506,14 @@ export function generateHairLong_02(): string {
       <!-- Volumen -->
       <rect x="40" y="0" width="8" height="2" fill="#909090" class="colorizable-hair"/>
 
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (nuca) cubierta por pelo -->
+      <rect x="48" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Ondas en la nuca -->
+      <rect x="49" y="1" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="50" y="2" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="49" y="3" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="50" y="5" width="4" height="2" fill="#707070" class="colorizable-hair"/>
+
       <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con ondas cayendo -->
       <rect x="32" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
       <!-- Marco superior -->
@@ -583,40 +591,87 @@ export function generateHairLong_02(): string {
 /**
  * Genera sprite de pelo largo (cuerpo/caída) - Tipo 2: Wavy Long Hair
  * Se combina con generateHairLong_02 para pelo completo ondulado
+ * Pelo voluminoso con ondas naturales que se expanden hacia los lados
  */
 export function generateHairLongBody_02(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- BODY_BACK (4x12) at (32,20) - Pelo ondulado cayendo en espalda -->
+      <!-- BODY_BACK (4x12) at (32,20) - Pelo ondulado VOLUMINOSO cayendo en espalda -->
+      <!-- Capa base ancha -->
       <rect x="32" y="20" width="4" height="12" fill="#808080" class="colorizable-hair"/>
-      <!-- Patrón de ondas verticales -->
-      <rect x="32" y="21" width="3" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="33" y="22" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="32" y="23" width="3" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="33" y="25" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="32" y="27" width="3" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="33" y="29" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <!-- Puntas onduladas -->
-      <rect x="32" y="30" width="2" height="1" fill="#606060" class="colorizable-hair"/>
-      <rect x="34" y="31" width="2" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- BODY_RIGHT (4x12) at (16,20) - Lado derecho ondulado -->
-      <rect x="16" y="20" width="4" height="9" fill="#808080" class="colorizable-hair"/>
-      <!-- Ondas -->
+      <!-- Ondas que se expanden hacia los lados (más ancho progresivamente) -->
+      <!-- Fila 1: Conexión con cabeza -->
+      <rect x="31" y="20" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="32" y="20" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+
+      <!-- Fila 2-3: Primera onda (hacia la derecha) -->
+      <rect x="32" y="21" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="21" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="22" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="22" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Fila 4-5: Segunda onda (hacia la izquierda) -->
+      <rect x="31" y="23" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="32" y="23" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="24" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="24" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Fila 6-7: Tercera onda (hacia la derecha) -->
+      <rect x="32" y="25" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="25" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="26" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="26" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Fila 8-9: Cuarta onda (hacia la izquierda) -->
+      <rect x="31" y="27" width="5" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="32" y="27" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="28" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="28" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Fila 10-11: Quinta onda y preparación de puntas -->
+      <rect x="32" y="29" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="32" y="29" width="3" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="32" y="30" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="30" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Puntas irregulares (no rectas) -->
+      <rect x="32" y="31" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="34" y="31" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- BODY_FRONT (8x12) at (20,20) - Pelo cayendo al frente (opcional/transparente) -->
+      <!-- Este pelo cae por delante de los hombros -->
+      <rect x="20" y="20" width="2" height="8" fill="#808080" class="colorizable-hair" opacity="0.8"/>
+      <rect x="21" y="21" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="21" y="23" width="1" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="21" y="25" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="21" y="27" width="1" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <rect x="26" y="20" width="2" height="8" fill="#808080" class="colorizable-hair" opacity="0.8"/>
+      <rect x="26" y="21" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="26" y="23" width="1" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="26" y="25" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="26" y="27" width="1" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- BODY_RIGHT (4x12) at (16,20) - Lado derecho con más volumen -->
+      <rect x="16" y="20" width="4" height="10" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones con ondas -->
+      <rect x="16" y="20" width="3" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="17" y="21" width="2" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="17" y="23" width="2" height="1" fill="#707070" class="colorizable-hair"/>
       <rect x="17" y="25" width="2" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="17" y="27" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="17" y="28" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="17" y="29" width="1" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- BODY_LEFT (4x12) at (28,20) - Lado izquierdo ondulado -->
-      <rect x="28" y="20" width="4" height="9" fill="#808080" class="colorizable-hair"/>
-      <!-- Ondas -->
+      <!-- BODY_LEFT (4x12) at (28,20) - Lado izquierdo con más volumen -->
+      <rect x="28" y="20" width="4" height="10" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones con ondas -->
+      <rect x="29" y="20" width="3" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="29" y="21" width="2" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="29" y="23" width="2" height="1" fill="#707070" class="colorizable-hair"/>
       <rect x="29" y="25" width="2" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="29" y="27" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="30" y="28" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="30" y="29" width="1" height="1" fill="#606060" class="colorizable-hair"/>
     </svg>
   `;
 }
