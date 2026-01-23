@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.blaniel.minecraft.entity.BlanielVillagerEntity;
 import com.blaniel.minecraft.command.BlanielCommands;
 import com.blaniel.minecraft.config.BlanielConfig;
-import com.blaniel.minecraft.skin.BlanielSkinManager;
 
 /**
  * Blaniel Minecraft Integration
@@ -59,9 +58,6 @@ public class BlanielMod implements ModInitializer {
 
 		// Registrar network handlers
 		com.blaniel.minecraft.network.NetworkHandler.registerServerReceivers();
-
-		// Inicializar skin manager
-		BlanielSkinManager.initialize();
 
 		LOGGER.info("Blaniel Minecraft Integration cargado exitosamente");
 	}
