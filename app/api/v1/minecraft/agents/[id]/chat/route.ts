@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getAuthenticatedUser } from '@/lib/auth/session';
+import { verifyToken, extractTokenFromHeader } from '@/lib/jwt';
+import { prisma } from '@/lib/prisma';
 import { MessageService } from '@/lib/services/message.service';
-import { formatZodError } from '@/lib/utils/validation';
-import { canUseResource } from '@/lib/usage/token-limits';
+import { formatZodError } from '@/lib/validation/schemas';
+import { canSendMessage } from '@/lib/usage/token-limits';
 import { trackUsage } from '@/lib/usage/tracker';
 
 /**
@@ -45,9 +46,27 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
+    // Extraer y verificar JWT token
+    const authHeader = req.headers.get('Authorization');
+    const token = extractTokenFromHeader(authHeader);
+
+    if (!token) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
+
+    const tokenData = await verifyToken(token);
+    if (!tokenData) {
+      return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+    }
+
+    // Obtener usuario de la BD
+    const user = await prisma.user.findUnique({
+      where: { id: tokenData.userId },
+      select: { id: true, plan: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
     const agentId = params.id;
@@ -61,7 +80,7 @@ export async function POST(
     const { message, context } = validation.data;
 
     // Rate limiting específico para Minecraft (más restrictivo)
-    const canUse = await canUseResource(user.id, 'minecraft_message', 1);
+    const canUse = await canSendMessage(user.id, user.plan);
     if (!canUse) {
       return NextResponse.json(
         {
@@ -100,8 +119,10 @@ export async function POST(
       },
     });
 
-    // Track usage
-    await trackUsage(user.id, 'minecraft_message', 1);
+    // Track usage (tokens usados en el procesamiento)
+    if (result.usage?.totalTokens) {
+      await trackUsage(user.id, 'message', result.usage.totalTokens);
+    }
 
     // Formato de respuesta optimizado para Minecraft
     return NextResponse.json({

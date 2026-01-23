@@ -90,20 +90,29 @@ public class BlanielModClient implements ClientModInitializer {
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(
             com.blaniel.minecraft.network.NetworkHandler.OPEN_CHAT_PACKET,
             (client, handler, buf, responseSender) -> {
+                BlanielMod.LOGGER.info("OPEN_CHAT_PACKET recibido en cliente!");
+
                 // Leer datos del packet
                 int villagerEntityId = buf.readInt();
                 String agentId = buf.readString();
                 String agentName = buf.readString();
+
+                BlanielMod.LOGGER.info("Datos del packet - Villager ID: " + villagerEntityId + ", Agent: " + agentName);
 
                 // Ejecutar en thread principal del cliente
                 client.execute(() -> {
                     if (client.world != null) {
                         net.minecraft.entity.Entity entity = client.world.getEntityById(villagerEntityId);
                         if (entity instanceof com.blaniel.minecraft.entity.BlanielVillagerEntity) {
+                            BlanielMod.LOGGER.info("Entidad encontrada, abriendo AgentChatScreen...");
                             com.blaniel.minecraft.entity.BlanielVillagerEntity villager =
                                 (com.blaniel.minecraft.entity.BlanielVillagerEntity) entity;
                             client.setScreen(new com.blaniel.minecraft.client.gui.AgentChatScreen(villager));
+                        } else {
+                            BlanielMod.LOGGER.error("Entidad no encontrada o no es BlanielVillagerEntity!");
                         }
+                    } else {
+                        BlanielMod.LOGGER.error("Client world es null!");
                     }
                 });
             }

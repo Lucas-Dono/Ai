@@ -74,9 +74,13 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 				player.sendMessage(Text.literal("§7Abre la UI con tecla K para asignar un agente"), false);
 			} else {
 				// Enviar packet al cliente para abrir GUI
+				BlanielMod.LOGGER.info("Click derecho en aldeano con agente: " + this.blanielAgentName);
+
 				if (player instanceof net.minecraft.server.network.ServerPlayerEntity) {
 					net.minecraft.server.network.ServerPlayerEntity serverPlayer =
 						(net.minecraft.server.network.ServerPlayerEntity) player;
+
+					BlanielMod.LOGGER.info("Enviando OPEN_CHAT_PACKET al cliente...");
 
 					net.minecraft.network.PacketByteBuf byteBuf =
 						net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
@@ -89,6 +93,8 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 						com.blaniel.minecraft.network.NetworkHandler.OPEN_CHAT_PACKET,
 						byteBuf
 					);
+
+					BlanielMod.LOGGER.info("OPEN_CHAT_PACKET enviado exitosamente");
 				}
 			}
 		}
