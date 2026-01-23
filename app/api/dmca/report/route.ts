@@ -16,9 +16,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { logError } from "@/lib/logging/logger";
+import { createLogger } from "@/lib/logging/logger";
 
 export const runtime = "nodejs";
+
+const log = createLogger("DMCAReport");
 
 // ============================================================================
 // VALIDATION SCHEMA
@@ -50,14 +52,14 @@ const DMCAReportSchema = z.object({
   ]),
 
   // Declaración de buena fe
-  goodFaithStatement: z.literal(true, {
-    errorMap: () => ({ message: "Debes declarar que actúas de buena fe" }),
+  goodFaithStatement: z.boolean().refine((val) => val === true, {
+    message: "Debes declarar que actúas de buena fe",
   }),
-  accuracyStatement: z.literal(true, {
-    errorMap: () => ({ message: "Debes declarar bajo pena de perjurio que la información es exacta" }),
+  accuracyStatement: z.boolean().refine((val) => val === true, {
+    message: "Debes declarar bajo pena de perjurio que la información es exacta",
   }),
-  authorizedStatement: z.literal(true, {
-    errorMap: () => ({ message: "Debes declarar que estás autorizado para actuar en nombre del propietario" }),
+  authorizedStatement: z.boolean().refine((val) => val === true, {
+    message: "Debes declarar que estás autorizado para actuar en nombre del propietario",
   }),
 
   // Signature
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Validación fallida",
-          details: validation.error.errors.map((err) => ({
+          details: validation.error.issues.map((err) => ({
             field: err.path.join("."),
             message: err.message,
           })),
@@ -143,7 +145,7 @@ export async function POST(request: NextRequest) {
       estimatedResponseTime: "24-48 horas",
     });
   } catch (error) {
-    logError(console, error, { context: "DMCAReport" });
+    log.error({ err: error, context: "DMCAReport" }, "Error processing DMCA report");
 
     return NextResponse.json(
       {
@@ -203,7 +205,7 @@ export async function GET(request: NextRequest) {
       resolutionNotes: report.resolutionNotes,
     });
   } catch (error) {
-    logError(console, error, { context: "DMCAReportStatus" });
+    log.error({ err: error, context: "DMCAReportStatus" }, "Error fetching DMCA report status");
 
     return NextResponse.json(
       {
