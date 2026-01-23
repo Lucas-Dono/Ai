@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/lib/auth/session';
+import { verifyToken, extractTokenFromHeader } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -16,9 +16,27 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(req: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
+    // Extraer y verificar JWT token
+    const authHeader = req.headers.get('Authorization');
+    const token = extractTokenFromHeader(authHeader);
+
+    if (!token) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
+
+    const tokenData = await verifyToken(token);
+    if (!tokenData) {
+      return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+    }
+
+    // Obtener usuario completo de la BD
+    const user = await prisma.user.findUnique({
+      where: { id: tokenData.userId },
+      select: { id: true, plan: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
     // Obtener agentes del usuario con datos mínimos
@@ -60,14 +78,19 @@ export async function GET(req: NextRequest) {
     });
 
     // Formatear respuesta minimalista
-    const formattedAgents = agents.map((agent) => ({
-      id: agent.id,
-      name: agent.name,
-      gender: agent.gender,
-      age: agent.age,
-      profession: extractProfession(agent.profile),
-      personality: agent.personalityCore
-        ? {
+    const formattedAgents = agents.map((agent) => {
+      // Extraer edad del profile JSON
+      const profile = agent.profile as any;
+      const age = profile?.identidad?.edad || profile?.age || null;
+
+      return {
+        id: agent.id,
+        name: agent.name,
+        gender: agent.gender || 'unknown',
+        age: age,
+        profession: extractProfession(agent.profile),
+        personality: agent.personalityCore
+          ? {
             openness: agent.personalityCore.openness,
             conscientiousness: agent.personalityCore.conscientiousness,
             extraversion: agent.personalityCore.extraversion,
@@ -82,18 +105,19 @@ export async function GET(req: NextRequest) {
             stage: agent.relation[0].stage,
           }
         : null,
-      currentEmotion: agent.internalState?.currentEmotions
-        ? (agent.internalState.currentEmotions as any).primary || 'neutral'
-        : 'neutral',
-      // Datos para skinning en Minecraft
-      appearance: {
-        skinUrl: agent.referenceImageUrl || null,
-        hairColor: extractFromProfile(agent.profile, 'hairColor'),
-        eyeColor: extractFromProfile(agent.profile, 'eyeColor'),
-        height: extractFromProfile(agent.profile, 'height'),
-        build: extractFromProfile(agent.profile, 'build'),
-      },
-    }));
+        currentEmotion: agent.internalState?.currentEmotions
+          ? (agent.internalState.currentEmotions as any).primary || 'neutral'
+          : 'neutral',
+        // Datos para skinning en Minecraft
+        appearance: {
+          skinUrl: agent.referenceImageUrl || null,
+          hairColor: extractFromProfile(agent.profile, 'hairColor'),
+          eyeColor: extractFromProfile(agent.profile, 'eyeColor'),
+          height: extractFromProfile(agent.profile, 'height'),
+          build: extractFromProfile(agent.profile, 'build'),
+        },
+      };
+    });
 
     return NextResponse.json({
       agents: formattedAgents,
