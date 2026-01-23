@@ -39,6 +39,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
+    console.log('[Minecraft Agents] User ID from token:', tokenData.userId);
+    console.log('[Minecraft Agents] User found:', user.id);
+
     // Obtener agentes del usuario con datos mínimos
     const agents = await prisma.agent.findMany({
       where: {
@@ -78,6 +81,21 @@ export async function GET(req: NextRequest) {
       },
       take: user.plan === 'FREE' ? 3 : user.plan === 'PLUS' ? 10 : undefined,
     });
+
+    console.log('[Minecraft Agents] Agents found:', agents.length);
+
+    // Debug: verificar cuántos agentes hay en total
+    const totalAgents = await prisma.agent.count();
+    const userAgents = await prisma.agent.count({ where: { userId: user.id } });
+    console.log('[Minecraft Agents] Total agents in DB:', totalAgents);
+    console.log('[Minecraft Agents] Agents for this user:', userAgents);
+
+    // Mostrar algunos ejemplos de userIds en la BD
+    const sampleAgents = await prisma.agent.findMany({
+      select: { id: true, name: true, userId: true },
+      take: 5,
+    });
+    console.log('[Minecraft Agents] Sample agents:', JSON.stringify(sampleAgents, null, 2));
 
     // Formatear respuesta minimalista
     const formattedAgents = agents.map((agent) => {
