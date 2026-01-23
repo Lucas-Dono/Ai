@@ -58,7 +58,7 @@ export async function GET(
     // Obtener historial de triggers con cursor-based pagination
     const triggerHistory = await prisma.behaviorTriggerLog.findMany({
       where: {
-        message: {
+        Message: {
           agentId,
         },
       },
@@ -92,7 +92,7 @@ export async function GET(
     // Obtener count total de triggers (sin limit) para metadata
     const totalTriggersCount = await prisma.behaviorTriggerLog.count({
       where: {
-        message: {
+        Message: {
           agentId,
         },
       },
@@ -116,7 +116,7 @@ export async function GET(
       const triggersByTypeResults = await prisma.behaviorTriggerLog.groupBy({
         by: ['triggerType'],
         where: {
-          message: {
+          Message: {
             agentId,
           },
         },
@@ -133,7 +133,7 @@ export async function GET(
       const triggersByBehaviorResults = await prisma.behaviorTriggerLog.groupBy({
         by: ['behaviorType'],
         where: {
-          message: {
+          Message: {
             agentId,
           },
         },
@@ -149,7 +149,7 @@ export async function GET(
       // Query 3: Calculate average weight
       const avgWeightResult = await prisma.behaviorTriggerLog.aggregate({
         where: {
-          message: {
+          Message: {
             agentId,
           },
         },
