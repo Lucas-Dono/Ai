@@ -38,11 +38,11 @@ dependencies {
 	// Fabric API
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// HTTP Client (OkHttp)
-	include implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
-	// JSON (Gson)
+	// JSON (Gson) - único externo necesario
 	include implementation("com.google.code.gson:gson:2.10.1")
+
+	// Nota: Usamos java.net.http.HttpClient (nativo en Java 11+)
+	// No requiere dependencias externas
 }
 
 processResources {
