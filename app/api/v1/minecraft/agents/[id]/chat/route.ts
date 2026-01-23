@@ -75,7 +75,8 @@ export async function POST(
     const validation = minecraftChatSchema.safeParse(body);
 
     if (!validation.success) {
-      return formatZodError(validation.error);
+      const error = formatZodError(validation.error);
+      return NextResponse.json(error, { status: 400 });
     }
 
     const { message, context } = validation.data;
