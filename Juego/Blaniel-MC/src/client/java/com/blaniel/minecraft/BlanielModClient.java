@@ -56,8 +56,11 @@ public class BlanielModClient implements ClientModInitializer {
 			dispatcher.register(ClientCommandManager.literal("blaniel")
 				.then(ClientCommandManager.literal("login")
 					.executes(context -> {
-						// Abrir pantalla de login
-						context.getSource().getClient().setScreen(new LoginScreen(null));
+						// Abrir pantalla de login en el thread principal
+						var client = context.getSource().getClient();
+						client.execute(() -> {
+							client.setScreen(new LoginScreen(null));
+						});
 						context.getSource().sendFeedback(Text.literal("§a[Blaniel] §fAbriendo pantalla de login..."));
 						return Command.SINGLE_SUCCESS;
 					})
