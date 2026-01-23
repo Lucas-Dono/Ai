@@ -255,7 +255,7 @@ public class BlanielAPIClient {
 		public String id;
 		public String name;
 		public String gender;
-		public int age;
+		public Integer age; // Nullable - puede no estar disponible
 		public String profession;
 		public String currentEmotion;
 	}

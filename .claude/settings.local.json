@@ -191,7 +191,8 @@
       "Bash(javac:*)",
       "Bash(gradle wrapper:*)",
       "Bash(JAVA_HOME=/usr/lib/jvm/java-21 ./gradlew build:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "WebFetch(domain:mvnrepository.com)"
     ],
     "deny": [],
     "ask": []

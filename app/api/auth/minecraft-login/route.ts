@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
             id: true,
             name: true,
             gender: true,
-            age: true,
+            profile: true,
           },
           orderBy: {
             createdAt: 'desc',
@@ -101,12 +101,18 @@ export async function POST(req: NextRequest) {
         image: user.image,
         plan: user.plan,
       },
-      agents: user.Agent.map(agent => ({
-        id: agent.id,
-        name: agent.name,
-        gender: agent.gender,
-        age: agent.age,
-      })),
+      agents: user.Agent.map(agent => {
+        // Extraer edad del profile JSON si existe
+        const profile = agent.profile as any;
+        const age = profile?.identidad?.edad || profile?.age || null;
+
+        return {
+          id: agent.id,
+          name: agent.name,
+          gender: agent.gender || 'unknown',
+          age: age,
+        };
+      }),
       message: 'Login exitoso',
     });
 
