@@ -1,0 +1,924 @@
+{
+  "processedAt": "2026-01-23T19:45:00.000Z",
+  "total": 51,
+  "characters": [
+    {
+      "characterName": "albert-einstein",
+      "imageAnalyzed": "public/personajes/albert-einstein/Albert Einstein.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F5D7C1",
+        "hairColor": "#E8E8E8",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "curly",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_casual_curly_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "ada-lovelace",
+      "imageAnalyzed": "public/personajes/ada-lovelace/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F4D5C3",
+        "hairColor": "#5A3A2A",
+        "eyeColor": "#6B4E3D",
+        "hairStyle": "ponytail",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_ponytail_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "amelia-earhart",
+      "imageAnalyzed": "public/personajes/amelia-earhart/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5D4B8",
+        "hairColor": "#8B6F47",
+        "eyeColor": "#7A9DB3",
+        "hairStyle": "short",
+        "clothingStyle": "athletic",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_athletic_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "marie-curie",
+      "imageAnalyzed": "public/personajes/marie-curie/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F2D4C0",
+        "hairColor": "#8B7355",
+        "eyeColor": "#6B7A8C",
+        "hairStyle": "long",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "frida-kahlo",
+      "imageAnalyzed": "public/personajes/frida-kahlo/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C19A6B",
+        "hairColor": "#2C1810",
+        "eyeColor": "#3D2817",
+        "hairStyle": "long",
+        "clothingStyle": "fantasy",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_fantasy_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "nikola-tesla",
+      "imageAnalyzed": "public/personajes/nikola-tesla/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F5E0D0",
+        "hairColor": "#1A1A1A",
+        "eyeColor": "#5A6F7A",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "leonardo-da-vinci",
+      "imageAnalyzed": "public/personajes/leonardo-da-vinci/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4B5A0",
+        "hairColor": "#C8C0B0",
+        "eyeColor": "#7A6F5A",
+        "hairStyle": "long",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_medieval_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "cleopatra-vii",
+      "imageAnalyzed": "public/personajes/cleopatra-vii/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C19A6B",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "long",
+        "clothingStyle": "fantasy",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_fantasy_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "marilyn-monroe",
+      "imageAnalyzed": "public/personajes/marilyn-monroe/Marilyn Monroe.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#FCEEE0",
+        "hairColor": "#F4E4B8",
+        "eyeColor": "#87CEEB",
+        "hairStyle": "curly",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_curly_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "jane-austen",
+      "imageAnalyzed": "public/personajes/jane-austen/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5D9C8",
+        "hairColor": "#6B4E3D",
+        "eyeColor": "#7A6A5A",
+        "hairStyle": "long",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "sigmund-freud",
+      "imageAnalyzed": "public/personajes/sigmund-freud/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#E8D5C4",
+        "hairColor": "#C0C0C0",
+        "eyeColor": "#6B7A8C",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "charles-darwin",
+      "imageAnalyzed": "public/personajes/charles-darwin/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#E0CAB8",
+        "hairColor": "#E8E8E8",
+        "eyeColor": "#7A8A9A",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "vincent-van-gogh",
+      "imageAnalyzed": "public/personajes/vincent-van-gogh/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4A574",
+        "hairColor": "#C17A3D",
+        "eyeColor": "#6B8E7A",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": true,
+        "hasFacialHair": true,
+        "templateId": "male_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "virginia-woolf",
+      "imageAnalyzed": "public/personajes/virginia-woolf/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F2DED0",
+        "hairColor": "#4A3428",
+        "eyeColor": "#6B7380",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "oscar-wilde",
+      "imageAnalyzed": "public/personajes/oscar-wilde/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F0DCC8",
+        "hairColor": "#3D2817",
+        "eyeColor": "#6A7A8A",
+        "hairStyle": "long",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_formal_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "wolfgang-amadeus-mozart",
+      "imageAnalyzed": "public/personajes/wolfgang-amadeus-mozart/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F5E5D8",
+        "hairColor": "#E8E0D0",
+        "eyeColor": "#7A8090",
+        "hairStyle": "ponytail",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_formal_ponytail_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "ludwig-van-beethoven",
+      "imageAnalyzed": "public/personajes/ludwig-van-beethoven/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4B89A",
+        "hairColor": "#5A4A3A",
+        "eyeColor": "#6B7A8C",
+        "hairStyle": "curly",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_formal_curly_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "mark-twain",
+      "imageAnalyzed": "public/personajes/mark-twain/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F5E8DC",
+        "hairColor": "#EBEBEB",
+        "eyeColor": "#7A8A9A",
+        "hairStyle": "curly",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_formal_curly_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "ernest-hemingway",
+      "imageAnalyzed": "public/personajes/ernest-hemingway/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4B89A",
+        "hairColor": "#C0B8A8",
+        "eyeColor": "#7A8090",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "edgar-allan-poe",
+      "imageAnalyzed": "public/personajes/edgar-allan-poe/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4C0B0",
+        "hairColor": "#2C1810",
+        "eyeColor": "#5A4A3A",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "harriet-tubman",
+      "imageAnalyzed": "public/personajes/harriet-tubman/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#8B6F47",
+        "hairColor": "#2C1810",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "florence-nightingale",
+      "imageAnalyzed": "public/personajes/florence-nightingale/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5E0D0",
+        "hairColor": "#3D2817",
+        "eyeColor": "#6B7A8C",
+        "hairStyle": "long",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "helen-keller",
+      "imageAnalyzed": "public/personajes/helen-keller/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F2DED0",
+        "hairColor": "#6B5A4D",
+        "eyeColor": "#7A8090",
+        "hairStyle": "long",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "juana-de-arco",
+      "imageAnalyzed": "public/personajes/juana-de-arco/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C8A882",
+        "hairColor": "#2C1810",
+        "eyeColor": "#5A4A3A",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "hypatia-de-alejandria",
+      "imageAnalyzed": "public/personajes/hypatia-de-alejandria/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C19A6B",
+        "hairColor": "#4A3428",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "long",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_medieval_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "socrates",
+      "imageAnalyzed": "public/personajes/socrates/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4A574",
+        "hairColor": "#E8E8E8",
+        "eyeColor": "#7A6A5A",
+        "hairStyle": "bald",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_medieval_bald_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "confucio",
+      "imageAnalyzed": "public/personajes/confucio/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4B89A",
+        "hairColor": "#E0E0E0",
+        "eyeColor": "#5A4A3A",
+        "hairStyle": "long",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": true,
+        "hasFacialHair": true,
+        "templateId": "male_medieval_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "buda-siddhartha-gautama",
+      "imageAnalyzed": "public/personajes/buda-siddhartha-gautama/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#A67C52",
+        "hairColor": "#000000",
+        "eyeColor": "#3D2817",
+        "hairStyle": "bald",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_medieval_bald_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "sun-tzu",
+      "imageAnalyzed": "public/personajes/sun-tzu/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4B89A",
+        "hairColor": "#E0E0E0",
+        "eyeColor": "#5A4A3A",
+        "hairStyle": "long",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_medieval_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "marco-polo",
+      "imageAnalyzed": "public/personajes/marco-polo/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4B89A",
+        "hairColor": "#6B4E3D",
+        "eyeColor": "#7A6A5A",
+        "hairStyle": "short",
+        "clothingStyle": "medieval",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_medieval_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "carl-jung",
+      "imageAnalyzed": "public/personajes/carl-jung/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#E8D5C4",
+        "hairColor": "#A0A0A0",
+        "eyeColor": "#7A8090",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": true,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "atlas-stone",
+      "imageAnalyzed": "public/personajes/atlas-stone/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4A882",
+        "hairColor": "#6B5A4D",
+        "eyeColor": "#7A8A9A",
+        "hairStyle": "short",
+        "clothingStyle": "athletic",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_athletic_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "aria-rosenberg",
+      "imageAnalyzed": "public/personajes/aria-rosenberg/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5E0D0",
+        "hairColor": "#4A3428",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "curly",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_curly_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "dante-rossi",
+      "imageAnalyzed": "public/personajes/dante-rossi/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#D4A882",
+        "hairColor": "#C0B8A8",
+        "eyeColor": "#5A6F7A",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "elena-moreno",
+      "imageAnalyzed": "public/personajes/elena-moreno/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C8A882",
+        "hairColor": "#2C1810",
+        "eyeColor": "#5A4A3A",
+        "hairStyle": "ponytail",
+        "clothingStyle": "athletic",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_athletic_ponytail_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "ethan-cross",
+      "imageAnalyzed": "public/personajes/ethan-cross/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#E8D5C4",
+        "hairColor": "#2C1810",
+        "eyeColor": "#5A6F7A",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": true,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "isabella-ferreira",
+      "imageAnalyzed": "public/personajes/isabella-ferreira/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C8A882",
+        "hairColor": "#3D2817",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "long",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "mia-chen",
+      "imageAnalyzed": "public/personajes/mia-chen/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#E8D4B8",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "fantasy",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_fantasy_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "noah-kepler",
+      "imageAnalyzed": "public/personajes/noah-kepler/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F5E0D0",
+        "hairColor": "#5A4A3A",
+        "eyeColor": "#6B7A8C",
+        "hairStyle": "short",
+        "clothingStyle": "fantasy",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_fantasy_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "oliver-chen",
+      "imageAnalyzed": "public/personajes/oliver-chen/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#E8D5C4",
+        "hairColor": "#5A4A3A",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "priya-sharma",
+      "imageAnalyzed": "public/personajes/priya-sharma/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#8B6F47",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "long",
+        "clothingStyle": "athletic",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_athletic_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "rafael-costa",
+      "imageAnalyzed": "public/personajes/rafael-costa/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#C19A6B",
+        "hairColor": "#3D2817",
+        "eyeColor": "#5A4A3A",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "rei-takahashi",
+      "imageAnalyzed": "public/personajes/rei-takahashi/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5E5D8",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "yuki-tanaka",
+      "imageAnalyzed": "public/personajes/yuki-tanaka/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5E5D8",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "zara-malik",
+      "imageAnalyzed": "public/personajes/zara-malik/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#C19A6B",
+        "hairColor": "#4A3428",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "long",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "luna",
+      "imageAnalyzed": "public/personajes/luna/cuerpo.webp",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#E8D4B8",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "marcus",
+      "imageAnalyzed": "public/personajes/marcus/cuerpo.webp",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#C19A6B",
+        "hairColor": "#2C1810",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "sofia",
+      "imageAnalyzed": "public/personajes/sofia/cuerpo.webp",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#D4B89A",
+        "hairColor": "#5A3A2A",
+        "eyeColor": "#6B5A4D",
+        "hairStyle": "ponytail",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_casual_ponytail_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "katya",
+      "imageAnalyzed": "public/personajes/katya/cuerpo.webp",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "female",
+        "skinTone": "#F5E5D8",
+        "hairColor": "#E8D4A8",
+        "eyeColor": "#87CEEB",
+        "hairStyle": "long",
+        "clothingStyle": "athletic",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "female_athletic_long_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "marcus-washington",
+      "imageAnalyzed": "public/personajes/marcus-washington/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#6B4E3D",
+        "hairColor": "#1C1208",
+        "eyeColor": "#3D2817",
+        "hairStyle": "short",
+        "clothingStyle": "formal",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_formal_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    },
+    {
+      "characterName": "sebastian-muller",
+      "imageAnalyzed": "public/personajes/sebastian-muller/Foto-completa.png",
+      "minecraftSkinTraits": {
+        "version": 1,
+        "gender": "male",
+        "skinTone": "#F5E0D0",
+        "hairColor": "#8B7355",
+        "eyeColor": "#7A8A9A",
+        "hairStyle": "short",
+        "clothingStyle": "casual",
+        "hasGlasses": false,
+        "hasHat": false,
+        "hasFacialHair": false,
+        "templateId": "male_casual_short_01",
+        "generatedAt": "2026-01-23T19:45:00.000Z"
+      }
+    }
+  ]
+}
