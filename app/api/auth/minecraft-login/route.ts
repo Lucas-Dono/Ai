@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
 
     const { email, password } = validation.data;
 
+    console.log('[Minecraft Login] Email recibido:', email);
+    console.log('[Minecraft Login] Email toLowerCase:', email.toLowerCase());
+
     // Buscar usuario
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -56,7 +59,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log('[Minecraft Login] Usuario encontrado:', user ? 'SÍ' : 'NO');
+    if (user) {
+      console.log('[Minecraft Login] User ID:', user.id);
+      console.log('[Minecraft Login] User email:', user.email);
+      console.log('[Minecraft Login] Password exists:', user.password ? 'SÍ' : 'NO');
+      if (user.password) {
+        console.log('[Minecraft Login] Password hash (primeros 20):', user.password.substring(0, 20));
+      }
+    }
+
     if (!user) {
+      console.log('[Minecraft Login] ❌ Usuario NO encontrado');
       return NextResponse.json(
         { error: 'Email o contraseña incorrectos' },
         { status: 401 }
@@ -65,14 +79,19 @@ export async function POST(req: NextRequest) {
 
     // Verificar contraseña
     if (!user.password) {
+      console.log('[Minecraft Login] ❌ Usuario sin password (OAuth)');
       return NextResponse.json(
         { error: 'Usuario sin contraseña configurada. Usa login social desde la web.' },
         { status: 401 }
       );
     }
 
+    console.log('[Minecraft Login] Verificando contraseña con bcrypt...');
     const passwordValid = await bcrypt.compare(password, user.password);
+    console.log('[Minecraft Login] Password valid:', passwordValid ? 'SÍ ✅' : 'NO ❌');
+
     if (!passwordValid) {
+      console.log('[Minecraft Login] ❌ Password inválido');
       return NextResponse.json(
         { error: 'Email o contraseña incorrectos' },
         { status: 401 }
