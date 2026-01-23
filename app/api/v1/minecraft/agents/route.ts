@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
         // (opcional: agregar campo isMinecraftEnabled en el futuro)
       },
       include: {
-        personalityCore: {
+        PersonalityCore: {
           select: {
             openness: true,
             conscientiousness: true,
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
             neuroticism: true,
           },
         },
-        relation: {
+        Relation: {
           where: { targetId: user.id },
           select: {
             trust: true,
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
             stage: true,
           },
         },
-        internalState: {
+        InternalState: {
           select: {
             currentEmotions: true,
             mood: true,
@@ -89,24 +89,24 @@ export async function GET(req: NextRequest) {
         gender: agent.gender || 'unknown',
         age: age,
         profession: extractProfession(agent.profile),
-        personality: agent.personalityCore
+        personality: agent.PersonalityCore
           ? {
-            openness: agent.personalityCore.openness,
-            conscientiousness: agent.personalityCore.conscientiousness,
-            extraversion: agent.personalityCore.extraversion,
-            agreeableness: agent.personalityCore.agreeableness,
-            neuroticism: agent.personalityCore.neuroticism,
+            openness: agent.PersonalityCore.openness,
+            conscientiousness: agent.PersonalityCore.conscientiousness,
+            extraversion: agent.PersonalityCore.extraversion,
+            agreeableness: agent.PersonalityCore.agreeableness,
+            neuroticism: agent.PersonalityCore.neuroticism,
           }
         : null,
-      relationship: agent.relation[0]
-        ? {
-            trust: agent.relation[0].trust,
-            affinity: agent.relation[0].affinity,
-            stage: agent.relation[0].stage,
+        relationship: agent.Relation[0]
+          ? {
+            trust: agent.Relation[0].trust,
+            affinity: agent.Relation[0].affinity,
+            stage: agent.Relation[0].stage,
           }
-        : null,
-        currentEmotion: agent.internalState?.currentEmotions
-          ? (agent.internalState.currentEmotions as any).primary || 'neutral'
+          : null,
+        currentEmotion: agent.InternalState?.currentEmotions
+          ? (agent.InternalState.currentEmotions as any).primary || 'neutral'
           : 'neutral',
         // Datos para skinning en Minecraft
         appearance: {
