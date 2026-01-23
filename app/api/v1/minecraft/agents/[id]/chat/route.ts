@@ -6,6 +6,7 @@ import { MessageService } from '@/lib/services/message.service';
 import { formatZodError } from '@/lib/validation/schemas';
 import { canSendMessage } from '@/lib/usage/token-limits';
 import { trackUsage } from '@/lib/usage/tracker';
+import { decryptMessageIfNeeded } from '@/lib/encryption/message-encryption';
 
 /**
  * Endpoint especializado para Minecraft
@@ -135,14 +136,38 @@ export async function POST(
       await trackUsage(user.id, 'message', result.usage.totalTokens);
     }
 
+    // Obtener el mensaje completo de la BD para desencriptar
+    const dbMessage = await prisma.message.findUnique({
+      where: { id: result.assistantMessage.id },
+      select: {
+        content: true,
+        iv: true,
+        authTag: true,
+      },
+    });
+
+    if (!dbMessage) {
+      throw new Error('Message not found in database');
+    }
+
+    // Desencriptar el contenido del mensaje
+    const decryptedContent = decryptMessageIfNeeded(
+      dbMessage.content,
+      dbMessage.iv,
+      dbMessage.authTag
+    );
+
+    console.log('[Minecraft Chat] Decrypted content:', decryptedContent);
+
     // Formato de respuesta optimizado para Minecraft
-    return NextResponse.json({
-      response: result.assistantMessage.content,
+    const primaryEmotion = result.emotions?.dominant?.[0] || 'neutral';
+    const responsePayload = {
+      response: decryptedContent,
       emotions: {
-        primary: result.emotions?.primary || 'neutral',
-        intensity: result.emotions?.intensity || 0.5,
+        primary: primaryEmotion,
+        intensity: result.emotions?.pad?.arousal || 0.5,
         // Emociones mapeadas a animaciones de Minecraft
-        animation: mapEmotionToAnimation(result.emotions?.primary),
+        animation: mapEmotionToAnimation(primaryEmotion),
       },
       action: determineAction(result, { ...context, timeOfDay: normalizedTimeOfDay }),
       relationship: {
@@ -154,7 +179,10 @@ export async function POST(
         processingTime: result.metadata?.processingTime,
         tokensUsed: result.usage?.totalTokens,
       },
-    });
+    };
+
+    console.log('[Minecraft Chat] Sending response:', JSON.stringify(responsePayload, null, 2));
+    return NextResponse.json(responsePayload);
 
   } catch (error: any) {
     console.error('[Minecraft Chat API Error]', error);
