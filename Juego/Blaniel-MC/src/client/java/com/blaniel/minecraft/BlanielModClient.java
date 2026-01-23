@@ -65,28 +65,27 @@ public class BlanielModClient implements ClientModInitializer {
 		});
 
 		// Registrar comando del cliente para abrir login
+		// Usamos /blogin para evitar conflictos con el comando del servidor /blaniel
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			dispatcher.register(ClientCommandManager.literal("blaniel")
-				.then(ClientCommandManager.literal("login")
-					.executes(context -> {
-						BlanielMod.LOGGER.info("Comando /blaniel login ejecutado");
-						// Abrir pantalla de login en el thread principal
-						var client = context.getSource().getClient();
-						client.execute(() -> {
-							BlanielMod.LOGGER.info("Abriendo LoginScreen desde comando...");
-							try {
-								client.setScreen(new LoginScreen(null));
-								BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente desde comando");
-							} catch (Exception e) {
-								BlanielMod.LOGGER.error("✗ Error al abrir LoginScreen desde comando: " + e.getMessage(), e);
-							}
-						});
-						context.getSource().sendFeedback(Text.literal("§a[Blaniel] §fAbriendo pantalla de login..."));
-						return Command.SINGLE_SUCCESS;
-					})
-				)
+			dispatcher.register(ClientCommandManager.literal("blogin")
+				.executes(context -> {
+					BlanielMod.LOGGER.info("Comando /blogin ejecutado");
+					// Abrir pantalla de login en el thread principal
+					var client = context.getSource().getClient();
+					client.execute(() -> {
+						BlanielMod.LOGGER.info("Abriendo LoginScreen desde comando /blogin...");
+						try {
+							client.setScreen(new LoginScreen(null));
+							BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente desde /blogin");
+						} catch (Exception e) {
+							BlanielMod.LOGGER.error("✗ Error al abrir LoginScreen desde /blogin: " + e.getMessage(), e);
+						}
+					});
+					context.getSource().sendFeedback(Text.literal("§a[Blaniel] §fAbriendo pantalla de login..."));
+					return Command.SINGLE_SUCCESS;
+				})
 			);
-			BlanielMod.LOGGER.info("✓ Comando /blaniel login registrado");
+			BlanielMod.LOGGER.info("✓ Comando /blogin registrado (cliente)");
 		});
 
 		BlanielMod.LOGGER.info("========================================");

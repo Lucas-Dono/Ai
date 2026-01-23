@@ -23,6 +23,7 @@ public class LoginScreen extends Screen {
 	private ButtonWidget loginButton;
 	private String errorMessage = "";
 	private boolean loggingIn = false;
+	private boolean firstRender = true;
 
 	public LoginScreen(Screen parent) {
 		super(Text.literal("Iniciar Sesión en Blaniel"));
@@ -160,6 +161,10 @@ public class LoginScreen extends Screen {
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+		if (firstRender) {
+			BlanielMod.LOGGER.info("LoginScreen.render() llamado por primera vez - la pantalla se está renderizando!");
+			firstRender = false;
+		}
 		// Fondo oscuro
 		this.renderBackground(context);
 
@@ -218,9 +223,16 @@ public class LoginScreen extends Screen {
 
 	@Override
 	public void close() {
+		BlanielMod.LOGGER.info("LoginScreen.close() llamado - cerrando pantalla");
 		if (this.client != null) {
 			this.client.setScreen(this.parent);
 		}
+	}
+
+	@Override
+	public void removed() {
+		BlanielMod.LOGGER.info("LoginScreen.removed() llamado - pantalla eliminada");
+		super.removed();
 	}
 
 	@Override
