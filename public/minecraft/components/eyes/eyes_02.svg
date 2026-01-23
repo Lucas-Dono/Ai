@@ -1,0 +1,11 @@
+
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg">
+      <!-- Ojo izquierdo - entrecerrado -->
+      <rect x="1" y="4" width="2" height="1" fill="#404040"/>
+      <rect x="2" y="4" width="1" height="1" fill="#808080" class="colorizable-eye"/>
+
+      <!-- Ojo derecho - entrecerrado -->
+      <rect x="5" y="4" width="2" height="1" fill="#404040"/>
+      <rect x="5" y="4" width="1" height="1" fill="#808080" class="colorizable-eye"/>
+    </svg>
+  

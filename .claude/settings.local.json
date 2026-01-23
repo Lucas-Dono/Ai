@@ -192,7 +192,18 @@
       "Bash(gradle wrapper:*)",
       "Bash(JAVA_HOME=/usr/lib/jvm/java-21 ./gradlew build:*)",
       "Bash(git rm:*)",
-      "WebFetch(domain:mvnrepository.com)"
+      "WebFetch(domain:mvnrepository.com)",
+      "Bash(git -C Juego/Blaniel-MC status)",
+      "Bash(pgrep:*)",
+      "Bash(journalctl:*)",
+      "Bash(file:*)",
+      "Bash(identify:*)",
+      "WebFetch(domain:ljvmiranda921.github.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.kokutech.com)",
+      "WebFetch(domain:www.minecraftforum.net)",
+      "WebFetch(domain:minecraft.wiki)",
+      "Bash(NODE_OPTIONS='--max-old-space-size=8192' npx tsx:*)"
     ],
     "deny": [],
     "ask": []

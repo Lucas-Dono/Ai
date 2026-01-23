@@ -1,0 +1,10 @@
+
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg">
+      <!-- Parte superior de la gorra -->
+      <rect x="1" y="0" width="6" height="2" fill="#707070" class="colorizable-clothing"/>
+      <!-- Visera -->
+      <rect x="0" y="2" width="8" height="1" fill="#505050" class="colorizable-clothing"/>
+      <!-- Sombra de visera -->
+      <rect x="0" y="3" width="8" height="1" fill="#303030" opacity="0.3"/>
+    </svg>
+  

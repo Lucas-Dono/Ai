@@ -136,14 +136,19 @@ public class AgentSelectionScreen extends Screen {
      */
     private void spawnAgent(String agentId, String agentName) {
         if (this.client == null || this.client.player == null) {
+            BlanielMod.LOGGER.error("No se puede spawnear: client o player es null");
             return;
         }
+
+        BlanielMod.LOGGER.info("Enviando SPAWN_AGENT_PACKET al servidor: agentId={}, agentName={}", agentId, agentName);
 
         // Enviar packet al servidor
         ClientPlayNetworking.send(
             NetworkHandler.SPAWN_AGENT_PACKET,
             SpawnAgentPacket.create(agentId, agentName)
         );
+
+        BlanielMod.LOGGER.info("SPAWN_AGENT_PACKET enviado exitosamente");
 
         // Cerrar GUI
         this.close();

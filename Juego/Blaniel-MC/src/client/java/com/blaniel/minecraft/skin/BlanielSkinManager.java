@@ -207,25 +207,30 @@ public class BlanielSkinManager {
 
 			// Registrar textura en TextureManager (solo en cliente)
 			if (MinecraftClient.getInstance() != null) {
-				Identifier skinIdentifier = registerTexture(agentId, skinData);
+				// Registrar textura y esperar a que termine
+				try {
+					Identifier skinIdentifier = registerTextureSync(agentId, skinData);
 
-				// Convertir skin a formato base64 para GameProfile
-				String base64Skin = Base64.getEncoder().encodeToString(skinData);
+					// Convertir skin a formato base64 para GameProfile
+					String base64Skin = Base64.getEncoder().encodeToString(skinData);
 
-				// Crear property de textura
-				// Formato esperado por Minecraft: { "textures": { "SKIN": { "url": "..." } } }
-				String textureJson = String.format(
-					"{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"textures\":{\"SKIN\":{\"url\":\"blaniel:%s\"}}}",
-					System.currentTimeMillis(),
-					uuid.toString(),
-					agentName,
-					skinIdentifier.getPath()
-				);
+					// Crear property de textura
+					// Formato esperado por Minecraft: { "textures": { "SKIN": { "url": "..." } } }
+					String textureJson = String.format(
+						"{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"textures\":{\"SKIN\":{\"url\":\"blaniel:%s\"}}}",
+						System.currentTimeMillis(),
+						uuid.toString(),
+						agentName,
+						skinIdentifier.getPath()
+					);
 
-				String encodedTextures = Base64.getEncoder().encodeToString(textureJson.getBytes());
-				profile.getProperties().put("textures", new Property("textures", encodedTextures));
+					String encodedTextures = Base64.getEncoder().encodeToString(textureJson.getBytes());
+					profile.getProperties().put("textures", new Property("textures", encodedTextures));
 
-				BlanielMod.LOGGER.info("Skin aplicada a GameProfile: {} ({})", agentName, agentId);
+					BlanielMod.LOGGER.info("Skin aplicada a GameProfile: {} ({})", agentName, agentId);
+				} catch (Exception e) {
+					BlanielMod.LOGGER.error("Error registrando textura para {}: {}", agentName, e.getMessage());
+				}
 			}
 
 			// Guardar en caché RAM
@@ -240,45 +245,61 @@ public class BlanielSkinManager {
 	}
 
 	/**
-	 * Registrar textura en TextureManager de Minecraft
+	 * Registrar textura en TextureManager de Minecraft (sincrónico)
+	 *
+	 * Este método espera a que la textura esté completamente registrada
+	 * antes de retornar el Identifier, eliminando la race condition.
 	 */
-	private static Identifier registerTexture(String agentId, byte[] skinData) {
+	private static Identifier registerTextureSync(String agentId, byte[] skinData) throws Exception {
 		// Verificar caché de texturas
 		if (TEXTURE_CACHE.containsKey(agentId)) {
+			BlanielMod.LOGGER.debug("Textura de {} encontrada en caché", agentId);
 			return TEXTURE_CACHE.get(agentId);
 		}
 
-		try {
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client == null) {
-				BlanielMod.LOGGER.warn("MinecraftClient es null, no se puede registrar textura");
-				return new Identifier("blaniel", "skins/default");
-			}
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client == null) {
+			throw new IllegalStateException("MinecraftClient es null, no se puede registrar textura");
+		}
 
-			// Identifier único para esta skin
-			Identifier skinIdentifier = new Identifier("blaniel", "skins/agent_" + agentId);
+		// Identifier único para esta skin
+		Identifier skinIdentifier = new Identifier("blaniel", "skins/agent_" + agentId);
 
-			// Convertir byte[] a NativeImage
-			NativeImage nativeImage = NativeImage.read(new ByteArrayInputStream(skinData));
+		// Convertir byte[] a NativeImage
+		NativeImage nativeImage = NativeImage.read(new ByteArrayInputStream(skinData));
 
-			// Registrar textura en TextureManager (debe ejecutarse en thread principal)
-			client.execute(() -> {
+		// Usar CompletableFuture para esperar el registro en el thread principal
+		CompletableFuture<Void> registrationFuture = new CompletableFuture<>();
+
+		// Registrar textura en TextureManager (debe ejecutarse en thread principal)
+		client.execute(() -> {
+			try {
 				client.getTextureManager().registerTexture(
 					skinIdentifier,
 					new NativeImageBackedTexture(nativeImage)
 				);
-				BlanielMod.LOGGER.debug("Textura registrada: {}", skinIdentifier);
-			});
+				BlanielMod.LOGGER.info("Textura registrada exitosamente: {}", skinIdentifier);
+				registrationFuture.complete(null);
+			} catch (Exception e) {
+				BlanielMod.LOGGER.error("Error en thread principal al registrar textura", e);
+				registrationFuture.completeExceptionally(e);
+			}
+		});
 
-			// Guardar en caché
-			TEXTURE_CACHE.put(agentId, skinIdentifier);
-
-			return skinIdentifier;
-
-		} catch (IOException e) {
-			BlanielMod.LOGGER.error("Error registrando textura", e);
-			return new Identifier("blaniel", "skins/default");
+		// Esperar a que el registro termine (timeout de 5 segundos)
+		try {
+			registrationFuture.get(5, java.util.concurrent.TimeUnit.SECONDS);
+		} catch (java.util.concurrent.TimeoutException e) {
+			throw new Exception("Timeout esperando registro de textura", e);
+		} catch (java.util.concurrent.ExecutionException e) {
+			throw new Exception("Error durante registro de textura", e.getCause());
 		}
+
+		// Guardar en caché solo después de que el registro esté completo
+		TEXTURE_CACHE.put(agentId, skinIdentifier);
+		BlanielMod.LOGGER.debug("Textura {} agregada al caché", agentId);
+
+		return skinIdentifier;
 	}
 
 	/**
@@ -337,11 +358,18 @@ public class BlanielSkinManager {
 
 	/**
 	 * Obtener Identifier de textura para un agente (si está cacheado)
+	 *
+	 * Retorna null si la textura no está cacheada aún (sin registrar).
+	 * El renderer debe manejar el null y usar su fallback.
 	 */
 	public static Identifier getTextureIdentifier(String agentId) {
-		return TEXTURE_CACHE.getOrDefault(
-			agentId,
-			new Identifier("blaniel", "skins/default")
-		);
+		return TEXTURE_CACHE.get(agentId);  // Retorna null si no está en caché
+	}
+
+	/**
+	 * Verificar si una textura está cargada y lista para usar
+	 */
+	public static boolean isTextureLoaded(String agentId) {
+		return TEXTURE_CACHE.containsKey(agentId);
 	}
 }

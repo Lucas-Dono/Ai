@@ -20,8 +20,9 @@ import java.util.Set;
  */
 public class BlanielVillagerRenderer extends MobEntityRenderer<BlanielVillagerEntity, PlayerEntityModel<BlanielVillagerEntity>> {
 
-	// Skin por defecto (Steve)
-	private static final Identifier DEFAULT_TEXTURE = new Identifier("textures/entity/steve.png");
+	// Skin por defecto (Steve) - Ruta correcta para Minecraft 1.20.1
+	// Las skins de jugador por defecto están en entity/player/
+	private static final Identifier DEFAULT_TEXTURE = new Identifier("minecraft", "textures/entity/player/wide/steve.png");
 
 	// Set de agentes cuyas skins ya están siendo descargadas (evitar duplicados)
 	private static final Set<String> LOADING_SKINS = new HashSet<>();
@@ -40,15 +41,23 @@ public class BlanielVillagerRenderer extends MobEntityRenderer<BlanielVillagerEn
 	public Identifier getTexture(BlanielVillagerEntity entity) {
 		String agentId = entity.getBlanielAgentId();
 
-		if (agentId.isEmpty()) {
+		// DEBUG: Log cada vez que se renderiza
+		if (agentId == null || agentId.isEmpty()) {
+			BlanielMod.LOGGER.warn("getTexture() llamado con agentId vacío para aldeano: {}", entity.getBlanielAgentName());
 			return DEFAULT_TEXTURE;
+		}
+
+		// DEBUG: Log primera vez que se ve este aldeano
+		if (!LOADING_SKINS.contains(agentId) && !BlanielSkinManager.isTextureLoaded(agentId)) {
+			BlanielMod.LOGGER.info("getTexture() llamado por primera vez para: {} (agentId={})",
+				entity.getBlanielAgentName(), agentId);
 		}
 
 		// Intentar obtener Identifier de textura del SkinManager
 		Identifier skinTexture = BlanielSkinManager.getTextureIdentifier(agentId);
 
-		// Si ya tiene una textura cargada (no es default), usarla
-		if (!skinTexture.getPath().equals("skins/default")) {
+		// Si la textura está cargada y registrada, usarla
+		if (skinTexture != null) {
 			return skinTexture;
 		}
 
@@ -60,25 +69,26 @@ public class BlanielVillagerRenderer extends MobEntityRenderer<BlanielVillagerEn
 			String jwtToken = BlanielMod.CONFIG.getJwtToken();
 
 			if (!apiUrl.isEmpty() && !jwtToken.isEmpty()) {
-				BlanielMod.LOGGER.info("Cargando skin para: {} ({})", entity.getBlanielAgentName(), agentId);
+				BlanielMod.LOGGER.info("Iniciando carga de skin para: {} ({})", entity.getBlanielAgentName(), agentId);
 
 				BlanielSkinManager.loadSkin(agentId, entity.getBlanielAgentName(), apiUrl, jwtToken)
 					.thenAccept(profile -> {
 						entity.customGameProfile = profile;
 						LOADING_SKINS.remove(agentId);
-						BlanielMod.LOGGER.info("Skin cargada: {}", entity.getBlanielAgentName());
+						BlanielMod.LOGGER.info("Skin completamente cargada y registrada: {}", entity.getBlanielAgentName());
 					})
 					.exceptionally(ex -> {
-						BlanielMod.LOGGER.error("Error cargando skin: {}", ex.getMessage());
+						BlanielMod.LOGGER.error("Error cargando skin para {}: {}", entity.getBlanielAgentName(), ex.getMessage());
 						LOADING_SKINS.remove(agentId);
 						return null;
 					});
 			} else {
+				BlanielMod.LOGGER.warn("API no configurada, usando textura default para {}", entity.getBlanielAgentName());
 				LOADING_SKINS.remove(agentId);
 			}
 		}
 
-		// Mientras se descarga, usar Steve
+		// Mientras se descarga y registra, usar Steve como fallback
 		return DEFAULT_TEXTURE;
 	}
 }

@@ -1,0 +1,21 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HEAD TOP (8x8) at (8,0) -->
+      <rect x="8" y="0" width="8" height="8" fill="#808080" class="colorizable-skin"/>
+
+      <!-- HEAD BOTTOM (8x8) at (16,0) -->
+      <rect x="16" y="0" width="8" height="8" fill="#707070" class="colorizable-skin"/>
+
+      <!-- HEAD RIGHT (8x8) at (0,8) -->
+      <rect x="0" y="8" width="8" height="8" fill="#707070" class="colorizable-skin"/>
+
+      <!-- HEAD FRONT (8x8) at (8,8) -->
+      <rect x="8" y="8" width="8" height="8" fill="#808080" class="colorizable-skin"/>
+
+      <!-- HEAD LEFT (8x8) at (16,8) -->
+      <rect x="16" y="8" width="8" height="8" fill="#707070" class="colorizable-skin"/>
+
+      <!-- HEAD BACK (8x8) at (24,8) -->
+      <rect x="24" y="8" width="8" height="8" fill="#606060" class="colorizable-skin"/>
+    </svg>
+  

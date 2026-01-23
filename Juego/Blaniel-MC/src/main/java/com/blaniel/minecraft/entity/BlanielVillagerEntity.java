@@ -7,6 +7,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,9 +24,13 @@ import net.minecraft.world.World;
  */
 public class BlanielVillagerEntity extends PathAwareEntity {
 
-	// ID del agente de Blaniel asociado
-	private String blanielAgentId = "";
-	private String blanielAgentName = "Aldeano";
+	// DataTracker para sincronización cliente-servidor
+	private static final TrackedData<String> AGENT_ID = DataTracker.registerData(
+		BlanielVillagerEntity.class, TrackedDataHandlerRegistry.STRING
+	);
+	private static final TrackedData<String> AGENT_NAME = DataTracker.registerData(
+		BlanielVillagerEntity.class, TrackedDataHandlerRegistry.STRING
+	);
 
 	// GameProfile personalizado para skin custom
 	public GameProfile customGameProfile = null;
@@ -38,6 +45,16 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 		String apiUrl = BlanielMod.CONFIG.getApiUrl();
 		String jwtToken = BlanielMod.CONFIG.getJwtToken();
 		this.apiClient = new BlanielAPIClient(apiUrl, jwtToken);
+	}
+
+	/**
+	 * Inicializar DataTracker para sincronización cliente-servidor
+	 */
+	@Override
+	protected void initDataTracker() {
+		super.initDataTracker();
+		this.dataTracker.startTracking(AGENT_ID, "");
+		this.dataTracker.startTracking(AGENT_NAME, "Aldeano");
 	}
 
 	/**
@@ -73,12 +90,15 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		if (!this.getWorld().isClient) {
 			// Lado del servidor
-			if (blanielAgentId.isEmpty()) {
+			String agentId = this.getBlanielAgentId();
+			String agentName = this.getBlanielAgentName();
+
+			if (agentId.isEmpty()) {
 				player.sendMessage(Text.literal("§c[Blaniel] §fEste aldeano no tiene un agente asignado"), false);
 				player.sendMessage(Text.literal("§7Abre la UI con tecla K para asignar un agente"), false);
 			} else {
 				// Enviar packet al cliente para abrir GUI
-				BlanielMod.LOGGER.info("Click derecho en aldeano con agente: " + this.blanielAgentName);
+				BlanielMod.LOGGER.info("Click derecho en aldeano con agente: " + agentName);
 
 				if (player instanceof net.minecraft.server.network.ServerPlayerEntity) {
 					net.minecraft.server.network.ServerPlayerEntity serverPlayer =
@@ -89,8 +109,8 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 					net.minecraft.network.PacketByteBuf byteBuf =
 						net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
 					byteBuf.writeInt(this.getId());
-					byteBuf.writeString(this.blanielAgentId);
-					byteBuf.writeString(this.blanielAgentName);
+					byteBuf.writeString(agentId);
+					byteBuf.writeString(agentName);
 
 					net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(
 						serverPlayer,
@@ -110,7 +130,10 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 * Enviar mensaje al agente de Blaniel
 	 */
 	public void sendMessageToAgent(String message, PlayerEntity player) {
-		if (blanielAgentId.isEmpty() || !BlanielMod.CONFIG.isApiEnabled()) {
+		String agentId = this.getBlanielAgentId();
+		String agentName = this.getBlanielAgentName();
+
+		if (agentId.isEmpty() || !BlanielMod.CONFIG.isApiEnabled()) {
 			player.sendMessage(Text.literal("§c[Blaniel] §fAPI no configurada o agente no asignado"), false);
 			return;
 		}
@@ -130,15 +153,15 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 		context.position = pos;
 
 		// Enviar mensaje a API (async)
-		BlanielMod.LOGGER.info("Enviando mensaje a agente {}: {}", blanielAgentId, message);
+		BlanielMod.LOGGER.info("Enviando mensaje a agente {}: {}", agentId, message);
 
-		apiClient.sendMessage(blanielAgentId, message, context).thenAccept(response -> {
+		apiClient.sendMessage(agentId, message, context).thenAccept(response -> {
 			if (response != null && response.response != null) {
 				// Ejecutar en thread principal de Minecraft
 				if (this.getWorld().getServer() != null) {
 					this.getWorld().getServer().execute(() -> {
 						// Mostrar respuesta al jugador
-						player.sendMessage(Text.literal("§b" + blanielAgentName + "§f: " + response.response), false);
+						player.sendMessage(Text.literal("§b" + agentName + "§f: " + response.response), false);
 
 						// Log de emoción
 						if (response.emotions != null) {
@@ -160,46 +183,46 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	}
 
 	/**
-	 * Guardar datos adicionales en NBT
+	 * Guardar datos adicionales en NBT (persistencia en disco)
 	 */
 	@Override
 	public void writeCustomDataToNbt(NbtCompound nbt) {
 		super.writeCustomDataToNbt(nbt);
-		nbt.putString("BlanielAgentId", this.blanielAgentId);
-		nbt.putString("BlanielAgentName", this.blanielAgentName);
+		nbt.putString("BlanielAgentId", this.getBlanielAgentId());
+		nbt.putString("BlanielAgentName", this.getBlanielAgentName());
 	}
 
 	/**
-	 * Cargar datos adicionales desde NBT
+	 * Cargar datos adicionales desde NBT (persistencia en disco)
 	 */
 	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
 		if (nbt.contains("BlanielAgentId")) {
-			this.blanielAgentId = nbt.getString("BlanielAgentId");
+			this.setBlanielAgentId(nbt.getString("BlanielAgentId"));
 		}
 		if (nbt.contains("BlanielAgentName")) {
-			this.blanielAgentName = nbt.getString("BlanielAgentName");
+			this.setBlanielAgentName(nbt.getString("BlanielAgentName"));
 		}
-		// La skin se carga automáticamente en el cliente mediante el renderer
 	}
 
-	// Getters y Setters
+	// Getters y Setters (usando DataTracker para sincronización cliente-servidor)
 	public String getBlanielAgentId() {
-		return blanielAgentId;
+		return this.dataTracker.get(AGENT_ID);
 	}
 
 	public void setBlanielAgentId(String blanielAgentId) {
-		this.blanielAgentId = blanielAgentId;
-		// La skin se carga automáticamente en el cliente mediante el renderer
+		this.dataTracker.set(AGENT_ID, blanielAgentId);
+		BlanielMod.LOGGER.info("AgentId establecido: {} para aldeano {}", blanielAgentId, this.getBlanielAgentName());
 	}
 
 	public String getBlanielAgentName() {
-		return blanielAgentName;
+		return this.dataTracker.get(AGENT_NAME);
 	}
 
 	public void setBlanielAgentName(String blanielAgentName) {
-		this.blanielAgentName = blanielAgentName;
+		this.dataTracker.set(AGENT_NAME, blanielAgentName);
+		BlanielMod.LOGGER.info("AgentName establecido: {}", blanielAgentName);
 	}
 
 	/**

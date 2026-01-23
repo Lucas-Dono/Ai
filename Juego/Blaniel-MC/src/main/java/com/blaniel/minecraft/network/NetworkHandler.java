@@ -25,8 +25,12 @@ public class NetworkHandler {
                 String agentId = buf.readString();
                 String agentName = buf.readString();
 
+                BlanielMod.LOGGER.info("SPAWN_AGENT_PACKET recibido en servidor: agentId={}, agentName={}, player={}",
+                    agentId, agentName, player.getName().getString());
+
                 // Ejecutar en thread principal del servidor
                 server.execute(() -> {
+                    BlanielMod.LOGGER.info("Ejecutando SpawnAgentPacket.handle() en thread principal del servidor");
                     // Importar la lógica de spawn aquí
                     com.blaniel.minecraft.network.packet.SpawnAgentPacket.handle(
                         server, player, agentId, agentName
