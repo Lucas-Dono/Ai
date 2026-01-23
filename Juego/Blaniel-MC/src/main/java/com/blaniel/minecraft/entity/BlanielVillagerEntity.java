@@ -32,8 +32,8 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 
 		// Inicializar cliente de API
 		String apiUrl = BlanielMod.CONFIG.getApiUrl();
-		String apiKey = BlanielMod.CONFIG.getApiKey();
-		this.apiClient = new BlanielAPIClient(apiUrl, apiKey);
+		String jwtToken = BlanielMod.CONFIG.getJwtToken();
+		this.apiClient = new BlanielAPIClient(apiUrl, jwtToken);
 	}
 
 	/**

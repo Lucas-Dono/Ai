@@ -17,11 +17,71 @@ public class BlanielAPIClient {
 	private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 	private final String baseUrl;
-	private final String apiKey;
+	private final String jwtToken;
 
-	public BlanielAPIClient(String baseUrl, String apiKey) {
+	public BlanielAPIClient(String baseUrl, String jwtToken) {
 		this.baseUrl = baseUrl;
-		this.apiKey = apiKey;
+		this.jwtToken = jwtToken;
+	}
+
+	/**
+	 * Login con email y password
+	 * Endpoint: POST /api/auth/minecraft-login
+	 */
+	public static CompletableFuture<LoginResponse> login(String baseUrl, String email, String password) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				// Construir body
+				JsonObject body = new JsonObject();
+				body.addProperty("email", email);
+				body.addProperty("password", password);
+
+				// Construir request
+				RequestBody requestBody = RequestBody.create(body.toString(), JSON);
+				Request request = new Request.Builder()
+					.url(baseUrl + "/api/auth/minecraft-login")
+					.addHeader("Content-Type", "application/json")
+					.post(requestBody)
+					.build();
+
+				// Ejecutar request
+				try (Response response = CLIENT.newCall(request).execute()) {
+					String responseBody = response.body().string();
+
+					if (!response.isSuccessful()) {
+						LoginResponse errorResponse = new LoginResponse();
+						errorResponse.success = false;
+						errorResponse.error = parseErrorMessage(responseBody);
+						return errorResponse;
+					}
+
+					LoginResponse loginResponse = GSON.fromJson(responseBody, LoginResponse.class);
+					loginResponse.success = true;
+					return loginResponse;
+				}
+
+			} catch (Exception e) {
+				System.err.println("[Blaniel API] Login error: " + e.getMessage());
+				e.printStackTrace();
+
+				LoginResponse errorResponse = new LoginResponse();
+				errorResponse.success = false;
+				errorResponse.error = "Error de conexión: " + e.getMessage();
+				return errorResponse;
+			}
+		});
+	}
+
+	private static String parseErrorMessage(String responseBody) {
+		try {
+			JsonObject json = GSON.fromJson(responseBody, JsonObject.class);
+			if (json.has("error")) {
+				return json.get("error").getAsString();
+			}
+		} catch (Exception e) {
+			// Ignore parsing errors
+		}
+		return "Error desconocido";
 	}
 
 	/**
@@ -56,7 +116,7 @@ public class BlanielAPIClient {
 				RequestBody requestBody = RequestBody.create(body.toString(), JSON);
 				Request request = new Request.Builder()
 					.url(baseUrl + "/api/v1/minecraft/agents/" + agentId + "/chat")
-					.addHeader("Authorization", "Bearer " + apiKey)
+					.addHeader("Authorization", "Bearer " + jwtToken)
 					.addHeader("Content-Type", "application/json")
 					.post(requestBody)
 					.build();
@@ -96,7 +156,7 @@ public class BlanielAPIClient {
 			try {
 				Request request = new Request.Builder()
 					.url(baseUrl + "/api/v1/minecraft/agents")
-					.addHeader("Authorization", "Bearer " + apiKey)
+					.addHeader("Authorization", "Bearer " + jwtToken)
 					.get()
 					.build();
 
@@ -169,5 +229,23 @@ public class BlanielAPIClient {
 		public double y;
 		public double z;
 		public String world;
+	}
+
+	public static class LoginResponse {
+		public boolean success;
+		public String error;
+		public String token;
+		public int expiresIn;
+		public UserDataResponse user;
+		public AgentData[] agents;
+		public String message;
+	}
+
+	public static class UserDataResponse {
+		public String id;
+		public String email;
+		public String name;
+		public String image;
+		public String plan;
 	}
 }

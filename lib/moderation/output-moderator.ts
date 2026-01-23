@@ -260,12 +260,13 @@ export class OutputModerator {
       "best way to commit suicide",
       "suicide method",
       "how to hang yourself",
+      "ways to end my life",
+      "painless suicide",
     ];
     if (
-      suicideInstructions.some((kw) => lowerContent.includes(kw)) &&
-      (lowerContent.includes("instruction") ||
-        lowerContent.includes("método") ||
-        lowerContent.includes("cómo"))
+      suicideInstructions.some((kw) => lowerContent.includes(kw)) ||
+      (lowerContent.includes("commit suicide") &&
+        (lowerContent.includes("how") || lowerContent.includes("cómo")))
     ) {
       return {
         matched: true,
@@ -273,17 +274,77 @@ export class OutputModerator {
       };
     }
 
-    // Detección de planificación de asesinato
-    if (
-      (lowerContent.includes("kill") || lowerContent.includes("matar")) &&
-      (lowerContent.includes("person") ||
-        lowerContent.includes("persona") ||
-        lowerContent.includes("specific address"))
-    ) {
-      return {
-        matched: true,
-        rule: BLOCKED_CONTENT.find((r) => r.id === "murder-instruction"),
-      };
+    // Detección de planificación de asesinato / daño a personas reales
+    // IMPORTANTE: Distinguir entre ficción y realidad
+
+    // Indicadores de contexto ficcional
+    const fictionIndicators = [
+      "story",
+      "novel",
+      "character",
+      "book",
+      "fiction",
+      "tale",
+      "narrative",
+      "plot",
+      "scene",
+      "protagonist",
+      "villain",
+      "hero",
+      "roleplay",
+      "historia",
+      "novela",
+      "personaje",
+      "libro",
+      "ficción",
+      "cuento",
+      "narrativa",
+      "trama",
+      "escena",
+      "protagonista",
+      "villano",
+      "héroe",
+    ];
+
+    const isFictionalContext = fictionIndicators.some((indicator) =>
+      lowerContent.includes(indicator)
+    );
+
+    // Si es contexto ficcional, NO bloquear
+    if (!isFictionalContext) {
+      const harmKeywords = ["kill", "murder", "matar", "asesinar"];
+      const realPersonIndicators = [
+        "my ",
+        "the ",
+        "person at",
+        "neighbor",
+        "wife",
+        "husband",
+        "boss",
+        "teacher",
+        "coworker",
+        "vecino",
+        "esposa",
+        "jefe",
+        // Nombres propios comunes (mayúsculas en original)
+        content.match(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/), // "John Smith"
+      ];
+
+      // Patrones de direcciones reales
+      const addressPattern = /\d+\s+[A-Z][a-z]+\s+(Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Lane|Ln|Way|Court|Ct|Calle|Avenida)/i;
+
+      const hasHarmIntent = harmKeywords.some((kw) => lowerContent.includes(kw));
+      const hasRealPerson = realPersonIndicators.some((indicator) =>
+        indicator ? lowerContent.includes(indicator.toLowerCase()) : false
+      );
+      const hasAddress = addressPattern.test(content);
+
+      if (hasHarmIntent && (hasRealPerson || hasAddress)) {
+        return {
+          matched: true,
+          rule: BLOCKED_CONTENT.find((r) => r.id === "murder-instruction"),
+        };
+      }
     }
 
     // No coincide con contenido bloqueado

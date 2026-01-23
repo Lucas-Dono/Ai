@@ -54,11 +54,11 @@ public class BlanielCommands {
 						.executes(BlanielCommands::setApiUrl)
 					)
 				)
-				.then(CommandManager.literal("apiKey")
-					.then(CommandManager.argument("key", StringArgumentType.string())
-						.executes(BlanielCommands::setApiKey)
-					)
-				)
+//				.then(CommandManager.literal("apiKey")
+//					.then(CommandManager.argument("key", StringArgumentType.string())
+//						.executes(BlanielCommands::setApiKey)
+//					)
+//				)
 			)
 		);
 	}
@@ -118,8 +118,8 @@ public class BlanielCommands {
 
 			// Llamar a API
 			String apiUrl = BlanielMod.CONFIG.getApiUrl();
-			String apiKey = BlanielMod.CONFIG.getApiKey();
-			BlanielAPIClient client = new BlanielAPIClient(apiUrl, apiKey);
+			String jwtToken = BlanielMod.CONFIG.getJwtToken();
+			BlanielAPIClient client = new BlanielAPIClient(apiUrl, jwtToken);
 
 			client.getAvailableAgents().thenAccept(response -> {
 				if (response != null && response.agents != null) {
@@ -246,7 +246,7 @@ public class BlanielCommands {
 			false
 		);
 		source.sendFeedback(
-			() -> Text.literal("  API Key: §b" + (BlanielMod.CONFIG.getApiKey().isEmpty() ? "§c(no configurada)" : "***")),
+			() -> Text.literal("  JWT Token: §b" + (BlanielMod.CONFIG.getJwtToken().isEmpty() ? "§c(no configurada)" : "***")),
 			false
 		);
 		source.sendFeedback(
@@ -277,17 +277,17 @@ public class BlanielCommands {
 	/**
 	 * /blaniel config apiKey <key>
 	 */
-	private static int setApiKey(CommandContext<ServerCommandSource> context) {
-		String key = StringArgumentType.getString(context, "key");
-		ServerCommandSource source = context.getSource();
-
-		BlanielMod.CONFIG.setApiKey(key);
-
-		source.sendFeedback(
-			() -> Text.literal("§a[Blaniel] §fAPI Key configurada"),
-			false
-		);
-
-		return 1;
-	}
+//	private static int setJwtToken(CommandContext<ServerCommandSource> context) {
+//		String key = StringArgumentType.getString(context, "key");
+//		ServerCommandSource source = context.getSource();
+//
+//		BlanielMod.CONFIG.setJwtToken(key);
+//
+//		source.sendFeedback(
+//			() -> Text.literal("§a[Blaniel] §fJWT Token configurada"),
+//			false
+//		);
+//
+//		return 1;
+//	}
 }

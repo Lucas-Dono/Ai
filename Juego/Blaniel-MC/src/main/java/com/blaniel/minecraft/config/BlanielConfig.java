@@ -22,8 +22,28 @@ public class BlanielConfig {
 
 	// Valores por defecto
 	private String apiUrl = "http://localhost:3000";
-	private String apiKey = "";
+	private String jwtToken = "";
 	private boolean apiEnabled = true;
+
+	// Datos del usuario (cacheados)
+	private UserData userData = null;
+
+	// Clase interna para datos del usuario
+	public static class UserData {
+		public String userId;
+		public String email;
+		public String name;
+		public String plan;
+
+		public UserData() {}
+
+		public UserData(String userId, String email, String name, String plan) {
+			this.userId = userId;
+			this.email = email;
+			this.name = name;
+			this.plan = plan;
+		}
+	}
 
 	/**
 	 * Cargar configuración desde archivo
@@ -35,8 +55,9 @@ public class BlanielConfig {
 				BlanielConfig loaded = GSON.fromJson(json, BlanielConfig.class);
 
 				this.apiUrl = loaded.apiUrl;
-				this.apiKey = loaded.apiKey;
+				this.jwtToken = loaded.jwtToken;
 				this.apiEnabled = loaded.apiEnabled;
+				this.userData = loaded.userData;
 
 				System.out.println("[Blaniel] Configuración cargada desde " + CONFIG_PATH);
 			} catch (IOException e) {
@@ -66,12 +87,20 @@ public class BlanielConfig {
 		return apiUrl;
 	}
 
-	public String getApiKey() {
-		return apiKey;
+	public String getJwtToken() {
+		return jwtToken;
 	}
 
 	public boolean isApiEnabled() {
 		return apiEnabled;
+	}
+
+	public UserData getUserData() {
+		return userData;
+	}
+
+	public boolean isLoggedIn() {
+		return jwtToken != null && !jwtToken.isEmpty() && userData != null;
 	}
 
 	// Setters
@@ -80,13 +109,36 @@ public class BlanielConfig {
 		save();
 	}
 
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
+	public void setJwtToken(String jwtToken) {
+		this.jwtToken = jwtToken;
 		save();
 	}
 
 	public void setApiEnabled(boolean apiEnabled) {
 		this.apiEnabled = apiEnabled;
+		save();
+	}
+
+	public void setUserData(UserData userData) {
+		this.userData = userData;
+		save();
+	}
+
+	/**
+	 * Login: guarda token y datos del usuario
+	 */
+	public void login(String jwtToken, UserData userData) {
+		this.jwtToken = jwtToken;
+		this.userData = userData;
+		save();
+	}
+
+	/**
+	 * Logout: limpia token y datos
+	 */
+	public void logout() {
+		this.jwtToken = "";
+		this.userData = null;
 		save();
 	}
 }
