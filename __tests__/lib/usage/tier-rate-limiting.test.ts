@@ -149,12 +149,15 @@ describe('Tier Limits System', () => {
       expect(comparison.improvements.some(imp => imp.includes('30 solicitudes/min'))).toBe(true);
     });
 
-    it.skip('should show unlimited benefits for ultra tier', () => {
-      // SKIP: getTierComparison tiene un bug - intenta acceder a messagesPerDay que ya no existe
-      // TODO: Arreglar getTierComparison para usar totalTokensPerDay
+    it('should show ultra tier benefits', () => {
+      // Ultra tier NO tiene mensajes ilimitados - tiene 35,000 tokens/día (mismo que PLUS)
+      // Solo groupMessagesPerDay es ilimitado (-1)
       const comparison = getTierComparison('free', 'ultra');
       expect(comparison.tier).toBe('ultra');
-      expect(comparison.improvements.some(imp => imp.includes('ilimitados'))).toBe(true);
+      expect(comparison.improvements.length).toBeGreaterThan(0);
+      // Verificar que incluye más agentes y mundos
+      expect(comparison.improvements.some(imp => imp.includes('100 agentes'))).toBe(true);
+      expect(comparison.improvements.some(imp => imp.includes('20 mundos'))).toBe(true);
     });
   });
 
