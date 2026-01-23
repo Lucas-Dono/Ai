@@ -19,7 +19,7 @@
 			"com.blaniel.minecraft.BlanielMod"
 		],
 		"client": [
-			"com.blaniel.minecraft.BlanielModClient"
+			"com.blaniel.minecraft.client.BlanielModClient"
 		]
 	},
 	"mixins": [
