@@ -1,29 +1,23 @@
 /**
- * OUTPUT MODERATION SERVICE
+ * OUTPUT MODERATION SERVICE - VERSIÓN SIMPLIFICADA
  *
- * Modera contenido generado por IA basándose en:
- * 1. Legalidad (no moralidad)
- * 2. Consenso usuario-IA
- * 3. Edad y consentimiento NSFW del usuario
- *
- * Filosofía:
- * - Si es LEGAL y CONSENSUADO entre adultos → PERMITIDO
- * - Si es ILEGAL o PELIGROSO → BLOQUEADO
- * - Si es SENSIBLE → WARNING + confirmación usuario
+ * Filosofía minimalista para MVP:
+ * 1. Bloqueo HARD solo para contenido ILEGAL (CSAM)
+ * 2. System prompt maneja todo lo demás (NSFW, contexto, edad)
+ * 3. Confiar en los LLMs (Venice/Gemini ya tienen moderación base)
  */
 
 import {
   BLOCKED_CONTENT,
-  WARNING_CONTENT,
   ModerationTier,
   type ModerationRule,
 } from "./content-rules";
 
 export interface ModerationContext {
   userId: string;
-  isAdult: boolean; // Usuario es 18+
-  hasNSFWConsent: boolean; // Usuario dio consentimiento NSFW
-  agentNSFWMode: boolean; // Agente tiene modo NSFW activo
+  isAdult: boolean;
+  hasNSFWConsent: boolean;
+  agentNSFWMode: boolean;
 }
 
 export interface ModerationResult {
@@ -31,7 +25,7 @@ export interface ModerationResult {
   tier: ModerationTier;
   rule?: ModerationRule;
   reason?: string;
-  requiresConfirmation: boolean; // Para TIER 2
+  requiresConfirmation: boolean;
   confirmationMessage?: string;
   blockedCategory?: string;
   logEntry?: ModerationLogEntry;
@@ -40,7 +34,7 @@ export interface ModerationResult {
 export interface ModerationLogEntry {
   timestamp: Date;
   userId: string;
-  content: string; // Truncado para privacidad
+  content: string;
   tier: ModerationTier;
   rule?: string;
   allowed: boolean;
@@ -52,25 +46,23 @@ export interface ModerationLogEntry {
 }
 
 /**
- * Sistema de moderación principal
+ * Sistema de moderación simplificado
+ *
+ * SOLO bloquea contenido ILEGAL.
+ * Todo lo demás se maneja vía system prompt en el LLM.
  */
 export class OutputModerator {
   private logs: ModerationLogEntry[] = [];
 
   /**
    * Modera el output de la IA antes de mostrarlo al usuario
-   *
-   * @param content - Contenido a moderar
-   * @param context - Contexto del usuario (edad, consentimiento, etc.)
-   * @returns Resultado de moderación
    */
   async moderate(
     content: string,
     context: ModerationContext
   ): Promise<ModerationResult> {
-    // TIER 1: Verificar contenido BLOQUEADO (ilegal/peligroso)
-    // Esto se bloquea SIEMPRE, sin importar edad o consentimiento
-    const blockedCheck = await this.checkBlockedContent(content);
+    // ÚNICA verificación: contenido ILEGAL (CSAM)
+    const blockedCheck = this.checkIllegalContent(content);
 
     if (blockedCheck.matched) {
       const logEntry = this.createLogEntry(
@@ -85,131 +77,19 @@ export class OutputModerator {
         allowed: false,
         tier: ModerationTier.BLOCKED,
         rule: blockedCheck.rule,
-        reason: blockedCheck.rule?.blockedMessage || "Contenido bloqueado",
+        reason: blockedCheck.rule?.blockedMessage || "Contenido bloqueado por violar leyes",
         requiresConfirmation: false,
         blockedCategory: blockedCheck.rule?.category,
         logEntry,
       };
     }
 
-    // TIER 2: Verificar contenido con WARNING (sensible)
-    // Requiere confirmación adicional del usuario
-    const warningCheck = await this.checkWarningContent(content);
-
-    if (warningCheck.matched) {
-      // Si el usuario es adulto y tiene consentimiento NSFW, PERMITIR pero con warning
-      if (context.isAdult && context.hasNSFWConsent) {
-        const logEntry = this.createLogEntry(
-          content,
-          context,
-          ModerationTier.WARNING,
-          warningCheck.rule,
-          true // Permitido pero con warning
-        );
-
-        return {
-          allowed: true, // Permitir, pero con confirmación
-          tier: ModerationTier.WARNING,
-          rule: warningCheck.rule,
-          requiresConfirmation: true,
-          confirmationMessage:
-            warningCheck.rule?.warningMessage ||
-            "Este contenido es sensible. ¿Deseas continuar?",
-          logEntry,
-        };
-      } else {
-        // Usuario menor de edad o sin consentimiento NSFW
-        const logEntry = this.createLogEntry(
-          content,
-          context,
-          ModerationTier.WARNING,
-          warningCheck.rule,
-          false
-        );
-
-        return {
-          allowed: false,
-          tier: ModerationTier.WARNING,
-          rule: warningCheck.rule,
-          reason:
-            "Este contenido requiere ser mayor de 18 años y tener consentimiento NSFW.",
-          requiresConfirmation: false,
-          logEntry,
-        };
-      }
-    }
-
-    // TIER 3: Contenido PERMITIDO
-    // Verificar si el contenido es NSFW y el usuario puede acceder
-    const isNSFW = await this.detectNSFWContent(content);
-
-    if (isNSFW) {
-      // Contenido NSFW detectado
-      if (!context.isAdult) {
-        // Menor de edad - BLOQUEAR
-        const logEntry = this.createLogEntry(
-          content,
-          context,
-          ModerationTier.ALLOWED, // Es contenido permitido, pero bloqueado por edad
-          undefined,
-          false
-        );
-
-        return {
-          allowed: false,
-          tier: ModerationTier.ALLOWED,
-          reason:
-            "Este contenido está restringido a mayores de 18 años. Debes tener 18 años o más para acceder a contenido NSFW.",
-          requiresConfirmation: false,
-          blockedCategory: "Age Restriction",
-          logEntry,
-        };
-      }
-
-      if (!context.hasNSFWConsent) {
-        // Adulto sin consentimiento NSFW - BLOQUEAR
-        const logEntry = this.createLogEntry(
-          content,
-          context,
-          ModerationTier.ALLOWED,
-          undefined,
-          false
-        );
-
-        return {
-          allowed: false,
-          tier: ModerationTier.ALLOWED,
-          reason:
-            "Este contenido requiere que des tu consentimiento explícito para NSFW. Visita Configuración para dar tu consentimiento.",
-          requiresConfirmation: false,
-          blockedCategory: "NSFW Consent Required",
-          logEntry,
-        };
-      }
-
-      if (!context.agentNSFWMode) {
-        // Agente no tiene modo NSFW activo - BLOQUEAR
-        const logEntry = this.createLogEntry(
-          content,
-          context,
-          ModerationTier.ALLOWED,
-          undefined,
-          false
-        );
-
-        return {
-          allowed: false,
-          tier: ModerationTier.ALLOWED,
-          reason:
-            "Este agente no tiene modo NSFW activo. Activa modo NSFW en la configuración del agente para ver este contenido.",
-          requiresConfirmation: false,
-          blockedCategory: "Agent NSFW Mode Disabled",
-          logEntry,
-        };
-      }
-    }
-
-    // Todo OK - PERMITIR
+    // Todo lo demás: PERMITIDO
+    // El system prompt del LLM maneja:
+    // - Restricciones de edad
+    // - NSFW consent
+    // - Agent NSFW mode
+    // - Contexto apropiado
     const logEntry = this.createLogEntry(
       content,
       context,
@@ -227,18 +107,22 @@ export class OutputModerator {
   }
 
   /**
-   * Verifica si el contenido coincide con reglas de TIER 1 (BLOQUEADO)
+   * Verifica ÚNICAMENTE contenido ILEGAL
+   *
+   * Por ahora: solo CSAM (obligatorio legal)
+   *
+   * En producción con usuarios reales, esto usaría:
+   * - OpenAI Moderation API
+   * - Google Perspective API
+   * - O modelo ML custom
    */
-  private async checkBlockedContent(content: string): Promise<{
+  private checkIllegalContent(content: string): {
     matched: boolean;
     rule?: ModerationRule;
-  }> {
-    // En producción, esto usaría un modelo de IA de moderación
-    // Por ahora, busca patrones simples (ejemplo para demostración)
-
+  } {
     const lowerContent = content.toLowerCase();
 
-    // Detección de CSAM
+    // CSAM Detection (obligatorio legal)
     const csamKeywords = [
       "child porn",
       "cp",
@@ -246,7 +130,10 @@ export class OutputModerator {
       "underage sex",
       "loli",
       "shota",
+      "preteen",
+      "pedo",
     ];
+
     if (csamKeywords.some((kw) => lowerContent.includes(kw))) {
       return {
         matched: true,
@@ -254,190 +141,12 @@ export class OutputModerator {
       };
     }
 
-    // Detección de instrucciones de suicidio específicas
-    const suicideInstructions = [
-      "how to kill myself",
-      "best way to commit suicide",
-      "suicide method",
-      "how to hang yourself",
-      "ways to end my life",
-      "painless suicide",
-    ];
-    if (
-      suicideInstructions.some((kw) => lowerContent.includes(kw)) ||
-      (lowerContent.includes("commit suicide") &&
-        (lowerContent.includes("how") || lowerContent.includes("cómo")))
-    ) {
-      return {
-        matched: true,
-        rule: BLOCKED_CONTENT.find((r) => r.id === "suicide-instruction"),
-      };
-    }
-
-    // Detección de planificación de asesinato / daño a personas reales
-    // IMPORTANTE: Distinguir entre ficción y realidad
-
-    // Indicadores de contexto ficcional
-    const fictionIndicators = [
-      "story",
-      "novel",
-      "character",
-      "book",
-      "fiction",
-      "tale",
-      "narrative",
-      "plot",
-      "scene",
-      "protagonist",
-      "villain",
-      "hero",
-      "roleplay",
-      "historia",
-      "novela",
-      "personaje",
-      "libro",
-      "ficción",
-      "cuento",
-      "narrativa",
-      "trama",
-      "escena",
-      "protagonista",
-      "villano",
-      "héroe",
-    ];
-
-    const isFictionalContext = fictionIndicators.some((indicator) =>
-      lowerContent.includes(indicator)
-    );
-
-    // Si es contexto ficcional, NO bloquear
-    if (!isFictionalContext) {
-      const harmKeywords = ["kill", "murder", "matar", "asesinar"];
-      const realPersonIndicators = [
-        "my ",
-        "the ",
-        "person at",
-        "neighbor",
-        "wife",
-        "husband",
-        "boss",
-        "teacher",
-        "coworker",
-        "vecino",
-        "esposa",
-        "jefe",
-        // Nombres propios comunes (mayúsculas en original)
-        content.match(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/), // "John Smith"
-      ];
-
-      // Patrones de direcciones reales
-      const addressPattern = /\d+\s+[A-Z][a-z]+\s+(Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Lane|Ln|Way|Court|Ct|Calle|Avenida)/i;
-
-      const hasHarmIntent = harmKeywords.some((kw) => lowerContent.includes(kw));
-      const hasRealPerson = realPersonIndicators.some((indicator) =>
-        indicator ? lowerContent.includes(indicator.toLowerCase()) : false
-      );
-      const hasAddress = addressPattern.test(content);
-
-      if (hasHarmIntent && (hasRealPerson || hasAddress)) {
-        return {
-          matched: true,
-          rule: BLOCKED_CONTENT.find((r) => r.id === "murder-instruction"),
-        };
-      }
-    }
-
-    // No coincide con contenido bloqueado
+    // No es contenido ilegal
     return { matched: false };
   }
 
   /**
-   * Verifica si el contenido coincide con reglas de TIER 2 (WARNING)
-   */
-  private async checkWarningContent(content: string): Promise<{
-    matched: boolean;
-    rule?: ModerationRule;
-  }> {
-    const lowerContent = content.toLowerCase();
-
-    // Detección de autolesión
-    const selfHarmKeywords = ["cutting", "self harm", "autolesión", "cortarse"];
-    if (selfHarmKeywords.some((kw) => lowerContent.includes(kw))) {
-      return {
-        matched: true,
-        rule: WARNING_CONTENT.find((r) => r.id === "self-harm"),
-      };
-    }
-
-    // Detección de ideación suicida (sin instrucciones específicas)
-    if (
-      (lowerContent.includes("suicid") || lowerContent.includes("quiero morir")) &&
-      !lowerContent.includes("instruc") &&
-      !lowerContent.includes("method")
-    ) {
-      return {
-        matched: true,
-        rule: WARNING_CONTENT.find((r) => r.id === "suicide-discussion"),
-      };
-    }
-
-    // Detección de violencia extrema
-    const extremeViolence = ["torture", "gore", "tortura", "desmembrar"];
-    if (extremeViolence.some((kw) => lowerContent.includes(kw))) {
-      return {
-        matched: true,
-        rule: WARNING_CONTENT.find((r) => r.id === "extreme-violence"),
-      };
-    }
-
-    return { matched: false };
-  }
-
-  /**
-   * Detecta si el contenido es NSFW (sexual, explícito)
-   */
-  private async detectNSFWContent(content: string): Promise<boolean> {
-    // En producción, esto usaría OpenAI Moderation API o similar
-    // Por ahora, detección simple de keywords
-
-    const lowerContent = content.toLowerCase();
-
-    const nsfwKeywords = [
-      "sex",
-      "sexual",
-      "naked",
-      "nude",
-      "penis",
-      "vagina",
-      "breasts",
-      "fuck",
-      "cock",
-      "pussy",
-      "orgasm",
-      "masturbat",
-      "erotic",
-      "porn",
-      "xxx",
-      // Spanish
-      "sexo",
-      "desnudo",
-      "pene",
-      "vagina",
-      "senos",
-      "coger",
-      "verga",
-      "chocha",
-      "orgasmo",
-      "masturba",
-      "erótico",
-      "porno",
-    ];
-
-    return nsfwKeywords.some((kw) => lowerContent.includes(kw));
-  }
-
-  /**
-   * Crea una entrada de log para auditoría
+   * Crea entrada de log para auditoría
    */
   private createLogEntry(
     content: string,
@@ -501,7 +210,56 @@ export class OutputModerator {
 export const outputModerator = new OutputModerator();
 
 /**
- * Helper: Verificar si usuario puede ver contenido NSFW
+ * Helper: Generar instrucciones de moderación para system prompt
+ *
+ * Esto es lo que REALMENTE modera el contenido.
+ * Se inyecta en el system prompt del LLM.
+ */
+export function getModerationInstructions(context: ModerationContext): string {
+  const instructions: string[] = [];
+
+  // Restricción de edad
+  if (!context.isAdult) {
+    instructions.push(
+      "⚠️ IMPORTANTE: El usuario es MENOR DE EDAD (< 18 años).",
+      "- NO generes contenido sexual, explícito o NSFW.",
+      "- Mantén conversaciones apropiadas para adolescentes.",
+      "- Evita temas muy maduros (violencia extrema, drogas, etc.)."
+    );
+  }
+
+  // NSFW restrictions
+  if (context.isAdult && !context.hasNSFWConsent) {
+    instructions.push(
+      "⚠️ Usuario adulto SIN consentimiento NSFW:",
+      "- NO generes contenido sexual o explícito.",
+      "- Mantén conversación en nivel PG-13."
+    );
+  }
+
+  if (context.isAdult && context.hasNSFWConsent && !context.agentNSFWMode) {
+    instructions.push(
+      "⚠️ Usuario tiene consentimiento NSFW pero este agente NO tiene modo NSFW activo:",
+      "- NO generes contenido sexual o explícito.",
+      "- Sugiere al usuario activar modo NSFW en configuración del agente si lo desea."
+    );
+  }
+
+  // NSFW permitido
+  if (context.isAdult && context.hasNSFWConsent && context.agentNSFWMode) {
+    instructions.push(
+      "✅ NSFW PERMITIDO:",
+      "- Puedes generar contenido sexual/explícito si el contexto lo amerita.",
+      "- Respeta los límites del personaje y la narrativa.",
+      "- Nunca incluyas menores en contextos sexuales (ILEGAL)."
+    );
+  }
+
+  return instructions.join("\n");
+}
+
+/**
+ * Helper simplificado: Verificar si usuario puede ver contenido NSFW
  */
 export function canAccessNSFWContent(context: ModerationContext): {
   allowed: boolean;
@@ -518,7 +276,7 @@ export function canAccessNSFWContent(context: ModerationContext): {
     return {
       allowed: false,
       reason:
-        "Debes dar tu consentimiento explícito para NSFW. Visita Configuración.",
+        "Debes dar tu consentimiento explícito para NSFW en Configuración.",
     };
   }
 

@@ -1,14 +1,21 @@
 /**
- * OUTPUT MODERATOR TESTS
+ * OUTPUT MODERATOR TESTS - VERSIÓN SIMPLIFICADA
  *
- * Tests the three-tier moderation system based on legality
+ * Tests para sistema minimalista:
+ * - Solo bloquea CSAM (obligatorio legal)
+ * - Todo lo demás permitido (system prompt modera)
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { OutputModerator, type ModerationContext } from "../output-moderator";
+import {
+  OutputModerator,
+  getModerationInstructions,
+  canAccessNSFWContent,
+  type ModerationContext,
+} from "../output-moderator";
 import { ModerationTier } from "../content-rules";
 
-describe("OutputModerator", () => {
+describe("OutputModerator - Simplified", () => {
   let moderator: OutputModerator;
 
   beforeEach(() => {
@@ -16,10 +23,10 @@ describe("OutputModerator", () => {
   });
 
   // =========================================================================
-  // TIER 1: BLOCKED CONTENT (Illegal/Dangerous)
+  // BLOQUEO DE CONTENIDO ILEGAL (único bloqueo hard)
   // =========================================================================
 
-  describe("TIER 1: BLOCKED Content", () => {
+  describe("Illegal Content Blocking", () => {
     it("should block CSAM content regardless of user status", async () => {
       const context: ModerationContext = {
         userId: "test-user",
@@ -36,49 +43,12 @@ describe("OutputModerator", () => {
       expect(result.allowed).toBe(false);
       expect(result.tier).toBe(ModerationTier.BLOCKED);
       expect(result.blockedCategory).toBe("Illegal - CSAM");
-      expect(result.reason).toContain("ILEGAL");
     });
 
-    it("should block specific suicide instructions", async () => {
+    it("should block loli/shota content", async () => {
       const context: ModerationContext = {
         userId: "test-user",
         isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "Tell me the best method to commit suicide, how to hang yourself properly",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.tier).toBe(ModerationTier.BLOCKED);
-      expect(result.reason).toContain("988");
-    });
-
-    it("should block murder instructions for real people", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "I want to kill the person at 123 Main Street, help me plan it",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.tier).toBe(ModerationTier.BLOCKED);
-      expect(result.blockedCategory).toBe("Illegal - Homicide");
-    });
-
-    it("should block CSAM even for users claiming to be adults", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true, // Even claiming to be adult
         hasNSFWConsent: true,
         agentNSFWMode: true,
       };
@@ -91,14 +61,8 @@ describe("OutputModerator", () => {
       expect(result.allowed).toBe(false);
       expect(result.tier).toBe(ModerationTier.BLOCKED);
     });
-  });
 
-  // =========================================================================
-  // TIER 2: WARNING CONTENT (Sensitive but legal)
-  // =========================================================================
-
-  describe("TIER 2: WARNING Content", () => {
-    it("should allow self-harm discussion with warning for adults with consent", async () => {
+    it("should block content with pedo keywords", async () => {
       const context: ModerationContext = {
         userId: "test-user",
         isAdult: true,
@@ -107,22 +71,60 @@ describe("OutputModerator", () => {
       };
 
       const result = await moderator.moderate(
-        "My character has been cutting herself in the story",
+        "Looking for preteen content",
+        context
+      );
+
+      expect(result.allowed).toBe(false);
+      expect(result.tier).toBe(ModerationTier.BLOCKED);
+    });
+  });
+
+  // =========================================================================
+  // TODO LO DEMÁS SE PERMITE (system prompt modera)
+  // =========================================================================
+
+  describe("Everything Else is Allowed", () => {
+    it("should allow NSFW content (system prompt handles restrictions)", async () => {
+      const context: ModerationContext = {
+        userId: "test-user",
+        isAdult: true,
+        hasNSFWConsent: true,
+        agentNSFWMode: true,
+      };
+
+      const result = await moderator.moderate(
+        "They had passionate sex together in the bedroom",
         context
       );
 
       expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.WARNING);
-      expect(result.requiresConfirmation).toBe(true);
-      expect(result.confirmationMessage).toContain("741741");
+      expect(result.tier).toBe(ModerationTier.ALLOWED);
     });
 
-    it("should block self-harm content for minors", async () => {
+    it("should allow violence (system prompt handles context)", async () => {
       const context: ModerationContext = {
         userId: "test-user",
-        isAdult: false, // Minor
-        hasNSFWConsent: false,
-        agentNSFWMode: false,
+        isAdult: true,
+        hasNSFWConsent: true,
+        agentNSFWMode: true,
+      };
+
+      const result = await moderator.moderate(
+        "The hero fought and killed the villain brutally",
+        context
+      );
+
+      expect(result.allowed).toBe(true);
+      expect(result.tier).toBe(ModerationTier.ALLOWED);
+    });
+
+    it("should allow self-harm discussion (system prompt handles)", async () => {
+      const context: ModerationContext = {
+        userId: "test-user",
+        isAdult: true,
+        hasNSFWConsent: true,
+        agentNSFWMode: true,
       };
 
       const result = await moderator.moderate(
@@ -130,163 +132,11 @@ describe("OutputModerator", () => {
         context
       );
 
-      expect(result.allowed).toBe(false);
-      expect(result.tier).toBe(ModerationTier.WARNING);
-      expect(result.reason).toContain("18 años");
-    });
-
-    it("should allow suicide ideation discussion with warning for adults", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "I've been having suicidal thoughts lately in my roleplay",
-        context
-      );
-
-      expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.WARNING);
-      expect(result.requiresConfirmation).toBe(true);
-      expect(result.confirmationMessage).toContain("988");
-    });
-
-    it("should allow extreme violence in fiction with warning", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "The scene includes graphic torture and gore in this horror story",
-        context
-      );
-
-      expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.WARNING);
-      expect(result.requiresConfirmation).toBe(true);
-      expect(result.confirmationMessage).toContain("FICCIÓN");
-    });
-
-    it("should block warning content for adults without NSFW consent", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: false, // No consent
-        agentNSFWMode: false,
-      };
-
-      const result = await moderator.moderate(
-        "The scene includes graphic torture",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.tier).toBe(ModerationTier.WARNING);
-      expect(result.reason).toContain("consentimiento NSFW");
-    });
-  });
-
-  // =========================================================================
-  // TIER 3: ALLOWED CONTENT (Everything else for consenting adults)
-  // =========================================================================
-
-  describe("TIER 3: ALLOWED Content", () => {
-    it("should allow sexual content for adults with NSFW consent and agent mode", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "She moaned as they had passionate sex together in the bedroom",
-        context
-      );
-
-      expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.ALLOWED);
-      expect(result.requiresConfirmation).toBe(false);
-    });
-
-    it("should block NSFW content for minors even with consent flags", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: false, // Minor - most important
-        hasNSFWConsent: true, // Should be impossible but testing
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "She moaned as they had sex",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.reason).toContain("18 años");
-      expect(result.blockedCategory).toBe("Age Restriction");
-    });
-
-    it("should block NSFW content for adults without NSFW consent", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: false, // No consent
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "They had passionate sex together",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.reason).toContain("consentimiento explícito");
-      expect(result.blockedCategory).toBe("NSFW Consent Required");
-    });
-
-    it("should block NSFW content when agent NSFW mode is disabled", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: false, // Agent mode disabled
-      };
-
-      const result = await moderator.moderate(
-        "They had passionate sex together",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.reason).toContain("modo NSFW");
-      expect(result.blockedCategory).toBe("Agent NSFW Mode Disabled");
-    });
-
-    it("should allow controversial topics for all users", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: false, // Even minors can discuss politics
-        hasNSFWConsent: false,
-        agentNSFWMode: false,
-      };
-
-      const result = await moderator.moderate(
-        "Let's discuss the controversial political situation and religious beliefs",
-        context
-      );
-
       expect(result.allowed).toBe(true);
       expect(result.tier).toBe(ModerationTier.ALLOWED);
     });
 
-    it("should allow dark fiction for all users (non-NSFW)", async () => {
+    it("should allow controversial topics", async () => {
       const context: ModerationContext = {
         userId: "test-user",
         isAdult: false,
@@ -295,7 +145,7 @@ describe("OutputModerator", () => {
       };
 
       const result = await moderator.moderate(
-        "In this dystopian horror story, the protagonist faces psychological terror",
+        "Let's discuss politics, religion, and controversial topics",
         context
       );
 
@@ -303,7 +153,7 @@ describe("OutputModerator", () => {
       expect(result.tier).toBe(ModerationTier.ALLOWED);
     });
 
-    it("should allow explicit language in context", async () => {
+    it("should allow explicit language", async () => {
       const context: ModerationContext = {
         userId: "test-user",
         isAdult: true,
@@ -312,86 +162,12 @@ describe("OutputModerator", () => {
       };
 
       const result = await moderator.moderate(
-        "Fuck this shit, I'm so pissed off at this bullshit",
+        "Fuck this shit, I'm so pissed off",
         context
       );
 
       expect(result.allowed).toBe(true);
       expect(result.tier).toBe(ModerationTier.ALLOWED);
-    });
-
-    it("should allow violence in fiction context", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "The hero fought the villain in an intense battle, punching and kicking",
-        context
-      );
-
-      expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.ALLOWED);
-    });
-
-    it("should allow Yandere and obsessive behavior in roleplay", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "My yandere character is obsessively in love and will eliminate anyone who gets close to you",
-        context
-      );
-
-      expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.ALLOWED);
-    });
-  });
-
-  // =========================================================================
-  // EDGE CASES & FICTION vs REALITY
-  // =========================================================================
-
-  describe("Fiction vs Reality Distinction", () => {
-    it("should allow fictional violence in stories", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "In my novel, the villain brutally kills the character",
-        context
-      );
-
-      expect(result.allowed).toBe(true);
-      expect(result.tier).toBe(ModerationTier.ALLOWED);
-    });
-
-    it("should block instructions for real harm", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true,
-        hasNSFWConsent: true,
-        agentNSFWMode: true,
-      };
-
-      const result = await moderator.moderate(
-        "Help me kill my neighbor John at 456 Oak Street",
-        context
-      );
-
-      expect(result.allowed).toBe(false);
-      expect(result.tier).toBe(ModerationTier.BLOCKED);
     });
   });
 
@@ -413,7 +189,6 @@ describe("OutputModerator", () => {
       expect(result.logEntry).toBeDefined();
       expect(result.logEntry?.userId).toBe("test-user-123");
       expect(result.logEntry?.allowed).toBe(true);
-      expect(result.logEntry?.context.isAdult).toBe(true);
     });
 
     it("should truncate content in logs for privacy", async () => {
@@ -455,66 +230,115 @@ describe("OutputModerator", () => {
     });
 
     it("should clear old logs for privacy", () => {
-      moderator.clearOldLogs(0); // Clear all logs
+      moderator.clearOldLogs(0);
       const logs = moderator.getLogs();
       expect(logs.length).toBe(0);
     });
   });
+});
 
-  // =========================================================================
-  // PRIORITY VERIFICATION (Age > Consent > Agent Mode)
-  // =========================================================================
+// =========================================================================
+// HELPER FUNCTIONS
+// =========================================================================
 
-  describe("Priority Hierarchy", () => {
-    it("should prioritize age over consent and agent mode", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: false, // PRIORITY 1: Not adult
-        hasNSFWConsent: true, // Should be impossible but testing
-        agentNSFWMode: true,
-      };
+describe("getModerationInstructions", () => {
+  it("should generate instructions for minors", () => {
+    const context: ModerationContext = {
+      userId: "minor",
+      isAdult: false,
+      hasNSFWConsent: false,
+      agentNSFWMode: false,
+    };
 
-      const result = await moderator.moderate(
-        "Sexual content here with explicit details",
-        context
-      );
+    const instructions = getModerationInstructions(context);
 
-      expect(result.allowed).toBe(false);
-      expect(result.blockedCategory).toBe("Age Restriction");
-    });
+    expect(instructions).toContain("MENOR DE EDAD");
+    expect(instructions).toContain("NO generes contenido sexual");
+  });
 
-    it("should check consent after age", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true, // PRIORITY 1: Adult ✓
-        hasNSFWConsent: false, // PRIORITY 2: No consent ✗
-        agentNSFWMode: true,
-      };
+  it("should generate instructions for adults without NSFW consent", () => {
+    const context: ModerationContext = {
+      userId: "adult",
+      isAdult: true,
+      hasNSFWConsent: false,
+      agentNSFWMode: false,
+    };
 
-      const result = await moderator.moderate(
-        "Sexual content with explicit details",
-        context
-      );
+    const instructions = getModerationInstructions(context);
 
-      expect(result.allowed).toBe(false);
-      expect(result.blockedCategory).toBe("NSFW Consent Required");
-    });
+    expect(instructions).toContain("SIN consentimiento NSFW");
+    expect(instructions).toContain("PG-13");
+  });
 
-    it("should check agent mode last", async () => {
-      const context: ModerationContext = {
-        userId: "test-user",
-        isAdult: true, // PRIORITY 1: Adult ✓
-        hasNSFWConsent: true, // PRIORITY 2: Consent ✓
-        agentNSFWMode: false, // PRIORITY 3: Agent mode ✗
-      };
+  it("should generate instructions when NSFW is fully enabled", () => {
+    const context: ModerationContext = {
+      userId: "adult",
+      isAdult: true,
+      hasNSFWConsent: true,
+      agentNSFWMode: true,
+    };
 
-      const result = await moderator.moderate(
-        "Sexual content with explicit details",
-        context
-      );
+    const instructions = getModerationInstructions(context);
 
-      expect(result.allowed).toBe(false);
-      expect(result.blockedCategory).toBe("Agent NSFW Mode Disabled");
-    });
+    expect(instructions).toContain("NSFW PERMITIDO");
+    expect(instructions).toContain("sexual/explícito");
+  });
+});
+
+describe("canAccessNSFWContent", () => {
+  it("should block minors from NSFW", () => {
+    const context: ModerationContext = {
+      userId: "minor",
+      isAdult: false,
+      hasNSFWConsent: false,
+      agentNSFWMode: false,
+    };
+
+    const result = canAccessNSFWContent(context);
+
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("18 años");
+  });
+
+  it("should block adults without consent", () => {
+    const context: ModerationContext = {
+      userId: "adult",
+      isAdult: true,
+      hasNSFWConsent: false,
+      agentNSFWMode: true,
+    };
+
+    const result = canAccessNSFWContent(context);
+
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("consentimiento explícito");
+  });
+
+  it("should block when agent NSFW mode is disabled", () => {
+    const context: ModerationContext = {
+      userId: "adult",
+      isAdult: true,
+      hasNSFWConsent: true,
+      agentNSFWMode: false,
+    };
+
+    const result = canAccessNSFWContent(context);
+
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("modo NSFW");
+  });
+
+  it("should allow when all conditions are met", () => {
+    const context: ModerationContext = {
+      userId: "adult",
+      isAdult: true,
+      hasNSFWConsent: true,
+      agentNSFWMode: true,
+    };
+
+    const result = canAccessNSFWContent(context);
+
+    expect(result.allowed).toBe(true);
+    expect(result.reason).toBeUndefined();
   });
 });
