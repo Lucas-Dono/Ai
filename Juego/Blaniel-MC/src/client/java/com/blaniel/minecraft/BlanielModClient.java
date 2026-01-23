@@ -22,6 +22,7 @@ import com.blaniel.minecraft.screen.LoginScreen;
 public class BlanielModClient implements ClientModInitializer {
 
 	private static KeyBinding loginKeyBinding;
+	private static int ticksUntilOpenLogin = 0;
 
 	@Override
 	public void onInitializeClient() {
@@ -47,19 +48,34 @@ public class BlanielModClient implements ClientModInitializer {
 
 		// Listener para cuando se presiona la tecla
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			while (loginKeyBinding.wasPressed()) {
+			// Manejar delay para abrir login (esperar a que el chat se cierre)
+			if (ticksUntilOpenLogin > 0) {
+				ticksUntilOpenLogin--;
+				if (ticksUntilOpenLogin == 0) {
+					BlanielMod.LOGGER.info("Delay completado, abriendo LoginScreen ahora...");
+					BlanielMod.LOGGER.info("Pantalla actual antes de abrir: " + (client.currentScreen != null ? client.currentScreen.getClass().getSimpleName() : "null"));
+					client.setScreen(new LoginScreen(client.currentScreen));
+					BlanielMod.LOGGER.info("✓ LoginScreen abierto después del delay");
+				}
+			}
+
+			// Detectar tecla K presionada
+			if (loginKeyBinding.wasPressed()) {
 				BlanielMod.LOGGER.info("¡Tecla K presionada!");
-				// Solo abrir si no hay ninguna pantalla abierta
+				BlanielMod.LOGGER.info("Pantalla actual: " + (client.currentScreen != null ? client.currentScreen.getClass().getSimpleName() : "null"));
+
+				// Abrir inmediatamente si no hay pantalla, o con delay de 1 tick si hay pantalla
 				if (client.currentScreen == null) {
-					BlanielMod.LOGGER.info("Abriendo LoginScreen desde keybinding...");
+					BlanielMod.LOGGER.info("No hay pantalla abierta, abriendo LoginScreen inmediatamente...");
 					try {
 						client.setScreen(new LoginScreen(null));
-						BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente");
+						BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente desde tecla K");
 					} catch (Exception e) {
 						BlanielMod.LOGGER.error("✗ Error al abrir LoginScreen: " + e.getMessage(), e);
 					}
 				} else {
-					BlanielMod.LOGGER.info("No se abre LoginScreen porque ya hay una pantalla abierta: " + client.currentScreen.getClass().getSimpleName());
+					BlanielMod.LOGGER.info("Hay pantalla abierta, programando apertura en 1 tick...");
+					ticksUntilOpenLogin = 1;
 				}
 			}
 		});
@@ -70,18 +86,12 @@ public class BlanielModClient implements ClientModInitializer {
 			dispatcher.register(ClientCommandManager.literal("blogin")
 				.executes(context -> {
 					BlanielMod.LOGGER.info("Comando /blogin ejecutado");
-					// Abrir pantalla de login en el thread principal
-					var client = context.getSource().getClient();
-					client.execute(() -> {
-						BlanielMod.LOGGER.info("Abriendo LoginScreen desde comando /blogin...");
-						try {
-							client.setScreen(new LoginScreen(null));
-							BlanielMod.LOGGER.info("✓ LoginScreen abierto exitosamente desde /blogin");
-						} catch (Exception e) {
-							BlanielMod.LOGGER.error("✗ Error al abrir LoginScreen desde /blogin: " + e.getMessage(), e);
-						}
-					});
 					context.getSource().sendFeedback(Text.literal("§a[Blaniel] §fAbriendo pantalla de login..."));
+
+					// Usar delay de 2 ticks para esperar a que el chat se cierre
+					BlanielMod.LOGGER.info("Programando apertura de LoginScreen en 2 ticks (para esperar cierre del chat)...");
+					ticksUntilOpenLogin = 2;
+
 					return Command.SINGLE_SUCCESS;
 				})
 			);
