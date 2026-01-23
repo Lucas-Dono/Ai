@@ -43,9 +43,12 @@ const minecraftChatSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params (Next.js 16 requirement)
+    const { id: agentId } = await params;
+
     // Extraer y verificar JWT token
     const authHeader = req.headers.get('Authorization');
     const token = extractTokenFromHeader(authHeader);
@@ -68,8 +71,6 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
-
-    const agentId = params.id;
     const body = await req.json();
     const validation = minecraftChatSchema.safeParse(body);
 
