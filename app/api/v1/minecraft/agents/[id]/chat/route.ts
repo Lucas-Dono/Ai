@@ -37,7 +37,7 @@ const minecraftChatSchema = z.object({
       'talking',
     ]).optional(),
     nearbyPlayers: z.array(z.string()).optional(), // Lista de usernames
-    timeOfDay: z.number().min(0).max(24000).optional(), // Minecraft ticks
+    timeOfDay: z.number().min(0).optional(), // Minecraft world time (total ticks)
     weather: z.enum(['clear', 'rain', 'thunder']).optional(),
   }).optional(),
 });
@@ -87,6 +87,9 @@ export async function POST(
 
     const { message, context } = validation.data;
 
+    // Normalizar timeOfDay a 0-24000 (hora del día)
+    const normalizedTimeOfDay = context?.timeOfDay ? context.timeOfDay % 24000 : undefined;
+
     // Rate limiting específico para Minecraft (más restrictivo)
     const canUse = await canSendMessage(user.id, user.plan);
     if (!canUse) {
@@ -106,7 +109,7 @@ export async function POST(
       position: context?.position,
       activity: context?.activity || 'idle',
       nearbyPlayers: context?.nearbyPlayers || [],
-      timeOfDay: context?.timeOfDay,
+      timeOfDay: normalizedTimeOfDay,
       weather: context?.weather,
       timestamp: Date.now(),
     };
@@ -141,7 +144,7 @@ export async function POST(
         // Emociones mapeadas a animaciones de Minecraft
         animation: mapEmotionToAnimation(result.emotions?.primary),
       },
-      action: determineAction(result, context),
+      action: determineAction(result, { ...context, timeOfDay: normalizedTimeOfDay }),
       relationship: {
         stage: result.relationship?.stage,
         trust: result.relationship?.trust,
