@@ -3547,6 +3547,47 @@ model PaymentClaim {
   @@index([status])
 }
 
+// DMCA (Digital Millennium Copyright Act) Reports
+model DMCAReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Información del reportante (copyright holder)
+  reporterName    String
+  reporterEmail   String
+  reporterCompany String?
+  reporterAddress String
+  reporterPhone   String?
+
+  // Información del copyright
+  copyrightWork         String
+  copyrightOwner        String
+  copyrightRegistration String?
+
+  // Contenido infractor
+  infringingContentUrl         String
+  infringingContentDescription String
+  infringingContentType        String
+
+  // Firma y declaraciones
+  signature     String
+  signatureDate DateTime
+
+  // Estado del reporte
+  status          String   @default("pending")
+  submittedAt     DateTime @default(now())
+  reviewedAt      DateTime?
+  resolvedAt      DateTime?
+  resolutionNotes String?
+  reviewedBy      String?
+
+  @@index([status])
+  @@index([submittedAt])
+  @@index([reporterEmail])
+  @@index([infringingContentType])
+}
+
 enum BehaviorType {
   ANXIOUS_ATTACHMENT
   AVOIDANT_ATTACHMENT
