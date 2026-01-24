@@ -47,12 +47,16 @@ const REGIONS: Region[] = [
   { name: 'HEAD_BACK', x: 24, y: 8, width: 8, height: 8, description: 'Cabeza trasera' },
 
   // BRAZO DERECHO (Right Arm)
+  { name: 'ARM_R_TOP', x: 44, y: 16, width: 4, height: 4, description: 'Brazo derecho superior (hombro)' },
+  { name: 'ARM_R_BOTTOM', x: 48, y: 16, width: 4, height: 4, description: 'Brazo derecho inferior' },
   { name: 'ARM_R_FRONT', x: 44, y: 20, width: 4, height: 12, description: 'Brazo derecho frontal' },
   { name: 'ARM_R_BACK', x: 52, y: 20, width: 4, height: 12, description: 'Brazo derecho trasero' },
   { name: 'ARM_R_RIGHT', x: 40, y: 20, width: 4, height: 12, description: 'Brazo derecho lado derecho' },
   { name: 'ARM_R_LEFT', x: 48, y: 20, width: 4, height: 12, description: 'Brazo derecho lado izquierdo' },
 
   // BRAZO IZQUIERDO (Left Arm)
+  { name: 'ARM_L_TOP', x: 36, y: 48, width: 4, height: 4, description: 'Brazo izquierdo superior (hombro)' },
+  { name: 'ARM_L_BOTTOM', x: 40, y: 48, width: 4, height: 4, description: 'Brazo izquierdo inferior' },
   { name: 'ARM_L_FRONT', x: 36, y: 52, width: 4, height: 12, description: 'Brazo izquierdo frontal' },
   { name: 'ARM_L_BACK', x: 44, y: 52, width: 4, height: 12, description: 'Brazo izquierdo trasero' },
   { name: 'ARM_L_RIGHT', x: 32, y: 52, width: 4, height: 12, description: 'Brazo izquierdo lado derecho' },
@@ -187,7 +191,7 @@ function generateSVGForRegion(regionName: string, pixels: Pixel[], region: Regio
 async function main() {
   const skinPath = path.join(
     process.cwd(),
-    'public/minecraft/hairstyle-showcase/08_long_wavy_romantic.png'
+    'public/minecraft/backup/texture.png'
   );
 
   console.log('🔍 Analizando skin:', skinPath);
