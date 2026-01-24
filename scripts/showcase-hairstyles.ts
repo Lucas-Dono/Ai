@@ -451,7 +451,7 @@ const showcaseExamples: ShowcaseExample[] = [
         legs: 'legs_average_01',
         hairFront: 'hair_long_02_wavy',
         hairBody: 'hair_long_body_02_wavy',
-        tShirt: 't_shirt_01',
+        shirt: 'outfit_wavy_sleeves_01',
         pants: 'pants_01',
         shoes: 'shoes_01',
       },
