@@ -499,6 +499,9 @@ export function generateHairLong_02(): string {
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
       <!-- HAT_TOP (8x8) at (40,0) - Vista superior SUPER VOLUMINOSA -->
       <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- ESQUINAS SUPERIORES (muy importante para cobertura completa) -->
+      <rect x="40" y="0" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="47" y="0" width="1" height="1" fill="#909090" class="colorizable-hair"/>
       <!-- Rizos circulares desde arriba -->
       <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="40" y="1" width="8" height="1" fill="#909090" class="colorizable-hair"/>
@@ -510,16 +513,29 @@ export function generateHairLong_02(): string {
       <rect x="41" y="6" width="2" height="2" fill="#707070" class="colorizable-hair"/>
       <rect x="45" y="6" width="2" height="2" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Nuca COMPLETAMENTE cubierta con rizos -->
-      <rect x="48" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <!-- Textura de rizos en nuca -->
+      <!-- HAT_BOTTOM (8x8) at (48,0) - MARCO de pelo (no caja completa) -->
+      <!-- Solo pelo en los BORDES, centro vacío para el cuello -->
+
+      <!-- Borde SUPERIOR (frente cuando se ve desde abajo) - pelo cayendo -->
+      <rect x="48" y="0" width="8" height="2" fill="#808080" class="colorizable-hair"/>
       <rect x="49" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="48" y="1" width="8" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="50" y="2" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="49" y="3" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="50" y="4" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="49" y="5" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="50" y="6" width="4" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="48" y="1" width="8" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="50" y="1" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Borde IZQUIERDO - mechón lateral -->
+      <rect x="48" y="2" width="2" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="48" y="2" width="1" height="4" fill="#909090" class="colorizable-hair"/>
+
+      <!-- Borde DERECHO - mechón lateral -->
+      <rect x="54" y="2" width="2" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="55" y="2" width="1" height="4" fill="#909090" class="colorizable-hair"/>
+
+      <!-- Borde INFERIOR (nuca) - pelo cayendo atrás -->
+      <rect x="48" y="6" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="49" y="6" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="50" y="7" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- Centro VACÍO (y=2-5, x=50-53) - aquí va el cuello/piel -->
 
       <!-- HAT_RIGHT (8x8) at (32,8) - RIZOS GRANDES sobresaliendo al lado derecho -->
       <rect x="32" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
