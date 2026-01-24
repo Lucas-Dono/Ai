@@ -43,28 +43,28 @@
       <rect x="32" y="15" width="6" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="33" y="15" width="4" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente VOLUMINOSO pero ojos visibles -->
-      <!-- Marco superior muy voluminoso -->
-      <rect x="40" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="41" y="8" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="40" y="9" width="8" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="42" y="10" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - COMPACTO con ojos BIEN VISIBLES -->
+      <!-- Marco superior reducido (solo 2 filas) -->
+      <rect x="41" y="8" width="6" height="1" fill="#959595" class="colorizable-hair"/>
+      <rect x="42" y="8" width="4" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="41" y="9" width="6" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="42" y="9" width="4" height="1" fill="#808080" class="colorizable-hair"/>
 
-      <!-- Rizos laterales GRANDES pero dejando espacio para ojos (y=11-13 libre en centro) -->
-      <!-- Rizo derecho -->
-      <rect x="40" y="10" width="3" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="40" y="11" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="41" y="12" width="1" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Rizos laterales COMPACTOS (2x2 en lugar de 3x3) -->
+      <!-- Rizo derecho - más pequeño y más arriba -->
+      <rect x="40" y="10" width="2" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="40" y="10" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="40" y="11" width="1" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- Rizo izquierdo -->
-      <rect x="45" y="10" width="3" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="46" y="11" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="46" y="12" width="1" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Rizo izquierdo - más pequeño y más arriba -->
+      <rect x="46" y="10" width="2" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="47" y="10" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="47" y="11" width="1" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- Mechones inferiores rizados -->
-      <rect x="40" y="13" width="2" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones inferiores MÁS PEQUEÑOS y alejados del centro -->
+      <rect x="40" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="40" y="14" width="1" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="46" y="13" width="2" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="47" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="47" y="14" width="1" height="1" fill="#707070" class="colorizable-hair"/>
 
       <!-- HAT_LEFT (8x8) at (48,8) - RIZOS GRANDES sobresaliendo al lado izquierdo (simétrico a RIGHT) -->
