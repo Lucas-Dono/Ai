@@ -151,14 +151,70 @@ export function generateHead_Base_01(): string {
       <rect x="16" y="15" width="8" height="1" fill="#706253" class="colorizable-skin"/>
 
       <!-- HEAD_BACK (8x8) at (24,8) - Cabeza trasera -->
-      <rect x="24" y="8" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="9" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="10" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="11" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="12" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="13" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="14" width="8" height="1" fill="#605447" class="colorizable-skin"/>
-      <rect x="24" y="15" width="8" height="1" fill="#605447" class="colorizable-skin"/>
+      <rect x="24" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="25" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="26" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="27" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="28" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="29" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="30" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="31" y="8" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="24" y="9" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="25" y="9" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="26" y="9" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="27" y="9" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="28" y="9" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="29" y="9" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="30" y="9" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="31" y="9" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="24" y="10" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="25" y="10" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="26" y="10" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="27" y="10" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="28" y="10" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="29" y="10" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="30" y="10" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="31" y="10" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="24" y="11" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="25" y="11" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="26" y="11" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="27" y="11" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="28" y="11" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="29" y="11" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="30" y="11" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="31" y="11" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="24" y="12" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="25" y="12" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="26" y="12" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="27" y="12" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="28" y="12" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="29" y="12" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="30" y="12" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="31" y="12" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="24" y="13" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="25" y="13" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="26" y="13" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="27" y="13" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="28" y="13" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="29" y="13" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="30" y="13" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="31" y="13" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="24" y="14" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="25" y="14" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="26" y="14" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="27" y="14" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="28" y="14" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="29" y="14" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="30" y="14" width="1" height="1" fill="#482020" class="colorizable-skin"/>
+      <rect x="31" y="14" width="1" height="1" fill="#451f1f" class="colorizable-skin"/>
+      <rect x="24" y="15" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="25" y="15" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="26" y="15" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="27" y="15" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="28" y="15" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="29" y="15" width="1" height="1" fill="#361818" class="colorizable-skin"/>
+      <rect x="30" y="15" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
+      <rect x="31" y="15" width="1" height="1" fill="#3d1b1b" class="colorizable-skin"/>
     </svg>
   `;
 }
@@ -1735,11 +1791,11 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
 
   // PELO - PEINADOS LARGOS (Long) - BODY (pelo cayendo en espalda/hombros)
   { id: 'hair_long_body_01_straight', category: ComponentCategory.HAIR_BODY, generator: HairLib.generateHairLongBody_01, filename: 'hair_long_body_01_straight.svg' },
-  { id: 'hair_long_body_02_wavy', category: ComponentCategory.HAIR_BODY, generator: HairLib.generateHairLongBody_02, filename: 'hair_long_body_02_wavy.svg' },
+  // { id: 'hair_long_body_02_wavy', category: ComponentCategory.HAIR_BODY, generator: HairLib.generateHairLongBody_02, filename: 'hair_long_body_02_wavy.svg' },
 
   // PELO - PEINADOS RECOGIDOS (Updos)
-  { id: 'hair_updo_01_high_ponytail', category: ComponentCategory.HAIR_BACK, generator: HairLib.generateHairUpdo_01_HighPonytail, filename: 'hair_updo_01_high_ponytail.svg' },
-  { id: 'hair_updo_05_messy_bun', category: ComponentCategory.HAIR_BACK, generator: HairLib.generateHairUpdo_05_MessyBun, filename: 'hair_updo_05_messy_bun.svg' },
+  // { id: 'hair_updo_01_high_ponytail', category: ComponentCategory.HAIR_BACK, generator: HairLib.generateHairUpdo_01_HighPonytail, filename: 'hair_updo_01_high_ponytail.svg' },
+  // { id: 'hair_updo_05_messy_bun', category: ComponentCategory.HAIR_BACK, generator: HairLib.generateHairUpdo_05_MessyBun, filename: 'hair_updo_05_messy_bun.svg' },
 
   // CUERPO BASE
   { id: 'torso_slim_01', category: ComponentCategory.TORSO_BASE, generator: generateTorso_Slim_01, filename: 'torso_slim_01.svg' },
