@@ -1,47 +1,53 @@
 
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (40,0) 8x8 - CRÍTICO: Base de la coleta visible desde arriba -->
-      <!-- Base circular de la coleta en la coronilla -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- ========== CAPA BASE (HEAD) - Pelo pegado a la cabeza ========== -->
+
+      <!-- HEAD_TOP (8x8) at (8,0) - Base de la coleta -->
+      <rect x="8" y="0" width="8" height="4" fill="#707070" class="colorizable-hair"/>
+      <rect x="10" y="0" width="4" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="11" y="4" width="2" height="3" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HEAD_RIGHT (8x8) at (0,8) - Lado derecho despejado -->
+      <rect x="0" y="8" width="8" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="2" y="8" width="3" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HEAD_FRONT (8x8) at (8,8) - Frente despejado -->
+      <rect x="8" y="8" width="8" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="9" y="9" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <rect x="13" y="9" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HEAD_LEFT (8x8) at (16,8) - Lado izquierdo despejado -->
+      <rect x="16" y="8" width="8" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="19" y="8" width="3" height="1" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HEAD_BACK (8x8) at (24,8) - Nuca despejada con coleta -->
+      <rect x="24" y="8" width="8" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="26" y="8" width="4" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="27" y="9" width="3" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="28" y="11" width="2" height="2" fill="#606060" class="colorizable-hair"/>
+
+      <!-- ========== CAPA OVERLAY (HAT) - Volumen de la coleta ========== -->
+
+      <!-- HAT_TOP (8x8) at (40,0) - Base circular prominente -->
       <rect x="42" y="0" width="4" height="4" fill="#808080" class="colorizable-hair"/>
       <rect x="41" y="1" width="6" height="2" fill="#707070" class="colorizable-hair"/>
-      <!-- Highlight en la parte superior -->
       <rect x="43" y="0" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Proyección de la coleta hacia atrás -->
       <rect x="43" y="4" width="2" height="3" fill="#707070" class="colorizable-hair"/>
-      <rect x="44" y="5" width="1" height="2" fill="#606060" class="colorizable-hair" opacity="0.7"/>
 
-      <!-- HAT_BOTTOM (48,0) 8x8 - Vacío (no visible desde abajo) -->
-
-      <!-- HAT_RIGHT (32,8) 8x8 - Lado derecho: base despejada + coleta proyectándose -->
-      <!-- Base del cráneo despejada -->
-      <rect x="32" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Parte superior donde se recoge -->
+      <!-- HAT_RIGHT (8x8) at (32,8) - Proyección lateral de coleta -->
       <rect x="34" y="8" width="3" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Coleta proyectándose hacia atrás (visible desde lateral) -->
       <rect x="35" y="9" width="2" height="2" fill="#707070" class="colorizable-hair"/>
-      <rect x="36" y="10" width="1" height="2" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (40,8) 8x8 - Frente despejado, sin flequillo -->
-      <!-- Línea de pelo recogida hacia atrás -->
-      <rect x="40" y="8" width="8" height="1" fill="#808080" class="colorizable-hair"/>
-      <!-- Sienes despejadas -->
-      <rect x="41" y="9" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="45" y="9" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Sombra frontal mínima -->
 
-      <!-- HAT_LEFT (48,8) 8x8 - Lado izquierdo: simétrico al derecho -->
-      <rect x="48" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Proyección lateral de coleta -->
       <rect x="51" y="8" width="3" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="51" y="9" width="2" height="2" fill="#707070" class="colorizable-hair"/>
-      <rect x="51" y="10" width="1" height="2" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (56,8) 8x8 - Parte trasera: coleta colgando hacia abajo -->
-      <!-- Base de la nuca despejada -->
-      <rect x="56" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Coleta descendiendo desde arriba -->
+      <!-- HAT_BACK (8x8) at (56,8) - Coleta colgando -->
       <rect x="58" y="8" width="4" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="59" y="9" width="3" height="2" fill="#808080" class="colorizable-hair"/>
       <rect x="60" y="11" width="2" height="2" fill="#707070" class="colorizable-hair"/>
-      <!-- Punta de la coleta -->
       <rect x="60" y="13" width="2" height="1" fill="#606060" class="colorizable-hair"/>
     </svg>
   

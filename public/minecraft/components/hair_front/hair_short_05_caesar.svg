@@ -1,37 +1,43 @@
 
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (8x8) at (40,0) - Vista superior uniforme -->
-      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <rect x="41" y="0" width="6" height="2" fill="#909090" class="colorizable-hair"/>
-      <!-- Textura de capas -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- ========== CAPA BASE (HEAD) - Pelo pegado a la cabeza ========== -->
+
+      <!-- HEAD_TOP (8x8) at (8,0) - Forma base uniforme -->
+      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <rect x="9" y="0" width="6" height="7" fill="#808080" class="colorizable-hair"/>
+
+      <!-- HEAD_RIGHT (8x8) at (0,8) - Lado derecho uniforme -->
+      <rect x="0" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
+      <rect x="1" y="12" width="6" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HEAD_FRONT (8x8) at (8,8) - Frente con flequillo base -->
+      <rect x="8" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <rect x="8" y="11" width="8" height="1" fill="#707070" class="colorizable-hair"/>
+
+      <!-- HEAD_LEFT (8x8) at (16,8) - Lado izquierdo uniforme -->
+      <rect x="16" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
+      <rect x="17" y="12" width="6" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- HEAD_BACK (8x8) at (24,8) - Nuca uniforme -->
+      <rect x="24" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
+      <rect x="25" y="12" width="6" height="1" fill="#606060" class="colorizable-hair"/>
+
+      <!-- ========== CAPA OVERLAY (HAT) - Textura de capas ========== -->
+
+      <!-- HAT_TOP (8x8) at (40,0) - Textura superior -->
       <rect x="40" y="2" width="8" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="41" y="4" width="6" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+      <!-- HAT_RIGHT (8x8) at (32,8) - Capas laterales -->
+      <rect x="33" y="12" width="4" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho uniforme -->
-      <rect x="32" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
-      <!-- Capas -->
-      <rect x="33" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="34" y="13" width="4" height="1" fill="#606060" class="colorizable-hair"/>
-
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo horizontal -->
-      <rect x="40" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <!-- Flequillo horizontal recto -->
-      <rect x="40" y="11" width="8" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Borde del flequillo -->
       <rect x="41" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <!-- Línea del flequillo -->
-      <rect x="40" y="13" width="8" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo uniforme -->
-      <rect x="48" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
-      <!-- Capas -->
-      <rect x="49" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="50" y="13" width="4" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Capas laterales -->
+      <rect x="51" y="12" width="4" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera uniforme -->
-      <rect x="56" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Capas traseras -->
       <rect x="57" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="58" y="13" width="4" height="1" fill="#606060" class="colorizable-hair"/>
     </svg>
   
