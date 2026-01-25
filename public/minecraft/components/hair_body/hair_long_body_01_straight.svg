@@ -1,14 +1,17 @@
 
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- BODY_BACK (4x12) at (32,20) - Pelo cayendo en espalda (PRINCIPAL) -->
-      <rect x="32" y="20" width="4" height="12" fill="#808080" class="colorizable-hair"/>
+      <!-- BODY_BACK (8x12) at (32,20) - Pelo cayendo en espalda (PRINCIPAL) - COBERTURA COMPLETA -->
+      <rect x="32" y="20" width="8" height="12" fill="#808080" class="colorizable-hair"/>
       <!-- Sombra central -->
-      <rect x="33" y="20" width="2" height="12" fill="#707070" class="colorizable-hair"/>
-      <!-- Mechas laterales -->
+      <rect x="34" y="20" width="4" height="12" fill="#707070" class="colorizable-hair"/>
+      <!-- Mechas laterales izquierdas -->
       <rect x="32" y="21" width="1" height="10" fill="#909090" class="colorizable-hair"/>
-      <rect x="35" y="21" width="1" height="10" fill="#909090" class="colorizable-hair"/>
-      <!-- Puntas -->
-      <rect x="33" y="30" width="2" height="2" fill="#606060" class="colorizable-hair"/>
+      <rect x="33" y="22" width="1" height="9" fill="#858585" class="colorizable-hair"/>
+      <!-- Mechas laterales derechas -->
+      <rect x="38" y="21" width="1" height="10" fill="#909090" class="colorizable-hair"/>
+      <rect x="39" y="22" width="1" height="9" fill="#858585" class="colorizable-hair"/>
+      <!-- Puntas centrales -->
+      <rect x="35" y="30" width="2" height="2" fill="#606060" class="colorizable-hair"/>
 
       <!-- BODY_RIGHT (4x12) at (16,20) - Pelo cayendo lado derecho -->
       <rect x="16" y="20" width="4" height="8" fill="#808080" class="colorizable-hair"/>
