@@ -203,7 +203,9 @@
       "WebFetch(domain:www.kokutech.com)",
       "WebFetch(domain:www.minecraftforum.net)",
       "WebFetch(domain:minecraft.wiki)",
-      "Bash(NODE_OPTIONS='--max-old-space-size=8192' npx tsx:*)"
+      "Bash(NODE_OPTIONS='--max-old-space-size=8192' npx tsx:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx sharp:*)"
     ],
     "deny": [],
     "ask": []

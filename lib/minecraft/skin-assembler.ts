@@ -109,21 +109,14 @@ export async function assembleSkin(
   try {
     console.log('[Skin Assembler] Iniciando ensamblaje de skin...');
 
-    // 1. Crear canvas base 64x64 transparente
-    const canvas = await sharp({
-      create: {
-        width: SKIN_WIDTH,
-        height: SKIN_HEIGHT,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      },
-    }).png();
+    // 1. Crear canvas base 64x64 transparente (raw buffer)
+    const canvasData = Buffer.alloc(SKIN_WIDTH * SKIN_HEIGHT * 4, 0);
 
     // 2. Construir lista de capas ordenadas por layer (menor = abajo, mayor = arriba)
-    const layers: sharp.OverlayOptions[] = [];
+    const layers: { buffer: Buffer; top: number; left: number }[] = [];
 
-    // 3. CAPA BASE: Cabeza con color de piel
-    await addHeadBaseLayers(layers, config, componentsBaseDir);
+    // 3. CAPA BASE: Generar cabeza base (devuelve buffer en vez de agregar a layers)
+    const headBase = await generateHeadBase(config, componentsBaseDir);
 
     // 4. CAPA BASE: Piel del cuerpo (torso, brazos, piernas)
     await addBodyBaseLayers(layers, config, componentsBaseDir);
@@ -131,8 +124,8 @@ export async function assembleSkin(
     // 5. CAPA: Ropa (remeras, camisas, chaquetas, pantalones)
     await addClothingLayers(layers, config, componentsBaseDir);
 
-    // 6. CAPA: Cabeza (ojos, boca, nariz en regiones UV de cabeza)
-    await addFacialLayers(layers, config, componentsBaseDir);
+    // 6. CAPA: Cabeza con ojos pre-compuestos manualmente + otros elementos faciales
+    await addFacialLayers(layers, headBase, config, componentsBaseDir);
 
     // 7. CAPA: Pelo (overlay de cabeza)
     await addHairLayers(layers, config, componentsBaseDir);
@@ -143,12 +136,23 @@ export async function assembleSkin(
     // 9. CAPA: Accesorios cabeza (lentes, sombreros)
     await addHeadAccessories(layers, config, componentsBaseDir);
 
-    // 8. Componer todas las capas
-    console.log(`[Skin Assembler] Componiendo ${layers.length} capas...`);
-    const finalSkin = await canvas.composite(layers).png().toBuffer();
+    // 10. Componer todas las capas pixel-por-pixel (sin antialiasing)
+    console.log(`[Skin Assembler] Componiendo ${layers.length} capas pixel-por-pixel...`);
+    for (const layer of layers) {
+      await composeLayerManually(canvasData, layer.buffer, layer.left, layer.top);
+    }
 
+    // 11. Convertir canvas raw a PNG
     console.log('[Skin Assembler] ✓ Skin ensamblada exitosamente');
-    return finalSkin;
+    return sharp(canvasData, {
+      raw: {
+        width: SKIN_WIDTH,
+        height: SKIN_HEIGHT,
+        channels: 4,
+      },
+    })
+      .png()
+      .toBuffer();
   } catch (error) {
     logError(error, { context: 'assembleSkin', config });
     throw error;
@@ -156,27 +160,116 @@ export async function assembleSkin(
 }
 
 // ============================================================================
+// COMPOSICIÓN MANUAL PIXEL-POR-PIXEL
+// ============================================================================
+
+/**
+ * Compone una capa sobre el canvas principal pixel-por-píxel sin antialiasing
+ */
+async function composeLayerManually(
+  canvasData: Buffer,
+  layerBuffer: Buffer,
+  offsetX: number,
+  offsetY: number
+): Promise<void> {
+  const layerData = await sharp(layerBuffer)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  // Copiar píxeles de capa sobre canvas donde alpha > 0
+  for (let y = 0; y < layerData.info.height; y++) {
+    for (let x = 0; x < layerData.info.width; x++) {
+      const layerIdx = (y * layerData.info.width + x) * 4;
+      const layerAlpha = layerData.data[layerIdx + 3];
+
+      if (layerAlpha > 0) {
+        const canvasX = x + offsetX;
+        const canvasY = y + offsetY;
+
+        // Verificar límites
+        if (canvasX >= 0 && canvasX < SKIN_WIDTH && canvasY >= 0 && canvasY < SKIN_HEIGHT) {
+          const canvasIdx = (canvasY * SKIN_WIDTH + canvasX) * 4;
+
+          // Copiar píxel directamente (sin blending)
+          canvasData[canvasIdx] = layerData.data[layerIdx];         // R
+          canvasData[canvasIdx + 1] = layerData.data[layerIdx + 1]; // G
+          canvasData[canvasIdx + 2] = layerData.data[layerIdx + 2]; // B
+          canvasData[canvasIdx + 3] = 255;                           // Alpha total
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Compone los ojos manualmente sobre la cabeza base pixel-por-pixel
+ * para evitar antialiasing/blending de Sharp
+ */
+async function composeEyesManually(
+  headBaseBuffer: Buffer,
+  eyesBuffer: Buffer
+): Promise<Buffer> {
+  const headData = await sharp(headBaseBuffer)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const eyesData = await sharp(eyesBuffer)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  // Copiar píxeles de ojos sobre cabeza donde alpha > 0
+  for (let y = 0; y < eyesData.info.height; y++) {
+    for (let x = 0; x < eyesData.info.width; x++) {
+      const eyeIdx = (y * eyesData.info.width + x) * 4;
+      const eyeAlpha = eyesData.data[eyeIdx + 3];
+
+      if (eyeAlpha > 0) {
+        // Calcular posición en head_base (ojos van en HEAD_FRONT: x+8, y+8)
+        const headX = x + UV_REGIONS.HEAD_FRONT.x;
+        const headY = y + UV_REGIONS.HEAD_FRONT.y;
+        const headIdx = (headY * headData.info.width + headX) * 4;
+
+        // Copiar píxel directamente (sin blending)
+        headData.data[headIdx] = eyesData.data[eyeIdx];         // R
+        headData.data[headIdx + 1] = eyesData.data[eyeIdx + 1]; // G
+        headData.data[headIdx + 2] = eyesData.data[eyeIdx + 2]; // B
+        headData.data[headIdx + 3] = 255;                        // Alpha total
+      }
+    }
+  }
+
+  // Convertir de vuelta a PNG
+  return sharp(headData.data, {
+    raw: {
+      width: headData.info.width,
+      height: headData.info.height,
+      channels: 4,
+    },
+  })
+  .png()
+  .toBuffer();
+}
+
+// ============================================================================
 // FUNCIONES DE ENSAMBLAJE POR CATEGORÍA
 // ============================================================================
 
 /**
- * Agrega capa base de cabeza (piel)
+ * Genera capa base de cabeza (piel) y devuelve el buffer
  */
-async function addHeadBaseLayers(
-  layers: sharp.OverlayOptions[],
+async function generateHeadBase(
   config: SkinConfiguration,
   baseDir: string
-): Promise<void> {
+): Promise<Buffer> {
   const { colors } = config;
 
   // Cabeza base siempre se usa (head_base_01)
   const headBasePath = path.join(baseDir, 'head_base', 'head_base_01.png');
   const recoloredHead = await recolorImage(headBasePath, colors.skinTone);
-  layers.push({
-    input: recoloredHead,
-    top: 0,
-    left: 0,
-  });
+  return recoloredHead;
 }
 
 /**
@@ -184,7 +277,7 @@ async function addHeadBaseLayers(
  * Los sprites de cuerpo ahora son de 64x64 completos con todas las caras
  */
 async function addBodyBaseLayers(
-  layers: sharp.OverlayOptions[],
+  layers: { buffer: Buffer; top: number; left: number }[],
   config: SkinConfiguration,
   baseDir: string
 ): Promise<void> {
@@ -195,7 +288,7 @@ async function addBodyBaseLayers(
     const torsoPath = path.join(baseDir, ComponentCategory.TORSO_BASE, `${components.torso}.png`);
     const recoloredTorso = await recolorImage(torsoPath, colors.skinTone);
     layers.push({
-      input: recoloredTorso,
+      buffer: recoloredTorso,
       top: 0,
       left: 0,
     });
@@ -206,7 +299,7 @@ async function addBodyBaseLayers(
     const armsPath = path.join(baseDir, ComponentCategory.ARMS_BASE, `${components.arms}.png`);
     const recoloredArms = await recolorImage(armsPath, colors.skinTone);
     layers.push({
-      input: recoloredArms,
+      buffer: recoloredArms,
       top: 0,
       left: 0,
     });
@@ -217,7 +310,7 @@ async function addBodyBaseLayers(
     const legsPath = path.join(baseDir, ComponentCategory.LEGS_BASE, `${components.legs}.png`);
     const recoloredLegs = await recolorImage(legsPath, colors.skinTone);
     layers.push({
-      input: recoloredLegs,
+      buffer: recoloredLegs,
       top: 0,
       left: 0,
     });
@@ -235,7 +328,7 @@ async function addBodyBaseLayers(
  * 4. Pantalones
  */
 async function addClothingLayers(
-  layers: sharp.OverlayOptions[],
+  layers: { buffer: Buffer; top: number; left: number }[],
   config: SkinConfiguration,
   baseDir: string
 ): Promise<void> {
@@ -246,7 +339,7 @@ async function addClothingLayers(
     const tShirtPath = path.join(baseDir, ComponentCategory.T_SHIRT, `${components.tShirt}.png`);
     const recoloredTShirt = await recolorImage(tShirtPath, colors.clothingPrimary);
     layers.push({
-      input: recoloredTShirt,
+      buffer: recoloredTShirt,
       top: 0,
       left: 0,
     });
@@ -260,7 +353,7 @@ async function addClothingLayers(
       components.tShirt ? (colors.clothingSecondary || colors.clothingPrimary) : colors.clothingPrimary
     );
     layers.push({
-      input: recoloredShirt,
+      buffer: recoloredShirt,
       top: 0,
       left: 0,
     });
@@ -274,7 +367,7 @@ async function addClothingLayers(
       colors.clothingSecondary || colors.clothingPrimary
     );
     layers.push({
-      input: recoloredJacket,
+      buffer: recoloredJacket,
       top: 0,
       left: 0,
     });
@@ -285,7 +378,7 @@ async function addClothingLayers(
     const pantsPath = path.join(baseDir, ComponentCategory.PANTS, `${components.pants}.png`);
     const recoloredPants = await recolorImage(pantsPath, colors.clothingPrimary);
     layers.push({
-      input: recoloredPants,
+      buffer: recoloredPants,
       top: 0,
       left: 0,
     });
@@ -293,32 +386,38 @@ async function addClothingLayers(
 }
 
 /**
- * Agrega elementos faciales (ojos, boca, nariz)
+ * Pre-compone elementos faciales (ojos) sobre la cabeza base y agrega a layers
  */
 async function addFacialLayers(
-  layers: sharp.OverlayOptions[],
+  layers: { buffer: Buffer; top: number; left: number }[],
+  headBaseBuffer: Buffer,
   config: SkinConfiguration,
   baseDir: string
 ): Promise<void> {
   const { colors, components } = config;
 
-  // Ojos (recolorear con eyeColor)
+  let composedHead = headBaseBuffer;
+
+  // Ojos (composición manual pixel-por-pixel para evitar antialiasing)
   if (components.eyes) {
     const eyesPath = path.join(baseDir, ComponentCategory.EYES, `${components.eyes}.png`);
     const recoloredEyes = await recolorImage(eyesPath, colors.eyeColor);
-    layers.push({
-      input: recoloredEyes,
-      top: UV_REGIONS.HEAD_FRONT.y,
-      left: UV_REGIONS.HEAD_FRONT.x,
-    });
+    composedHead = await composeEyesManually(composedHead, recoloredEyes);
   }
+
+  // Agregar cabeza (con ojos pre-compuestos)
+  layers.push({
+    buffer: composedHead,
+    top: 0,
+    left: 0,
+  });
 
   // Boca
   if (components.mouth) {
     const mouthPath = path.join(baseDir, ComponentCategory.MOUTH, `${components.mouth}.png`);
     const mouthBuffer = await fs.readFile(mouthPath);
     layers.push({
-      input: mouthBuffer,
+      buffer: mouthBuffer,
       top: UV_REGIONS.HEAD_FRONT.y,
       left: UV_REGIONS.HEAD_FRONT.x,
     });
@@ -329,7 +428,7 @@ async function addFacialLayers(
     const nosePath = path.join(baseDir, ComponentCategory.NOSE, `${components.nose}.png`);
     const noseBuffer = await fs.readFile(nosePath);
     layers.push({
-      input: noseBuffer,
+      buffer: noseBuffer,
       top: UV_REGIONS.HEAD_FRONT.y,
       left: UV_REGIONS.HEAD_FRONT.x,
     });
@@ -340,7 +439,7 @@ async function addFacialLayers(
     const eyebrowsPath = path.join(baseDir, ComponentCategory.EYEBROWS, `${components.eyebrows}.png`);
     const recoloredEyebrows = await recolorImage(eyebrowsPath, colors.hairPrimary);
     layers.push({
-      input: recoloredEyebrows,
+      buffer: recoloredEyebrows,
       top: UV_REGIONS.HEAD_FRONT.y,
       left: UV_REGIONS.HEAD_FRONT.x,
     });
@@ -352,7 +451,7 @@ async function addFacialLayers(
  * Los sprites de pelo ahora son de 64x64 completos con todas las caras
  */
 async function addHairLayers(
-  layers: sharp.OverlayOptions[],
+  layers: { buffer: Buffer; top: number; left: number }[],
   config: SkinConfiguration,
   baseDir: string
 ): Promise<void> {
@@ -363,7 +462,7 @@ async function addHairLayers(
     const hairPath = path.join(baseDir, ComponentCategory.HAIR_FRONT, `${components.hairFront}.png`);
     const recoloredHair = await recolorImage(hairPath, colors.hairPrimary);
     layers.push({
-      input: recoloredHair,
+      buffer: recoloredHair,
       top: 0,
       left: 0,
     });
@@ -374,7 +473,7 @@ async function addHairLayers(
     const hairPath = path.join(baseDir, ComponentCategory.HAIR_TOP, `${components.hairTop}.png`);
     const recoloredHair = await recolorImage(hairPath, colors.hairPrimary);
     layers.push({
-      input: recoloredHair,
+      buffer: recoloredHair,
       top: UV_REGIONS.HAT_TOP.y,
       left: UV_REGIONS.HAT_TOP.x,
     });
@@ -385,7 +484,7 @@ async function addHairLayers(
     const hairPath = path.join(baseDir, ComponentCategory.HAIR_BACK, `${components.hairBack}.png`);
     const recoloredHair = await recolorImage(hairPath, colors.hairPrimary);
     layers.push({
-      input: recoloredHair,
+      buffer: recoloredHair,
       top: UV_REGIONS.HAT_BACK.y,
       left: UV_REGIONS.HAT_BACK.x,
     });
@@ -396,7 +495,7 @@ async function addHairLayers(
     const hairBodyPath = path.join(baseDir, ComponentCategory.HAIR_BODY, `${components.hairBody}.png`);
     const recoloredHairBody = await recolorImage(hairBodyPath, colors.hairPrimary);
     layers.push({
-      input: recoloredHairBody,
+      buffer: recoloredHairBody,
       top: 0,
       left: 0,
     });
@@ -407,7 +506,7 @@ async function addHairLayers(
     const facialHairPath = path.join(baseDir, ComponentCategory.FACIAL_HAIR, `${components.facialHair}.png`);
     const recoloredFacialHair = await recolorImage(facialHairPath, colors.hairPrimary);
     layers.push({
-      input: recoloredFacialHair,
+      buffer: recoloredFacialHair,
       top: UV_REGIONS.HEAD_FRONT.y,
       left: UV_REGIONS.HEAD_FRONT.x,
     });
@@ -418,7 +517,7 @@ async function addHairLayers(
  * Agrega accesorios de extremidades (guantes, zapatos, botas)
  */
 async function addExtremityAccessories(
-  layers: sharp.OverlayOptions[],
+  layers: { buffer: Buffer; top: number; left: number }[],
   config: SkinConfiguration,
   baseDir: string
 ): Promise<void> {
@@ -429,7 +528,7 @@ async function addExtremityAccessories(
     const glovesPath = path.join(baseDir, ComponentCategory.GLOVES, `${components.gloves}.png`);
     const recoloredGloves = await recolorImage(glovesPath, colors.clothingSecondary || colors.clothingPrimary);
     layers.push({
-      input: recoloredGloves,
+      buffer: recoloredGloves,
       top: 0,
       left: 0,
     });
@@ -440,7 +539,7 @@ async function addExtremityAccessories(
     const shoesPath = path.join(baseDir, ComponentCategory.SHOES, `${components.shoes}.png`);
     const recoloredShoes = await recolorImage(shoesPath, colors.clothingSecondary || colors.clothingPrimary);
     layers.push({
-      input: recoloredShoes,
+      buffer: recoloredShoes,
       top: 0,
       left: 0,
     });
@@ -448,7 +547,7 @@ async function addExtremityAccessories(
     const bootsPath = path.join(baseDir, ComponentCategory.BOOTS, `${components.boots}.png`);
     const recoloredBoots = await recolorImage(bootsPath, colors.clothingSecondary || colors.clothingPrimary);
     layers.push({
-      input: recoloredBoots,
+      buffer: recoloredBoots,
       top: 0,
       left: 0,
     });
@@ -459,7 +558,7 @@ async function addExtremityAccessories(
  * Agrega accesorios de cabeza (lentes, sombreros)
  */
 async function addHeadAccessories(
-  layers: sharp.OverlayOptions[],
+  layers: { buffer: Buffer; top: number; left: number }[],
   config: SkinConfiguration,
   baseDir: string
 ): Promise<void> {
@@ -470,7 +569,7 @@ async function addHeadAccessories(
     const glassesPath = path.join(baseDir, ComponentCategory.GLASSES, `${components.glasses}.png`);
     const glassesBuffer = await fs.readFile(glassesPath);
     layers.push({
-      input: glassesBuffer,
+      buffer: glassesBuffer,
       top: UV_REGIONS.HEAD_FRONT.y,
       left: UV_REGIONS.HEAD_FRONT.x,
     });
@@ -481,7 +580,7 @@ async function addHeadAccessories(
     const hatPath = path.join(baseDir, ComponentCategory.HAT, `${components.hat}.png`);
     const hatBuffer = await fs.readFile(hatPath);
     layers.push({
-      input: hatBuffer,
+      buffer: hatBuffer,
       top: UV_REGIONS.HAT_TOP.y,
       left: UV_REGIONS.HAT_TOP.x,
     });

@@ -122,30 +122,16 @@ export function generateHead_Base_01(): string {
       <rect x="0" y="14" width="8" height="1" fill="#706253" class="colorizable-skin"/>
       <rect x="0" y="15" width="8" height="1" fill="#706253" class="colorizable-skin"/>
 
-      <!-- HEAD_FRONT (8x8) at (8,8) - Cabeza frontal con ojos verdes asimétricos -->
+      <!-- HEAD_FRONT (8x8) at (8,8) - Cabeza frontal (sin ojos, solo piel base) -->
       <rect x="8" y="8" width="8" height="1" fill="#6a5d50" class="colorizable-skin"/>
       <rect x="8" y="9" width="2" height="1" fill="#6a5d50" class="colorizable-skin"/>
       <rect x="10" y="9" width="4" height="1" fill="#80705f" class="colorizable-skin"/>
       <rect x="14" y="9" width="2" height="1" fill="#6a5d50" class="colorizable-skin"/>
       <rect x="8" y="10" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
-      <rect x="9" y="10" width="2" height="1" fill="#228b22"/>
-      <rect x="11" y="10" width="2" height="1" fill="#80705f" class="colorizable-skin"/>
-      <rect x="13" y="10" width="2" height="1" fill="#228b22"/>
+      <rect x="9" y="10" width="6" height="1" fill="#80705f" class="colorizable-skin"/>
       <rect x="15" y="10" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
-      <rect x="8" y="11" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
-      <rect x="9" y="11" width="1" height="1" fill="#228b22"/>
-      <rect x="10" y="11" width="1" height="1" fill="#114611"/>
-      <rect x="11" y="11" width="2" height="1" fill="#80705f" class="colorizable-skin"/>
-      <rect x="13" y="11" width="1" height="1" fill="#114611"/>
-      <rect x="14" y="11" width="1" height="1" fill="#228b22"/>
-      <rect x="15" y="11" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
-      <rect x="8" y="12" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
-      <rect x="9" y="12" width="1" height="1" fill="#228b22"/>
-      <rect x="10" y="12" width="1" height="1" fill="#114611"/>
-      <rect x="11" y="12" width="2" height="1" fill="#80705f" class="colorizable-skin"/>
-      <rect x="13" y="12" width="1" height="1" fill="#114611"/>
-      <rect x="14" y="12" width="1" height="1" fill="#228b22"/>
-      <rect x="15" y="12" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="8" y="11" width="8" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="8" y="12" width="8" height="1" fill="#80705f" class="colorizable-skin"/>
       <rect x="8" y="13" width="8" height="1" fill="#80705f" class="colorizable-skin"/>
       <rect x="8" y="14" width="2" height="1" fill="#80705f" class="colorizable-skin"/>
       <rect x="10" y="14" width="4" height="1" fill="#303030"/>
@@ -231,18 +217,16 @@ export function generateEyes_02(): string {
  */
 export function generateEyes_03(): string {
   return `
-    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg">
-      <!-- Ojo izquierdo -->
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- Ojo izquierdo (x=1-2, y=2-4) -->
       <rect x="1" y="2" width="2" height="3" fill="#FFFFFF"/>
-      <rect x="2" y="2" width="1" height="3" fill="#808080" class="colorizable-eye"/>
-      <!-- Brillo -->
-      <rect x="1" y="2" width="1" height="1" fill="#FFFFFF" opacity="0.8"/>
+      <rect x="2" y="3" width="1" height="1" fill="#808080" class="colorizable-eye"/>
+      <rect x="2" y="4" width="1" height="1" fill="#808080" class="colorizable-eye"/>
 
-      <!-- Ojo derecho -->
+      <!-- Ojo derecho (x=5-6, y=2-4) -->
       <rect x="5" y="2" width="2" height="3" fill="#FFFFFF"/>
-      <rect x="5" y="2" width="1" height="3" fill="#808080" class="colorizable-eye"/>
-      <!-- Brillo -->
-      <rect x="5" y="2" width="1" height="1" fill="#FFFFFF" opacity="0.8"/>
+      <rect x="5" y="3" width="1" height="1" fill="#808080" class="colorizable-eye"/>
+      <rect x="5" y="4" width="1" height="1" fill="#808080" class="colorizable-eye"/>
     </svg>
   `;
 }
@@ -256,14 +240,11 @@ export function generateEyes_03(): string {
  */
 export function generateMouth_01(): string {
   return `
-    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg">
-      <!-- Sonrisa (3 pixels) -->
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- Sonrisa simple (sin curva superior para evitar píxeles semi-transparentes) -->
       <rect x="2" y="6" width="1" height="1" fill="#303030"/>
       <rect x="3" y="6" width="2" height="1" fill="#303030"/>
       <rect x="5" y="6" width="1" height="1" fill="#303030"/>
-      <!-- Curva de sonrisa -->
-      <rect x="2" y="5" width="1" height="1" fill="#404040" opacity="0.5"/>
-      <rect x="5" y="5" width="1" height="1" fill="#404040" opacity="0.5"/>
     </svg>
   `;
 }
@@ -1496,8 +1477,7 @@ export function generateOutfit_WavySleeves_01(): string {
       <!-- BODY_LEFT (4x12) at (28,20) -->
       <rect x="28" y="20" width="4" height="12" fill="#805b61"/>
 
-      <!-- BODY_BACK (4x12) at (32,20) -->
-      <rect x="32" y="20" width="4" height="12" fill="#805b61"/>
+      <!-- BODY_BACK: Omitido - el componente hairBody maneja esta región con mechones de pelo -->
 
       <!-- BRAZO DERECHO -->
       <!-- ARM_R_TOP (4x4) at (44,16) - Hombro con mechones -->

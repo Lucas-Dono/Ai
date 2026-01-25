@@ -716,39 +716,47 @@ export function generateHairLongBody_02(): string {
       <rect x="20" y="30" width="8" height="1" fill="#805b61" class="colorizable-hair"/>
       <rect x="20" y="31" width="8" height="1" fill="#805b61" class="colorizable-hair"/>
 
-      <!-- BODY_BACK (4x12) at (32,20) - Torso trasero -->
+      <!-- BODY_BACK (4x12) at (32,20) - Torso trasero - Solo píxeles de pelo -->
+      <!-- Fila y=20: mechones superiores -->
       <rect x="32" y="20" width="1" height="1" fill="#743434" class="colorizable-hair"/>
       <rect x="33" y="20" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="35" y="20" width="1" height="1" fill="#743434" class="colorizable-hair"/>
-      <rect x="32" y="21" width="1" height="1" fill="#604549" class="colorizable-hair"/>
+      <rect x="36" y="20" width="1" height="1" fill="#783636" class="colorizable-hair"/>
+      <!-- Fila y=21: [32] = piel (outfit), mechones en 33-36 -->
       <rect x="33" y="21" width="1" height="1" fill="#743434" class="colorizable-hair"/>
       <rect x="34" y="21" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
+      <rect x="36" y="21" width="1" height="1" fill="#5a2828" class="colorizable-hair"/>
+      <!-- Fila y=22: mechones completos -->
       <rect x="32" y="22" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="34" y="22" width="2" height="1" fill="#5a2828" class="colorizable-hair"/>
+      <!-- Fila y=23: mechones completos -->
       <rect x="32" y="23" width="1" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="33" y="23" width="2" height="1" fill="#743434" class="colorizable-hair"/>
       <rect x="35" y="23" width="1" height="1" fill="#783636" class="colorizable-hair"/>
-      <rect x="32" y="24" width="1" height="1" fill="#604549" class="colorizable-hair"/>
+      <!-- Fila y=24: [32] = piel (outfit), mechones en 33-35 -->
       <rect x="33" y="24" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="35" y="24" width="1" height="1" fill="#743434" class="colorizable-hair"/>
-      <rect x="32" y="25" width="2" height="1" fill="#604549" class="colorizable-hair"/>
+      <!-- Fila y=25: [32,33] = piel (outfit), mechones en 34-36 -->
       <rect x="34" y="25" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
+      <rect x="36" y="25" width="1" height="1" fill="#5a2828" class="colorizable-hair"/>
+      <!-- Fila y=26: mechones completos con detalle en 36 -->
       <rect x="32" y="26" width="1" height="1" fill="#743434" class="colorizable-hair"/>
       <rect x="33" y="26" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="35" y="26" width="1" height="1" fill="#5a2828" class="colorizable-hair"/>
+      <rect x="36" y="26" width="1" height="1" fill="#5a2828" class="colorizable-hair"/>
+      <!-- Fila y=27: mechones completos -->
       <rect x="32" y="27" width="1" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="33" y="27" width="2" height="1" fill="#743434" class="colorizable-hair"/>
       <rect x="35" y="27" width="1" height="1" fill="#783636" class="colorizable-hair"/>
-      <rect x="32" y="28" width="1" height="1" fill="#604549" class="colorizable-hair"/>
+      <!-- Fila y=28: [32,35] = piel (outfit), mechones en 33-34 -->
       <rect x="33" y="28" width="1" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="34" y="28" width="1" height="1" fill="#743434" class="colorizable-hair"/>
-      <rect x="35" y="28" width="1" height="1" fill="#604549" class="colorizable-hair"/>
+      <!-- Fila y=29: mechones completos -->
       <rect x="32" y="29" width="2" height="1" fill="#672e2e" class="colorizable-hair"/>
       <rect x="34" y="29" width="2" height="1" fill="#5a2828" class="colorizable-hair"/>
-      <rect x="32" y="30" width="1" height="1" fill="#604549" class="colorizable-hair"/>
+      <!-- Fila y=30: [32,35] = piel (outfit), mechones en 33-34 -->
       <rect x="33" y="30" width="2" height="1" fill="#5a2828" class="colorizable-hair"/>
-      <rect x="35" y="30" width="1" height="1" fill="#604549" class="colorizable-hair"/>
-      <rect x="32" y="31" width="4" height="1" fill="#604549" class="colorizable-hair"/>
+      <!-- Fila y=31: toda piel (outfit), sin mechones -->
 
       <!-- BODY_RIGHT (4x12) at (16,20) - Torso derecho -->
       <rect x="16" y="20" width="1" height="1" fill="#783636" class="colorizable-hair"/>
