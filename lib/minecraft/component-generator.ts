@@ -1535,7 +1535,8 @@ export function generateOutfit_WavySleeves_01(): string {
       <!-- BODY_LEFT (4x12) at (28,20) -->
       <rect x="28" y="20" width="4" height="12" fill="#805b61"/>
 
-      <!-- BODY_BACK: Omitido - el componente hairBody maneja esta región con mechones de pelo -->
+      <!-- BODY_BACK (8x12) at (32,20) - Color de la ropa (se superpone el pelo) -->
+      <rect x="32" y="20" width="8" height="12" fill="#805b61"/>
 
       <!-- BRAZO DERECHO -->
       <!-- ARM_R_TOP (4x4) at (44,16) - Hombro con mechones -->
