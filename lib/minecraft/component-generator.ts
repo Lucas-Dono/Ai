@@ -220,13 +220,15 @@ export function generateEyes_03(): string {
     <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
       <!-- Ojo izquierdo (x=1-2, y=2-4) -->
       <rect x="1" y="2" width="2" height="3" fill="#FFFFFF"/>
-      <rect x="2" y="3" width="1" height="1" fill="#808080" class="colorizable-eye"/>
-      <rect x="2" y="4" width="1" height="1" fill="#808080" class="colorizable-eye"/>
+      <!-- Pupila en gris muy claro (E0E0E0) para que los colores se vean vibrantes -->
+      <rect x="2" y="3" width="1" height="1" fill="#E0E0E0" class="colorizable-eye"/>
+      <rect x="2" y="4" width="1" height="1" fill="#E0E0E0" class="colorizable-eye"/>
 
       <!-- Ojo derecho (x=5-6, y=2-4) -->
       <rect x="5" y="2" width="2" height="3" fill="#FFFFFF"/>
-      <rect x="5" y="3" width="1" height="1" fill="#808080" class="colorizable-eye"/>
-      <rect x="5" y="4" width="1" height="1" fill="#808080" class="colorizable-eye"/>
+      <!-- Pupila en gris muy claro (E0E0E0) para que los colores se vean vibrantes -->
+      <rect x="5" y="3" width="1" height="1" fill="#E0E0E0" class="colorizable-eye"/>
+      <rect x="5" y="4" width="1" height="1" fill="#E0E0E0" class="colorizable-eye"/>
     </svg>
   `;
 }

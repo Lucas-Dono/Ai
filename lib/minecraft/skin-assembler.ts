@@ -63,7 +63,12 @@ async function recolorImage(
       // Detectar si es un pixel gris (R ≈ G ≈ B)
       const isGray = Math.abs(r - g) < 10 && Math.abs(g - b) < 10 && Math.abs(r - b) < 10;
 
-      if (isGray && a > 0) {
+      // Excluir blanco puro (para ojos) y negro puro (para detalles)
+      const isWhite = r > 245 && g > 245 && b > 245;
+      const isBlack = r < 10 && g < 10 && b < 10;
+
+      // Solo recolorear grises intermedios (no blanco ni negro)
+      if (isGray && !isWhite && !isBlack && a > 0) {
         // Mapear luminosidad del gris al color target
         const luminosity = r / 255; // Normalizar 0-1
 
