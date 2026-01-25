@@ -289,61 +289,47 @@ export function generateMouth_03(): string {
  */
 export function generateHairFront_01(): string {
   return `
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ======================================== -->
-      <!-- CAPA BASE (HEAD) - Pelo pegado a cabeza -->
-      <!-- ======================================== -->
-
-      <!-- HEAD_TOP (8x8) at (8,0) - Forma base -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="9" y="1" width="6" height="6" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Pelo pegado lado -->
-      <rect x="0" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="0" y="10" width="6" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="1" y="11" width="5" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="2" y="12" width="3" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente con flequillo base -->
-      <rect x="8" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="9" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="13" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Pelo pegado lado -->
-      <rect x="16" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="18" y="10" width="6" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="18" y="11" width="5" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="19" y="12" width="3" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca base -->
-      <rect x="24" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="25" y="11" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- ======================================== -->
-      <!-- CAPA OVERLAY (HAT) - Profundidad y volumen -->
-      <!-- ======================================== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Volumen superior -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con volumen -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
       <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Línea central de profundidad -->
-      <rect x="43" y="1" width="2" height="6" fill="#606060" class="colorizable-hair" opacity="0.3"/>
+      <!-- Línea central -->
+      <rect x="43" y="1" width="2" height="6" fill="#707070" class="colorizable-hair" opacity="0.3"/>
 
       <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Mechones sobresalientes -->
-      <rect x="32" y="13" width="1" height="1" fill="#606060" class="colorizable-hair"/>
-      <rect x="33" y="14" width="1" height="1" fill="#505050" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho estilizado -->
+      <!-- Base del pelo -->
+      <rect x="32" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones laterales -->
+      <rect x="32" y="10" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="32" y="11" width="5" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="32" y="12" width="3" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra -->
+      <rect x="32" y="13" width="2" height="2" fill="#606060" class="colorizable-hair" opacity="0.5"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Puntas de flequillo -->
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo -->
+      <rect x="40" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones del flequillo -->
+      <rect x="41" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="45" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Puntas -->
       <rect x="41" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
       <rect x="46" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Mechones sobresalientes -->
-      <rect x="55" y="13" width="1" height="1" fill="#606060" class="colorizable-hair"/>
-      <rect x="54" y="14" width="1" height="1" fill="#505050" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo estilizado -->
+      <!-- Base del pelo -->
+      <rect x="48" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones laterales -->
+      <rect x="50" y="10" width="6" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="51" y="11" width="5" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="53" y="12" width="3" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra -->
+      <rect x="54" y="13" width="2" height="2" fill="#606060" class="colorizable-hair" opacity="0.5"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Volumen trasero sutil -->
-      <!-- (mínimo para mantener apariencia limpia) -->
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera -->
+      <rect x="56" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <rect x="57" y="11" width="6" height="1" fill="#707070" class="colorizable-hair"/>
     </svg>
   `;
 }
@@ -354,57 +340,42 @@ export function generateHairFront_01(): string {
  */
 export function generateHairFront_02(): string {
   return `
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ======================================== -->
-      <!-- CAPA BASE (HEAD) - Pelo pegado a cabeza -->
-      <!-- ======================================== -->
-
-      <!-- HEAD_TOP (8x8) at (8,0) - Forma base -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="9" y="1" width="6" height="6" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Pelo pegado con longitud -->
-      <rect x="0" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="0" y="11" width="7" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="1" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="2" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente con flequillo lateral base -->
-      <rect x="8" y="8" width="3" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="9" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Pelo pegado con longitud -->
-      <rect x="16" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="17" y="11" width="7" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="17" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="18" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca con detalle -->
-      <rect x="24" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
-      <rect x="25" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- ======================================== -->
-      <!-- CAPA OVERLAY (HAT) - Profundidad y volumen -->
-      <!-- ======================================== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Volumen superior -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con volumen -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
       <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Línea central de profundidad -->
-      <rect x="43" y="1" width="2" height="6" fill="#606060" class="colorizable-hair" opacity="0.3"/>
+      <!-- Línea central -->
+      <rect x="43" y="1" width="2" height="6" fill="#707070" class="colorizable-hair" opacity="0.3"/>
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Mechones largos sobresalientes -->
-      <rect x="33" y="13" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="33" y="14" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con pelo largo estilizado -->
+      <!-- Base del pelo -->
+      <rect x="32" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Transición -->
+      <rect x="32" y="11" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="32" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Mechón largo con puntas -->
+      <rect x="33" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="33" y="14" width="2" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Punta de flequillo lateral -->
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo lateral -->
+      <rect x="40" y="8" width="3" height="3" fill="#808080" class="colorizable-hair"/>
+      <rect x="41" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
       <rect x="41" y="12" width="1" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Mechones largos sobresalientes -->
-      <rect x="53" y="13" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="54" y="14" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con pelo largo estilizado -->
+      <!-- Base del pelo -->
+      <rect x="48" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Transición -->
+      <rect x="49" y="11" width="7" height="1" fill="#808080" class="colorizable-hair"/>
+      <rect x="50" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Mechón largo con puntas -->
+      <rect x="51" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="53" y="14" width="2" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Mechón trasero -->
-      <rect x="58" y="13" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con detalle -->
+      <rect x="56" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="57" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="58" y="13" width="4" height="1" fill="#606060" class="colorizable-hair" opacity="0.5"/>
     </svg>
   `;
 }
@@ -451,64 +422,48 @@ export function generateHairBack_01(): string {
  */
 export function generateHairShort_01_Pixie(): string {
   return `
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ======================================== -->
-      <!-- CAPA BASE (HEAD) - Pelo pegado a cabeza -->
-      <!-- ======================================== -->
-
-      <!-- HEAD_TOP (8x8) at (8,0) - Forma base compacta -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="9" y="1" width="6" height="6" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Pelo pegado muy corto -->
-      <rect x="0" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="1" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="2" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente con flequillo corto -->
-      <rect x="8" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Flequillo texturizado base -->
-      <rect x="9" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="11" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="13" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Pelo pegado muy corto -->
-      <rect x="16" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="17" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="18" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca muy corta -->
-      <rect x="24" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="25" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- ======================================== -->
-      <!-- CAPA OVERLAY (HAT) - Profundidad y volumen -->
-      <!-- ======================================== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Volumen en corona -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con volumen en corona -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
       <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
       <rect x="42" y="1" width="4" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Centro con profundidad -->
-      <rect x="43" y="2" width="2" height="4" fill="#606060" class="colorizable-hair"/>
-      <rect x="44" y="3" width="1" height="2" fill="#505050" class="colorizable-hair"/>
+      <!-- Centro más oscuro para profundidad -->
+      <rect x="43" y="2" width="2" height="4" fill="#707070" class="colorizable-hair"/>
+      <rect x="44" y="3" width="1" height="2" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío para pixie) -->
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Mechones texturizados -->
-      <rect x="33" y="10" width="1" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="33" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho muy corto -->
+      <!-- Cobertura superior corta -->
+      <rect x="32" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Transición sutil hacia abajo -->
+      <rect x="33" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="34" y="12" width="2" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Puntas de flequillo sobresalientes -->
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo corto estilizado -->
+      <rect x="40" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Flequillo texturizado -->
+      <rect x="41" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="43" y="10" width="1" height="1" fill="#909090" class="colorizable-hair"/>
+      <rect x="45" y="10" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Puntas del flequillo -->
       <rect x="41" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
       <rect x="43" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
       <rect x="46" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Mechones texturizados -->
-      <rect x="54" y="10" width="1" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="54" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo muy corto -->
+      <!-- Cobertura superior corta -->
+      <rect x="48" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="49" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Transición sutil hacia abajo -->
+      <rect x="51" y="11" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="52" y="12" width="2" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Volumen trasero sutil -->
-      <rect x="58" y="11" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera muy corta -->
+      <rect x="56" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <rect x="57" y="10" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="58" y="11" width="4" height="1" fill="#606060" class="colorizable-hair"/>
     </svg>
   `;
 }
@@ -521,75 +476,48 @@ export function generateHairShort_01_Pixie(): string {
  */
 export function generateHairShort_02_BobCut(): string {
   return `
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ======================================== -->
-      <!-- CAPA BASE (HEAD) - Pelo pegado a cabeza -->
-      <!-- ======================================== -->
-
-      <!-- HEAD_TOP (8x8) at (8,0) - Forma base compacta -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="9" y="1" width="6" height="6" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Pelo pegado lado derecho -->
-      <rect x="0" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="1" y="10" width="7" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="2" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="3" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente base con flequillo pegado -->
-      <rect x="8" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="8" y="10" width="3" height="2" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Pelo pegado lado izquierdo -->
-      <rect x="16" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="16" y="10" width="7" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="16" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="17" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca base -->
-      <rect x="24" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="25" y="11" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- ======================================== -->
-      <!-- CAPA OVERLAY (HAT) - Profundidad y volumen -->
-      <!-- ======================================== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Volumen superior -->
-      <!-- Mechones superiores sobresalientes -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con cobertura completa -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
       <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Línea de parte central (profundidad) -->
-      <rect x="43" y="1" width="2" height="6" fill="#606060" class="colorizable-hair" opacity="0.4"/>
-      <!-- Mechones laterales con volumen -->
+      <!-- Línea de parte central -->
+      <rect x="43" y="1" width="2" height="6" fill="#707070" class="colorizable-hair" opacity="0.4"/>
+      <!-- Volumen lateral -->
       <rect x="40" y="2" width="2" height="4" fill="#909090" class="colorizable-hair"/>
       <rect x="46" y="2" width="2" height="4" fill="#909090" class="colorizable-hair"/>
 
       <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Mechones sobresalientes lado derecho -->
-      <!-- Mechones superiores con volumen extra -->
-      <rect x="32" y="8" width="1" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="32" y="11" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Mechones ondulados -->
-      <rect x="32" y="13" width="1" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="33" y="14" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con corte recto -->
+      <!-- Cobertura superior -->
+      <rect x="32" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Volumen medio -->
+      <rect x="32" y="11" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Línea de corte recta -->
+      <rect x="32" y="13" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra inferior -->
+      <rect x="33" y="14" width="5" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Flequillo con volumen -->
-      <!-- Mechones frontales sobresalientes -->
-      <rect x="40" y="11" width="1" height="2" fill="#707070" class="colorizable-hair"/>
-      <rect x="41" y="13" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo lateral opcional -->
+      <rect x="40" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Flequillo lateral barrido -->
+      <rect x="40" y="11" width="3" height="2" fill="#707070" class="colorizable-hair"/>
+      <rect x="41" y="13" width="2" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Mechones sobresalientes lado izquierdo -->
-      <!-- Mechones superiores con volumen extra -->
-      <rect x="55" y="8" width="1" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="54" y="11" width="2" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Mechones ondulados -->
-      <rect x="55" y="13" width="1" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="54" y="14" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con corte recto -->
+      <!-- Cobertura superior -->
+      <rect x="48" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
+      <!-- Volumen medio -->
+      <rect x="48" y="11" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Línea de corte recta -->
+      <rect x="49" y="13" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra inferior -->
+      <rect x="50" y="14" width="5" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Volumen trasero -->
-      <!-- Mechones traseros sobresalientes -->
-      <rect x="56" y="12" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="58" y="13" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con línea de nuca -->
+      <rect x="56" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="57" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="58" y="13" width="4" height="1" fill="#606060" class="colorizable-hair"/>
     </svg>
   `;
 }
@@ -602,31 +530,10 @@ export function generateHairShort_02_BobCut(): string {
  */
 export function generateHairShort_03_BuzzCut(): string {
   return `
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ======================================== -->
-      <!-- CAPA BASE (HEAD) - Pelo muy pegado -->
-      <!-- ======================================== -->
-
-      <!-- HEAD_TOP (8x8) at (8,0) - Base uniforme -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Pelo muy corto pegado -->
-      <rect x="0" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente pegado -->
-      <rect x="8" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Pelo muy corto pegado -->
-      <rect x="16" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca pegada -->
-      <rect x="24" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-
-      <!-- ======================================== -->
-      <!-- CAPA OVERLAY (HAT) - Textura y profundidad -->
-      <!-- ======================================== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Textura de pelo muy corto -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con textura uniforme -->
+      <rect x="40" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura de pelo muy corto con puntos -->
       <rect x="41" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="43" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="45" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
@@ -639,26 +546,34 @@ export function generateHairShort_03_BuzzCut(): string {
 
       <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Textura lado derecho -->
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho muy corto uniforme -->
+      <rect x="32" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura uniforme -->
       <rect x="33" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="35" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="37" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="34" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Textura frontal sutil -->
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente uniforme sin flequillo -->
+      <rect x="40" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura sutil -->
       <rect x="41" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="43" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="45" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="42" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="44" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Textura lado izquierdo -->
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo muy corto uniforme -->
+      <rect x="48" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura uniforme -->
       <rect x="49" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="51" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="53" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="50" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Textura trasera -->
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera uniforme -->
+      <rect x="56" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Textura -->
       <rect x="57" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="59" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
       <rect x="61" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>

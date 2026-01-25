@@ -1,52 +1,47 @@
 
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ========== CAPA BASE (HEAD) - Pelo pegado a la cabeza ========== -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior circular -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Forma circular en la parte superior -->
+      <rect x="41" y="0" width="6" height="8" fill="#909090" class="colorizable-hair"/>
+      <rect x="42" y="1" width="4" height="6" fill="#959595" class="colorizable-hair"/>
+      <!-- Centro -->
+      <rect x="43" y="2" width="2" height="4" fill="#808080" class="colorizable-hair"/>
 
-      <!-- HEAD_TOP (8x8) at (8,0) - Forma circular base -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="9" y="0" width="6" height="8" fill="#808080" class="colorizable-hair"/>
-      <rect x="10" y="1" width="4" height="6" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
 
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Lado derecho circular -->
-      <rect x="0" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
-      <rect x="1" y="10" width="6" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="0" y="12" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con corte circular -->
+      <!-- Cobertura superior -->
+      <rect x="32" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="33" y="10" width="6" height="2" fill="#909090" class="colorizable-hair"/>
+      <!-- Línea de corte circular -->
+      <rect x="32" y="12" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="33" y="13" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="34" y="14" width="4" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente con flequillo circular -->
-      <rect x="8" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
-      <rect x="9" y="10" width="6" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="8" y="12" width="8" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Lado izquierdo circular -->
-      <rect x="16" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
-      <rect x="17" y="10" width="6" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="17" y="12" width="7" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca circular -->
-      <rect x="24" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
-      <rect x="25" y="10" width="6" height="2" fill="#808080" class="colorizable-hair"/>
-      <rect x="25" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- ========== CAPA OVERLAY (HAT) - Volumen circular ========== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Volumen superior circular -->
-      <rect x="41" y="0" width="6" height="7" fill="#909090" class="colorizable-hair"/>
-      <rect x="42" y="1" width="4" height="5" fill="#959595" class="colorizable-hair"/>
-
-      <!-- HAT_RIGHT (8x8) at (32,8) - Borde circular -->
-      <rect x="33" y="10" width="4" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="33" y="13" width="5" height="1" fill="#707070" class="colorizable-hair"/>
-
-      <!-- HAT_FRONT (8x8) at (40,8) - Flequillo circular pronunciado -->
-      <rect x="41" y="10" width="6" height="2" fill="#959595" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo circular -->
+      <rect x="40" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="41" y="10" width="6" height="2" fill="#909090" class="colorizable-hair"/>
+      <!-- Flequillo recto circular -->
+      <rect x="40" y="12" width="8" height="1" fill="#707070" class="colorizable-hair"/>
       <rect x="41" y="13" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="42" y="14" width="4" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Borde circular -->
-      <rect x="51" y="10" width="4" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="50" y="13" width="5" height="1" fill="#707070" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con corte circular -->
+      <!-- Cobertura superior -->
+      <rect x="48" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <rect x="49" y="10" width="6" height="2" fill="#909090" class="colorizable-hair"/>
+      <!-- Línea de corte circular -->
+      <rect x="49" y="12" width="7" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="49" y="13" width="6" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="50" y="14" width="4" height="1" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Borde circular trasero -->
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con línea circular -->
+      <rect x="56" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
       <rect x="57" y="10" width="6" height="2" fill="#909090" class="colorizable-hair"/>
+      <!-- Línea de corte -->
+      <rect x="57" y="12" width="6" height="1" fill="#707070" class="colorizable-hair"/>
       <rect x="58" y="13" width="4" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="59" y="14" width="2" height="1" fill="#606060" class="colorizable-hair"/>
     </svg>
   

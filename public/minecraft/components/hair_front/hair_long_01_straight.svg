@@ -1,52 +1,43 @@
 
-    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- ========== CAPA BASE (HEAD) - Pelo pegado a la cabeza ========== -->
-
-      <!-- HEAD_TOP (8x8) at (8,0) - Forma base con raya -->
-      <rect x="8" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="11" y="0" width="2" height="8" fill="#606060" class="colorizable-hair"/>
-      <rect x="8" y="1" width="3" height="6" fill="#808080" class="colorizable-hair"/>
-      <rect x="13" y="1" width="3" height="6" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_RIGHT (8x8) at (0,8) - Lado derecho con caída -->
-      <rect x="0" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="0" y="8" width="2" height="8" fill="#606060" class="colorizable-hair"/>
-      <rect x="2" y="10" width="4" height="5" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_FRONT (8x8) at (8,8) - Frente con pelo hacia atrás -->
-      <rect x="8" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
-      <rect x="11" y="8" width="2" height="4" fill="#606060" class="colorizable-hair"/>
-      <rect x="9" y="11" width="6" height="1" fill="#606060" class="colorizable-hair"/>
-
-      <!-- HEAD_LEFT (8x8) at (16,8) - Lado izquierdo con caída -->
-      <rect x="16" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="22" y="8" width="2" height="8" fill="#606060" class="colorizable-hair"/>
-      <rect x="18" y="10" width="4" height="5" fill="#808080" class="colorizable-hair"/>
-
-      <!-- HEAD_BACK (8x8) at (24,8) - Nuca con volumen -->
-      <rect x="24" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <rect x="26" y="8" width="4" height="6" fill="#808080" class="colorizable-hair"/>
-      <rect x="25" y="13" width="6" height="2" fill="#606060" class="colorizable-hair"/>
-
-      <!-- ========== CAPA OVERLAY (HAT) - Mechones y profundidad ========== -->
-
-      <!-- HAT_TOP (8x8) at (40,0) - Volumen superior y raya -->
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con raya al medio -->
+      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Raya central -->
+      <rect x="43" y="0" width="2" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Volumen lateral -->
       <rect x="40" y="1" width="3" height="6" fill="#909090" class="colorizable-hair"/>
       <rect x="45" y="1" width="3" height="6" fill="#909090" class="colorizable-hair"/>
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Mechones laterales -->
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío, pelo cae) -->
+
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con caída recta -->
+      <rect x="32" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Sombra lateral -->
+      <rect x="32" y="8" width="2" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Mechas de caída -->
       <rect x="34" y="10" width="4" height="5" fill="#909090" class="colorizable-hair"/>
       <rect x="35" y="14" width="3" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Sombra frontal -->
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con pelo liso hacia atrás -->
+      <rect x="40" y="8" width="8" height="4" fill="#808080" class="colorizable-hair"/>
+      <!-- Línea central suave -->
+      <rect x="43" y="8" width="2" height="4" fill="#707070" class="colorizable-hair"/>
+      <!-- Sombra inferior -->
       <rect x="41" y="11" width="6" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Mechones laterales -->
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con caída recta -->
+      <rect x="48" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Sombra lateral -->
+      <rect x="54" y="8" width="2" height="8" fill="#707070" class="colorizable-hair"/>
+      <!-- Mechas de caída -->
       <rect x="50" y="10" width="4" height="5" fill="#909090" class="colorizable-hair"/>
       <rect x="50" y="14" width="3" height="1" fill="#707070" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Volumen trasero -->
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con volumen -->
+      <rect x="56" y="8" width="8" height="8" fill="#808080" class="colorizable-hair"/>
+      <!-- Volumen central -->
       <rect x="58" y="8" width="4" height="6" fill="#909090" class="colorizable-hair"/>
+      <!-- Transición hacia caída -->
       <rect x="57" y="13" width="6" height="2" fill="#707070" class="colorizable-hair"/>
     </svg>
   
