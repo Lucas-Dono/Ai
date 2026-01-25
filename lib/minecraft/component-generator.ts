@@ -1203,6 +1203,177 @@ export function generateTShirt_02(): string {
     </svg>
   `;
 }
+/**
+ * Genera sprite de remera - Tipo 3: Remera con cara simple
+ * Diseño personalizado con cara dibujada en el frente
+ */
+export function generateTShirt_03(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- BODY_RIGHT (4x12) at (16,20) -->
+      <rect x="16" y="20" width="4" height="12" fill="#1a1a1a" class="colorizable-clothing"/>
+
+      <!-- BODY_FRONT (8x12) at (20,20) - Con cara simple -->
+      <rect x="20" y="20" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="20" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="20" width="1" height="1" fill="#706253"/>
+      <rect x="23" y="20" width="1" height="1" fill="#706253"/>
+      <rect x="24" y="20" width="1" height="1" fill="#706253"/>
+      <rect x="25" y="20" width="1" height="1" fill="#706253"/>
+      <rect x="26" y="20" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="20" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="21" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="22" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="22" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="22" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="23" y="22" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="24" y="22" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="25" y="22" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="26" y="22" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="22" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="23" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="23" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="22" y="23" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="23" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="23" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="23" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="23" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="27" y="23" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="24" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="21" y="24" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="24" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="23" y="24" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="24" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="24" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="26" y="24" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="24" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="20" y="25" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="21" y="25" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="25" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="25" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="25" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="25" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="25" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="25" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="20" y="26" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="21" y="26" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="26" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="23" y="26" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="24" y="26" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="25" y="26" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="26" y="26" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="26" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="20" y="27" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="21" y="27" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="27" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="27" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="27" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="27" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="27" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="27" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="20" y="28" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="28" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="22" y="28" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="28" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="28" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="28" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="28" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="27" y="28" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="29" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="29" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="29" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="23" y="29" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="24" y="29" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="25" y="29" width="1" height="1" fill="#ffffff" class="colorizable-clothing"/>
+      <rect x="26" y="29" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="29" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="30" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="20" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="21" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="22" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="23" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="24" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="25" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="26" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="27" y="31" width="1" height="1" fill="#1a1a1a" class="colorizable-clothing"/>
+
+      <!-- BODY_LEFT (4x12) at (28,20) -->
+      <rect x="28" y="20" width="4" height="12" fill="#1a1a1a" class="colorizable-clothing"/>
+
+      <!-- BODY_BACK (8x12) at (32,20) -->
+      <rect x="32" y="20" width="8" height="12" fill="#1a1a1a" class="colorizable-clothing"/>
+
+      <!-- ARM_R_TOP (4x4) at (44,16) -->
+      <rect x="44" y="16" width="4" height="4" fill="#1a1a1a" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BOTTOM (4x4) at (48,16) - Piel visible -->
+      <rect x="48" y="16" width="4" height="4" fill="#7b6c59"/>
+
+      <!-- ARM_R_RIGHT (4x12) at (40,20) -->
+      <rect x="40" y="20" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="40" y="25" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="40" y="26" width="4" height="6" fill="#756755"/>
+
+      <!-- ARM_R_FRONT (4x12) at (44,20) -->
+      <rect x="44" y="20" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="44" y="25" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="44" y="26" width="4" height="6" fill="#8a7964"/>
+
+      <!-- ARM_R_LEFT (4x12) at (48,20) -->
+      <rect x="48" y="20" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="48" y="25" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="48" y="26" width="4" height="6" fill="#7b6c59"/>
+
+      <!-- ARM_R_BACK (4x12) at (52,20) -->
+      <rect x="52" y="20" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="52" y="25" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="52" y="26" width="4" height="6" fill="#6c5e4e"/>
+
+      <!-- ARM_L_TOP (4x4) at (36,48) -->
+      <rect x="36" y="48" width="4" height="4" fill="#1a1a1a" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BOTTOM (4x4) at (40,48) - Piel visible -->
+      <rect x="40" y="48" width="4" height="4" fill="#7b6c59"/>
+
+      <!-- ARM_L_RIGHT (4x12) at (32,52) -->
+      <rect x="32" y="52" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="32" y="57" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="32" y="58" width="4" height="6" fill="#756755"/>
+
+      <!-- ARM_L_FRONT (4x12) at (36,52) -->
+      <rect x="36" y="52" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="36" y="57" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="36" y="58" width="4" height="6" fill="#8a7964"/>
+
+      <!-- ARM_L_LEFT (4x12) at (40,52) -->
+      <rect x="40" y="52" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="40" y="57" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="40" y="58" width="4" height="6" fill="#7b6c59"/>
+
+      <!-- ARM_L_BACK (4x12) at (44,52) -->
+      <rect x="44" y="52" width="4" height="5" fill="#1a1a1a" class="colorizable-clothing"/>
+      <rect x="44" y="57" width="4" height="1" fill="#aaaaaa" class="colorizable-clothing"/>
+      <rect x="44" y="58" width="4" height="6" fill="#6c5e4e"/>
+    </svg>
+  `;
+}
+
+
 
 // ============================================================================
 // BIBLIOTECA DE SPRITES - ACCESORIOS (EXTREMIDADES)
@@ -1754,6 +1925,7 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
   // ROPA - SUPERIOR
   { id: 't_shirt_01', category: ComponentCategory.T_SHIRT, generator: generateTShirt_01, filename: 't_shirt_01.svg' },
   { id: 't_shirt_02', category: ComponentCategory.T_SHIRT, generator: generateTShirt_02, filename: 't_shirt_02.svg' },
+  { id: 't_shirt_03', category: ComponentCategory.T_SHIRT, generator: generateTShirt_03, filename: 't_shirt_03.svg' },
   { id: 'shirt_01', category: ComponentCategory.SHIRT, generator: generateShirt_01, filename: 'shirt_01.svg' },
   { id: 'jacket_01', category: ComponentCategory.JACKET, generator: generateJacket_01, filename: 'jacket_01.svg' },
   { id: 'outfit_wavy_sleeves_01', category: ComponentCategory.SHIRT, generator: generateOutfit_WavySleeves_01, filename: 'outfit_wavy_sleeves_01.svg' },
