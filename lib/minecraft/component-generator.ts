@@ -1186,26 +1186,13 @@ export function generateHairShort_02_BobCut(): string {
  * Inspiración: Militar, deportistas, Jason Statham
  *
  * NOTA: El pelo se pinta directamente en HEAD_TOP con colores oscuros
- * para simular pelo muy corto pegado al cráneo. HAT layer está vacío.
+ * para simular pelo muy corto pegado al cráneo. HAT layer está 100% VACÍO.
  */
 export function generateHairShort_03_BuzzCut(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (8x8) at (40,0) - Vista superior: VACÍO (pelo se pinta en HEAD_TOP) -->
-
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior: VACÍO -->
-
-      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho: Solo línea de pelo en parte superior -->
-      <rect x="32" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
-
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente: Solo línea de pelo en parte superior -->
-      <rect x="40" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
-
-      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo: Solo línea de pelo en parte superior -->
-      <rect x="48" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
-
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera: Solo línea de pelo en parte superior -->
-      <rect x="56" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <!-- HAT COMPLETAMENTE VACÍO - El pelo rapado está pintado directamente en HEAD -->
+      <!-- No se necesita HAT layer porque el corte es tan corto que no sobresale -->
     </svg>
   `;
 }
