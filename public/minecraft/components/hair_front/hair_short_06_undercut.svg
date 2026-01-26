@@ -1,43 +1,63 @@
 
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con mucho volumen arriba -->
-      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <!-- Volumen pronunciado -->
-      <rect x="41" y="0" width="6" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="42" y="1" width="4" height="2" fill="#959595" class="colorizable-hair"/>
-      <!-- Centro con altura -->
-      <rect x="43" y="2" width="2" height="4" fill="#959595" class="colorizable-hair"/>
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior -->
+      <rect x="44" y="0" width="1" height="1" fill="#191009" class="colorizable-skin"/>
+      <rect x="45" y="0" width="1" height="1" fill="#261a11" class="colorizable-skin"/>
+      <rect x="43" y="1" width="1" height="1" fill="#2a1b11" class="colorizable-skin"/>
+      <rect x="44" y="1" width="1" height="1" fill="#1d140b" class="colorizable-skin"/>
+      <rect x="46" y="1" width="1" height="1" fill="#23170e" class="colorizable-skin"/>
+      <rect x="46" y="2" width="1" height="1" fill="#241811" class="colorizable-skin"/>
+      <rect x="41" y="3" width="1" height="1" fill="#2f1f16" class="colorizable-skin"/>
+      <rect x="42" y="3" width="1" height="1" fill="#22160e" class="colorizable-skin"/>
+      <rect x="43" y="3" width="1" height="1" fill="#2b1b15" class="colorizable-skin"/>
+      <rect x="44" y="3" width="1" height="1" fill="#302114" class="colorizable-skin"/>
+      <rect x="46" y="3" width="1" height="1" fill="#311e16" class="colorizable-skin"/>
+      <rect x="40" y="4" width="1" height="1" fill="#302115" class="colorizable-skin"/>
+      <rect x="41" y="4" width="1" height="1" fill="#2a1d13" class="colorizable-skin"/>
+      <rect x="42" y="4" width="1" height="1" fill="#291d15" class="colorizable-skin"/>
+      <rect x="43" y="4" width="1" height="1" fill="#2d2012" class="colorizable-skin"/>
+      <rect x="45" y="4" width="1" height="1" fill="#1e160d" class="colorizable-skin"/>
+      <rect x="46" y="4" width="1" height="1" fill="#20170d" class="colorizable-skin"/>
+      <rect x="43" y="5" width="1" height="1" fill="#24190f" class="colorizable-skin"/>
+      <rect x="46" y="5" width="1" height="1" fill="#2d1d13" class="colorizable-skin"/>
+      <rect x="40" y="6" width="1" height="1" fill="#23180f" class="colorizable-skin"/>
+      <rect x="41" y="6" width="1" height="1" fill="#261810" class="colorizable-skin"/>
+      <rect x="42" y="6" width="1" height="1" fill="#1d140d" class="colorizable-skin"/>
+      <rect x="43" y="6" width="1" height="1" fill="#281912" class="colorizable-skin"/>
+      <rect x="44" y="6" width="1" height="1" fill="#2d1f12" class="colorizable-skin"/>
+      <rect x="45" y="6" width="1" height="1" fill="#2d1d13" class="colorizable-skin"/>
+      <rect x="46" y="6" width="1" height="1" fill="#291c11" class="colorizable-skin"/>
+      <rect x="47" y="6" width="1" height="1" fill="#241a10" class="colorizable-skin"/>
+      <rect x="40" y="7" width="1" height="1" fill="#24180f" class="colorizable-skin"/>
+      <rect x="41" y="7" width="1" height="1" fill="#22160d" class="colorizable-skin"/>
+      <rect x="42" y="7" width="1" height="1" fill="#2d1f12" class="colorizable-skin"/>
+      <rect x="43" y="7" width="1" height="1" fill="#251a11" class="colorizable-skin"/>
+      <rect x="44" y="7" width="1" height="1" fill="#281c10" class="colorizable-skin"/>
+      <rect x="45" y="7" width="1" height="1" fill="#2d1f15" class="colorizable-skin"/>
+      <rect x="46" y="7" width="1" height="1" fill="#251611" class="colorizable-skin"/>
+      <rect x="47" y="7" width="1" height="1" fill="#2d2013" class="colorizable-skin"/>
 
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior -->
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con contraste marcado -->
-      <!-- Parte superior con volumen -->
-      <rect x="32" y="8" width="8" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="33" y="10" width="5" height="1" fill="#808080" class="colorizable-hair"/>
-      <!-- Transición abrupta (undercut) -->
-      <rect x="34" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <!-- Lados rapados -->
-      <rect x="35" y="12" width="1" height="2" fill="#606060" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente con volumen alto -->
-      <rect x="40" y="8" width="8" height="2" fill="#909090" class="colorizable-hair"/>
-      <!-- Volumen frontal pronunciado -->
-      <rect x="41" y="10" width="6" height="1" fill="#959595" class="colorizable-hair"/>
-      <rect x="42" y="11" width="4" height="1" fill="#909090" class="colorizable-hair"/>
-      <rect x="43" y="12" width="2" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho -->
+      <rect x="38" y="8" width="1" height="1" fill="#251810" class="colorizable-skin"/>
+      <rect x="39" y="8" width="1" height="1" fill="#291c12" class="colorizable-skin"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con contraste marcado -->
-      <!-- Parte superior con volumen -->
-      <rect x="48" y="8" width="8" height="2" fill="#909090" class="colorizable-hair"/>
-      <rect x="50" y="10" width="5" height="1" fill="#808080" class="colorizable-hair"/>
-      <!-- Transición abrupta (undercut) -->
-      <rect x="52" y="11" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <!-- Lados rapados -->
-      <rect x="52" y="12" width="1" height="2" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente -->
+      <rect x="40" y="8" width="1" height="1" fill="#271a11" class="colorizable-skin"/>
+      <rect x="41" y="8" width="1" height="1" fill="#22160e" class="colorizable-skin"/>
+      <rect x="42" y="8" width="1" height="1" fill="#2b1c11" class="colorizable-skin"/>
+      <rect x="43" y="8" width="1" height="1" fill="#2e1e14" class="colorizable-skin"/>
+      <rect x="44" y="8" width="1" height="1" fill="#23170f" class="colorizable-skin"/>
+      <rect x="45" y="8" width="1" height="1" fill="#312215" class="colorizable-skin"/>
+      <rect x="46" y="8" width="1" height="1" fill="#312014" class="colorizable-skin"/>
+      <rect x="47" y="8" width="1" height="1" fill="#1d150d" class="colorizable-skin"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con volumen arriba -->
-      <rect x="56" y="8" width="8" height="3" fill="#909090" class="colorizable-hair"/>
-      <rect x="57" y="11" width="6" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="59" y="12" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo -->
+
+
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera -->
+
     </svg>
   
