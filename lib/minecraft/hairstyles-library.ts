@@ -305,129 +305,125 @@ export function generateHairShort_08_SlickedBack(): string {
 
 /**
  * Genera sprite de pelo medio - Tipo 1: Lob (Long Bob)
- * Corte hasta los hombros con capas suaves y mechones definidos
- * Basado en diseño de referencia con toques personalizados
+ * Corte hasta los hombros - diseño de referencia exacto
  * Se recolorea con hairPrimary
  */
 export function generateHairMedium_01_Lob(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (8x8) at (40,0) - Vista superior minimalista -->
-      <!-- Toques personalizados: patrón ligeramente diferente -->
-      <rect x="40" y="0" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="47" y="0" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="41" y="1" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="46" y="1" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior -->
+      <rect x="41" y="0" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="46" y="0" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="40" y="1" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="47" y="1" width="1" height="1" fill="#745251" class="colorizable-skin"/>
 
       <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior -->
-      <rect x="50" y="0" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="51" y="0" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="52" y="0" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="53" y="0" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente con mechones -->
-      <rect x="41" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="42" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="43" y="9" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="44" y="9" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="45" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="46" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="40" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="41" y="10" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="42" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="43" y="10" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="44" y="10" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="45" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="46" y="10" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="47" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="40" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="41" y="11" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="42" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="45" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="46" y="11" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="47" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="40" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="41" y="12" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="46" y="12" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="47" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="40" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
-      <rect x="47" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
-      <rect x="40" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="47" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="41" y="15" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="46" y="15" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="50" y="0" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="51" y="0" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="52" y="0" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="53" y="0" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
 
       <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho -->
-      <rect x="33" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="32" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="33" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="32" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="39" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="32" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="39" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="39" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="32" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="36" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
-      <rect x="37" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
-      <rect x="39" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
-      <rect x="32" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="39" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="33" y="8" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="32" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="33" y="9" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="32" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="39" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="32" y="11" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="39" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="39" y="12" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="32" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="36" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
+      <rect x="37" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
+      <rect x="39" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
+      <rect x="32" y="14" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="39" y="14" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente -->
+      <rect x="41" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="42" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="43" y="9" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="44" y="9" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="45" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="46" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="40" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="41" y="10" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="42" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="43" y="10" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="44" y="10" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="45" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="46" y="10" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="47" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="40" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="41" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="42" y="11" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="45" y="11" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="46" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="47" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="40" y="12" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="41" y="12" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="46" y="12" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="47" y="12" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="40" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
+      <rect x="47" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
+      <rect x="40" y="14" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="47" y="14" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="41" y="15" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="46" y="15" width="1" height="1" fill="#745251" class="colorizable-skin"/>
 
       <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo -->
-      <rect x="54" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="54" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="55" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="48" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="55" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="48" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="55" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="48" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="48" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
-      <rect x="50" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
-      <rect x="51" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
-      <rect x="55" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="48" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="55" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="54" y="8" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="54" y="9" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="55" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="48" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="55" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="48" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="55" y="11" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="48" y="12" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="48" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
+      <rect x="50" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
+      <rect x="51" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
+      <rect x="55" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="48" y="14" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="55" y="14" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con volumen -->
-      <!-- Toques personalizados: patrón de mechones ligeramente diferente -->
-      <rect x="57" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="62" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="56" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="57" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="61" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="62" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="63" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="56" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="63" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="56" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="57" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="58" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="60" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="61" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="62" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="63" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="58" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="60" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
-      <rect x="56" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="57" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="59" y="13" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="60" y="13" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="62" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="63" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="56" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="57" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="59" y="14" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="60" y="14" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
-      <rect x="62" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="63" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="57" y="15" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
-      <rect x="59" y="15" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="60" y="15" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
-      <rect x="62" y="15" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera -->
+      <rect x="57" y="8" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="62" y="8" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="56" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="57" y="9" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="62" y="9" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="63" y="9" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="56" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="63" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="56" y="11" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="57" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="59" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="60" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="62" y="11" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="63" y="11" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="59" y="12" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="60" y="12" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
+      <rect x="56" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="58" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="59" y="13" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="60" y="13" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="61" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="63" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="56" y="14" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="58" y="14" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="59" y="14" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="60" y="14" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="61" y="14" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="63" y="14" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="58" y="15" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="59" y="15" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="60" y="15" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
+      <rect x="61" y="15" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
     </svg>
   `;
 }
+
 
 
 

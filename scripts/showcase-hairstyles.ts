@@ -288,6 +288,7 @@ const showcaseExamples: ShowcaseExample[] = [
         clothingSecondary: '#4682B4', // Jeans azul acero
       },
       components: {
+        headBase: 'head_lob',  // Cara femenina del backup
         eyes: 'eyes_03',
         mouth: 'mouth_01',
         torso: 'torso_slim_01',
