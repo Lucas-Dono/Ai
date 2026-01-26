@@ -305,58 +305,131 @@ export function generateHairShort_08_SlickedBack(): string {
 
 /**
  * Genera sprite de pelo medio - Tipo 1: Lob (Long Bob)
- * Estilo: Bob largo hasta los hombros, línea recta, flequillo lateral
- * Género: Femenino/Unisex
- * Inspiración: Heidi Klum, Jessica Alba
+ * Corte hasta los hombros con capas suaves y mechones definidos
+ * Basado en diseño de referencia con toques personalizados
+ * Se recolorea con hairPrimary
  */
 export function generateHairMedium_01_Lob(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con volumen -->
-      <rect x="40" y="0" width="8" height="8" fill="#808080" class="colorizable-hair"/>
-      <rect x="41" y="0" width="6" height="1" fill="#909090" class="colorizable-hair"/>
-      <!-- Raya lateral -->
-      <rect x="42" y="1" width="1" height="6" fill="#707070" class="colorizable-hair" opacity="0.4"/>
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior minimalista -->
+      <!-- Toques personalizados: patrón ligeramente diferente -->
+      <rect x="40" y="0" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="47" y="0" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="41" y="1" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="46" y="1" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
 
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío por transparencia) -->
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior -->
+      <rect x="50" y="0" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="51" y="0" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="52" y="0" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="53" y="0" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho con pelo hasta hombros -->
-      <!-- Base superior -->
-      <rect x="32" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Transición media -->
-      <rect x="32" y="10" width="7" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Mechones bajando -->
-      <rect x="32" y="12" width="6" height="2" fill="#707070" class="colorizable-hair"/>
-      <!-- Puntas (salen un poco del HAT layer hacia abajo) -->
-      <rect x="32" y="14" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="33" y="15" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente con mechones -->
+      <rect x="41" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="42" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="43" y="9" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="44" y="9" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="45" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="46" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="40" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="41" y="10" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="42" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="43" y="10" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="44" y="10" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="45" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="46" y="10" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="47" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="40" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="41" y="11" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="42" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="45" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="46" y="11" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="47" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="40" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="41" y="12" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="46" y="12" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="47" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="40" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
+      <rect x="47" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
+      <rect x="40" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="47" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="41" y="15" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="46" y="15" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente con flequillo lateral -->
-      <rect x="40" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Flequillo lateral (más largo de un lado) -->
-      <rect x="40" y="10" width="3" height="2" fill="#707070" class="colorizable-hair"/>
-      <rect x="40" y="12" width="2" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="40" y="13" width="1" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho -->
+      <rect x="33" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="32" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="33" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="32" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="39" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="32" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="39" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="39" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="32" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="36" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
+      <rect x="37" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
+      <rect x="39" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
+      <rect x="32" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="39" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo con pelo hasta hombros -->
-      <!-- Base superior -->
-      <rect x="48" y="8" width="8" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Transición media -->
-      <rect x="49" y="10" width="7" height="2" fill="#808080" class="colorizable-hair"/>
-      <!-- Mechones bajando -->
-      <rect x="50" y="12" width="6" height="2" fill="#707070" class="colorizable-hair"/>
-      <!-- Puntas -->
-      <rect x="52" y="14" width="4" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="53" y="15" width="2" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo -->
+      <rect x="54" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="54" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="55" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="48" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="55" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="48" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="55" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="48" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="48" y="13" width="1" height="1" fill="#4d3935" class="colorizable-hair"/>
+      <rect x="50" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
+      <rect x="51" y="13" width="1" height="1" fill="#484955" class="colorizable-hair"/>
+      <rect x="55" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="48" y="14" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="55" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera recta -->
-      <rect x="56" y="8" width="8" height="3" fill="#808080" class="colorizable-hair"/>
-      <rect x="56" y="11" width="8" height="2" fill="#707070" class="colorizable-hair"/>
-      <rect x="57" y="13" width="6" height="1" fill="#707070" class="colorizable-hair"/>
-      <rect x="58" y="14" width="4" height="1" fill="#606060" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera con volumen -->
+      <!-- Toques personalizados: patrón de mechones ligeramente diferente -->
+      <rect x="57" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="62" y="8" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="56" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="57" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="61" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="62" y="9" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="63" y="9" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="56" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="63" y="10" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="56" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="57" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="58" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="60" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="61" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="62" y="11" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="63" y="11" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="58" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="60" y="12" width="1" height="1" fill="#9f7a7e" class="colorizable-hair"/>
+      <rect x="56" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="57" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="59" y="13" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="60" y="13" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="62" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="63" y="13" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="56" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="57" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="59" y="14" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="60" y="14" width="1" height="1" fill="#8a6b6e" class="colorizable-hair"/>
+      <rect x="62" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="63" y="14" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="57" y="15" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
+      <rect x="59" y="15" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="60" y="15" width="1" height="1" fill="#755a5d" class="colorizable-hair"/>
+      <rect x="62" y="15" width="1" height="1" fill="#6a4e52" class="colorizable-hair"/>
     </svg>
   `;
 }
+
+
 
 /**
  * Genera sprite de pelo medio - Tipo 3: Shag Medio
