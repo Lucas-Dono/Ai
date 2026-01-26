@@ -490,6 +490,142 @@ export function generateHead_Base_01(): string {
     </svg>
   `;}
 
+/**
+ * Genera sprite de cabeza con Buzz Cut (pelo rapado pintado directamente)
+ * Para cortes militares muy cortos donde el pelo se pinta en HEAD_TOP
+ * Se recolorea con skinTone y hairColor
+ */
+export function generateHead_BuzzCut(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- HEAD_TOP (8x8) at (8,0) - Cabeza superior con textura de pelo rapado -->
+      <!-- Pelo rapado con textura irregular marrón/grisáceo mezclado con beige de piel -->
+      <rect x="8" y="0" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="9" y="0" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="10" y="0" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="11" y="0" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="12" y="0" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="13" y="0" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="14" y="0" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="15" y="0" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="8" y="1" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="9" y="1" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="10" y="1" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="11" y="1" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="12" y="1" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="13" y="1" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="14" y="1" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="15" y="1" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="8" y="2" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="9" y="2" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="10" y="2" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="11" y="2" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="12" y="2" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="13" y="2" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="14" y="2" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="15" y="2" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="8" y="3" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="9" y="3" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="10" y="3" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="11" y="3" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="12" y="3" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="13" y="3" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="14" y="3" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="15" y="3" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="8" y="4" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="9" y="4" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="10" y="4" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="11" y="4" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="12" y="4" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="13" y="4" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="14" y="4" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="15" y="4" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="8" y="5" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="9" y="5" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="10" y="5" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="11" y="5" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="12" y="5" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="13" y="5" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="14" y="5" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="15" y="5" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="8" y="6" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="9" y="6" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="10" y="6" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="11" y="6" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="12" y="6" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="13" y="6" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="14" y="6" width="1" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="15" y="6" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="8" y="7" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="9" y="7" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="10" y="7" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="11" y="7" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="12" y="7" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="13" y="7" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="14" y="7" width="1" height="1" fill="#5d5347" class="colorizable-hair"/>
+      <rect x="15" y="7" width="1" height="1" fill="#4a3f35" class="colorizable-hair"/>
+
+      <!-- HEAD_BOTTOM (8x8) at (16,0) - Cabeza inferior -->
+      <rect x="16" y="0" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="1" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="2" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="3" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="4" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="5" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="6" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="7" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+
+      <!-- HEAD_RIGHT (8x8) at (0,8) - Cabeza derecha con línea de pelo arriba -->
+      <rect x="0" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="0" y="9" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="0" y="10" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="0" y="11" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="0" y="12" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="0" y="13" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="0" y="14" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="0" y="15" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+
+      <!-- HEAD_FRONT (8x8) at (8,8) - Cabeza frontal con línea de pelo arriba -->
+      <rect x="8" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="8" y="9" width="2" height="1" fill="#6a5d50" class="colorizable-skin"/>
+      <rect x="10" y="9" width="4" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="14" y="9" width="2" height="1" fill="#6a5d50" class="colorizable-skin"/>
+      <rect x="8" y="10" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
+      <rect x="9" y="10" width="6" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="15" y="10" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
+      <rect x="8" y="11" width="8" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="8" y="12" width="8" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="8" y="13" width="8" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="8" y="14" width="2" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="10" y="14" width="4" height="1" fill="#303030"/>
+      <rect x="14" y="14" width="2" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="8" y="15" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
+      <rect x="9" y="15" width="6" height="1" fill="#80705f" class="colorizable-skin"/>
+      <rect x="15" y="15" width="1" height="1" fill="#6a5d50" class="colorizable-skin"/>
+
+      <!-- HEAD_LEFT (8x8) at (16,8) - Cabeza izquierda con línea de pelo arriba -->
+      <rect x="16" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="16" y="9" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="16" y="10" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="11" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="12" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="13" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="14" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="16" y="15" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+
+      <!-- HEAD_BACK (8x8) at (24,8) - Cabeza trasera con línea de pelo arriba -->
+      <rect x="24" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="24" y="9" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
+      <rect x="24" y="10" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="24" y="11" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="24" y="12" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="24" y="13" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="24" y="14" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+      <rect x="24" y="15" width="8" height="1" fill="#706253" class="colorizable-skin"/>
+    </svg>
+  `;
+}
+
 
 // ============================================================================
 // BIBLIOTECA DE SPRITES - OJOS
@@ -1045,60 +1181,31 @@ export function generateHairShort_02_BobCut(): string {
 
 /**
  * Genera sprite de pelo corto - Tipo 3: Buzz Cut
- * Estilo: Muy corto, uniforme, cortado con máquina, estilo militar
+ * Estilo: Muy corto, uniforme, cortado con máquina, estilo militar (rapado)
  * Género: Masculino
  * Inspiración: Militar, deportistas, Jason Statham
+ *
+ * NOTA: El pelo se pinta directamente en HEAD_TOP con colores oscuros
+ * para simular pelo muy corto pegado al cráneo. HAT layer está vacío.
  */
 export function generateHairShort_03_BuzzCut(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
-      <!-- HAT_TOP (8x8) at (40,0) - Vista superior con textura uniforme -->
-      <rect x="40" y="0" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <!-- Textura de pelo muy corto con puntos -->
-      <rect x="41" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="43" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="45" y="1" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="42" y="3" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="44" y="3" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="46" y="3" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="41" y="5" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="43" y="5" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="45" y="5" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_TOP (8x8) at (40,0) - Vista superior: VACÍO (pelo se pinta en HEAD_TOP) -->
 
-      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior (vacío) -->
+      <!-- HAT_BOTTOM (8x8) at (48,0) - Vista inferior: VACÍO -->
 
-      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho muy corto uniforme -->
-      <rect x="32" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <!-- Textura uniforme -->
-      <rect x="33" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="35" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="37" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="34" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_RIGHT (8x8) at (32,8) - Lado derecho: Solo línea de pelo en parte superior -->
+      <rect x="32" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
 
-      <!-- HAT_FRONT (8x8) at (40,8) - Frente uniforme sin flequillo -->
-      <rect x="40" y="8" width="8" height="4" fill="#707070" class="colorizable-hair"/>
-      <!-- Textura sutil -->
-      <rect x="41" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="43" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="45" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="42" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="44" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_FRONT (8x8) at (40,8) - Frente: Solo línea de pelo en parte superior -->
+      <rect x="40" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
 
-      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo muy corto uniforme -->
-      <rect x="48" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <!-- Textura uniforme -->
-      <rect x="49" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="51" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="53" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="50" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_LEFT (8x8) at (48,8) - Lado izquierdo: Solo línea de pelo en parte superior -->
+      <rect x="48" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
 
-      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera uniforme -->
-      <rect x="56" y="8" width="8" height="8" fill="#707070" class="colorizable-hair"/>
-      <!-- Textura -->
-      <rect x="57" y="9" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="59" y="10" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="61" y="11" width="1" height="1" fill="#808080" class="colorizable-hair"/>
-      <rect x="58" y="13" width="1" height="1" fill="#808080" class="colorizable-hair"/>
+      <!-- HAT_BACK (8x8) at (56,8) - Parte trasera: Solo línea de pelo en parte superior -->
+      <rect x="56" y="8" width="8" height="1" fill="#4a3f35" class="colorizable-hair"/>
     </svg>
   `;
 }
@@ -2391,6 +2498,7 @@ interface ComponentInfo {
 export const COMPONENT_CATALOG: ComponentInfo[] = [
   // CABEZA BASE (piel)
   { id: 'head_base_01', category: 'head_base' as ComponentCategory, generator: generateHead_Base_01, filename: 'head_base_01.svg' },
+  { id: 'head_buzz_cut', category: 'head_base' as ComponentCategory, generator: generateHead_BuzzCut, filename: 'head_buzz_cut.svg' },
 
   // OJOS
   { id: 'eyes_01', category: ComponentCategory.EYES, generator: generateEyes_01, filename: 'eyes_01.svg' },

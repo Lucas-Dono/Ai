@@ -256,6 +256,7 @@ export interface SkinConfiguration {
   // COMPONENTES SELECCIONADOS (ID de cada componente)
   components: {
     // CARA
+    headBase?: string;         // Opcional (default: "head_base_01", o "head_buzz_cut" para rapado)
     eyes: string;              // ID: "eyes_01"
     eyebrows?: string;         // Opcional
     nose?: string;             // Opcional

@@ -269,10 +269,11 @@ async function generateHeadBase(
   config: SkinConfiguration,
   baseDir: string
 ): Promise<Buffer> {
-  const { colors } = config;
+  const { colors, components } = config;
 
-  // Cabeza base siempre se usa (head_base_01)
-  const headBasePath = path.join(baseDir, 'head_base', 'head_base_01.png');
+  // Usar headBase de config o default a head_base_01
+  const headBaseId = components.headBase || 'head_base_01';
+  const headBasePath = path.join(baseDir, 'head_base', `${headBaseId}.png`);
   const recoloredHead = await recolorImage(headBasePath, colors.skinTone);
   return recoloredHead;
 }

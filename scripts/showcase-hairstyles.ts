@@ -76,7 +76,7 @@ const showcaseExamples: ShowcaseExample[] = [
         eyeColor: '#87CEEB',
         eyeWhite: '#FFFFFF',
         eyePupil: '#000000',
-        clothingPrimary: '#FF6B9D', // Remera rosa
+        clothingPrimary: '#1A1A1A', // Remera rosa
         clothingSecondary: '#4169E1', // Jeans azul
       },
       components: {
@@ -86,7 +86,7 @@ const showcaseExamples: ShowcaseExample[] = [
         arms: 'arms_slim_01',
         legs: 'legs_average_01',
         hairFront: 'hair_short_01_pixie',
-        tShirt: 't_shirt_01',
+        tShirt: 't_shirt_03',
         pants: 'pants_01',
         shoes: 'shoes_01',
       },
@@ -140,7 +140,6 @@ const showcaseExamples: ShowcaseExample[] = [
         shirt: 'shirt_01',
         pants: 'pants_01',
         shoes: 'shoes_02',
-        glasses: 'glasses_01',
       },
       style: ComponentStyle.PIXEL,
       version: 1,
@@ -183,12 +182,13 @@ const showcaseExamples: ShowcaseExample[] = [
         clothingSecondary: '#000000', // Pantalones negros
       },
       components: {
+        headBase: 'head_buzz_cut', // HEAD con pelo rapado pintado directamente
         eyes: 'eyes_01',
         mouth: 'mouth_02',
         torso: 'torso_athletic_01',
         arms: 'arms_classic_01',
         legs: 'legs_long_01',
-        hairFront: 'hair_short_03_buzz',
+        hairFront: 'hair_short_03_buzz', // HAT layer casi vacío (solo líneas)
         tShirt: 't_shirt_02',
         pants: 'pants_01',
         shoes: 'shoes_01',
