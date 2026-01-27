@@ -177,7 +177,7 @@
       <rect x="1" y="13" width="1" height="1" fill="#745251" class="colorizable-skin"/>
       <rect x="2" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
       <rect x="3" y="13" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
-      <rect x="4" y="13" width="1" height="1" fill="#63646a" class="colorizable-skin"/>
+      <rect x="4" y="13" width="1" height="1" fill="#5f5345" class="colorizable-skin"/>
       <rect x="5" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
       <rect x="6" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
       <rect x="7" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
@@ -216,43 +216,43 @@
       <rect x="14" y="9" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="15" y="9" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="8" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="9" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="10" y="10" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
+      <rect x="9" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="10" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
       <rect x="11" y="10" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="12" y="10" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
-      <rect x="13" y="10" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
-      <rect x="14" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="13" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="14" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
       <rect x="15" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
       <rect x="8" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="9" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="10" y="11" width="1" height="1" fill="#fdd2b4" class="colorizable-skin"/>
+      <rect x="9" y="11" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="10" y="11" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="11" y="11" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="12" y="11" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
-      <rect x="13" y="11" width="1" height="1" fill="#fdd2b4" class="colorizable-skin"/>
-      <rect x="14" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="13" y="11" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
+      <rect x="14" y="11" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
       <rect x="15" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="8" y="12" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="8" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="9" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="10" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="11" y="12" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="12" y="12" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="13" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="14" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="15" y="12" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="15" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="8" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="9" y="13" width="1" height="1" fill="#e2d6cf" class="colorizable-skin"/>
-      <rect x="10" y="13" width="1" height="1" fill="#a1763d" class="colorizable-skin"/>
+      <rect x="10" y="13" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
       <rect x="11" y="13" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="12" y="13" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
-      <rect x="13" y="13" width="1" height="1" fill="#a1763d" class="colorizable-skin"/>
+      <rect x="13" y="13" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
       <rect x="14" y="13" width="1" height="1" fill="#e2d6cf" class="colorizable-skin"/>
       <rect x="15" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="8" y="14" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="9" y="14" width="1" height="1" fill="#fcf7f2" class="colorizable-skin"/>
-      <rect x="10" y="14" width="1" height="1" fill="#c28e49" class="colorizable-skin"/>
+      <rect x="10" y="14" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
       <rect x="11" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="12" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
-      <rect x="13" y="14" width="1" height="1" fill="#c28e49" class="colorizable-skin"/>
+      <rect x="13" y="14" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
       <rect x="14" y="14" width="1" height="1" fill="#fcf7f2" class="colorizable-skin"/>
       <rect x="15" y="14" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="8" y="15" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
@@ -308,7 +308,7 @@
       <rect x="16" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
       <rect x="17" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
       <rect x="18" y="13" width="1" height="1" fill="#363941" class="colorizable-skin"/>
-      <rect x="19" y="13" width="1" height="1" fill="#63646a" class="colorizable-skin"/>
+      <rect x="19" y="13" width="1" height="1" fill="#5f5345" class="colorizable-skin"/>
       <rect x="20" y="13" width="1" height="1" fill="#7f5955" class="colorizable-skin"/>
       <rect x="21" y="13" width="1" height="1" fill="#5f4747" class="colorizable-skin"/>
       <rect x="22" y="13" width="1" height="1" fill="#745251" class="colorizable-skin"/>
