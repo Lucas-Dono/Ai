@@ -1110,31 +1110,39 @@ export function generateEyes_03(): string {
  */
 
 /**
- * Genera sprite de ojos para Lob - Ojos grandes del backup
- * Iris directamente debajo de blancos (sin separación)
+ * Genera sprite de ojos para Lob - Forma exacta del backup
+ * Ojos con forma de "L" invertida y sombras laterales
  */
 export function generateEyes_Lob(): string {
   return `
     <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-      <!-- Fila y=2 (HEAD y=10): Ojos blancos superiores -->
+      <!-- Fila y=2 (HEAD y=10): Blancos superiores 2x2 -->
       <rect x="1" y="2" width="1" height="1" fill="#ffffff"/>
       <rect x="2" y="2" width="1" height="1" fill="#ffffff"/>
       <rect x="5" y="2" width="1" height="1" fill="#ffffff"/>
       <rect x="6" y="2" width="1" height="1" fill="#ffffff"/>
 
-      <!-- Fila y=3 (HEAD y=11): Ojos blancos inferiores -->
+      <!-- Fila y=3 (HEAD y=11): Blancos laterales (forma L) -->
       <rect x="1" y="3" width="1" height="1" fill="#ffffff"/>
-      <rect x="2" y="3" width="1" height="1" fill="#ffffff"/>
-      <rect x="5" y="3" width="1" height="1" fill="#ffffff"/>
       <rect x="6" y="3" width="1" height="1" fill="#ffffff"/>
 
-      <!-- Fila y=4 (HEAD y=12): Iris azul superior -->
-      <rect x="2" y="4" width="1" height="1" fill="#395cc6"/>
-      <rect x="5" y="4" width="1" height="1" fill="#395cc6"/>
+      <!-- Fila y=4 (HEAD y=12): Contorno marrón 2x2 -->
+      <rect x="1" y="4" width="1" height="1" fill="#3f2e27"/>
+      <rect x="2" y="4" width="1" height="1" fill="#3f2e27"/>
+      <rect x="5" y="4" width="1" height="1" fill="#3f2e27"/>
+      <rect x="6" y="4" width="1" height="1" fill="#3f2e27"/>
 
-      <!-- Fila y=5 (HEAD y=13): Iris azul inferior -->
+      <!-- Fila y=5 (HEAD y=13): Iris con sombra lateral -->
+      <rect x="1" y="5" width="1" height="1" fill="#e2d6cf"/>
       <rect x="2" y="5" width="1" height="1" fill="#395cc6"/>
       <rect x="5" y="5" width="1" height="1" fill="#395cc6"/>
+      <rect x="6" y="5" width="1" height="1" fill="#e2d6cf"/>
+
+      <!-- Fila y=6 (HEAD y=14): Iris con sombra lateral clara -->
+      <rect x="1" y="6" width="1" height="1" fill="#fcf7f2"/>
+      <rect x="2" y="6" width="1" height="1" fill="#395cc6"/>
+      <rect x="5" y="6" width="1" height="1" fill="#395cc6"/>
+      <rect x="6" y="6" width="1" height="1" fill="#fcf7f2"/>
     </svg>
   `;
 }
