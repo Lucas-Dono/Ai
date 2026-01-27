@@ -288,14 +288,14 @@ const showcaseExamples: ShowcaseExample[] = [
         clothingSecondary: '#4682B4', // Jeans azul acero
       },
       components: {
-        headBase: 'head_lob',  // Cara femenina limpia (sin ojos/boca)
-        eyes: 'eyes_lob',      // Ojos grandes del backup
+        headBase: 'head_female_01',  // Cara femenina limpia (sin ojos/boca)
+        eyes: 'eyes_female_01',      // Ojos grandes del backup
         mouth: 'mouth_empty',  // Sin boca
         torso: 'torso_slim_01',
         arms: 'arms_slim_01',
         legs: 'legs_average_01',
         hairFront: 'hair_medium_01_lob',
-        shirt: 'outfit_lob_chic_01',  // Outfit completo: escote V + mangas largas + minifalda + zapatos
+        shirt: 'dress_vneck_female_01',  // Outfit completo: escote V + mangas largas + minifalda + zapatos
       },
       style: ComponentStyle.PIXEL,
       version: 1,

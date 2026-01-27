@@ -627,7 +627,7 @@ export function generateHead_BuzzCut(): string {
   `;
 }
 
-export function generateHead_Lob(): string {
+export function generateHead_Female_01(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
       <!-- HEAD_TOP (8x8) at (8,0) - Cabeza superior -->
@@ -1112,7 +1112,7 @@ export function generateEyes_03(): string {
 /**
  * Genera sprite de ojos para Lob - Solo blancos, contorno e iris
  */
-export function generateEyes_Lob(): string {
+export function generateEyes_Female_01(): string {
   return `
     <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
       <!-- Fila y=4: Contorno oscuro superior de ojos -->
@@ -2916,7 +2916,7 @@ export function generateOutfit_WavySleeves_01(): string {
  * Genera outfit completo - Tipo Lob Chic: Top escote V + mangas largas + minifalda + zapatos
  * Colores en escala de grises para colorización
  */
-export function generateOutfit_LobChic_01(): string {
+export function generateDress_VneckFemale_01(): string {
   return `
     <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
       <!-- ========== TORSO FRONTAL (8x12) at (20,20) ========== -->
@@ -3448,7 +3448,7 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
   // CABEZA BASE (piel)
   { id: 'head_base_01', category: 'head_base' as ComponentCategory, generator: generateHead_Base_01, filename: 'head_base_01.svg' },
   { id: 'head_buzz_cut', category: 'head_base' as ComponentCategory, generator: generateHead_BuzzCut, filename: 'head_buzz_cut.svg' },
-  { id: 'head_lob', category: 'head_base' as ComponentCategory, generator: generateHead_Lob, filename: 'head_lob.svg' },
+  { id: 'head_female_01', category: 'head_base' as ComponentCategory, generator: generateHead_Female_01, filename: 'head_female_01.svg' },
 
   // OJOS
   { id: 'eyes_01', category: ComponentCategory.EYES, generator: generateEyes_01, filename: 'eyes_01.svg' },
@@ -3457,7 +3457,7 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
 
   // BOCAS
   { id: 'mouth_01', category: ComponentCategory.MOUTH, generator: generateMouth_01, filename: 'mouth_01.svg' },
-  { id: 'eyes_lob', category: ComponentCategory.EYES, generator: generateEyes_Lob, filename: 'eyes_lob.svg' },
+  { id: 'eyes_female_01', category: ComponentCategory.EYES, generator: generateEyes_Female_01, filename: 'eyes_female_01.svg' },
   { id: 'mouth_empty', category: ComponentCategory.MOUTH, generator: generateMouth_Empty, filename: 'mouth_empty.svg' },
   { id: 'mouth_02', category: ComponentCategory.MOUTH, generator: generateMouth_02, filename: 'mouth_02.svg' },
   { id: 'mouth_03', category: ComponentCategory.MOUTH, generator: generateMouth_03, filename: 'mouth_03.svg' },
@@ -3510,7 +3510,7 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
   { id: 'shirt_01', category: ComponentCategory.SHIRT, generator: generateShirt_01, filename: 'shirt_01.svg' },
   { id: 'jacket_01', category: ComponentCategory.JACKET, generator: generateJacket_01, filename: 'jacket_01.svg' },
   { id: 'outfit_wavy_sleeves_01', category: ComponentCategory.SHIRT, generator: generateOutfit_WavySleeves_01, filename: 'outfit_wavy_sleeves_01.svg' },
-  { id: 'outfit_lob_chic_01', category: ComponentCategory.SHIRT, generator: generateOutfit_LobChic_01, filename: 'outfit_lob_chic_01.svg' },
+  { id: 'dress_vneck_female_01', category: ComponentCategory.SHIRT, generator: generateDress_VneckFemale_01, filename: 'dress_vneck_female_01.svg' },
 
   // ROPA - INFERIOR
   { id: 'pants_01', category: ComponentCategory.PANTS, generator: generatePants_01, filename: 'pants_01.svg' },
