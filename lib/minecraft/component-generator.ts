@@ -2912,6 +2912,277 @@ export function generateOutfit_WavySleeves_01(): string {
   `;
 }
 
+/**
+ * Genera outfit completo - Tipo Lob Chic: Top escote V + mangas largas + minifalda + zapatos
+ * Colores en escala de grises para colorización
+ */
+export function generateOutfit_LobChic_01(): string {
+  return `
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- ========== TORSO FRONTAL (8x12) at (20,20) ========== -->
+      <!-- y=20: Escote V - bordes ropa, centro piel -->
+      <rect x="20" y="20" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="23" y="20" width="2" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="27" y="20" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- y=21: Escote V más cerrado -->
+      <rect x="20" y="21" width="2" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="26" y="21" width="2" height="1" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- y=22-31: Cuerpo completo con degradado de sombras -->
+      <rect x="20" y="22" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="21" y="22" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="22" y="22" width="1" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="23" y="22" width="2" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="25" y="22" width="1" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="26" y="22" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="27" y="22" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+
+      <rect x="20" y="23" width="1" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="21" y="23" width="1" height="1" fill="#909090" class="colorizable-clothing"/>
+      <rect x="22" y="23" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="23" y="23" width="2" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="25" y="23" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="26" y="23" width="1" height="1" fill="#909090" class="colorizable-clothing"/>
+      <rect x="27" y="23" width="1" height="1" fill="#757575" class="colorizable-clothing"/>
+
+      <rect x="20" y="24" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="21" y="24" width="1" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="22" y="24" width="2" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="24" y="24" width="2" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="26" y="24" width="1" height="1" fill="#757575" class="colorizable-clothing"/>
+      <rect x="27" y="24" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+
+      <rect x="20" y="25" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="21" y="25" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="22" y="25" width="2" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="24" y="25" width="2" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="26" y="25" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="27" y="25" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+
+      <rect x="20" y="26" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="21" y="26" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="22" y="26" width="2" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="24" y="26" width="2" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="26" y="26" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="27" y="26" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <rect x="20" y="27" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="21" y="27" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="22" y="27" width="2" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="24" y="27" width="2" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="26" y="27" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="27" y="27" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <rect x="20" y="28" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="21" y="28" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="22" y="28" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="23" y="28" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="24" y="28" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="25" y="28" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="26" y="28" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="27" y="28" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+
+      <rect x="20" y="29" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="21" y="29" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="22" y="29" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="23" y="29" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="24" y="29" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="25" y="29" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="26" y="29" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="27" y="29" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+
+      <rect x="20" y="30" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="21" y="30" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="22" y="30" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="23" y="30" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="24" y="30" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="25" y="30" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="26" y="30" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="27" y="30" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+
+      <rect x="20" y="31" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="21" y="31" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="22" y="31" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="23" y="31" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="24" y="31" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="25" y="31" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+      <rect x="26" y="31" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="27" y="31" width="1" height="1" fill="#5a5a5a" class="colorizable-clothing"/>
+
+      <!-- ========== TORSO DERECHO (4x12) at (16,20) ========== -->
+      <rect x="16" y="20" width="4" height="2" fill="#808080" class="colorizable-clothing"/>
+      <rect x="16" y="22" width="4" height="2" fill="#757575" class="colorizable-clothing"/>
+      <rect x="16" y="24" width="4" height="2" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="16" y="26" width="4" height="2" fill="#606060" class="colorizable-clothing"/>
+      <rect x="16" y="28" width="4" height="2" fill="#555555" class="colorizable-clothing"/>
+      <rect x="16" y="30" width="4" height="2" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ========== TORSO IZQUIERDO (4x12) at (28,20) ========== -->
+      <rect x="28" y="20" width="4" height="2" fill="#808080" class="colorizable-clothing"/>
+      <rect x="28" y="22" width="4" height="2" fill="#757575" class="colorizable-clothing"/>
+      <rect x="28" y="24" width="4" height="2" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="28" y="26" width="4" height="2" fill="#606060" class="colorizable-clothing"/>
+      <rect x="28" y="28" width="4" height="2" fill="#555555" class="colorizable-clothing"/>
+      <rect x="28" y="30" width="4" height="2" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ========== TORSO TRASERO (8x12) at (32,20) ========== -->
+      <rect x="32" y="20" width="8" height="2" fill="#808080" class="colorizable-clothing"/>
+      <rect x="32" y="22" width="8" height="2" fill="#757575" class="colorizable-clothing"/>
+      <rect x="32" y="24" width="8" height="2" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="32" y="26" width="8" height="2" fill="#606060" class="colorizable-clothing"/>
+      <rect x="32" y="28" width="8" height="2" fill="#555555" class="colorizable-clothing"/>
+      <rect x="32" y="30" width="8" height="2" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ========== BRAZO DERECHO - MANGAS LARGAS (hasta y=28) ========== -->
+      <!-- ARM_R_TOP (4x4) at (44,16) -->
+      <rect x="44" y="16" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+      <!-- ARM_R_BOTTOM (4x4) at (48,16) -->
+      <rect x="48" y="16" width="4" height="4" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_R_RIGHT (4x12) at (40,20) - Manga larga -->
+      <rect x="40" y="20" width="4" height="3" fill="#808080" class="colorizable-clothing"/>
+      <rect x="40" y="23" width="4" height="3" fill="#707070" class="colorizable-clothing"/>
+      <rect x="40" y="26" width="4" height="3" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_FRONT (4x12) at (44,20) -->
+      <rect x="44" y="20" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="45" y="20" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="46" y="20" width="2" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="44" y="21" width="4" height="5" fill="#808080" class="colorizable-clothing"/>
+      <rect x="45" y="21" width="1" height="5" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="44" y="26" width="4" height="2" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="45" y="26" width="1" height="2" fill="#555555" class="colorizable-clothing"/>
+      <rect x="44" y="28" width="4" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="45" y="28" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+
+      <!-- ARM_R_LEFT (4x12) at (48,20) -->
+      <rect x="48" y="20" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <rect x="48" y="26" width="4" height="3" fill="#6a6a6a" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x12) at (52,20) -->
+      <rect x="52" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+      <rect x="52" y="26" width="4" height="3" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ========== BRAZO IZQUIERDO - MANGAS LARGAS (hasta y=60) ========== -->
+      <!-- ARM_L_TOP (4x4) at (36,48) -->
+      <rect x="36" y="48" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+      <!-- ARM_L_BOTTOM (4x4) at (40,48) -->
+      <rect x="40" y="48" width="4" height="4" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_L_RIGHT (4x12) at (32,52) -->
+      <rect x="32" y="52" width="4" height="3" fill="#808080" class="colorizable-clothing"/>
+      <rect x="32" y="55" width="4" height="3" fill="#707070" class="colorizable-clothing"/>
+      <rect x="32" y="58" width="4" height="2" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_FRONT (4x12) at (36,52) -->
+      <rect x="36" y="52" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="37" y="52" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="38" y="52" width="2" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="36" y="53" width="4" height="5" fill="#808080" class="colorizable-clothing"/>
+      <rect x="37" y="53" width="1" height="5" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="36" y="58" width="4" height="2" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="37" y="58" width="1" height="2" fill="#555555" class="colorizable-clothing"/>
+
+      <!-- ARM_L_LEFT (4x12) at (40,52) -->
+      <rect x="40" y="52" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <rect x="40" y="58" width="4" height="2" fill="#6a6a6a" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x12) at (44,52) -->
+      <rect x="44" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+      <rect x="44" y="58" width="4" height="2" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ========== PIERNA DERECHA - MINIFALDA + ZAPATOS ========== -->
+      <!-- LEG_R_RIGHT (4x12) at (0,20) -->
+      <rect x="0" y="20" width="4" height="5" fill="#707070" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="0" y="28" width="4" height="2" fill="#606060" class="colorizable-shoes"/>
+      <rect x="0" y="30" width="4" height="2" fill="#505050" class="colorizable-shoes"/>
+
+      <!-- LEG_R_FRONT (4x12) at (4,20) -->
+      <rect x="4" y="20" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="5" y="20" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="6" y="20" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="7" y="20" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="4" y="21" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="5" y="21" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="6" y="21" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="7" y="21" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="4" y="22" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="5" y="22" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="6" y="22" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="7" y="22" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="4" y="23" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="5" y="23" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="6" y="23" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="7" y="23" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="4" y="24" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="5" y="24" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="6" y="24" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="7" y="24" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="4" y="28" width="4" height="1" fill="#606060" class="colorizable-shoes"/>
+      <rect x="4" y="29" width="4" height="1" fill="#454545" class="colorizable-shoes"/>
+      <rect x="4" y="30" width="4" height="1" fill="#606060" class="colorizable-shoes"/>
+      <rect x="4" y="31" width="4" height="1" fill="#505050" class="colorizable-shoes"/>
+
+      <!-- LEG_R_LEFT (4x12) at (8,20) -->
+      <rect x="8" y="20" width="4" height="5" fill="#707070" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="8" y="28" width="4" height="2" fill="#606060" class="colorizable-shoes"/>
+      <rect x="8" y="30" width="4" height="2" fill="#505050" class="colorizable-shoes"/>
+
+      <!-- LEG_R_BACK (4x12) at (12,20) -->
+      <rect x="12" y="20" width="4" height="5" fill="#606060" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="12" y="28" width="4" height="2" fill="#555555" class="colorizable-shoes"/>
+      <rect x="12" y="30" width="4" height="2" fill="#454545" class="colorizable-shoes"/>
+
+      <!-- ========== PIERNA IZQUIERDA - MINIFALDA + ZAPATOS ========== -->
+      <!-- LEG_L_RIGHT (4x12) at (16,52) -->
+      <rect x="16" y="52" width="4" height="5" fill="#707070" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="16" y="60" width="4" height="2" fill="#606060" class="colorizable-shoes"/>
+      <rect x="16" y="62" width="4" height="2" fill="#505050" class="colorizable-shoes"/>
+
+      <!-- LEG_L_FRONT (4x12) at (20,52) -->
+      <rect x="20" y="52" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="21" y="52" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="22" y="52" width="1" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="23" y="52" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="20" y="53" width="4" height="1" fill="#808080" class="colorizable-clothing"/>
+      <rect x="21" y="53" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="20" y="54" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="21" y="54" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="22" y="54" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="23" y="54" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="20" y="55" width="4" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="21" y="55" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="20" y="56" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="21" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="22" y="56" width="1" height="1" fill="#6a6a6a" class="colorizable-clothing"/>
+      <rect x="23" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="20" y="60" width="4" height="1" fill="#606060" class="colorizable-shoes"/>
+      <rect x="20" y="61" width="4" height="1" fill="#454545" class="colorizable-shoes"/>
+      <rect x="20" y="62" width="4" height="1" fill="#606060" class="colorizable-shoes"/>
+      <rect x="20" y="63" width="4" height="1" fill="#505050" class="colorizable-shoes"/>
+
+      <!-- LEG_L_LEFT (4x12) at (24,52) -->
+      <rect x="24" y="52" width="4" height="5" fill="#707070" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="24" y="60" width="4" height="2" fill="#606060" class="colorizable-shoes"/>
+      <rect x="24" y="62" width="4" height="2" fill="#505050" class="colorizable-shoes"/>
+
+      <!-- LEG_L_BACK (4x12) at (28,52) -->
+      <rect x="28" y="52" width="4" height="5" fill="#606060" class="colorizable-clothing"/>
+      <!-- Zapatos -->
+      <rect x="28" y="60" width="4" height="2" fill="#555555" class="colorizable-shoes"/>
+      <rect x="28" y="62" width="4" height="2" fill="#454545" class="colorizable-shoes"/>
+    </svg>
+  `;
+}
+
 // ============================================================================
 // GENERADOR Y EXPORTADOR
 // ============================================================================
@@ -2995,6 +3266,7 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
   { id: 'shirt_01', category: ComponentCategory.SHIRT, generator: generateShirt_01, filename: 'shirt_01.svg' },
   { id: 'jacket_01', category: ComponentCategory.JACKET, generator: generateJacket_01, filename: 'jacket_01.svg' },
   { id: 'outfit_wavy_sleeves_01', category: ComponentCategory.SHIRT, generator: generateOutfit_WavySleeves_01, filename: 'outfit_wavy_sleeves_01.svg' },
+  { id: 'outfit_lob_chic_01', category: ComponentCategory.SHIRT, generator: generateOutfit_LobChic_01, filename: 'outfit_lob_chic_01.svg' },
 
   // ROPA - INFERIOR
   { id: 'pants_01', category: ComponentCategory.PANTS, generator: generatePants_01, filename: 'pants_01.svg' },

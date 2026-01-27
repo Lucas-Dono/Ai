@@ -295,9 +295,7 @@ const showcaseExamples: ShowcaseExample[] = [
         arms: 'arms_slim_01',
         legs: 'legs_average_01',
         hairFront: 'hair_medium_01_lob',
-        tShirt: 't_shirt_01',
-        pants: 'pants_01',
-        shoes: 'shoes_01',
+        shirt: 'outfit_lob_chic_01',  // Outfit completo: escote V + mangas largas + minifalda + zapatos
       },
       style: ComponentStyle.PIXEL,
       version: 1,
