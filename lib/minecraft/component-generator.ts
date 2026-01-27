@@ -846,45 +846,45 @@ export function generateHead_Lob(): string {
       <rect x="14" y="9" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="15" y="9" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="8" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="9" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
-      <rect x="10" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="9" y="10" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="10" y="10" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="11" y="10" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="12" y="10" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
-      <rect x="13" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
-      <rect x="14" y="10" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="13" y="10" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="14" y="10" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="15" y="10" width="1" height="1" fill="#745251" class="colorizable-skin"/>
       <rect x="8" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="9" y="11" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="9" y="11" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="10" y="11" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="11" y="11" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="12" y="11" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="13" y="11" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
-      <rect x="14" y="11" width="1" height="1" fill="#ffffff" class="colorizable-skin"/>
+      <rect x="14" y="11" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="15" y="11" width="1" height="1" fill="#745251" class="colorizable-skin"/>
-      <rect x="8" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="9" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="10" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
+      <rect x="8" y="12" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="9" y="12" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="10" y="12" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="11" y="12" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="12" y="12" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
-      <rect x="13" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="14" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="15" y="12" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="8" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="9" y="13" width="1" height="1" fill="#e2d6cf" class="colorizable-skin"/>
-      <rect x="10" y="13" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
+      <rect x="13" y="12" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="14" y="12" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="15" y="12" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="8" y="13" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="9" y="13" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="10" y="13" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="11" y="13" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
       <rect x="12" y="13" width="1" height="1" fill="#fde4d3" class="colorizable-skin"/>
-      <rect x="13" y="13" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
-      <rect x="14" y="13" width="1" height="1" fill="#e2d6cf" class="colorizable-skin"/>
-      <rect x="15" y="13" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="8" y="14" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
-      <rect x="9" y="14" width="1" height="1" fill="#fcf7f2" class="colorizable-skin"/>
-      <rect x="10" y="14" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
+      <rect x="13" y="13" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="14" y="13" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="15" y="13" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="8" y="14" width="1" height="1" fill="#745251" class="colorizable-skin"/>
+      <rect x="9" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="10" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="11" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="12" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
-      <rect x="13" y="14" width="1" height="1" fill="#395cc6" class="colorizable-skin"/>
-      <rect x="14" y="14" width="1" height="1" fill="#fcf7f2" class="colorizable-skin"/>
-      <rect x="15" y="14" width="1" height="1" fill="#3f2e27" class="colorizable-skin"/>
+      <rect x="13" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="14" y="14" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
+      <rect x="15" y="14" width="1" height="1" fill="#745251" class="colorizable-skin"/>
       <rect x="8" y="15" width="1" height="1" fill="#523d42" class="colorizable-skin"/>
       <rect x="9" y="15" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
       <rect x="10" y="15" width="1" height="1" fill="#fddbc4" class="colorizable-skin"/>
@@ -1108,6 +1108,46 @@ export function generateEyes_03(): string {
 /**
  * Genera sprite de boca - Tipo 1: Sonrisa pequeña
  */
+
+/**
+ * Genera sprite de ojos para Lob - Ojos grandes del backup
+ * Ubicación: row 10-14 del HEAD_FRONT en backup
+ */
+export function generateEyes_Lob(): string {
+  return `
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- Fila 0 (HEAD y=10): Ojos blancos base -->
+      <rect x="1" y="0" width="1" height="1" fill="#ffffff"/>
+      <rect x="2" y="0" width="1" height="1" fill="#ffffff"/>
+      <rect x="5" y="0" width="1" height="1" fill="#ffffff"/>
+      <rect x="6" y="0" width="1" height="1" fill="#ffffff"/>
+
+      <!-- Fila 1 (HEAD y=11): Blancos con centro de piel -->
+      <rect x="1" y="1" width="1" height="1" fill="#ffffff"/>
+      <rect x="6" y="1" width="1" height="1" fill="#ffffff"/>
+
+      <!-- Fila 3 (HEAD y=13): Iris azul -->
+      <rect x="2" y="3" width="1" height="1" fill="#395cc6"/>
+      <rect x="5" y="3" width="1" height="1" fill="#395cc6"/>
+
+      <!-- Fila 4 (HEAD y=14): Iris azul -->
+      <rect x="2" y="4" width="1" height="1" fill="#395cc6"/>
+      <rect x="5" y="4" width="1" height="1" fill="#395cc6"/>
+    </svg>
+  `;
+}
+
+/**
+ * Genera sprite de boca vacía para Lob
+ */
+export function generateMouth_Empty(): string {
+  return `
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- Sin boca -->
+    </svg>
+  `;
+}
+
 export function generateMouth_01(): string {
   return `
     <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
@@ -2899,6 +2939,8 @@ export const COMPONENT_CATALOG: ComponentInfo[] = [
 
   // BOCAS
   { id: 'mouth_01', category: ComponentCategory.MOUTH, generator: generateMouth_01, filename: 'mouth_01.svg' },
+  { id: 'eyes_lob', category: ComponentCategory.EYES, generator: generateEyes_Lob, filename: 'eyes_lob.svg' },
+  { id: 'mouth_empty', category: ComponentCategory.MOUTH, generator: generateMouth_Empty, filename: 'mouth_empty.svg' },
   { id: 'mouth_02', category: ComponentCategory.MOUTH, generator: generateMouth_02, filename: 'mouth_02.svg' },
   { id: 'mouth_03', category: ComponentCategory.MOUTH, generator: generateMouth_03, filename: 'mouth_03.svg' },
 
