@@ -330,7 +330,25 @@
       <rect x="32" y="41" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
       <rect x="35" y="41" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
 
-      <!-- OVERLAY BRAZO DERECHO (y=36-47) -->
+      <!-- OVERLAY BRAZO DERECHO - ARM_R_RIGHT (x=40-43, y=36-47) -->
+      <rect x="40" y="38" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="41" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="42" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="43" y="38" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="40" y="40" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="41" y="40" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="42" y="40" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="43" y="40" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="40" y="41" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="41" y="41" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="42" y="41" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="43" y="41" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="40" y="43" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+      <rect x="41" y="43" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="42" y="43" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+      <rect x="43" y="43" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- OVERLAY BRAZO DERECHO - ARM_R_FRONT (x=44-47, y=36-47) -->
       <rect x="44" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
       <rect x="45" y="38" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
       <rect x="46" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
@@ -348,7 +366,53 @@
       <rect x="46" y="43" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
       <rect x="47" y="43" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
 
-      <!-- OVERLAY BRAZO IZQUIERDO (x=52-55, y=52-63) -->
+      <!-- OVERLAY BRAZO DERECHO - ARM_R_LEFT (x=48-51, y=36-47) -->
+      <rect x="48" y="38" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="49" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="50" y="38" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="51" y="38" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="48" y="40" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="49" y="40" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="50" y="40" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="51" y="40" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="48" y="41" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="49" y="41" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="50" y="41" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="51" y="41" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="48" y="43" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+      <rect x="49" y="43" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="50" y="43" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="51" y="43" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+
+      <!-- OVERLAY BRAZO DERECHO - ARM_R_BACK (x=52-55, y=36-47) -->
+      <rect x="52" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="53" y="38" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="52" y="40" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="53" y="40" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="52" y="41" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="53" y="41" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="52" y="43" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="53" y="43" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+
+      <!-- OVERLAY BRAZO IZQUIERDO - ARM_L_RIGHT (x=48-51, y=52-63) -->
+      <rect x="48" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="49" y="54" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="50" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="51" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="48" y="56" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="49" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="50" y="56" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="51" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="48" y="57" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="49" y="57" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="50" y="57" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="51" y="57" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="48" y="59" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="49" y="59" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+      <rect x="50" y="59" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="51" y="59" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+
+      <!-- OVERLAY BRAZO IZQUIERDO - ARM_L_FRONT (x=52-55, y=52-63) -->
       <rect x="52" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
       <rect x="53" y="54" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
       <rect x="54" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
@@ -365,6 +429,34 @@
       <rect x="53" y="59" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
       <rect x="54" y="59" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
       <rect x="55" y="59" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+
+      <!-- OVERLAY BRAZO IZQUIERDO - ARM_L_LEFT (x=56-59, y=52-63) -->
+      <rect x="56" y="54" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="57" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="58" y="54" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="59" y="54" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="56" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="57" y="56" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="58" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="59" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="56" y="57" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="57" y="57" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="58" y="57" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="59" y="57" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="56" y="59" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+      <rect x="57" y="59" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="58" y="59" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="59" y="59" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
+
+      <!-- OVERLAY BRAZO IZQUIERDO - ARM_L_BACK (x=60-63, y=52-63) -->
+      <rect x="60" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="61" y="54" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="60" y="56" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="61" y="56" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="60" y="57" width="1" height="1" fill="#707070" class="colorizable-clothing"/>
+      <rect x="61" y="57" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
+      <rect x="60" y="59" width="1" height="1" fill="#555555" class="colorizable-clothing"/>
+      <rect x="61" y="59" width="1" height="1" fill="#454545" class="colorizable-clothing"/>
 
       <!-- OVERLAY PIERNA DERECHA (x=4-7, y=36-47) - Minifalda -->
       <rect x="4" y="37" width="1" height="1" fill="#505050" class="colorizable-clothing"/>
