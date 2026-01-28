@@ -1,165 +1,118 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken, extractTokenFromHeader } from '@/lib/jwt';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { MINECRAFT_ERROR_CODES } from "@/types/minecraft-chat";
 
 /**
  * GET /api/v1/minecraft/agents
  *
- * Lista los agentes del usuario disponibles para Minecraft
+ * Lista todos los agentes del usuario disponibles para Minecraft
  *
- * Límites por plan:
- * - FREE: máximo 3 agentes
- * - PLUS: máximo 10 agentes
- * - ULTRA: ilimitado
+ * Headers:
+ * - X-API-Key: API key del usuario
  *
- * Solo retorna datos esenciales para minimizar payload
+ * Query params:
+ * - ?active=true (opcional): Solo agentes activos
+ *
+ * Response:
+ * {
+ *   "agents": [
+ *     {
+ *       "id": "agent_123",
+ *       "name": "Alice",
+ *       "avatar": "https://...",
+ *       "personality": {
+ *         "extraversion": 75,
+ *         "agreeableness": 80
+ *       },
+ *       "isActive": true
+ *     }
+ *   ]
+ * }
  */
 export async function GET(req: NextRequest) {
   try {
-    // Extraer y verificar JWT token
-    const authHeader = req.headers.get('Authorization');
-    const token = extractTokenFromHeader(authHeader);
+    // 1. Autenticación
+    const apiKey = req.headers.get("x-api-key");
 
-    if (!token) {
-      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          error: "API Key requerida",
+          code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED,
+        },
+        { status: 401 }
+      );
     }
 
-    const tokenData = await verifyToken(token);
-    if (!tokenData) {
-      return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
-    }
-
-    // Obtener usuario completo de la BD
     const user = await prisma.user.findUnique({
-      where: { id: tokenData.userId },
-      select: { id: true, plan: true },
+      where: { apiKey },
+      select: { id: true },
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: "API Key inválida",
+          code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED,
+        },
+        { status: 401 }
+      );
     }
 
-    console.log('[Minecraft Agents] User ID from token:', tokenData.userId);
-    console.log('[Minecraft Agents] User found:', user.id);
+    // 2. Obtener parámetros
+    const { searchParams } = new URL(req.url);
+    const activeOnly = searchParams.get("active") === "true";
 
-    // Obtener agentes del usuario con datos mínimos
-    // Incluye: agentes privados del usuario + agentes públicos de la empresa (userId null)
+    // 3. Buscar agentes del usuario
     const agents = await prisma.agent.findMany({
       where: {
-        OR: [
-          { userId: user.id },      // Agentes privados del usuario
-          { userId: null },          // Agentes públicos de la empresa
-        ],
-        // Excluir agentes marcados como no disponibles para Minecraft
-        // (opcional: agregar campo isMinecraftEnabled en el futuro)
+        userId: user.id,
+        ...(activeOnly && { isActive: true }),
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
         PersonalityCore: {
           select: {
-            openness: true,
-            conscientiousness: true,
             extraversion: true,
             agreeableness: true,
+            conscientiousness: true,
             neuroticism: true,
+            openness: true,
           },
         },
-        Relation: {
-          where: { targetId: user.id },
-          select: {
-            trust: true,
-            affinity: true,
-            stage: true,
-          },
-        },
-        InternalState: {
-          select: {
-            currentEmotions: true,
-            moodValence: true,
-            moodArousal: true,
-            moodDominance: true,
-          },
-        },
+        profile: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
-      take: user.plan === 'FREE' ? 3 : user.plan === 'PLUS' ? 10 : undefined,
     });
 
-    console.log('[Minecraft Agents] Agents found:', agents.length);
-
-    // Debug: verificar cuántos agentes hay en total
-    const totalAgents = await prisma.agent.count();
-    const userAgents = await prisma.agent.count({ where: { userId: user.id } });
-    console.log('[Minecraft Agents] Total agents in DB:', totalAgents);
-    console.log('[Minecraft Agents] Agents for this user:', userAgents);
-
-    // Mostrar algunos ejemplos de userIds en la BD
-    const sampleAgents = await prisma.agent.findMany({
-      select: { id: true, name: true, userId: true },
-      take: 5,
-    });
-    console.log('[Minecraft Agents] Sample agents:', JSON.stringify(sampleAgents, null, 2));
-
-    // Formatear respuesta minimalista
-    const formattedAgents = agents.map((agent) => {
-      // Extraer edad del profile JSON
-      const profile = agent.profile as any;
-      const age = profile?.identidad?.edad || profile?.age || null;
-
-      return {
-        id: agent.id,
-        name: agent.name,
-        gender: agent.gender || 'unknown',
-        age: age,
-        profession: extractProfession(agent.profile),
-        personality: agent.PersonalityCore
-          ? {
-            openness: agent.PersonalityCore.openness,
-            conscientiousness: agent.PersonalityCore.conscientiousness,
-            extraversion: agent.PersonalityCore.extraversion,
-            agreeableness: agent.PersonalityCore.agreeableness,
-            neuroticism: agent.PersonalityCore.neuroticism,
-          }
-        : null,
-        relationship: agent.Relation[0]
-          ? {
-            trust: agent.Relation[0].trust,
-            affinity: agent.Relation[0].affinity,
-            stage: agent.Relation[0].stage,
-          }
-          : null,
-        currentEmotion: agent.InternalState?.currentEmotions
-          ? (agent.InternalState.currentEmotions as any).primary || 'neutral'
-          : 'neutral',
-        // Datos para skinning en Minecraft
-        appearance: {
-          skinUrl: agent.referenceImageUrl || null,
-          hairColor: extractFromProfile(agent.profile, 'hairColor'),
-          eyeColor: extractFromProfile(agent.profile, 'eyeColor'),
-          height: extractFromProfile(agent.profile, 'height'),
-          build: extractFromProfile(agent.profile, 'build'),
-        },
-      };
-    });
+    // 4. Formatear respuesta
+    const formattedAgents = agents.map((agent) => ({
+      id: agent.id,
+      name: agent.name,
+      avatar: agent.avatar,
+      personality: agent.PersonalityCore || {},
+      profile: {
+        age: (agent.profile as any)?.identidad?.edad,
+        occupation: (agent.profile as any)?.ocupacion?.profesion,
+        gender: (agent.profile as any)?.identidad?.genero,
+      },
+      isActive: true, // Simplificado: siempre true
+    }));
 
     return NextResponse.json({
       agents: formattedAgents,
       total: formattedAgents.length,
-      plan: user.plan,
-      limits: {
-        FREE: 3,
-        PLUS: 10,
-        ULTRA: -1, // ilimitado
-      },
     });
-
-  } catch (error: any) {
-    console.error('[Minecraft Agents List API Error]', error);
+  } catch (error) {
+    console.error("Error fetching Minecraft agents:", error);
     return NextResponse.json(
       {
-        error: 'Error al obtener agentes',
-        details: error.message,
+        error: "Error al obtener agentes",
+        code: MINECRAFT_ERROR_CODES.GENERATION_FAILED,
       },
       { status: 500 }
     );
@@ -167,118 +120,15 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * Extrae la profesión del perfil del agente
+ * OPTIONS para CORS
  */
-function extractProfession(profile: any): string {
-  if (!profile) return 'VILLAGER';
-
-  // Intentar extraer de diferentes campos del perfil
-  const profileData = typeof profile === 'string' ? JSON.parse(profile) : profile;
-
-  if (profileData.occupation) return mapProfessionToMCA(profileData.occupation);
-  if (profileData.career) return mapProfessionToMCA(profileData.career);
-  if (profileData.job) return mapProfessionToMCA(profileData.job);
-
-  return 'VILLAGER';
-}
-
-/**
- * Mapea profesiones de Blaniel a profesiones de MCA
- */
-function mapProfessionToMCA(occupation: string): string {
-  const lowerOccupation = occupation.toLowerCase();
-
-  // Mapeo de profesiones comunes
-  const professionMap: Record<string, string> = {
-    // Agricultores
-    farmer: 'FARMER',
-    agricultor: 'FARMER',
-    granjero: 'FARMER',
-
-    // Guardias/Militares
-    guard: 'GUARD',
-    guardia: 'GUARD',
-    soldier: 'GUARD',
-    soldado: 'GUARD',
-    warrior: 'GUARD',
-    guerrero: 'GUARD',
-
-    // Bandidos (para personajes antagonistas)
-    bandit: 'BANDIT',
-    bandido: 'BANDIT',
-    thief: 'BANDIT',
-    ladrón: 'BANDIT',
-
-    // Mineros
-    miner: 'MINER',
-    minero: 'MINER',
-
-    // Herreros
-    blacksmith: 'BLACKSMITH',
-    herrero: 'BLACKSMITH',
-    smith: 'BLACKSMITH',
-
-    // Comerciantes
-    merchant: 'TRADER',
-    trader: 'TRADER',
-    comerciante: 'TRADER',
-    vendedor: 'TRADER',
-
-    // Sacerdotes
-    priest: 'PRIEST',
-    sacerdote: 'PRIEST',
-    cleric: 'PRIEST',
-
-    // Bibliotecarios
-    librarian: 'LIBRARIAN',
-    bibliotecario: 'LIBRARIAN',
-    scholar: 'LIBRARIAN',
-    erudito: 'LIBRARIAN',
-
-    // Panaderos
-    baker: 'BAKER',
-    panadero: 'BAKER',
-
-    // Chefs
-    chef: 'CHEF',
-    cocinero: 'CHEF',
-    cook: 'CHEF',
-
-    // Default
-    default: 'VILLAGER',
-  };
-
-  // Buscar match exacto
-  if (professionMap[lowerOccupation]) {
-    return professionMap[lowerOccupation];
-  }
-
-  // Buscar match parcial (contains)
-  for (const [key, value] of Object.entries(professionMap)) {
-    if (lowerOccupation.includes(key)) {
-      return value;
-    }
-  }
-
-  return 'VILLAGER';
-}
-
-/**
- * Extrae un campo específico del perfil
- */
-function extractFromProfile(profile: any, field: string): string | null {
-  if (!profile) return null;
-
-  try {
-    const profileData = typeof profile === 'string' ? JSON.parse(profile) : profile;
-
-    // Buscar en diferentes niveles del perfil
-    if (profileData[field]) return profileData[field];
-    if (profileData.appearance?.[field]) return profileData.appearance[field];
-    if (profileData.physical?.[field]) return profileData.physical[field];
-
-    return null;
-  } catch {
-    return null;
-  }
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, X-API-Key",
+    },
+  });
 }

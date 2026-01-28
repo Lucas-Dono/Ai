@@ -25,6 +25,7 @@ export async function GET(
       where: { id: agentId },
       select: {
         metadata: true,
+        name: true, // Para buscar configuración de componentes por nombre
       },
     });
 
@@ -62,10 +63,18 @@ export async function GET(
     }
 
     // 3. Generar PNG on-the-fly
-    const skinBuffer = await renderSkinFromTraits(validation.data);
+    // Convertir nombre a slug para buscar configuración de componentes modulares
+    // Ej: "Albert Einstein" -> "albert-einstein"
+    const characterSlug = agent.name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const skinBuffer = await renderSkinFromTraits(validation.data, characterSlug);
 
     // 4. Retornar con headers de caché agresivo
-    return new NextResponse(skinBuffer, {
+    return new NextResponse(new Uint8Array(skinBuffer), {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=31536000, immutable', // 1 año
