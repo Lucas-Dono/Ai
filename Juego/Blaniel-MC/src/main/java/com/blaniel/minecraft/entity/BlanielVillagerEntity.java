@@ -38,6 +38,14 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	// Cliente de API
 	private final BlanielAPIClient apiClient;
 
+	// Tracking de último jugador que interactuó
+	private java.util.UUID lastInteractedPlayerId = null;
+	private long lastInteractionTime = 0;
+
+	// Chat bubble state
+	private boolean chatBubbleVisible = false;
+	private long chatBubbleHideTime = 0;
+
 	public BlanielVillagerEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
 		super(entityType, world);
 
@@ -89,6 +97,10 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	@Override
 	public ActionResult interactMob(PlayerEntity player, Hand hand) {
 		if (!this.getWorld().isClient) {
+			// Trackear última interacción
+			this.lastInteractedPlayerId = player.getUuid();
+			this.lastInteractionTime = System.currentTimeMillis();
+
 			// Lado del servidor
 			String agentId = this.getBlanielAgentId();
 			String agentName = this.getBlanielAgentName();
@@ -230,5 +242,105 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 */
 	public GameProfile getCustomGameProfile() {
 		return customGameProfile;
+	}
+
+	/**
+	 * Obtener UUID del último jugador que interactuó
+	 */
+	public java.util.UUID getLastInteractedPlayerId() {
+		return lastInteractedPlayerId;
+	}
+
+	/**
+	 * Mostrar chat bubble sobre la entidad
+	 */
+	public void displayChatBubble(String message) {
+		// Mostrar usando custom name
+		this.setCustomName(Text.literal("§f" + message));
+		this.setCustomNameVisible(true);
+		this.chatBubbleVisible = true;
+
+		// Programar ocultar después de 5 segundos
+		this.chatBubbleHideTime = System.currentTimeMillis() + 5000;
+	}
+
+	/**
+	 * Ocultar chat bubble
+	 */
+	public void hideChatBubble() {
+		this.setCustomNameVisible(false);
+		this.chatBubbleVisible = false;
+	}
+
+	/**
+	 * Aplicar animación basada en hint
+	 */
+	public void playAnimation(String hint) {
+		if (hint == null || hint.isEmpty()) {
+			hint = "idle";
+		}
+
+		switch (hint) {
+			case "waving":
+				// Hacer que el brazo se mueva (swing hand)
+				this.swingHand(Hand.MAIN_HAND);
+				break;
+
+			case "beckoning":
+				// Señalar "ven acá"
+				this.swingHand(Hand.MAIN_HAND);
+				this.jump();
+				break;
+
+			case "happy":
+				// Saltar de felicidad
+				this.jump();
+				break;
+
+			case "pointing":
+				// Señalar (swing hand)
+				this.swingHand(Hand.MAIN_HAND);
+				break;
+
+			case "thinking":
+				// Mirar hacia arriba
+				this.headYaw += 10;
+				break;
+
+			case "surprised":
+				// Paso atrás pequeño
+				this.addVelocity(0, 0.1, 0);
+				this.velocityModified = true;
+				break;
+
+			case "sad":
+				// Mirar hacia abajo
+				this.headYaw -= 10;
+				break;
+
+			case "angry":
+				// Agitar la cabeza
+				this.headYaw += 20;
+				break;
+
+			case "talking":
+			case "idle":
+			default:
+				// Animación por defecto: nada especial
+				break;
+		}
+	}
+
+	/**
+	 * Tick override para manejar chat bubbles
+	 */
+	@Override
+	public void tick() {
+		super.tick();
+
+		// Auto-ocultar chat bubble después del tiempo
+		if (chatBubbleVisible && System.currentTimeMillis() >= chatBubbleHideTime) {
+			hideChatBubble();
+		}
 	}
 }

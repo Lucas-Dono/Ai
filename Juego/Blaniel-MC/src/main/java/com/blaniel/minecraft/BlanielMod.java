@@ -51,6 +51,15 @@ public class BlanielMod implements ModInitializer {
 		LOGGER.info("API URL: {}", CONFIG.getApiUrl());
 		LOGGER.info("API habilitada: {}", CONFIG.isApiEnabled());
 
+		// Cargar configuración adicional (API key, etc.)
+		com.blaniel.minecraft.config.ConfigManager.load();
+		String apiKey = com.blaniel.minecraft.config.ConfigManager.getApiKey();
+		if (apiKey != null) {
+			LOGGER.info("API key configurada correctamente");
+		} else {
+			LOGGER.warn("API key no configurada. Edita blaniel-mc.properties para configurarla.");
+		}
+
 		// Registrar atributos de entidad
 		FabricDefaultAttributeRegistry.register(BLANIEL_VILLAGER, BlanielVillagerEntity.createVillagerAttributes());
 

@@ -1,7 +1,6 @@
 package com.blaniel.minecraft.integration;
 
 import com.google.gson.*;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
@@ -28,9 +27,15 @@ import java.util.concurrent.CompletableFuture;
  */
 public class BlanielChatIntegration {
 
-    private static final String API_URL = "https://blaniel.com/api/v1/minecraft/message";
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private static final Gson GSON = new Gson();
+
+    /**
+     * Obtiene la URL de la API desde la configuración
+     */
+    private static String getApiUrl() {
+        return com.blaniel.minecraft.config.ConfigManager.getApiUrl() + "/message";
+    }
 
     /**
      * Envía un mensaje de chat al backend y procesa las respuestas
@@ -68,7 +73,7 @@ public class BlanielChatIntegration {
 
                 // 4. Enviar request HTTP
                 HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL))
+                    .uri(URI.create(getApiUrl()))
                     .header("Content-Type", "application/json")
                     .header("X-API-Key", apiKey)
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
@@ -144,7 +149,7 @@ public class BlanielChatIntegration {
         // Convertir a JSON
         for (BlanielVillagerEntity villager : nearbyVillagers) {
             JsonObject agentObj = new JsonObject();
-            agentObj.addProperty("agentId", villager.getAgentId());
+            agentObj.addProperty("agentId", villager.getBlanielAgentId());
             agentObj.addProperty("entityId", villager.getId());
             agentObj.addProperty("name", villager.getName().getString());
 
@@ -189,23 +194,29 @@ public class BlanielChatIntegration {
                 JsonObject agentResp = elem.getAsJsonObject();
 
                 String agentId = agentResp.get("agentId").getAsString();
-                String content = agentResp.get("content").getAsString();
-                String animationHint = agentResp.has("animationHint")
-                    ? agentResp.get("animationHint").getAsString()
-                    : "talking";
 
                 // Encontrar la entidad correspondiente
                 BlanielVillagerEntity entity = findEntityByAgentId(player, agentId);
 
                 if (entity != null) {
-                    // Mostrar chat bubble
-                    displayChatBubble(entity, content);
+                    // Verificar si tiene estructura de partes (respuesta avanzada)
+                    if (agentResp.has("parts")) {
+                        // Procesar respuesta estructurada con comandos
+                        CommandHandler.processStructuredResponse(entity, agentResp);
+                    } else {
+                        // Fallback: respuesta simple
+                        String content = agentResp.get("content").getAsString();
+                        String animationHint = agentResp.has("animationHint")
+                            ? agentResp.get("animationHint").getAsString()
+                            : "talking";
 
-                    // Aplicar animación
-                    applyAnimation(entity, animationHint);
+                        entity.displayChatBubble(content);
+                        entity.playAnimation(animationHint);
+                    }
                 } else {
                     // Si no encontramos la entidad, mostrar en chat normal
                     String agentName = agentResp.get("agentName").getAsString();
+                    String content = agentResp.get("content").getAsString();
                     player.sendMessage(
                         Text.literal("§b" + agentName + ": §f" + content),
                         false
@@ -253,67 +264,10 @@ public class BlanielChatIntegration {
                     player.getY() + 32,
                     player.getZ() + 32
                 ),
-                entity -> agentId.equals(entity.getAgentId())
+                entity -> agentId.equals(entity.getBlanielAgentId())
             );
 
         return entities.isEmpty() ? null : entities.get(0);
-    }
-
-    /**
-     * Muestra un chat bubble sobre la entidad
-     */
-    private static void displayChatBubble(BlanielVillagerEntity entity, String message) {
-        // Opción 1: Usar el nombre de la entidad (simple)
-        entity.setCustomName(Text.literal("§f" + message));
-        entity.setCustomNameVisible(true);
-
-        // Programar ocultar después de 5 segundos
-        MinecraftClient.getInstance().execute(() -> {
-            try {
-                Thread.sleep(5000);
-                entity.setCustomNameVisible(false);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        // Opción 2: Si tienes un mod de chat bubbles, úsalo aquí
-        // ChatBubbleMod.display(entity, message, 5);
-    }
-
-    /**
-     * Aplica animación a la entidad basada en el hint
-     */
-    private static void applyAnimation(BlanielVillagerEntity entity, String hint) {
-        switch (hint) {
-            case "waving":
-                // Hacer que el brazo se mueva
-                entity.swingHand(entity.getActiveHand());
-                break;
-
-            case "happy":
-                // Saltar
-                entity.jump();
-                break;
-
-            case "thinking":
-                // Mirar al jugador y inclinar cabeza
-                // (requiere acceso a campos internos)
-                break;
-
-            case "talking":
-                // Animación de boca (requiere texturas custom)
-                break;
-
-            case "surprised":
-                // Paso atrás
-                entity.addVelocity(0, 0.1, 0);
-                break;
-
-            default:
-                // Animación por defecto: idle
-                break;
-        }
     }
 
     /**
@@ -350,8 +304,6 @@ public class BlanielChatIntegration {
      * Carga la API key desde el archivo de configuración
      */
     public static String loadApiKey() {
-        // TODO: Implementar lectura desde blaniel-mc.properties
-        // Por ahora, retorna placeholder
-        return "API_KEY_PLACEHOLDER";
+        return com.blaniel.minecraft.config.ConfigManager.getApiKey();
     }
 }

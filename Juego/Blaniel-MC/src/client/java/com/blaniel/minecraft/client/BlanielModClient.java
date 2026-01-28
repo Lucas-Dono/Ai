@@ -21,6 +21,10 @@ public class BlanielModClient implements ClientModInitializer {
 		// Inicializar skin manager
 		BlanielSkinManager.initialize();
 
+		// Inicializar chat handler
+		BlanielChatHandler.initialize();
+		BlanielMod.LOGGER.info("Chat handler inicializado");
+
 		// Registrar renderer para BlanielVillager
 		EntityRendererRegistry.register(BlanielMod.BLANIEL_VILLAGER, BlanielVillagerRenderer::new);
 
