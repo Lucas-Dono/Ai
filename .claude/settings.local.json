@@ -205,7 +205,17 @@
       "WebFetch(domain:minecraft.wiki)",
       "Bash(NODE_OPTIONS='--max-old-space-size=8192' npx tsx:*)",
       "Bash(npx ts-node:*)",
-      "Bash(npx sharp:*)"
+      "Bash(npx sharp:*)",
+      "Bash(git -C \"/e/Proyectos/AI/creador-inteligencias\" log --oneline --all --grep=\"skin\\\\|minecraft\\\\|component\" -i)",
+      "Bash(where:*)",
+      "Bash(.gradlew.bat build:*)",
+      "Bash(E:)",
+      "Bash(cmd /c \"gradlew.bat build --no-daemon\")",
+      "Bash(cmd /c \"cd /d E:\\\\Proyectos\\\\AI\\\\creador-inteligencias\\\\Juego\\\\Blaniel-MC && gradlew.bat build --no-daemon\")",
+      "Bash(powershell -Command:*)",
+      "Bash(unzip:*)",
+      "Bash(javap:*)",
+      "Bash(rsync:*)"
     ],
     "deny": [],
     "ask": []

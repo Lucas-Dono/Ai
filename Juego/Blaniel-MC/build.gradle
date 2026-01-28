@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.6.12'
 	id 'maven-publish'
 }
 
@@ -19,14 +19,16 @@ repositories {
 }
 
 loom {
-    splitEnvironmentSourceSets()
+    // splitEnvironmentSourceSets() - DESHABILITADO temporalmente
+    // Bug en Loom 1.5.x causa que remapJar genere JAR vacío
+    // TODO: Re-habilitar cuando actualicemos a Loom 1.7+
 
-	mods {
-		"blaniel-mc" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
+	// mods {
+	// 	"blaniel-mc" {
+	// 		sourceSet sourceSets.main
+	// 		sourceSet sourceSets.client
+	// 	}
+	// }
 }
 
 dependencies {
@@ -54,6 +56,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
+	// Compilar con target 17 para compatibilidad con Minecraft 1.20.1
 	it.options.release = 17
 }
 
@@ -65,11 +68,63 @@ java {
 
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
+
+	// Nota: No usamos toolchain para evitar problemas de descarga
+	// Java 24 puede compilar a target 17 sin problemas
 }
 
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.base.archivesName.get()}"}
+	}
+
+	manifest {
+		attributes([
+			'Fabric-Mapping-Namespace': 'named'
+		])
+	}
+}
+
+// Configurar remapJar para incluir dependencias anidadas (como Gson)
+remapJar {
+	input = jar.archiveFile
+	addNestedDependencies = true
+}
+
+// Tarea para instalar el mod en Minecraft
+task installMod(type: Copy) {
+	description = 'Instala el mod en Minecraft'
+	group = 'blaniel'
+
+	from 'build/libs'
+	into "${System.getProperty('user.home')}/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances/1.20.1(1)/minecraft/mods"
+	include 'blaniel-mc-*.jar'
+	exclude '*-sources.jar'
+
+	dependsOn remapJar
+
+	doLast {
+		println "✓ Mod instalado: ${destinationDir}/blaniel-mc-0.1.0-alpha.jar"
+		println "  Mappings: Intermediary (compatible con Minecraft)"
+	}
+}
+
+// Tarea para preparar el mod para distribución (PRODUCCIÓN - usa JAR con Intermediary mappings)
+task prepareRelease(type: Copy) {
+	description = 'Prepara el JAR para distribución (Intermediary mappings)'
+	group = 'blaniel'
+
+	from 'build/libs'
+	into 'build/release'
+	include 'blaniel-mc-*.jar'
+	exclude '*-sources.jar'
+
+	dependsOn remapJar
+
+	doLast {
+		println "✓ JAR de producción listo: build/release/blaniel-mc-0.1.0-alpha.jar"
+		println "  Tamaño: ${file('build/release/blaniel-mc-0.1.0-alpha.jar').length() / 1024} KB"
+		println "  Usa Intermediary mappings - listo para distribución"
 	}
 }
 

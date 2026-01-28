@@ -338,7 +338,7 @@ const showcaseExamples: ShowcaseExample[] = [
         clothingSecondary: '#8B4513', // Pantalones marrones
       },
       components: {
-        eyes: 'eyes_02',
+        eyes: 'eyes_01',
         mouth: 'mouth_01',
         torso: 'torso_slim_01',
         arms: 'arms_slim_01',
@@ -357,7 +357,7 @@ const showcaseExamples: ShowcaseExample[] = [
   // ===== PEINADOS LARGOS =====
   {
     name: '07_long_straight_elegant',
-    description: 'Pelo Largo Liso - Look elegante con camisa',
+    description: 'Pelo Largo Liso - Extraído de backup con look oscuro',
     config: {
       bodyGenes: {
         height: 'average',
@@ -371,36 +371,40 @@ const showcaseExamples: ShowcaseExample[] = [
       },
       facialGenes: {
         faceShape: 'oval',
-        eyeSize: 'large',
+        eyeSize: 'medium',
         eyeSpacing: 'normal',
         noseSize: 'small',
         mouthWidth: 'normal',
         jawline: 'soft',
-        eyeExpression: 'happy',
-        mouthExpression: 'smile',
+        eyeExpression: 'neutral',
+        mouthExpression: 'neutral',
       },
       colors: {
-        skinTone: SKIN_TONES['Oscuro'].base,
-        skinShadow: SKIN_TONES['Oscuro'].shadow,
-        skinHighlight: SKIN_TONES['Oscuro'].highlight,
-        hairPrimary: HAIR_COLORS['Negro Azabache'],
-        eyeColor: '#654321',
+        // Piel rosada del backup
+        skinTone: '#caac9b',
+        skinShadow: '#b4877a',
+        skinHighlight: '#c29d8c',
+        // Pelo oscuro/gris del backup (no se recolorea, usa colores originales)
+        hairPrimary: '#313131',
+        // Ojos oscuros
+        eyeColor: '#292929',
         eyeWhite: '#FFFFFF',
         eyePupil: '#000000',
-        clothingPrimary: '#E6E6FA', // Camisa lavanda
-        clothingSecondary: '#2C3E50', // Pantalones gris oscuro
+        // Vestimenta gris oscura del backup
+        clothingPrimary: '#716565', // Suéter gris
+        clothingSecondary: '#4c4b4b', // Pantalones oscuros
       },
       components: {
-        eyes: 'eyes_02',
-        mouth: 'mouth_01',
+        eyes: 'eyes_female_01',
+        mouth: 'mouth_empty',
         torso: 'torso_slim_01',
         arms: 'arms_slim_01',
         legs: 'legs_average_01',
-        hairFront: 'hair_long_01_straight',
-        hairBody: 'hair_long_body_01_straight',
-        shirt: 'shirt_01',
+        hairFront: 'hair_long_straight_07',
+        hairBody: 'hair_body_long_07',
+        tShirt: 't_shirt_01',
         pants: 'pants_01',
-        shoes: 'shoes_02',
+        shoes: 'shoes_01',
       },
       style: ComponentStyle.PIXEL,
       version: 1,
@@ -461,52 +465,54 @@ const showcaseExamples: ShowcaseExample[] = [
   },
   {
     name: '09_long_wavy_professional',
-    description: 'Pelo Largo Ondulado - Look profesional con chaqueta',
+    description: 'Pelo Rojo Rizado - Extraído de backup estilo femenino',
     config: {
       bodyGenes: {
         height: 'average',
-        build: 'athletic',
+        build: 'slim',
         armModel: 'slim',
         chest: 'medium',
         hips: 'average',
-        shoulders: 'average',
+        shoulders: 'narrow',
         headSize: 'normal',
         legLength: 'normal',
       },
       facialGenes: {
         faceShape: 'oval',
-        eyeSize: 'medium',
+        eyeSize: 'large',
         eyeSpacing: 'normal',
-        noseSize: 'medium',
+        noseSize: 'small',
         mouthWidth: 'normal',
-        jawline: 'normal',
-        eyeExpression: 'neutral',
+        jawline: 'soft',
+        eyeExpression: 'happy',
         mouthExpression: 'neutral',
       },
       colors: {
-        skinTone: SKIN_TONES['Bronceado'].base,
-        skinShadow: SKIN_TONES['Bronceado'].shadow,
-        skinHighlight: SKIN_TONES['Bronceado'].highlight,
-        hairPrimary: HAIR_COLORS['Castaño'],
-        eyeColor: '#654321',
-        eyeWhite: '#FFFFFF',
-        eyePupil: '#000000',
-        clothingPrimary: '#2C3E50', // Chaqueta gris oscuro
-        clothingSecondary: '#34495E', // Pantalones gris
+        // Piel clara del backup
+        skinTone: '#ffd6ba',
+        skinShadow: '#ffceb2',
+        skinHighlight: '#f7baa1',
+        // Pelo rojo borgoña (no se recolorea)
+        hairPrimary: '#913e39',
+        // Ojos azules del backup
+        eyeColor: '#486685',
+        eyeWhite: '#f5f4f2',
+        eyePupil: '#26131c',
+        // Ropa roja/oscura
+        clothingPrimary: '#b52d3b',
+        clothingSecondary: '#371c25',
       },
       components: {
-        eyes: 'eyes_02',
-        mouth: 'mouth_02',
-        torso: 'torso_athletic_01',
+        eyes: 'eyes_female_01',
+        mouth: 'mouth_empty',
+        torso: 'torso_slim_01',
         arms: 'arms_slim_01',
         legs: 'legs_average_01',
-        hairFront: 'hair_long_02_wavy',
-        hairBody: 'hair_long_body_02_wavy',
+        hairFront: 'hair_curly_red_09',
+        hairBody: 'hair_body_curly_09',
         tShirt: 't_shirt_01',
-        jacket: 'jacket_01',
         pants: 'pants_01',
-        shoes: 'shoes_02',
-        glasses: 'glasses_01',
+        shoes: 'shoes_01',
       },
       style: ComponentStyle.PIXEL,
       version: 1,
@@ -567,8 +573,8 @@ const showcaseExamples: ShowcaseExample[] = [
     },
   },
   {
-    name: '11_messy_bun_casual',
-    description: 'Moño Desprolijo - Look casual bohemio',
+    name: '11_black_hair_green_outfit',
+    description: 'Pelo Negro Corto - Extraído de backup con outfit verde',
     config: {
       bodyGenes: {
         height: 'average',
@@ -591,26 +597,24 @@ const showcaseExamples: ShowcaseExample[] = [
         mouthExpression: 'smile',
       },
       colors: {
-        skinTone: SKIN_TONES['Pálido'].base,
-        skinShadow: SKIN_TONES['Pálido'].shadow,
-        skinHighlight: SKIN_TONES['Pálido'].highlight,
-        hairPrimary: HAIR_COLORS['Rubio Platino'],
-        eyeColor: '#87CEEB',
+        skinTone: '#ffe2bd', // Piel del backup
+        skinShadow: '#e6c9a8',
+        skinHighlight: '#fff0e0',
+        hairPrimary: '#242424', // Pelo negro del backup
+        eyeColor: '#461f00', // Iris marrón
         eyeWhite: '#FFFFFF',
-        eyePupil: '#000000',
-        clothingPrimary: '#F0E68C', // Remera amarillo pastel
-        clothingSecondary: '#DEB887', // Pantalones beige
+        eyePupil: '#321600',
+        clothingPrimary: '#5aa163', // Verde del backup
+        clothingSecondary: '#498250',
       },
       components: {
-        eyes: 'eyes_03',
-        mouth: 'mouth_01',
+        eyes: 'eyes_expressive_11',
+        mouth: 'mouth_empty',
         torso: 'torso_slim_01',
         arms: 'arms_slim_01',
         legs: 'legs_average_01',
-        hairBack: 'hair_updo_05_messy_bun',
-        tShirt: 't_shirt_01',
-        pants: 'pants_01',
-        shoes: 'shoes_01',
+        hairFront: 'hair_black_short_11',
+        shirt: 'outfit_green_11', // Outfit completo extraído del backup
       },
       style: ComponentStyle.PIXEL,
       version: 1,
@@ -621,15 +625,15 @@ const showcaseExamples: ShowcaseExample[] = [
   // ===== VARIACIONES ADICIONALES CON DISTINTOS TONOS DE PIEL =====
   {
     name: '12_bob_darkskin',
-    description: 'Bob Cut - Piel oscura con look profesional',
+    description: 'Bob Cut - Extraído de backup con piel oscura y ojos verdes',
     config: {
       bodyGenes: {
         height: 'average',
-        build: 'athletic',
+        build: 'slim',
         armModel: 'slim',
         chest: 'medium',
         hips: 'average',
-        shoulders: 'average',
+        shoulders: 'narrow',
         headSize: 'normal',
         legLength: 'normal',
       },
@@ -637,33 +641,37 @@ const showcaseExamples: ShowcaseExample[] = [
         faceShape: 'oval',
         eyeSize: 'large',
         eyeSpacing: 'normal',
-        noseSize: 'medium',
+        noseSize: 'small',
         mouthWidth: 'normal',
-        jawline: 'normal',
+        jawline: 'soft',
         eyeExpression: 'happy',
         mouthExpression: 'smile',
       },
       colors: {
-        skinTone: SKIN_TONES['Muy Oscuro'].base,
-        skinShadow: SKIN_TONES['Muy Oscuro'].shadow,
-        skinHighlight: SKIN_TONES['Muy Oscuro'].highlight,
-        hairPrimary: HAIR_COLORS['Negro Azabache'],
-        eyeColor: '#654321',
-        eyeWhite: '#FFFFFF',
-        eyePupil: '#000000',
-        clothingPrimary: '#FFFFFF', // Camisa blanca
-        clothingSecondary: '#1C1C1C', // Pantalones negros
+        // Piel oscura del backup
+        skinTone: '#cf9b86',
+        skinShadow: '#ba6d4f',
+        skinHighlight: '#d6aa98',
+        // Pelo marrón oscuro del backup
+        hairPrimary: '#69453f',
+        // Ojos verdes del backup
+        eyeColor: '#7d8a58',
+        eyeWhite: '#e4d5cb',
+        eyePupil: '#49302b',
+        // Ropa del backup (blanco/crema + marrón)
+        clothingPrimary: '#e0d5d1',
+        clothingSecondary: '#69453f',
       },
       components: {
-        eyes: 'eyes_02',
-        mouth: 'mouth_01',
-        torso: 'torso_athletic_01',
-        arms: 'arms_slim_01',
-        legs: 'legs_average_01',
-        hairFront: 'hair_short_02_bob',
-        shirt: 'shirt_01',
-        pants: 'pants_01',
-        shoes: 'shoes_02',
+        // Usar body completo como headBase (incluye toda la skin base)
+        headBase: 'body_bob_13',
+        eyes: 'eyes_bob_13',
+        mouth: 'mouth_empty',
+        torso: 'torso_empty',
+        arms: 'arms_empty',
+        legs: 'legs_empty',
+        hairFront: 'hair_bob_13',
+        shirt: 'outfit_bob_13', // Outfit completo extraído del backup
       },
       style: ComponentStyle.PIXEL,
       version: 1,
@@ -672,7 +680,7 @@ const showcaseExamples: ShowcaseExample[] = [
   },
   {
     name: '13_caesar_classic',
-    description: 'Caesar Cut - Look clásico masculino',
+    description: 'Caesar Cut - Pelo rapado pintado en capa base (sin overlay)',
     config: {
       bodyGenes: {
         height: 'tall',
@@ -706,12 +714,13 @@ const showcaseExamples: ShowcaseExample[] = [
         clothingSecondary: '#2C3E50', // Pantalones formales
       },
       components: {
+        headBase: 'head_caesar_13', // Cabeza con pelo rapado pintado directamente
         eyes: 'eyes_01',
         mouth: 'mouth_02',
         torso: 'torso_athletic_01',
         arms: 'arms_classic_01',
         legs: 'legs_long_01',
-        hairFront: 'hair_short_05_caesar',
+        // Sin hairFront - el pelo está en la capa base
         shirt: 'shirt_01',
         pants: 'pants_01',
         shoes: 'shoes_02',
@@ -722,51 +731,104 @@ const showcaseExamples: ShowcaseExample[] = [
     },
   },
   {
-    name: '14_slicked_formal',
-    description: 'Slicked Back - Look formal con chaqueta',
+    name: '14_goth_long_black',
+    description: 'Pelo Negro Largo - Extraído de backup estilo gótico/formal',
     config: {
       bodyGenes: {
-        height: 'tall',
-        build: 'athletic',
-        armModel: 'classic',
-        chest: 'flat',
-        hips: 'narrow',
-        shoulders: 'broad',
+        height: 'average',
+        build: 'slim',
+        armModel: 'slim',
+        chest: 'medium',
+        hips: 'average',
+        shoulders: 'narrow',
         headSize: 'normal',
-        legLength: 'long',
+        legLength: 'normal',
       },
       facialGenes: {
-        faceShape: 'square',
-        eyeSize: 'medium',
+        faceShape: 'oval',
+        eyeSize: 'large',
         eyeSpacing: 'normal',
-        noseSize: 'medium',
+        noseSize: 'small',
         mouthWidth: 'normal',
-        jawline: 'defined',
+        jawline: 'soft',
         eyeExpression: 'neutral',
         mouthExpression: 'neutral',
       },
       colors: {
-        skinTone: SKIN_TONES['Claro'].base,
-        skinShadow: SKIN_TONES['Claro'].shadow,
-        skinHighlight: SKIN_TONES['Claro'].highlight,
-        hairPrimary: HAIR_COLORS['Negro Azabache'],
-        eyeColor: '#4169E1',
-        eyeWhite: '#FFFFFF',
-        eyePupil: '#000000',
-        clothingPrimary: '#1C1C1C', // Chaqueta negra
-        clothingSecondary: '#2C3E50', // Pantalones formales
+        // Piel muy pálida del backup
+        skinTone: '#f9e7e0',
+        skinShadow: '#fadad4',
+        skinHighlight: '#ffffff',
+        // Pelo negro del backup
+        hairPrimary: '#2f2f2f',
+        // Ojos claros/grises del backup
+        eyeColor: '#908699',
+        eyeWhite: '#e1e1e1',
+        eyePupil: '#1a1a1a',
+        // Outfit negro del backup
+        clothingPrimary: '#2f2f2f',
+        clothingSecondary: '#1a1a1a',
       },
       components: {
-        eyes: 'eyes_01',
-        mouth: 'mouth_02',
-        torso: 'torso_athletic_01',
-        arms: 'arms_classic_01',
-        legs: 'legs_long_01',
-        hairFront: 'hair_short_08_slicked',
-        tShirt: 't_shirt_01',
-        jacket: 'jacket_01',
-        pants: 'pants_01',
-        shoes: 'shoes_02',
+        // Usar body completo como headBase
+        headBase: 'body_goth_14',
+        eyes: 'eyes_goth_14',
+        mouth: 'mouth_empty',
+        torso: 'torso_empty',
+        arms: 'arms_empty',
+        legs: 'legs_empty',
+        hairFront: 'hair_long_black_14',
+        shirt: 'outfit_goth_14', // Outfit completo extraído del backup
+      },
+      style: ComponentStyle.PIXEL,
+      version: 1,
+      generatedAt: new Date().toISOString(),
+    },
+  },
+  {
+    name: '15_messy_bun_casual',
+    description: 'Moño Desprolijo - Extraído de backup con outfit rosado',
+    config: {
+      bodyGenes: {
+        height: 'average',
+        build: 'slim',
+        armModel: 'slim',
+        chest: 'small',
+        hips: 'average',
+        shoulders: 'narrow',
+        headSize: 'normal',
+        legLength: 'normal',
+      },
+      facialGenes: {
+        faceShape: 'oval',
+        eyeSize: 'large',
+        eyeSpacing: 'normal',
+        noseSize: 'small',
+        mouthWidth: 'normal',
+        jawline: 'soft',
+        eyeExpression: 'happy',
+        mouthExpression: 'smile',
+      },
+      colors: {
+        skinTone: '#faccae', // Piel del backup
+        skinShadow: '#f8b796',
+        skinHighlight: '#ffd6c0',
+        hairPrimary: '#b7701f', // Pelo castaño/naranja del backup
+        eyeColor: '#b57640', // Iris marrón
+        eyeWhite: '#FFFFFF',
+        eyePupil: '#5f432b',
+        clothingPrimary: '#f7a6c3', // Rosa del backup
+        clothingSecondary: '#e895b2',
+      },
+      components: {
+        headBase: 'head_base_peach', // Tono melocotón del backup
+        eyes: 'eyes_cute_12',
+        mouth: 'mouth_empty',
+        torso: 'torso_empty',
+        arms: 'arms_empty',
+        legs: 'legs_empty',
+        hairFront: 'hair_messy_bun_12',
+        shirt: 'outfit_pink_12', // Outfit completo con piel incluida
       },
       style: ComponentStyle.PIXEL,
       version: 1,

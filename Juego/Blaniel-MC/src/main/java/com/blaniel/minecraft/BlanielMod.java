@@ -29,19 +29,22 @@ public class BlanielMod implements ModInitializer {
 	// Configuración
 	public static final BlanielConfig CONFIG = new BlanielConfig();
 
-	// Entity Type para BlanielVillager
-	public static final EntityType<BlanielVillagerEntity> BLANIEL_VILLAGER = Registry.register(
-		Registries.ENTITY_TYPE,
-		new Identifier(MOD_ID, "blaniel_villager"),
-		EntityType.Builder.create(BlanielVillagerEntity::new, SpawnGroup.CREATURE)
-			.setDimensions(0.6f, 1.95f) // Tamaño de aldeano vanilla
-			.maxTrackingRange(10)
-			.build("blaniel_villager")
-	);
+	// Entity Type para BlanielVillager (se inicializa en onInitialize)
+	public static EntityType<BlanielVillagerEntity> BLANIEL_VILLAGER;
 
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Inicializando Blaniel Minecraft Integration");
+
+		// Registrar EntityType
+		BLANIEL_VILLAGER = Registry.register(
+			Registries.ENTITY_TYPE,
+			new Identifier(MOD_ID, "blaniel_villager"),
+			EntityType.Builder.create(BlanielVillagerEntity::new, SpawnGroup.CREATURE)
+				.setDimensions(0.6f, 1.95f) // Tamaño de aldeano vanilla
+				.maxTrackingRange(10)
+				.build("blaniel_villager")
+		);
 
 		// Cargar configuración
 		CONFIG.load();

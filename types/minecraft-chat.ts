@@ -118,11 +118,72 @@ export const MinecraftChatMessageSchema = z.object({
 
 export type MinecraftChatMessage = z.infer<typeof MinecraftChatMessageSchema>;
 
+// ============================================================================
+// Comandos Embebidos
+// ============================================================================
+
+export const AgentCommandSchema = z.object({
+  type: z.enum([
+    "move_closer", // IA se acerca al jugador (si distancia > 4m)
+    "walk_to_agent", // IA camina hacia otro agente (si < 20m)
+    "teleport_to_agent", // IA teletransporta hacia otro agente (si > 20m, o uso el "sigueme")
+    "redirect_question", // IA redirige pregunta a otro agente
+    "wait_for_arrival", // Pausa hasta que NPC llegue
+    "look_at_player", // IA mira al jugador
+    "look_at_agent", // IA mira a otro agente
+  ]),
+  targetAgentId: z.string().optional(), // ID del agente objetivo
+  targetPosition: MinecraftPositionSchema.optional(), // Posición objetivo
+  pauseMessage: z.boolean().default(false), // Si true, pausa mensaje hasta completar comando
+  question: z.string().optional(), // Pregunta a redirigir
+  estimatedDuration: z.number().optional(), // Duración estimada en ms
+});
+
+export type AgentCommand = z.infer<typeof AgentCommandSchema>;
+
+// ============================================================================
+// Respuesta Estructurada (con partes)
+// ============================================================================
+
+export const ResponsePartSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("speech"),
+    content: z.string(),
+    emotion: z.string().optional(),
+    animationHint: z
+      .enum([
+        "idle",
+        "talking",
+        "happy",
+        "sad",
+        "angry",
+        "surprised",
+        "thinking",
+        "waving",
+        "pointing",
+        "beckoning",
+      ])
+      .optional(),
+  }),
+  z.object({
+    type: z.literal("command"),
+    command: AgentCommandSchema,
+  }),
+  z.object({
+    type: z.literal("continuation"),
+    content: z.string(),
+    continuesAfterCommand: z.boolean().default(true),
+  }),
+]);
+
+export type ResponsePart = z.infer<typeof ResponsePartSchema>;
+
 export const MinecraftAgentResponseSchema = z.object({
   messageId: z.string(),
   agentId: z.string(),
   agentName: z.string(),
-  content: z.string(),
+  content: z.string(), // Texto completo (para retrocompatibilidad)
+  parts: z.array(ResponsePartSchema).optional(), // Partes estructuradas
   emotion: z.string().optional(), // Emoción primaria
   emotionalIntensity: z.number().min(0).max(1).optional(),
   timestamp: z.date(),
@@ -138,11 +199,54 @@ export const MinecraftAgentResponseSchema = z.object({
       "surprised",
       "thinking",
       "waving",
+      "pointing",
+      "beckoning",
     ])
     .optional(),
 });
 
 export type MinecraftAgentResponse = z.infer<typeof MinecraftAgentResponseSchema>;
+
+// ============================================================================
+// Contexto Conversacional (historial reciente)
+// ============================================================================
+
+export interface ConversationContext {
+  recentMessages: Array<{
+    agentId: string;
+    content: string;
+    timestamp: Date;
+  }>;
+  lastSpokenAgentId: string | null; // Último agente con el que habló
+  lastSpokenAt: Date | null; // Cuándo fue la última interacción
+  conversationContinuity: boolean; // ¿Es continuación de conversación reciente?
+}
+
+// ============================================================================
+// Análisis del Director (quién debe responder)
+// ============================================================================
+
+export interface DirectorAnalysis {
+  conversationType: "individual" | "group" | "redirected";
+  primaryResponderId: string; // Agente principal que responde
+  secondaryResponders: string[]; // Agentes secundarios (si es grupal)
+  reasoning: string; // Por qué se eligió este set de responders
+  detectedContext: {
+    isFacingNPC: boolean; // ¿Está mirando a un NPC específico?
+    facingNPCId: string | null;
+    hasRecentHistory: boolean; // ¿Hay historial reciente?
+    mentionedAgents: string[]; // Agentes mencionados por nombre
+    groupKeywords: string[]; // Palabras clave grupales encontradas
+    hasAmbiguity: boolean; // ¿Hay ambigüedad que requiere redirección?
+    ambiguousReference: string | null; // Ej: "tu amiga", "él"
+  };
+  requiresMovement: boolean; // ¿Algún agente necesita moverse?
+  movementPlan: Array<{
+    agentId: string;
+    action: "move_closer" | "walk_to_agent" | "teleport_to_agent";
+    reason: string;
+  }>;
+}
 
 // ============================================================================
 // Configuración del Sistema
@@ -167,6 +271,50 @@ export const DEFAULT_MINECRAFT_CHAT_CONFIG: MinecraftChatConfig = {
   enableVoice: false, // Costoso, off por defecto
   enableAnimations: true,
 };
+
+// ============================================================================
+// Constantes del Director
+// ============================================================================
+
+export const DIRECTOR_CONSTANTS = {
+  INDIVIDUAL_DISTANCE_THRESHOLD: 7, // metros (< 7m + mirando = individual)
+  MOVE_CLOSER_THRESHOLD: 4, // metros (> 4m = acercarse a 3m)
+  WALK_TO_AGENT_THRESHOLD: 20, // metros (< 20m = caminar, > 20m = "sigueme")
+  TARGET_DISTANCE: 3, // metros (distancia objetivo al acercarse)
+  CONVERSATION_CONTINUITY_WINDOW: 60000, // ms (1 minuto para continuidad)
+} as const;
+
+export const GROUP_KEYWORDS = [
+  "todos",
+  "chicos",
+  "chicas",
+  "equipo",
+  "grupo",
+  "amigos",
+  "ustedes",
+  "vosotros",
+  "hey all",
+  "everyone",
+  "guys",
+  "gente",
+] as const;
+
+export const AMBIGUOUS_REFERENCES = [
+  "amiga",
+  "amigo",
+  "ella",
+  "él",
+  "ellos",
+  "ellas",
+  "esa persona",
+  "ese",
+  "esa",
+  "friend",
+  "she",
+  "he",
+  "they",
+  "that person",
+] as const;
 
 // ============================================================================
 // Request/Response de API
