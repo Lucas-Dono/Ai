@@ -34,7 +34,7 @@ public class BlanielChatIntegration {
      * Obtiene la URL de la API desde la configuración
      */
     private static String getApiUrl() {
-        return com.blaniel.minecraft.config.ConfigManager.getApiUrl() + "/message";
+        return com.blaniel.minecraft.BlanielMod.CONFIG.getApiUrl() + "/v1/minecraft/message";
     }
 
     /**
@@ -42,12 +42,12 @@ public class BlanielChatIntegration {
      *
      * @param player El jugador que envía el mensaje
      * @param message El contenido del mensaje
-     * @param apiKey API key del usuario
+     * @param jwtToken JWT token del usuario (desde login)
      */
     public static CompletableFuture<Void> sendChatMessage(
             PlayerEntity player,
             String message,
-            String apiKey
+            String jwtToken
     ) {
         return CompletableFuture.runAsync(() -> {
             try {
@@ -75,7 +75,7 @@ public class BlanielChatIntegration {
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(getApiUrl()))
                     .header("Content-Type", "application/json")
-                    .header("X-API-Key", apiKey)
+                    .header("Authorization", "Bearer " + jwtToken)
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
                     .build();
 
@@ -301,9 +301,9 @@ public class BlanielChatIntegration {
     }
 
     /**
-     * Carga la API key desde el archivo de configuración
+     * Obtiene el JWT token desde la configuración (guardado después del login)
      */
-    public static String loadApiKey() {
-        return com.blaniel.minecraft.config.ConfigManager.getApiKey();
+    public static String getJwtToken() {
+        return com.blaniel.minecraft.BlanielMod.CONFIG.getJwtToken();
     }
 }

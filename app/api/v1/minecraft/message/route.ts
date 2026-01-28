@@ -7,13 +7,14 @@ import {
 } from "@/types/minecraft-chat";
 import { checkTierRateLimit } from "@/lib/redis/ratelimit";
 import { prisma } from "@/lib/prisma";
+import { verifyToken, extractTokenFromHeader } from "@/lib/jwt";
 
 /**
  * POST /api/v1/minecraft/message
  *
  * Endpoint principal para enviar mensajes desde Minecraft
  *
- * Autenticación: API Key en header X-API-Key
+ * Autenticación: JWT token en header Authorization: Bearer <token>
  *
  * Body:
  * {
@@ -58,30 +59,38 @@ import { prisma } from "@/lib/prisma";
  */
 export async function POST(req: NextRequest) {
   try {
-    // 1. Autenticación via API Key
-    const apiKey = req.headers.get("x-api-key");
+    // 1. Autenticación via JWT token
+    const authHeader = req.headers.get("authorization");
+    const token = extractTokenFromHeader(authHeader);
 
-    if (!apiKey) {
+    if (!token) {
       return NextResponse.json(
-        { error: "API Key requerida", code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED },
+        { error: "Token requerido", code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED },
         { status: 401 }
       );
     }
 
-    // Buscar usuario por API Key
+    const tokenData = await verifyToken(token);
+    if (!tokenData) {
+      return NextResponse.json(
+        { error: "Token inválido", code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED },
+        { status: 401 }
+      );
+    }
+
+    // Buscar usuario por ID del token
     const user = await prisma.user.findUnique({
-      where: { apiKey },
+      where: { id: tokenData.userId },
       select: {
         id: true,
         plan: true,
-        apiKey: true,
       },
     });
 
     if (!user) {
       return NextResponse.json(
-        { error: "API Key inválida", code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED },
-        { status: 401 }
+        { error: "Usuario no encontrado", code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED },
+        { status: 404 }
       );
     }
 
@@ -159,7 +168,7 @@ export async function GET() {
     endpoint: "/api/v1/minecraft/message",
     method: "POST",
     description: "Envía mensajes desde Minecraft y recibe respuestas de agentes IA",
-    authentication: "API Key en header X-API-Key",
+    authentication: "JWT token en header Authorization: Bearer <token>",
     rateLimit: {
       free: "10 req/min, 100 req/hora, 300 req/día",
       plus: "30 req/min, 600 req/hora, 3000 req/día",

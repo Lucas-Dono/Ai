@@ -19,7 +19,6 @@ import com.blaniel.minecraft.integration.BlanielChatIntegration;
 public class BlanielChatHandler {
 
     private static KeyBinding openChatKey;
-    private static String apiKey = null;
     private static boolean chatOpen = false;
     private static StringBuilder messageBuffer = new StringBuilder();
 
@@ -34,9 +33,6 @@ public class BlanielChatHandler {
             GLFW.GLFW_KEY_K,
             "category.blaniel" // Category
         ));
-
-        // Cargar API key desde configuración
-        apiKey = BlanielChatIntegration.loadApiKey();
 
         // Registrar tick handler
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -55,12 +51,14 @@ public class BlanielChatHandler {
     private static void handleChatKeyPress(MinecraftClient client) {
         if (client.player == null) return;
 
-        // Verificar que API key esté configurada
-        if (apiKey == null || apiKey.equals("API_KEY_PLACEHOLDER")) {
+        // Verificar que el usuario esté logueado
+        if (!com.blaniel.minecraft.BlanielMod.CONFIG.isLoggedIn()) {
             client.player.sendMessage(
-                Text.literal("§c[Blaniel] §fConfigura tu API key en blaniel-mc.properties"),
+                Text.literal("§c[Blaniel] §fDebes iniciar sesión primero"),
                 false
             );
+            // Abrir pantalla de login
+            client.setScreen(new com.blaniel.minecraft.screen.LoginScreen(null));
             return;
         }
 
@@ -81,6 +79,16 @@ public class BlanielChatHandler {
             return;
         }
 
+        // Obtener JWT token
+        String jwtToken = com.blaniel.minecraft.BlanielMod.CONFIG.getJwtToken();
+        if (jwtToken == null) {
+            client.player.sendMessage(
+                Text.literal("§c[Blaniel] §fNo estás logueado. Reinicia el juego."),
+                false
+            );
+            return;
+        }
+
         // Mostrar feedback inmediato
         client.player.sendMessage(
             Text.literal("§7Enviando mensaje..."),
@@ -88,7 +96,7 @@ public class BlanielChatHandler {
         );
 
         // Enviar mensaje de forma asíncrona
-        BlanielChatIntegration.sendChatMessage(client.player, message, apiKey)
+        BlanielChatIntegration.sendChatMessage(client.player, message, jwtToken)
             .exceptionally(ex -> {
                 client.execute(() -> {
                     client.player.sendMessage(
@@ -98,19 +106,5 @@ public class BlanielChatHandler {
                 });
                 return null;
             });
-    }
-
-    /**
-     * Actualiza la API key
-     */
-    public static void setApiKey(String key) {
-        apiKey = key;
-    }
-
-    /**
-     * Obtiene la API key actual
-     */
-    public static String getApiKey() {
-        return apiKey;
     }
 }

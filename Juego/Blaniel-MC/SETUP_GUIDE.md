@@ -1,6 +1,6 @@
 # Guía de Configuración - Blaniel Minecraft Mod
 
-## 🎮 Sistema de Chat Avanzado Implementado
+## 🎮 Sistema de Chat Avanzado con IA Conversacional
 
 El mod ahora incluye un sistema de chat grupal avanzado con IA conversacional que detecta contexto espacial y gestiona interacciones inteligentes.
 
@@ -12,66 +12,82 @@ El mod ahora incluye un sistema de chat grupal avanzado con IA conversacional qu
    - Regístrate en https://blaniel.com/registro
    - Crea al menos un personaje IA
 
-2. **API Key**
-   - Ve a https://blaniel.com/configuracion
-   - En la sección "Desarrollador", genera una API key
-   - Copia la API key (la necesitarás para el paso siguiente)
+2. **Minecraft 1.20.1 con Fabric**
+   - Fabric Loader instalado
+   - Fabric API mod instalado
 
 ---
 
-## ⚙️ Configuración Inicial
+## ⚙️ Primer Uso - Login Automático
 
-### 1. Ubicar el archivo de configuración
+### 1. Instalar el mod
 
-Cuando ejecutas el mod por primera vez, se crea automáticamente el archivo:
+1. Descarga el archivo `.jar` del mod
+2. Colócalo en la carpeta `mods` de tu instalación de Minecraft
+3. Inicia Minecraft con el perfil de Fabric
+
+### 2. Login automático en el juego
+
+Cuando entres a un mundo por primera vez, **aparecerá automáticamente** una pantalla de inicio de sesión:
+
+**Pantalla de Login:**
+- **Email**: Tu email registrado en Blaniel.com
+- **Contraseña**: Tu contraseña de Blaniel.com
+- Presiona `Enter` o haz clic en "Iniciar Sesión"
+
+El mod guardará tu sesión automáticamente. **No necesitas volver a loguearte** a menos que cierres sesión manualmente o cambies de cuenta.
+
+### 3. Configuración guardada
+
+Después del login, el mod crea automáticamente:
 ```
-blaniel-mc.properties
-```
-
-Este archivo se encuentra en el **directorio raíz del juego** (donde está instalado Minecraft).
-
-### 2. Editar la configuración
-
-Abre `blaniel-mc.properties` con un editor de texto y configura:
-
-```properties
-# API Key de Blaniel (REQUERIDO)
-api.key=tu_api_key_aqui
-
-# URL de la API (por defecto: https://blaniel.com/api/v1/minecraft)
-api.url=https://blaniel.com/api/v1/minecraft
-
-# Radio de detección de agentes (en bloques, por defecto: 16.0)
-chat.radius=16.0
-
-# Modo debug (muestra información adicional en consola)
-debug.enabled=false
+.minecraft/config/blaniel-mc.json
 ```
 
-**Importante:** Reemplaza `tu_api_key_aqui` con la API key que copiaste de Blaniel.com
+Este archivo contiene:
+- Token JWT de sesión (se renueva automáticamente)
+- URL del servidor (por defecto: https://blaniel.com)
+- Datos básicos del usuario (nombre, email, plan)
 
-### 3. Reiniciar Minecraft
-
-Después de editar la configuración, reinicia Minecraft para que los cambios surtan efecto.
+**No necesitas editar este archivo manualmente.**
 
 ---
 
 ## 🎯 Uso del Sistema de Chat
 
-### Invocar agentes en el mundo
+### Acceso a Personajes
+
+El mod te da acceso a:
+- ✅ **Todos tus personajes privados** (creados por ti)
+- ✅ **Todos los personajes públicos** (creados por otros usuarios)
+- ✅ **Personajes destacados** (featured)
+
+Esto significa que puedes invocar **cualquier personaje de Blaniel** en tu mundo de Minecraft, no solo los tuyos.
+
+### Invocar personajes en el mundo
 
 Usa el comando en el chat de Minecraft:
 
 ```
-/blaniel spawn <agentId> [nombre personalizado]
+/blaniel list
 ```
+Muestra todos los personajes disponibles (públicos + privados)
+
+```
+/blaniel spawn <nombre_o_id>
+```
+Invoca un personaje en tu ubicación
 
 **Ejemplo:**
 ```
-/blaniel spawn agent_abc123 Einstein
-```
+/blaniel list
+> Mostrando 45 agentes disponibles:
+> - Tus agentes (3): Alice, Bob, Charlie
+> - Agentes públicos (42): Einstein, Marilyn Monroe, Sherlock Holmes...
 
-Esto creará un aldeano con la IA de ese agente en tu ubicación actual.
+/blaniel spawn Einstein
+> ✓ Einstein invocado en tu posición
+```
 
 ### Abrir el chat avanzado
 
@@ -147,14 +163,14 @@ Los NPCs responden con animaciones según el contexto:
 
 ### "No hay agentes IA cercanos para responder"
 - **Causa:** No hay NPCs de Blaniel en un radio de 16 bloques
-- **Solución:** Invoca un agente con `/blaniel spawn <agentId>` o acércate a uno existente
+- **Solución:** Invoca un agente con `/blaniel spawn <nombre>` o acércate a uno existente
 
-### "Error de autenticación. Verifica tu API key"
-- **Causa:** API key incorrecta o no configurada
+### "Debes iniciar sesión primero"
+- **Causa:** No has iniciado sesión o la sesión expiró
 - **Solución:**
-  1. Verifica que `blaniel-mc.properties` existe
-  2. Asegúrate de que `api.key` tiene tu API key correcta (sin espacios)
-  3. Reinicia Minecraft
+  1. Presiona `K` nuevamente (se abrirá login automático)
+  2. Ingresa tu email y contraseña de Blaniel.com
+  3. Si el problema persiste, elimina `.minecraft/config/blaniel-mc.json` y reinicia
 
 ### "Límite de tasa excedido. Espera un momento"
 - **Causa:** Has enviado demasiados mensajes en poco tiempo
@@ -165,24 +181,32 @@ Los NPCs responden con animaciones según el contexto:
   - Ultra: 100 msg/min, 6000 msg/hora
 
 ### "No se encontraron agentes"
-- **Causa:** No has creado agentes en Blaniel.com o el agentId es incorrecto
-- **Solución:** Ve a https://blaniel.com/create-character y crea un personaje
+- **Causa:** No hay personajes creados en el servidor
+- **Solución:**
+  1. Ve a https://blaniel.com/create-character y crea un personaje
+  2. También puedes usar personajes públicos de otros usuarios
 
 ### La tecla K no funciona
 - **Causa:** Conflicto con otro mod o keybinding
 - **Solución:** Busca en las opciones de Minecraft → Controles → "Blaniel" y reasigna la tecla
 
+### Error de conexión al servidor
+- **Causa:** El servidor de Blaniel no está disponible o hay problemas de red
+- **Solución:**
+  1. Verifica tu conexión a internet
+  2. Si usas localhost en desarrollo, asegúrate de que el servidor esté corriendo
+  3. Verifica la URL en `.minecraft/config/blaniel-mc.json`
+
 ---
 
 ## 📊 Información de Debug
 
-Si habilitas `debug.enabled=true` en la configuración, verás información adicional en los logs:
+Para ver información adicional en los logs, busca en `.minecraft/logs/latest.log`:
 
 ```
-[INFO] Tipo de conversación: individual
-[INFO] Razón: Player looking at NPC within 7m
-[INFO] Agentes respondiendo: 1
-[INFO] Tiempo de respuesta: 1247ms
+[Blaniel] Usuario logueado: Tu Nombre (tu@email.com)
+[Blaniel] Tipo de conversación: individual
+[Blaniel] Agentes respondiendo: 1
 ```
 
 ---
@@ -190,17 +214,20 @@ Si habilitas `debug.enabled=true` en la configuración, verás información adic
 ## 🎮 Comandos Disponibles
 
 ```bash
-# Invocar agente
-/blaniel spawn <agentId> [nombre]
-
-# Listar agentes cercanos
+# Listar agentes disponibles
 /blaniel list
+
+# Invocar agente por nombre o ID
+/blaniel spawn <nombre_o_id>
 
 # Eliminar agente (mirando al NPC)
 /blaniel remove
 
-# Recargar configuración
-/blaniel reload
+# Cerrar sesión
+/blaniel logout
+
+# Información del mod
+/blaniel info
 ```
 
 ---
@@ -208,10 +235,21 @@ Si habilitas `debug.enabled=true` en la configuración, verás información adic
 ## 💡 Consejos de Uso
 
 1. **Conversaciones naturales:** Habla como lo harías normalmente, el sistema entiende contexto
-2. **Nombres claros:** Nombra a tus NPCs con nombres fáciles de recordar y mencionar
-3. **Espaciado:** Mantén los NPCs a menos de 16 bloques para que respondan
-4. **Emociones:** Los NPCs responderán con animaciones apropiadas al contexto emocional
-5. **Grupos:** Invoca varios agentes para crear conversaciones grupales dinámicas
+2. **Explora personajes públicos:** Usa `/blaniel list` para ver todos los personajes disponibles
+3. **Nombra NPCs claramente:** Usa nombres fáciles de recordar y mencionar
+4. **Espaciado:** Mantén los NPCs a menos de 16 bloques para que respondan
+5. **Emociones:** Los NPCs responderán con animaciones apropiadas al contexto emocional
+6. **Grupos:** Invoca varios agentes para crear conversaciones grupales dinámicas
+7. **Privacidad:** Solo tú puedes ver las conversaciones con tus personajes privados
+
+---
+
+## 🔐 Seguridad y Privacidad
+
+- **Sesión segura:** El mod usa JWT tokens que expiran automáticamente
+- **Sin almacenamiento de contraseñas:** Tu contraseña nunca se guarda en el disco
+- **Datos encriptados:** Las conversaciones se transmiten de forma segura (HTTPS)
+- **Privacidad de personajes:** Tus personajes privados solo son accesibles por ti
 
 ---
 
@@ -222,6 +260,8 @@ Si habilitas `debug.enabled=true` en la configuración, verás información adic
 - [ ] Memoria persistente entre sesiones
 - [ ] Eventos emergentes grupales
 - [ ] Animaciones más complejas (mod Emotecraft)
+- [ ] Sistema de relaciones entre NPCs
+- [ ] Misiones y objetivos generados por IA
 
 ---
 
@@ -232,6 +272,7 @@ Si encuentras problemas o tienes preguntas:
 1. **Logs:** Revisa los logs de Minecraft en `.minecraft/logs/latest.log`
 2. **GitHub Issues:** Reporta bugs en el repositorio del mod
 3. **Discord:** Únete al servidor de Blaniel para soporte comunitario
+4. **Web:** https://blaniel.com/soporte
 
 ---
 
@@ -242,3 +283,4 @@ Este mod es parte del proyecto Blaniel y está licenciado bajo MIT License.
 **Versión:** 0.1.0-alpha
 **Fecha:** 2026-01-28
 **Autor:** Sistema Blaniel
+**Web:** https://blaniel.com

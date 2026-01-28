@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { MINECRAFT_ERROR_CODES } from "@/types/minecraft-chat";
+import { verifyToken, extractTokenFromHeader } from "@/lib/jwt";
 
 /**
  * GET /api/v1/minecraft/agents
  *
- * Lista todos los agentes del usuario disponibles para Minecraft
+ * Lista TODOS los agentes disponibles para Minecraft:
+ * - Agentes privados del usuario
+ * - Agentes públicos de otros usuarios
  *
  * Headers:
- * - X-API-Key: API key del usuario
+ * - Authorization: Bearer <JWT token>
  *
  * Query params:
  * - ?active=true (opcional): Solo agentes activos
+ * - ?mine=true (opcional): Solo mis agentes
  *
  * Response:
  * {
@@ -20,11 +24,9 @@ import { MINECRAFT_ERROR_CODES } from "@/types/minecraft-chat";
  *       "id": "agent_123",
  *       "name": "Alice",
  *       "avatar": "https://...",
- *       "personality": {
- *         "extraversion": 75,
- *         "agreeableness": 80
- *       },
- *       "isActive": true
+ *       "personality": { ... },
+ *       "isPublic": true,
+ *       "isOwned": false
  *     }
  *   ]
  * }
@@ -32,12 +34,24 @@ import { MINECRAFT_ERROR_CODES } from "@/types/minecraft-chat";
 export async function GET(req: NextRequest) {
   try {
     // 1. Autenticación
-    const apiKey = req.headers.get("x-api-key");
+    const authHeader = req.headers.get("authorization");
+    const token = extractTokenFromHeader(authHeader);
 
-    if (!apiKey) {
+    if (!token) {
       return NextResponse.json(
         {
-          error: "API Key requerida",
+          error: "Token requerido",
+          code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED,
+        },
+        { status: 401 }
+      );
+    }
+
+    const tokenData = await verifyToken(token);
+    if (!tokenData) {
+      return NextResponse.json(
+        {
+          error: "Token inválido",
           code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED,
         },
         { status: 401 }
@@ -45,34 +59,47 @@ export async function GET(req: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { apiKey },
+      where: { id: tokenData.userId },
       select: { id: true },
     });
 
     if (!user) {
       return NextResponse.json(
         {
-          error: "API Key inválida",
+          error: "Usuario no encontrado",
           code: MINECRAFT_ERROR_CODES.PLAYER_NOT_AUTHENTICATED,
         },
-        { status: 401 }
+        { status: 404 }
       );
     }
 
     // 2. Obtener parámetros
     const { searchParams } = new URL(req.url);
     const activeOnly = searchParams.get("active") === "true";
+    const mineOnly = searchParams.get("mine") === "true";
 
-    // 3. Buscar agentes del usuario
+    // 3. Buscar agentes (propios + públicos)
+    const whereClause = mineOnly
+      ? { userId: user.id }
+      : {
+          OR: [
+            { userId: user.id }, // Mis agentes (privados o públicos)
+            { visibility: "public" }, // Agentes públicos de otros
+            { visibility: "featured" }, // Agentes destacados
+          ],
+        };
+
     const agents = await prisma.agent.findMany({
       where: {
-        userId: user.id,
+        ...whereClause,
         ...(activeOnly && { isActive: true }),
       },
       select: {
         id: true,
         name: true,
         avatar: true,
+        visibility: true,
+        userId: true,
         PersonalityCore: {
           select: {
             extraversion: true,
@@ -84,9 +111,11 @@ export async function GET(req: NextRequest) {
         },
         profile: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        { visibility: "desc" }, // Featured primero
+        { createdAt: "desc" },
+      ],
+      take: 100, // Límite razonable
     });
 
     // 4. Formatear respuesta
@@ -100,12 +129,16 @@ export async function GET(req: NextRequest) {
         occupation: (agent.profile as any)?.ocupacion?.profesion,
         gender: (agent.profile as any)?.identidad?.genero,
       },
-      isActive: true, // Simplificado: siempre true
+      isPublic: agent.visibility === "public" || agent.visibility === "featured",
+      isOwned: agent.userId === user.id,
+      isFeatured: agent.visibility === "featured",
     }));
 
     return NextResponse.json({
       agents: formattedAgents,
       total: formattedAgents.length,
+      ownedCount: formattedAgents.filter((a) => a.isOwned).length,
+      publicCount: formattedAgents.filter((a) => a.isPublic && !a.isOwned).length,
     });
   } catch (error) {
     console.error("Error fetching Minecraft agents:", error);
@@ -128,7 +161,7 @@ export async function OPTIONS() {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, X-API-Key",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
 }
