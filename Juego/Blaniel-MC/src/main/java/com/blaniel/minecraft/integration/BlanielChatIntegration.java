@@ -214,6 +214,9 @@ public class BlanielChatIntegration {
                 // Encontrar la entidad correspondiente
                 BlanielVillagerEntity entity = findEntityByAgentId(player, agentId);
 
+                String agentName = agentResp.get("agentName").getAsString();
+                String content = agentResp.get("content").getAsString();
+
                 if (entity != null) {
                     // Verificar si tiene estructura de partes (respuesta avanzada)
                     if (agentResp.has("parts")) {
@@ -221,23 +224,21 @@ public class BlanielChatIntegration {
                         CommandHandler.processStructuredResponse(entity, agentResp);
                     } else {
                         // Fallback: respuesta simple
-                        String content = agentResp.get("content").getAsString();
                         String animationHint = agentResp.has("animationHint")
                             ? agentResp.get("animationHint").getAsString()
                             : "talking";
 
+                        // Mostrar chat bubble sobre la entidad
                         entity.displayChatBubble(content);
                         entity.playAnimation(animationHint);
                     }
-                } else {
-                    // Si no encontramos la entidad, mostrar en chat normal
-                    String agentName = agentResp.get("agentName").getAsString();
-                    String content = agentResp.get("content").getAsString();
-                    player.sendMessage(
-                        Text.literal("§b" + agentName + ": §f" + content),
-                        false
-                    );
                 }
+
+                // SIEMPRE mostrar en el chat del jugador (consola con T)
+                player.sendMessage(
+                    Text.literal("§b" + agentName + ": §f" + content),
+                    false
+                );
             }
 
             // Mostrar metadata (debug)
