@@ -13,7 +13,7 @@ import com.blaniel.minecraft.integration.BlanielChatIntegration;
 /**
  * Manejador de chat avanzado para Blaniel
  *
- * Captura la tecla K para abrir el chat y enviar mensajes
+ * Captura la tecla C para abrir el chat y enviar mensajes
  * al sistema de chat grupal avanzado.
  */
 public class BlanielChatHandler {
@@ -26,11 +26,11 @@ public class BlanielChatHandler {
      * Inicializa el handler de chat
      */
     public static void initialize() {
-        // Registrar keybinding para tecla K
+        // Registrar keybinding para tecla C (Chat)
         openChatKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.blaniel.openchat", // Translation key
             InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_K,
+            GLFW.GLFW_KEY_C,
             "category.blaniel" // Category
         ));
 
@@ -38,7 +38,7 @@ public class BlanielChatHandler {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
 
-            // Verificar si se presionó la tecla K
+            // Verificar si se presionó la tecla C
             if (openChatKey.wasPressed()) {
                 handleChatKeyPress(client);
             }
