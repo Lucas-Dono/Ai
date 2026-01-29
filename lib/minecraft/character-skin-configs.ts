@@ -1,7 +1,7 @@
 /**
  * Configuraciones de skin Minecraft generadas automáticamente
- * Generado: 2026-01-28T03:45:31.416Z
- * Total: 51 personajes
+ * Actualizado: 2026-01-29
+ * Total: 54 personajes + 6 aliases
  */
 
 export interface CharacterSkinConfig {
@@ -1040,11 +1040,89 @@ export const CHARACTER_SKIN_CONFIGS: Record<string, CharacterSkinConfig> = {
           "pants": "pants_01",
           "shoes": "shoes_01"
     },
+  },
+  'luna-chen': {
+    characterName: 'luna-chen',
+    gender: 'female',
+    skinTone: '#E8D4B8',
+    hairColor: '#1C1208',
+    eyeColor: '#3D2817',
+    components: {
+          "headBase": "head_female_01",
+          "eyes": "eyes_female_01",
+          "mouth": "mouth_empty",
+          "torso": "torso_slim_01",
+          "arms": "arms_slim_01",
+          "legs": "legs_average_01",
+          "hairFront": "hair_long_02_wavy",
+          "hairBody": "hair_long_body_02_wavy",
+          "tShirt": "t_shirt_02",
+          "pants": "pants_01",
+          "shoes": "shoes_01"
+    },
+  },
+  'atlas': {
+    characterName: 'atlas',
+    gender: 'male',
+    skinTone: '#D4A882',
+    hairColor: '#6B5A4D',
+    eyeColor: '#7A8A9A',
+    components: {
+          "headBase": "head_base_01",
+          "eyes": "eyes_01",
+          "mouth": "mouth_02",
+          "torso": "torso_athletic_01",
+          "arms": "arms_classic_01",
+          "legs": "legs_average_01",
+          "hairFront": "hair_short_06_undercut",
+          "tShirt": "t_shirt_02",
+          "pants": "pants_01",
+          "shoes": "shoes_01"
+    },
+  },
+  'aria': {
+    characterName: 'aria',
+    gender: 'female',
+    skinTone: '#F5E0D0',
+    hairColor: '#4A3428',
+    eyeColor: '#6B5A4D',
+    components: {
+          "headBase": "head_female_01",
+          "eyes": "eyes_female_01",
+          "mouth": "mouth_empty",
+          "torso": "torso_slim_01",
+          "arms": "arms_slim_01",
+          "legs": "legs_average_01",
+          "hairFront": "hair_medium_01_lob",
+          "tShirt": "t_shirt_01",
+          "pants": "pants_01",
+          "shoes": "shoes_01"
+    },
   }
 };
 
+// Mapeo de slugs alternativos (para manejar variaciones en nombres)
+const SLUG_ALIASES: Record<string, string> = {
+  'dr-sigmund-freud': 'sigmund-freud',
+  'cleopatra-vii-philopator': 'cleopatra-vii',
+  'confucio-kong-fuzi': 'confucio',
+  'dr-sebastian-muller': 'sebastian-muller',
+  'ekaterina-katya-volkov': 'katya',
+  'marcus-vega': 'marcus',
+};
+
 export function getCharacterSkinConfig(characterName: string): CharacterSkinConfig | undefined {
-  return CHARACTER_SKIN_CONFIGS[characterName];
+  // Intentar directamente
+  let config = CHARACTER_SKIN_CONFIGS[characterName];
+  if (config) return config;
+
+  // Intentar con alias
+  const aliasTarget = SLUG_ALIASES[characterName];
+  if (aliasTarget) {
+    return CHARACTER_SKIN_CONFIGS[aliasTarget];
+  }
+
+  return undefined;
 }
 
 export const ALL_CHARACTER_NAMES = [
@@ -1099,7 +1177,10 @@ export const ALL_CHARACTER_NAMES = [
   'katya',
   'marcus-washington',
   'sebastian-muller',
-  'sofia-volkov'
+  'sofia-volkov',
+  'luna-chen',
+  'atlas',
+  'aria'
 ] as const;
 
 export type CharacterName = typeof ALL_CHARACTER_NAMES[number];
