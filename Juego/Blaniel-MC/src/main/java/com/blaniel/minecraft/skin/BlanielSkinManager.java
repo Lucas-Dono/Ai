@@ -354,15 +354,6 @@ public class BlanielSkinManager {
 		} catch (IOException e) {
 			BlanielMod.LOGGER.error("Error limpiando caché de skins", e);
 		}
-
-		// Limpiar caché del renderer (solo en cliente)
-		try {
-			Class<?> rendererClass = Class.forName("com.blaniel.minecraft.client.renderer.BlanielVillagerRenderer");
-			rendererClass.getMethod("clearRendererCache").invoke(null);
-		} catch (Exception e) {
-			// No hacer nada si estamos en servidor (clase no existe)
-			BlanielMod.LOGGER.debug("Renderer cache no limpiado (probablemente estamos en servidor)");
-		}
 	}
 
 	/**

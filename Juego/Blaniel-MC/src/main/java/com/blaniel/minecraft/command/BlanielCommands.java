@@ -55,10 +55,6 @@ public class BlanielCommands {
 					)
 				)
 			)
-			// /blaniel clearskins
-			.then(CommandManager.literal("clearskins")
-				.executes(BlanielCommands::clearSkins)
-			)
 		);
 	}
 
@@ -269,53 +265,6 @@ public class BlanielCommands {
 			() -> Text.literal("§a[Blaniel] §fAPI URL configurada: " + url),
 			false
 		);
-
-		return 1;
-	}
-
-	/**
-	 * /blaniel clearskins
-	 *
-	 * Limpia el caché de skins de todos los agentes
-	 */
-	private static int clearSkins(CommandContext<ServerCommandSource> context) {
-		ServerCommandSource source = context.getSource();
-
-		source.sendFeedback(
-			() -> Text.literal("§e[Blaniel] §fLimpiando caché de skins..."),
-			false
-		);
-
-		// Limpiar todo el caché de skins (lado del cliente)
-		try {
-			// Este método limpia:
-			// - Caché en memoria (PROFILE_CACHE, TEXTURE_CACHE)
-			// - Caché en disco (.minecraft/blaniel-skins/)
-			com.blaniel.minecraft.skin.BlanielSkinManager.clearAllCache();
-
-			source.sendFeedback(
-				() -> Text.literal("§a[Blaniel] §fCaché de skins limpiado exitosamente"),
-				false
-			);
-
-			source.sendFeedback(
-				() -> Text.literal("§7Los personajes usarán skin por defecto (Steve/Alex) hasta que se recarguen."),
-				false
-			);
-
-			source.sendFeedback(
-				() -> Text.literal("§7Para forzar recarga: despawnea y vuelve a spawnear los personajes."),
-				false
-			);
-
-		} catch (Exception e) {
-			BlanielMod.LOGGER.error("Error limpiando caché de skins", e);
-
-			source.sendFeedback(
-				() -> Text.literal("§c[Blaniel] §fError al limpiar caché: " + e.getMessage()),
-				false
-			);
-		}
 
 		return 1;
 	}
