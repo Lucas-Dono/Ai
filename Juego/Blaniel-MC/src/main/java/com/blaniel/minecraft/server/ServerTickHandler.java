@@ -2,6 +2,7 @@ package com.blaniel.minecraft.server;
 
 import com.blaniel.minecraft.ai.AmbientDialogueHandler;
 import com.blaniel.minecraft.ai.SocialGroupingSystem;
+import com.blaniel.minecraft.conversation.SocialGroupManager;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -51,6 +52,10 @@ public class ServerTickHandler {
      */
     private static void checkPlayersNearGroups(ServerWorld world) {
         for (ServerPlayerEntity player : world.getPlayers()) {
+            // Sistema de conversation scripts (guiones completos)
+            SocialGroupManager.checkPlayerProximity(player);
+
+            // Sistema legacy de diálogos ambientales (frases sueltas)
             UUID nearbyGroupId = SocialGroupingSystem.getInstance().findNearbyGroup(player);
 
             if (nearbyGroupId != null) {

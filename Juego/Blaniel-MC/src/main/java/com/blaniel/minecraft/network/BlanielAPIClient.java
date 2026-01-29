@@ -1,5 +1,7 @@
 package com.blaniel.minecraft.network;
 
+import com.blaniel.minecraft.conversation.models.ConversationScript;
+import com.blaniel.minecraft.conversation.models.ScriptMetadata;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -8,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -215,6 +218,104 @@ public class BlanielAPIClient {
 
 		} catch (Exception e) {
 			System.err.println("[Blaniel API] Error creating request: " + e.getMessage());
+			e.printStackTrace();
+			return CompletableFuture.completedFuture(null);
+		}
+	}
+
+	/**
+	 * Obtener metadata del script (solo versión, sin líneas completas)
+	 * Endpoint: GET /api/v1/minecraft/conversation-script/metadata?groupHash=xxx
+	 */
+	public CompletableFuture<ScriptMetadata> getScriptMetadata(String groupHash) {
+		try {
+			String url = baseUrl + "/api/v1/minecraft/conversation-script/metadata?groupHash=" + groupHash;
+
+			HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.header("Accept", "application/json")
+				.header("User-Agent", "BlanielMinecraft/0.1.0")
+				.GET()
+				.timeout(Duration.ofSeconds(10))
+				.build();
+
+			return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+				.thenApply(response -> {
+					if (response.statusCode() == 404) {
+						// No existe script para este grupo
+						return null;
+					}
+
+					if (response.statusCode() != 200) {
+						System.err.println("[Blaniel API] Failed to get metadata: " + response.statusCode());
+						return null;
+					}
+
+					return GSON.fromJson(response.body(), ScriptMetadata.class);
+				})
+				.exceptionally(e -> {
+					System.err.println("[Blaniel API] Error getting metadata: " + e.getMessage());
+					return null;
+				});
+
+		} catch (Exception e) {
+			System.err.println("[Blaniel API] Error creating metadata request: " + e.getMessage());
+			return CompletableFuture.completedFuture(null);
+		}
+	}
+
+	/**
+	 * Obtener guión conversacional completo
+	 * Endpoint: POST /api/v1/minecraft/conversation-script
+	 */
+	public CompletableFuture<ConversationScript> getConversationScript(
+		List<String> agentIds,
+		String location,
+		String contextHint,
+		String groupHash,
+		boolean forceNew
+	) {
+		try {
+			// Construir body
+			JsonObject body = new JsonObject();
+			body.add("agentIds", GSON.toJsonTree(agentIds));
+			body.addProperty("location", location);
+			if (contextHint != null) {
+				body.addProperty("contextHint", contextHint);
+			}
+			body.addProperty("groupHash", groupHash);
+			body.addProperty("forceNew", forceNew);
+
+			HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(baseUrl + "/api/v1/minecraft/conversation-script"))
+				.header("Content-Type", "application/json")
+				.header("Accept", "application/json")
+				.header("User-Agent", "BlanielMinecraft/0.1.0")
+				.POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+				.timeout(Duration.ofSeconds(30))
+				.build();
+
+			return HTTP_CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+				.thenApply(response -> {
+					if (response.statusCode() != 200) {
+						System.err.println("[Blaniel API] Failed to get script: " + response.statusCode());
+						System.err.println("[Blaniel API] Response: " + response.body());
+						return null;
+					}
+
+					ConversationScript script = GSON.fromJson(response.body(), ConversationScript.class);
+					System.out.println("[Blaniel API] Script downloaded: " + script.getTopic() +
+						" (v" + script.getVersion() + ", " + script.getTotalLines() + " lines)");
+					return script;
+				})
+				.exceptionally(e -> {
+					System.err.println("[Blaniel API] Error getting script: " + e.getMessage());
+					e.printStackTrace();
+					return null;
+				});
+
+		} catch (Exception e) {
+			System.err.println("[Blaniel API] Error creating script request: " + e.getMessage());
 			e.printStackTrace();
 			return CompletableFuture.completedFuture(null);
 		}
