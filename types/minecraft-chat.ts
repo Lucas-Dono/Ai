@@ -7,7 +7,7 @@ import { z } from "zod";
  * - X: Este (+) / Oeste (-)
  * - Y: Arriba (+) / Abajo (-)
  * - Z: Sur (+) / Norte (-)
- * - Yaw: Rotación horizontal (0-360°)
+ * - Yaw: Rotación horizontal (-180 a +180° en Java, 0-360° en Bedrock)
  * - Pitch: Rotación vertical (-90 a +90°)
  */
 
@@ -19,7 +19,7 @@ export const MinecraftPositionSchema = z.object({
   x: z.number(),
   y: z.number(),
   z: z.number(),
-  yaw: z.number().min(0).max(360).optional(), // Rotación horizontal
+  yaw: z.number().min(-180).max(360).optional(), // Rotación horizontal (soporta ambos formatos)
   pitch: z.number().min(-90).max(90).optional(), // Rotación vertical
   dimensionId: z.string().default("minecraft:overworld"), // overworld, nether, end
 });

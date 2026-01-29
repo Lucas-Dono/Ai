@@ -20,7 +20,7 @@ model AIRelation {
   tensionLevel     Float     @default(0)
   sharedMoments    Json      @default("[]")
   createdAt        DateTime  @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   Group            Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, agentAId, agentBId])
@@ -40,7 +40,7 @@ model Account {
   expiresAt    DateTime?
   password     String?
   createdAt    DateTime  @default(now())
-  updatedAt    DateTime
+  updatedAt              DateTime              @updatedAt
   User         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([providerId, accountId])
@@ -57,7 +57,7 @@ model AdminAccess {
   lastLoginIp        String?
   lastLoginUserAgent String?
   createdAt          DateTime           @default(now())
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   User               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   AdminBackupCode    AdminBackupCode[]
   AdminCertificate   AdminCertificate[]
@@ -151,7 +151,7 @@ model Agent {
   userEditedFields         Json?
   metadata                 Json?
   createdAt                DateTime                  @default(now())
-  updatedAt                DateTime
+  updatedAt              DateTime              @updatedAt
   Team                     Team?                     @relation(fields: [teamId], references: [id])
   User                     User?                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   AgentBondConfig          AgentBondConfig?
@@ -211,7 +211,7 @@ model AgentAvailability {
   lastSpacedResponseAt  DateTime?
   lastUnavailableAt     DateTime?
   createdAt             DateTime  @default(now())
-  updatedAt             DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([agentId])
   @@index([available])
@@ -228,7 +228,7 @@ model AgentBondConfig {
   totalBondsReleased Int      @default(0)
   mostSoughtTier     String?
   createdAt          DateTime @default(now())
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   Agent              Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -255,7 +255,7 @@ model AgentEnergyState {
   conversationStartedAt DateTime @default(now())
   messagesSinceReset    Int      @default(0)
   createdAt             DateTime @default(now())
-  updatedAt             DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([agentId])
 }
@@ -293,7 +293,7 @@ model AttackPattern {
   autoBlock       Boolean   @default(false)
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([isActive])
   @@index([patternType])
@@ -335,7 +335,7 @@ model BehaviorProfile {
   phaseHistory                Json         @default("[]")
   behaviorSpecificState       Json?
   createdAt                   DateTime     @default(now())
-  updatedAt                   DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                       Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@unique([agentId, behaviorType])
@@ -353,7 +353,7 @@ model BehaviorProgressionState {
   currentIntensities   Json     @default("{}")
   lastCalculatedAt     DateTime @default(now())
   createdAt            DateTime @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -467,7 +467,7 @@ model BondQueue {
   slotExpiresAt     DateTime?
   status            String    @default("waiting")
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Agent             Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
   User              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -493,7 +493,7 @@ model CanaryToken {
   alertWebhook       String?
   lastTriggered      DateTime?
   createdAt          DateTime             @default(now())
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   CanaryTokenTrigger CanaryTokenTrigger[]
 
   @@index([isActive])
@@ -557,7 +557,7 @@ model CharacterAppearance {
   preferredProvider String   @default("gemini")
   totalGenerations  Int      @default(0)
   createdAt         DateTime @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Agent             Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -601,7 +601,7 @@ model CharacterRating {
   review               String?
   helpful              Int                  @default(0)
   createdAt            DateTime             @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   MarketplaceCharacter MarketplaceCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, userId])
@@ -624,7 +624,7 @@ model CharacterRoutine {
   manuallyModified       Boolean                 @default(false)
   lastSimulated          DateTime?
   createdAt              DateTime                @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                  Agent                   @relation(fields: [agentId], references: [id], onDelete: Cascade)
   User                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   RoutineInstance        RoutineInstance[]
@@ -726,7 +726,7 @@ model Community {
   memberCount      Int                @default(0)
   postCount        Int                @default(0)
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   User             User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   CommunityChannel CommunityChannel[]
   CommunityEvent   CommunityEvent[]
@@ -777,7 +777,7 @@ model CommunityComment {
   isAcceptedAnswer       Boolean            @default(false)
   isByOP                 Boolean            @default(false)
   createdAt              DateTime           @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
   mentions               Json               @default("[]")
   CommentReport          CommentReport[]
   CommentVote            CommentVote[]
@@ -814,7 +814,7 @@ model CommunityEvent {
   tags                 Json                @default("[]")
   status               String              @default("upcoming")
   createdAt            DateTime            @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   Community            Community?          @relation(fields: [communityId], references: [id], onDelete: Cascade)
   User                 User                @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   EventRegistration    EventRegistration[]
@@ -879,7 +879,7 @@ model CommunityPost {
   slug             String?            @unique
   metaDescription  String?
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   lastActivityAt   DateTime           @default(now())
   mentions         Json               @default("[]")
   CommunityComment CommunityComment[]
@@ -912,7 +912,7 @@ model ConversationSummary {
   periodEnd       DateTime
   estimatedTokens Int      @default(0)
   createdAt       DateTime @default(now())
-  updatedAt       DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([agentId])
   @@index([agentId, userId, messagesCount])
@@ -931,7 +931,7 @@ model ConversationTracking {
   totalMessages       Int      @default(0)
   isPinned            Boolean  @default(false)
   createdAt           DateTime @default(now())
-  updatedAt           DateTime
+  updatedAt              DateTime              @updatedAt
   Agent               Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   User                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -960,7 +960,7 @@ model CrossContextMemory {
   topics           Json?
   metadata         Json?
   createdAt        DateTime  @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([agentId])
   @@index([happenedAt])
@@ -1005,7 +1005,7 @@ model DailyKPI {
   adventureCompanionBonds Int      @default(0)
   acquaintanceBonds       Int      @default(0)
   createdAt               DateTime @default(now())
-  updatedAt               DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([date])
 }
@@ -1037,7 +1037,7 @@ model DeepRelationalPatterns {
   authenticityByContext     Json
   socialEnergy              String
   createdAt                 DateTime @default(now())
-  updatedAt                 DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -1054,7 +1054,7 @@ model DirectConversation {
   isMuted            Boolean         @default(false)
   isArchived         Boolean         @default(false)
   createdAt          DateTime        @default(now())
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   DirectMessage      DirectMessage[]
 
   @@index([lastMessageAt])
@@ -1075,7 +1075,7 @@ model DirectMessage {
   isDeleted          Boolean            @default(false)
   reactions          Json               @default("[]")
   createdAt          DateTime           @default(now())
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   readAt             DateTime?
   DirectConversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
@@ -1097,7 +1097,7 @@ model EmailNotificationConfig {
   digestTime       String    @default("09:00")
   lastDigestSentAt DateTime?
   createdAt        DateTime  @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   User             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([frequency])
@@ -1164,7 +1164,7 @@ model FastSDInstallation {
   avgGenerationTime        Float?
   metadata                 Json?
   createdAt                DateTime  @default(now())
-  updatedAt                DateTime
+  updatedAt              DateTime              @updatedAt
   User                     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([installed])
@@ -1191,7 +1191,7 @@ model Friendship {
   addresseeId                       String
   status                            FriendshipStatus @default(PENDING)
   createdAt                         DateTime         @default(now())
-  updatedAt                         DateTime
+  updatedAt              DateTime              @updatedAt
   respondedAt                       DateTime?
   User_Friendship_addresseeIdToUser User             @relation("Friendship_addresseeIdToUser", fields: [addresseeId], references: [id], onDelete: Cascade)
   User_Friendship_requesterIdToUser User             @relation("Friendship_requesterIdToUser", fields: [requesterId], references: [id], onDelete: Cascade)
@@ -1245,7 +1245,7 @@ model Group {
   lastActivityAt        DateTime              @default(now())
   settings              Json                  @default("{}")
   createdAt             DateTime              @default(now())
-  updatedAt             DateTime
+  updatedAt             DateTime              @updatedAt
   directorSettings      Json                  @default("{}")
   directorVersion       Int                   @default(0)
   AIRelation            AIRelation[]
@@ -1308,7 +1308,7 @@ model GroupMember {
   isFocused        Boolean   @default(false)
   focusedUntil     DateTime?
   joinedAt         DateTime  @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   Agent            Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   Group            Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   User             User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1339,7 +1339,7 @@ model GroupMessage {
   readBy             Json           @default("[]")
   isSystemMessage    Boolean        @default(false)
   createdAt          DateTime       @default(now())
-  updatedAt          DateTime
+  updatedAt          DateTime       @updatedAt
   Agent              Agent?         @relation(fields: [agentId], references: [id], onDelete: Cascade)
   Group              Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
   GroupMessage       GroupMessage?  @relation("GroupMessageToGroupMessage", fields: [replyToId], references: [id])
@@ -1369,7 +1369,7 @@ model GroupSceneState {
   lastDramaticScene DateTime?
   activeSeedCount   Int       @default(0)
   loopDetection     Json      @default("{}")
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Group             Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@index([groupId])
@@ -1440,7 +1440,7 @@ model ImportantEvent {
   emotionalTone  String?
   metadata       Json?
   createdAt      DateTime  @default(now())
-  updatedAt      DateTime
+  updatedAt              DateTime              @updatedAt
   Agent          Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -1467,7 +1467,7 @@ model ImportantPerson {
   importance    String    @default("medium")
   metadata      Json?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime
+  updatedAt              DateTime              @updatedAt
   Agent         Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -1563,7 +1563,7 @@ model MarketplaceCharacter {
   previewImages     Json                @default("[]")
   previewVideo      String?
   createdAt         DateTime            @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   publishedAt       DateTime            @default(now())
   CharacterDownload CharacterDownload[]
   CharacterRating   CharacterRating[]
@@ -1590,7 +1590,7 @@ model MarketplaceCollection {
   followers        Int                @default(0)
   themeOrder       Json               @default("[]")
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   MarketplaceTheme MarketplaceTheme[] @relation("CollectionThemes")
 
   @@index([createdAt])
@@ -1628,7 +1628,7 @@ model MarketplacePrompt {
   changelog        String?
   previewImages    Json             @default("[]")
   createdAt        DateTime         @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   publishedAt      DateTime         @default(now())
   User             User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
   PromptDownload   PromptDownload[]
@@ -1672,7 +1672,7 @@ model MarketplaceTheme {
   previewImages            Json                       @default("[]")
   exportData               Json
   createdAt                DateTime                   @default(now())
-  updatedAt                DateTime
+  updatedAt              DateTime              @updatedAt
   publishedAt              DateTime                   @default(now())
   User                     User                       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   MarketplaceThemeDownload MarketplaceThemeDownload[]
@@ -1713,7 +1713,7 @@ model MarketplaceThemeRating {
   review           String?
   helpful          Int              @default(0)
   createdAt        DateTime         @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   MarketplaceTheme MarketplaceTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
 
   @@unique([themeId, userId])
@@ -1734,7 +1734,7 @@ model MarketplaceThemeReport {
   reviewedAt       DateTime?
   resolution       String?
   createdAt        DateTime         @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
   MarketplaceTheme MarketplaceTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
@@ -1769,7 +1769,7 @@ model MessageTracking {
   sessionCount     Int      @default(0)
   sessionStartedAt DateTime @default(now())
   createdAt        DateTime @default(now())
-  updatedAt        DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@unique([userId, agentId, date])
   @@index([agentId])
@@ -1834,7 +1834,7 @@ model NotificationPreferences {
   desktopNotifications       Boolean  @default(true)
   lastActiveHours            Json     @default("{}")
   createdAt                  DateTime @default(now())
-  updatedAt                  DateTime
+  updatedAt              DateTime              @updatedAt
   User                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -1852,7 +1852,7 @@ model OnboardingProgress {
   lastTourStarted   DateTime?
   lastTourCompleted DateTime?
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([lastTourCompleted])
   @@index([lastTourStarted])
@@ -1904,7 +1904,7 @@ model PersonalGoal {
   shouldShareProgress  Boolean   @default(false)
   lastSharedAt         DateTime?
   createdAt            DateTime  @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -1926,7 +1926,7 @@ model PersonalityCore {
   backstory         String?
   baselineEmotions  Json
   createdAt         DateTime @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Agent             Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -1962,7 +1962,7 @@ model PhilosophicalFramework {
   opennessToChange       Int      @default(50)
   philosophicalEvolution String?
   createdAt              DateTime @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                  Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -2008,7 +2008,7 @@ model PostFollower {
   notificationsEnabled Boolean       @default(true)
   emailNotifications   Boolean       @default(true)
   createdAt            DateTime      @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   CommunityPost        CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   User                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -2066,7 +2066,7 @@ model ProactiveConfig {
   lastProactiveMessage    DateTime?
   timezone                String    @default("America/Argentina/Buenos_Aires")
   createdAt               DateTime  @default(now())
-  updatedAt               DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                   Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -2089,7 +2089,7 @@ model ProactiveMessage {
   userResponded Boolean   @default(false)
   messageId     String?   @unique
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime
+  updatedAt              DateTime              @updatedAt
   Agent         Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -2132,7 +2132,7 @@ model PromptRating {
   review            String?
   helpful           Int               @default(0)
   createdAt         DateTime          @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   MarketplacePrompt MarketplacePrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
 
   @@unique([promptId, userId])
@@ -2162,7 +2162,7 @@ model PsychologicalProfile {
   blindSpots                  Json
   insightAreas                Json
   createdAt                   DateTime @default(now())
-  updatedAt                   DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -2215,7 +2215,7 @@ model Relation {
   stage             String    @default("stranger")
   totalInteractions Int       @default(0)
   lastInteractionAt DateTime?
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Agent             Agent     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([subjectId, targetId])
@@ -2279,7 +2279,7 @@ model ResearchProject {
   version              String                @default("1.0")
   doi                  String?               @unique
   createdAt            DateTime              @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   publishedAt          DateTime?
   ResearchContributor  ResearchContributor[]
   ResearchDataset      ResearchDataset[]
@@ -2337,7 +2337,7 @@ model Review {
   rating    Int
   comment   String?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt              DateTime              @updatedAt
   Agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@unique([agentId, userId])
@@ -2379,7 +2379,7 @@ model RoutineInstance {
   notes                String?
   userInteractedDuring Boolean          @default(false)
   createdAt            DateTime         @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
   CharacterRoutine     CharacterRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
   RoutineTemplate      RoutineTemplate? @relation(fields: [templateId], references: [id])
@@ -2400,7 +2400,7 @@ model RoutineSimulationState {
   lastSimulatedAt   DateTime         @default(now())
   simulationVersion Int              @default(1)
   needsResimulation Boolean          @default(false)
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Agent             Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
   CharacterRoutine  CharacterRoutine @relation(fields: [routineId], references: [id], onDelete: Cascade)
 
@@ -2423,7 +2423,7 @@ model RoutineTemplate {
   moodImpact          Json?
   location            String?
   createdAt           DateTime          @default(now())
-  updatedAt           DateTime
+  updatedAt              DateTime              @updatedAt
   RoutineInstance     RoutineInstance[]
   CharacterRoutine    CharacterRoutine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
 
@@ -2456,7 +2456,7 @@ model Scene {
   maxAIs               Int           @default(5)
   duration             String        @default("short")
   createdAt            DateTime      @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([category, isActive])
   @@index([code])
@@ -2511,7 +2511,7 @@ model ScheduledEvent {
   isRecurring            Boolean   @default(false)
   recurringPattern       String?
   createdAt              DateTime  @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                  Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -2543,7 +2543,7 @@ model Session {
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt              DateTime              @updatedAt
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -2568,7 +2568,7 @@ model ShareEvent {
 model SharedKnowledge {
   id              String    @id
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime
+  updatedAt              DateTime              @updatedAt
   groupId         String?
   agentId         String
   userId          String
@@ -2611,7 +2611,7 @@ model SmartStartAnalytics {
   aiFieldsEdited    Int
   editRate          Float
   createdAt         DateTime @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@index([date])
 }
@@ -2637,7 +2637,7 @@ model SmartStartSession {
   interactionEvents Json[]
   resultCharacterId String?   @unique
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   Agent             Agent?    @relation(fields: [resultCharacterId], references: [id])
   User              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -2663,7 +2663,7 @@ model Subscription {
   canceledAt               DateTime?
   metadata                 Json?
   createdAt                DateTime       @default(now())
-  updatedAt                DateTime
+  updatedAt              DateTime              @updatedAt
   User                     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   PaymentClaim             PaymentClaim[]
 
@@ -2706,7 +2706,7 @@ model SymbolicBond {
   marketValue        Float?
   blockchainHash     String?
   createdAt          DateTime @default(now())
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   Agent              Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   User               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -2742,7 +2742,7 @@ model Team {
   plan           String           @default("free")
   metadata       Json?
   createdAt      DateTime         @default(now())
-  updatedAt      DateTime
+  updatedAt              DateTime              @updatedAt
   Agent          Agent[]
   User           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   TeamInvitation TeamInvitation[]
@@ -2793,7 +2793,7 @@ model TempTierGrant {
   active    Boolean  @default(true)
   expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt              DateTime              @updatedAt
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([active])
@@ -2815,7 +2815,7 @@ model TemporalContext {
   typicalResponseTime    Int?
   lastSeenAt             DateTime?
   createdAt              DateTime  @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@unique([agentId, userId])
   @@index([agentId])
@@ -2870,7 +2870,7 @@ model ThreatAlert {
   resolution        String?
   metadata          Json?
   createdAt         DateTime         @default(now())
-  updatedAt         DateTime
+  updatedAt              DateTime              @updatedAt
   ThreatDetection   ThreatDetection? @relation(fields: [threatDetectionId], references: [id])
 
   @@index([acknowledged])
@@ -2926,7 +2926,7 @@ model TopicFatigue {
   mentions        Int      @default(1)
   lastMentionedAt DateTime @default(now())
   createdAt       DateTime @default(now())
-  updatedAt       DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@unique([agentId, userId, topic])
   @@index([agentId, userId])
@@ -2974,7 +2974,7 @@ model User {
   imageUploadLimit                                Int                      @default(10)
   imageUploadResetDate                            DateTime                 @default(now())
   createdAt                                       DateTime                 @default(now())
-  updatedAt                                       DateTime
+  updatedAt              DateTime              @updatedAt
   mentionPrivacy                                  String                   @default("anyone")
   Account                                         Account[]
   AdminAccess                                     AdminAccess?
@@ -3096,7 +3096,7 @@ model UserAnalyticsSummary {
   isPowerUser           Boolean   @default(false)
   isHighValue           Boolean   @default(false)
   createdAt             DateTime  @default(now())
-  updatedAt             DateTime
+  updatedAt              DateTime              @updatedAt
   User                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([acquisitionCampaign])
@@ -3134,7 +3134,7 @@ model UserContentPreference {
   preferredTags        Json     @default("{}")
   preferredCommunities Json     @default("{}")
   createdAt            DateTime @default(now())
-  updatedAt            DateTime
+  updatedAt              DateTime              @updatedAt
   User                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -3182,7 +3182,7 @@ model UserProfile {
   lastInteractionAt   DateTime?
   profileVersion      Int       @default(1)
   createdAt           DateTime  @default(now())
-  updatedAt           DateTime
+  updatedAt              DateTime              @updatedAt
   User                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -3204,7 +3204,7 @@ model UserReputation {
   longestStreak      Int         @default(0)
   lastActiveDate     DateTime    @default(now())
   expertiseAreas     Json        @default("[]")
-  updatedAt          DateTime
+  updatedAt              DateTime              @updatedAt
   UserBadge          UserBadge[]
 
   @@index([level])
@@ -3229,7 +3229,7 @@ model UserRewards {
   xp                     Int       @default(0)
   xpToNext               Int       @default(100)
   createdAt              DateTime  @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
   User                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([level])
@@ -3259,7 +3259,7 @@ model UserSession {
   demoCompleted   Boolean          @default(false)
   signupConverted Boolean          @default(false)
   createdAt       DateTime         @default(now())
-  updatedAt       DateTime
+  updatedAt              DateTime              @updatedAt
   AnalyticsEvent  AnalyticsEvent[]
   User            User?            @relation(fields: [userId], references: [id])
 
@@ -3280,7 +3280,7 @@ model Verification {
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-  updatedAt  DateTime
+  updatedAt              DateTime              @updatedAt
 
   @@unique([identifier, value])
 }
@@ -3340,7 +3340,7 @@ model VoiceConfig {
   totalVoiceGenerations  Int      @default(0)
   totalTranscriptions    Int      @default(0)
   createdAt              DateTime @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime              @updatedAt
   Agent                  Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId])
@@ -3402,7 +3402,7 @@ model ContentPreference {
   blockedTags  String[] @default([])
   mutedWords   String[] @default([])
   createdAt    DateTime @default(now())
-  updatedAt    DateTime
+  updatedAt              DateTime              @updatedAt
   User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -3424,7 +3424,7 @@ model AutoModRule {
   priority    Int        @default(0)
   createdBy   String
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime
+  updatedAt              DateTime              @updatedAt
   Creator     User       @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   Community   Community? @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
@@ -3475,7 +3475,7 @@ model NarrativeArc {
   milestones  Json      @default("[]")
   metadata    Json?
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime
+  updatedAt              DateTime              @updatedAt
   Agent       Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
   User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 

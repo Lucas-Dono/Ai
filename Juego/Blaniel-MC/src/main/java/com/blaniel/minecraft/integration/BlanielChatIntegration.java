@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,7 +28,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public class BlanielChatIntegration {
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+    // Cliente HTTP con configuración optimizada para localhost
+    // Usamos HTTP/1.1 para compatibilidad con servidores de desarrollo (localhost sin TLS)
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_1_1)
+        .connectTimeout(Duration.ofSeconds(10))
+        .build();
     private static final Gson GSON = new Gson();
 
     /**
@@ -79,8 +85,11 @@ public class BlanielChatIntegration {
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
                     .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .header("User-Agent", "BlanielMinecraft/0.1.0")
                     .header("Authorization", "Bearer " + jwtToken)
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+                    .timeout(Duration.ofSeconds(30))
                     .build();
 
                 HttpResponse<String> response = HTTP_CLIENT.send(
