@@ -49,6 +49,7 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	// Conversation mode state
 	private boolean inConversation = false;
 	private java.util.UUID conversationPartnerId = null;
+	private int conversationTickCounter = 0; // Para movimientos sutiles
 
 	public BlanielVillagerEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
 		super(entityType, world);
@@ -362,6 +363,7 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	public void exitConversationMode() {
 		this.inConversation = false;
 		this.conversationPartnerId = null;
+		this.conversationTickCounter = 0;
 
 		BlanielMod.LOGGER.info("{} salió del modo conversación", this.getBlanielAgentName());
 	}
@@ -387,6 +389,8 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 
 		// Manejar modo conversación
 		if (inConversation) {
+			conversationTickCounter++;
+
 			// Buscar al jugador con el que está conversando
 			PlayerEntity partner = this.getWorld().getPlayerByUuid(conversationPartnerId);
 			if (partner != null) {
@@ -398,11 +402,41 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 					return;
 				}
 
-				// Mirar al jugador constantemente
-				this.getLookControl().lookAt(partner, 30.0f, 30.0f);
-				this.lookAtEntity(partner, 30.0f, 30.0f);
+				// Mirar al jugador constantemente (con pequeñas variaciones sutiles)
+				float yawVariation = (float) (Math.sin(conversationTickCounter * 0.03) * 2.0); // ±2 grados
+				float pitchVariation = (float) (Math.cos(conversationTickCounter * 0.05) * 1.0); // ±1 grado
 
-				// Asegurar que no se mueva
+				this.getLookControl().lookAt(
+					partner.getX() + yawVariation * 0.1,
+					partner.getEyeY() + pitchVariation * 0.1,
+					partner.getZ(),
+					30.0f,
+					30.0f
+				);
+
+				// Movimientos corporales sutiles cada cierto tiempo
+				if (conversationTickCounter % 60 == 0) { // Cada 3 segundos
+					// Pequeño cambio de peso (shift de postura)
+					double random = this.random.nextDouble();
+					if (random < 0.3) {
+						// Ocasionalmente, pequeño movimiento de cabeza
+						this.headYaw += (this.random.nextFloat() - 0.5f) * 4.0f; // ±2 grados
+					} else if (random < 0.5) {
+						// Pequeño ajuste de brazos (swing sutil)
+						if (this.random.nextBoolean()) {
+							this.handSwingProgress = 0.1f; // Movimiento muy sutil
+						}
+					}
+				}
+
+				// Pequeños movimientos de respiración
+				if (conversationTickCounter % 40 == 0) { // Cada 2 segundos
+					// Simular respiración con un pequeño "bounce"
+					this.addVelocity(0, 0.01, 0);
+					this.velocityModified = true;
+				}
+
+				// Asegurar que no se mueva demasiado
 				if (!this.getNavigation().isIdle()) {
 					this.getNavigation().stop();
 				}
