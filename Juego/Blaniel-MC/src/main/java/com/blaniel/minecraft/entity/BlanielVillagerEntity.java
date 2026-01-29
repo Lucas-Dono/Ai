@@ -46,6 +46,12 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	private boolean chatBubbleVisible = false;
 	private long chatBubbleHideTime = 0;
 
+	// Conversation mode state
+	private boolean inConversation = false;
+	private java.util.UUID conversationPartnerId = null;
+	private long conversationStartTime = 0;
+	private static final long CONVERSATION_TIMEOUT = 30000; // 30 segundos de timeout
+
 	public BlanielVillagerEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
 		super(entityType, world);
 
@@ -332,7 +338,56 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	}
 
 	/**
-	 * Tick override para manejar chat bubbles
+	 * Entrar en modo conversación con un jugador
+	 */
+	public void enterConversationMode(PlayerEntity player) {
+		this.inConversation = true;
+		this.conversationPartnerId = player.getUuid();
+		this.conversationStartTime = System.currentTimeMillis();
+
+		// Cancelar movimiento actual
+		this.getNavigation().stop();
+
+		// Deshabilitar los AI goals de movimiento temporalmente
+		this.goalSelector.getGoals().forEach(goal -> {
+			if (goal.getGoal() instanceof WanderAroundFarGoal ||
+				goal.getGoal() instanceof LookAroundGoal) {
+				goal.getGoal().stop();
+			}
+		});
+
+		BlanielMod.LOGGER.info("{} entró en modo conversación con {}", this.getBlanielAgentName(), player.getName().getString());
+	}
+
+	/**
+	 * Salir del modo conversación
+	 */
+	public void exitConversationMode() {
+		this.inConversation = false;
+		this.conversationPartnerId = null;
+		this.conversationStartTime = 0;
+
+		BlanielMod.LOGGER.info("{} salió del modo conversación", this.getBlanielAgentName());
+	}
+
+	/**
+	 * Verificar si está en modo conversación
+	 */
+	public boolean isInConversation() {
+		return this.inConversation;
+	}
+
+	/**
+	 * Refrescar el timeout de conversación
+	 */
+	public void refreshConversationTimeout() {
+		if (this.inConversation) {
+			this.conversationStartTime = System.currentTimeMillis();
+		}
+	}
+
+	/**
+	 * Tick override para manejar chat bubbles y modo conversación
 	 */
 	@Override
 	public void tick() {
@@ -341,6 +396,40 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 		// Auto-ocultar chat bubble después del tiempo
 		if (chatBubbleVisible && System.currentTimeMillis() >= chatBubbleHideTime) {
 			hideChatBubble();
+		}
+
+		// Manejar modo conversación
+		if (inConversation) {
+			// Verificar timeout
+			if (System.currentTimeMillis() - conversationStartTime > CONVERSATION_TIMEOUT) {
+				BlanielMod.LOGGER.info("{} - timeout de conversación alcanzado", this.getBlanielAgentName());
+				exitConversationMode();
+				return;
+			}
+
+			// Buscar al jugador con el que está conversando
+			PlayerEntity partner = this.getWorld().getPlayerByUuid(conversationPartnerId);
+			if (partner != null) {
+				// Verificar distancia (si el jugador se aleja mucho, terminar conversación)
+				double distance = this.distanceTo(partner);
+				if (distance > 16.0) {
+					BlanielMod.LOGGER.info("{} - jugador muy lejos, terminando conversación", this.getBlanielAgentName());
+					exitConversationMode();
+					return;
+				}
+
+				// Mirar al jugador constantemente
+				this.getLookControl().lookAt(partner, 30.0f, 30.0f);
+				this.lookAtEntity(partner, 30.0f, 30.0f);
+
+				// Asegurar que no se mueva
+				if (!this.getNavigation().isIdle()) {
+					this.getNavigation().stop();
+				}
+			} else {
+				// Jugador no encontrado, terminar conversación
+				exitConversationMode();
+			}
 		}
 	}
 }

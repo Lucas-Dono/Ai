@@ -13,6 +13,8 @@ public class NetworkHandler {
     public static final Identifier SPAWN_AGENT_PACKET = new Identifier(BlanielMod.MOD_ID, "spawn_agent");
     public static final Identifier CHAT_MESSAGE_PACKET = new Identifier(BlanielMod.MOD_ID, "chat_message");
     public static final Identifier OPEN_CHAT_PACKET = new Identifier(BlanielMod.MOD_ID, "open_chat");
+    public static final Identifier CONVERSATION_START_PACKET = new Identifier(BlanielMod.MOD_ID, "conversation_start");
+    public static final Identifier CONVERSATION_END_PACKET = new Identifier(BlanielMod.MOD_ID, "conversation_end");
 
     /**
      * Registrar receivers del lado del servidor
@@ -51,6 +53,46 @@ public class NetworkHandler {
                     com.blaniel.minecraft.network.packet.ChatMessagePacket.handle(
                         server, player, villagerEntityId, message
                     );
+                });
+            }
+        );
+
+        // Registrar handler para inicio de conversación
+        ServerPlayNetworking.registerGlobalReceiver(CONVERSATION_START_PACKET,
+            (server, player, handler, buf, responseSender) -> {
+                // Leer ID de la entidad
+                int entityId = buf.readInt();
+
+                // Ejecutar en thread principal del servidor
+                server.execute(() -> {
+                    var entity = player.getWorld().getEntityById(entityId);
+                    if (entity instanceof com.blaniel.minecraft.entity.BlanielVillagerEntity) {
+                        com.blaniel.minecraft.entity.BlanielVillagerEntity villager =
+                            (com.blaniel.minecraft.entity.BlanielVillagerEntity) entity;
+                        villager.enterConversationMode(player);
+                        BlanielMod.LOGGER.info("Conversación iniciada con entidad {} por jugador {}",
+                            entityId, player.getName().getString());
+                    }
+                });
+            }
+        );
+
+        // Registrar handler para fin de conversación
+        ServerPlayNetworking.registerGlobalReceiver(CONVERSATION_END_PACKET,
+            (server, player, handler, buf, responseSender) -> {
+                // Leer ID de la entidad
+                int entityId = buf.readInt();
+
+                // Ejecutar en thread principal del servidor
+                server.execute(() -> {
+                    var entity = player.getWorld().getEntityById(entityId);
+                    if (entity instanceof com.blaniel.minecraft.entity.BlanielVillagerEntity) {
+                        com.blaniel.minecraft.entity.BlanielVillagerEntity villager =
+                            (com.blaniel.minecraft.entity.BlanielVillagerEntity) entity;
+                        villager.exitConversationMode();
+                        BlanielMod.LOGGER.info("Conversación terminada con entidad {} por jugador {}",
+                            entityId, player.getName().getString());
+                    }
                 });
             }
         );

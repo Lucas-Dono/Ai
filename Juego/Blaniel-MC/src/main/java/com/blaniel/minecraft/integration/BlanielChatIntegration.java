@@ -218,6 +218,9 @@ public class BlanielChatIntegration {
                 String content = agentResp.get("content").getAsString();
 
                 if (entity != null) {
+                    // Refrescar timeout de conversación (mantener al agente atento)
+                    entity.refreshConversationTimeout();
+
                     // Verificar si tiene estructura de partes (respuesta avanzada)
                     if (agentResp.has("parts")) {
                         // Procesar respuesta estructurada con comandos

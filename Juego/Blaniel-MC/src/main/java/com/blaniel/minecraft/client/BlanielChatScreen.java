@@ -4,6 +4,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
@@ -17,11 +19,13 @@ import java.util.function.Consumer;
 public class BlanielChatScreen extends Screen {
 
     private final Consumer<String> onSend;
+    private final Integer agentEntityId; // ID del agente en conversación (puede ser null)
     private TextFieldWidget messageField;
 
-    public BlanielChatScreen(Consumer<String> onSend) {
+    public BlanielChatScreen(Consumer<String> onSend, Integer agentEntityId) {
         super(Text.literal("Chat de Blaniel"));
         this.onSend = onSend;
+        this.agentEntityId = agentEntityId;
     }
 
     @Override
@@ -118,5 +122,25 @@ public class BlanielChatScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false; // No pausar el juego
+    }
+
+    @Override
+    public void close() {
+        // Terminar modo conversación al cerrar el chat
+        if (agentEntityId != null) {
+            var buf = PacketByteBufs.create();
+            buf.writeInt(agentEntityId);
+            ClientPlayNetworking.send(
+                com.blaniel.minecraft.network.NetworkHandler.CONVERSATION_END_PACKET,
+                buf
+            );
+
+            com.blaniel.minecraft.BlanielMod.LOGGER.info(
+                "Modo conversación terminado con entidad ID: {}",
+                agentEntityId
+            );
+        }
+
+        super.close();
     }
 }
