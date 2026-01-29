@@ -26,6 +26,7 @@
     "db:seed:worlds:reset": "tsx scripts/seed-predefined-worlds.ts --reset",
     "db:seed:marilyn": "tsx scripts/seed-marilyn.ts",
     "db:seed:einstein": "tsx scripts/seed-einstein.ts",
+    "minecraft:generate-configs": "tsx scripts/generate-minecraft-configs-batch.ts",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset && npm run db:seed",
     "db:setup": "prisma generate && prisma db push --accept-data-loss && npm run db:seed",
