@@ -20,6 +20,11 @@ public class KeyInputHandler {
 			while (BlanielKeyBindings.openUIKey.wasPressed()) {
 				handleOpenUI(client);
 			}
+
+			// Verificar si se presionó la tecla de abrir chat
+			while (BlanielKeyBindings.openChatKey.wasPressed()) {
+				handleOpenChat(client);
+			}
 		});
 	}
 
@@ -43,5 +48,19 @@ public class KeyInputHandler {
 			BlanielMod.LOGGER.info("Usuario no logueado - abriendo LoginScreen");
 			client.setScreen(new LoginScreen(null));
 		}
+	}
+
+	/**
+	 * Manejar apertura de chat
+	 */
+	private static void handleOpenChat(MinecraftClient client) {
+		if (client.player == null) {
+			return;
+		}
+
+		BlanielMod.LOGGER.info("Tecla C presionada - abriendo chat de Blaniel");
+
+		// Usar el handler de chat de BlanielChatHandler
+		BlanielChatHandler.openChat(client);
 	}
 }

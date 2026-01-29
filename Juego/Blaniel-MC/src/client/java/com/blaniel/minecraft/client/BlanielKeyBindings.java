@@ -16,6 +16,11 @@ public class BlanielKeyBindings {
 	public static KeyBinding openUIKey;
 
 	/**
+	 * Keybinding para abrir el chat de Blaniel (tecla C por defecto)
+	 */
+	public static KeyBinding openChatKey;
+
+	/**
 	 * Registrar todos los keybindings
 	 */
 	public static void register() {
@@ -23,6 +28,13 @@ public class BlanielKeyBindings {
 			"key.blaniel.openui",                         // Clave de traducción
 			InputUtil.Type.KEYSYM,                        // Tipo de input
 			GLFW.GLFW_KEY_K,                              // Tecla K por defecto
+			"category.blaniel"                            // Categoría en el menú de controles
+		));
+
+		openChatKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+			"key.blaniel.openchat",                       // Clave de traducción
+			InputUtil.Type.KEYSYM,                        // Tipo de input
+			GLFW.GLFW_KEY_C,                              // Tecla C por defecto
 			"category.blaniel"                            // Categoría en el menú de controles
 		));
 	}
