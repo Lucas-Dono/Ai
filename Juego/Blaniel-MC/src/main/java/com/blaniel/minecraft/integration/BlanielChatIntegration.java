@@ -34,7 +34,7 @@ public class BlanielChatIntegration {
      * Obtiene la URL de la API desde la configuración
      */
     private static String getApiUrl() {
-        return com.blaniel.minecraft.BlanielMod.CONFIG.getApiUrl() + "/v1/minecraft/message";
+        return com.blaniel.minecraft.BlanielMod.CONFIG.getApiUrl() + "/api/v1/minecraft/message";
     }
 
     /**
