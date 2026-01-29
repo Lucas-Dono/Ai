@@ -203,6 +203,7 @@ export const MinecraftAgentResponseSchema = z.object({
       "beckoning",
     ])
     .optional(),
+  isImportant: z.boolean().optional(), // Si la conversación fue significativa (para diálogos ambientales)
 });
 
 export type MinecraftAgentResponse = z.infer<typeof MinecraftAgentResponseSchema>;

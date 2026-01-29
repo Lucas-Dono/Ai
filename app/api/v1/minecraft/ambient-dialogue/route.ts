@@ -9,6 +9,7 @@ const RequestSchema = z.object({
   agentIds: z.array(z.string()).min(2).max(8), // 2-8 NPCs
   location: z.string(),
   contextHint: z.string().optional(),
+  hasImportantHistory: z.boolean().optional(), // Si hay conversaciones importantes
 });
 
 /**
@@ -32,12 +33,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { agentIds, location, contextHint } = validation.data;
+    const { agentIds, location, contextHint, hasImportantHistory } = validation.data;
 
     log.info("Generating ambient dialogue", {
       agentIds,
       location,
       contextHint,
+      hasImportantHistory,
     });
 
     // Obtener información de participantes
@@ -57,6 +59,7 @@ export async function POST(request: NextRequest) {
       participants,
       location,
       contextHint,
+      hasImportantHistory: hasImportantHistory || false,
     });
 
     return NextResponse.json(

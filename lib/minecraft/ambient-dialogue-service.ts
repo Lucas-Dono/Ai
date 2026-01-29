@@ -14,6 +14,7 @@ interface AmbientDialogueRequest {
   participants: DialogueParticipant[];
   location: string; // e.g., "minecraft:overworld"
   contextHint?: string; // e.g., "cerca de una fogata", "en el mercado"
+  hasImportantHistory?: boolean; // Si hay conversaciones importantes previas
 }
 
 interface AmbientDialogueResponse {
@@ -61,17 +62,123 @@ export class AmbientDialogueService {
   }
 
   /**
-   * Obtener diálogo desde cache o generar nuevo
+   * Diálogos pre-armados
+   */
+  private static prebuiltDialogues: Array<{ text: string; category: string }> | null = null;
+
+  /**
+   * Cargar diálogos pre-armados desde archivo
+   */
+  private static async loadPrebuiltDialogues(): Promise<void> {
+    if (this.prebuiltDialogues) return;
+
+    try {
+      const fs = await import("fs/promises");
+      const path = await import("path");
+
+      const filePath = path.join(
+        process.cwd(),
+        "Juego/Blaniel-MC/src/main/resources/data/ambient_dialogues.json"
+      );
+
+      const content = await fs.readFile(filePath, "utf-8");
+      const data = JSON.parse(content);
+      this.prebuiltDialogues = data.dialogues;
+
+      log.info("Loaded prebuilt dialogues", { count: this.prebuiltDialogues.length });
+    } catch (error) {
+      log.warn("Failed to load prebuilt dialogues, using fallback", { error });
+      this.prebuiltDialogues = [
+        { text: "Qué buen día hace, ¿no?", category: "clima" },
+        { text: "Sí, hace un clima agradable.", category: "clima" },
+        { text: "¿Has visto algo interesante por aquí?", category: "observaciones" },
+        { text: "No mucho, todo tranquilo.", category: "observaciones" },
+        { text: "Me pregunto qué habrá para cenar.", category: "planes" },
+      ];
+    }
+  }
+
+  /**
+   * Seleccionar diálogo pre-armado aleatorio
+   */
+  private static selectPrebuiltDialogue(
+    participants: DialogueParticipant[]
+  ): AmbientDialogueResponse {
+    if (!this.prebuiltDialogues || this.prebuiltDialogues.length === 0) {
+      // Fallback mínimo
+      return {
+        dialogues: [
+          {
+            agentId: participants[0].agentId,
+            agentName: participants[0].name,
+            message: "Qué día más tranquilo.",
+          },
+        ],
+        groupHash: this.generateGroupHash(participants),
+        totalTokens: 0,
+      };
+    }
+
+    // Seleccionar 1-2 diálogos aleatorios
+    const count = Math.random() < 0.6 ? 1 : 2; // 60% un mensaje, 40% dos mensajes
+    const selectedDialogues = [];
+
+    for (let i = 0; i < count && i < participants.length; i++) {
+      const randomDialogue =
+        this.prebuiltDialogues[Math.floor(Math.random() * this.prebuiltDialogues.length)];
+
+      selectedDialogues.push({
+        agentId: participants[i].agentId,
+        agentName: participants[i].name,
+        message: randomDialogue.text,
+      });
+    }
+
+    return {
+      dialogues: selectedDialogues,
+      groupHash: this.generateGroupHash(participants),
+      totalTokens: 0,
+    };
+  }
+
+  /**
+   * Obtener diálogo: pre-armado o generado con IA
+   *
+   * Estrategia:
+   * - Sin historial importante: 100% pre-armados
+   * - Con historial importante: 30% IA, 70% pre-armados
    */
   static async getAmbientDialogue(
     request: AmbientDialogueRequest
   ): Promise<AmbientDialogueResponse> {
+    // Asegurar que los diálogos pre-armados estén cargados
+    await this.loadPrebuiltDialogues();
+
     const groupHash = this.generateGroupHash(request.participants, request.contextHint);
+
+    // Decidir si usar IA o pre-armados
+    const useAI = request.hasImportantHistory && Math.random() < 0.3; // 30% si hay historial
+
+    if (!useAI) {
+      // Usar diálogo pre-armado
+      log.info("Using prebuilt dialogue", {
+        groupHash,
+        hasImportantHistory: request.hasImportantHistory || false,
+      });
+
+      return this.selectPrebuiltDialogue(request.participants);
+    }
+
+    // Usar IA (con cache)
+    log.info("Using AI-generated dialogue", {
+      groupHash,
+      hasImportantHistory: true,
+    });
 
     // Verificar cache (40% probabilidad de reusar si existe)
     const cachedDialogues = this.dialogueCache.get(groupHash);
     if (cachedDialogues && Math.random() < 0.4) {
-      log.info("Reusing cached dialogue", { groupHash, count: cachedDialogues.length });
+      log.info("Reusing cached AI dialogue", { groupHash, count: cachedDialogues.length });
 
       // Rotar entre diálogos cacheados
       const lastIndex = this.usageHistory.get(groupHash) || 0;
@@ -85,12 +192,7 @@ export class AmbientDialogueService {
       };
     }
 
-    // Generar nuevo diálogo
-    log.info("Generating new ambient dialogue", {
-      participants: request.participants.length,
-      location: request.location,
-    });
-
+    // Generar nuevo diálogo con IA
     const dialogue = await this.generateDialogue(request);
 
     // Cachear para uso futuro

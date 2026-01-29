@@ -51,6 +51,10 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	private java.util.UUID conversationPartnerId = null;
 	private int conversationTickCounter = 0; // Para movimientos sutiles
 
+	// Group meeting state
+	private java.util.UUID groupId = null;
+	private com.blaniel.minecraft.ai.MoveToGroupMeetingPointGoal moveToGroupGoal;
+
 	public BlanielVillagerEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
 		super(entityType, world);
 
@@ -85,12 +89,16 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 */
 	@Override
 	protected void initGoals() {
+		// Goal de reunión grupal (prioridad alta)
+		this.moveToGroupGoal = new com.blaniel.minecraft.ai.MoveToGroupMeetingPointGoal(this, 0.7);
+		this.goalSelector.add(1, this.moveToGroupGoal);
+
 		// Pathfinding básico
-		this.goalSelector.add(0, new SwimGoal(this));
-		this.goalSelector.add(1, new EscapeDangerGoal(this, 1.4));
-		this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
-		this.goalSelector.add(3, new WanderAroundFarGoal(this, 0.6));
-		this.goalSelector.add(4, new LookAroundGoal(this));
+		this.goalSelector.add(2, new SwimGoal(this));
+		this.goalSelector.add(3, new EscapeDangerGoal(this, 1.4));
+		this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
+		this.goalSelector.add(5, new WanderAroundFarGoal(this, 0.6));
+		this.goalSelector.add(6, new LookAroundGoal(this));
 
 		// Targets: huir de zombies
 		this.targetSelector.add(1, new ActiveTargetGoal<>(this, net.minecraft.entity.mob.ZombieEntity.class, true));
@@ -373,6 +381,44 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 */
 	public boolean isInConversation() {
 		return this.inConversation;
+	}
+
+	/**
+	 * Unirse a un grupo social
+	 */
+	public void joinGroup(java.util.UUID groupId, net.minecraft.util.math.Vec3d meetingPoint) {
+		this.groupId = groupId;
+		if (this.moveToGroupGoal != null) {
+			this.moveToGroupGoal.setMeetingPoint(meetingPoint);
+		}
+		BlanielMod.LOGGER.info("{} se unió al grupo {}", this.getBlanielAgentName(), groupId);
+	}
+
+	/**
+	 * Salir de un grupo social
+	 */
+	public void leaveGroup() {
+		if (this.groupId != null) {
+			BlanielMod.LOGGER.info("{} salió del grupo {}", this.getBlanielAgentName(), this.groupId);
+			this.groupId = null;
+			if (this.moveToGroupGoal != null) {
+				this.moveToGroupGoal.clearMeetingPoint();
+			}
+		}
+	}
+
+	/**
+	 * Obtener ID del grupo actual
+	 */
+	public java.util.UUID getGroupId() {
+		return this.groupId;
+	}
+
+	/**
+	 * Verificar si está en un grupo
+	 */
+	public boolean isInGroup() {
+		return this.groupId != null;
 	}
 
 	/**

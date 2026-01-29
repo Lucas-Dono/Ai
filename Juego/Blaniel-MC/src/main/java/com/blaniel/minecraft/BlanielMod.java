@@ -69,6 +69,9 @@ public class BlanielMod implements ModInitializer {
 		// Registrar network handlers
 		com.blaniel.minecraft.network.NetworkHandler.registerServerReceivers();
 
+		// Registrar tick handlers (para grupos sociales)
+		com.blaniel.minecraft.server.ServerTickHandler.register();
+
 		LOGGER.info("Blaniel Minecraft Integration cargado exitosamente");
 	}
 }

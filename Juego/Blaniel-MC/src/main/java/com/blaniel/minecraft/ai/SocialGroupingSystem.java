@@ -181,9 +181,16 @@ public class SocialGroupingSystem {
         centerY /= members.size();
         centerZ /= members.size();
 
+        net.minecraft.util.math.Vec3d meetingPoint = new net.minecraft.util.math.Vec3d(centerX, centerY, centerZ);
+
         // Registrar grupo
         activeGroups.put(groupId, memberIds);
         groupMeetingPoints.put(groupId, new GroupMeetingPoint(centerX, centerY, centerZ, GROUP_FORMATION_RADIUS));
+
+        // Notificar a cada NPC para que se una al grupo
+        for (BlanielVillagerEntity npc : members) {
+            npc.joinGroup(groupId, meetingPoint);
+        }
 
         // Incrementar historial
         String groupHash = getGroupHash(members);
@@ -208,10 +215,15 @@ public class SocialGroupingSystem {
         groupMeetingPoints.remove(groupId);
 
         if (memberIds != null) {
-            // Aplicar cooldown a todos los miembros
-            long now = System.currentTimeMillis();
+            // Notificar a cada NPC para que salga del grupo
             for (Integer memberId : memberIds) {
-                disbandCooldown.put(memberId, now);
+                var entity = world.getEntityById(memberId);
+                if (entity instanceof BlanielVillagerEntity) {
+                    ((BlanielVillagerEntity) entity).leaveGroup();
+                }
+
+                // Aplicar cooldown
+                disbandCooldown.put(memberId, System.currentTimeMillis());
             }
 
             BlanielMod.LOGGER.info("Grupo {} disuelto ({} miembros)", groupId, memberIds.size());
