@@ -666,6 +666,9 @@ export const VENICE_MODELS = {
 
   // Llama 3.1 405B - Mejor calidad (más caro)
   BEST: "llama-3.1-405b",
+
+  // Qwen 3 4B - Para diálogos ambientales ($0.15/M output, $0.05/M input)
+  QWEN_3_4B: "qwen-3-4b",
 };
 
 /**
@@ -689,4 +692,7 @@ export const RECOMMENDED_MODELS = {
 
   // Para JSON estructurado (más preciso)
   JSON: VENICE_MODELS.DEFAULT,
+
+  // Para diálogos ambientales en Minecraft (económico, rápido)
+  AMBIENT_DIALOGUE: VENICE_MODELS.QWEN_3_4B,
 };
