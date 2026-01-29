@@ -24,6 +24,7 @@ public class BlanielConfig {
 	private String apiUrl = "http://localhost:3000";
 	private String jwtToken = "";
 	private boolean apiEnabled = true;
+	private String googleClientId = "1036827882293-s8ofh16rlclnp1t82flhk2o54mnbtdmn.apps.googleusercontent.com"; // Default client ID
 
 	// Datos del usuario (cacheados)
 	private UserData userData = null;
@@ -57,6 +58,7 @@ public class BlanielConfig {
 				this.apiUrl = loaded.apiUrl;
 				this.jwtToken = loaded.jwtToken;
 				this.apiEnabled = loaded.apiEnabled;
+				this.googleClientId = loaded.googleClientId != null ? loaded.googleClientId : this.googleClientId;
 				this.userData = loaded.userData;
 
 				System.out.println("[Blaniel] Configuración cargada desde " + CONFIG_PATH);
@@ -93,6 +95,10 @@ public class BlanielConfig {
 
 	public boolean isApiEnabled() {
 		return apiEnabled;
+	}
+
+	public String getGoogleClientId() {
+		return googleClientId;
 	}
 
 	public UserData getUserData() {

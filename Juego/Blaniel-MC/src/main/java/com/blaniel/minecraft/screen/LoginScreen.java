@@ -3,6 +3,7 @@ package com.blaniel.minecraft.screen;
 import com.blaniel.minecraft.BlanielMod;
 import com.blaniel.minecraft.config.BlanielConfig;
 import com.blaniel.minecraft.network.BlanielAPIClient;
+import com.blaniel.minecraft.oauth.OAuth2Client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,6 +22,7 @@ public class LoginScreen extends Screen {
 	private TextFieldWidget emailField;
 	private TextFieldWidget passwordField;
 	private ButtonWidget loginButton;
+	private ButtonWidget googleLoginButton;
 	private String errorMessage = "";
 	private boolean loggingIn = false;
 	private boolean firstRender = true;
@@ -76,12 +78,21 @@ public class LoginScreen extends Screen {
 		.build();
 		this.addDrawableChild(this.loginButton);
 
+		// Google OAuth button
+		this.googleLoginButton = ButtonWidget.builder(
+			Text.literal("🔐 Iniciar Sesión con Google"),
+			(button) -> this.attemptGoogleLogin()
+		)
+		.dimensions(centerX - 100, startY + 140, 200, 20)
+		.build();
+		this.addDrawableChild(this.googleLoginButton);
+
 		// Cancel button
 		this.addDrawableChild(ButtonWidget.builder(
 			Text.literal("Cancelar"),
 			(button) -> this.close()
 		)
-		.dimensions(centerX - 100, startY + 110, 200, 20)
+		.dimensions(centerX - 100, startY + 170, 200, 20)
 		.build());
 	}
 
@@ -159,6 +170,73 @@ public class LoginScreen extends Screen {
 		});
 	}
 
+	/**
+	 * Iniciar flujo de Google OAuth
+	 */
+	private void attemptGoogleLogin() {
+		// Deshabilitar botones mientras se procesa
+		this.loggingIn = true;
+		this.loginButton.active = false;
+		this.googleLoginButton.active = false;
+		this.errorMessage = "Abriendo navegador para autorizar con Google...";
+
+		// Configuración OAuth
+		String clientId = BlanielMod.CONFIG.getGoogleClientId();
+		String redirectUri = "http://127.0.0.1:8888/callback";
+		String apiUrl = BlanielMod.CONFIG.getApiUrl();
+
+		// Crear cliente OAuth
+		OAuth2Client oauthClient = new OAuth2Client(clientId, redirectUri, apiUrl);
+
+		// Iniciar flujo de autorización (asíncrono)
+		oauthClient.authorize().thenAccept(response -> {
+			// Ejecutar en thread principal de Minecraft
+			if (this.client != null) {
+				this.client.execute(() -> {
+					if (response.success && response.token != null) {
+						// Login exitoso
+						BlanielConfig.UserData userData = new BlanielConfig.UserData(
+							response.user.id,
+							response.user.email,
+							response.user.name,
+							response.user.plan
+						);
+
+						BlanielMod.CONFIG.login(response.token, userData);
+
+						// Mostrar mensaje de éxito
+						if (this.client.player != null) {
+							this.client.player.sendMessage(
+								Text.literal("§a[Blaniel] §fInicio de sesión exitoso con Google. ¡Bienvenido " + response.user.name + "!"),
+								false
+							);
+						}
+
+						// Cerrar pantalla
+						this.close();
+					} else {
+						// Login fallido
+						this.errorMessage = response.error != null ? response.error : "Error al iniciar sesión con Google";
+						this.loggingIn = false;
+						this.loginButton.active = true;
+						this.googleLoginButton.active = true;
+					}
+				});
+			}
+		}).exceptionally(ex -> {
+			// Error de conexión
+			if (this.client != null) {
+				this.client.execute(() -> {
+					this.errorMessage = "Error OAuth: " + ex.getMessage();
+					this.loggingIn = false;
+					this.loginButton.active = true;
+					this.googleLoginButton.active = true;
+				});
+			}
+			return null;
+		});
+	}
+
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		if (firstRender) {
@@ -180,7 +258,7 @@ public class LoginScreen extends Screen {
 		// Subtítulo
 		context.drawCenteredTextWithShadow(
 			this.textRenderer,
-			Text.literal("Ingresa tus credenciales de Blaniel"),
+			Text.literal("Ingresa tus credenciales o usa Google"),
 			this.width / 2,
 			40,
 			0xAAAAAA
