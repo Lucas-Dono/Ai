@@ -7,6 +7,8 @@ import com.blaniel.minecraft.config.BlanielConfig;
 import com.blaniel.minecraft.oauth.OAuth2Client;
 import com.blaniel.minecraft.skin.BlanielSkinManager;
 import com.blaniel.minecraft.screen.LoginScreen;
+import com.blaniel.minecraft.screen.UpdateAvailableScreen;
+import com.blaniel.minecraft.update.ModUpdateInfo;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -23,6 +25,10 @@ public class BlanielModClient implements ClientModInitializer {
 	// Flag para evitar múltiples intentos de auto-login
 	private static boolean autoLoginAttempted = false;
 	private static boolean autoLoginInProgress = false;
+
+	// Información de actualización pendiente
+	private static ModUpdateInfo pendingUpdateInfo = null;
+	private static boolean updateScreenShown = false;
 
 	@Override
 	public void onInitializeClient() {
@@ -54,6 +60,26 @@ public class BlanielModClient implements ClientModInitializer {
 			// Solo ejecutar si el jugador está en un mundo
 			if (client.world == null || client.player == null) {
 				return;
+			}
+
+			// Verificar si hay actualización pendiente para mostrar
+			if (pendingUpdateInfo != null && !updateScreenShown) {
+				// Solo mostrar si no hay otra pantalla abierta (excepto login)
+				if (client.currentScreen == null || client.currentScreen instanceof LoginScreen) {
+					updateScreenShown = true;
+					client.setScreen(new UpdateAvailableScreen(null, pendingUpdateInfo));
+
+					// Notificar en chat
+					if (client.player != null) {
+						String prefix = pendingUpdateInfo.isRequired() ? "§c⚠️ [Blaniel]" : "§a🚀 [Blaniel]";
+						client.player.sendMessage(
+							Text.literal(prefix + " §fNueva actualización disponible: v" +
+								pendingUpdateInfo.getLatestVersion()),
+							false
+						);
+					}
+				}
+				return; // Dar prioridad a la pantalla de actualización
 			}
 
 			// Si ya está logueado, no hacer nada
@@ -145,5 +171,17 @@ public class BlanielModClient implements ClientModInitializer {
 		});
 
 		BlanielMod.LOGGER.info("Blaniel Client inicializado exitosamente");
+	}
+
+	/**
+	 * Configurar información de actualización pendiente
+	 *
+	 * Este método es llamado desde el servidor cuando se detecta una actualización
+	 */
+	public static void setUpdateInfo(ModUpdateInfo updateInfo) {
+		pendingUpdateInfo = updateInfo;
+		updateScreenShown = false;
+		BlanielMod.LOGGER.info("Update info set: v" + updateInfo.getLatestVersion() +
+			" (required: " + updateInfo.isRequired() + ")");
 	}
 }

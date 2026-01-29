@@ -5,6 +5,8 @@ import com.blaniel.minecraft.conversation.ConversationScriptPlayer;
 import com.blaniel.minecraft.conversation.ScriptCacheManager;
 import com.blaniel.minecraft.conversation.SocialGroupManager;
 import com.blaniel.minecraft.network.BlanielAPIClient;
+import com.blaniel.minecraft.update.ModUpdateChecker;
+import com.blaniel.minecraft.update.ModUpdateInfo;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
 
@@ -54,6 +56,9 @@ public class ServerLifecycleHandler {
 
 				// Verificar actualizaciones de scripts en segundo plano
 				checkScriptUpdates();
+
+				// Verificar actualizaciones del mod
+				checkModUpdates(apiUrl, server);
 			} else {
 				System.err.println("[Blaniel] User logged in but no JWT token found");
 			}
@@ -83,6 +88,58 @@ public class ServerLifecycleHandler {
 				e.printStackTrace();
 				return null;
 			});
+	}
+
+	/**
+	 * Verificar actualizaciones del mod
+	 */
+	private static void checkModUpdates(String apiUrl, MinecraftServer server) {
+		System.out.println("[Blaniel] Checking mod updates in background...");
+
+		ModUpdateChecker.checkForUpdates(apiUrl)
+			.thenAccept(updateInfo -> {
+				if (updateInfo == null) {
+					System.out.println("[Blaniel] Unable to check for mod updates");
+					return;
+				}
+
+				if (!updateInfo.hasUpdate()) {
+					System.out.println("[Blaniel] Mod is up to date");
+					return;
+				}
+
+				// Hay actualización disponible
+				System.out.println("[Blaniel] ========================================");
+				System.out.println("[Blaniel] 🚀 NEW MOD UPDATE AVAILABLE!");
+				System.out.println("[Blaniel] Current: v" + ModUpdateChecker.getCurrentVersion());
+				System.out.println("[Blaniel] Latest:  v" + updateInfo.getLatestVersion());
+				System.out.println("[Blaniel] Size:    " + updateInfo.getFormattedFileSize());
+
+				if (updateInfo.isRequired()) {
+					System.out.println("[Blaniel] ⚠️  REQUIRED UPDATE!");
+				}
+
+				System.out.println("[Blaniel] ========================================");
+
+				// Mostrar pantalla de actualización en el cliente
+				// Nota: Esto se mostrará cuando el jugador entre al mundo
+				showUpdateScreenOnClient(updateInfo);
+			})
+			.exceptionally(e -> {
+				System.err.println("[Blaniel] Error checking mod updates: " + e.getMessage());
+				return null;
+			});
+	}
+
+	/**
+	 * Mostrar pantalla de actualización en el cliente
+	 *
+	 * Como estamos en el servidor, necesitamos esperar a que el jugador
+	 * entre al mundo para mostrar la pantalla
+	 */
+	private static void showUpdateScreenOnClient(ModUpdateInfo updateInfo) {
+		// Guardar info de actualización para mostrarla cuando el jugador entre
+		com.blaniel.minecraft.client.BlanielModClient.setUpdateInfo(updateInfo);
 	}
 
 	/**
