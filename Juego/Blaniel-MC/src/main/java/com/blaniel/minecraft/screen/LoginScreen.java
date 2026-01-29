@@ -202,7 +202,12 @@ public class LoginScreen extends Screen {
 							response.user.plan
 						);
 
-						BlanielMod.CONFIG.login(response.token, userData);
+						// Guardar JWT, userData Y refresh_token de Google
+						BlanielMod.CONFIG.loginWithOAuth(
+							response.token,
+							userData,
+							response.googleRefreshToken != null ? response.googleRefreshToken : ""
+						);
 
 						// Mostrar mensaje de éxito
 						if (this.client.player != null) {

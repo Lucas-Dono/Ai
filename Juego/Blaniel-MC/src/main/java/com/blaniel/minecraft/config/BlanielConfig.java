@@ -25,6 +25,7 @@ public class BlanielConfig {
 	private String jwtToken = "";
 	private boolean apiEnabled = true;
 	private String googleClientId = "1036827882293-s8ofh16rlclnp1t82flhk2o54mnbtdmn.apps.googleusercontent.com"; // Default client ID
+	private String googleRefreshToken = ""; // Refresh token de Google para renovar sesión
 
 	// Datos del usuario (cacheados)
 	private UserData userData = null;
@@ -59,6 +60,7 @@ public class BlanielConfig {
 				this.jwtToken = loaded.jwtToken;
 				this.apiEnabled = loaded.apiEnabled;
 				this.googleClientId = loaded.googleClientId != null ? loaded.googleClientId : this.googleClientId;
+				this.googleRefreshToken = loaded.googleRefreshToken != null ? loaded.googleRefreshToken : this.googleRefreshToken;
 				this.userData = loaded.userData;
 
 				System.out.println("[Blaniel] Configuración cargada desde " + CONFIG_PATH);
@@ -101,6 +103,10 @@ public class BlanielConfig {
 		return googleClientId;
 	}
 
+	public String getGoogleRefreshToken() {
+		return googleRefreshToken;
+	}
+
 	public UserData getUserData() {
 		return userData;
 	}
@@ -131,7 +137,7 @@ public class BlanielConfig {
 	}
 
 	/**
-	 * Login: guarda token y datos del usuario
+	 * Login: guarda token y datos del usuario (sin OAuth)
 	 */
 	public void login(String jwtToken, UserData userData) {
 		this.jwtToken = jwtToken;
@@ -140,11 +146,29 @@ public class BlanielConfig {
 	}
 
 	/**
+	 * Login con OAuth: guarda token, datos del usuario Y refresh token de Google
+	 */
+	public void loginWithOAuth(String jwtToken, UserData userData, String googleRefreshToken) {
+		this.jwtToken = jwtToken;
+		this.userData = userData;
+		this.googleRefreshToken = googleRefreshToken;
+		save();
+	}
+
+	/**
+	 * Verificar si hay refresh token guardado
+	 */
+	public boolean hasRefreshToken() {
+		return googleRefreshToken != null && !googleRefreshToken.isEmpty();
+	}
+
+	/**
 	 * Logout: limpia token y datos
 	 */
 	public void logout() {
 		this.jwtToken = "";
 		this.userData = null;
+		this.googleRefreshToken = "";
 		save();
 	}
 }

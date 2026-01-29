@@ -120,6 +120,9 @@ public class OAuth2Client {
                 // 10. Enviar id_token a backend de Blaniel
                 LoginResponse blanielResponse = loginToBlaniel(tokens.id_token);
 
+                // 11. Guardar refresh_token de Google en la respuesta
+                blanielResponse.googleRefreshToken = tokens.refresh_token;
+
                 System.out.println("[OAuth2] Login exitoso en Blaniel");
 
                 return blanielResponse;
@@ -252,6 +255,110 @@ public class OAuth2Client {
         return body.toString();
     }
 
+    /**
+     * Refrescar tokens usando refresh_token (método estático)
+     *
+     * Este método se llama automáticamente al iniciar el juego si hay un refresh_token guardado,
+     * evitando que el usuario tenga que hacer el flujo OAuth completo cada vez.
+     *
+     * @param clientId Google OAuth Client ID
+     * @param refreshToken Refresh token de Google (guardado en config)
+     * @param blanielApiUrl URL del backend de Blaniel
+     * @return CompletableFuture con LoginResponse actualizado
+     */
+    public static CompletableFuture<LoginResponse> refreshTokens(
+        String clientId,
+        String refreshToken,
+        String blanielApiUrl
+    ) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                System.out.println("[OAuth2 Refresh] Refrescando tokens con refresh_token...");
+
+                // 1. Intercambiar refresh_token por nuevos tokens
+                Map<String, String> params = new HashMap<>();
+                params.put("client_id", clientId);
+                params.put("refresh_token", refreshToken);
+                params.put("grant_type", "refresh_token");
+
+                StringBuilder bodyBuilder = new StringBuilder();
+                boolean first = true;
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    if (!first) {
+                        bodyBuilder.append("&");
+                    }
+                    bodyBuilder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
+                    bodyBuilder.append("=");
+                    bodyBuilder.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                    first = false;
+                }
+
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(TOKEN_ENDPOINT))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(bodyBuilder.toString()))
+                    .timeout(Duration.ofSeconds(30))
+                    .build();
+
+                HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() != 200) {
+                    throw new RuntimeException("Error al refrescar tokens: HTTP " + response.statusCode() + " - " + response.body());
+                }
+
+                TokenResponse tokens = GSON.fromJson(response.body(), TokenResponse.class);
+
+                System.out.println("[OAuth2 Refresh] Nuevos tokens recibidos de Google");
+
+                // 2. Enviar nuevo id_token a backend de Blaniel
+                JsonObject body = new JsonObject();
+                body.addProperty("id_token", tokens.id_token);
+
+                String url = blanielApiUrl + "/api/auth/minecraft-oauth-login";
+
+                HttpRequest blanielRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                    .timeout(Duration.ofSeconds(30))
+                    .build();
+
+                HttpResponse<String> blanielResponse = HTTP_CLIENT.send(blanielRequest, HttpResponse.BodyHandlers.ofString());
+
+                if (blanielResponse.statusCode() != 200) {
+                    JsonObject errorJson = GSON.fromJson(blanielResponse.body(), JsonObject.class);
+                    String errorMessage = errorJson.has("error") ? errorJson.get("error").getAsString() : "Error desconocido";
+
+                    LoginResponse errorResponse = new LoginResponse();
+                    errorResponse.success = false;
+                    errorResponse.error = errorMessage;
+                    return errorResponse;
+                }
+
+                LoginResponse loginResponse = GSON.fromJson(blanielResponse.body(), LoginResponse.class);
+                loginResponse.success = true;
+
+                // 3. Importante: mantener el mismo refresh_token (o usar el nuevo si Google envió uno)
+                loginResponse.googleRefreshToken = tokens.refresh_token != null ? tokens.refresh_token : refreshToken;
+
+                System.out.println("[OAuth2 Refresh] Login exitoso en Blaniel (sesión renovada)");
+
+                return loginResponse;
+
+            } catch (Exception e) {
+                System.err.println("[OAuth2 Refresh] Error al refrescar tokens: " + e.getMessage());
+                e.printStackTrace();
+
+                LoginResponse errorResponse = new LoginResponse();
+                errorResponse.success = false;
+                errorResponse.error = e.getMessage();
+                return errorResponse;
+            }
+        });
+    }
+
     // ===== Data Classes =====
 
     public static class TokenResponse {
@@ -268,6 +375,7 @@ public class OAuth2Client {
         public String error;
         public String token;
         public int expiresIn;
+        public String googleRefreshToken; // Refresh token de Google para renovar sesión
         public UserDataResponse user;
         public AgentData[] agents;
         public String message;
