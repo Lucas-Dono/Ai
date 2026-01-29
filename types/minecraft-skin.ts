@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { SkinConfiguration } from './minecraft-skin-components';
 
 /**
  * Rasgos de una skin de Minecraft
@@ -49,9 +50,14 @@ export const MinecraftSkinTraitsSchema = z.object({
 
 /**
  * Metadata de Minecraft en Agent.metadata
+ *
+ * Sistema de prioridades:
+ * 1. componentConfig (personajes de usuario) - más flexible y preciso
+ * 2. skinTraits (legacy) - mantener por compatibilidad
  */
 export interface MinecraftMetadata {
   compatible: boolean;
-  skinTraits?: MinecraftSkinTraits;
+  componentConfig?: SkinConfiguration; // Sistema modular (PREFERIDO)
+  skinTraits?: MinecraftSkinTraits;    // Sistema legacy (DEPRECADO)
   generatedAt: string;
 }

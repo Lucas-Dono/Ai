@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { renderSkinFromTraits } from '@/lib/minecraft/skin-renderer';
 import { MinecraftSkinTraitsSchema, MinecraftSkinTraits } from '@/types/minecraft-skin';
+import { assembleSkin } from '@/lib/minecraft/skin-assembler';
+import { SkinConfiguration } from '@/types/minecraft-skin-components';
+import path from 'path';
 
 /**
  * GET /api/v1/minecraft/agents/:id/skin
@@ -38,6 +41,7 @@ export async function GET(
 
     const metadata = agent.metadata as any;
     const skinTraits = metadata?.minecraft?.skinTraits as MinecraftSkinTraits | undefined;
+    const componentConfig = metadata?.minecraft?.componentConfig as SkinConfiguration | undefined;
 
     // Convertir nombre a slug para buscar configuración de componentes modulares
     // Ej: "Albert Einstein" -> "albert-einstein"
@@ -48,7 +52,25 @@ export async function GET(
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    // Si hay skinTraits, validarlos
+    // PRIORIDAD 1: Configuración de componentes en metadata (personajes de usuario)
+    if (componentConfig) {
+      console.log('[Minecraft Skin] Usando componentConfig de metadata para:', agent.name);
+
+      const COMPONENTS_DIR = path.join(process.cwd(), 'public/minecraft/components');
+      const skinBuffer = await assembleSkin(componentConfig, COMPONENTS_DIR);
+
+      return new NextResponse(new Uint8Array(skinBuffer), {
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'ETag': `"${agentId}-component-metadata"`,
+          'X-Skin-Source': 'component-metadata',
+          'X-Character-Name': agent.name,
+        },
+      });
+    }
+
+    // PRIORIDAD 2: SkinTraits (sistema legacy, se mantiene por compatibilidad)
     if (skinTraits) {
       const validation = MinecraftSkinTraitsSchema.safeParse(skinTraits);
       if (!validation.success) {
@@ -76,8 +98,8 @@ export async function GET(
       });
     }
 
-    // Si NO hay skinTraits, intentar con configuración de componentes
-    console.log('[Minecraft Skin] No skinTraits, intentando con configuración de componentes para:', characterSlug);
+    // PRIORIDAD 3: Configuración hardcodeada (personajes premium/históricos)
+    console.log('[Minecraft Skin] Intentando con configuración hardcodeada para:', characterSlug);
 
     // Crear skinTraits dummy para el renderer (solo se usará characterSlug)
     const dummyTraits: MinecraftSkinTraits = {
