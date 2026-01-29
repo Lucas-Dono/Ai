@@ -1020,6 +1020,26 @@ export const CHARACTER_SKIN_CONFIGS: Record<string, CharacterSkinConfig> = {
           "pants": "pants_01",
           "shoes": "shoes_01"
     },
+  },
+  'sofia-volkov': {
+    characterName: 'sofia-volkov',
+    gender: 'female',
+    skinTone: '#F5E8D8',
+    hairColor: '#8B6F47',
+    eyeColor: '#6B7A8C',
+    components: {
+          "headBase": "head_female_01",
+          "eyes": "eyes_female_01",
+          "mouth": "mouth_empty",
+          "torso": "torso_slim_01",
+          "arms": "arms_slim_01",
+          "legs": "legs_average_01",
+          "hairFront": "hair_long_02_wavy",
+          "hairBody": "hair_long_body_02_wavy",
+          "tShirt": "t_shirt_01",
+          "pants": "pants_01",
+          "shoes": "shoes_01"
+    },
   }
 };
 
@@ -1078,7 +1098,8 @@ export const ALL_CHARACTER_NAMES = [
   'sofia',
   'katya',
   'marcus-washington',
-  'sebastian-muller'
+  'sebastian-muller',
+  'sofia-volkov'
 ] as const;
 
 export type CharacterName = typeof ALL_CHARACTER_NAMES[number];

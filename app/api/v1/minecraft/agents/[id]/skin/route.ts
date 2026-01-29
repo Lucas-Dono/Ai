@@ -39,30 +39,6 @@ export async function GET(
     const metadata = agent.metadata as any;
     const skinTraits = metadata?.minecraft?.skinTraits as MinecraftSkinTraits | undefined;
 
-    if (!skinTraits) {
-      return NextResponse.json(
-        {
-          error: 'Skin traits not generated yet',
-          suggestion: 'Create agent with referenceImageUrl to auto-generate skin',
-        },
-        { status: 404 }
-      );
-    }
-
-    // 2. Validar traits
-    const validation = MinecraftSkinTraitsSchema.safeParse(skinTraits);
-    if (!validation.success) {
-      console.error('[Minecraft Skin] Invalid traits:', validation.error);
-      return NextResponse.json(
-        {
-          error: 'Invalid skin traits',
-          details: validation.error.issues,
-        },
-        { status: 400 }
-      );
-    }
-
-    // 3. Generar PNG on-the-fly
     // Convertir nombre a slug para buscar configuración de componentes modulares
     // Ej: "Albert Einstein" -> "albert-einstein"
     const characterSlug = agent.name
@@ -71,16 +47,61 @@ export async function GET(
       .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    const skinBuffer = await renderSkinFromTraits(validation.data, characterSlug);
 
-    // 4. Retornar con headers de caché agresivo
+    // Si hay skinTraits, validarlos
+    if (skinTraits) {
+      const validation = MinecraftSkinTraitsSchema.safeParse(skinTraits);
+      if (!validation.success) {
+        console.error('[Minecraft Skin] Invalid traits:', validation.error);
+        return NextResponse.json(
+          {
+            error: 'Invalid skin traits',
+            details: validation.error.issues,
+          },
+          { status: 400 }
+        );
+      }
+
+      // 3. Generar PNG on-the-fly desde traits
+      const skinBuffer = await renderSkinFromTraits(validation.data, characterSlug);
+
+      return new NextResponse(new Uint8Array(skinBuffer), {
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=31536000, immutable', // 1 año
+          'ETag': `"${agentId}-${skinTraits.generatedAt}"`,
+          'X-Skin-Version': String(skinTraits.version),
+          'X-Template-Id': skinTraits.templateId,
+        },
+      });
+    }
+
+    // Si NO hay skinTraits, intentar con configuración de componentes
+    console.log('[Minecraft Skin] No skinTraits, intentando con configuración de componentes para:', characterSlug);
+
+    // Crear skinTraits dummy para el renderer (solo se usará characterSlug)
+    const dummyTraits: MinecraftSkinTraits = {
+      version: 1,
+      gender: 'female',
+      skinTone: '#F5D7B1',
+      hairColor: '#3D2817',
+      eyeColor: '#4A7BA7',
+      hairStyle: 'long',
+      clothingStyle: 'casual',
+      templateId: 'default',
+      generatedAt: new Date().toISOString(),
+    };
+
+    const skinBuffer = await renderSkinFromTraits(dummyTraits, characterSlug);
+
+    // 4. Retornar con headers de caché agresivo (desde configuración de componentes)
     return new NextResponse(new Uint8Array(skinBuffer), {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=31536000, immutable', // 1 año
-        'ETag': `"${agentId}-${skinTraits.generatedAt}"`,
-        'X-Skin-Version': String(skinTraits.version),
-        'X-Template-Id': skinTraits.templateId,
+        'ETag': `"${agentId}-component-config"`,
+        'X-Skin-Source': 'component-config',
+        'X-Character-Slug': characterSlug,
       },
     });
 
