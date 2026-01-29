@@ -72,8 +72,12 @@ public class BlanielChatIntegration {
                 requestBody.add("nearbyAgents", nearbyAgents);
 
                 // 4. Enviar request HTTP
+                String apiUrl = getApiUrl();
+                System.out.println("[Blaniel Chat] Enviando mensaje a: " + apiUrl);
+                System.out.println("[Blaniel Chat] Request body: " + requestBody.toString());
+
                 HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(getApiUrl()))
+                    .uri(URI.create(apiUrl))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + jwtToken)
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
@@ -83,6 +87,9 @@ public class BlanielChatIntegration {
                     request,
                     HttpResponse.BodyHandlers.ofString()
                 );
+
+                System.out.println("[Blaniel Chat] Response status: " + response.statusCode());
+                System.out.println("[Blaniel Chat] Response body: " + response.body());
 
                 // 5. Procesar respuesta
                 if (response.statusCode() == 200) {
