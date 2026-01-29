@@ -49,8 +49,6 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	// Conversation mode state
 	private boolean inConversation = false;
 	private java.util.UUID conversationPartnerId = null;
-	private long conversationStartTime = 0;
-	private static final long CONVERSATION_TIMEOUT = 30000; // 30 segundos de timeout
 
 	public BlanielVillagerEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
 		super(entityType, world);
@@ -343,7 +341,6 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	public void enterConversationMode(PlayerEntity player) {
 		this.inConversation = true;
 		this.conversationPartnerId = player.getUuid();
-		this.conversationStartTime = System.currentTimeMillis();
 
 		// Cancelar movimiento actual
 		this.getNavigation().stop();
@@ -365,7 +362,6 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	public void exitConversationMode() {
 		this.inConversation = false;
 		this.conversationPartnerId = null;
-		this.conversationStartTime = 0;
 
 		BlanielMod.LOGGER.info("{} salió del modo conversación", this.getBlanielAgentName());
 	}
@@ -375,15 +371,6 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 	 */
 	public boolean isInConversation() {
 		return this.inConversation;
-	}
-
-	/**
-	 * Refrescar el timeout de conversación
-	 */
-	public void refreshConversationTimeout() {
-		if (this.inConversation) {
-			this.conversationStartTime = System.currentTimeMillis();
-		}
 	}
 
 	/**
@@ -400,13 +387,6 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 
 		// Manejar modo conversación
 		if (inConversation) {
-			// Verificar timeout
-			if (System.currentTimeMillis() - conversationStartTime > CONVERSATION_TIMEOUT) {
-				BlanielMod.LOGGER.info("{} - timeout de conversación alcanzado", this.getBlanielAgentName());
-				exitConversationMode();
-				return;
-			}
-
 			// Buscar al jugador con el que está conversando
 			PlayerEntity partner = this.getWorld().getPlayerByUuid(conversationPartnerId);
 			if (partner != null) {
@@ -427,7 +407,8 @@ public class BlanielVillagerEntity extends PathAwareEntity {
 					this.getNavigation().stop();
 				}
 			} else {
-				// Jugador no encontrado, terminar conversación
+				// Jugador no encontrado (desconectado o cambió de dimensión), terminar conversación
+				BlanielMod.LOGGER.info("{} - jugador no encontrado, terminando conversación", this.getBlanielAgentName());
 				exitConversationMode();
 			}
 		}
