@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Sistema completo de conversaciones estructuradas para grupos de NPCs en Minecraft. Genera **guiones con inicio, desarrollo y cierre** en lugar de frases sueltas.
+Sistema completo de conversaciones estructuradas para grupos de NPCs en Minecraft. Genera **guiones con inicio, desarrollo y cierre** que el mod almacena localmente y ejecuta con sus propios timers.
 
 ## Problema que Resuelve
 
@@ -13,75 +13,121 @@ Sistema completo de conversaciones estructuradas para grupos de NPCs en Minecraf
 
 **Ahora:**
 - Conversaciones completas con estructura: Saludo → Desarrollo → Despedida
-- El jugador puede escuchar la conversación desde cualquier punto y entenderla
+- El mod descarga el guión completo UNA vez y lo ejecuta localmente
+- Sin polling HTTP constante, sin latencia de red
 - Las conversaciones tienen sentido coherente de principio a fin
 
 ## Arquitectura
 
+### Flujo Simplificado
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Mod detecta grupo social cercano                        │
+│    → Hash: "ada_lovelace_albert_einstein"                  │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 2. Mod hace UNA request al servidor                        │
+│    POST /api/v1/minecraft/conversation-script              │
+│    → Recibe guión COMPLETO (10-15 líneas)                  │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 3. Mod almacena guión en memoria                           │
+│    ConversationScriptPlayer {                              │
+│      lines: DialogueLine[]                                 │
+│      currentIndex: 0                                       │
+│      timer: ScheduledFuture                                │
+│    }                                                        │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 4. Timer local avanza líneas cada 4-7 segundos             │
+│    - Sin HTTP requests                                     │
+│    - Sin latencia de red                                   │
+│    - Funciona offline                                      │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 5. Al terminar: espera 3 minutos y reinicia (loop)        │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### Componentes
 
+**Servidor (Next.js):**
 ```
-┌─────────────────────────────────────────────────────────┐
-│ ConversationScriptGenerator                             │
-│ - Genera guiones con templates o IA                     │
-│ - 4 templates pre-definidos (gratis)                    │
-│ - Generación con Qwen 3 4B ($0.15/M tokens)            │
-└──────────────────┬──────────────────────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────────────────────┐
-│ ConversationScript (10-15 líneas)                      │
-│ ┌────────────────────────────────────────────────────┐ │
-│ │ SALUDO (1-2 líneas)                                │ │
-│ │ - "Hola, ¿cómo estás?"                             │ │
-│ │ - "Muy bien, gracias"                              │ │
-│ ├────────────────────────────────────────────────────┤ │
-│ │ INTRODUCCIÓN DEL TEMA (2-3 líneas)                │ │
-│ │ - "¿Viste el clima hoy?"                           │ │
-│ │ - "Sí, está muy soleado"                           │ │
-│ ├────────────────────────────────────────────────────┤ │
-│ │ DESARROLLO (3-5 líneas)                            │ │
-│ │ - "Ayer llovió mucho"                              │ │
-│ │ - "Cierto, el trueno era fuerte"                   │ │
-│ │ - "Pero ahora está mejor"                          │ │
-│ ├────────────────────────────────────────────────────┤ │
-│ │ CONCLUSIÓN (1-2 líneas)                            │ │
-│ │ - "Bueno, debo irme"                               │ │
-│ ├────────────────────────────────────────────────────┤ │
-│ │ DESPEDIDA (1-2 líneas)                             │ │
-│ │ - "Nos vemos luego"                                │ │
-│ │ - "Hasta pronto"                                   │ │
-│ └────────────────────────────────────────────────────┘ │
-└──────────────────┬──────────────────────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────────────────────┐
-│ ConversationScriptManager                               │
-│ - Controla progreso de conversaciones                   │
-│ - Avanza automáticamente cada 3-7 segundos              │
-│ - Pausa 2-3 segundos en cambios de fase                │
-│ - Reinicia después de completar (loop)                  │
-└─────────────────────────────────────────────────────────┘
+ConversationScriptGenerator
+  ├─ 4 templates pre-definidos (gratis)
+  └─ Generación con Qwen 3 4B ($0.00006/guión) como fallback
+
+ConversationScriptManager
+  ├─ Registro de scripts (sin auto-advance)
+  └─ Tracking de listeners (analytics)
 ```
 
-### Fases de Conversación
+**Cliente (Minecraft Mod):**
+```
+ConversationScriptPlayer (Java)
+  ├─ Almacena guión completo en memoria
+  ├─ Timer local para avanzar líneas
+  ├─ Chat bubbles para mostrar mensajes
+  └─ Loop automático al terminar
+```
+
+### Estructura de Conversación
 
 ```typescript
-enum ConversationPhase {
-  GREETING = "greeting",           // Saludo inicial
-  TOPIC_INTRODUCTION = "topic_introduction", // Introducción del tema
-  DEVELOPMENT = "development",     // Desarrollo
-  CONCLUSION = "conclusion",       // Conclusión
-  FAREWELL = "farewell"           // Despedida
+ConversationScript {
+  scriptId: "uuid-123",
+  topic: "El clima de hoy",
+  participants: [
+    { agentId: "ada", name: "Ada Lovelace" },
+    { agentId: "albert", name: "Albert Einstein" }
+  ],
+  lines: [
+    // SALUDO (1-2 líneas)
+    { agentId: "ada", message: "Hola Albert, ¿cómo estás?", phase: "greeting", lineNumber: 0 },
+    { agentId: "albert", message: "Hola Ada, muy bien gracias", phase: "greeting", lineNumber: 1 },
+
+    // INTRODUCCIÓN DEL TEMA (2-3 líneas)
+    { agentId: "ada", message: "¿Viste qué buen día hace?", phase: "topic_introduction", lineNumber: 2 },
+    { agentId: "albert", message: "Sí, el sol está brillante", phase: "topic_introduction", lineNumber: 3 },
+
+    // DESARROLLO (3-5 líneas)
+    { agentId: "ada", message: "Ayer llovió mucho", phase: "development", lineNumber: 4 },
+    { agentId: "albert", message: "Cierto, el trueno era fuerte", phase: "development", lineNumber: 5 },
+    { agentId: "ada", message: "Pero ahora está mejor", phase: "development", lineNumber: 6 },
+
+    // CONCLUSIÓN (1-2 líneas)
+    { agentId: "albert", message: "Bueno, debo irme", phase: "conclusion", lineNumber: 7 },
+
+    // DESPEDIDA (1-2 líneas)
+    { agentId: "ada", message: "Nos vemos luego", phase: "farewell", lineNumber: 8 },
+    { agentId: "albert", message: "Hasta pronto", phase: "farewell", lineNumber: 9 }
+  ],
+  timing: {
+    minDelayBetweenLines: 4,    // 4 segundos mínimo
+    maxDelayBetweenLines: 7,    // 7 segundos máximo
+    pauseAtPhaseChange: 3,      // 3 segundos extra en cambios de fase
+    loopDelay: 180              // 3 minutos antes de reiniciar
+  }
 }
 ```
 
-## Flujo de Uso
+## API Endpoints
 
-### 1. Iniciar Conversación
+### POST - Obtener Guión Completo
 
 ```bash
 POST /api/v1/minecraft/conversation-script
+Content-Type: application/json
+
 {
   "agentIds": ["premium_ada_lovelace", "historical_albert_einstein"],
   "location": "minecraft:overworld",
@@ -91,87 +137,372 @@ POST /api/v1/minecraft/conversation-script
 }
 ```
 
-**Respuesta:**
+**Respuesta (200 OK):**
 ```json
 {
   "scriptId": "uuid-123",
   "topic": "El clima de hoy",
-  "totalLines": 12,
-  "currentLineIndex": 0,
-  "currentPhase": "greeting",
-  "completed": false,
-  "progress": 0,
-  "source": "template", // "template" | "ai" | "cache"
-  "cost": 0,
-  "generatedBy": "template" // "template" | "ai"
-}
-```
-
-### 2. Obtener Línea Actual
-
-```bash
-GET /api/v1/minecraft/conversation-script?groupHash=ada_lovelace_albert_einstein&playerId=player_uuid
-```
-
-**Respuesta:**
-```json
-{
-  "groupHash": "ada_lovelace_albert_einstein",
-  "currentLine": {
-    "agentId": "premium_ada_lovelace",
-    "agentName": "Ada Lovelace",
-    "message": "Hola Albert, ¿cómo estás?",
-    "phase": "greeting",
-    "lineNumber": 0
-  },
-  "totalLines": 12,
-  "currentLineIndex": 0,
-  "currentPhase": "greeting",
-  "completed": false,
-  "progress": 0
-}
-```
-
-### 3. Obtener Próximas Líneas
-
-```bash
-GET /api/v1/minecraft/conversation-script?groupHash=ada_lovelace_albert_einstein&action=upcoming
-```
-
-**Respuesta:**
-```json
-{
-  "groupHash": "ada_lovelace_albert_einstein",
-  "upcomingLines": [
+  "location": "minecraft:overworld",
+  "contextHint": "cerca de una fogata",
+  "participants": [
+    { "agentId": "premium_ada_lovelace", "name": "Ada Lovelace" },
+    { "agentId": "historical_albert_einstein", "name": "Albert Einstein" }
+  ],
+  "lines": [
+    {
+      "agentId": "premium_ada_lovelace",
+      "agentName": "Ada Lovelace",
+      "message": "Hola Albert, ¿cómo estás?",
+      "phase": "greeting",
+      "lineNumber": 0
+    },
     {
       "agentId": "historical_albert_einstein",
       "agentName": "Albert Einstein",
       "message": "Hola Ada, muy bien gracias",
       "phase": "greeting",
       "lineNumber": 1
-    },
-    {
-      "agentId": "premium_ada_lovelace",
-      "agentName": "Ada Lovelace",
-      "message": "¿Viste qué buen día hace?",
-      "phase": "topic_introduction",
-      "lineNumber": 2
     }
+    // ... resto de líneas
   ],
-  "totalLines": 12,
-  "currentLineIndex": 1
+  "totalLines": 10,
+  "duration": 40,
+  "source": "template",
+  "cost": 0,
+  "generatedBy": "template",
+  "timing": {
+    "minDelayBetweenLines": 4,
+    "maxDelayBetweenLines": 7,
+    "pauseAtPhaseChange": 3,
+    "loopDelay": 180
+  }
 }
 ```
 
-### 4. Detener Conversación
+**Si ya existe (cache):**
+- Retorna el mismo guión sin regenerar
+- `source: "cache"`, `cost: 0`
+
+### PUT - Reportar Listener (Analytics)
 
 ```bash
-DELETE /api/v1/minecraft/conversation-script?groupHash=ada_lovelace_albert_einstein
+PUT /api/v1/minecraft/conversation-script?groupHash=ada_albert&playerId=player_uuid
 ```
 
-## Templates Pre-definidos
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Listener registrado"
+}
+```
 
-El sistema incluye **4 templates gratuitos** para evitar costos de IA:
+**Uso:** El mod puede reportar cuando un jugador está cerca escuchando (opcional, solo para analytics)
+
+### DELETE - Eliminar Script
+
+```bash
+DELETE /api/v1/minecraft/conversation-script?groupHash=ada_albert
+```
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "message": "Script eliminado"
+}
+```
+
+## Integración con Minecraft (Java)
+
+### 1. Modelo de Datos
+
+```java
+public class DialogueLine {
+    private String agentId;
+    private String agentName;
+    private String message;
+    private String phase;
+    private int lineNumber;
+
+    // Getters
+}
+
+public class ConversationScript {
+    private String scriptId;
+    private String topic;
+    private List<DialogueLine> lines;
+    private TimingConfig timing;
+
+    // Getters
+}
+
+public class TimingConfig {
+    private int minDelayBetweenLines = 4;
+    private int maxDelayBetweenLines = 7;
+    private int pauseAtPhaseChange = 3;
+    private int loopDelay = 180;
+}
+```
+
+### 2. Player de Conversaciones
+
+```java
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+public class ConversationScriptPlayer {
+    private static final ScheduledExecutorService scheduler =
+        Executors.newScheduledThreadPool(1);
+    private static final Random random = new Random();
+
+    private final ConversationScript script;
+    private final String groupHash;
+    private int currentLineIndex = 0;
+    private ScheduledFuture<?> currentTimer;
+    private String previousPhase = null;
+
+    public ConversationScriptPlayer(String groupHash, ConversationScript script) {
+        this.groupHash = groupHash;
+        this.script = script;
+    }
+
+    /**
+     * Iniciar reproducción del guión
+     */
+    public void start() {
+        currentLineIndex = 0;
+        previousPhase = null;
+        scheduleNextLine();
+    }
+
+    /**
+     * Detener reproducción
+     */
+    public void stop() {
+        if (currentTimer != null) {
+            currentTimer.cancel(false);
+            currentTimer = null;
+        }
+    }
+
+    /**
+     * Programar siguiente línea
+     */
+    private void scheduleNextLine() {
+        if (currentLineIndex >= script.getLines().size()) {
+            // Conversación completada, programar loop
+            scheduleLoop();
+            return;
+        }
+
+        DialogueLine line = script.getLines().get(currentLineIndex);
+
+        // Calcular delay
+        int delay = script.getTiming().getMinDelayBetweenLines() +
+                    random.nextInt(script.getTiming().getMaxDelayBetweenLines() -
+                                   script.getTiming().getMinDelayBetweenLines());
+
+        // Si cambió la fase, agregar pausa extra
+        if (previousPhase != null && !line.getPhase().equals(previousPhase)) {
+            delay += script.getTiming().getPauseAtPhaseChange();
+        }
+
+        // Programar ejecución
+        currentTimer = scheduler.schedule(() -> {
+            playLine(line);
+        }, delay, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Reproducir línea
+     */
+    private void playLine(DialogueLine line) {
+        // Mostrar chat bubble del NPC
+        BlanielChatIntegration.showChatBubble(
+            line.getAgentId(),
+            line.getAgentName(),
+            line.getMessage()
+        );
+
+        // Actualizar estado
+        previousPhase = line.getPhase();
+        currentLineIndex++;
+
+        // Programar siguiente
+        scheduleNextLine();
+    }
+
+    /**
+     * Programar reinicio (loop)
+     */
+    private void scheduleLoop() {
+        int loopDelay = script.getTiming().getLoopDelay();
+
+        currentTimer = scheduler.schedule(() -> {
+            start(); // Reiniciar desde el principio
+        }, loopDelay, TimeUnit.SECONDS);
+    }
+}
+```
+
+### 3. Gestor de Grupos Sociales
+
+```java
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class SocialGroupManager {
+    private static final Map<String, ConversationScriptPlayer> activePlayers =
+        new ConcurrentHashMap<>();
+
+    /**
+     * Iniciar conversación para un grupo
+     */
+    public static void startConversation(String groupHash, List<String> agentIds,
+                                        String location, String contextHint) {
+        // Verificar si ya hay player activo
+        if (activePlayers.containsKey(groupHash)) {
+            return; // Ya está en progreso
+        }
+
+        // Obtener guión del servidor
+        ConversationScript script = BlanielAPI.getConversationScript(
+            agentIds, location, contextHint, groupHash, false
+        );
+
+        if (script == null) {
+            System.err.println("Failed to get conversation script for group: " + groupHash);
+            return;
+        }
+
+        // Crear player y comenzar
+        ConversationScriptPlayer player = new ConversationScriptPlayer(groupHash, script);
+        activePlayers.put(groupHash, player);
+        player.start();
+
+        System.out.println("Started conversation for group: " + groupHash +
+                          " - Topic: " + script.getTopic());
+    }
+
+    /**
+     * Detener conversación de un grupo
+     */
+    public static void stopConversation(String groupHash) {
+        ConversationScriptPlayer player = activePlayers.remove(groupHash);
+        if (player != null) {
+            player.stop();
+            System.out.println("Stopped conversation for group: " + groupHash);
+        }
+    }
+
+    /**
+     * Verificar proximidad de jugador a grupos
+     * (llamar cada 20 ticks = 1 segundo)
+     */
+    public static void checkPlayerProximity(ServerPlayer player) {
+        // Buscar grupos sociales cercanos (5-10 bloques de radio)
+        List<SocialGroup> nearbyGroups = findNearbySocialGroups(player, 10.0);
+
+        for (SocialGroup group : nearbyGroups) {
+            String groupHash = group.getHash();
+
+            // Si no hay conversación activa, iniciarla
+            if (!activePlayers.containsKey(groupHash)) {
+                startConversation(
+                    groupHash,
+                    group.getAgentIds(),
+                    player.level().dimension().location().toString(),
+                    "cerca de " + player.getOnPos().toString()
+                );
+            }
+        }
+    }
+}
+```
+
+### 4. Cliente HTTP (BlanielAPI)
+
+```java
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+public class BlanielAPI {
+    private static final String SERVER_URL = "http://localhost:3000";
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final Gson gson = new Gson();
+
+    /**
+     * Obtener guión conversacional completo
+     */
+    public static ConversationScript getConversationScript(
+            List<String> agentIds,
+            String location,
+            String contextHint,
+            String groupHash,
+            boolean forceNew) {
+        try {
+            // Construir request body
+            JsonObject body = new JsonObject();
+            body.add("agentIds", gson.toJsonTree(agentIds));
+            body.addProperty("location", location);
+            body.addProperty("contextHint", contextHint);
+            body.addProperty("groupHash", groupHash);
+            body.addProperty("forceNew", forceNew);
+
+            // Hacer request
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SERVER_URL + "/api/v1/minecraft/conversation-script"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body)))
+                .build();
+
+            HttpResponse<String> response = client.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            );
+
+            if (response.statusCode() != 200) {
+                System.err.println("Failed to get script: " + response.body());
+                return null;
+            }
+
+            // Parse respuesta
+            return gson.fromJson(response.body(), ConversationScript.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
+```
+
+### 5. Integración en Tick Handler
+
+```java
+@SubscribeEvent
+public void onWorldTick(TickEvent.WorldTickEvent event) {
+    if (event.phase == TickEvent.Phase.END &&
+        event.world.getGameTime() % 20 == 0) { // Cada segundo
+
+        // Para cada jugador conectado
+        for (ServerPlayer player : event.world.players()) {
+            SocialGroupManager.checkPlayerProximity(player);
+        }
+    }
+}
+```
+
+## Templates Pre-definidos (Gratis)
 
 ### 1. Conversación Casual sobre el Clima
 - **Topic**: "El clima de hoy"
@@ -197,37 +528,6 @@ El sistema incluye **4 templates gratuitos** para evitar costos de IA:
 - **Categoría**: storytelling
 - **Participantes**: 2-3
 
-## Timing y Avance Automático
-
-### Configuración por Defecto
-
-```typescript
-{
-  minDelayBetweenLines: 3,      // 3 segundos mínimo
-  maxDelayBetweenLines: 6,      // 6 segundos máximo
-  pauseAtPhaseChange: 2,        // 2 segundos extra en cambios de fase
-  loopAfterCompletion: true,    // Reiniciar después de completar
-  loopDelay: 120                // 2 minutos antes de reiniciar
-}
-```
-
-### Ejemplo de Timeline
-
-```
-00:00 - [GREETING] Ada: "Hola Albert, ¿cómo estás?"
-00:04 - [GREETING] Albert: "Hola Ada, muy bien gracias"
-00:09 - [TOPIC_INTRO] Ada: "¿Viste qué buen día hace?"
-      └─ +2s de pausa (cambio de fase)
-00:15 - [TOPIC_INTRO] Albert: "Sí, el sol está brillante"
-00:20 - [DEVELOPMENT] Ada: "Ayer llovió tanto..."
-00:26 - [DEVELOPMENT] Albert: "Cierto, el trueno era fuerte"
-00:31 - [CONCLUSION] Ada: "Bueno, debo irme"
-      └─ +2s de pausa (cambio de fase)
-00:38 - [FAREWELL] Albert: "Nos vemos luego"
-00:43 - [FAREWELL] Ada: "Hasta pronto!"
-00:48 - [COMPLETED] - Espera 2 minutos antes de reiniciar
-```
-
 ## Costos
 
 ### Templates (Gratis)
@@ -243,89 +543,82 @@ El sistema incluye **4 templates gratuitos** para evitar costos de IA:
 - **Uso**: Solo cuando:
   - No hay template compatible
   - Se fuerza con `forceAI: true`
-  - Hay historial importante entre participantes
 
 ## Caché
 
-### Caché de Guiones
+### Caché de Guiones Generados
 - **Key**: Hash de participantes + topic
 - **Duración**: Hasta que se reinicie el servidor
-- **Beneficio**: Reutiliza guiones ya generados
+- **Beneficio**: Reutiliza guiones ya generados sin costo
 
-### Caché de Scripts del Manager
-- **Key**: groupHash
-- **Duración**: Mientras la conversación esté activa
-- **Beneficio**: No regenera si ya hay conversación en progreso
+### Caché en el Mod
+- **Almacenamiento**: Memoria (RAM)
+- **Duración**: Mientras el grupo esté activo
+- **Limpieza**: Cuando jugadores se alejan o desconectan
 
-## Limpieza Automática
+## Ventajas vs Polling
 
-### Conversaciones Inactivas
-
-El sistema limpia automáticamente conversaciones que:
-- No tienen listeners (jugadores cerca)
-- Llevan más de 10 minutos sin avanzar
-
-```typescript
-ConversationScriptManager.cleanupInactiveConversations(10);
-// Limpia conversaciones con 10+ minutos de inactividad
-```
-
-## Integración con Minecraft
-
-### Java - Polling Regular
-
-```java
-// En un tick handler (cada 20 ticks = 1 segundo)
-@SubscribeEvent
-public void onWorldTick(TickEvent.WorldTickEvent event) {
-    if (event.phase == TickEvent.Phase.END && event.world.getGameTime() % 20 == 0) {
-        // Cada segundo, verificar grupos sociales cercanos
-        for (SocialGroup group : activeSocialGroups) {
-            String groupHash = group.getHash();
-
-            // Consultar línea actual
-            HttpResponse<String> response = HttpClient.newHttpClient().send(
-                HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:3000/api/v1/minecraft/conversation-script?groupHash=" + groupHash))
-                    .GET()
-                    .build(),
-                HttpResponse.BodyHandlers.ofString()
-            );
-
-            if (response.statusCode() == 200) {
-                JsonObject data = JsonParser.parseString(response.body()).getAsJsonObject();
-                JsonObject currentLine = data.getAsJsonObject("currentLine");
-
-                if (currentLine != null) {
-                    String agentId = currentLine.get("agentId").getAsString();
-                    String message = currentLine.get("message").getAsString();
-                    String agentName = currentLine.get("agentName").getAsString();
-
-                    // Mostrar mensaje en chat bubble del NPC
-                    showChatBubble(agentId, agentName, message);
-                }
-            }
-        }
-    }
-}
-```
+| Aspecto | Sistema Anterior (Polling) | Sistema Nuevo (Local) |
+|---------|----------------------------|----------------------|
+| Requests HTTP | ~60 requests/minuto por grupo | 1 request inicial |
+| Latencia | 50-200ms por línea | 0ms (local) |
+| Ancho de banda | ~10 KB/minuto | ~2 KB una vez |
+| Funciona offline | ❌ No | ✅ Sí (después de descargar) |
+| Carga del servidor | Alta | Mínima |
+| Sincronización | Perfecta entre clientes | Independiente por cliente |
 
 ## Estadísticas
 
-```typescript
-// Obtener estadísticas
-ConversationScriptManager.getStats();
+```java
+// Obtener stats del servidor (opcional)
+Map<String, Object> stats = ConversationScriptManager.getStats();
 // {
-//   activeConversations: 5,
+//   registeredGroups: 5,
 //   loadedScripts: 12,
 //   totalListeners: 8
 // }
 
-ConversationScriptGenerator.getCacheStats();
-// {
-//   cachedScripts: 15,
-//   templates: 4
-// }
+// Stats locales del mod
+int activeConversations = SocialGroupManager.getActivePlayerCount();
+```
+
+## Troubleshooting
+
+### Problema: Conversación no inicia
+
+**Causa**: No se pudo obtener guión del servidor
+
+**Solución**:
+```java
+// Verificar logs
+System.err.println("Failed to get script for group: " + groupHash);
+
+// Verificar conectividad
+curl http://localhost:3000/api/v1/minecraft/conversation-script \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"agentIds":["ada","albert"],"location":"minecraft:overworld","groupHash":"test"}'
+```
+
+### Problema: Conversación se corta
+
+**Causa**: Player fue detenido prematuramente
+
+**Solución**:
+```java
+// Verificar que no se llama a stop() accidentalmente
+SocialGroupManager.stopConversation(groupHash);
+```
+
+### Problema: Múltiples conversaciones del mismo grupo
+
+**Causa**: No se verifica si ya existe player activo
+
+**Solución**:
+```java
+// Siempre verificar antes de crear
+if (activePlayers.containsKey(groupHash)) {
+    return; // Ya existe
+}
 ```
 
 ## Ejemplo de Conversación Completa
@@ -337,7 +630,7 @@ Albert Einstein: "Hola Ada, muy bien gracias. ¿Y tú?"
 
 [00:09] TOPIC_INTRODUCTION
 Ada Lovelace: "Bien también. Qué buen día hace, ¿no?"
-Albert Einstein: "Sí, el sol está brillante hoy. Perfecto para trabajar afuera."
+Albert Einstein: "Sí, el sol está brillante hoy."
 
 [00:20] DEVELOPMENT
 Ada Lovelace: "Totalmente. Ayer llovió tanto que no pude salir."
@@ -351,90 +644,10 @@ Albert Einstein: "Cierto, eso es bueno. Bueno, debo irme."
 Ada Lovelace: "Nos vemos luego!"
 Albert Einstein: "Hasta pronto, cuídate!"
 
-[00:48] COMPLETED - Loop en 2 minutos
+[00:48] COMPLETED - Loop en 3 minutos
 ```
 
-## Ventajas vs Sistema Anterior
+---
 
-| Aspecto | Sistema Anterior | Sistema Nuevo |
-|---------|------------------|---------------|
-| Estructura | Frases sueltas | Guión completo (saludo → despedida) |
-| Coherencia | Ninguna | Total |
-| Comprensibilidad | Baja | Alta (escuchas desde cualquier punto) |
-| Costo | $0.00006/frase | $0.00006/guión completo (12 líneas) |
-| Templates | No | 4 gratuitos |
-| Duración | Instantáneo | 40-80 segundos por guión |
-| Loop | No | Sí (reinicia automáticamente) |
-
-## Testing
-
-```typescript
-import { ConversationScriptGenerator } from "@/lib/minecraft/conversation-script-generator";
-import { ConversationScriptManager } from "@/lib/minecraft/conversation-script-manager";
-
-// Generar script
-const result = await ConversationScriptGenerator.generateScript({
-  participants: [
-    { agentId: "ada", name: "Ada", personality: "matemática brillante" },
-    { agentId: "albert", name: "Albert", personality: "físico curioso" }
-  ],
-  location: "minecraft:overworld",
-  contextHint: "cerca del laboratorio",
-  useTemplate: true
-});
-
-console.log("Script generado:", result.script.topic);
-console.log("Líneas:", result.script.lines.length);
-console.log("Fuente:", result.source);
-
-// Iniciar conversación
-const progress = await ConversationScriptManager.startConversation(
-  "ada_albert",
-  result.script
-);
-
-// Esperar 5 segundos y verificar progreso
-setTimeout(() => {
-  const currentLine = ConversationScriptManager.getCurrentLine("ada_albert");
-  console.log("Línea actual:", currentLine?.message);
-}, 5000);
-```
-
-## Troubleshooting
-
-### Problema: Conversación no avanza
-
-**Causa**: Timer no se programó correctamente
-
-**Solución**:
-```typescript
-ConversationScriptManager.stopConversation(groupHash);
-ConversationScriptManager.startConversation(groupHash, script);
-```
-
-### Problema: Costo muy alto
-
-**Causa**: Se está usando IA en lugar de templates
-
-**Solución**:
-```typescript
-// Forzar uso de templates
-const result = await ConversationScriptGenerator.generateScript({
-  participants,
-  location,
-  useTemplate: true,  // ✅
-  forceAI: false      // ✅
-});
-```
-
-### Problema: Conversaciones se acumulan
-
-**Causa**: No se limpian conversaciones inactivas
-
-**Solución**:
-```typescript
-// Ejecutar cada 10 minutos
-setInterval(() => {
-  ConversationScriptManager.cleanupInactiveConversations(10);
-}, 10 * 60 * 1000);
-```
+**Última actualización:** 2026-01-29
+**Versión:** 2.0 (Client-side execution)

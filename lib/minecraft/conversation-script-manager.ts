@@ -1,360 +1,154 @@
 /**
- * Gestor de Progreso de Conversaciones
+ * Gestor de Scripts de Conversaciones
  *
- * Controla el avance de guiones conversacionales en tiempo real
+ * Registra scripts y hace tracking de listeners (sin auto-advance, eso lo hace el cliente)
  */
 
 import { createLogger } from "@/lib/logger";
-import {
-  ConversationScript,
-  ConversationProgress,
-  ScriptTiming,
-  DialogueLine,
-  ConversationPhase,
-} from "./conversation-script-types";
-import { ConversationScriptGenerator } from "./conversation-script-generator";
+import { ConversationScript } from "./conversation-script-types";
 
 const log = createLogger({ module: "ConversationScriptManager" });
 
 /**
- * Configuración por defecto de timing
+ * Información de listeners por grupo
  */
-const DEFAULT_TIMING: ScriptTiming = {
-  minDelayBetweenLines: 3, // 3 segundos mínimo entre líneas
-  maxDelayBetweenLines: 6, // 6 segundos máximo
-  pauseAtPhaseChange: 2, // 2 segundos extra al cambiar de fase
-  loopAfterCompletion: true, // Reiniciar después de completar
-  loopDelay: 120, // 2 minutos antes de reiniciar
-};
+interface GroupListeners {
+  groupHash: string;
+  scriptId: string;
+  listeners: Set<string>;
+  lastActivityAt: Date;
+}
 
 export class ConversationScriptManager {
   /**
-   * Conversaciones activas
-   * Key: groupHash
-   */
-  private static activeConversations = new Map<string, ConversationProgress>();
-
-  /**
-   * Scripts cargados
+   * Scripts registrados
    * Key: scriptId
    */
   private static loadedScripts = new Map<string, ConversationScript>();
 
   /**
-   * Timers para avance automático
+   * Mapeo de groupHash a scriptId
    * Key: groupHash
    */
-  private static advanceTimers = new Map<string, NodeJS.Timeout>();
+  private static groupToScript = new Map<string, string>();
 
   /**
-   * Configuraciones de timing
+   * Listeners por grupo
    * Key: groupHash
    */
-  private static timingConfigs = new Map<string, ScriptTiming>();
+  private static groupListeners = new Map<string, GroupListeners>();
 
   /**
-   * Iniciar conversación con un grupo
+   * Registrar script para un grupo (sin auto-advance)
    */
-  static async startConversation(
-    groupHash: string,
-    script: ConversationScript,
-    timing?: Partial<ScriptTiming>
-  ): Promise<ConversationProgress> {
-    // Detener conversación existente si la hay
-    this.stopConversation(groupHash);
-
-    // Crear progreso inicial
-    const progress: ConversationProgress = {
-      scriptId: script.scriptId,
-      groupHash,
-      currentLineIndex: 0,
-      currentPhase: ConversationPhase.GREETING,
-      startedAt: new Date(),
-      lastAdvanceAt: new Date(),
-      completed: false,
-      listeners: [],
-    };
-
-    // Guardar script y progreso
+  static registerScript(groupHash: string, script: ConversationScript): void {
+    // Guardar script
     this.loadedScripts.set(script.scriptId, script);
-    this.activeConversations.set(groupHash, progress);
+    this.groupToScript.set(groupHash, script.scriptId);
 
-    // Configurar timing
-    const finalTiming = { ...DEFAULT_TIMING, ...timing };
-    this.timingConfigs.set(groupHash, finalTiming);
+    // Inicializar listeners
+    this.groupListeners.set(groupHash, {
+      groupHash,
+      scriptId: script.scriptId,
+      listeners: new Set(),
+      lastActivityAt: new Date(),
+    });
 
-    log.info("Conversation started", {
+    log.info("Script registered", {
       groupHash,
       scriptId: script.scriptId,
       topic: script.topic,
       totalLines: script.lines.length,
     });
-
-    // Programar primer avance
-    this.scheduleNextAdvance(groupHash);
-
-    return progress;
   }
 
   /**
-   * Detener conversación
+   * Obtener script por groupHash
    */
-  static stopConversation(groupHash: string): void {
-    // Cancelar timer
-    const timer = this.advanceTimers.get(groupHash);
-    if (timer) {
-      clearTimeout(timer);
-      this.advanceTimers.delete(groupHash);
-    }
-
-    // Limpiar progreso
-    this.activeConversations.delete(groupHash);
-    this.timingConfigs.delete(groupHash);
-
-    log.info("Conversation stopped", { groupHash });
+  static getScriptByGroupHash(groupHash: string): ConversationScript | null {
+    const scriptId = this.groupToScript.get(groupHash);
+    if (!scriptId) return null;
+    return this.loadedScripts.get(scriptId) || null;
   }
 
   /**
-   * Avanzar conversación a la siguiente línea
+   * Limpiar script de un grupo
    */
-  static advanceConversation(groupHash: string): DialogueLine | null {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress || progress.completed) {
-      return null;
+  static unregisterScript(groupHash: string): void {
+    const scriptId = this.groupToScript.get(groupHash);
+    if (scriptId) {
+      this.loadedScripts.delete(scriptId);
     }
+    this.groupToScript.delete(groupHash);
+    this.groupListeners.delete(groupHash);
 
-    const script = this.loadedScripts.get(progress.scriptId);
-    if (!script) {
-      log.error("Script not found", { scriptId: progress.scriptId });
-      return null;
-    }
-
-    // Obtener línea actual
-    const currentLine = script.lines[progress.currentLineIndex];
-
-    if (!currentLine) {
-      // Conversación completada
-      this.handleConversationCompletion(groupHash);
-      return null;
-    }
-
-    // Actualizar progreso
-    progress.currentLineIndex++;
-    progress.currentPhase = currentLine.phase;
-    progress.lastAdvanceAt = new Date();
-
-    // Verificar si completó
-    if (progress.currentLineIndex >= script.lines.length) {
-      this.handleConversationCompletion(groupHash);
-    } else {
-      // Programar siguiente avance
-      this.scheduleNextAdvance(groupHash);
-    }
-
-    log.debug("Conversation advanced", {
-      groupHash,
-      lineIndex: progress.currentLineIndex - 1,
-      phase: currentLine.phase,
-      speaker: currentLine.agentName,
-    });
-
-    return currentLine;
+    log.info("Script unregistered", { groupHash });
   }
 
   /**
-   * Manejar finalización de conversación
-   */
-  private static handleConversationCompletion(groupHash: string): void {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress) return;
-
-    progress.completed = true;
-
-    const timing = this.timingConfigs.get(groupHash) || DEFAULT_TIMING;
-
-    log.info("Conversation completed", {
-      groupHash,
-      scriptId: progress.scriptId,
-      duration: Date.now() - progress.startedAt.getTime(),
-    });
-
-    // Si se debe reiniciar, programar loop
-    if (timing.loopAfterCompletion) {
-      const loopTimer = setTimeout(() => {
-        this.restartConversation(groupHash);
-      }, timing.loopDelay * 1000);
-
-      this.advanceTimers.set(groupHash, loopTimer);
-
-      log.info("Conversation will loop", {
-        groupHash,
-        delaySeconds: timing.loopDelay,
-      });
-    } else {
-      // Limpiar
-      this.stopConversation(groupHash);
-    }
-  }
-
-  /**
-   * Reiniciar conversación (loop)
-   */
-  private static async restartConversation(groupHash: string): Promise<void> {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress) return;
-
-    const script = this.loadedScripts.get(progress.scriptId);
-    if (!script) return;
-
-    log.info("Restarting conversation (loop)", { groupHash, scriptId: script.scriptId });
-
-    // Reiniciar progreso
-    progress.currentLineIndex = 0;
-    progress.currentPhase = ConversationPhase.GREETING;
-    progress.startedAt = new Date();
-    progress.lastAdvanceAt = new Date();
-    progress.completed = false;
-    progress.listeners = []; // Limpiar listeners
-
-    // Programar primer avance
-    this.scheduleNextAdvance(groupHash);
-  }
-
-  /**
-   * Programar siguiente avance
-   */
-  private static scheduleNextAdvance(groupHash: string): void {
-    const progress = this.activeConversations.get(groupHash);
-    const timing = this.timingConfigs.get(groupHash) || DEFAULT_TIMING;
-
-    if (!progress || progress.completed) return;
-
-    const script = this.loadedScripts.get(progress.scriptId);
-    if (!script) return;
-
-    // Calcular delay
-    let delay =
-      timing.minDelayBetweenLines +
-      Math.random() * (timing.maxDelayBetweenLines - timing.minDelayBetweenLines);
-
-    // Si es cambio de fase, agregar pausa extra
-    const nextLine = script.lines[progress.currentLineIndex];
-    if (nextLine && nextLine.phase !== progress.currentPhase) {
-      delay += timing.pauseAtPhaseChange;
-    }
-
-    // Programar avance
-    const timer = setTimeout(() => {
-      this.advanceConversation(groupHash);
-    }, delay * 1000);
-
-    this.advanceTimers.set(groupHash, timer);
-
-    log.debug("Next advance scheduled", {
-      groupHash,
-      delaySeconds: delay.toFixed(1),
-      nextLineIndex: progress.currentLineIndex,
-    });
-  }
-
-  /**
-   * Obtener línea actual sin avanzar
-   */
-  static getCurrentLine(groupHash: string): DialogueLine | null {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress) return null;
-
-    const script = this.loadedScripts.get(progress.scriptId);
-    if (!script) return null;
-
-    // Línea actual es la anterior (ya avanzada)
-    const lineIndex = Math.max(0, progress.currentLineIndex - 1);
-    return script.lines[lineIndex] || null;
-  }
-
-  /**
-   * Obtener próximas N líneas (sin avanzar)
-   */
-  static getUpcomingLines(groupHash: string, count: number = 3): DialogueLine[] {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress) return [];
-
-    const script = this.loadedScripts.get(progress.scriptId);
-    if (!script) return [];
-
-    const upcomingLines: DialogueLine[] = [];
-    for (let i = 0; i < count && progress.currentLineIndex + i < script.lines.length; i++) {
-      upcomingLines.push(script.lines[progress.currentLineIndex + i]);
-    }
-
-    return upcomingLines;
-  }
-
-  /**
-   * Registrar jugador como listener
+   * Registrar jugador como listener (para analytics)
    */
   static addListener(groupHash: string, playerId: string): void {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress) return;
-
-    if (!progress.listeners.includes(playerId)) {
-      progress.listeners.push(playerId);
-      log.debug("Listener added", { groupHash, playerId, totalListeners: progress.listeners.length });
+    const group = this.groupListeners.get(groupHash);
+    if (!group) {
+      log.warn("Cannot add listener, group not found", { groupHash, playerId });
+      return;
     }
+
+    group.listeners.add(playerId);
+    group.lastActivityAt = new Date();
+
+    log.debug("Listener added", {
+      groupHash,
+      playerId,
+      totalListeners: group.listeners.size,
+    });
   }
 
   /**
    * Remover jugador como listener
    */
   static removeListener(groupHash: string, playerId: string): void {
-    const progress = this.activeConversations.get(groupHash);
-    if (!progress) return;
+    const group = this.groupListeners.get(groupHash);
+    if (!group) return;
 
-    progress.listeners = progress.listeners.filter((id) => id !== playerId);
-    log.debug("Listener removed", { groupHash, playerId, totalListeners: progress.listeners.length });
+    group.listeners.delete(playerId);
+    group.lastActivityAt = new Date();
+
+    log.debug("Listener removed", {
+      groupHash,
+      playerId,
+      totalListeners: group.listeners.size,
+    });
   }
 
   /**
-   * Obtener progreso de conversación
-   */
-  static getProgress(groupHash: string): ConversationProgress | null {
-    return this.activeConversations.get(groupHash) || null;
-  }
-
-  /**
-   * Obtener todas las conversaciones activas
-   */
-  static getActiveConversations(): Map<string, ConversationProgress> {
-    return new Map(this.activeConversations);
-  }
-
-  /**
-   * Obtener script de una conversación
+   * Obtener script por ID
    */
   static getScript(scriptId: string): ConversationScript | null {
     return this.loadedScripts.get(scriptId) || null;
   }
 
   /**
-   * Limpiar conversaciones inactivas (sin listeners por más de X tiempo)
+   * Limpiar grupos inactivos (sin listeners por más de X tiempo)
    */
-  static cleanupInactiveConversations(inactiveThresholdMinutes: number = 10): number {
+  static cleanupInactiveGroups(inactiveThresholdMinutes: number = 30): number {
     const now = Date.now();
     const threshold = inactiveThresholdMinutes * 60 * 1000;
     let cleaned = 0;
 
-    for (const [groupHash, progress] of this.activeConversations.entries()) {
-      const inactive = now - progress.lastAdvanceAt.getTime() > threshold;
-      const noListeners = progress.listeners.length === 0;
+    for (const [groupHash, group] of this.groupListeners.entries()) {
+      const inactive = now - group.lastActivityAt.getTime() > threshold;
+      const noListeners = group.listeners.size === 0;
 
       if (inactive && noListeners) {
-        this.stopConversation(groupHash);
+        this.unregisterScript(groupHash);
         cleaned++;
       }
     }
 
     if (cleaned > 0) {
-      log.info("Cleaned up inactive conversations", { count: cleaned });
+      log.info("Cleaned up inactive groups", { count: cleaned });
     }
 
     return cleaned;
@@ -364,13 +158,15 @@ export class ConversationScriptManager {
    * Obtener estadísticas
    */
   static getStats() {
+    const totalListeners = Array.from(this.groupListeners.values()).reduce(
+      (sum, g) => sum + g.listeners.size,
+      0
+    );
+
     return {
-      activeConversations: this.activeConversations.size,
+      registeredGroups: this.groupListeners.size,
       loadedScripts: this.loadedScripts.size,
-      totalListeners: Array.from(this.activeConversations.values()).reduce(
-        (sum, p) => sum + p.listeners.length,
-        0
-      ),
+      totalListeners,
     };
   }
 
@@ -378,16 +174,10 @@ export class ConversationScriptManager {
    * Limpiar todo (útil para tests)
    */
   static clearAll(): void {
-    // Detener todos los timers
-    for (const groupHash of this.activeConversations.keys()) {
-      this.stopConversation(groupHash);
-    }
-
-    this.activeConversations.clear();
     this.loadedScripts.clear();
-    this.advanceTimers.clear();
-    this.timingConfigs.clear();
+    this.groupToScript.clear();
+    this.groupListeners.clear();
 
-    log.info("All conversations cleared");
+    log.info("All scripts cleared");
   }
 }

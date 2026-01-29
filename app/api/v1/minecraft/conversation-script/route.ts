@@ -36,24 +36,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificar si ya hay una conversación activa
-    const existingProgress = ConversationScriptManager.getProgress(groupHash);
+    // Verificar si ya hay un script registrado para este grupo
+    const existingScript = ConversationScriptManager.getScriptByGroupHash(groupHash);
 
-    if (existingProgress && !forceNew) {
-      // Retornar conversación existente
-      const script = ConversationScriptManager.getScript(existingProgress.scriptId);
-
-      if (script) {
-        return NextResponse.json({
-          scriptId: script.scriptId,
-          topic: script.topic,
-          totalLines: script.lines.length,
-          currentLineIndex: existingProgress.currentLineIndex,
-          currentPhase: existingProgress.currentPhase,
-          completed: existingProgress.completed,
-          progress: (existingProgress.currentLineIndex / script.lines.length) * 100,
-        });
-      }
+    if (existingScript && !forceNew) {
+      // Retornar script existente completo
+      return NextResponse.json({
+        scriptId: existingScript.scriptId,
+        topic: existingScript.topic,
+        location: existingScript.location,
+        contextHint: existingScript.contextHint,
+        participants: existingScript.participants.map((p) => ({
+          agentId: p.agentId,
+          name: p.name,
+        })),
+        lines: existingScript.lines.map((line) => ({
+          agentId: line.agentId,
+          agentName: line.agentName,
+          message: line.message,
+          phase: line.phase,
+          lineNumber: line.lineNumber,
+        })),
+        totalLines: existingScript.lines.length,
+        duration: existingScript.duration,
+        source: "cache",
+        cost: 0,
+        generatedBy: existingScript.generatedBy,
+        timing: {
+          minDelayBetweenLines: 4,
+          maxDelayBetweenLines: 7,
+          pauseAtPhaseChange: 3,
+          loopDelay: 180,
+        },
+      });
     }
 
     // Obtener información de participantes
@@ -68,30 +83,38 @@ export async function POST(req: NextRequest) {
       useTemplate: true, // Preferir templates (gratis)
     });
 
-    // Iniciar conversación
-    const progress = await ConversationScriptManager.startConversation(
-      groupHash,
-      result.script,
-      {
-        minDelayBetweenLines: 4, // 4 segundos mínimo
-        maxDelayBetweenLines: 7, // 7 segundos máximo
-        pauseAtPhaseChange: 3, // 3 segundos extra en cambios de fase
-        loopAfterCompletion: true,
-        loopDelay: 180, // 3 minutos antes de reiniciar
-      }
-    );
+    // Registrar en manager solo para tracking (sin auto-advance)
+    ConversationScriptManager.registerScript(groupHash, result.script);
 
+    // Retornar guión completo para que el mod lo almacene localmente
     return NextResponse.json({
       scriptId: result.script.scriptId,
       topic: result.script.topic,
+      location: result.script.location,
+      contextHint: result.script.contextHint,
+      participants: result.script.participants.map((p) => ({
+        agentId: p.agentId,
+        name: p.name,
+      })),
+      lines: result.script.lines.map((line) => ({
+        agentId: line.agentId,
+        agentName: line.agentName,
+        message: line.message,
+        phase: line.phase,
+        lineNumber: line.lineNumber,
+      })),
       totalLines: result.script.lines.length,
-      currentLineIndex: progress.currentLineIndex,
-      currentPhase: progress.currentPhase,
-      completed: progress.completed,
-      progress: 0,
+      duration: result.script.duration,
       source: result.source,
       cost: result.cost,
       generatedBy: result.script.generatedBy,
+      // Configuración recomendada para el timer del cliente
+      timing: {
+        minDelayBetweenLines: 4,
+        maxDelayBetweenLines: 7,
+        pauseAtPhaseChange: 3,
+        loopDelay: 180,
+      },
     });
   } catch (error) {
     console.error("[Conversation Script API] Error:", error);
@@ -106,114 +129,35 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * GET /api/v1/minecraft/conversation-script?groupHash=xxx
+ * PUT /api/v1/minecraft/conversation-script?groupHash=xxx&playerId=yyy
  *
- * Obtener línea actual de una conversación activa
+ * Reportar que un jugador está escuchando la conversación (para analytics)
  */
-export async function GET(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const groupHash = searchParams.get("groupHash");
-    const action = searchParams.get("action"); // "current" | "upcoming" | "progress"
-    const playerId = searchParams.get("playerId"); // Para tracking de listeners
+    const playerId = searchParams.get("playerId");
 
-    if (!groupHash) {
+    if (!groupHash || !playerId) {
       return NextResponse.json(
-        { error: "Se requiere groupHash" },
+        { error: "Se requiere groupHash y playerId" },
         { status: 400 }
       );
     }
 
-    // Registrar jugador como listener si se provee
-    if (playerId) {
-      ConversationScriptManager.addListener(groupHash, playerId);
-    }
-
-    // Obtener progreso
-    const progress = ConversationScriptManager.getProgress(groupHash);
-
-    if (!progress) {
-      return NextResponse.json(
-        { error: "No hay conversación activa para este grupo" },
-        { status: 404 }
-      );
-    }
-
-    const script = ConversationScriptManager.getScript(progress.scriptId);
-
-    if (!script) {
-      return NextResponse.json(
-        { error: "Script no encontrado" },
-        { status: 404 }
-      );
-    }
-
-    // Según la acción solicitada
-    if (action === "upcoming") {
-      // Próximas 3 líneas
-      const upcomingLines = ConversationScriptManager.getUpcomingLines(groupHash, 3);
-
-      return NextResponse.json({
-        groupHash,
-        upcomingLines: upcomingLines.map((line) => ({
-          agentId: line.agentId,
-          agentName: line.agentName,
-          message: line.message,
-          phase: line.phase,
-          lineNumber: line.lineNumber,
-        })),
-        totalLines: script.lines.length,
-        currentLineIndex: progress.currentLineIndex,
-      });
-    }
-
-    if (action === "progress") {
-      // Solo información de progreso
-      return NextResponse.json({
-        groupHash,
-        scriptId: script.scriptId,
-        topic: script.topic,
-        totalLines: script.lines.length,
-        currentLineIndex: progress.currentLineIndex,
-        currentPhase: progress.currentPhase,
-        completed: progress.completed,
-        progress: (progress.currentLineIndex / script.lines.length) * 100,
-        listeners: progress.listeners.length,
-      });
-    }
-
-    // Por defecto: línea actual
-    const currentLine = ConversationScriptManager.getCurrentLine(groupHash);
-
-    if (!currentLine) {
-      return NextResponse.json({
-        groupHash,
-        currentLine: null,
-        completed: progress.completed,
-        message: progress.completed ? "Conversación completada" : "Esperando inicio",
-      });
-    }
+    // Registrar jugador como listener (solo para analytics)
+    ConversationScriptManager.addListener(groupHash, playerId);
 
     return NextResponse.json({
-      groupHash,
-      currentLine: {
-        agentId: currentLine.agentId,
-        agentName: currentLine.agentName,
-        message: currentLine.message,
-        phase: currentLine.phase,
-        lineNumber: currentLine.lineNumber,
-      },
-      totalLines: script.lines.length,
-      currentLineIndex: progress.currentLineIndex - 1, // -1 porque ya avanzó
-      currentPhase: progress.currentPhase,
-      completed: progress.completed,
-      progress: ((progress.currentLineIndex - 1) / script.lines.length) * 100,
+      success: true,
+      message: "Listener registrado",
     });
   } catch (error) {
     console.error("[Conversation Script API] Error:", error);
     return NextResponse.json(
       {
-        error: "Error al obtener línea actual",
+        error: "Error al registrar listener",
         message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
@@ -224,7 +168,7 @@ export async function GET(req: NextRequest) {
 /**
  * DELETE /api/v1/minecraft/conversation-script?groupHash=xxx
  *
- * Detener conversación
+ * Eliminar script registrado para un grupo
  */
 export async function DELETE(req: NextRequest) {
   try {
@@ -238,17 +182,17 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    ConversationScriptManager.stopConversation(groupHash);
+    ConversationScriptManager.unregisterScript(groupHash);
 
     return NextResponse.json({
       success: true,
-      message: "Conversación detenida",
+      message: "Script eliminado",
     });
   } catch (error) {
     console.error("[Conversation Script API] Error:", error);
     return NextResponse.json(
       {
-        error: "Error al detener conversación",
+        error: "Error al eliminar script",
         message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
