@@ -333,15 +333,18 @@ export class ConversationScriptGenerator {
     // Calcular duración (3-5 segundos por línea)
     const duration = lines.length * 4;
 
+    const now = new Date();
     return {
       scriptId: uuidv4(),
+      version: 1, // Primera versión
       participants,
       topic: template.topic,
       location,
       contextHint,
       lines,
       duration,
-      createdAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
       generatedBy: "template",
     };
   }
@@ -427,15 +430,18 @@ Formato JSON:
       const totalTokens = response.usage?.total_tokens || 0;
       const cost = (totalTokens * 0.15) / 1_000_000; // $0.15 por millón tokens
 
+      const now = new Date();
       const script: ConversationScript = {
         scriptId: uuidv4(),
+        version: 1, // Primera versión
         participants,
         topic,
         location,
         contextHint,
         lines,
         duration: lines.length * 4, // 4 segundos por línea
-        createdAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
         generatedBy: "ai",
       };
 
@@ -489,6 +495,67 @@ Formato JSON:
     ];
 
     return topics[Math.floor(Math.random() * topics.length)];
+  }
+
+  /**
+   * Regenerar script existente con versión incrementada
+   */
+  static async regenerateScript(
+    existingScript: ConversationScript,
+    options?: Partial<ScriptGenerationOptions>
+  ): Promise<ScriptGenerationResult> {
+    log.info("Regenerating script", {
+      scriptId: existingScript.scriptId,
+      currentVersion: existingScript.version,
+    });
+
+    // Generar nuevo script
+    const result = await this.generateScript({
+      participants: existingScript.participants,
+      location: existingScript.location,
+      contextHint: existingScript.contextHint,
+      topic: existingScript.topic,
+      ...options,
+      forceAI: options?.forceAI ?? false, // Permitir usar templates en regeneración
+    });
+
+    // Mantener el mismo scriptId pero incrementar versión
+    result.script.scriptId = existingScript.scriptId;
+    result.script.version = existingScript.version + 1;
+    result.script.createdAt = existingScript.createdAt; // Mantener fecha de creación original
+    result.script.updatedAt = new Date(); // Nueva fecha de actualización
+
+    // Actualizar caché
+    const cacheKey = this.generateCacheKey(
+      existingScript.participants,
+      existingScript.topic
+    );
+    this.scriptCache.set(cacheKey, result.script);
+
+    log.info("Script regenerated", {
+      scriptId: result.script.scriptId,
+      newVersion: result.script.version,
+      source: result.source,
+    });
+
+    return result;
+  }
+
+  /**
+   * Invalidar script (incrementar versión para forzar actualización)
+   */
+  static invalidateScript(scriptId: string): void {
+    // Buscar script en caché
+    for (const [key, script] of this.scriptCache.entries()) {
+      if (script.scriptId === scriptId) {
+        script.version++;
+        script.updatedAt = new Date();
+        log.info("Script invalidated", { scriptId, newVersion: script.version });
+        return;
+      }
+    }
+
+    log.warn("Script not found for invalidation", { scriptId });
   }
 
   /**

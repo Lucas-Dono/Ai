@@ -5,7 +5,7 @@
  */
 
 import { createLogger } from "@/lib/logger";
-import { ConversationScript } from "./conversation-script-types";
+import { ConversationScript, ScriptMetadata } from "./conversation-script-types";
 
 const log = createLogger({ module: "ConversationScriptManager" });
 
@@ -127,6 +127,37 @@ export class ConversationScriptManager {
    */
   static getScript(scriptId: string): ConversationScript | null {
     return this.loadedScripts.get(scriptId) || null;
+  }
+
+  /**
+   * Obtener metadata de script (sin las líneas completas)
+   */
+  static getScriptMetadata(groupHash: string): ScriptMetadata | null {
+    const scriptId = this.groupToScript.get(groupHash);
+    if (!scriptId) return null;
+
+    const script = this.loadedScripts.get(scriptId);
+    if (!script) return null;
+
+    return {
+      scriptId: script.scriptId,
+      groupHash,
+      version: script.version,
+      topic: script.topic,
+      totalLines: script.lines.length,
+      updatedAt: script.updatedAt,
+      generatedBy: script.generatedBy,
+    };
+  }
+
+  /**
+   * Verificar si hay una versión más nueva disponible
+   */
+  static hasNewerVersion(groupHash: string, clientVersion: number): boolean {
+    const metadata = this.getScriptMetadata(groupHash);
+    if (!metadata) return false;
+
+    return metadata.version > clientVersion;
   }
 
   /**

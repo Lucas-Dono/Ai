@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       // Retornar script existente completo
       return NextResponse.json({
         scriptId: existingScript.scriptId,
+        version: existingScript.version,
         topic: existingScript.topic,
         location: existingScript.location,
         contextHint: existingScript.contextHint,
@@ -59,6 +60,8 @@ export async function POST(req: NextRequest) {
         })),
         totalLines: existingScript.lines.length,
         duration: existingScript.duration,
+        createdAt: existingScript.createdAt,
+        updatedAt: existingScript.updatedAt,
         source: "cache",
         cost: 0,
         generatedBy: existingScript.generatedBy,
@@ -89,6 +92,7 @@ export async function POST(req: NextRequest) {
     // Retornar guión completo para que el mod lo almacene localmente
     return NextResponse.json({
       scriptId: result.script.scriptId,
+      version: result.script.version,
       topic: result.script.topic,
       location: result.script.location,
       contextHint: result.script.contextHint,
@@ -105,6 +109,8 @@ export async function POST(req: NextRequest) {
       })),
       totalLines: result.script.lines.length,
       duration: result.script.duration,
+      createdAt: result.script.createdAt,
+      updatedAt: result.script.updatedAt,
       source: result.source,
       cost: result.cost,
       generatedBy: result.script.generatedBy,
@@ -121,6 +127,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: "Error al generar guión conversacional",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/v1/minecraft/conversation-script/metadata?groupHash=xxx
+ *
+ * Obtener solo metadata del script (para verificación de versión)
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const searchParams = req.nextUrl.searchParams;
+    const groupHash = searchParams.get("groupHash");
+
+    if (!groupHash) {
+      return NextResponse.json(
+        { error: "Se requiere groupHash" },
+        { status: 400 }
+      );
+    }
+
+    const metadata = ConversationScriptManager.getScriptMetadata(groupHash);
+
+    if (!metadata) {
+      return NextResponse.json(
+        { error: "No hay script registrado para este grupo" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(metadata);
+  } catch (error) {
+    console.error("[Conversation Script API] Error:", error);
+    return NextResponse.json(
+      {
+        error: "Error al obtener metadata",
         message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }

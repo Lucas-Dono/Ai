@@ -33,6 +33,7 @@ export interface DialogueLine {
  */
 export interface ConversationScript {
   scriptId: string; // UUID único
+  version: number; // Número de versión (incrementa con cada actualización)
   participants: Array<{
     agentId: string;
     name: string;
@@ -44,7 +45,22 @@ export interface ConversationScript {
   lines: DialogueLine[]; // Todas las líneas del guión (10-15 típicamente)
   duration: number; // Duración estimada en segundos
   createdAt: Date;
+  updatedAt: Date; // Última actualización
   generatedBy: "ai" | "template"; // Origen del guión
+}
+
+/**
+ * Metadata de guión (sin las líneas completas)
+ * Usado para verificación de versiones
+ */
+export interface ScriptMetadata {
+  scriptId: string;
+  groupHash: string;
+  version: number;
+  topic: string;
+  totalLines: number;
+  updatedAt: Date;
+  generatedBy: "ai" | "template";
 }
 
 /**

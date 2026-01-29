@@ -19,34 +19,40 @@ Sistema completo de conversaciones estructuradas para grupos de NPCs en Minecraf
 
 ## Arquitectura
 
-### Flujo Simplificado
+### Flujo Simplificado (con Versionado)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 1. Mod detecta grupo social cercano                        │
+│ 1. Al iniciar juego: Verificar versiones                   │
+│    GET /metadata → { version: 2, updatedAt: "..." }       │
+│    ¿version_servidor > version_local? → Descargar         │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 2. Mod detecta grupo social cercano                        │
 │    → Hash: "ada_lovelace_albert_einstein"                  │
 └──────────────────┬──────────────────────────────────────────┘
                    │
                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 2. Mod hace UNA request al servidor                        │
+│ 3. Si no tiene guión o versión vieja: Descargar           │
 │    POST /api/v1/minecraft/conversation-script              │
-│    → Recibe guión COMPLETO (10-15 líneas)                  │
+│    → Recibe guión COMPLETO (10-15 líneas + version)       │
 └──────────────────┬──────────────────────────────────────────┘
                    │
                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 3. Mod almacena guión en memoria                           │
+│ 4. Mod almacena guión en disco/memoria                     │
 │    ConversationScriptPlayer {                              │
-│      lines: DialogueLine[]                                 │
-│      currentIndex: 0                                       │
-│      timer: ScheduledFuture                                │
+│      scriptId, version, lines[]                            │
+│      currentIndex: 0, timer                                │
 │    }                                                        │
 └──────────────────┬──────────────────────────────────────────┘
                    │
                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 4. Timer local avanza líneas cada 4-7 segundos             │
+│ 5. Timer local avanza líneas cada 4-7 segundos             │
 │    - Sin HTTP requests                                     │
 │    - Sin latencia de red                                   │
 │    - Funciona offline                                      │
@@ -54,7 +60,7 @@ Sistema completo de conversaciones estructuradas para grupos de NPCs en Minecraf
                    │
                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 5. Al terminar: espera 3 minutos y reinicia (loop)        │
+│ 6. Al terminar: espera 3 minutos y reinicia (loop)        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -122,6 +128,40 @@ ConversationScript {
 
 ## API Endpoints
 
+### GET - Verificar Versión (Metadata)
+
+**Uso:** Verificar si hay una versión más nueva del guión sin descargarlo completo.
+
+```bash
+GET /api/v1/minecraft/conversation-script/metadata?groupHash=ada_lovelace_albert_einstein
+```
+
+**Respuesta (200 OK):**
+```json
+{
+  "scriptId": "uuid-123",
+  "groupHash": "ada_lovelace_albert_einstein",
+  "version": 2,
+  "topic": "El clima de hoy",
+  "totalLines": 10,
+  "updatedAt": "2026-01-29T18:30:00.000Z",
+  "generatedBy": "template"
+}
+```
+
+**Respuesta (404):**
+```json
+{
+  "error": "No hay script registrado para este grupo"
+}
+```
+
+**Cuándo usar:**
+- Al iniciar el juego, verificar todos los guiones almacenados localmente
+- Periódicamente (cada 30 minutos) para detectar actualizaciones
+- Comparar `version` del servidor con `version` local
+- Si `version_servidor > version_local` → descargar guión actualizado
+
 ### POST - Obtener Guión Completo
 
 ```bash
@@ -141,6 +181,7 @@ Content-Type: application/json
 ```json
 {
   "scriptId": "uuid-123",
+  "version": 1,
   "topic": "El clima de hoy",
   "location": "minecraft:overworld",
   "contextHint": "cerca de una fogata",
@@ -167,6 +208,8 @@ Content-Type: application/json
   ],
   "totalLines": 10,
   "duration": 40,
+  "createdAt": "2026-01-29T15:00:00.000Z",
+  "updatedAt": "2026-01-29T15:00:00.000Z",
   "source": "template",
   "cost": 0,
   "generatedBy": "template",
@@ -230,9 +273,24 @@ public class DialogueLine {
 
 public class ConversationScript {
     private String scriptId;
+    private int version; // Número de versión
     private String topic;
     private List<DialogueLine> lines;
     private TimingConfig timing;
+    private String createdAt;
+    private String updatedAt;
+
+    // Getters
+}
+
+public class ScriptMetadata {
+    private String scriptId;
+    private String groupHash;
+    private int version;
+    private String topic;
+    private int totalLines;
+    private String updatedAt;
+    private String generatedBy;
 
     // Getters
 }
@@ -245,7 +303,118 @@ public class TimingConfig {
 }
 ```
 
-### 2. Player de Conversaciones
+### 2. Gestor de Caché con Versionado
+
+```java
+import com.google.gson.Gson;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ScriptCacheManager {
+    private static final Gson gson = new Gson();
+    private static final File CACHE_DIR = new File("blaniel_cache/scripts");
+    private static final Map<String, ConversationScript> memoryCache = new HashMap<>();
+
+    static {
+        CACHE_DIR.mkdirs();
+    }
+
+    /**
+     * Guardar script en caché (disco + memoria)
+     */
+    public static void cacheScript(String groupHash, ConversationScript script) {
+        // Guardar en memoria
+        memoryCache.put(groupHash, script);
+
+        // Guardar en disco
+        File cacheFile = new File(CACHE_DIR, groupHash + ".json");
+        try (FileWriter writer = new FileWriter(cacheFile)) {
+            gson.toJson(script, writer);
+            System.out.println("Script cached: " + groupHash + " (v" + script.getVersion() + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Cargar script de caché
+     */
+    public static ConversationScript getCachedScript(String groupHash) {
+        // Verificar memoria primero
+        if (memoryCache.containsKey(groupHash)) {
+            return memoryCache.get(groupHash);
+        }
+
+        // Cargar de disco
+        File cacheFile = new File(CACHE_DIR, groupHash + ".json");
+        if (!cacheFile.exists()) {
+            return null;
+        }
+
+        try (FileReader reader = new FileReader(cacheFile)) {
+            ConversationScript script = gson.fromJson(reader, ConversationScript.class);
+            memoryCache.put(groupHash, script); // Cachear en memoria
+            return script;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Verificar si necesita actualización
+     */
+    public static boolean needsUpdate(String groupHash) {
+        ConversationScript cached = getCachedScript(groupHash);
+        if (cached == null) {
+            return true; // No existe, necesita descarga
+        }
+
+        // Consultar metadata del servidor
+        ScriptMetadata serverMetadata = BlanielAPI.getScriptMetadata(groupHash);
+        if (serverMetadata == null) {
+            return false; // No hay script en servidor, usar caché
+        }
+
+        // Comparar versiones
+        boolean needsUpdate = serverMetadata.getVersion() > cached.getVersion();
+
+        if (needsUpdate) {
+            System.out.println("Update available for " + groupHash +
+                              ": v" + cached.getVersion() + " -> v" + serverMetadata.getVersion());
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * Verificar todas las actualizaciones al iniciar el juego
+     */
+    public static void checkAllUpdates() {
+        System.out.println("Checking script updates...");
+
+        for (String groupHash : memoryCache.keySet()) {
+            if (needsUpdate(groupHash)) {
+                ConversationScript updated = BlanielAPI.getConversationScript(
+                    null, null, null, groupHash, true // forceNew = true
+                );
+
+                if (updated != null) {
+                    cacheScript(groupHash, updated);
+                    System.out.println("Updated script: " + groupHash + " (v" + updated.getVersion() + ")");
+                }
+            }
+        }
+
+        System.out.println("Script update check completed");
+    }
+}
+```
+
+### 3. Player de Conversaciones
 
 ```java
 import java.util.List;
@@ -350,7 +519,7 @@ public class ConversationScriptPlayer {
 }
 ```
 
-### 3. Gestor de Grupos Sociales
+### 4. Gestor de Grupos Sociales (con Caché)
 
 ```java
 import java.util.Map;
@@ -370,14 +539,22 @@ public class SocialGroupManager {
             return; // Ya está en progreso
         }
 
-        // Obtener guión del servidor
-        ConversationScript script = BlanielAPI.getConversationScript(
-            agentIds, location, contextHint, groupHash, false
-        );
+        // Intentar cargar de caché primero
+        ConversationScript script = ScriptCacheManager.getCachedScript(groupHash);
 
-        if (script == null) {
-            System.err.println("Failed to get conversation script for group: " + groupHash);
-            return;
+        // Si no está en caché o necesita actualización, descargar
+        if (script == null || ScriptCacheManager.needsUpdate(groupHash)) {
+            script = BlanielAPI.getConversationScript(
+                agentIds, location, contextHint, groupHash, false
+            );
+
+            if (script == null) {
+                System.err.println("Failed to get conversation script for group: " + groupHash);
+                return;
+            }
+
+            // Cachear el nuevo script
+            ScriptCacheManager.cacheScript(groupHash, script);
         }
 
         // Crear player y comenzar
@@ -386,7 +563,7 @@ public class SocialGroupManager {
         player.start();
 
         System.out.println("Started conversation for group: " + groupHash +
-                          " - Topic: " + script.getTopic());
+                          " - Topic: " + script.getTopic() + " (v" + script.getVersion() + ")");
     }
 
     /**
@@ -425,7 +602,7 @@ public class SocialGroupManager {
 }
 ```
 
-### 4. Cliente HTTP (BlanielAPI)
+### 5. Cliente HTTP (BlanielAPI)
 
 ```java
 import com.google.gson.Gson;
@@ -439,6 +616,38 @@ public class BlanielAPI {
     private static final String SERVER_URL = "http://localhost:3000";
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final Gson gson = new Gson();
+
+    /**
+     * Obtener metadata del script (solo versión, sin líneas)
+     */
+    public static ScriptMetadata getScriptMetadata(String groupHash) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SERVER_URL + "/api/v1/minecraft/conversation-script/metadata?groupHash=" + groupHash))
+                .GET()
+                .build();
+
+            HttpResponse<String> response = client.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            );
+
+            if (response.statusCode() == 404) {
+                return null; // No existe script para este grupo
+            }
+
+            if (response.statusCode() != 200) {
+                System.err.println("Failed to get metadata: " + response.body());
+                return null;
+            }
+
+            return gson.fromJson(response.body(), ScriptMetadata.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * Obtener guión conversacional completo
@@ -486,9 +695,21 @@ public class BlanielAPI {
 }
 ```
 
-### 5. Integración en Tick Handler
+### 6. Integración en Eventos
 
 ```java
+/**
+ * Al iniciar el servidor/mundo: verificar actualizaciones
+ */
+@SubscribeEvent
+public void onServerStart(ServerStartingEvent event) {
+    System.out.println("Blaniel: Checking script updates...");
+    ScriptCacheManager.checkAllUpdates();
+}
+
+/**
+ * Tick handler: verificar proximidad de jugadores a grupos
+ */
 @SubscribeEvent
 public void onWorldTick(TickEvent.WorldTickEvent event) {
     if (event.phase == TickEvent.Phase.END &&
@@ -498,6 +719,19 @@ public void onWorldTick(TickEvent.WorldTickEvent event) {
         for (ServerPlayer player : event.world.players()) {
             SocialGroupManager.checkPlayerProximity(player);
         }
+    }
+}
+
+/**
+ * Opcional: verificar actualizaciones periódicamente (cada 30 minutos)
+ */
+@SubscribeEvent
+public void onWorldTick(TickEvent.WorldTickEvent event) {
+    if (event.phase == TickEvent.Phase.END &&
+        event.world.getGameTime() % 36000 == 0) { // 30 minutos = 36000 ticks
+
+        System.out.println("Blaniel: Periodic script update check...");
+        ScriptCacheManager.checkAllUpdates();
     }
 }
 ```
@@ -555,6 +789,63 @@ public void onWorldTick(TickEvent.WorldTickEvent event) {
 - **Almacenamiento**: Memoria (RAM)
 - **Duración**: Mientras el grupo esté activo
 - **Limpieza**: Cuando jugadores se alejan o desconectan
+
+## Sistema de Versionado
+
+### Beneficios
+
+1. **Actualizaciones Automáticas:**
+   - Corrección de errores en guiones sin que el jugador haga nada
+   - Mejora de calidad de conversaciones de forma transparente
+   - Agregar más variedad sin invalidar toda la caché
+
+2. **Verificación Eficiente:**
+   - Solo descarga metadata (< 1 KB) para verificar versión
+   - Si no hay cambios, usa caché local (0 KB)
+   - Solo descarga guión completo si hay actualización
+
+3. **Caché Persistente:**
+   - Scripts se guardan en disco (sobreviven reinicio del juego)
+   - Memoria caché para acceso ultra-rápido
+   - Funciona offline después de descargar
+
+### Flujo de Actualización
+
+```
+INICIO DEL JUEGO:
+1. Cargar scripts de disco a memoria
+2. Para cada script en caché:
+   - GET /metadata → { version: 2 }
+   - ¿version_servidor > version_local?
+     ✅ Sí → POST /script (descargar actualizado)
+     ❌ No → Usar caché local
+
+CADA 30 MINUTOS (opcional):
+- Repetir verificación de actualizaciones
+- Solo descarga si hay cambios
+
+CUANDO JUGADOR SE ACERCA:
+- Usar script de caché (ya actualizado)
+- Sin HTTP requests
+```
+
+### Ejemplo de Actualización
+
+```
+Versión 1 (inicial):
+- Ada: "Hola Albert, ¿cómo estás?"
+- Albert: "Bien, gracias"
+
+Servidor actualiza a Versión 2 (mejor calidad):
+- Ada: "¡Hola Albert! ¿Cómo estás hoy?"
+- Albert: "¡Muy bien, gracias por preguntar! ¿Y tú?"
+
+Al iniciar el juego:
+- GET /metadata → { version: 2 }
+- Cache local: { version: 1 }
+- 2 > 1 ✅ → Descargar versión 2
+- Próxima conversación usará v2 automáticamente
+```
 
 ## Ventajas vs Polling
 
