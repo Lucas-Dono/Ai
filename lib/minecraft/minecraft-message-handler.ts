@@ -377,19 +377,19 @@ ${proximityContext.player.name}: ${userMessage.content}
 
 Responde como ${agent.name} en este contexto espacial de Minecraft. Mantén el mensaje corto y natural (1-3 oraciones).`;
 
-    // 7. Generar respuesta con LLM
+    // 7. Generar respuesta con LLM (usando cliente correcto de Venice)
     const venice = getVeniceClient();
-    const completion = await venice.createChatCompletion({
-      model: "llama-3.3-70b",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.9,
-      max_tokens: 200, // Respuestas cortas para chat
-    });
+    const response = await venice.generateWithSystemPrompt(
+      systemPrompt,
+      userPrompt,
+      {
+        model: process.env.VENICE_MODEL, // Usa el modelo del .env
+        temperature: 0.9,
+        maxTokens: 200, // Respuestas cortas para chat
+      }
+    );
 
-    const content = completion.choices[0]?.message?.content;
+    const content = response.text;
 
     if (!content) {
       console.error("Venice returned empty response");
