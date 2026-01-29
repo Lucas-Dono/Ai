@@ -128,15 +128,21 @@ Invoca un personaje en tu ubicación
 > ✓ Einstein invocado en tu posición
 ```
 
+### Controles de Teclado
+
+**Teclas principales:**
+- **`K`** → Abre la interfaz de Blaniel (login o selección de agentes)
+- **`C`** → Abre el chat para hablar con los agentes
+
 ### Abrir el chat avanzado
 
-**Presiona la tecla `K`** para abrir el chat de Blaniel.
+**Presiona la tecla `C`** para abrir el chat de Blaniel.
 
 Se abrirá una interfaz donde puedes escribir tu mensaje.
 
 ### Enviar mensajes
 
-1. Presiona `K`
+1. Presiona `C`
 2. Escribe tu mensaje
 3. Presiona `Enter` para enviar
 4. Presiona `ESC` para cancelar
@@ -263,9 +269,14 @@ Los NPCs responden con animaciones según el contexto:
   1. Ve a https://blaniel.com/create-character y crea un personaje
   2. También puedes usar personajes públicos de otros usuarios
 
-### La tecla K no funciona
+### Las teclas K o C no funcionan
 - **Causa:** Conflicto con otro mod o keybinding
-- **Solución:** Busca en las opciones de Minecraft → Controles → "Blaniel" y reasigna la tecla
+- **Solución:**
+  1. Ve a Opciones de Minecraft → Controles
+  2. Busca la categoría "Blaniel"
+  3. Reasigna las teclas:
+     - `key.blaniel.openui` (por defecto K) → Abrir UI de Blaniel
+     - `key.blaniel.openchat` (por defecto C) → Abrir chat
 
 ### Error de conexión al servidor
 - **Causa:** El servidor de Blaniel no está disponible o hay problemas de red
