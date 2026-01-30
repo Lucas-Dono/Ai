@@ -155,6 +155,7 @@ export const mockPrismaClient = {
   },
   characterDownload: {
     findUnique: vi.fn(),
+    findFirst: vi.fn(),
     create: vi.fn(),
   },
   characterRating: {
@@ -259,6 +260,54 @@ export const mockPrismaClient = {
     create: vi.fn(),
     findMany: vi.fn(),
   },
+  behaviorTriggerLog: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    deleteMany: vi.fn(),
+    count: vi.fn(),
+    groupBy: vi.fn(),
+  },
+  // Symbolic Bonds
+  symbolicBond: {
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  // Post Follow System
+  postFollower: {
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  // Reviews
+  review: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+    aggregate: vi.fn(),
+  },
+  // Important Events
+  importantEvent: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
   $transaction: vi.fn((callback) => callback(mockPrismaClient)),
 } as unknown as PrismaClient;
 
@@ -300,6 +349,7 @@ vi.mock('@/lib/auth', () => ({
 vi.mock('@/lib/auth-server', () => ({
   getServerSession: vi.fn(() => Promise.resolve(mockSession)),
   getUserSession: vi.fn(() => Promise.resolve(mockSession.user)),
+  getAuthenticatedUser: vi.fn(() => Promise.resolve(mockSession.user)),
 }));
 
 // ============================================
@@ -324,6 +374,7 @@ vi.mock('@/lib/emotional-system/llm/venice', () => ({
   getVeniceClient: vi.fn(() => ({
     generateJSON: vi.fn().mockResolvedValue({}),
     generateText: vi.fn().mockResolvedValue('Mock response'),
+    generateWithMessages: vi.fn().mockResolvedValue('This is a test response from Venice'),
   })),
 }));
 
@@ -338,6 +389,73 @@ vi.mock('@/lib/emotional-system/llm/hybrid-provider', () => ({
     generateText: vi.fn().mockResolvedValue('Mock response'),
     generateWithSystemPrompt: vi.fn().mockResolvedValue('Mock response from system prompt'),
   })),
+}));
+
+// ============================================
+// MOCK MESSAGE ENCRYPTION
+// ============================================
+
+vi.mock('@/lib/encryption/message-encryption', () => ({
+  encryptMessage: vi.fn((plaintext: string) => ({
+    encrypted: Buffer.from(plaintext).toString('base64'),
+    iv: 'mock-iv-' + Math.random().toString(36).substring(7),
+    authTag: 'mock-auth-tag-' + Math.random().toString(36).substring(7),
+  })),
+  decryptMessage: vi.fn((encrypted: string, _iv: string, _authTag: string) => {
+    try {
+      return Buffer.from(encrypted, 'base64').toString('utf8');
+    } catch {
+      return encrypted; // If not base64, return as-is
+    }
+  }),
+  decryptMessageIfNeeded: vi.fn((content: string, iv?: string | null, authTag?: string | null) => {
+    // If has iv and authTag, decrypt (mock implementation)
+    if (iv && authTag) {
+      try {
+        return Buffer.from(content, 'base64').toString('utf8');
+      } catch {
+        return content;
+      }
+    }
+    // Otherwise return as-is
+    return content;
+  }),
+  encryptMessageIfNeeded: vi.fn((content: string, iv?: string | null, authTag?: string | null) => {
+    if (iv && authTag) {
+      return { encrypted: content, iv, authTag };
+    }
+    return {
+      encrypted: Buffer.from(content).toString('base64'),
+      iv: 'mock-iv-' + Math.random().toString(36).substring(7),
+      authTag: 'mock-auth-tag-' + Math.random().toString(36).substring(7),
+    };
+  }),
+  isMessageEncrypted: vi.fn((message: any) => !!(message.iv && message.authTag)),
+}));
+
+// ============================================
+// MOCK QWEN EMBEDDINGS
+// ============================================
+
+vi.mock('@/lib/memory/qwen-embeddings', () => ({
+  generateQwenEmbedding: vi.fn(async (text: string) => {
+    // Return a mock 384-dimensional embedding vector (Qwen3-Embedding-0.6B dimension)
+    return Array(384).fill(0).map(() => Math.random());
+  }),
+  cosineSimilarity: vi.fn((a: number[], b: number[]) => {
+    // Simple mock implementation
+    if (!a || !b || a.length !== b.length) return 0;
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+    for (let i = 0; i < a.length; i++) {
+      dotProduct += a[i] * b[i];
+      normA += a[i] * a[i];
+      normB += b[i] * b[i];
+    }
+    const denominator = Math.sqrt(normA) * Math.sqrt(normB);
+    return denominator === 0 ? 0 : dotProduct / denominator;
+  }),
 }));
 
 // ============================================
@@ -386,18 +504,28 @@ export const mockAgent = (overrides: Partial<any> = {}) => ({
   voiceId: null,
   kind: 'companion',
   isPublic: false,
+  visibility: 'private',
   nsfwMode: false,
   stagePrompts: null,
   tone: 'casual',
   purpose: 'testing',
+  personalityVariant: null,
+  profile: {},
   createdAt: new Date(),
   updatedAt: new Date(),
-  personalityCore: mockPersonalityCore(),
-  internalState: mockInternalState(),
+  // Relations (Prisma naming)
+  PersonalityCore: null,
+  InternalState: null,
+  SemanticMemory: null,
+  CharacterGrowth: null,
+  BehaviorProfile: [],
+  User: null,
+  // Legacy lowercase versions for backward compatibility
+  personalityCore: null,
+  internalState: null,
   semanticMemory: null,
   characterGrowth: null,
-  behaviorProfiles: [],
-  user: mockUser(),
+  user: null,
   ...overrides,
 });
 
@@ -543,6 +671,32 @@ export const mockEmotionState = (overrides: Partial<any> = {}) => ({
   anticipation: 0.4,
   ...overrides,
 });
+
+// ============================================
+// MOCK SERVICES (for dynamic imports)
+// ============================================
+
+vi.mock('@/lib/services/post-follow.service', () => ({
+  PostFollowService: {
+    followPost: vi.fn().mockResolvedValue({ success: true }),
+    unfollowPost: vi.fn().mockResolvedValue({ success: true }),
+    isFollowing: vi.fn().mockResolvedValue(false),
+    getFollowers: vi.fn().mockResolvedValue([]),
+  },
+}));
+
+vi.mock('@/lib/services/notification.service', () => ({
+  NotificationService: {
+    notifyPostFollowers: vi.fn().mockResolvedValue(undefined),
+    notifyMentions: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('@/lib/services/post-follow-email.service', () => ({
+  PostFollowEmailService: {
+    notifyNewComment: vi.fn().mockResolvedValue(undefined),
+  },
+}));
 
 // ============================================
 // HELPER FUNCTIONS

@@ -1,6 +1,10 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { config } from "dotenv";
+
+// Load test environment variables
+config({ path: ".env.test" });
 
 export default defineConfig({
   plugins: [react()],
@@ -28,11 +32,11 @@ export default defineConfig({
       },
     },
     env: {
-      // Test environment variables
+      // Test environment variables (loaded from .env.test)
       NODE_ENV: "test",
-      DATABASE_URL: "postgresql://test:test@localhost:5432/test",
-      NEXTAUTH_SECRET: "test-secret-min-32-chars-long-123456",
-      NEXTAUTH_URL: "http://localhost:3000",
+      DATABASE_URL: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/creador_inteligencias_test",
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "test-secret-min-32-chars-long-123456",
+      NEXTAUTH_URL: process.env.NEXTAUTH_URL || "http://localhost:3000",
     },
   },
   resolve: {

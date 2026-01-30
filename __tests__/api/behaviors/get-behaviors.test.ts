@@ -5,12 +5,16 @@
  * Valida la estructura de datos, cálculos estadísticos, y casos edge.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { prisma } from "@/lib/prisma";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { nanoid } from "nanoid";
 import { BehaviorType } from "@prisma/client";
 import { GET } from "@/app/api/agents/[id]/behaviors/route";
 import { NextRequest } from "next/server";
-import { nanoid } from "nanoid";
+
+// Unmock Prisma for integration tests - we need the real database connection
+vi.unmock("@/lib/prisma");
+
+import { prisma } from "@/lib/prisma";
 
 describe("GET /api/agents/[id]/behaviors", () => {
   let testAgentId: string;

@@ -5,16 +5,34 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 import { BehaviorType } from "@prisma/client";
 import { GET } from "@/app/api/analytics/behaviors/route";
 import { NextRequest } from "next/server";
-import { nanoid } from "nanoid";
 
-// Mock next-auth
-vi.mock("@/lib/auth", () => ({
-  auth: vi.fn().mockResolvedValue({
-    user: { id: "test-user-analytics" },
+// Unmock Prisma for integration tests - we need the real database connection
+vi.unmock("@/lib/prisma");
+
+import { prisma } from "@/lib/prisma";
+
+// Mock auth-server to return the test user
+vi.mock("@/lib/auth-server", () => ({
+  getAuthenticatedUser: vi.fn().mockResolvedValue({
+    id: "test-user-analytics",
+    email: "test-analytics@test.com",
+    name: "Test User Analytics",
+  }),
+  getServerSession: vi.fn().mockResolvedValue({
+    user: {
+      id: "test-user-analytics",
+      email: "test-analytics@test.com",
+      name: "Test User Analytics",
+    },
+  }),
+  getUserSession: vi.fn().mockResolvedValue({
+    id: "test-user-analytics",
+    email: "test-analytics@test.com",
+    name: "Test User Analytics",
   }),
 }));
 

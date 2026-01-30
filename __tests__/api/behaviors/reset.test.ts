@@ -4,12 +4,16 @@
  * Tests para el endpoint que resetea todos los behaviors de un agente.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { prisma } from "@/lib/prisma";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { nanoid } from "nanoid";
 import { BehaviorType } from "@prisma/client";
 import { POST } from "@/app/api/agents/[id]/behaviors/reset/route";
 import { NextRequest } from "next/server";
-import { nanoid } from "nanoid";
+
+// Unmock Prisma for integration tests - we need the real database connection
+vi.unmock("@/lib/prisma");
+
+import { prisma } from "@/lib/prisma";
 
 describe("POST /api/agents/[id]/behaviors/reset", () => {
   let testAgentId: string;
