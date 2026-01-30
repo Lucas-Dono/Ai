@@ -15,7 +15,8 @@ import {
   FileTextIcon,
   Award,
   BarChartIcon,
-  LogOutIcon
+  LogOutIcon,
+  PackageIcon
 } from 'lucide-react';
 
 const navigation = [
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'Moderación', href: '/congrats/moderation', icon: ShieldAlertIcon },
   { name: 'Audit Logs', href: '/congrats/audit-logs', icon: FileTextIcon },
   { name: 'Certificados', href: '/congrats/certificates', icon: Award },
+  { name: 'Mod Minecraft', href: '/congrats/minecraft-mod', icon: PackageIcon },
 ];
 
 export default function AdminLayout({

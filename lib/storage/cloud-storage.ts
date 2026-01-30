@@ -36,6 +36,9 @@ export interface StorageService {
   uploadImage(buffer: Buffer, filename: string, userId: string): Promise<string>;
   deleteImage(url: string): Promise<void>;
   getSignedUrl(key: string, expiresIn?: number): Promise<string>;
+  uploadFile(buffer: Buffer, key: string, contentType?: string): Promise<string>;
+  getFile(key: string): Promise<Buffer>;
+  deleteFile(key: string): Promise<void>;
 }
 
 /**
@@ -105,6 +108,63 @@ class S3StorageService implements StorageService {
     const match = url.match(/avatars\/[^?]+/);
     return match ? match[0] : null;
   }
+
+  /**
+   * Sube archivo genérico a S3/R2
+   */
+  async uploadFile(buffer: Buffer, key: string, contentType?: string): Promise<string> {
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType || 'application/octet-stream',
+        CacheControl: 'public, max-age=31536000', // Cache 1 año
+      })
+    );
+
+    // Retornar URL pública
+    if (CDN_URL) {
+      return `${CDN_URL}/${key}`;
+    }
+
+    const region = process.env.AWS_REGION || 'us-east-1';
+    return `https://${BUCKET_NAME}.s3.${region}.amazonaws.com/${key}`;
+  }
+
+  /**
+   * Obtiene archivo desde S3/R2
+   */
+  async getFile(key: string): Promise<Buffer> {
+    const response = await s3Client.send(
+      new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      })
+    );
+
+    // Convertir stream a buffer
+    const chunks: Buffer[] = [];
+    const stream = response.Body as any;
+
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+
+    return Buffer.concat(chunks);
+  }
+
+  /**
+   * Elimina archivo desde S3/R2
+   */
+  async deleteFile(key: string): Promise<void> {
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      })
+    );
+  }
 }
 
 /**
@@ -151,6 +211,51 @@ class LocalStorageService implements StorageService {
   async getSignedUrl(key: string): Promise<string> {
     // En local no hay signed URLs, retornar la ruta directa
     return key;
+  }
+
+  /**
+   * Sube archivo genérico al sistema local
+   */
+  async uploadFile(buffer: Buffer, key: string, contentType?: string): Promise<string> {
+    const { writeFile, mkdir } = await import('fs/promises');
+    const path = await import('path');
+    const { existsSync } = await import('fs');
+
+    const filepath = path.join(process.cwd(), 'public', key);
+    const dir = path.dirname(filepath);
+
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
+    }
+
+    await writeFile(filepath, buffer);
+    return `/${key}`;
+  }
+
+  /**
+   * Obtiene archivo desde el sistema local
+   */
+  async getFile(key: string): Promise<Buffer> {
+    const { readFile } = await import('fs/promises');
+    const path = await import('path');
+
+    const filepath = path.join(process.cwd(), 'public', key);
+    return await readFile(filepath);
+  }
+
+  /**
+   * Elimina archivo del sistema local
+   */
+  async deleteFile(key: string): Promise<void> {
+    const { unlink } = await import('fs/promises');
+    const path = await import('path');
+
+    const filepath = path.join(process.cwd(), 'public', key);
+    try {
+      await unlink(filepath);
+    } catch (error) {
+      console.error('[LocalStorage] Error deleting file:', error);
+    }
   }
 }
 

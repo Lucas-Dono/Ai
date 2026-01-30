@@ -215,7 +215,8 @@
       "Bash(powershell -Command:*)",
       "Bash(unzip:*)",
       "Bash(javap:*)",
-      "Bash(rsync:*)"
+      "Bash(rsync:*)",
+      "Bash(git revert:*)"
     ],
     "deny": [],
     "ask": []
