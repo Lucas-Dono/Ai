@@ -58,24 +58,33 @@ export interface PIIPattern {
 export const SSN_PATTERN: PIIPattern = {
   type: PIIType.SSN,
   name: "Social Security Number",
-  regex: /\b(?!000|666|9\d{2})\d{3}-?(?!00)\d{2}-?(?!0000)\d{4}\b/g,
+  regex: /\b\d{3}-?\d{2}-?\d{4}\b/g,
   validator: (match: string) => {
     // Remove hyphens
     const cleaned = match.replace(/-/g, "");
     // Check length
     if (cleaned.length !== 9) return false;
-    // Check for invalid prefixes
+
+    // Check for invalid prefixes (000, 666, 900-999)
     const prefix = parseInt(cleaned.substring(0, 3));
     if (prefix === 0 || prefix === 666 || prefix >= 900) return false;
+
+    // Check for invalid middle group (00)
+    const middle = parseInt(cleaned.substring(3, 5));
+    if (middle === 0) return false;
+
+    // Check for invalid last group (0000)
+    const last = parseInt(cleaned.substring(5, 9));
+    if (last === 0) return false;
+
     return true;
   },
   redactionTemplate: "[SSN REDACTED]",
   severity: "critical",
   examples: ["123-45-6789", "123456789"],
   falsePositivePatterns: [
-    /000-00-0000/, // Test SSN
-    /111-11-1111/, // Common fake
-    /123-45-6789/, // Example SSN often used in docs
+    /000-?00-?0000/, // Test SSN
+    /111-?11-?1111/, // Common fake
   ],
 };
 
@@ -142,9 +151,19 @@ export const PHONE_PATTERN: PIIPattern = {
   validator: (match: string) => {
     // Remove non-digits
     const digits = match.replace(/\D/g, "");
+
     // US phone: 10 digits (or 11 with country code)
     // International: 7-15 digits
-    return digits.length >= 7 && digits.length <= 15;
+    if (digits.length < 7 || digits.length > 15) return false;
+
+    // Skip obviously fake numbers (all zeros, all ones, etc.)
+    if (/^0+$/.test(digits) || /^1+$/.test(digits)) return false;
+
+    // Require separators for 8-digit sequences to avoid false positives
+    // (real phone numbers typically have formatting)
+    if (digits.length === 8 && !/[-.\s()]/.test(match)) return false;
+
+    return true;
   },
   redactionTemplate: "[PHONE REDACTED]",
   severity: "high",
@@ -221,8 +240,17 @@ export const DATE_OF_BIRTH_PATTERN: PIIPattern = {
   validator: (match: string) => {
     // Parse date and check if it's a plausible birthdate
     const parts = match.split(/[\/\-]/);
-    const year = parseInt(parts[2] || parts[0]);
     const currentYear = new Date().getFullYear();
+
+    // Determine format: YYYY-MM-DD vs MM/DD/YYYY
+    let year: number;
+    if (parts[0].length === 4) {
+      // YYYY-MM-DD format
+      year = parseInt(parts[0]);
+    } else {
+      // MM/DD/YYYY or DD/MM/YYYY format
+      year = parseInt(parts[2]);
+    }
 
     // Must be between 1900 and current year
     return year >= 1900 && year <= currentYear;
@@ -264,20 +292,22 @@ export const DRIVERS_LICENSE_PATTERN: PIIPattern = {
 
 /**
  * Bank Account Number (US)
- * Format: 8-17 digits
+ * Format: 10-17 digits (excluding SSN/CC which are validated separately)
  */
 export const BANK_ACCOUNT_PATTERN: PIIPattern = {
   type: PIIType.BANK_ACCOUNT,
   name: "Bank Account Number",
-  regex: /\b\d{8,17}\b/g,
+  regex: /\b\d{10,17}\b/g,
   validator: (match: string) => {
-    // Must be 8-17 digits
+    // Must be 10-17 digits (not 9 which is SSN, not 15-16 which is CC)
     const length = match.length;
-    return length >= 8 && length <= 17;
+    if (length === 9) return false; // Likely SSN
+    if (length === 15 || length === 16) return false; // Likely credit card
+    return length >= 10 && length <= 17;
   },
   redactionTemplate: "[ACCOUNT REDACTED]",
   severity: "critical",
-  examples: ["123456789012", "12345678"],
+  examples: ["1234567890123", "1234567890"],
 };
 
 /**
@@ -295,19 +325,20 @@ export const MEDICAL_RECORD_PATTERN: PIIPattern = {
 
 /**
  * All PII patterns grouped
+ * Order matters: More specific patterns should come before generic ones
  */
 export const ALL_PII_PATTERNS: PIIPattern[] = [
   SSN_PATTERN,
   CREDIT_CARD_PATTERN,
+  MEDICAL_RECORD_PATTERN, // Before phone/bank account (more specific)
+  PASSPORT_PATTERN,
+  BANK_ACCOUNT_PATTERN,
   EMAIL_PATTERN,
   PHONE_PATTERN,
   ADDRESS_PATTERN,
   IP_ADDRESS_PATTERN,
   DATE_OF_BIRTH_PATTERN,
-  PASSPORT_PATTERN,
   DRIVERS_LICENSE_PATTERN,
-  BANK_ACCOUNT_PATTERN,
-  MEDICAL_RECORD_PATTERN,
 ];
 
 /**
@@ -343,7 +374,7 @@ export const PII_CONTEXTS = {
   CHAT_MESSAGE: {
     allowEmails: false,
     allowPhones: false,
-    allowDatesInStories: true,
+    allowDatesInStories: false, // Detect dates in chat as they could be real PII
     strictMode: true,
   } as PIIContext,
 

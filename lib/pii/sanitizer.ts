@@ -78,6 +78,9 @@ export class PIISanitizer {
 
     // Process each pattern
     for (const pattern of patterns) {
+      // Reset regex lastIndex to avoid issues with global flag
+      pattern.regex.lastIndex = 0;
+
       const matches = text.matchAll(pattern.regex);
 
       for (const match of matches) {
@@ -146,8 +149,12 @@ export class PIISanitizer {
     const patterns = getPatternsForContext(context);
 
     for (const pattern of patterns) {
-      const match = pattern.regex.exec(text);
-      if (match) {
+      // Reset regex lastIndex to avoid issues with global flag
+      pattern.regex.lastIndex = 0;
+
+      const matches = text.matchAll(pattern.regex);
+
+      for (const match of matches) {
         const matchedText = match[0];
 
         // Skip false positives
