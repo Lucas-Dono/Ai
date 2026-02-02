@@ -2766,26 +2766,198 @@
       "contactUs": "Contact us"
     }
   },
-  "characterCreator": {
-    "methodSelector": {
-      "title": "Choose Creation Method",
-      "subtitle": "Select how you want to create your character",
-      "continue": "Continue",
-      "smartStart": {
-        "title": "Smart Start",
-        "description": "Guided wizard with AI assistance for quick character creation",
-        "badge": "Recommended",
-        "feature1": "Genre-based templates",
-        "feature2": "Search existing characters",
-        "feature3": "AI-powered suggestions",
-        "feature4": "Complete in under 5 minutes"
+  "characterCreation": {
+    "tabs": {
+      "identity": "Identity",
+      "work": "Work",
+      "personality": "Personality",
+      "relationships": "Relationships",
+      "history": "History"
+    },
+    "status": {
+      "readyToSave": "Ready to save",
+      "fillRequired": "Fill in required fields"
+    },
+    "actions": {
+      "save": "Create Character",
+      "saving": "Creating..."
+    },
+    "helper": {
+      "aiAssist": "You can use AI to generate content in each section"
+    },
+    "identity": {
+      "title": "Character Identity",
+      "description": "Basic information and physical appearance",
+      "name": {
+        "label": "Full Name",
+        "placeholder": "Character Name"
       },
-      "manual": {
-        "title": "Advanced Creator",
-        "description": "Full control over every aspect of your character",
-        "feature1": "Complete customization",
-        "feature2": "Manual configuration",
-        "feature3": "For experienced users"
+      "age": {
+        "label": "Age",
+        "placeholder": "25"
+      },
+      "gender": {
+        "label": "Gender",
+        "placeholder": "Select gender",
+        "options": {
+          "male": "Male",
+          "female": "Female",
+          "nonBinary": "Non-Binary"
+        }
+      },
+      "origin": {
+        "label": "Origin",
+        "placeholder": "City, country or place of origin"
+      },
+      "description": {
+        "label": "Physical Description",
+        "placeholder": "Describe the character's physical appearance: height, build, eye color, hair, distinctive features, clothing style...",
+        "hint": "Be detailed, this information is used to generate the avatar and in conversations",
+        "generate": "Generate with AI",
+        "errors": {
+          "needBasicInfo": "You need to complete name, age and gender first"
+        }
+      },
+      "avatar": {
+        "label": "Character Photo",
+        "placeholder": "No photo",
+        "upload": "Upload Photo",
+        "generate": "Generate with AI",
+        "generateHint": "Based on physical description",
+        "uploaded": "Photo uploaded",
+        "uploadedHint": "Click Change to upload another",
+        "change": "Change",
+        "errors": {
+          "invalidFormat": "Invalid file format. Only images are allowed.",
+          "tooLarge": "File is too large. Maximum 5MB.",
+          "uploadFailed": "Failed to upload image. Please try again.",
+          "needDescription": "You need to complete the physical description first",
+          "generationFailed": "Failed to generate avatar. Please try again."
+        }
+      }
+    },
+    "work": {
+      "title": "Profession and Skills",
+      "description": "Work information and competencies",
+      "generate": "Generate Profile",
+      "occupation": {
+        "label": "Occupation",
+        "placeholder": "E.g.: Software Developer, Artist, Student...",
+        "hint": "Occupation is required and influences the character's personality"
+      },
+      "skills": {
+        "label": "Skills",
+        "placeholder": "E.g.: Programming, Graphic design, Languages...",
+        "hint": "Press Enter to add each skill"
+      },
+      "achievements": {
+        "label": "Professional Achievements",
+        "placeholder": "E.g.: Best project award, Professional certification...",
+        "hint": "Notable achievements in their career"
+      },
+      "errors": {
+        "needOccupation": "You need to specify an occupation first"
+      }
+    },
+    "personality": {
+      "title": "Personality",
+      "description": "Psychological traits and characteristics",
+      "generate": "Generate Personality",
+      "bigFive": {
+        "title": "Big Five",
+        "description": "Five-factor personality model",
+        "openness": {
+          "label": "Openness",
+          "description": "Curiosity and imagination"
+        },
+        "conscientiousness": {
+          "label": "Conscientiousness",
+          "description": "Organization and discipline"
+        },
+        "extraversion": {
+          "label": "Extraversion",
+          "description": "Sociability and energy"
+        },
+        "agreeableness": {
+          "label": "Agreeableness",
+          "description": "Empathy and cooperation"
+        },
+        "neuroticism": {
+          "label": "Neuroticism",
+          "description": "Emotional stability"
+        }
+      },
+      "values": {
+        "label": "Core Values",
+        "description": "Principles that guide their decisions",
+        "placeholder": "E.g.: Honesty, Freedom, Family..."
+      },
+      "fears": {
+        "label": "Fears and Phobias",
+        "description": "Character's deep fears",
+        "placeholder": "E.g.: Fear of abandonment, Claustrophobia..."
+      }
+    },
+    "relationships": {
+      "title": "Important Relationships",
+      "description": "Significant people in their life",
+      "generate": "Generate Relationships",
+      "maritalStatus": {
+        "label": "Marital Status",
+        "placeholder": "Select marital status",
+        "options": {
+          "single": "Single",
+          "married": "Married",
+          "divorced": "Divorced",
+          "widowed": "Widowed",
+          "complicated": "It's complicated"
+        }
+      },
+      "people": {
+        "label": "Important People",
+        "add": "Add Person",
+        "form": {
+          "name": "Name",
+          "namePlaceholder": "Person's name",
+          "relationship": "Relationship",
+          "relationshipPlaceholder": "E.g.: Best friend, Sister, Mentor...",
+          "description": "Description",
+          "descriptionPlaceholder": "Describe the relationship and its importance...",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "errors": {
+          "required": "Name and relationship are required"
+        }
+      }
+    },
+    "history": {
+      "title": "Personal History",
+      "description": "Events and experiences that define the character",
+      "generate": "Generate History",
+      "events": {
+        "label": "Important Events",
+        "add": "Add Event",
+        "form": {
+          "year": "Year",
+          "title": "Title",
+          "titlePlaceholder": "Event name",
+          "description": "Description",
+          "descriptionPlaceholder": "Describe what happened and how it affected the character...",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "errors": {
+          "required": "Year and title are required"
+        }
+      },
+      "traumas": {
+        "label": "Traumas",
+        "placeholder": "E.g.: Loss of a loved one, Traumatic accident..."
+      },
+      "achievements": {
+        "label": "Personal Achievements",
+        "placeholder": "E.g.: Overcame addiction, Traveled the world..."
       }
     }
   },

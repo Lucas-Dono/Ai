@@ -7,8 +7,6 @@ import { SmartStartProvider, useSmartStart } from './context/SmartStartContext';
 import { WizardHeader } from './ui/WizardHeader';
 import { ProgressBreadcrumb } from './ui/ProgressBreadcrumb';
 import { GenreSelection } from './steps/GenreSelection';
-import { CharacterTypeSelection } from './steps/CharacterTypeSelection';
-import { CharacterSearch } from './steps/CharacterSearch';
 import { DescriptionGenerationStep } from './steps/DescriptionGenerationStep';
 import { CharacterCustomization } from './steps/CharacterCustomization';
 import { DepthCustomizationStep } from './steps/DepthCustomizationStep';
@@ -126,7 +124,7 @@ interface StepContentProps {
 
 function StepContent({ step, userTier, selectedDepth, sessionId, onDepthSelect, goToStep, onCharacterGenerated }: StepContentProps) {
   switch (step) {
-    // NEW LEGAL FLOW: Start directly with description (no "type" selection)
+    // Start directly with description generation
     case 'description':
       if (!sessionId) {
         return <div>Loading session...</div>;
@@ -144,22 +142,6 @@ function StepContent({ step, userTier, selectedDepth, sessionId, onDepthSelect, 
               // Could add a back option or skip
             }}
           />
-        </ErrorBoundary>
-      );
-
-    // DEPRECATED: Keep for backward compatibility but not used in new flow
-    case 'type':
-      return (
-        <ErrorBoundary componentName="CharacterTypeSelection" level="recoverable">
-          <CharacterTypeSelection />
-        </ErrorBoundary>
-      );
-
-    // DEPRECATED: Old search flow (ILLEGAL - kept only for reference)
-    case 'search':
-      return (
-        <ErrorBoundary componentName="CharacterSearch" level="recoverable">
-          <CharacterSearch />
         </ErrorBoundary>
       );
 

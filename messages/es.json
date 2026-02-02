@@ -2942,26 +2942,198 @@
       "contactUs": "Contáctanos"
     }
   },
-  "characterCreator": {
-    "methodSelector": {
-      "title": "Elige el Método de Creación",
-      "subtitle": "Selecciona cómo quieres crear tu personaje",
-      "continue": "Continuar",
-      "smartStart": {
-        "title": "Inicio Inteligente",
-        "description": "Asistente guiado con ayuda de IA para crear personajes rápidamente",
-        "badge": "Recomendado",
-        "feature1": "Plantillas basadas en géneros",
-        "feature2": "Buscar personajes existentes",
-        "feature3": "Sugerencias impulsadas por IA",
-        "feature4": "Completa en menos de 5 minutos"
+  "characterCreation": {
+    "tabs": {
+      "identity": "Identidad",
+      "work": "Trabajo",
+      "personality": "Personalidad",
+      "relationships": "Relaciones",
+      "history": "Historia"
+    },
+    "status": {
+      "readyToSave": "Listo para guardar",
+      "fillRequired": "Completa los campos obligatorios"
+    },
+    "actions": {
+      "save": "Crear Personaje",
+      "saving": "Creando..."
+    },
+    "helper": {
+      "aiAssist": "Puedes usar IA para generar contenido en cada sección"
+    },
+    "identity": {
+      "title": "Identidad del Personaje",
+      "description": "Información básica y apariencia física",
+      "name": {
+        "label": "Nombre Completo",
+        "placeholder": "Nombre del Personaje"
       },
-      "manual": {
-        "title": "Creador Avanzado",
-        "description": "Control total sobre cada aspecto de tu personaje",
-        "feature1": "Personalización completa",
-        "feature2": "Configuración manual",
-        "feature3": "Para usuarios experimentados"
+      "age": {
+        "label": "Edad",
+        "placeholder": "25"
+      },
+      "gender": {
+        "label": "Género",
+        "placeholder": "Selecciona género",
+        "options": {
+          "male": "Masculino",
+          "female": "Femenino",
+          "nonBinary": "No Binario"
+        }
+      },
+      "origin": {
+        "label": "Origen",
+        "placeholder": "Ciudad, país o lugar de origen"
+      },
+      "description": {
+        "label": "Descripción Física",
+        "placeholder": "Describe la apariencia física del personaje: altura, constitución, color de ojos, cabello, rasgos distintivos, estilo de vestir...",
+        "hint": "Sé detallado, esta información se usa para generar el avatar y en las conversaciones",
+        "generate": "Generar con IA",
+        "errors": {
+          "needBasicInfo": "Necesitas completar nombre, edad y género primero"
+        }
+      },
+      "avatar": {
+        "label": "Foto del Personaje",
+        "placeholder": "Sin foto",
+        "upload": "Subir Foto",
+        "generate": "Generar con IA",
+        "generateHint": "Basado en la descripción física",
+        "uploaded": "Foto cargada",
+        "uploadedHint": "Haz clic en Cambiar para subir otra",
+        "change": "Cambiar",
+        "errors": {
+          "invalidFormat": "Formato de archivo inválido. Solo se permiten imágenes.",
+          "tooLarge": "El archivo es demasiado grande. Máximo 5MB.",
+          "uploadFailed": "Error al subir la imagen. Inténtalo de nuevo.",
+          "needDescription": "Necesitas completar la descripción física primero",
+          "generationFailed": "Error al generar avatar. Inténtalo de nuevo."
+        }
+      }
+    },
+    "work": {
+      "title": "Profesión y Habilidades",
+      "description": "Información laboral y competencias",
+      "generate": "Generar Perfil",
+      "occupation": {
+        "label": "Ocupación",
+        "placeholder": "Ej: Desarrollador de Software, Artista, Estudiante...",
+        "hint": "La ocupación es obligatoria e influye en la personalidad del personaje"
+      },
+      "skills": {
+        "label": "Habilidades",
+        "placeholder": "Ej: Programación, Diseño gráfico, Idiomas...",
+        "hint": "Presiona Enter para añadir cada habilidad"
+      },
+      "achievements": {
+        "label": "Logros Profesionales",
+        "placeholder": "Ej: Premio al mejor proyecto, Certificación profesional...",
+        "hint": "Logros destacados en su carrera"
+      },
+      "errors": {
+        "needOccupation": "Necesitas especificar una ocupación primero"
+      }
+    },
+    "personality": {
+      "title": "Personalidad",
+      "description": "Rasgos psicológicos y características",
+      "generate": "Generar Personalidad",
+      "bigFive": {
+        "title": "Big Five",
+        "description": "Modelo de personalidad de cinco factores",
+        "openness": {
+          "label": "Apertura",
+          "description": "Curiosidad e imaginación"
+        },
+        "conscientiousness": {
+          "label": "Responsabilidad",
+          "description": "Organización y disciplina"
+        },
+        "extraversion": {
+          "label": "Extraversión",
+          "description": "Sociabilidad y energía"
+        },
+        "agreeableness": {
+          "label": "Amabilidad",
+          "description": "Empatía y cooperación"
+        },
+        "neuroticism": {
+          "label": "Neuroticismo",
+          "description": "Estabilidad emocional"
+        }
+      },
+      "values": {
+        "label": "Valores Fundamentales",
+        "description": "Principios que guían sus decisiones",
+        "placeholder": "Ej: Honestidad, Libertad, Familia..."
+      },
+      "fears": {
+        "label": "Miedos y Fobias",
+        "description": "Temores profundos del personaje",
+        "placeholder": "Ej: Miedo al abandono, Claustrofobia..."
+      }
+    },
+    "relationships": {
+      "title": "Relaciones Importantes",
+      "description": "Personas significativas en su vida",
+      "generate": "Generar Relaciones",
+      "maritalStatus": {
+        "label": "Estado Civil",
+        "placeholder": "Selecciona estado civil",
+        "options": {
+          "single": "Soltero/a",
+          "married": "Casado/a",
+          "divorced": "Divorciado/a",
+          "widowed": "Viudo/a",
+          "complicated": "Es complicado"
+        }
+      },
+      "people": {
+        "label": "Personas Importantes",
+        "add": "Añadir Persona",
+        "form": {
+          "name": "Nombre",
+          "namePlaceholder": "Nombre de la persona",
+          "relationship": "Relación",
+          "relationshipPlaceholder": "Ej: Mejor amigo, Hermana, Mentor...",
+          "description": "Descripción",
+          "descriptionPlaceholder": "Describe la relación y su importancia...",
+          "save": "Guardar",
+          "cancel": "Cancelar"
+        },
+        "errors": {
+          "required": "El nombre y la relación son obligatorios"
+        }
+      }
+    },
+    "history": {
+      "title": "Historia Personal",
+      "description": "Eventos y experiencias que definen al personaje",
+      "generate": "Generar Historia",
+      "events": {
+        "label": "Eventos Importantes",
+        "add": "Añadir Evento",
+        "form": {
+          "year": "Año",
+          "title": "Título",
+          "titlePlaceholder": "Nombre del evento",
+          "description": "Descripción",
+          "descriptionPlaceholder": "Describe qué sucedió y cómo afectó al personaje...",
+          "save": "Guardar",
+          "cancel": "Cancelar"
+        },
+        "errors": {
+          "required": "El año y el título son obligatorios"
+        }
+      },
+      "traumas": {
+        "label": "Traumas",
+        "placeholder": "Ej: Pérdida de un ser querido, Accidente traumático..."
+      },
+      "achievements": {
+        "label": "Logros Personales",
+        "placeholder": "Ej: Superó una adicción, Viajó por el mundo..."
       }
     }
   },
