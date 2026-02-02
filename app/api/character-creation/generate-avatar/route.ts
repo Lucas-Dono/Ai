@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/withAuth';
-import { VisualGenerationService } from '@/lib/visual-system/visual-generation-service';
+import { getAuthenticatedUser } from '@/lib/auth-helper';
+import { getAIHordeClient } from '@/lib/visual-system/ai-horde-client';
 import { z } from 'zod';
 
 const RequestSchema = z.object({
@@ -9,14 +9,19 @@ const RequestSchema = z.object({
   gender: z.enum(['male', 'female', 'non-binary']).optional(),
 });
 
-export const POST = withAuth(async (req: NextRequest, { user }) => {
+export async function POST(req: NextRequest) {
   try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
     const body = await req.json();
     const validation = RequestSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Datos de entrada inválidos', details: validation.error.errors },
+        { error: 'Datos de entrada inválidos', details: validation.error.format() },
         { status: 400 }
       );
     }
@@ -41,19 +46,22 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
 
     imagePrompt += ', professional headshot, high quality, realistic, detailed face';
 
-    // Generar imagen usando el servicio de visual generation
-    const visualService = new VisualGenerationService();
-
-    const imageUrl = await visualService.generateImage({
+    // Generar imagen usando AI Horde
+    const aiHordeClient = getAIHordeClient();
+    const result = await aiHordeClient.generateImage({
       prompt: imagePrompt,
-      negativePrompt: 'cartoon, anime, drawing, painting, sketch, low quality, blurry, distorted',
+      negativePrompt: 'cartoon, anime, drawing, painting, sketch, low quality, blurry, distorted, deformed, multiple people, text',
       width: 512,
       height: 512,
       steps: 30,
-      model: 'realistic',
+      cfgScale: 7.5,
+      sampler: 'k_euler_a',
+      seed: -1,
+      nsfw: false,
+      karras: true,
     });
 
-    return NextResponse.json({ url: imageUrl });
+    return NextResponse.json({ url: result.imageUrl });
   } catch (error: any) {
     console.error('Error generating avatar:', error);
     return NextResponse.json(
@@ -61,4 +69,4 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
       { status: 500 }
     );
   }
-});
+}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/withAuth';
-import { generateText } from '@/lib/llm/provider';
+import { getAuthenticatedUser } from '@/lib/auth-helper';
+import { getLLMProvider } from '@/lib/llm/provider';
 import { z } from 'zod';
 
 const RequestSchema = z.object({
@@ -9,14 +9,19 @@ const RequestSchema = z.object({
   age: z.number().optional(),
 });
 
-export const POST = withAuth(async (req: NextRequest, { user }) => {
+export async function POST(req: NextRequest) {
   try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
     const body = await req.json();
     const validation = RequestSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Datos de entrada inválidos', details: validation.error.errors },
+        { error: 'Datos de entrada inválidos', details: validation.error.format() },
         { status: 400 }
       );
     }
@@ -55,9 +60,10 @@ EJEMPLOS DE BUENOS LOGROS:
 
 Responde SOLO con el JSON válido, sin texto adicional.`;
 
-    const response = await generateText({
-      prompt,
+    const llm = getLLMProvider();
+    const response = await llm.generate({
       systemPrompt: 'Eres un experto en desarrollo profesional que crea perfiles de carrera realistas. Respondes siempre con JSON válido.',
+      messages: [{ role: 'user', content: prompt }],
       maxTokens: 400,
       temperature: 0.7,
     });
@@ -78,4 +84,4 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
       { status: 500 }
     );
   }
-});
+}

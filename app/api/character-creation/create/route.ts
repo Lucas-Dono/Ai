@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/withAuth';
+import { getAuthenticatedUser } from '@/lib/auth-helper';
 import { prisma } from '@/lib/prisma';
 import { nanoid } from 'nanoid';
 import { atomicCheckAgentLimit } from '@/lib/usage/atomic-resource-check';
@@ -55,14 +55,23 @@ const CreateCharacterSchema = z.object({
   personalAchievements: z.array(z.string()),
 });
 
-export const POST = withAuth(async (req: NextRequest, { user }) => {
+export async function POST(req: NextRequest) {
   try {
+    // Autenticación
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'No autenticado' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const validation = CreateCharacterSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Datos inválidos', details: validation.error.errors },
+        { error: 'Datos inválidos', details: validation.error.format() },
         { status: 400 }
       );
     }
@@ -90,45 +99,74 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
     // Construir perfil completo (ProfileData V2)
     const profile: ProfileData = {
       // Identidad
-      name: sanitizedName,
-      age: data.age,
-      gender: data.gender,
-      origin: data.origin,
-      appearance: data.physicalDescription,
+      basicIdentity: {
+        fullName: sanitizedName,
+        preferredName: sanitizedName,
+        age: data.age,
+        nationality: data.origin,
+      },
 
       // Personalidad
       personality: {
         bigFive: data.bigFive,
-        values: data.coreValues,
-        fears: data.fears,
-        traits: [], // Se puede poblar después
-        moralCode: [],
+        traits: data.coreValues,
+        strengths: data.skills,
+        weaknesses: data.fears,
       },
 
       // Ocupación
-      occupation: data.occupation,
-      skills: data.skills,
-      professionalAchievements: data.achievements,
+      occupation: {
+        current: data.occupation,
+        education: data.achievements.join(', '),
+      },
 
       // Relaciones
-      importantPeople: data.importantPeople.map(p => ({
-        name: p.name,
-        relationship: p.relationship,
-        description: p.description,
-      })),
-      maritalStatus: data.maritalStatus,
+      socialCircle: {
+        friends: data.importantPeople.map(p => ({
+          name: p.name,
+          age: undefined,
+          howMet: p.description,
+          relationshipType: p.relationship,
+        })),
+        currentRelationshipStatus: data.maritalStatus,
+      },
 
       // Historia
-      lifeEvents: data.importantEvents.map(e => ({
-        year: e.year,
-        event: e.title,
-        description: e.description,
-      })),
-      traumas: data.traumas,
-      personalAchievements: data.personalAchievements,
+      lifeExperiences: {
+        formativeEvents: data.importantEvents.map(e => ({
+          event: e.title,
+          age: data.age - (new Date().getFullYear() - e.year),
+          impact: e.description || '',
+          emotionalWeight: 'medio' as const,
+        })),
+        traumas: data.traumas.map(t => ({
+          event: t,
+          age: 0,
+          healing: 'en proceso' as const,
+          triggers: [],
+        })),
+        achievements: data.personalAchievements.map(a => ({
+          achievement: a,
+          when: 'Pasado',
+          pride: 8,
+        })),
+      },
 
-      // Cognitivo
-      cognitiveStyle: data.cognitivePrompt || '',
+      // Mundo interior
+      innerWorld: {
+        fears: {
+          primary: data.fears,
+        },
+        dreams: {
+          shortTerm: [],
+          longTerm: [],
+        },
+        values: data.coreValues.map(v => ({
+          value: v,
+          importance: 'alta' as const,
+          description: v,
+        })),
+      },
     };
 
     // Generar system prompt basado en todos los datos
@@ -163,6 +201,7 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
       // Crear PersonalityCore
       await tx.personalityCore.create({
         data: {
+          id: nanoid(),
           agentId: newAgent.id,
           openness: data.bigFive.openness,
           conscientiousness: data.bigFive.conscientiousness,
@@ -171,15 +210,15 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
           neuroticism: data.bigFive.neuroticism,
           coreValues: data.coreValues,
           moralSchemas: [],
-          emotionalRange: {
-            joy: { min: 0, max: 1, baseline: 0.5 },
-            sadness: { min: 0, max: 1, baseline: 0.3 },
-            anger: { min: 0, max: 1, baseline: 0.2 },
-            fear: { min: 0, max: 1, baseline: 0.3 },
-            surprise: { min: 0, max: 1, baseline: 0.5 },
-            disgust: { min: 0, max: 1, baseline: 0.2 },
-            trust: { min: 0, max: 1, baseline: 0.5 },
-            anticipation: { min: 0, max: 1, baseline: 0.5 },
+          baselineEmotions: {
+            joy: 0.5,
+            sadness: 0.3,
+            anger: 0.2,
+            fear: 0.3,
+            surprise: 0.5,
+            disgust: 0.2,
+            trust: 0.5,
+            anticipation: 0.5,
           },
         },
       });
@@ -187,13 +226,14 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
       // Crear InternalState
       await tx.internalState.create({
         data: {
+          id: nanoid(),
           agentId: newAgent.id,
           currentEmotions: {},
-          mood: { pleasure: 0.5, arousal: 0.5, dominance: 0.5 },
-          goals: [],
-          beliefs: data.coreValues.map(value => ({ belief: value, strength: 0.8 })),
-          desires: [],
-          intentions: [],
+          moodValence: 0.5,
+          moodArousal: 0.5,
+          moodDominance: 0.5,
+          activeGoals: [],
+          conversationBuffer: [],
         },
       });
 
@@ -201,10 +241,10 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
     });
 
     // Track analytics
-    await trackEvent({
-      eventType: EventType.AGENT_CREATED,
-      userId: user.id,
-      metadata: {
+    await trackEvent(
+      EventType.FIRST_AGENT_CREATED,
+      {
+        userId: user.id,
         agentId: agent.id,
         method: 'persona_architect',
         hasAvatar: !!data.avatarUrl,
@@ -215,8 +255,8 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
           relationships: data.importantPeople.length > 0,
           history: data.importantEvents.length > 0,
         }
-      },
-    });
+      }
+    );
 
     return NextResponse.json({
       success: true,
@@ -242,7 +282,7 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
       { status: 500 }
     );
   }
-});
+}
 
 // Helper: Generar system prompt completo
 function generateSystemPrompt(data: z.infer<typeof CreateCharacterSchema>): string {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/withAuth';
-import { generateText } from '@/lib/llm/provider';
+import { getAuthenticatedUser } from '@/lib/auth-helper';
+import { getLLMProvider } from '@/lib/llm/provider';
 import { z } from 'zod';
 
 const RequestSchema = z.object({
@@ -10,14 +10,19 @@ const RequestSchema = z.object({
   gender: z.enum(['male', 'female', 'non-binary']).optional(),
 });
 
-export const POST = withAuth(async (req: NextRequest, { user }) => {
+export async function POST(req: NextRequest) {
   try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
     const body = await req.json();
     const validation = RequestSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Datos de entrada inválidos', details: validation.error.errors },
+        { error: 'Datos de entrada inválidos', details: validation.error.format() },
         { status: 400 }
       );
     }
@@ -47,9 +52,10 @@ IMPORTANTE:
 
 Responde SOLO con el JSON, sin texto adicional.`;
 
-    const response = await generateText({
-      prompt,
+    const llm = getLLMProvider();
+    const response = await llm.generate({
       systemPrompt: 'Eres un generador de datos de personajes realistas. Respondes siempre con JSON válido y datos coherentes.',
+      messages: [{ role: 'user', content: prompt }],
       maxTokens: 200,
       temperature: 0.7,
     });
@@ -70,4 +76,4 @@ Responde SOLO con el JSON, sin texto adicional.`;
       { status: 500 }
     );
   }
-});
+}
