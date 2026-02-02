@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
-  User, Briefcase, Brain, BookOpen, Sparkles,
+  User, Users, Briefcase, Brain, BookOpen, Sparkles,
   Plus, X, Upload, RefreshCw,
   PenTool, Download, Rocket, ChevronDown, ChevronUp, Zap
 } from 'lucide-react';
