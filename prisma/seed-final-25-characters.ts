@@ -1843,8 +1843,9 @@ const katyaVolkov = {
     id: 'premium_katya_engineer',
     name: 'Ekaterina "Katya" Volkov',
     kind: 'companion' as const,
-    visibility: 'public',
+    visibility: 'public' as const,
     featured: true,
+    generationTier: 'ultra' as const,
 
     description: 'Senior Software Engineer rusa de 26 años en Silicon Valley. IQ 147, belleza matemática, disciplina militar que esconde TOC y ansiedad. Perfeccionista patológica que no sabe ser de otra manera. Códifica como lenguaje del amor. Atraída a chaos que no puede controlar.',
 
@@ -4473,81 +4474,6 @@ const lunaDemo = {
 };
 
 // ============================================================================
-// FUNCIÓN EXPORTADORA - SEED TODOS LOS 25 PERSONAJES
-// ============================================================================
-
-export async function seedUpdatedCharacters() {
-  console.log('🌱 Iniciando seed de 25 personajes actualizados...\n');
-
-  try {
-    // Crear usuario sistema
-    await prisma.user.upsert({
-      where: { id: 'system' },
-      update: {},
-      create: {
-        id: 'system',
-        email: 'system@platform.internal',
-        name: 'Sistema',
-        plan: 'ultra',
-        updatedAt: new Date(),
-      },
-    });
-
-    console.log('✅ Usuario sistema creado\n');
-
-    // Array con todos los personajes
-    const allCharacters = [
-      // NOTA: Personajes 1-19 deberían importarse de seed-updated-characters-manual.ts
-      // Aquí solo incluimos 20-25 que completamos
-
-      drSebastianMuller,    // 20
-      sofiaVolkov,          // 21
-      sofiaMendoza,         // 22
-      yukiTanaka,           // 23
-      zaraMalik,            // 24
-      lunaDemo,             // 25 (FREE)
-    ];
-
-    // Seed cada personaje
-    for (let i = 0; i < allCharacters.length; i++) {
-      const character = allCharacters[i];
-
-      await prisma.agent.upsert({
-        where: { id: character.id },
-        update: { ...character, updatedAt: new Date() },
-        create: { ...character, updatedAt: new Date() },
-      });
-
-      console.log(`✅ ${i + 20}/25 ${character.name} actualizado\n`);
-    }
-
-    console.log('\n🎉 ¡SEED COMPLETADO!');
-    console.log('📊 Total: 25 personajes (24 premium + 1 free)');
-    console.log('   - Personajes 1-19: Importar de seed-updated-characters-manual.ts');
-    console.log('   - Personajes 20-25: Completados aquí');
-
-  } catch (error) {
-    console.error('❌ Error:', error);
-    throw error;
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-// Ejecutar si es main module
-if (require.main === module) {
-  seedUpdatedCharacters()
-    .then(() => {
-      console.log('✅ Seed ejecutado exitosamente');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('❌ Error en seed:', error);
-      process.exit(1);
-    });
-}
-
-// ============================================================================
 // ARRAY CONSOLIDADO DE TODOS LOS PERSONAJES
 // ============================================================================
 
@@ -4598,20 +4524,24 @@ export async function seedFinal25Characters() {
   console.log('🌱 Iniciando seed de 25 personajes premium...\n');
 
   try {
-    // Crear usuario sistema si no existe
-    await prisma.user.upsert({
-      where: { id: 'system' },
-      update: {},
-      create: {
-        id: 'system',
-        email: 'system@platform.internal',
-        name: 'Sistema',
-        plan: 'ultra',
-        updatedAt: new Date(),
-      },
+    // Verificar/crear usuario sistema
+    const existingUser = await prisma.user.findUnique({
+      where: { id: 'system' }
     });
 
-    console.log('✅ Usuario sistema verificado\n');
+    if (!existingUser) {
+      await prisma.user.create({
+        data: {
+          id: 'system',
+          email: 'system@platform.internal',
+          name: 'Sistema',
+          plan: 'ultra',
+        },
+      });
+      console.log('✅ Usuario sistema creado\n');
+    } else {
+      console.log('✅ Usuario sistema ya existe\n');
+    }
 
     // Seed cada personaje
     let successCount = 0;
@@ -4622,16 +4552,17 @@ export async function seedFinal25Characters() {
       const position = i + 1;
 
       try {
+        // Agregar systemPrompt genérico si no existe
+        const characterData = {
+          ...character,
+          systemPrompt: character.systemPrompt || `Eres ${character.name}. ${character.description || 'Interactúa de manera auténtica y coherente con tu personalidad.'}`,
+          updatedAt: new Date()
+        };
+
         await prisma.agent.upsert({
           where: { id: character.id },
-          update: {
-            ...character,
-            updatedAt: new Date()
-          },
-          create: {
-            ...character,
-            updatedAt: new Date()
-          },
+          update: characterData,
+          create: characterData,
         });
 
         successCount++;
