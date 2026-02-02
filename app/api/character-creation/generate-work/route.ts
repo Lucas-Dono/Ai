@@ -56,13 +56,18 @@ Genera el siguiente perfil profesional en formato JSON:
 
 {
   "occupation": "Título profesional específico y realista",
-  "skills": ["habilidad1", "habilidad2", "habilidad3", "habilidad4"],
+  "skills": [
+    {"name": "habilidad1", "level": 75},
+    {"name": "habilidad2", "level": 60}
+  ],
   "achievements": ["logro1", "logro2", "logro3"]
 }
 
 INSTRUCCIONES:
 - Ocupación: Debe ser coherente con la edad y descripción
-- Habilidades: 4-6 competencias específicas relacionadas con su ocupación y experiencia
+- Habilidades: 4-6 competencias específicas con niveles de proficiencia
+  - level: 0-20 (Novato), 21-40 (Principiante), 41-60 (Intermedio), 61-80 (Avanzado), 81-100 (Experto)
+  - Ajusta niveles según la edad y experiencia del personaje
 - Logros: 2-4 logros profesionales concretos y medibles
 ${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE (no reemplaces). Mantén lo que el usuario ya definió y construye sobre ello.' : ''}
 

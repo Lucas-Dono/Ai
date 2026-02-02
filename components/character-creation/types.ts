@@ -10,7 +10,7 @@ export interface CharacterDraft {
 
   // Work (Required)
   occupation: string;
-  skills: string[];
+  skills: Skill[]; // Skills con niveles de proficiencia
   achievements: string[];
 
   // Personality (Optional)
@@ -25,6 +25,12 @@ export interface CharacterDraft {
   fears: string[];
   cognitivePrompt: string; // Descripción del pensamiento y comportamiento
 
+  // Moral Alignment (Optional) - Sistema D&D 9 alineamientos
+  moralAlignment: {
+    lawfulness: number; // 0 (Chaotic) - 50 (Neutral) - 100 (Lawful)
+    morality: number; // 0 (Evil) - 50 (Neutral) - 100 (Good)
+  };
+
   // Relationships (Optional)
   importantPeople: ImportantPerson[];
   maritalStatus: 'single' | 'married' | 'divorced' | 'widowed' | 'complicated' | undefined;
@@ -35,11 +41,19 @@ export interface CharacterDraft {
   personalAchievements: string[];
 }
 
+export interface Skill {
+  name: string;
+  level: number; // 0-100: 0-20 Novice, 21-40 Beginner, 41-60 Intermediate, 61-80 Advanced, 81-100 Expert
+}
+
 export interface ImportantPerson {
   id: string;
   name: string;
   relationship: string; // "Padre", "Mejor amigo", "Mentor", etc.
   description: string;
+  type: 'family' | 'friend' | 'romantic' | 'rival' | 'mentor' | 'colleague' | 'other';
+  closeness: number; // 0-100: qué tan cercana es la relación
+  status: 'active' | 'estranged' | 'deceased' | 'distant'; // Estado actual de la relación
 }
 
 export interface HistoryEvent {

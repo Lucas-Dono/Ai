@@ -66,7 +66,11 @@ Genera el siguiente perfil psicológico en formato JSON:
   },
   "values": ["valor1", "valor2", "valor3"],
   "fears": ["miedo1", "miedo2"],
-  "cognitivePrompt": "Descripción de 2-3 frases sobre cómo piensa, procesa información y se comporta este personaje"
+  "cognitivePrompt": "Descripción de 2-3 frases sobre cómo piensa, procesa información y se comporta este personaje",
+  "moralAlignment": {
+    "lawfulness": número 0-100,
+    "morality": número 0-100
+  }
 }
 
 INSTRUCCIONES:
@@ -74,6 +78,10 @@ INSTRUCCIONES:
 - Valores: 3-5 principios fundamentales que guían al personaje
 - Miedos: 2-4 temores profundos realistas
 - cognitivePrompt: Describe patrones de pensamiento, sesgos cognitivos, estilo de razonamiento
+- moralAlignment:
+  - lawfulness: 0 (Caótico) - 50 (Neutral) - 100 (Legal). Respeta reglas vs improvisa
+  - morality: 0 (Malvado) - 50 (Neutral) - 100 (Bueno). Altruista vs egoísta
+  - Ejemplos: Lawful Good (80, 85), Chaotic Neutral (20, 50), Neutral Evil (50, 15)
 ${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE (no reemplaces). Mantén la esencia de lo que el usuario ya definió.' : ''}
 
 Responde SOLO con el JSON válido, sin texto adicional.`;

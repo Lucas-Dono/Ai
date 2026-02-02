@@ -57,6 +57,12 @@ export function CVStyleCreator() {
     fears: [],
     cognitivePrompt: '',
 
+    // Alineamiento Moral
+    moralAlignment: {
+      lawfulness: 50, // 0=Chaotic, 50=Neutral, 100=Lawful
+      morality: 50, // 0=Evil, 50=Neutral, 100=Good
+    },
+
     // Relaciones
     importantPeople: [],
     maritalStatus: undefined,
@@ -203,9 +209,27 @@ export function CVStyleCreator() {
         case 'avatar':
           return { ...prev, avatarUrl: data.url };
         case 'work':
-          return { ...prev, occupation: data.occupation, skills: data.skills, achievements: data.achievements };
+          // Convertir skills a formato con niveles si vienen como strings
+          const skills = Array.isArray(data.skills)
+            ? data.skills.map((s: any) =>
+                typeof s === 'string'
+                  ? { name: s, level: 60 } // Nivel intermedio por defecto
+                  : s
+              )
+            : prev.skills;
+          return { ...prev, occupation: data.occupation, skills, achievements: data.achievements };
         case 'personality':
-          return { ...prev, bigFive: data.bigFive, coreValues: data.values, fears: data.fears, cognitivePrompt: data.cognitivePrompt };
+          const updates: any = {
+            bigFive: data.bigFive,
+            coreValues: data.values,
+            fears: data.fears,
+            cognitivePrompt: data.cognitivePrompt
+          };
+          // Agregar moralAlignment si viene en la respuesta
+          if (data.moralAlignment) {
+            updates.moralAlignment = data.moralAlignment;
+          }
+          return { ...prev, ...updates };
         case 'history':
           return { ...prev, importantEvents: data.events, traumas: data.traumas, personalAchievements: data.achievements };
         default:
@@ -348,6 +372,29 @@ export function CVStyleCreator() {
     setCharacter(prev => ({
       ...prev,
       [field]: (prev[field] as string[]).filter((_, i) => i !== index)
+    }));
+  };
+
+  // --- SKILL HELPERS ---
+  const addSkill = (name: string, level: number = 50) => {
+    if (!name.trim()) return;
+    setCharacter(prev => ({
+      ...prev,
+      skills: [...prev.skills, { name: name.trim(), level }]
+    }));
+  };
+
+  const updateSkillLevel = (index: number, level: number) => {
+    setCharacter(prev => ({
+      ...prev,
+      skills: prev.skills.map((skill, i) => i === index ? { ...skill, level } : skill)
+    }));
+  };
+
+  const removeSkill = (index: number) => {
+    setCharacter(prev => ({
+      ...prev,
+      skills: prev.skills.filter((_, i) => i !== index)
     }));
   };
 
