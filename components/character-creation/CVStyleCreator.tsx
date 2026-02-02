@@ -14,6 +14,7 @@ import { MoralAlignmentChart } from './MoralAlignmentChart';
 import { SkillBarsChart } from './SkillBarsChart';
 import { ContradictionsDisplay } from './ContradictionsDisplay';
 import { RelationshipNetworkDisplay } from './RelationshipNetworkDisplay';
+import { PersonalityTimelineDisplay } from './PersonalityTimelineDisplay';
 
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
@@ -159,6 +160,9 @@ export function CVStyleCreator() {
           if (character.coreValues.length > 0) payload.existingValues = character.coreValues;
           if (character.fears.length > 0) payload.existingFears = character.fears;
           if (character.cognitivePrompt) payload.existingCognitivePrompt = character.cognitivePrompt;
+          // Agregar historia para personalityEvolution
+          if (character.traumas.length > 0) payload.traumas = character.traumas;
+          if (character.importantEvents.length > 0) payload.importantEvents = character.importantEvents;
           break;
 
         case 'work':
@@ -251,6 +255,10 @@ export function CVStyleCreator() {
               internalContradictions: data.internalContradictions || [],
               situationalVariations: data.situationalVariations || [],
             };
+          }
+          // Agregar personalityEvolution si viene en la respuesta
+          if (data.personalityEvolution) {
+            updates.personalityEvolution = data.personalityEvolution;
           }
           return { ...prev, ...updates };
         case 'history':
@@ -881,6 +889,13 @@ export function CVStyleCreator() {
                       internalContradictions={character.personalityConflicts.internalContradictions}
                       situationalVariations={character.personalityConflicts.situationalVariations}
                     />
+                  </div>
+                )}
+
+                {/* Evolución de Personalidad */}
+                {character.personalityEvolution && character.personalityEvolution.snapshots.length > 0 && (
+                  <div className="mt-8">
+                    <PersonalityTimelineDisplay evolution={character.personalityEvolution} />
                   </div>
                 )}
 

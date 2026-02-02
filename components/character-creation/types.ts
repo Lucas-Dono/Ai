@@ -34,6 +34,9 @@ export interface CharacterDraft {
   // Personality Conflicts (Optional) - Contradicciones internas y variaciones situacionales
   personalityConflicts: PersonalityConflicts;
 
+  // Personality Evolution (Optional) - Cómo ha cambiado la personalidad con el tiempo
+  personalityEvolution?: PersonalityEvolution;
+
   // Relationships (Optional)
   importantPeople: ImportantPerson[];
   maritalStatus: 'single' | 'married' | 'divorced' | 'widowed' | 'complicated' | undefined;
@@ -75,6 +78,28 @@ export interface SituationalVariation {
 export interface PersonalityConflicts {
   internalContradictions: InternalContradiction[];
   situationalVariations: SituationalVariation[];
+}
+
+// Snapshot de personalidad en un momento del tiempo
+export interface PersonalitySnapshot {
+  id: string;
+  age: number;
+  bigFive: {
+    openness: number;
+    conscientiousness: number;
+    extraversion: number;
+    agreeableness: number;
+    neuroticism: number;
+  };
+  moment: string; // Ej: "Bachiller - Pre-trauma", "Post-accidente", "Actualidad"
+  descriptor: string; // Descripción corta del estado mental
+  trigger?: string; // Evento o razón del cambio (opcional para el primero)
+}
+
+// Evolución de personalidad a través del tiempo
+export interface PersonalityEvolution {
+  snapshots: PersonalitySnapshot[]; // Ordenados cronológicamente
+  currentTrajectory?: string; // Ej: "Recuperación ascendente", "Estable", "Declive"
 }
 
 export interface ImportantPerson {

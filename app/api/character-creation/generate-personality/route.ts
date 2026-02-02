@@ -13,6 +13,9 @@ const RequestSchema = z.object({
   existingValues: z.array(z.string()).optional(),
   existingFears: z.array(z.string()).optional(),
   existingCognitivePrompt: z.string().optional(),
+  // Historia para personalityEvolution
+  traumas: z.array(z.string()).optional(),
+  importantEvents: z.array(z.any()).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -32,7 +35,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description, name, age, gender, existingValues, existingFears, existingCognitivePrompt } = validation.data;
+    const { description, name, age, gender, existingValues, existingFears, existingCognitivePrompt, traumas, importantEvents } = validation.data;
 
     // Construir sección de contexto existente
     let existingContext = '';
@@ -45,6 +48,16 @@ export async function POST(req: NextRequest) {
     if (existingCognitivePrompt) {
       existingContext += `\nESTILO COGNITIVO YA DEFINIDO: "${existingCognitivePrompt}"\n(Expande y profundiza esta descripción, mantén la esencia)`;
     }
+
+    // Contexto de historia para personalityEvolution
+    let historyContext = '';
+    if (traumas && traumas.length > 0) {
+      historyContext += `\nTRAUMAS: ${traumas.join(', ')}`;
+    }
+    if (importantEvents && importantEvents.length > 0) {
+      historyContext += `\nEVENTOS IMPORTANTES:\n${importantEvents.map((e: any) => `- ${e.year}: ${e.title}`).join('\n')}`;
+    }
+    const shouldGenerateEvolution = age && age > 20 && (traumas?.length || importantEvents?.length);
 
     const prompt = `Basándote en la siguiente descripción de un personaje, genera un perfil psicológico completo y realista con CONTRADICCIONES INTERNAS (lo que hace humano al personaje).
 
@@ -89,7 +102,19 @@ Genera el siguiente perfil psicológico en formato JSON:
       },
       "description": "Descripción de cómo cambia en este contexto"
     }
-  ]
+  ]${shouldGenerateEvolution ? `,
+  "personalityEvolution": {
+    "snapshots": [
+      {
+        "age": número (edad pasada),
+        "bigFive": { "openness": número, "conscientiousness": número, etc. },
+        "moment": "Descripción del momento (ej: 'Adolescencia - Pre-trauma')",
+        "descriptor": "Estado mental en ese momento",
+        "trigger": "Evento o razón del cambio (opcional para el primero)"
+      }
+    ],
+    "currentTrajectory": "Descripción de la tendencia actual (ej: 'Recuperación ascendente')"
+  }` : ''}
 }
 
 INSTRUCCIONES:
@@ -111,6 +136,16 @@ INSTRUCCIONES:
   - Ejemplos: Extraversion alta en trabajo (75) pero baja con familia (30)
   - Solo incluye rasgos que REALMENTE cambian significativamente (diferencia de 20+ puntos)
   - Describe POR QUÉ cambia (necesidad profesional, compartimentalización, etc.)
+
+${shouldGenerateEvolution ? `\n- EVOLUCIÓN DE PERSONALIDAD (CRÍTICO): Genera 2-4 snapshots temporales
+  ${historyContext}
+  - Crea snapshots en momentos clave de vida (adolescencia, post-trauma, actualidad, etc.)
+  - Los traumas DEBEN afectar Neuroticism (+10 a +30 típicamente)
+  - Eventos positivos pueden reducir Neuroticism o aumentar otros rasgos
+  - La personalidad ACTUAL (en bigFive principal) debe ser el último snapshot
+  - Ejemplo: trauma severo → Neuroticism de 40 a 75, Extraversion de 70 a 45
+  - Ejemplo: terapia exitosa → Neuroticism de 80 a 50, recovery trajectory
+  - Describe currentTrajectory: "Recuperación", "Estable", "Declive", etc.` : ''}
 
 ${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE (no reemplaces). Mantén la esencia de lo que el usuario ya definió.' : ''}
 
@@ -145,6 +180,14 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
       personalityData.internalContradictions = personalityData.internalContradictions.map((contradiction: any) => ({
         id: nanoid(),
         ...contradiction
+      }));
+    }
+
+    // Añadir IDs a snapshots de personalityEvolution
+    if (personalityData.personalityEvolution?.snapshots) {
+      personalityData.personalityEvolution.snapshots = personalityData.personalityEvolution.snapshots.map((snapshot: any) => ({
+        id: nanoid(),
+        ...snapshot
       }));
     }
 
