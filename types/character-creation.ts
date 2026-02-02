@@ -829,8 +829,9 @@ export const GeneratedProfileSchema = z.object({
 
 /** Steps for Smart Start flow */
 export type SmartStartStep =
-  | 'type'
-  | 'search'
+  | 'description' // NEW: Legal flow - generate from free-form description
+  | 'type'       // DEPRECATED: Old flow - kept for backward compatibility
+  | 'search'     // DEPRECATED: Old illegal flow - kept for backward compatibility
   | 'customize'
   | 'depth'
   | 'review'

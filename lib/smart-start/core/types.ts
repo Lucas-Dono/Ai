@@ -265,9 +265,11 @@ export interface GenerationResult {
 // ============================================================================
 
 export type SmartStartStep =
-  | 'type'
-  | 'search'
+  | 'description' // NEW: Legal flow - generate from free-form description
+  | 'type'       // DEPRECATED: Old flow
+  | 'search'     // DEPRECATED: Old illegal flow
   | 'customize'
+  | 'depth'
   | 'review'
   | 'genre'; // Optional - accessed from customize when changing genre
 

@@ -9,6 +9,7 @@ import { ProgressBreadcrumb } from './ui/ProgressBreadcrumb';
 import { GenreSelection } from './steps/GenreSelection';
 import { CharacterTypeSelection } from './steps/CharacterTypeSelection';
 import { CharacterSearch } from './steps/CharacterSearch';
+import { DescriptionGenerationStep } from './steps/DescriptionGenerationStep';
 import { CharacterCustomization } from './steps/CharacterCustomization';
 import { DepthCustomizationStep } from './steps/DepthCustomizationStep';
 import { ReviewStep } from './steps/ReviewStep';
@@ -43,6 +44,7 @@ function WizardContent() {
     selectedDepth,
     selectDepthLevel,
     goToStep,
+    updateCharacterDraft,
   } = useSmartStart();
 
   // Keyboard navigation
@@ -94,8 +96,13 @@ function WizardContent() {
               step={currentStep}
               userTier={userTier}
               selectedDepth={selectedDepth}
+              sessionId={sessionId}
               onDepthSelect={selectDepthLevel}
               goToStep={goToStep}
+              onCharacterGenerated={(draft) => {
+                // Update character draft in context
+                updateCharacterDraft(draft);
+              }}
             />
           </motion.div>
         </AnimatePresence>
@@ -111,12 +118,36 @@ interface StepContentProps {
   step: string;
   userTier: string;
   selectedDepth: string | null;
+  sessionId: string | null;
   onDepthSelect: (depthId: any) => void;
   goToStep: (step: any) => void;
+  onCharacterGenerated: (draft: any) => void;
 }
 
-function StepContent({ step, userTier, selectedDepth, onDepthSelect, goToStep }: StepContentProps) {
+function StepContent({ step, userTier, selectedDepth, sessionId, onDepthSelect, goToStep, onCharacterGenerated }: StepContentProps) {
   switch (step) {
+    // NEW LEGAL FLOW: Start directly with description (no "type" selection)
+    case 'description':
+      if (!sessionId) {
+        return <div>Loading session...</div>;
+      }
+      return (
+        <ErrorBoundary componentName="DescriptionGenerationStep" level="recoverable">
+          <DescriptionGenerationStep
+            sessionId={sessionId}
+            userTier={userTier as 'FREE' | 'PLUS' | 'ULTRA'}
+            onCharacterGenerated={(draft) => {
+              onCharacterGenerated(draft);
+              goToStep('customize');
+            }}
+            onBack={() => {
+              // Could add a back option or skip
+            }}
+          />
+        </ErrorBoundary>
+      );
+
+    // DEPRECATED: Keep for backward compatibility but not used in new flow
     case 'type':
       return (
         <ErrorBoundary componentName="CharacterTypeSelection" level="recoverable">
@@ -124,6 +155,7 @@ function StepContent({ step, userTier, selectedDepth, onDepthSelect, goToStep }:
         </ErrorBoundary>
       );
 
+    // DEPRECATED: Old search flow (ILLEGAL - kept only for reference)
     case 'search':
       return (
         <ErrorBoundary componentName="CharacterSearch" level="recoverable">

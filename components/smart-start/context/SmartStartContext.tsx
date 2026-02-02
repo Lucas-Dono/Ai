@@ -124,14 +124,14 @@ const SmartStartContext = createContext<SmartStartContextValue | null>(null);
 
 const INITIAL_STATE: SmartStartState = {
   sessionId: null,
-  currentStep: 'type',
+  currentStep: 'description', // NEW: Start directly with description (legal flow)
   isLoading: false,
   error: null,
   availableGenres: [],
   selectedGenre: null,
   selectedSubgenre: null,
   selectedArchetype: null,
-  characterType: null,
+  characterType: 'original', // Always 'original' now (no cloning)
   selectedDepth: null,
   userTier: 'free', // Default to free tier (will be fetched from user profile)
   searchQuery: '',
@@ -178,8 +178,8 @@ export function SmartStartProvider({ children }: SmartStartProviderProps) {
         ...prev,
         sessionId: data.session.id,
         availableGenres: data.availableGenres || [],
-        // Flow starts with 'type' - user chooses existing vs original character
-        currentStep: data.session.currentStep || 'type',
+        // NEW: Flow starts directly with 'description' (legal flow)
+        currentStep: data.session.currentStep || 'description',
       }));
     } catch (error) {
       console.error('[SmartStart] Failed to initialize session:', error);
@@ -543,30 +543,38 @@ export function SmartStartProvider({ children }: SmartStartProviderProps) {
 
   const goBack = useCallback(() => {
     setState(prev => {
-      // Flow: type -> search (if existing) OR customize (if original) -> depth -> review
+      // NEW FLOW: description -> customize -> depth -> review
       // 'genre' step is optional (only accessed from customize when changing genre)
 
       // Handle back navigation based on current step
       let previousStep: SmartStartStep = prev.currentStep;
 
       switch (prev.currentStep) {
-        case 'type':
-          // Can't go back from type - it's the first step
-          previousStep = 'type';
-          break;
-        case 'search':
-          previousStep = 'type';
+        case 'description':
+          // Can't go back from description - it's the first step
+          previousStep = 'description';
           break;
         case 'customize':
-          // If came from search, go back to search; otherwise go to type
-          previousStep = prev.characterType === 'existing' ? 'search' : 'type';
+          // Go back to description
+          previousStep = 'description';
+          break;
+        case 'depth':
+          // Go back to customize
+          previousStep = 'customize';
           break;
         case 'review':
-          previousStep = 'customize';
+          previousStep = 'depth';
           break;
         case 'genre':
           // If on genre selection (changing genre), go back to customize
           previousStep = 'customize';
+          break;
+        // DEPRECATED: Old flow (kept for backward compatibility)
+        case 'type':
+          previousStep = 'description';
+          break;
+        case 'search':
+          previousStep = 'description';
           break;
         default:
           // Stay on current step

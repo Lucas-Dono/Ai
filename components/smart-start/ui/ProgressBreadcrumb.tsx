@@ -15,15 +15,18 @@ interface BreadcrumbStep {
   order: number;
 }
 
-// New flow: type -> search (if existing) -> customize -> review
+// NEW LEGAL FLOW: description -> customize -> depth -> review
 // 'genre' is optional (only accessed when user wants to change genre)
 const BREADCRUMB_STEPS: BreadcrumbStep[] = [
-  { id: 'type', labelKey: 'type', order: 0 },
-  { id: 'search', labelKey: 'search', order: 1 },
-  { id: 'customize', labelKey: 'customize', order: 2 },
+  { id: 'description', labelKey: 'description', order: 0 },
+  { id: 'customize', labelKey: 'customize', order: 1 },
+  { id: 'depth', labelKey: 'depth', order: 2 },
   { id: 'review', labelKey: 'review', order: 3 },
   // Optional steps (shown only when active)
   { id: 'genre', labelKey: 'genre', order: -1 },
+  // DEPRECATED (kept for backward compatibility)
+  { id: 'type', labelKey: 'type', order: -1 },
+  { id: 'search', labelKey: 'search', order: -1 },
 ];
 
 export function ProgressBreadcrumb({ currentStep }: ProgressBreadcrumbProps) {

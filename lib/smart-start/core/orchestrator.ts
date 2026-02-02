@@ -21,6 +21,7 @@ import { getAIService } from '../services/ai-service';
 import { getValidationService } from '../services/validation-service';
 import { PromptBuilder } from '../prompts/generator';
 import { nanoid } from 'nanoid';
+import { getDescriptionBasedGenerator, type GenerationOptions } from '../services/description-based-generator';
 
 const prisma = new PrismaClient();
 
@@ -402,6 +403,186 @@ export class SmartStartOrchestrator {
     });
 
     return draft;
+  }
+
+  /**
+   * NEW: Generate character from free-form description (LEGAL - 100% original)
+   * This replaces the old "search existing character" flow
+   */
+  async generateFromDescription(
+    sessionId: string,
+    description: string,
+    userTier: 'FREE' | 'PLUS' | 'ULTRA',
+    options?: {
+      genreHint?: GenreId;
+      archetypeHint?: ArchetypeId;
+      era?: string;
+      nsfwLevel?: 'sfw' | 'romantic' | 'suggestive' | 'explicit';
+    }
+  ): Promise<CharacterDraft> {
+    const session = await prisma.smartStartSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    console.log('[Orchestrator] Generating from description:', {
+      sessionId,
+      descriptionLength: description.length,
+      tier: userTier,
+    });
+
+    // Use the new description-based generator
+    const generator = getDescriptionBasedGenerator();
+
+    const generationOptions: GenerationOptions = {
+      description,
+      tier: userTier,
+      genreHint: options?.genreHint,
+      archetypeHint: options?.archetypeHint,
+      constraints: {
+        era: options?.era,
+        nsfwLevel: options?.nsfwLevel,
+      },
+    };
+
+    const result = await generator.generate(generationOptions);
+
+    // Log warnings if any (copyright issues detected)
+    if (result.warnings && result.warnings.length > 0) {
+      console.warn('[Orchestrator] Originality warnings:', result.warnings);
+    }
+
+    // Generate system prompt from the draft
+    const genre = options?.genreHint ? this.genreService.getGenre(options.genreHint) : null;
+    const archetype = null; // Skip archetype for now as we don't have subgenre
+
+    const systemPrompt = await this.promptBuilder.build({
+      genreId: options?.genreHint || ('general' as GenreId),
+      name: result.draft.name,
+      personality: result.draft.personality ? [result.draft.personality] : [],
+      background: result.draft.backstory,
+      appearance: result.draft.physicalAppearance,
+    });
+
+    // Enhance draft with system prompt and metadata
+    const enhancedDraft: CharacterDraft = {
+      ...result.draft,
+      systemPrompt,
+      genreId: options?.genreHint,
+      archetypeId: options?.archetypeHint,
+      aiGeneratedFields: [
+        'name',
+        'age',
+        'gender',
+        'occupation',
+        'personality',
+        'backstory',
+        'physicalAppearance',
+        'communicationStyle',
+        'catchphrases',
+        'systemPrompt',
+      ],
+      userEditedFields: [],
+    };
+
+    // Update session with generated data
+    await this.progressSession(sessionId, {
+      type: 'generate',
+      data: {
+        generatedFields: enhancedDraft,
+        generationMetadata: {
+          method: 'description-based',
+          confidence: result.confidence,
+          warnings: result.warnings,
+          tokensUsed: result.metadata.tokensUsed,
+          tier: userTier,
+        },
+      },
+    });
+
+    // Track analytics
+    await this.trackEvent('character_generated_from_description', {
+      sessionId,
+      userId: session.userId,
+      tier: userTier,
+      descriptionLength: description.length,
+      confidence: result.confidence,
+      hasWarnings: result.warnings && result.warnings.length > 0,
+    });
+
+    return enhancedDraft;
+  }
+
+  /**
+   * NEW: Generate random character ("Surprise me" button)
+   */
+  async generateRandomCharacter(
+    sessionId: string,
+    userTier: 'FREE' | 'PLUS' | 'ULTRA'
+  ): Promise<CharacterDraft> {
+    const session = await prisma.smartStartSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    console.log('[Orchestrator] Generating random character for tier:', userTier);
+
+    const generator = getDescriptionBasedGenerator();
+    const result = await generator.generateRandom(userTier);
+
+    // Generate system prompt
+    const systemPrompt = await this.promptBuilder.build({
+      genreId: 'general' as GenreId,
+      name: result.draft.name,
+      personality: result.draft.personality ? [result.draft.personality] : [],
+      background: result.draft.backstory,
+      appearance: result.draft.physicalAppearance,
+    });
+
+    const enhancedDraft: CharacterDraft = {
+      ...result.draft,
+      systemPrompt,
+      aiGeneratedFields: [
+        'name',
+        'age',
+        'gender',
+        'occupation',
+        'personality',
+        'backstory',
+        'physicalAppearance',
+        'communicationStyle',
+        'catchphrases',
+        'systemPrompt',
+      ],
+      userEditedFields: [],
+    };
+
+    // Update session
+    await this.progressSession(sessionId, {
+      type: 'generate',
+      data: {
+        generatedFields: enhancedDraft,
+        generationMetadata: {
+          method: 'random',
+          confidence: result.confidence,
+          tier: userTier,
+        },
+      },
+    });
+
+    await this.trackEvent('character_generated_random', {
+      sessionId,
+      userId: session.userId,
+      tier: userTier,
+    });
+
+    return enhancedDraft;
   }
 
   /**
