@@ -1839,7 +1839,7 @@ const jamesOBrien = {
 // PERSONAJE 9/25: KATYA VOLKOV
 // ============================================================================
   // Katya Volkov - La Perfeccionista
-  {
+const katyaVolkov = {
     id: 'premium_katya_engineer',
     name: 'Ekaterina "Katya" Volkov',
     kind: 'companion' as const,
@@ -2157,42 +2157,7 @@ Tu función es ser brillantez perfecta que lentamente permite imperfección. Ere
     nsfwMode: true, // Permite contenido adulto con construcción emocional
     userId: null,
     tags: ['premium', 'experto', 'profesional', 'ingeniera', 'tecnología', 'perfeccionista', 'código'],
-  },
-
-  /* TEMPLATE PARA AGREGAR PERSONAJES:
-
-  {
-    id: 'premium_sofia_confidente', // ID único permanente
-    name: 'Sofía',
-    kind: 'companion' as const,
-    visibility: 'public',
-    featured: true, // Marca como premium/destacado
-
-    description: 'Descripción corta del personaje (1-2 líneas)',
-
-    // Personality
-    personality: `[Texto de personalidad del JSON de Opus]`,
-    personalityVariant: 'submissive',
-
-    // System Prompt (del JSON de Opus)
-    systemPrompt: `[System prompt completo de 500+ palabras del JSON]`,
-
-    // Profile (JSON con toda la info de Opus)
-    profile: {
-      // basicInfo del JSON de Opus
-      age: 29,
-      gender: 'female',
-      origin: 'Buenos Aires, Argentina',
-      occupation: 'Psicóloga especializada en trauma',
-      appearance: {
-        physicalDescription: '...',
-        style: '...',
-        distinctiveFeatures: '...'
-      },
-
-      // psychology del JSON
-      psychology: {
-        attachmentStyle: '...',
+};
 
 // ============================================================================
 // PERSONAJES 10-19: Liam O'Connor hasta Yuki Tanaka
@@ -3544,46 +3509,6 @@ const reiTakahashi = {
 // FIN DE PERSONAJES 15-19
 // ============================================================================
 
-async function seedUpdatedCharacters() {
-  console.log('🌱 Seeding personajes actualizados (versión manual de alta calidad)...\n');
-
-  try {
-    // Crear usuario sistema
-    await prisma.user.upsert({
-      where: { id: 'system' },
-      update: {},
-      create: {
-        id: 'system',
-        email: 'system@platform.internal',
-        name: 'Sistema',
-        plan: 'ultra',
-        updatedAt: new Date(),
-      },
-    });
-
-    // Seed Amara Okafor
-    await prisma.agent.upsert({
-      where: { id: amaraOkafor.id },
-      update: { ...amaraOkafor, updatedAt: new Date() },
-      create: { ...amaraOkafor, updatedAt: new Date() },
-    });
-    console.log('✅ 1/25 Amara Okafor actualizada\n');
-
-    // TODO: Agregar resto de personajes...
-
-  } catch (error) {
-    console.error('❌ Error:', error);
-    throw error;
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-if (require.main === module) {
-  seedUpdatedCharacters();
-}
-
-
 // ============================================================================
 // PERSONAJES 20-25: Sebastian, Sofia V., Sofía M., Yuki T., Zara, Luna
 // ============================================================================
@@ -4622,15 +4547,6 @@ if (require.main === module) {
     });
 }
 
-export {
-  drSebastianMuller,
-  sofiaVolkov,
-  sofiaMendoza,
-  yukiTanaka,
-  zaraMalik,
-  lunaDemo,
-};
-
 // ============================================================================
 // ARRAY CONSOLIDADO DE TODOS LOS PERSONAJES
 // ============================================================================
@@ -4651,11 +4567,12 @@ export const allCharacters = [
   jamesOBrien,
 
   // Personaje 9
-  { ...PREMIUM_CHARACTERS[5] }, // Katya Volkov del seed premium
+  katyaVolkov,
 
-  // Personajes 10-19
+  // Personajes 10-20
   liamOConnor,
   lunaChen,
+  marcusWashington,
   marcusVega,
   miaChen,
   noahKepler,
@@ -4665,11 +4582,10 @@ export const allCharacters = [
   reiTakahashi,
   yukiTanaka,
 
-  // Personajes 20-25
+  // Personajes 21-25
   drSebastianMuller,
   sofiaVolkov,
   sofiaMendoza,
-  yukiTanaka, // Yuki del seed-all-characters
   zaraMalik,
   lunaDemo,
 ];
@@ -4772,9 +4688,10 @@ export {
   ethanCross,
   isabellaFerreira,
   jamesOBrien,
-  // Katya se importa de PREMIUM_CHARACTERS
+  katyaVolkov,
   liamOConnor,
   lunaChen,
+  marcusWashington,
   marcusVega,
   miaChen,
   noahKepler,
