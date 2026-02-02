@@ -94,14 +94,28 @@ export function CVStyleCreator() {
     setShowAdvanced(true);
 
     try {
-      // Simulación de cascada de generación
+      console.log('[PersonaArchitect] 🚀 Iniciando generación completa con IA...');
+
+      // PASO 1: Generar identidad (incluye physicalDescription)
+      console.log('[PersonaArchitect] 📝 Generando identidad...');
+      await simulateAIGeneration('identity', 0);
+
+      // PASO 2: Generar avatar (necesita physicalDescription del paso 1)
+      console.log('[PersonaArchitect] 🎨 Generando avatar...');
+      await handleAvatarGeneration(true); // silent=true para no mostrar errores molestos
+
+      // PASO 3: Generar resto en paralelo (no dependen entre sí)
+      console.log('[PersonaArchitect] ⚡ Generando personalidad, trabajo e historia en paralelo...');
       await Promise.all([
-        simulateAIGeneration('identity', 500),
-        simulateAIGeneration('avatar', 1000),
-        simulateAIGeneration('personality', 1500),
-        simulateAIGeneration('work', 2000),
-        simulateAIGeneration('history', 2500),
+        simulateAIGeneration('personality', 0),
+        simulateAIGeneration('work', 0),
+        simulateAIGeneration('history', 0),
       ]);
+
+      console.log('[PersonaArchitect] ✅ Generación completa finalizada');
+    } catch (error: any) {
+      console.error('[PersonaArchitect] ❌ Error en generación:', error);
+      alert(`Error en la generación: ${error.message}`);
     } finally {
       setLoadingAI(prev => ({ ...prev, all: false }));
     }
@@ -170,24 +184,28 @@ export function CVStyleCreator() {
     });
   };
 
-  const handleAvatarGeneration = async () => {
+  const handleAvatarGeneration = async (silent: boolean = false) => {
     // Limpiar error previo
     setAvatarError(null);
 
     // Validar que existe la descripción física
     if (!character.physicalDescription || character.physicalDescription.trim().length < 10) {
-      setAvatarError('Necesitas completar la descripción visual primero (mínimo 10 caracteres)');
-      setShowValidation(true);
+      if (!silent) {
+        setAvatarError('Necesitas completar la descripción visual primero (mínimo 10 caracteres)');
+        setShowValidation(true);
 
-      // Hacer scroll al campo de descripción física y enfocarlo
-      if (physicalDescRef.current) {
-        physicalDescRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Focus después de un breve delay para que el scroll se complete
-        setTimeout(() => physicalDescRef.current?.focus(), 500);
+        // Hacer scroll al campo de descripción física y enfocarlo
+        if (physicalDescRef.current) {
+          physicalDescRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Focus después de un breve delay para que el scroll se complete
+          setTimeout(() => physicalDescRef.current?.focus(), 500);
+        }
+
+        // Auto-limpiar el error después de 5 segundos
+        setTimeout(() => setAvatarError(null), 5000);
+      } else {
+        console.log('[Avatar] Saltando generación: descripción física insuficiente');
       }
-
-      // Auto-limpiar el error después de 5 segundos
-      setTimeout(() => setAvatarError(null), 5000);
       return;
     }
 
@@ -212,8 +230,10 @@ export function CVStyleCreator() {
       setCharacter(prev => ({ ...prev, avatarUrl: result.url }));
     } catch (error: any) {
       console.error('Failed to generate avatar:', error);
-      setAvatarError(`Error al generar avatar: ${error.message}`);
-      setTimeout(() => setAvatarError(null), 5000);
+      if (!silent) {
+        setAvatarError(`Error al generar avatar: ${error.message}`);
+        setTimeout(() => setAvatarError(null), 5000);
+      }
     } finally {
       setLoadingAI(prev => ({ ...prev, avatar: false }));
     }
