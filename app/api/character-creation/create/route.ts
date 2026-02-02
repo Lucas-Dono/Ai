@@ -7,6 +7,14 @@ import { sanitizeAndValidateName } from '@/lib/security/unicode-sanitizer';
 import { trackEvent, EventType } from '@/lib/analytics/kpi-tracker';
 import { z } from 'zod';
 import type { ProfileData } from '@/types/prisma-json';
+import {
+  analyzePsychologicalProfile,
+  type BigFiveFacets,
+  type DarkTriad,
+  type AttachmentProfile,
+  type EnrichedPersonalityProfile,
+} from '@/lib/psychological-analysis';
+import type { PsychologicalNeeds } from '@/types/character-creation';
 
 const CreateCharacterSchema = z.object({
   // Identidad (obligatorio)
@@ -53,6 +61,32 @@ const CreateCharacterSchema = z.object({
   })),
   traumas: z.array(z.string()),
   personalAchievements: z.array(z.string()),
+
+  // ============================================================================
+  // SISTEMA PSICOLÓGICO ENRIQUECIDO (opcional, solo PLUS/ULTRA)
+  // ============================================================================
+  enrichedPersonality: z.object({
+    facets: z.any().optional(), // BigFiveFacets
+    darkTriad: z.object({
+      machiavellianism: z.number().min(0).max(100),
+      narcissism: z.number().min(0).max(100),
+      psychopathy: z.number().min(0).max(100),
+    }).optional(),
+    attachmentProfile: z.object({
+      primaryStyle: z.enum(['secure', 'anxious', 'avoidant', 'fearful-avoidant']),
+      intensity: z.number().min(0).max(100),
+      manifestations: z.array(z.string()),
+    }).optional(),
+    psychologicalNeeds: z.object({
+      connection: z.number().min(0).max(1),
+      autonomy: z.number().min(0).max(1),
+      competence: z.number().min(0).max(1),
+      novelty: z.number().min(0).max(1),
+    }).optional(),
+  }).optional(),
+
+  // Confirmación de conflictos críticos (si los hay)
+  confirmCriticalConflicts: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -95,6 +129,80 @@ export async function POST(req: NextRequest) {
       select: { plan: true },
     });
     const userPlan = userData?.plan || 'free';
+
+    // ============================================================================
+    // VALIDACIÓN PSICOLÓGICA (Solo si hay dimensiones enriquecidas)
+    // ============================================================================
+    if (data.enrichedPersonality && (userPlan === 'plus' || userPlan === 'ultra')) {
+      console.log('[Psychological] Validando perfil psicológico enriquecido...');
+
+      // Construir perfil enriquecido para análisis
+      const enrichedProfile: EnrichedPersonalityProfile = {
+        openness: data.bigFive.openness,
+        conscientiousness: data.bigFive.conscientiousness,
+        extraversion: data.bigFive.extraversion,
+        agreeableness: data.bigFive.agreeableness,
+        neuroticism: data.bigFive.neuroticism,
+        coreValues: data.coreValues,
+        baselineEmotions: {
+          joy: 0.5,
+          sadness: 0.5,
+          anger: 0.5,
+          fear: 0.5,
+          disgust: 0.5,
+          surprise: 0.5,
+        },
+        facets: data.enrichedPersonality.facets as BigFiveFacets | undefined,
+        darkTriad: data.enrichedPersonality.darkTriad as DarkTriad | undefined,
+        attachment: data.enrichedPersonality.attachmentProfile as AttachmentProfile | undefined,
+        psychologicalNeeds: data.enrichedPersonality.psychologicalNeeds,
+      };
+
+      // Ejecutar análisis
+      const analysis = analyzePsychologicalProfile(enrichedProfile);
+
+      console.log('[Psychological] Análisis completo:', {
+        authenticityScore: analysis.authenticityScore.score,
+        conflictsCount: analysis.detectedConflicts.length,
+        predictedBehaviors: analysis.predictedBehaviors.length,
+      });
+
+      // Verificar autenticidad muy baja
+      if (analysis.authenticityScore.score < 30) {
+        console.warn('[Psychological] Perfil con autenticidad muy baja:', analysis.authenticityScore.score);
+        return NextResponse.json({
+          error: 'Perfil psicológicamente inconsistente',
+          authenticityScore: analysis.authenticityScore.score,
+          conflicts: analysis.detectedConflicts.map(c => ({
+            severity: c.severity,
+            title: c.title,
+            description: c.description,
+          })),
+          suggestion: 'Revisa los conflictos detectados en la pestaña de Análisis y ajusta las dimensiones psicológicas para mejorar la coherencia.',
+        }, { status: 400 });
+      }
+
+      // Detectar conflictos críticos
+      const criticalConflicts = analysis.detectedConflicts.filter(c => c.severity === 'critical');
+
+      if (criticalConflicts.length > 0 && !data.confirmCriticalConflicts) {
+        console.warn('[Psychological] Conflictos críticos detectados sin confirmar:', criticalConflicts.length);
+        return NextResponse.json({
+          requiresConfirmation: true,
+          authenticityScore: analysis.authenticityScore.score,
+          criticalConflicts: criticalConflicts.map(c => ({
+            id: c.id,
+            title: c.title,
+            description: c.description,
+            implications: c.implications,
+            mitigations: c.mitigations,
+          })),
+          message: 'Este perfil tiene conflictos psicológicos críticos. Revisa las implicaciones y confirma que deseas continuar.',
+        }, { status: 400 });
+      }
+
+      console.log('[Psychological] Validación exitosa ✓');
+    }
 
     // Construir perfil completo (ProfileData V2)
     const profile: ProfileData = {
@@ -198,29 +306,47 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Crear PersonalityCore
-      await tx.personalityCore.create({
-        data: {
-          id: nanoid(),
-          agentId: newAgent.id,
-          openness: data.bigFive.openness,
-          conscientiousness: data.bigFive.conscientiousness,
-          extraversion: data.bigFive.extraversion,
-          agreeableness: data.bigFive.agreeableness,
-          neuroticism: data.bigFive.neuroticism,
-          coreValues: data.coreValues,
-          moralSchemas: [],
-          baselineEmotions: {
-            joy: 0.5,
-            sadness: 0.3,
-            anger: 0.2,
-            fear: 0.3,
-            surprise: 0.5,
-            disgust: 0.2,
-            trust: 0.5,
-            anticipation: 0.5,
-          },
+      // Crear PersonalityCore (con dimensiones enriquecidas si aplica)
+      const personalityCoreData: any = {
+        id: nanoid(),
+        agentId: newAgent.id,
+        openness: data.bigFive.openness,
+        conscientiousness: data.bigFive.conscientiousness,
+        extraversion: data.bigFive.extraversion,
+        agreeableness: data.bigFive.agreeableness,
+        neuroticism: data.bigFive.neuroticism,
+        moralSchemas: [],
+        baselineEmotions: {
+          joy: 0.5,
+          sadness: 0.3,
+          anger: 0.2,
+          fear: 0.3,
+          surprise: 0.5,
+          disgust: 0.2,
+          trust: 0.5,
+          anticipation: 0.5,
         },
+      };
+
+      // Extender coreValues con dimensiones enriquecidas (PLUS/ULTRA)
+      if (data.enrichedPersonality && (userPlan === 'plus' || userPlan === 'ultra')) {
+        personalityCoreData.coreValues = {
+          // Valores tradicionales
+          values: data.coreValues,
+          // Dimensiones enriquecidas (persistidas en JSON)
+          bigFiveFacets: data.enrichedPersonality.facets,
+          darkTriad: data.enrichedPersonality.darkTriad,
+          attachmentProfile: data.enrichedPersonality.attachmentProfile,
+          psychologicalNeeds: data.enrichedPersonality.psychologicalNeeds,
+        };
+        console.log('[Psychological] Dimensiones enriquecidas persistidas en PersonalityCore ✓');
+      } else {
+        // Solo valores tradicionales (FREE tier o sin dimensiones enriquecidas)
+        personalityCoreData.coreValues = data.coreValues;
+      }
+
+      await tx.personalityCore.create({
+        data: personalityCoreData,
       });
 
       // Crear InternalState

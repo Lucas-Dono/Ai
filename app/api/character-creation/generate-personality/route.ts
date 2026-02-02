@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth-helper';
 import { getLLMProvider } from '@/lib/llm/provider';
+import { prisma } from '@/lib/prisma';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
+import { inferFacetsFromBigFive } from '@/lib/psychological-analysis';
 
 const RequestSchema = z.object({
   description: z.string().min(10),
@@ -189,6 +191,76 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
         id: nanoid(),
         ...snapshot
       }));
+    }
+
+    // ============================================================================
+    // SISTEMA PSICOLÓGICO ENRIQUECIDO (Solo PLUS/ULTRA)
+    // ============================================================================
+
+    // Obtener plan del usuario para determinar tier
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { plan: true },
+    });
+    const userPlan = userData?.plan || 'free';
+
+    // Solo generar dimensiones enriquecidas para PLUS y ULTRA
+    if (userPlan === 'plus' || userPlan === 'ultra') {
+      console.log(`[Psychological] Generando dimensiones enriquecidas para tier ${userPlan.toUpperCase()}`);
+
+      // 1. Inferir facetas desde Big Five
+      const facets = inferFacetsFromBigFive(personalityData.bigFive);
+      personalityData.facets = facets;
+
+      // 2. Inicializar Dark Triad en valores bajos (usuario puede ajustar)
+      personalityData.darkTriad = {
+        machiavellianism: 20,
+        narcissism: 15,
+        psychopathy: 10,
+      };
+
+      // 3. Inferir estilo de apego desde Big Five y Neuroticism
+      let attachmentStyle: 'secure' | 'anxious' | 'avoidant' | 'fearful-avoidant' = 'secure';
+      let attachmentIntensity = 50;
+
+      const { neuroticism, extraversion, agreeableness } = personalityData.bigFive;
+
+      if (neuroticism > 70 && extraversion > 60) {
+        attachmentStyle = 'anxious';
+        attachmentIntensity = Math.min(neuroticism, 85);
+      } else if (neuroticism < 40 && agreeableness > 60 && extraversion > 50) {
+        attachmentStyle = 'secure';
+        attachmentIntensity = 40; // Seguro es menos "intenso"
+      } else if (extraversion < 40 && agreeableness < 50) {
+        attachmentStyle = 'avoidant';
+        attachmentIntensity = Math.min(100 - extraversion, 80);
+      } else if (neuroticism > 60 && extraversion < 50 && agreeableness < 50) {
+        attachmentStyle = 'fearful-avoidant';
+        attachmentIntensity = Math.min(neuroticism + (100 - extraversion), 90) / 2;
+      }
+
+      personalityData.attachmentProfile = {
+        primaryStyle: attachmentStyle,
+        intensity: Math.round(attachmentIntensity),
+        manifestations: [],
+      };
+
+      // 4. Inicializar necesidades psicológicas SDT (valores balanceados)
+      personalityData.psychologicalNeeds = {
+        connection: extraversion / 100, // 0-1
+        autonomy: (100 - neuroticism) / 100,
+        competence: (personalityData.bigFive.conscientiousness + personalityData.bigFive.openness) / 200,
+        novelty: personalityData.bigFive.openness / 100,
+      };
+
+      console.log('[Psychological] Dimensiones enriquecidas generadas:', {
+        facets: '30 facetas inferidas',
+        darkTriad: personalityData.darkTriad,
+        attachment: `${attachmentStyle} (${attachmentIntensity})`,
+        needs: personalityData.psychologicalNeeds,
+      });
+    } else {
+      console.log('[Psychological] Tier FREE - Solo Big Five básico');
     }
 
     return NextResponse.json(personalityData);

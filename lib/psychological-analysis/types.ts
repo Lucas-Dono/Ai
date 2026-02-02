@@ -256,6 +256,17 @@ export const ATTACHMENT_DESCRIPTIONS: Record<AttachmentStyle, string> = {
  * Extiende BigFiveTraits con facetas, Dark Triad y estilo de apego.
  */
 export interface EnrichedPersonalityProfile extends BigFiveTraits {
+  /** Valores fundamentales del personaje */
+  coreValues: string[];
+  /** Emociones base */
+  baselineEmotions: {
+    joy: number;
+    sadness: number;
+    anger: number;
+    fear: number;
+    disgust: number;
+    surprise: number;
+  };
   /** Facetas detalladas de Big Five (30 dimensiones) */
   facets?: BigFiveFacets;
   /** Dark Triad (3 dimensiones) */
@@ -273,6 +284,16 @@ export const EnrichedPersonalityProfileSchema = z.object({
   extraversion: z.number().min(0).max(100),
   agreeableness: z.number().min(0).max(100),
   neuroticism: z.number().min(0).max(100),
+  // Core values y emociones base
+  coreValues: z.array(z.string()),
+  baselineEmotions: z.object({
+    joy: z.number(),
+    sadness: z.number(),
+    anger: z.number(),
+    fear: z.number(),
+    disgust: z.number(),
+    surprise: z.number(),
+  }),
   // Dimensiones enriquecidas (opcionales)
   facets: BigFiveFacetsSchema.optional(),
   darkTriad: DarkTriadSchema.optional(),
