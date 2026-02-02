@@ -2943,6 +2943,9 @@
     }
   },
   "characterCreation": {
+    "header": {
+      "subtitle": "Creador de Personajes Realistas"
+    },
     "tabs": {
       "identity": "Identidad",
       "work": "Trabajo",
@@ -2956,13 +2959,29 @@
     },
     "actions": {
       "save": "Crear Personaje",
-      "saving": "Creando..."
+      "saving": "Creando...",
+      "publish": "Publicar Personaje",
+      "export": "Exportar"
     },
     "helper": {
       "aiAssist": "Puedes usar IA para generar contenido en cada sección"
     },
+    "advanced": {
+      "show": "Ver Detalles Avanzados",
+      "hide": "Ocultar Detalles Avanzados"
+    },
+    "description": {
+      "title": "Descripción del Personaje",
+      "subtitle": "Describe a la persona que quieres crear. Esta descripción servirá como base para generar automáticamente su historia, personalidad y trabajo.",
+      "placeholder": "Ej: Un profesor de historia jubilado que vive en una casa antigua con sus tres gatos. Es amable pero reservado, le gusta la jardinería y tiene miedo a la tecnología moderna...",
+      "generateAll": "Generar Personaje Completo con IA",
+      "errors": {
+        "needDescription": "Necesitas escribir una descripción primero"
+      }
+    },
     "identity": {
-      "title": "Identidad del Personaje",
+      "title": "Identidad",
+      "badge": "Básico",
       "description": "Información básica y apariencia física",
       "name": {
         "label": "Nombre Completo",
@@ -3036,9 +3055,14 @@
       }
     },
     "personality": {
-      "title": "Personalidad",
+      "title": "Perfil Psicológico",
+      "badge": "Detalles",
       "description": "Rasgos psicológicos y características",
-      "generate": "Generar Personalidad",
+      "generate": "Refinar Personalidad",
+      "cognitive": {
+        "label": "Psicología y Comportamiento",
+        "placeholder": "Describe cómo piensa y actúa..."
+      },
       "bigFive": {
         "title": "Big Five",
         "description": "Modelo de personalidad de cinco factores",
@@ -3108,9 +3132,10 @@
       }
     },
     "history": {
-      "title": "Historia Personal",
+      "title": "Biografía y Antecedentes",
       "description": "Eventos y experiencias que definen al personaje",
-      "generate": "Generar Historia",
+      "generate": "Generar Biografía",
+      "empty": "Sin registros biográficos.",
       "events": {
         "label": "Eventos Importantes",
         "add": "Añadir Evento",

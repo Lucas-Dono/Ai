@@ -22,6 +22,7 @@ export interface CharacterDraft {
   };
   coreValues: string[];
   fears: string[];
+  cognitivePrompt: string; // Descripción del pensamiento y comportamiento
 
   // Relationships (Optional)
   importantPeople: ImportantPerson[];
