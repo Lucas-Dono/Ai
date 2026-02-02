@@ -10,6 +10,18 @@
  */
 
 import { z } from 'zod';
+import type {
+  BigFiveFacets,
+  DarkTriad,
+  AttachmentProfile,
+  PsychologicalAnalysis,
+} from '@/lib/psychological-analysis/types';
+import {
+  BigFiveFacetsSchema,
+  DarkTriadSchema,
+  AttachmentProfileSchema,
+  PsychologicalAnalysisSchema,
+} from '@/lib/psychological-analysis';
 
 // ============================================================================
 // PERSONALITY CORE TYPES
@@ -113,30 +125,9 @@ export const BaselineEmotionsSchema = z.object({
   melancholy: z.number().min(0).max(1).default(0.2),
 }).catchall(z.number().min(0).max(1));
 
-/**
- * Complete PersonalityCore compatible with Prisma model.
- */
-export interface PersonalityCoreData extends BigFiveTraits {
-  /** Core values that drive the character (JSON array in Prisma) */
-  coreValues: CoreValue[];
-  /** Moral schemas for ethical decisions (JSON array in Prisma) */
-  moralSchemas: MoralSchema[];
-  /** Character's backstory (optional, can be long) */
-  backstory?: string;
-  /** Default emotional baseline (JSON object in Prisma) */
-  baselineEmotions: BaselineEmotions;
-}
-
-export const PersonalityCoreDataSchema = BigFiveTraitsSchema.extend({
-  coreValues: z.array(CoreValueSchema).min(1).max(10),
-  moralSchemas: z.array(MoralSchemaSchema).max(10).default([]),
-  backstory: z.string().max(10000).optional(),
-  baselineEmotions: BaselineEmotionsSchema,
-});
-
 // ============================================================================
 // PSYCHOLOGICAL NEEDS TYPES
-// Compatible with Prisma model InternalState
+// Movido aquí para evitar referencia circular
 // ============================================================================
 
 /**
@@ -159,6 +150,53 @@ export const PsychologicalNeedsSchema = z.object({
   autonomy: z.number().min(0).max(1).default(0.5),
   competence: z.number().min(0).max(1).default(0.5),
   novelty: z.number().min(0).max(1).default(0.5),
+});
+
+/**
+ * Complete PersonalityCore compatible with Prisma model.
+ *
+ * NOTA: Las dimensiones enriquecidas (facets, darkTriad, attachment, analysis)
+ * se almacenan en el campo JSON `coreValues` junto con los valores centrales.
+ * Esto permite retrocompatibilidad 100% sin cambios en el schema de Prisma.
+ */
+export interface PersonalityCoreData extends BigFiveTraits {
+  /** Core values that drive the character (JSON array in Prisma) */
+  coreValues: CoreValue[];
+  /** Moral schemas for ethical decisions (JSON array in Prisma) */
+  moralSchemas: MoralSchema[];
+  /** Character's backstory (optional, can be long) */
+  backstory?: string;
+  /** Default emotional baseline (JSON object in Prisma) */
+  baselineEmotions: BaselineEmotions;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // DIMENSIONES PSICOLÓGICAS ENRIQUECIDAS (Almacenadas en JSON)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /** Facetas detalladas de Big Five (30 dimensiones) */
+  bigFiveFacets?: BigFiveFacets;
+  /** Dark Triad - rasgos oscuros (3 dimensiones) */
+  darkTriad?: DarkTriad;
+  /** Estilo de apego */
+  attachmentProfile?: AttachmentProfile;
+  /** Necesidades psicológicas (ya existe en InternalState, aquí es opcional) */
+  psychologicalNeeds?: PsychologicalNeeds;
+
+  /** Análisis psicológico (se recalcula on-demand, no se persiste normalmente) */
+  analysis?: PsychologicalAnalysis;
+}
+
+export const PersonalityCoreDataSchema = BigFiveTraitsSchema.extend({
+  coreValues: z.array(CoreValueSchema).min(1).max(10),
+  moralSchemas: z.array(MoralSchemaSchema).max(10).default([]),
+  backstory: z.string().max(10000).optional(),
+  baselineEmotions: BaselineEmotionsSchema,
+  // Dimensiones enriquecidas (todas opcionales para retrocompatibilidad)
+  bigFiveFacets: BigFiveFacetsSchema.optional(),
+  darkTriad: DarkTriadSchema.optional(),
+  attachmentProfile: AttachmentProfileSchema.optional(),
+  psychologicalNeeds: PsychologicalNeedsSchema.optional(),
+  analysis: PsychologicalAnalysisSchema.optional(),
 });
 
 /**
@@ -545,6 +583,14 @@ export interface CharacterDraft {
   fearsDesires?: FearsDesiresData;
 
   // ─────────────────────────────────────────────────────────────────────────
+  // ENRICHED PERSONALITY (Sistema Psicológico Enriquecido)
+  // ─────────────────────────────────────────────────────────────────────────
+  /** Perfil psicológico enriquecido con facetas, Dark Triad, apego, etc. */
+  enrichedPersonality?: import('@/lib/psychological-analysis/types').EnrichedPersonalityProfile;
+  /** Confirmación de conflictos críticos detectados */
+  confirmCriticalConflicts?: boolean;
+
+  // ─────────────────────────────────────────────────────────────────────────
   // RELATIONSHIPS (Step 6)
   // ─────────────────────────────────────────────────────────────────────────
   /** Important people in character's life */
@@ -664,6 +710,22 @@ export const CharacterDraftSchema = z.object({
   // Psychology
   psychologicalNeeds: PsychologicalNeedsSchema.optional(),
   fearsDesires: FearsDesiresDataSchema.optional(),
+
+  // Enriched Personality (nuevo sistema psicológico)
+  enrichedPersonality: z
+    .object({
+      openness: z.number().min(0).max(100),
+      conscientiousness: z.number().min(0).max(100),
+      extraversion: z.number().min(0).max(100),
+      agreeableness: z.number().min(0).max(100),
+      neuroticism: z.number().min(0).max(100),
+      facets: BigFiveFacetsSchema.optional(),
+      darkTriad: DarkTriadSchema.optional(),
+      attachment: AttachmentProfileSchema.optional(),
+      psychologicalNeeds: PsychologicalNeedsSchema.optional(),
+    })
+    .optional(),
+  confirmCriticalConflicts: z.boolean().optional(),
 
   // Relationships
   importantPeople: z.array(ImportantPersonDataSchema).max(50).optional(),
