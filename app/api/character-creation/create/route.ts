@@ -14,7 +14,8 @@ const CreateCharacterSchema = z.object({
   age: z.number().min(1).max(200),
   gender: z.enum(['male', 'female', 'non-binary']),
   origin: z.string(),
-  physicalDescription: z.string().min(10),
+  generalDescription: z.string(), // Descripción general del personaje
+  physicalDescription: z.string().min(10), // Solo apariencia física
   avatarUrl: z.string().nullable(),
 
   // Trabajo (obligatorio)
@@ -145,7 +146,7 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
           userId: user.id,
           kind: 'original', // Personajes creados desde PersonaArchitect son originales
           name: sanitizedName,
-          description: data.physicalDescription,
+          description: data.generalDescription || data.physicalDescription, // Usa descripción general si existe
           personality: `${data.cognitivePrompt || ''}\n\nValores: ${data.coreValues.join(', ')}`,
           purpose: data.occupation,
           tone: inferToneFromPersonality(data.bigFive),

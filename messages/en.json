@@ -2828,6 +2828,11 @@
         "label": "Origin",
         "placeholder": "City, country or place of origin"
       },
+      "physicalAppearance": {
+        "label": "Physical Appearance",
+        "placeholder": "Describe only their appearance: height, build, eye color, hair, facial features, clothing style...",
+        "hint": "This description is used to generate the avatar. Focus only on visual characteristics."
+      },
       "description": {
         "label": "Physical Description",
         "placeholder": "Describe the character's physical appearance: height, build, eye color, hair, distinctive features, clothing style...",

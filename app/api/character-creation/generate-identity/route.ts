@@ -24,7 +24,7 @@ export const POST = withAuth(async (req: NextRequest, { user }) => {
 
     const { description } = validation.data;
 
-    const prompt = `Basándote en la siguiente descripción de un personaje, genera los datos de identidad básicos.
+    const prompt = `Basándote en la siguiente descripción de un personaje, genera los datos de identidad básicos y extrae la descripción física/visual.
 
 DESCRIPCIÓN DEL PERSONAJE:
 ${description}
@@ -34,7 +34,8 @@ Genera SOLO los siguientes campos en formato JSON válido:
   "name": "Nombre completo apropiado",
   "age": número (edad realista),
   "gender": "male" | "female" | "non-binary",
-  "origin": "Ciudad, país de origen realista"
+  "origin": "Ciudad, país de origen realista",
+  "physicalDescription": "Descripción SOLO de la apariencia física extraída de la descripción original"
 }
 
 IMPORTANTE:
@@ -42,6 +43,7 @@ IMPORTANTE:
 - La edad debe ser realista según la descripción
 - El género debe inferirse de la descripción si es posible
 - El origen debe ser específico (ciudad y país)
+- physicalDescription: Extrae SOLO las características visuales/físicas mencionadas (altura, complexión, color de ojos, cabello, rasgos faciales, vestimenta). Si no hay descripción física en el texto original, genera una coherente basada en el nombre, edad y origen. Máximo 150 palabras, enfócate en lo visual.
 
 Responde SOLO con el JSON, sin texto adicional.`;
 

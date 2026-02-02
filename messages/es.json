@@ -3004,6 +3004,11 @@
         "label": "Origen",
         "placeholder": "Ciudad, país o lugar de origen"
       },
+      "physicalAppearance": {
+        "label": "Apariencia Física",
+        "placeholder": "Describe solo su apariencia: altura, complexión, color de ojos, cabello, rasgos faciales, estilo de vestir...",
+        "hint": "Esta descripción se usa para generar el avatar. Enfócate solo en características visuales."
+      },
       "description": {
         "label": "Descripción Física",
         "placeholder": "Describe la apariencia física del personaje: altura, constitución, color de ojos, cabello, rasgos distintivos, estilo de vestir...",

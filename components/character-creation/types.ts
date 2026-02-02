@@ -4,7 +4,8 @@ export interface CharacterDraft {
   age: number | undefined;
   gender: 'male' | 'female' | 'non-binary' | undefined;
   origin: string;
-  physicalDescription: string;
+  generalDescription: string; // Descripción general del personaje (prompt maestro)
+  physicalDescription: string; // Solo apariencia física/visual (para avatar)
   avatarUrl: string | null;
 
   // Work (Required)

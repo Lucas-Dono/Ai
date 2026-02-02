@@ -35,7 +35,8 @@ export function CVStyleCreator() {
     age: undefined,
     gender: undefined,
     origin: '',
-    physicalDescription: '', // Prompt maestro
+    generalDescription: '', // Descripción general (prompt maestro)
+    physicalDescription: '', // Solo apariencia física (para avatar)
     avatarUrl: null,
 
     // Trabajo
@@ -82,7 +83,7 @@ export function CVStyleCreator() {
 
   // --- AI GENERATION HANDLERS ---
   const generateAll = async () => {
-    if (!character.physicalDescription.trim()) {
+    if (!character.generalDescription.trim()) {
       alert(t('description.errors.needDescription'));
       return;
     }
@@ -117,7 +118,8 @@ export function CVStyleCreator() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          description: character.physicalDescription,
+          // Para avatar usamos physicalDescription, para el resto generalDescription
+          description: section === 'avatar' ? character.physicalDescription : character.generalDescription,
           name: character.name,
           age: character.age,
           gender: character.gender,
@@ -143,7 +145,15 @@ export function CVStyleCreator() {
     setCharacter(prev => {
       switch (section) {
         case 'identity':
-          return { ...prev, name: data.name, age: data.age, gender: data.gender, origin: data.origin };
+          return {
+            ...prev,
+            name: data.name,
+            age: data.age,
+            gender: data.gender,
+            origin: data.origin,
+            // También actualizar la descripción física si viene en la respuesta
+            physicalDescription: data.physicalDescription || prev.physicalDescription
+          };
         case 'avatar':
           return { ...prev, avatarUrl: data.url };
         case 'work':
@@ -159,8 +169,8 @@ export function CVStyleCreator() {
   };
 
   const handleAvatarGeneration = async () => {
-    if (!character.physicalDescription) {
-      alert(t('identity.avatar.errors.needDescription'));
+    if (!character.physicalDescription || character.physicalDescription.trim().length < 10) {
+      alert('Necesitas completar la descripción física primero (mínimo 10 caracteres)');
       return;
     }
 
@@ -176,12 +186,16 @@ export function CVStyleCreator() {
         }),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        setCharacter(prev => ({ ...prev, avatarUrl: result.url }));
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error al generar avatar');
       }
-    } catch (error) {
+
+      const result = await response.json();
+      setCharacter(prev => ({ ...prev, avatarUrl: result.url }));
+    } catch (error: any) {
       console.error('Failed to generate avatar:', error);
+      alert(`Error al generar avatar: ${error.message}`);
     } finally {
       setLoadingAI(prev => ({ ...prev, avatar: false }));
     }
@@ -510,6 +524,34 @@ export function CVStyleCreator() {
               </div>
             </div>
 
+            {/* Descripción Física (para avatar) */}
+            <div className="mt-5">
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
+                {t('identity.physicalAppearance.label')} <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
+                <textarea
+                  rows={3}
+                  className={`w-full bg-slate-900 border rounded-lg p-3 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none ${
+                    showValidation && !validation.physicalDescription
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
+                  }`}
+                  placeholder={t('identity.physicalAppearance.placeholder')}
+                  value={character.physicalDescription}
+                  onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
+                />
+                {showValidation && !validation.physicalDescription && (
+                  <div className="absolute -bottom-5 left-0 text-xs text-red-400">
+                    Mínimo 10 caracteres - describe su apariencia física
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-2">
+                {t('identity.physicalAppearance.hint')}
+              </p>
+            </div>
+
             {/* Avatar Preview */}
             <div className="md:col-span-4 flex flex-col items-center gap-4 border-l border-slate-800 pl-8 pt-2">
               <div className="relative">
@@ -562,24 +604,13 @@ export function CVStyleCreator() {
               {t('description.subtitle')}
             </p>
 
-            <div className="relative">
-              <textarea
-                rows={4}
-                className={`w-full bg-slate-950 border rounded-lg p-4 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none mb-4 shadow-inner ${
-                  showValidation && !validation.physicalDescription
-                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                    : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
-                }`}
-                placeholder={t('description.placeholder')}
-                value={character.physicalDescription}
-                onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
-              />
-              {showValidation && !validation.physicalDescription && (
-                <div className="absolute -bottom-1 left-0 text-xs text-red-400">
-                  Mínimo 10 caracteres (campo obligatorio)
-                </div>
-              )}
-            </div>
+            <textarea
+              rows={4}
+              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-4 text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm leading-relaxed resize-none mb-4 shadow-inner"
+              placeholder={t('description.placeholder')}
+              value={character.generalDescription}
+              onChange={(e) => setCharacter(prev => ({ ...prev, generalDescription: e.target.value }))}
+            />
 
             <MagicButton
               text={t('description.generateAll')}
