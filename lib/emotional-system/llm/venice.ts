@@ -33,6 +33,21 @@ export interface VeniceRequestBody {
   stream?: boolean;
 }
 
+export interface VeniceImageParams {
+  prompt: string;
+  negativePrompt?: string;
+  width?: number;
+  height?: number;
+  quality?: 'standard' | 'hd';
+  style?: 'vivid' | 'natural';
+}
+
+export interface VeniceImageResult {
+  imageUrl: string;
+  revisedPrompt?: string;
+  generationTime: number;
+}
+
 /**
  * Tipos de errores que puede devolver Venice API
  */
@@ -591,6 +606,105 @@ export class VeniceClient {
       console.error("[Venice] Raw response:", response.text);
       throw new Error(`Failed to parse JSON response: ${error}`);
     }
+  }
+
+  /**
+   * Genera una imagen usando grok-imagine de Venice
+   * Costo: $0.04 por imagen (mejor que Google Nano Banana a $0.039)
+   */
+  async generateImage(params: VeniceImageParams): Promise<VeniceImageResult> {
+    try {
+      console.log('[Venice Image] 🎨 Generando imagen con grok-imagine...');
+      const startTime = Date.now();
+
+      // Construir prompt completo (combinando prompt + negative prompt)
+      let fullPrompt = params.prompt;
+
+      if (params.negativePrompt) {
+        fullPrompt += `\n\nNegative: ${params.negativePrompt}`;
+      }
+
+      const requestBody = {
+        model: 'grok-imagine',
+        prompt: fullPrompt,
+        n: 1,
+        size: `${params.width || 1024}x${params.height || 1024}`,
+        quality: params.quality || 'standard',
+        style: params.style || 'vivid',
+      };
+
+      const currentKey = this.getCurrentApiKey();
+      const response = await fetch(`${this.baseURL}/images/generations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentKey}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Venice Image] ❌ Error:', response.status, errorText);
+        throw new Error(`Venice Image API error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.data || !data.data[0] || !data.data[0].url) {
+        throw new Error('Invalid response from Venice Image API - no image URL');
+      }
+
+      const generationTime = (Date.now() - startTime) / 1000;
+      console.log(`[Venice Image] ✅ Imagen generada en ${generationTime.toFixed(2)}s`);
+
+      return {
+        imageUrl: data.data[0].url,
+        revisedPrompt: data.data[0].revised_prompt,
+        generationTime,
+      };
+    } catch (error) {
+      console.error('[Venice Image] ❌ Error generando imagen:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Genera imagen de avatar optimizada para personajes
+   * Costo: $0.04 por avatar
+   */
+  async generateAvatar(params: {
+    description: string;
+    age?: number;
+    gender?: 'male' | 'female' | 'non-binary';
+  }): Promise<VeniceImageResult> {
+    let prompt = `professional portrait photo, ${params.description}`;
+
+    if (params.age) {
+      prompt += `, ${params.age} years old`;
+    }
+
+    if (params.gender) {
+      const genderMap = {
+        'male': 'male',
+        'female': 'female',
+        'non-binary': 'androgynous person'
+      };
+      prompt += `, ${genderMap[params.gender]}`;
+    }
+
+    prompt += ', high quality, realistic, detailed face, professional headshot, studio lighting, 8k';
+
+    const negativePrompt = 'cartoon, anime, drawing, painting, sketch, low quality, blurry, distorted, deformed, multiple people, text, watermark, signature, bad anatomy, ugly';
+
+    return this.generateImage({
+      prompt,
+      negativePrompt,
+      width: 1024,
+      height: 1024,
+      quality: 'hd',
+      style: 'natural',
+    });
   }
 }
 

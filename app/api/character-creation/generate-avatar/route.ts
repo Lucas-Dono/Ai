@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth-helper';
-import { getAIHordeClient } from '@/lib/visual-system/ai-horde-client';
+import { getVeniceClient } from '@/lib/emotional-system/llm/venice';
 import { z } from 'zod';
 
 const RequestSchema = z.object({
@@ -28,40 +28,25 @@ export async function POST(req: NextRequest) {
 
     const { description, age, gender } = validation.data;
 
-    // Construir prompt de imagen
-    let imagePrompt = `portrait photo of a person, ${description}`;
+    console.log('[Generate Avatar] Generating avatar with Venice (grok-imagine)...');
+    console.log('[Generate Avatar] Cost: $0.04 per image');
 
-    if (age) {
-      imagePrompt += `, ${age} years old`;
-    }
-
-    if (gender) {
-      const genderMap = {
-        'male': 'male',
-        'female': 'female',
-        'non-binary': 'androgynous'
-      };
-      imagePrompt += `, ${genderMap[gender]}`;
-    }
-
-    imagePrompt += ', professional headshot, high quality, realistic, detailed face';
-
-    // Generar imagen usando AI Horde
-    const aiHordeClient = getAIHordeClient();
-    const result = await aiHordeClient.generateImage({
-      prompt: imagePrompt,
-      negativePrompt: 'cartoon, anime, drawing, painting, sketch, low quality, blurry, distorted, deformed, multiple people, text',
-      width: 512,
-      height: 512,
-      steps: 30,
-      cfgScale: 7.5,
-      sampler: 'k_euler_a',
-      seed: -1,
-      nsfw: false,
-      karras: true,
+    // Generar avatar usando Venice AI con grok-imagine
+    const veniceClient = getVeniceClient();
+    const result = await veniceClient.generateAvatar({
+      description,
+      age,
+      gender,
     });
 
-    return NextResponse.json({ url: result.imageUrl });
+    console.log(`[Generate Avatar] ✅ Avatar generated in ${result.generationTime.toFixed(2)}s`);
+
+    return NextResponse.json({
+      url: result.imageUrl,
+      revisedPrompt: result.revisedPrompt,
+      generationTime: result.generationTime,
+      cost: 0.04, // USD
+    });
   } catch (error: any) {
     console.error('Error generating avatar:', error);
     return NextResponse.json(
