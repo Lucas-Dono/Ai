@@ -522,34 +522,34 @@ export function CVStyleCreator() {
                   placeholder={t('identity.origin.placeholder')}
                 />
               </div>
-            </div>
 
-            {/* Descripción Física (para avatar) */}
-            <div className="mt-5">
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
-                {t('identity.physicalAppearance.label')} <span className="text-red-400">*</span>
-              </label>
-              <div className="relative">
-                <textarea
-                  rows={3}
-                  className={`w-full bg-slate-900 border rounded-lg p-3 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none ${
-                    showValidation && !validation.physicalDescription
-                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                      : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
-                  }`}
-                  placeholder={t('identity.physicalAppearance.placeholder')}
-                  value={character.physicalDescription}
-                  onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
-                />
-                {showValidation && !validation.physicalDescription && (
-                  <div className="absolute -bottom-5 left-0 text-xs text-red-400">
-                    Mínimo 10 caracteres - describe su apariencia física
-                  </div>
-                )}
+              {/* Descripción Física (para avatar) */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
+                  {t('identity.physicalAppearance.label')} <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <textarea
+                    rows={3}
+                    className={`w-full bg-slate-900 border rounded-lg p-3 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none ${
+                      showValidation && !validation.physicalDescription
+                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                        : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
+                    }`}
+                    placeholder={t('identity.physicalAppearance.placeholder')}
+                    value={character.physicalDescription}
+                    onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
+                  />
+                  {showValidation && !validation.physicalDescription && (
+                    <div className="absolute -bottom-5 left-0 text-xs text-red-400">
+                      Mínimo 10 caracteres - describe su apariencia física
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  {t('identity.physicalAppearance.hint')}
+                </p>
               </div>
-              <p className="text-xs text-slate-500 mt-2">
-                {t('identity.physicalAppearance.hint')}
-              </p>
             </div>
 
             {/* Avatar Preview */}
