@@ -9,6 +9,7 @@ import {
   PenTool, Download, Rocket, ChevronDown, ChevronUp, Zap
 } from 'lucide-react';
 import type { CharacterDraft } from './types';
+import { PersonalityRadarChart } from './PersonalityRadarChart';
 
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
@@ -777,6 +778,20 @@ export function CVStyleCreator() {
                     }))}
                   />
                 </div>
+
+                {/* Radar Chart de Personalidad */}
+                {(character.bigFive.openness > 0 ||
+                  character.bigFive.conscientiousness > 0 ||
+                  character.bigFive.extraversion > 0 ||
+                  character.bigFive.agreeableness > 0 ||
+                  character.bigFive.neuroticism > 0) && (
+                  <div className="mt-8 pt-8 border-t border-slate-800">
+                    <PersonalityRadarChart
+                      bigFive={character.bigFive}
+                      values={character.coreValues}
+                    />
+                  </div>
+                )}
 
                 {/* Valores y Miedos */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
