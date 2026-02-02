@@ -2812,10 +2812,12 @@
       "skipConfirm": "Skip Smart Start? You can create a character manually."
     },
     "progress": {
+      "description": "Description",
       "genre": "Genre",
       "type": "Type",
       "search": "Search",
       "customize": "Customize",
+      "depth": "Depth",
       "review": "Review"
     },
     "genreSelection": {
@@ -2928,11 +2930,85 @@
         }
       }
     },
+    "descriptionGeneration": {
+      "title": "Describe Your Character",
+      "subtitle": "Write freely how you imagine your character and AI will create it for you",
+      "placeholder": "E.g: a rebellious hacker with purple mohawk, expert in cybersecurity, sarcastic but loyal to friends...",
+      "characterCount": "{count}/2000",
+      "examplesTitle": "Quick examples:",
+      "advancedOptions": "Advanced options (optional)",
+      "advancedOptionsHide": "Hide advanced options",
+      "generateButton": "Generate with AI",
+      "surpriseMeButton": "Surprise Me",
+      "generating": "Generating character...",
+      "generatingRandom": "Generating random character...",
+      "fields": {
+        "genre": {
+          "label": "Genre",
+          "placeholder": "Unspecified",
+          "options": {
+            "none": "Unspecified",
+            "romance": "Romance",
+            "roleplay": "Roleplay",
+            "gaming": "Gaming",
+            "professional": "Professional",
+            "friendship": "Friendship",
+            "wellness": "Wellness"
+          }
+        },
+        "era": {
+          "label": "Era",
+          "placeholder": "E.g: Modern, Victorian, Futuristic..."
+        },
+        "archetype": {
+          "label": "Archetype",
+          "placeholder": "E.g: Hero, Rebel, Mentor..."
+        }
+      },
+      "examples": {
+        "detective": "a noir detective from the 1940s, cynical but kind-hearted",
+        "hacker": "a rebellious hacker with purple mohawk, cybersecurity expert",
+        "chef": "a French chef obsessed with culinary perfection",
+        "pilot": "a drone racing pilot with a defiant attitude",
+        "professor": "a philosophy professor with unconventional theories"
+      },
+      "tierInfo": {
+        "title": "Your {tier} plan includes:",
+        "free": {
+          "feature1": "Basic profile (~60 fields)",
+          "feature2": "2,000 generation tokens",
+          "feature3": "200-300 word biography"
+        },
+        "plus": {
+          "feature1": "Enriched profile (~160 fields)",
+          "feature2": "8,000 generation tokens",
+          "feature3": "400-600 word biography",
+          "feature4": "Detailed relationships and goals"
+        },
+        "ultra": {
+          "feature1": "Complete psychological profile (~240+ fields)",
+          "feature2": "20,000 generation tokens",
+          "feature3": "Epic 600-800 word biography",
+          "feature4": "Big Five analysis, narrative arcs, traumas",
+          "feature5": "Complex relationship network"
+        }
+      },
+      "errors": {
+        "tooShort": "Description must be at least 10 characters",
+        "tooLong": "Description is too long (maximum 2000 characters)",
+        "generationFailed": "Failed to generate character. Please try again."
+      },
+      "warnings": {
+        "similarName": "The generated name is similar to '{name}'. For legal reasons, we recommend using a more original name.",
+        "franchiseMention": "The biography mentions '{franchise}'. To avoid copyright issues, avoid direct references to existing franchises."
+      }
+    },
     "characterType": {
       "title": "Character Type",
       "subtitle": "Start with an existing character or create something original",
+      "note": "NOTE: The existing character search flow has been deprecated for legal reasons. We recommend using original character generation.",
       "existing": {
-        "title": "Existing Character",
+        "title": "Existing Character (Deprecated)",
         "description": "Search for a character from anime, games, movies, or TV shows"
       },
       "original": {

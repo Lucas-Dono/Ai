@@ -2988,10 +2988,12 @@
       "skipConfirm": "¿Saltar Inicio Inteligente? Puedes crear un personaje manualmente."
     },
     "progress": {
+      "description": "Descripción",
       "genre": "Género",
       "type": "Tipo",
       "search": "Búsqueda",
       "customize": "Personalizar",
+      "depth": "Profundidad",
       "review": "Revisar"
     },
     "genreSelection": {
@@ -3104,11 +3106,85 @@
         }
       }
     },
+    "descriptionGeneration": {
+      "title": "Describe tu Personaje",
+      "subtitle": "Escribe libremente cómo imaginas tu personaje y la IA lo creará para ti",
+      "placeholder": "Ej: una hacker rebelde con mohawk morado, experta en ciberseguridad, sarcástica pero leal con sus amigos...",
+      "characterCount": "{count}/2000",
+      "examplesTitle": "Ejemplos rápidos:",
+      "advancedOptions": "Opciones avanzadas (opcional)",
+      "advancedOptionsHide": "Ocultar opciones avanzadas",
+      "generateButton": "Generar con IA",
+      "surpriseMeButton": "Sorpréndeme",
+      "generating": "Generando personaje...",
+      "generatingRandom": "Generando personaje aleatorio...",
+      "fields": {
+        "genre": {
+          "label": "Género",
+          "placeholder": "Sin especificar",
+          "options": {
+            "none": "Sin especificar",
+            "romance": "Romance",
+            "roleplay": "Roleplay",
+            "gaming": "Gaming",
+            "professional": "Profesional",
+            "friendship": "Amistad",
+            "wellness": "Bienestar"
+          }
+        },
+        "era": {
+          "label": "Época",
+          "placeholder": "Ej: Moderna, Victoriana, Futurista..."
+        },
+        "archetype": {
+          "label": "Arquetipo",
+          "placeholder": "Ej: Héroe, Rebelde, Mentor..."
+        }
+      },
+      "examples": {
+        "detective": "un detective noir de los años 40, cínico pero con buen corazón",
+        "hacker": "una hacker rebelde con mohawk morado, experta en ciberseguridad",
+        "chef": "un chef francés obsesionado con la perfección culinaria",
+        "pilot": "una piloto de drones de carreras con actitud desafiante",
+        "professor": "un profesor de filosofía con teorías poco convencionales"
+      },
+      "tierInfo": {
+        "title": "Tu plan {tier} incluye:",
+        "free": {
+          "feature1": "Perfil básico (~60 campos)",
+          "feature2": "2,000 tokens de generación",
+          "feature3": "Biografía de 200-300 palabras"
+        },
+        "plus": {
+          "feature1": "Perfil enriquecido (~160 campos)",
+          "feature2": "8,000 tokens de generación",
+          "feature3": "Biografía de 400-600 palabras",
+          "feature4": "Relaciones y metas detalladas"
+        },
+        "ultra": {
+          "feature1": "Perfil psicológico completo (~240+ campos)",
+          "feature2": "20,000 tokens de generación",
+          "feature3": "Biografía épica de 600-800 palabras",
+          "feature4": "Análisis Big Five, arcos narrativos, traumas",
+          "feature5": "Red de relaciones compleja"
+        }
+      },
+      "errors": {
+        "tooShort": "La descripción debe tener al menos 10 caracteres",
+        "tooLong": "La descripción es demasiado larga (máximo 2000 caracteres)",
+        "generationFailed": "Error al generar personaje. Por favor, inténtalo de nuevo."
+      },
+      "warnings": {
+        "similarName": "El nombre generado es similar a '{name}'. Por motivos legales, recomendamos usar un nombre más original.",
+        "franchiseMention": "La biografía menciona '{franchise}'. Para evitar problemas de copyright, evita referencias directas a franquicias existentes."
+      }
+    },
     "characterType": {
       "title": "Tipo de Personaje",
       "subtitle": "Comienza con un personaje existente o crea algo original",
+      "note": "NOTA: El flujo de búsqueda de personajes existentes ha sido deprecado por razones legales. Se recomienda usar la generación de personajes originales.",
       "existing": {
-        "title": "Personaje Existente",
+        "title": "Personaje Existente (Deprecado)",
         "description": "Busca un personaje de anime, juegos, películas o series de TV"
       },
       "original": {
