@@ -85,6 +85,27 @@ export interface ImportantPerson {
   type: 'family' | 'friend' | 'romantic' | 'rival' | 'mentor' | 'colleague' | 'other';
   closeness: number; // 0-100: qué tan cercana es la relación
   status: 'active' | 'estranged' | 'deceased' | 'distant'; // Estado actual de la relación
+
+  // Influencia en el personaje
+  influenceOn?: {
+    values: string[]; // Valores que esta persona influyó/inculcó
+    fears: string[]; // Miedos que esta persona causó/generó
+    skills: string[]; // Habilidades que enseñó o inspiró
+    personalityImpact?: string; // Descripción de cómo moldeó la personalidad
+  };
+
+  // Historia compartida
+  sharedHistory?: HistoryEvent[]; // Eventos importantes en común
+
+  // Dinámica actual
+  currentDynamic?: string; // Ej: "Hablan 2 veces al mes, relación distante pero cordial"
+
+  // Conflicto/Tensión (opcional)
+  conflict?: {
+    active: boolean;
+    description: string; // Ej: "Discrepancia sobre valores religiosos"
+    intensity: number; // 0-100
+  };
 }
 
 export interface HistoryEvent {

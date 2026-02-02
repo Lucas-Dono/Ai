@@ -13,6 +13,7 @@ import { PersonalityRadarChart } from './PersonalityRadarChart';
 import { MoralAlignmentChart } from './MoralAlignmentChart';
 import { SkillBarsChart } from './SkillBarsChart';
 import { ContradictionsDisplay } from './ContradictionsDisplay';
+import { RelationshipNetworkDisplay } from './RelationshipNetworkDisplay';
 
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
@@ -172,6 +173,12 @@ export function CVStyleCreator() {
           if (character.personalAchievements.length > 0) payload.existingAchievements = character.personalAchievements;
           break;
 
+        case 'relationships':
+          if (character.importantPeople.length > 0) payload.existingPeople = character.importantPeople;
+          if (character.coreValues.length > 0) payload.existingValues = character.coreValues;
+          if (character.fears.length > 0) payload.existingFears = character.fears;
+          break;
+
         case 'identity':
           // Para identity, usar origin y physicalDescription si existen
           if (character.origin) payload.existingOrigin = character.origin;
@@ -248,6 +255,8 @@ export function CVStyleCreator() {
           return { ...prev, ...updates };
         case 'history':
           return { ...prev, importantEvents: data.events, traumas: data.traumas, personalAchievements: data.achievements };
+        case 'relationships':
+          return { ...prev, importantPeople: data.people || [] };
         default:
           return prev;
       }
@@ -984,6 +993,33 @@ export function CVStyleCreator() {
                 </div>
               </section>
             </div>
+
+            {/* Relaciones Interpersonales */}
+            <section className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+              <SectionHeader icon={Users} title="Relaciones Interpersonales" />
+              <div className="space-y-4">
+                {character.importantPeople.length > 0 && (
+                  <RelationshipNetworkDisplay
+                    people={character.importantPeople}
+                    characterName={character.name || "Personaje"}
+                  />
+                )}
+
+                <MagicButton
+                  text={character.importantPeople.length > 0 ? "Refinar Relaciones" : "Generar Relaciones"}
+                  onClick={() => simulateAIGeneration('relationships', 1500)}
+                  loading={loadingAI.relationships}
+                  fullWidth
+                  variant="secondary"
+                />
+
+                {character.importantPeople.length === 0 && (
+                  <div className="text-xs text-center text-slate-500 italic py-4">
+                    Las personas importantes moldean quiénes somos
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
         )}
 
