@@ -8,6 +8,10 @@ const RequestSchema = z.object({
   description: z.string().min(10),
   name: z.string().optional(),
   age: z.number().optional(),
+  // Contexto existente (para refinar/expandir)
+  existingEvents: z.array(z.any()).optional(),
+  existingTraumas: z.array(z.string()).optional(),
+  existingAchievements: z.array(z.string()).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,10 +31,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description, name, age } = validation.data;
+    const { description, name, age, existingEvents, existingTraumas, existingAchievements } = validation.data;
 
     const currentYear = new Date().getFullYear();
     const birthYear = age ? currentYear - age : currentYear - 30;
+
+    // Construir sección de contexto existente
+    let existingContext = '';
+    if (existingEvents && existingEvents.length > 0) {
+      existingContext += `\nEVENTOS YA DEFINIDOS:\n${existingEvents.map((e: any) => `- ${e.year}: ${e.title}`).join('\n')}\n(Respeta estos eventos, agrega más coherentes con la historia)`;
+    }
+    if (existingTraumas && existingTraumas.length > 0) {
+      existingContext += `\nTRAUMAS YA DEFINIDOS: ${existingTraumas.join(', ')}\n(Respeta estos traumas, agrega más si es coherente)`;
+    }
+    if (existingAchievements && existingAchievements.length > 0) {
+      existingContext += `\nLOGROS PERSONALES YA DEFINIDOS: ${existingAchievements.join(', ')}\n(Respeta estos logros, agrega más coherentes)`;
+    }
 
     const prompt = `Basándote en la siguiente descripción de un personaje, genera su biografía y línea temporal.
 
@@ -39,6 +55,7 @@ ${description}
 ${name ? `Nombre: ${name}` : ''}
 ${age ? `Edad: ${age}` : ''}
 ${age ? `Año de nacimiento estimado: ${birthYear}` : ''}
+${existingContext}
 
 Genera la siguiente historia en formato JSON:
 
@@ -58,6 +75,7 @@ INSTRUCCIONES:
 - Títulos cortos y descriptivos (máx 60 caracteres)
 - Traumas: 1-3 experiencias difíciles que moldearon al personaje
 - Logros personales: 2-4 logros no profesionales (relaciones, superación personal, etc.)
+${existingContext ? '- IMPORTANTE: Si hay información previa, RESPÉTALA y construye sobre ella. No reemplaces eventos/traumas/logros existentes, agrega más coherentes.' : ''}
 
 EJEMPLOS DE BUENOS EVENTOS:
 - {"year": 2010, "title": "Inicio de estudios universitarios"}

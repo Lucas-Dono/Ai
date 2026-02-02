@@ -7,6 +7,10 @@ const RequestSchema = z.object({
   description: z.string().min(10),
   name: z.string().optional(),
   age: z.number().optional(),
+  // Contexto existente (para refinar/expandir)
+  existingOccupation: z.string().optional(),
+  existingSkills: z.array(z.string()).optional(),
+  existingAchievements: z.array(z.string()).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -26,7 +30,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description, name, age } = validation.data;
+    const { description, name, age, existingOccupation, existingSkills, existingAchievements } = validation.data;
+
+    // Construir sección de contexto existente
+    let existingContext = '';
+    if (existingOccupation) {
+      existingContext += `\nOCUPACIÓN YA DEFINIDA: ${existingOccupation}\n(Usa esta ocupación, genera habilidades y logros coherentes)`;
+    }
+    if (existingSkills && existingSkills.length > 0) {
+      existingContext += `\nHABILIDADES YA DEFINIDAS: ${existingSkills.join(', ')}\n(Expande estas habilidades, agrega más si es necesario)`;
+    }
+    if (existingAchievements && existingAchievements.length > 0) {
+      existingContext += `\nLOGROS YA DEFINIDOS: ${existingAchievements.join(', ')}\n(Expande estos logros, agrega más coherentes)`;
+    }
 
     const prompt = `Basándote en la siguiente descripción de un personaje, genera su perfil profesional.
 
@@ -34,6 +50,7 @@ DESCRIPCIÓN DEL PERSONAJE:
 ${description}
 ${name ? `Nombre: ${name}` : ''}
 ${age ? `Edad: ${age}` : ''}
+${existingContext}
 
 Genera el siguiente perfil profesional en formato JSON:
 
@@ -47,6 +64,7 @@ INSTRUCCIONES:
 - Ocupación: Debe ser coherente con la edad y descripción
 - Habilidades: 4-6 competencias específicas relacionadas con su ocupación y experiencia
 - Logros: 2-4 logros profesionales concretos y medibles
+${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE (no reemplaces). Mantén lo que el usuario ya definió y construye sobre ello.' : ''}
 
 EJEMPLOS DE BUENAS HABILIDADES:
 - "Gestión de proyectos ágiles"

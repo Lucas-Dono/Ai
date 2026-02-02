@@ -8,6 +8,9 @@ const RequestSchema = z.object({
   name: z.string().optional(),
   age: z.number().optional(),
   gender: z.enum(['male', 'female', 'non-binary']).optional(),
+  // Contexto existente (para refinar/expandir)
+  existingOrigin: z.string().optional(),
+  existingPhysicalDescription: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,12 +30,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description } = validation.data;
+    const { description, name, age, gender, existingOrigin, existingPhysicalDescription } = validation.data;
+
+    // Construir sección de contexto existente
+    let existingContext = '';
+    if (existingOrigin) {
+      existingContext += `\nORIGEN YA DEFINIDO: ${existingOrigin}\n(Usa este origen, no lo cambies)`;
+    }
+    if (existingPhysicalDescription) {
+      existingContext += `\nDESCRIPCIÓN FÍSICA YA DEFINIDA: "${existingPhysicalDescription}"\n(Refina y expande esta descripción, mantén la esencia)`;
+    }
 
     const prompt = `Basándote en la siguiente descripción de un personaje, genera los datos de identidad básicos y extrae la descripción física/visual.
 
 DESCRIPCIÓN DEL PERSONAJE:
 ${description}
+${existingContext}
 
 Genera SOLO los siguientes campos en formato JSON válido:
 {
@@ -49,6 +62,7 @@ IMPORTANTE:
 - El género debe inferirse de la descripción si es posible
 - El origen debe ser específico (ciudad y país)
 - physicalDescription: Extrae SOLO las características visuales/físicas mencionadas (altura, complexión, color de ojos, cabello, rasgos faciales, vestimenta). Si no hay descripción física en el texto original, genera una coherente basada en el nombre, edad y origen. Máximo 150 palabras, enfócate en lo visual.
+${existingContext ? '- IMPORTANTE: Si hay información previa (origen o descripción física), RESPÉTALA y construye sobre ella. No reemplaces lo que ya existe.' : ''}
 
 Responde SOLO con el JSON, sin texto adicional.`;
 

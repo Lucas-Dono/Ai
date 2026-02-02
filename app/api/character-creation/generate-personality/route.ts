@@ -8,6 +8,10 @@ const RequestSchema = z.object({
   name: z.string().optional(),
   age: z.number().optional(),
   gender: z.enum(['male', 'female', 'non-binary']).optional(),
+  // Contexto existente (para refinar/expandir)
+  existingValues: z.array(z.string()).optional(),
+  existingFears: z.array(z.string()).optional(),
+  existingCognitivePrompt: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,7 +31,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description, name, age, gender } = validation.data;
+    const { description, name, age, gender, existingValues, existingFears, existingCognitivePrompt } = validation.data;
+
+    // Construir sección de contexto existente
+    let existingContext = '';
+    if (existingValues && existingValues.length > 0) {
+      existingContext += `\nVALORES YA DEFINIDOS: ${existingValues.join(', ')}\n(Expande y refina estos valores, no los reemplaces)`;
+    }
+    if (existingFears && existingFears.length > 0) {
+      existingContext += `\nMIEDOS YA DEFINIDOS: ${existingFears.join(', ')}\n(Expande y refina estos miedos, no los reemplaces)`;
+    }
+    if (existingCognitivePrompt) {
+      existingContext += `\nESTILO COGNITIVO YA DEFINIDO: "${existingCognitivePrompt}"\n(Expande y profundiza esta descripción, mantén la esencia)`;
+    }
 
     const prompt = `Basándote en la siguiente descripción de un personaje, genera un perfil psicológico completo y realista.
 
@@ -36,6 +52,7 @@ ${description}
 ${name ? `Nombre: ${name}` : ''}
 ${age ? `Edad: ${age}` : ''}
 ${gender ? `Género: ${gender}` : ''}
+${existingContext}
 
 Genera el siguiente perfil psicológico en formato JSON:
 
@@ -57,6 +74,7 @@ INSTRUCCIONES:
 - Valores: 3-5 principios fundamentales que guían al personaje
 - Miedos: 2-4 temores profundos realistas
 - cognitivePrompt: Describe patrones de pensamiento, sesgos cognitivos, estilo de razonamiento
+${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE (no reemplaces). Mantén la esencia de lo que el usuario ya definió.' : ''}
 
 Responde SOLO con el JSON válido, sin texto adicional.`;
 

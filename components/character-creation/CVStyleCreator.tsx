@@ -100,11 +100,8 @@ export function CVStyleCreator() {
       console.log('[PersonaArchitect] 📝 Generando identidad...');
       await simulateAIGeneration('identity', 0);
 
-      // PASO 2: Generar avatar (necesita physicalDescription del paso 1)
-      console.log('[PersonaArchitect] 🎨 Generando avatar...');
-      await handleAvatarGeneration(true); // silent=true para no mostrar errores molestos
-
-      // PASO 3: Generar resto en paralelo (no dependen entre sí)
+      // PASO 2: Generar resto en paralelo (no dependen entre sí)
+      // NOTA: Avatar se genera por separado, es opcional
       console.log('[PersonaArchitect] ⚡ Generando personalidad, trabajo e historia en paralelo...');
       await Promise.all([
         simulateAIGeneration('personality', 0),
@@ -113,6 +110,7 @@ export function CVStyleCreator() {
       ]);
 
       console.log('[PersonaArchitect] ✅ Generación completa finalizada');
+      console.log('[PersonaArchitect] 💡 Tip: Puedes generar el avatar después con el botón en la sección Identidad');
     } catch (error: any) {
       console.error('[PersonaArchitect] ❌ Error en generación:', error);
       alert(`Error en la generación: ${error.message}`);
@@ -130,16 +128,47 @@ export function CVStyleCreator() {
     }
 
     try {
+      // Preparar payload base
+      const payload: any = {
+        description: character.generalDescription,
+        name: character.name,
+        age: character.age,
+        gender: character.gender,
+      };
+
+      // Agregar contexto existente según la sección
+      switch (section) {
+        case 'personality':
+          if (character.coreValues.length > 0) payload.existingValues = character.coreValues;
+          if (character.fears.length > 0) payload.existingFears = character.fears;
+          if (character.cognitivePrompt) payload.existingCognitivePrompt = character.cognitivePrompt;
+          break;
+
+        case 'work':
+          if (character.occupation) payload.existingOccupation = character.occupation;
+          if (character.skills.length > 0) payload.existingSkills = character.skills;
+          if (character.achievements.length > 0) payload.existingAchievements = character.achievements;
+          break;
+
+        case 'history':
+          if (character.importantEvents.length > 0) payload.existingEvents = character.importantEvents;
+          if (character.traumas.length > 0) payload.existingTraumas = character.traumas;
+          if (character.personalAchievements.length > 0) payload.existingAchievements = character.personalAchievements;
+          break;
+
+        case 'identity':
+          // Para identity, usar origin y physicalDescription si existen
+          if (character.origin) payload.existingOrigin = character.origin;
+          if (character.physicalDescription) payload.existingPhysicalDescription = character.physicalDescription;
+          break;
+      }
+
+      console.log(`[Generate ${section}] Enviando contexto:`, payload);
+
       const response = await fetch(`/api/character-creation/generate-${section}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          // Para avatar usamos physicalDescription, para el resto generalDescription
-          description: section === 'avatar' ? character.physicalDescription : character.generalDescription,
-          name: character.name,
-          age: character.age,
-          gender: character.gender,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
