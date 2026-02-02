@@ -306,7 +306,7 @@ export function CVStyleCreator() {
       disabled={loading}
       className={`
         flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium text-sm
-        ${loading ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' : ''}
+        ${loading ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' : 'cursor-pointer'}
         ${!loading && variant === 'primary' ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500 hover:scale-[1.02]' : ''}
         ${!loading && variant === 'secondary' ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600' : ''}
         ${!loading && variant === 'gradient' ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white shadow-lg border border-indigo-400/30' : ''}
@@ -347,7 +347,7 @@ export function CVStyleCreator() {
           {tags.map((tag: string, i: number) => (
             <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono text-indigo-300 bg-indigo-900/30 border border-indigo-500/30">
               {tag}
-              <button onClick={() => onRemove(i)} className="ml-2 text-indigo-400 hover:text-indigo-200">
+              <button onClick={() => onRemove(i)} className="ml-2 text-indigo-400 hover:text-indigo-200 cursor-pointer">
                 <X size={12}/>
               </button>
             </span>
@@ -370,7 +370,7 @@ export function CVStyleCreator() {
           />
           <button
             onClick={() => { onAdd(input); setInput(''); }}
-            className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-400"
+            className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-400 cursor-pointer"
           >
             <Plus size={18} />
           </button>
@@ -385,9 +385,9 @@ export function CVStyleCreator() {
         <span className="text-sm font-medium text-slate-300">{label}</span>
         <span className="text-xs font-mono text-indigo-400 bg-indigo-900/20 px-1.5 py-0.5 rounded">{value}%</span>
       </div>
-      <div className="relative w-full h-2 bg-slate-800 rounded-full">
+      <div className="relative w-full h-2 bg-slate-800 rounded-full cursor-pointer">
         <div
-          className="absolute h-full bg-gradient-to-r from-indigo-600 to-purple-500 rounded-full"
+          className="absolute h-full bg-gradient-to-r from-indigo-600 to-purple-500 rounded-full pointer-events-none"
           style={{ width: `${value}%` }}
         />
         <input
@@ -420,7 +420,7 @@ export function CVStyleCreator() {
             </div>
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors border border-transparent hover:border-slate-700 rounded-lg">
+            <button className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors border border-transparent hover:border-slate-700 rounded-lg cursor-pointer">
               <Download size={14}/> {t('actions.export')}
             </button>
             <button
@@ -428,7 +428,7 @@ export function CVStyleCreator() {
               disabled={isSaving || !isValid}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg uppercase tracking-wide ${
                 isValid && !isSaving
-                  ? 'bg-slate-100 text-slate-900 hover:bg-white shadow-white/5 hover:scale-105'
+                  ? 'bg-slate-100 text-slate-900 hover:bg-white shadow-white/5 hover:scale-105 cursor-pointer'
                   : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50'
               }`}
             >
@@ -478,7 +478,7 @@ export function CVStyleCreator() {
                       {t('identity.gender.label')} <span className="text-red-400">*</span>
                     </label>
                     <select
-                      className={`w-full px-3 py-2 bg-slate-900 border rounded-lg focus:ring-1 text-slate-200 outline-none ${
+                      className={`w-full px-3 py-2 bg-slate-900 border rounded-lg focus:ring-1 text-slate-200 outline-none cursor-pointer ${
                         showValidation && !validation.gender
                           ? 'border-red-500 focus:ring-red-500'
                           : 'border-slate-700 focus:ring-indigo-500'
@@ -596,7 +596,7 @@ export function CVStyleCreator() {
         <div className="flex justify-center py-4">
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="group flex flex-col items-center gap-2 text-slate-500 hover:text-indigo-400 transition-colors"
+            className="group flex flex-col items-center gap-2 text-slate-500 hover:text-indigo-400 transition-colors cursor-pointer"
           >
             <span className="text-sm font-semibold uppercase tracking-widest bg-slate-900 px-6 py-2 rounded-full border border-slate-800 group-hover:border-indigo-500/50 shadow-sm transition-all">
               {showAdvanced ? t('advanced.hide') : t('advanced.show')}
