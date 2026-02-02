@@ -66,6 +66,19 @@ export function CVStyleCreator() {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+
+  // Validaciones
+  const validation = {
+    name: character.name.trim().length > 0,
+    age: character.age !== undefined && character.age > 0,
+    gender: character.gender !== undefined,
+    physicalDescription: character.physicalDescription.trim().length >= 10,
+    avatarUrl: character.avatarUrl !== null,
+    occupation: character.occupation.trim().length > 0,
+  };
+
+  const isValid = Object.values(validation).every(v => v);
 
   // --- AI GENERATION HANDLERS ---
   const generateAll = async () => {
@@ -91,36 +104,39 @@ export function CVStyleCreator() {
     }
   };
 
-  const simulateAIGeneration = async (section: string, delay: number = 1500) => {
+  const simulateAIGeneration = async (section: string, delay: number = 0) => {
     setLoadingAI(prev => ({ ...prev, [section]: true }));
 
-    return new Promise<void>((resolve) => {
-      setTimeout(async () => {
-        try {
-          // Aquí irían las llamadas reales a la API
-          const response = await fetch(`/api/character-creation/generate-${section}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              description: character.physicalDescription,
-              name: character.name,
-              age: character.age,
-              gender: character.gender,
-            }),
-          });
+    // Pequeño delay para UX (mostrar loading)
+    if (delay > 0) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
 
-          if (response.ok) {
-            const result = await response.json();
-            updateCharacterFromAI(section, result);
-          }
-        } catch (error) {
-          console.error(`Failed to generate ${section}:`, error);
-        } finally {
-          setLoadingAI(prev => ({ ...prev, [section]: false }));
-          resolve();
-        }
-      }, delay);
-    });
+    try {
+      const response = await fetch(`/api/character-creation/generate-${section}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: character.physicalDescription,
+          name: character.name,
+          age: character.age,
+          gender: character.gender,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error en la generación');
+      }
+
+      const result = await response.json();
+      updateCharacterFromAI(section, result);
+    } catch (error: any) {
+      console.error(`Failed to generate ${section}:`, error);
+      alert(`Error al generar ${section}: ${error.message}`);
+    } finally {
+      setLoadingAI(prev => ({ ...prev, [section]: false }));
+    }
   };
 
   const updateCharacterFromAI = (section: string, data: any) => {
@@ -206,22 +222,32 @@ export function CVStyleCreator() {
 
   // --- SAVE HANDLER ---
   const handleSave = async () => {
-    const isValid = character.name && character.age && character.gender && character.physicalDescription && character.occupation;
-
     if (!isValid) {
+      setShowValidation(true);
       alert(t('status.fillRequired'));
       return;
     }
 
     setIsSaving(true);
     try {
-      // TODO: Llamar a API para crear personaje
-      console.log('Saving character:', character);
+      const response = await fetch('/api/character-creation/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(character),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error al crear personaje');
+      }
+
+      const result = await response.json();
 
       // Redirect to character page
-      router.push('/dashboard');
-    } catch (error) {
+      router.push(`/agentes/${result.agent.id}`);
+    } catch (error: any) {
       console.error('Failed to save character:', error);
+      alert(error.message || 'Error al crear personaje. Inténtalo de nuevo.');
     } finally {
       setIsSaving(false);
     }
@@ -292,14 +318,25 @@ export function CVStyleCreator() {
     </button>
   );
 
-  const DarkInput = ({ value, onChange, placeholder, type = "text" }: any) => (
-    <input
-      type={type}
-      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-slate-200 placeholder-slate-600 transition-all"
-      placeholder={placeholder}
-      value={value || ''}
-      onChange={onChange}
-    />
+  const DarkInput = ({ value, onChange, placeholder, type = "text", error }: any) => (
+    <div className="relative">
+      <input
+        type={type}
+        className={`w-full px-3 py-2 bg-slate-900 border rounded-lg focus:ring-1 outline-none text-slate-200 placeholder-slate-600 transition-all ${
+          error
+            ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+            : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
+        }`}
+        placeholder={placeholder}
+        value={value || ''}
+        onChange={onChange}
+      />
+      {error && (
+        <div className="absolute -bottom-5 left-0 text-xs text-red-400">
+          {error}
+        </div>
+      )}
+    </div>
   );
 
   const TagInput = ({ tags, onAdd, onRemove, placeholder }: any) => {
@@ -388,8 +425,12 @@ export function CVStyleCreator() {
             </button>
             <button
               onClick={handleSave}
-              disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-900 rounded-lg text-xs font-bold hover:bg-white transition-colors shadow-lg shadow-white/5 uppercase tracking-wide disabled:opacity-50"
+              disabled={isSaving || !isValid}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg uppercase tracking-wide ${
+                isValid && !isSaving
+                  ? 'bg-slate-100 text-slate-900 hover:bg-white shadow-white/5 hover:scale-105'
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50'
+              }`}
             >
               <Rocket size={14}/> {isSaving ? t('actions.saving') : t('actions.publish')}
             </button>
@@ -410,32 +451,38 @@ export function CVStyleCreator() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
-                    {t('identity.name.label')}
+                    {t('identity.name.label')} <span className="text-red-400">*</span>
                   </label>
                   <DarkInput
                     value={character.name}
                     onChange={(e: any) => setCharacter(prev => ({ ...prev, name: e.target.value }))}
                     placeholder={t('identity.name.placeholder')}
+                    error={showValidation && !validation.name ? 'Campo obligatorio' : null}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
-                      {t('identity.age.label')}
+                      {t('identity.age.label')} <span className="text-red-400">*</span>
                     </label>
                     <DarkInput
                       type="number"
                       value={character.age}
                       onChange={(e: any) => setCharacter(prev => ({ ...prev, age: parseInt(e.target.value) || undefined }))}
                       placeholder={t('identity.age.placeholder')}
+                      error={showValidation && !validation.age ? 'Campo obligatorio' : null}
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
-                      {t('identity.gender.label')}
+                      {t('identity.gender.label')} <span className="text-red-400">*</span>
                     </label>
                     <select
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg focus:ring-1 focus:ring-indigo-500 text-slate-200 outline-none"
+                      className={`w-full px-3 py-2 bg-slate-900 border rounded-lg focus:ring-1 text-slate-200 outline-none ${
+                        showValidation && !validation.gender
+                          ? 'border-red-500 focus:ring-red-500'
+                          : 'border-slate-700 focus:ring-indigo-500'
+                      }`}
                       value={character.gender || ''}
                       onChange={(e) => setCharacter(prev => ({ ...prev, gender: e.target.value as any }))}
                     >
@@ -444,6 +491,9 @@ export function CVStyleCreator() {
                       <option value="female">{t('identity.gender.options.female')}</option>
                       <option value="non-binary">{t('identity.gender.options.nonBinary')}</option>
                     </select>
+                    {showValidation && !validation.gender && (
+                      <div className="text-xs text-red-400 mt-1">Campo obligatorio</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -462,23 +512,32 @@ export function CVStyleCreator() {
 
             {/* Avatar Preview */}
             <div className="md:col-span-4 flex flex-col items-center gap-4 border-l border-slate-800 pl-8 pt-2">
-              <div className="w-32 h-32 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center overflow-hidden relative group shadow-lg shadow-black/20">
-                {character.avatarUrl ? (
-                  <img src={character.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <User size={32} className="text-slate-600" />
+              <div className="relative">
+                <div className={`w-32 h-32 rounded-full bg-slate-800 border-2 flex items-center justify-center overflow-hidden relative group shadow-lg shadow-black/20 ${
+                  showValidation && !validation.avatarUrl ? 'border-red-500' : 'border-slate-700'
+                }`}>
+                  {character.avatarUrl ? (
+                    <img src={character.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={32} className="text-slate-600" />
+                  )}
+                  <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all cursor-pointer">
+                    <Upload size={16} className="text-white"/>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                  </label>
+                </div>
+                {showValidation && !validation.avatarUrl && (
+                  <div className="absolute -bottom-6 left-0 right-0 text-center text-xs text-red-400">
+                    Obligatorio
+                  </div>
                 )}
-                <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all cursor-pointer">
-                  <Upload size={16} className="text-white"/>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                </label>
               </div>
-              <div className="w-full">
+              <div className="w-full mt-2">
                 <MagicButton
                   text={t('identity.avatar.generate')}
                   onClick={handleAvatarGeneration}
@@ -503,13 +562,24 @@ export function CVStyleCreator() {
               {t('description.subtitle')}
             </p>
 
-            <textarea
-              rows={4}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-4 text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm leading-relaxed resize-none mb-4 shadow-inner"
-              placeholder={t('description.placeholder')}
-              value={character.physicalDescription}
-              onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
-            />
+            <div className="relative">
+              <textarea
+                rows={4}
+                className={`w-full bg-slate-950 border rounded-lg p-4 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none mb-4 shadow-inner ${
+                  showValidation && !validation.physicalDescription
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                    : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
+                }`}
+                placeholder={t('description.placeholder')}
+                value={character.physicalDescription}
+                onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
+              />
+              {showValidation && !validation.physicalDescription && (
+                <div className="absolute -bottom-1 left-0 text-xs text-red-400">
+                  Mínimo 10 caracteres (campo obligatorio)
+                </div>
+              )}
+            </div>
 
             <MagicButton
               text={t('description.generateAll')}
@@ -648,12 +718,13 @@ export function CVStyleCreator() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">
-                      {t('work.occupation.label')}
+                      {t('work.occupation.label')} <span className="text-red-400">*</span>
                     </label>
                     <DarkInput
                       value={character.occupation}
                       onChange={(e: any) => setCharacter(prev => ({ ...prev, occupation: e.target.value }))}
                       placeholder={t('work.occupation.placeholder')}
+                      error={showValidation && !validation.occupation ? 'Campo obligatorio' : null}
                     />
                   </div>
                   <div>
