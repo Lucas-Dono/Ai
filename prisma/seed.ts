@@ -462,9 +462,15 @@ async function main() {
         const avatarPath = path.join(publicDir, 'avatar.webp');
         const referencePath = path.join(publicDir, 'reference.webp');
 
-        // Solo cargar personajes que tengan al menos el avatar
+        // Solo cargar personajes que tengan AMBAS imágenes (avatar + reference)
+        // Esto excluye los placeholders SVG que solo tienen avatar
         if (!fs.existsSync(avatarPath)) {
           console.log(`   ⏭️  ${character.name} (sin imagen de avatar, saltando)`);
+          continue;
+        }
+
+        if (!fs.existsSync(referencePath)) {
+          console.log(`   ⏭️  ${character.name} (solo placeholder, esperando imagen real)`);
           continue;
         }
 
@@ -492,9 +498,7 @@ async function main() {
               nsfwLevel: character.nsfwLevel,
               personalityVariant: character.personalityVariant || 'balanced',
               avatar: character.avatar,
-              referenceImageUrl: fs.existsSync(referencePath)
-                ? `/personajes/${slug}/reference.webp`
-                : character.avatar, // Usar avatar si no hay reference
+              referenceImageUrl: `/personajes/${slug}/reference.webp`,
               tags: character.tags || [],
               featured: character.isPremium || true,
               profile: character.profile,
@@ -505,7 +509,7 @@ async function main() {
             }
           });
 
-          console.log(`   ✅ ${character.name}${!fs.existsSync(referencePath) ? ' (sin imagen de cuerpo completo)' : ''}`);
+          console.log(`   ✅ ${character.name}`);
           premiumCount++;
         } else {
           console.log(`   ⏭️  ${character.name} (ya existe)`);
