@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
@@ -16,6 +16,28 @@ import { ContradictionsDisplay } from './ContradictionsDisplay';
 import { RelationshipNetworkDisplay } from './RelationshipNetworkDisplay';
 import { PersonalityTimelineDisplay } from './PersonalityTimelineDisplay';
 import { CharacterSimulator } from './CharacterSimulator';
+
+// UI Components
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+// Psychological System Components
+import { FacetsTab } from './Facets/FacetsTab';
+import { DarkTriadTab } from './DarkTriad/DarkTriadTab';
+import { AttachmentTab } from './Attachment/AttachmentTab';
+import { NeedsTab } from './PsychologicalNeeds/NeedsTab';
+import { AnalysisTab } from './PsychologicalAnalysis/AnalysisTab';
+
+// Psychological Analysis
+import {
+  inferFacetsFromBigFive,
+  analyzePsychologicalProfile,
+  type BigFiveFacets,
+  type DarkTriad,
+  type AttachmentProfile,
+  type EnrichedPersonalityProfile,
+  type PsychologicalAnalysis,
+} from '@/lib/psychological-analysis';
+import type { BigFiveTraits, PsychologicalNeeds } from '@/types/character-creation';
 
 // --- SUB-COMPONENTS (Fuera del render para evitar recreación) ---
 const SectionHeader = ({ icon: Icon, title, badge }: { icon: any; title: string; badge?: string }) => (
@@ -158,6 +180,7 @@ export function CVStyleCreator() {
   const t = useTranslations('characterCreation');
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvancedPsychology, setShowAdvancedPsychology] = useState(false);
 
   const [loadingAI, setLoadingAI] = useState({
     identity: false,
@@ -168,6 +191,17 @@ export function CVStyleCreator() {
     avatar: false,
     all: false
   });
+
+  // Estado para dimensiones psicológicas enriquecidas
+  const [enrichedPersonality, setEnrichedPersonality] = useState<{
+    facets?: BigFiveFacets;
+    darkTriad?: DarkTriad;
+    attachmentProfile?: AttachmentProfile;
+    psychologicalNeeds?: PsychologicalNeeds;
+  }>({});
+
+  // Estado para análisis psicológico
+  const [analysisResult, setAnalysisResult] = useState<PsychologicalAnalysis | null>(null);
 
   const [character, setCharacter] = useState<CharacterDraft>({
     // Identidad
@@ -222,6 +256,46 @@ export function CVStyleCreator() {
   const [showValidation, setShowValidation] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const physicalDescRef = useRef<HTMLTextAreaElement>(null);
+
+  // Construir perfil enriquecido completo para análisis
+  const enrichedProfile = useMemo<EnrichedPersonalityProfile | null>(() => {
+    // Necesitamos al menos Big Five para hacer análisis
+    if (!character.bigFive) return null;
+
+    return {
+      ...character.bigFive,
+      coreValues: character.coreValues,
+      baselineEmotions: {
+        joy: 0.5,
+        sadness: 0.5,
+        anger: 0.5,
+        fear: 0.5,
+        disgust: 0.5,
+        surprise: 0.5,
+      },
+      facets: enrichedPersonality.facets,
+      darkTriad: enrichedPersonality.darkTriad,
+      attachment: enrichedPersonality.attachmentProfile,
+      psychologicalNeeds: enrichedPersonality.psychologicalNeeds,
+    };
+  }, [character.bigFive, character.coreValues, enrichedPersonality]);
+
+  // Análisis automático con debounce (500ms)
+  useEffect(() => {
+    if (!enrichedProfile) return;
+
+    const timer = setTimeout(() => {
+      try {
+        const result = analyzePsychologicalProfile(enrichedProfile);
+        setAnalysisResult(result);
+      } catch (error) {
+        console.error('[Analysis] Error al analizar perfil:', error);
+        setAnalysisResult(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [enrichedProfile]);
 
   // Validaciones
   const validation = {
@@ -565,6 +639,53 @@ export function CVStyleCreator() {
     }));
   };
 
+  // --- PSYCHOLOGICAL HANDLERS ---
+  const handleBigFiveChange = (dimension: keyof BigFiveTraits, value: number) => {
+    const updatedBigFive = { ...character.bigFive, [dimension]: value };
+
+    setCharacter(prev => ({
+      ...prev,
+      bigFive: updatedBigFive,
+    }));
+
+    // Auto-inferir facetas si no hay facetas personalizadas
+    if (!enrichedPersonality.facets) {
+      const inferredFacets = inferFacetsFromBigFive(updatedBigFive);
+      setEnrichedPersonality(prev => ({
+        ...prev,
+        facets: inferredFacets,
+      }));
+    }
+  };
+
+  const handleFacetsChange = (facets: BigFiveFacets) => {
+    setEnrichedPersonality(prev => ({
+      ...prev,
+      facets,
+    }));
+  };
+
+  const handleDarkTriadChange = (darkTriad: DarkTriad) => {
+    setEnrichedPersonality(prev => ({
+      ...prev,
+      darkTriad,
+    }));
+  };
+
+  const handleAttachmentChange = (attachmentProfile: AttachmentProfile) => {
+    setEnrichedPersonality(prev => ({
+      ...prev,
+      attachmentProfile,
+    }));
+  };
+
+  const handleNeedsChange = (psychologicalNeeds: PsychologicalNeeds) => {
+    setEnrichedPersonality(prev => ({
+      ...prev,
+      psychologicalNeeds,
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 font-sans text-slate-200 pb-20 selection:bg-indigo-500/30">
 
@@ -797,143 +918,224 @@ export function CVStyleCreator() {
 
             {/* Personalidad */}
             <section className="bg-slate-900 rounded-xl border border-slate-800 p-6">
-              <SectionHeader icon={Brain} title={t('personality.title')} badge={t('personality.badge')} />
-
-              <div className="space-y-8">
-                {/* Prompt Cognitivo */}
-                <div className="bg-slate-950/50 p-4 rounded-lg border border-slate-800">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
-                      {t('personality.cognitive.label')}
-                    </label>
-                  </div>
-                  <textarea
-                    rows={3}
-                    className="w-full bg-transparent border-0 p-0 text-slate-300 placeholder-slate-600 focus:ring-0 text-sm leading-relaxed resize-none"
-                    placeholder={t('personality.cognitive.placeholder')}
-                    value={character.cognitivePrompt}
-                    onChange={(e) => setCharacter(prev => ({ ...prev, cognitivePrompt: e.target.value }))}
-                  />
-                </div>
-
-                {/* Big Five Sliders */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-                  <Slider
-                    label={t('personality.bigFive.openness.label')}
-                    value={character.bigFive.openness}
-                    onChange={(v: number) => setCharacter(prev => ({
-                      ...prev,
-                      bigFive: { ...prev.bigFive, openness: v }
-                    }))}
-                  />
-                  <Slider
-                    label={t('personality.bigFive.conscientiousness.label')}
-                    value={character.bigFive.conscientiousness}
-                    onChange={(v: number) => setCharacter(prev => ({
-                      ...prev,
-                      bigFive: { ...prev.bigFive, conscientiousness: v }
-                    }))}
-                  />
-                  <Slider
-                    label={t('personality.bigFive.extraversion.label')}
-                    value={character.bigFive.extraversion}
-                    onChange={(v: number) => setCharacter(prev => ({
-                      ...prev,
-                      bigFive: { ...prev.bigFive, extraversion: v }
-                    }))}
-                  />
-                  <Slider
-                    label={t('personality.bigFive.agreeableness.label')}
-                    value={character.bigFive.agreeableness}
-                    onChange={(v: number) => setCharacter(prev => ({
-                      ...prev,
-                      bigFive: { ...prev.bigFive, agreeableness: v }
-                    }))}
-                  />
-                  <Slider
-                    label={t('personality.bigFive.neuroticism.label')}
-                    value={character.bigFive.neuroticism}
-                    onChange={(v: number) => setCharacter(prev => ({
-                      ...prev,
-                      bigFive: { ...prev.bigFive, neuroticism: v }
-                    }))}
-                  />
-                </div>
-
-                {/* Radar Chart de Personalidad */}
-                {(character.bigFive.openness > 0 ||
-                  character.bigFive.conscientiousness > 0 ||
-                  character.bigFive.extraversion > 0 ||
-                  character.bigFive.agreeableness > 0 ||
-                  character.bigFive.neuroticism > 0) && (
-                  <div className="mt-8 pt-8 border-t border-slate-800">
-                    <PersonalityRadarChart
-                      bigFive={character.bigFive}
-                      values={character.coreValues}
-                    />
-                  </div>
-                )}
-
-                {/* Moral Alignment Chart */}
-                {(character.moralAlignment.lawfulness !== 50 ||
-                  character.moralAlignment.morality !== 50) && (
-                  <div className="mt-8">
-                    <MoralAlignmentChart moralAlignment={character.moralAlignment} />
-                  </div>
-                )}
-
-                {/* Contradicciones Internas */}
-                {(character.personalityConflicts.internalContradictions.length > 0 ||
-                  character.personalityConflicts.situationalVariations.length > 0) && (
-                  <div className="mt-8">
-                    <ContradictionsDisplay
-                      internalContradictions={character.personalityConflicts.internalContradictions}
-                      situationalVariations={character.personalityConflicts.situationalVariations}
-                    />
-                  </div>
-                )}
-
-                {/* Evolución de Personalidad */}
-                {character.personalityEvolution && character.personalityEvolution.snapshots.length > 0 && (
-                  <div className="mt-8">
-                    <PersonalityTimelineDisplay evolution={character.personalityEvolution} />
-                  </div>
-                )}
-
-                {/* Valores y Miedos */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
-                      {t('personality.values.label')}
-                    </label>
-                    <TagInput
-                      tags={character.coreValues}
-                      placeholder={t('personality.values.placeholder')}
-                      onAdd={(tag: string) => addToArray('coreValues', tag)}
-                      onRemove={(idx: number) => removeFromArray('coreValues', idx)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
-                      {t('personality.fears.label')}
-                    </label>
-                    <TagInput
-                      tags={character.fears}
-                      placeholder={t('personality.fears.placeholder')}
-                      onAdd={(tag: string) => addToArray('fears', tag)}
-                      onRemove={(idx: number) => removeFromArray('fears', idx)}
-                    />
-                  </div>
-                </div>
-
-                <MagicButton
-                  text={t('personality.generate')}
-                  onClick={() => simulateAIGeneration('personality', 1500)}
-                  loading={loadingAI.personality}
-                  fullWidth
-                  variant="secondary"
-                />
+              <div className="flex items-center justify-between mb-6">
+                <SectionHeader icon={Brain} title={t('personality.title')} badge={t('personality.badge')} />
+                <button
+                  onClick={() => setShowAdvancedPsychology(!showAdvancedPsychology)}
+                  className="px-4 py-2 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500/50 rounded-lg transition-all cursor-pointer"
+                >
+                  {showAdvancedPsychology ? '🔽 Ocultar' : '✨ Mostrar'} Opciones Avanzadas
+                </button>
               </div>
+
+              {/* Tabs de Personalidad */}
+              <Tabs defaultValue="big-five" className="w-full">
+                <TabsList className="grid w-full bg-slate-800/50 border border-slate-700 p-1 rounded-lg" style={{
+                  gridTemplateColumns: showAdvancedPsychology ? 'repeat(6, 1fr)' : '1fr'
+                }}>
+                  <TabsTrigger value="big-five" className="text-xs">
+                    Big Five
+                  </TabsTrigger>
+                  {showAdvancedPsychology && (
+                    <>
+                      <TabsTrigger value="facets" className="text-xs">
+                        Facetas
+                      </TabsTrigger>
+                      <TabsTrigger value="dark-triad" className="text-xs">
+                        Dark Triad
+                      </TabsTrigger>
+                      <TabsTrigger value="attachment" className="text-xs">
+                        Apego
+                      </TabsTrigger>
+                      <TabsTrigger value="needs" className="text-xs">
+                        Necesidades
+                      </TabsTrigger>
+                      <TabsTrigger value="analysis" className="text-xs">
+                        Análisis
+                      </TabsTrigger>
+                    </>
+                  )}
+                </TabsList>
+
+                {/* Tab 1: Big Five (Original) */}
+                <TabsContent value="big-five" className="mt-6 space-y-8">
+                  {/* Prompt Cognitivo */}
+                  <div className="bg-slate-950/50 p-4 rounded-lg border border-slate-800">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
+                        {t('personality.cognitive.label')}
+                      </label>
+                    </div>
+                    <textarea
+                      rows={3}
+                      className="w-full bg-transparent border-0 p-0 text-slate-300 placeholder-slate-600 focus:ring-0 text-sm leading-relaxed resize-none"
+                      placeholder={t('personality.cognitive.placeholder')}
+                      value={character.cognitivePrompt}
+                      onChange={(e) => setCharacter(prev => ({ ...prev, cognitivePrompt: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Big Five Sliders */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+                    <Slider
+                      label={t('personality.bigFive.openness.label')}
+                      value={character.bigFive.openness}
+                      onChange={(v: number) => handleBigFiveChange('openness', v)}
+                    />
+                    <Slider
+                      label={t('personality.bigFive.conscientiousness.label')}
+                      value={character.bigFive.conscientiousness}
+                      onChange={(v: number) => handleBigFiveChange('conscientiousness', v)}
+                    />
+                    <Slider
+                      label={t('personality.bigFive.extraversion.label')}
+                      value={character.bigFive.extraversion}
+                      onChange={(v: number) => handleBigFiveChange('extraversion', v)}
+                    />
+                    <Slider
+                      label={t('personality.bigFive.agreeableness.label')}
+                      value={character.bigFive.agreeableness}
+                      onChange={(v: number) => handleBigFiveChange('agreeableness', v)}
+                    />
+                    <Slider
+                      label={t('personality.bigFive.neuroticism.label')}
+                      value={character.bigFive.neuroticism}
+                      onChange={(v: number) => handleBigFiveChange('neuroticism', v)}
+                    />
+                  </div>
+
+                  {/* Radar Chart de Personalidad */}
+                  {(character.bigFive.openness > 0 ||
+                    character.bigFive.conscientiousness > 0 ||
+                    character.bigFive.extraversion > 0 ||
+                    character.bigFive.agreeableness > 0 ||
+                    character.bigFive.neuroticism > 0) && (
+                    <div className="mt-8 pt-8 border-t border-slate-800">
+                      <PersonalityRadarChart
+                        bigFive={character.bigFive}
+                        values={character.coreValues}
+                      />
+                    </div>
+                  )}
+
+                  {/* Moral Alignment Chart */}
+                  {(character.moralAlignment.lawfulness !== 50 ||
+                    character.moralAlignment.morality !== 50) && (
+                    <div className="mt-8">
+                      <MoralAlignmentChart moralAlignment={character.moralAlignment} />
+                    </div>
+                  )}
+
+                  {/* Contradicciones Internas */}
+                  {(character.personalityConflicts.internalContradictions.length > 0 ||
+                    character.personalityConflicts.situationalVariations.length > 0) && (
+                    <div className="mt-8">
+                      <ContradictionsDisplay
+                        internalContradictions={character.personalityConflicts.internalContradictions}
+                        situationalVariations={character.personalityConflicts.situationalVariations}
+                      />
+                    </div>
+                  )}
+
+                  {/* Evolución de Personalidad */}
+                  {character.personalityEvolution && character.personalityEvolution.snapshots.length > 0 && (
+                    <div className="mt-8">
+                      <PersonalityTimelineDisplay evolution={character.personalityEvolution} />
+                    </div>
+                  )}
+
+                  {/* Valores y Miedos */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
+                        {t('personality.values.label')}
+                      </label>
+                      <TagInput
+                        tags={character.coreValues}
+                        placeholder={t('personality.values.placeholder')}
+                        onAdd={(tag: string) => addToArray('coreValues', tag)}
+                        onRemove={(idx: number) => removeFromArray('coreValues', idx)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
+                        {t('personality.fears.label')}
+                      </label>
+                      <TagInput
+                        tags={character.fears}
+                        placeholder={t('personality.fears.placeholder')}
+                        onAdd={(tag: string) => addToArray('fears', tag)}
+                        onRemove={(idx: number) => removeFromArray('fears', idx)}
+                      />
+                    </div>
+                  </div>
+
+                  <MagicButton
+                    text={t('personality.generate')}
+                    onClick={() => simulateAIGeneration('personality', 1500)}
+                    loading={loadingAI.personality}
+                    fullWidth
+                    variant="secondary"
+                  />
+                </TabsContent>
+
+                {/* Tab 2: Facetas */}
+                {showAdvancedPsychology && (
+                  <TabsContent value="facets" className="mt-6">
+                    <FacetsTab
+                      facets={enrichedPersonality.facets}
+                      bigFive={character.bigFive}
+                      onChange={handleFacetsChange}
+                    />
+                  </TabsContent>
+                )}
+
+                {/* Tab 3: Dark Triad */}
+                {showAdvancedPsychology && (
+                  <TabsContent value="dark-triad" className="mt-6">
+                    <DarkTriadTab
+                      darkTriad={enrichedPersonality.darkTriad}
+                      onChange={handleDarkTriadChange}
+                    />
+                  </TabsContent>
+                )}
+
+                {/* Tab 4: Estilo de Apego */}
+                {showAdvancedPsychology && (
+                  <TabsContent value="attachment" className="mt-6">
+                    <AttachmentTab
+                      attachment={enrichedPersonality.attachmentProfile}
+                      onChange={handleAttachmentChange}
+                    />
+                  </TabsContent>
+                )}
+
+                {/* Tab 5: Necesidades Psicológicas SDT */}
+                {showAdvancedPsychology && (
+                  <TabsContent value="needs" className="mt-6">
+                    <NeedsTab
+                      needs={enrichedPersonality.psychologicalNeeds}
+                      onChange={handleNeedsChange}
+                    />
+                  </TabsContent>
+                )}
+
+                {/* Tab 6: Análisis Psicológico */}
+                {showAdvancedPsychology && (
+                  <TabsContent value="analysis" className="mt-6">
+                    {enrichedProfile && analysisResult ? (
+                      <AnalysisTab profile={enrichedProfile} />
+                    ) : (
+                      <div className="text-center py-12">
+                        <Brain className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                        <p className="text-sm text-slate-400">
+                          Completa las dimensiones psicológicas para ver el análisis
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+                )}
+              </Tabs>
             </section>
 
             {/* Trabajo & Historia */}
