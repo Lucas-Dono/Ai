@@ -17,6 +17,139 @@ import { RelationshipNetworkDisplay } from './RelationshipNetworkDisplay';
 import { PersonalityTimelineDisplay } from './PersonalityTimelineDisplay';
 import { CharacterSimulator } from './CharacterSimulator';
 
+// --- SUB-COMPONENTS (Fuera del render para evitar recreación) ---
+const SectionHeader = ({ icon: Icon, title, badge }: { icon: any; title: string; badge?: string }) => (
+  <div className="flex items-center gap-3 mb-6 border-b border-slate-700 pb-3">
+    <div className="p-2 bg-slate-800 rounded-lg text-indigo-400 shadow-lg shadow-indigo-500/10">
+      <Icon size={24} />
+    </div>
+    <div>
+      <h2 className="text-xl font-bold text-slate-100">{title}</h2>
+      {badge && (
+        <span className="text-xs text-indigo-400 font-mono uppercase tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+          {badge}
+        </span>
+      )}
+    </div>
+  </div>
+);
+
+const MagicButton = ({
+  onClick,
+  loading,
+  text,
+  fullWidth,
+  variant = 'primary',
+  icon: Icon = Sparkles
+}: {
+  onClick: () => void;
+  loading: boolean;
+  text: string;
+  fullWidth?: boolean;
+  variant?: 'primary' | 'secondary' | 'gradient';
+  icon?: any;
+}) => (
+  <button
+    onClick={onClick}
+    disabled={loading}
+    className={`
+      flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium text-sm
+      ${loading ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' : 'cursor-pointer'}
+      ${!loading && variant === 'primary' ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500 hover:scale-[1.02]' : ''}
+      ${!loading && variant === 'secondary' ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600' : ''}
+      ${!loading && variant === 'gradient' ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white shadow-lg border border-indigo-400/30' : ''}
+      ${fullWidth ? 'w-full' : ''}
+    `}
+  >
+    {loading ? <RefreshCw className="animate-spin" size={16} /> : <Icon size={16} />}
+    <span>{loading ? 'Procesando...' : text}</span>
+  </button>
+);
+
+const DarkInput = ({ value, onChange, placeholder, type = "text", error }: any) => (
+  <div className="relative">
+    <input
+      type={type}
+      className={`w-full px-3 py-2 bg-slate-900 border rounded-lg focus:ring-1 outline-none text-slate-200 placeholder-slate-600 transition-all ${
+        error
+          ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+          : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
+      }`}
+      placeholder={placeholder}
+      value={value || ''}
+      onChange={onChange}
+    />
+    {error && (
+      <div className="absolute -bottom-5 left-0 text-xs text-red-400">
+        {error}
+      </div>
+    )}
+  </div>
+);
+
+const TagInput = ({ tags, onAdd, onRemove, placeholder }: any) => {
+  const [input, setInput] = useState('');
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 mb-2">
+        {tags.map((tag: string, i: number) => (
+          <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono text-indigo-300 bg-indigo-900/30 border border-indigo-500/30">
+            {tag}
+            <button onClick={() => onRemove(i)} className="ml-2 text-indigo-400 hover:text-indigo-200 cursor-pointer">
+              <X size={12}/>
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              onAdd(input);
+              setInput('');
+            }
+          }}
+          placeholder={placeholder}
+          className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-slate-200 placeholder-slate-600"
+        />
+        <button
+          onClick={() => { onAdd(input); setInput(''); }}
+          className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-400 cursor-pointer"
+        >
+          <Plus size={18} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const Slider = ({ label, value, onChange }: any) => (
+  <div className="mb-5">
+    <div className="flex justify-between mb-2">
+      <span className="text-sm font-medium text-slate-300">{label}</span>
+      <span className="text-xs font-mono text-indigo-400 bg-indigo-900/20 px-1.5 py-0.5 rounded">{value}%</span>
+    </div>
+    <div className="relative w-full h-2 bg-slate-800 rounded-full cursor-pointer">
+      <div
+        className="absolute h-full bg-gradient-to-r from-indigo-600 to-purple-500 rounded-full pointer-events-none"
+        style={{ width: `${value}%` }}
+      />
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      />
+    </div>
+  </div>
+);
+
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
  */
@@ -431,139 +564,6 @@ export function CVStyleCreator() {
       skills: prev.skills.filter((_, i) => i !== index)
     }));
   };
-
-  // --- SUB-COMPONENTS ---
-  const SectionHeader = ({ icon: Icon, title, badge }: { icon: any; title: string; badge?: string }) => (
-    <div className="flex items-center gap-3 mb-6 border-b border-slate-700 pb-3">
-      <div className="p-2 bg-slate-800 rounded-lg text-indigo-400 shadow-lg shadow-indigo-500/10">
-        <Icon size={24} />
-      </div>
-      <div>
-        <h2 className="text-xl font-bold text-slate-100">{title}</h2>
-        {badge && (
-          <span className="text-xs text-indigo-400 font-mono uppercase tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-            {badge}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-
-  const MagicButton = ({
-    onClick,
-    loading,
-    text,
-    fullWidth,
-    variant = 'primary',
-    icon: Icon = Sparkles
-  }: {
-    onClick: () => void;
-    loading: boolean;
-    text: string;
-    fullWidth?: boolean;
-    variant?: 'primary' | 'secondary' | 'gradient';
-    icon?: any;
-  }) => (
-    <button
-      onClick={onClick}
-      disabled={loading}
-      className={`
-        flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium text-sm
-        ${loading ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' : 'cursor-pointer'}
-        ${!loading && variant === 'primary' ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 border border-indigo-500 hover:scale-[1.02]' : ''}
-        ${!loading && variant === 'secondary' ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600' : ''}
-        ${!loading && variant === 'gradient' ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white shadow-lg border border-indigo-400/30' : ''}
-        ${fullWidth ? 'w-full' : ''}
-      `}
-    >
-      {loading ? <RefreshCw className="animate-spin" size={16} /> : <Icon size={16} />}
-      <span>{loading ? 'Procesando...' : text}</span>
-    </button>
-  );
-
-  const DarkInput = ({ value, onChange, placeholder, type = "text", error }: any) => (
-    <div className="relative">
-      <input
-        type={type}
-        className={`w-full px-3 py-2 bg-slate-900 border rounded-lg focus:ring-1 outline-none text-slate-200 placeholder-slate-600 transition-all ${
-          error
-            ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-            : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
-        }`}
-        placeholder={placeholder}
-        value={value || ''}
-        onChange={onChange}
-      />
-      {error && (
-        <div className="absolute -bottom-5 left-0 text-xs text-red-400">
-          {error}
-        </div>
-      )}
-    </div>
-  );
-
-  const TagInput = ({ tags, onAdd, onRemove, placeholder }: any) => {
-    const [input, setInput] = useState('');
-    return (
-      <div className="space-y-2">
-        <div className="flex flex-wrap gap-2 mb-2">
-          {tags.map((tag: string, i: number) => (
-            <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono text-indigo-300 bg-indigo-900/30 border border-indigo-500/30">
-              {tag}
-              <button onClick={() => onRemove(i)} className="ml-2 text-indigo-400 hover:text-indigo-200 cursor-pointer">
-                <X size={12}/>
-              </button>
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                onAdd(input);
-                setInput('');
-              }
-            }}
-            placeholder={placeholder}
-            className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-slate-200 placeholder-slate-600"
-          />
-          <button
-            onClick={() => { onAdd(input); setInput(''); }}
-            className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-400 cursor-pointer"
-          >
-            <Plus size={18} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  const Slider = ({ label, value, onChange }: any) => (
-    <div className="mb-5">
-      <div className="flex justify-between mb-2">
-        <span className="text-sm font-medium text-slate-300">{label}</span>
-        <span className="text-xs font-mono text-indigo-400 bg-indigo-900/20 px-1.5 py-0.5 rounded">{value}%</span>
-      </div>
-      <div className="relative w-full h-2 bg-slate-800 rounded-full cursor-pointer">
-        <div
-          className="absolute h-full bg-gradient-to-r from-indigo-600 to-purple-500 rounded-full pointer-events-none"
-          style={{ width: `${value}%` }}
-        />
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={value}
-          onChange={(e) => onChange(parseInt(e.target.value))}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-slate-950 font-sans text-slate-200 pb-20 selection:bg-indigo-500/30">
