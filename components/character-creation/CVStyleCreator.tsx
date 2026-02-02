@@ -12,6 +12,7 @@ import type { CharacterDraft } from './types';
 import { PersonalityRadarChart } from './PersonalityRadarChart';
 import { MoralAlignmentChart } from './MoralAlignmentChart';
 import { SkillBarsChart } from './SkillBarsChart';
+import { ContradictionsDisplay } from './ContradictionsDisplay';
 
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
@@ -63,6 +64,12 @@ export function CVStyleCreator() {
     moralAlignment: {
       lawfulness: 50, // 0=Chaotic, 50=Neutral, 100=Lawful
       morality: 50, // 0=Evil, 50=Neutral, 100=Good
+    },
+
+    // Conflictos de Personalidad
+    personalityConflicts: {
+      internalContradictions: [],
+      situationalVariations: [],
     },
 
     // Relaciones
@@ -230,6 +237,13 @@ export function CVStyleCreator() {
           // Agregar moralAlignment si viene en la respuesta
           if (data.moralAlignment) {
             updates.moralAlignment = data.moralAlignment;
+          }
+          // Agregar personalityConflicts si vienen en la respuesta
+          if (data.internalContradictions || data.situationalVariations) {
+            updates.personalityConflicts = {
+              internalContradictions: data.internalContradictions || [],
+              situationalVariations: data.situationalVariations || [],
+            };
           }
           return { ...prev, ...updates };
         case 'history':
@@ -847,6 +861,17 @@ export function CVStyleCreator() {
                   character.moralAlignment.morality !== 50) && (
                   <div className="mt-8">
                     <MoralAlignmentChart moralAlignment={character.moralAlignment} />
+                  </div>
+                )}
+
+                {/* Contradicciones Internas */}
+                {(character.personalityConflicts.internalContradictions.length > 0 ||
+                  character.personalityConflicts.situationalVariations.length > 0) && (
+                  <div className="mt-8">
+                    <ContradictionsDisplay
+                      internalContradictions={character.personalityConflicts.internalContradictions}
+                      situationalVariations={character.personalityConflicts.situationalVariations}
+                    />
                   </div>
                 )}
 

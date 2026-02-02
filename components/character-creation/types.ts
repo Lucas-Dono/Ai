@@ -31,6 +31,9 @@ export interface CharacterDraft {
     morality: number; // 0 (Evil) - 50 (Neutral) - 100 (Good)
   };
 
+  // Personality Conflicts (Optional) - Contradicciones internas y variaciones situacionales
+  personalityConflicts: PersonalityConflicts;
+
   // Relationships (Optional)
   importantPeople: ImportantPerson[];
   maritalStatus: 'single' | 'married' | 'divorced' | 'widowed' | 'complicated' | undefined;
@@ -44,6 +47,34 @@ export interface CharacterDraft {
 export interface Skill {
   name: string;
   level: number; // 0-100: 0-20 Novice, 21-40 Beginner, 41-60 Intermediate, 61-80 Advanced, 81-100 Expert
+}
+
+// Internal Contradictions - Lo que hace al personaje humano y complejo
+export interface InternalContradiction {
+  id: string;
+  trait: string; // "Altamente organizado en el trabajo"
+  butAlso: string; // "Caótico absoluto en vida personal"
+  trigger?: string; // "Necesidad de control externo vs libertad interna"
+  manifestation: string; // "Escritorio impecable, apartamento hecho un desastre"
+}
+
+// Variación situacional - Personalidad cambia según contexto
+export interface SituationalVariation {
+  context: string; // "En el trabajo", "Con familia", "Con desconocidos"
+  personalityShift: {
+    extraversion?: number; // Override del Big Five base
+    conscientiousness?: number;
+    agreeableness?: number;
+    openness?: number;
+    neuroticism?: number;
+  };
+  description: string; // "Profesional y carismático, muy diferente a su yo privado"
+}
+
+// Contenedor de conflictos de personalidad
+export interface PersonalityConflicts {
+  internalContradictions: InternalContradiction[];
+  situationalVariations: SituationalVariation[];
 }
 
 export interface ImportantPerson {

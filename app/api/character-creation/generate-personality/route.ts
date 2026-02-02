@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth-helper';
 import { getLLMProvider } from '@/lib/llm/provider';
+import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
 const RequestSchema = z.object({
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       existingContext += `\nESTILO COGNITIVO YA DEFINIDO: "${existingCognitivePrompt}"\n(Expande y profundiza esta descripción, mantén la esencia)`;
     }
 
-    const prompt = `Basándote en la siguiente descripción de un personaje, genera un perfil psicológico completo y realista.
+    const prompt = `Basándote en la siguiente descripción de un personaje, genera un perfil psicológico completo y realista con CONTRADICCIONES INTERNAS (lo que hace humano al personaje).
 
 DESCRIPCIÓN DEL PERSONAJE:
 ${description}
@@ -70,7 +71,25 @@ Genera el siguiente perfil psicológico en formato JSON:
   "moralAlignment": {
     "lawfulness": número 0-100,
     "morality": número 0-100
-  }
+  },
+  "internalContradictions": [
+    {
+      "trait": "Rasgo o comportamiento principal",
+      "butAlso": "Rasgo o comportamiento contradictorio",
+      "trigger": "Qué desencadena esta contradicción (opcional)",
+      "manifestation": "Cómo se manifiesta esta contradicción en la vida real"
+    }
+  ],
+  "situationalVariations": [
+    {
+      "context": "En el trabajo / Con familia / Con desconocidos / etc.",
+      "personalityShift": {
+        "extraversion": número (si es diferente del base),
+        "conscientiousness": número (si es diferente del base)
+      },
+      "description": "Descripción de cómo cambia en este contexto"
+    }
+  ]
 }
 
 INSTRUCCIONES:
@@ -82,6 +101,17 @@ INSTRUCCIONES:
   - lawfulness: 0 (Caótico) - 50 (Neutral) - 100 (Legal). Respeta reglas vs improvisa
   - morality: 0 (Malvado) - 50 (Neutral) - 100 (Bueno). Altruista vs egoísta
   - Ejemplos: Lawful Good (80, 85), Chaotic Neutral (20, 50), Neutral Evil (50, 15)
+
+- CONTRADICCIONES INTERNAS (1-3): Las personas reales tienen paradojas
+  - Ejemplos: "Organizado en trabajo, caótico en casa", "Extrovertido social pero ansioso en intimidad", "Racional pero toma decisiones emocionales"
+  - Estas contradicciones NO son defectos, son lo que hace HUMANO al personaje
+  - Deben ser realistas y coherentes con la descripción
+
+- VARIACIONES SITUACIONALES (1-3): La personalidad cambia según contexto
+  - Ejemplos: Extraversion alta en trabajo (75) pero baja con familia (30)
+  - Solo incluye rasgos que REALMENTE cambian significativamente (diferencia de 20+ puntos)
+  - Describe POR QUÉ cambia (necesidad profesional, compartimentalización, etc.)
+
 ${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE (no reemplaces). Mantén la esencia de lo que el usuario ya definió.' : ''}
 
 Responde SOLO con el JSON válido, sin texto adicional.`;
@@ -109,6 +139,14 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
         personalityData.bigFive[trait] = Math.max(0, Math.min(100, value));
       }
     });
+
+    // Añadir IDs a contradicciones internas
+    if (personalityData.internalContradictions) {
+      personalityData.internalContradictions = personalityData.internalContradictions.map((contradiction: any) => ({
+        id: nanoid(),
+        ...contradiction
+      }));
+    }
 
     return NextResponse.json(personalityData);
   } catch (error: any) {
