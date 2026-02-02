@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
@@ -68,6 +68,8 @@ export function CVStyleCreator() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const physicalDescRef = useRef<HTMLTextAreaElement>(null);
 
   // Validaciones
   const validation = {
@@ -169,8 +171,23 @@ export function CVStyleCreator() {
   };
 
   const handleAvatarGeneration = async () => {
+    // Limpiar error previo
+    setAvatarError(null);
+
+    // Validar que existe la descripción física
     if (!character.physicalDescription || character.physicalDescription.trim().length < 10) {
-      alert('Necesitas completar la descripción física primero (mínimo 10 caracteres)');
+      setAvatarError('Necesitas completar la descripción visual primero (mínimo 10 caracteres)');
+      setShowValidation(true);
+
+      // Hacer scroll al campo de descripción física y enfocarlo
+      if (physicalDescRef.current) {
+        physicalDescRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Focus después de un breve delay para que el scroll se complete
+        setTimeout(() => physicalDescRef.current?.focus(), 500);
+      }
+
+      // Auto-limpiar el error después de 5 segundos
+      setTimeout(() => setAvatarError(null), 5000);
       return;
     }
 
@@ -195,7 +212,8 @@ export function CVStyleCreator() {
       setCharacter(prev => ({ ...prev, avatarUrl: result.url }));
     } catch (error: any) {
       console.error('Failed to generate avatar:', error);
-      alert(`Error al generar avatar: ${error.message}`);
+      setAvatarError(`Error al generar avatar: ${error.message}`);
+      setTimeout(() => setAvatarError(null), 5000);
     } finally {
       setLoadingAI(prev => ({ ...prev, avatar: false }));
     }
@@ -530,6 +548,7 @@ export function CVStyleCreator() {
                 </label>
                 <div className="relative">
                   <textarea
+                    ref={physicalDescRef}
                     rows={3}
                     className={`w-full bg-slate-900 border rounded-lg p-3 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none ${
                       showValidation && !validation.physicalDescription
@@ -587,6 +606,11 @@ export function CVStyleCreator() {
                   fullWidth
                   variant="secondary"
                 />
+                {avatarError && (
+                  <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 text-center animate-pulse">
+                    ⚠️ {avatarError}
+                  </div>
+                )}
               </div>
             </div>
           </div>
