@@ -15,6 +15,7 @@ import { SkillBarsChart } from './SkillBarsChart';
 import { ContradictionsDisplay } from './ContradictionsDisplay';
 import { RelationshipNetworkDisplay } from './RelationshipNetworkDisplay';
 import { PersonalityTimelineDisplay } from './PersonalityTimelineDisplay';
+import { CharacterSimulator } from './CharacterSimulator';
 
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
@@ -1034,6 +1035,11 @@ export function CVStyleCreator() {
                   </div>
                 )}
               </div>
+            </section>
+
+            {/* Simulador de Personaje */}
+            <section className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+              <CharacterSimulator character={character} />
             </section>
           </div>
         )}
