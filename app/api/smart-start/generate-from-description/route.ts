@@ -13,6 +13,7 @@ import type { GenreId, ArchetypeId } from '@/lib/smart-start/core/types';
 const GenerateFromDescriptionSchema = z.object({
   sessionId: z.string(),
   description: z.string().min(10).max(2000),
+  uploadedAvatarUrl: z.string().url().optional(), // User-uploaded avatar
   options: z
     .object({
       genreHint: z.string().optional(),
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { sessionId, description, options } = validation.data;
+    const { sessionId, description, uploadedAvatarUrl, options } = validation.data;
 
     // 3. Get user tier
     const userTier = (user.plan?.toUpperCase() || 'FREE') as 'FREE' | 'PLUS' | 'ULTRA';
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
       sessionId,
       descriptionLength: description.length,
       tier: userTier,
+      hasUploadedAvatar: !!uploadedAvatarUrl,
     });
 
     const draft = await orchestrator.generateFromDescription(
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
         archetypeHint: options?.archetypeHint as ArchetypeId | undefined,
         era: options?.era,
         nsfwLevel: options?.nsfwLevel,
+        uploadedAvatarUrl, // Pass uploaded avatar URL
       }
     );
 

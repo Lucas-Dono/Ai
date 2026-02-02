@@ -37,6 +37,10 @@ describe('Marketplace Flow Integration', () => {
     expect(character.status).toBe('pending');
 
     // Step 2: Admin approves the character (mock admin flow)
+    mockPrismaClient.user.findUnique = vi.fn().mockResolvedValue({
+      id: 'admin-1',
+      metadata: { isAdmin: true },
+    });
     mockPrismaClient.marketplaceCharacter.update = vi.fn().mockResolvedValue({
       id: 'char-1',
       status: 'approved',
@@ -65,7 +69,7 @@ describe('Marketplace Flow Integration', () => {
 
     // Step 4: User-2 downloads the character
     const downloadCreateSpy = vi.fn().mockResolvedValue({});
-    const downloadFindSpy = vi.fn().mockResolvedValue(null);
+    const downloadFindFirstSpy = vi.fn().mockResolvedValue(null);
     const charUpdateSpy = vi.fn().mockResolvedValue({});
 
     mockPrismaClient.marketplaceCharacter.findUnique = vi
@@ -75,8 +79,9 @@ describe('Marketplace Flow Integration', () => {
         id: 'char-1',
         name: 'Anime Character',
         status: 'approved',
+        author: { id: 'user-1', name: 'Creator', image: null },
       });
-    mockPrismaClient.characterDownload.findUnique = downloadFindSpy;
+    mockPrismaClient.characterDownload.findFirst = downloadFindFirstSpy;
     mockPrismaClient.characterDownload.create = downloadCreateSpy;
     mockPrismaClient.marketplaceCharacter.update = charUpdateSpy;
 
@@ -96,7 +101,7 @@ describe('Marketplace Flow Integration', () => {
       review: 'Amazing character!',
     });
 
-    mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue({
+    mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue({
       id: 'download-1',
     });
     mockPrismaClient.characterRating.upsert = ratingUpsertSpy;
@@ -131,6 +136,7 @@ describe('Marketplace Flow Integration', () => {
         personality: 'Friendly',
         systemPrompt: 'You are helpful',
         status: 'approved',
+        author: { id: 'user-1', name: 'Creator', image: null },
       })
       .mockResolvedValueOnce({
         id: 'char-1',
@@ -139,8 +145,9 @@ describe('Marketplace Flow Integration', () => {
         personality: 'Friendly',
         systemPrompt: 'You are helpful',
         status: 'approved',
+        author: { id: 'user-1', name: 'Creator', image: null },
       });
-    mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue(null);
+    mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue(null);
     mockPrismaClient.characterDownload.create = vi.fn().mockResolvedValue({});
     mockPrismaClient.marketplaceCharacter.update = vi.fn().mockResolvedValue({});
     mockPrismaClient.agent.create = agentCreateSpy;
@@ -158,6 +165,10 @@ describe('Marketplace Flow Integration', () => {
   });
 
   it('should reject character with inappropriate content', async () => {
+    mockPrismaClient.user.findUnique = vi.fn().mockResolvedValue({
+      id: 'admin-1',
+      metadata: { isAdmin: true },
+    });
     mockPrismaClient.marketplaceCharacter.update = vi.fn().mockResolvedValue({
       id: 'char-1',
       status: 'rejected',

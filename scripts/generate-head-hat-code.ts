@@ -24,7 +24,7 @@ const REGIONS = {
 };
 
 function generateRectCode(
-  imageData: sharp.OutputInfo & { data: Buffer },
+  imageData: { data: Buffer; info: sharp.OutputInfo },
   region: { x: number; y: number; width: number; height: number },
   colorClass: string
 ): string {

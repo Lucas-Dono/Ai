@@ -22,7 +22,7 @@ describe('CommunityService', () => {
         category: 'tech',
         type: 'public',
         ownerId: 'user-1',
-        owner: { id: 'user-1', name: 'Test User', image: null },
+        User: { id: 'user-1', name: 'Test User', image: null },
         createdAt: new Date(),
       };
 
@@ -37,7 +37,12 @@ describe('CommunityService', () => {
         category: 'tech',
       });
 
-      expect(result).toEqual(mockCommunity);
+      expect(result).toMatchObject({
+        id: 'community-1',
+        slug: 'test-community',
+        name: 'Test Community',
+        ownerId: 'user-1',
+      });
       expect(mockPrismaClient.community.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({

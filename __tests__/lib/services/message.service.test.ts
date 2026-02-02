@@ -159,9 +159,12 @@ describe('MessageService', () => {
       const agentData = mockAgent({
         id: 'agent-123',
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
+        SemanticMemory: null,
+        CharacterGrowth: null,
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -173,6 +176,15 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.create as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue(null);
+      (mockPrismaClient.symbolicBond.create as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+        tier: 'ACQUAINTANCE',
+        status: 'active',
+        affinityLevel: 0,
+      });
 
       // Act
       const result = await service.processMessage({
@@ -206,9 +218,10 @@ describe('MessageService', () => {
     });
 
     it('debería lanzar error si el agente no pertenece al usuario', async () => {
-      // Arrange: Agente de otro usuario
+      // Arrange: Agente de otro usuario (private, not system, not public)
       const agentData = mockAgent({
         userId: 'other-user',
+        visibility: 'private', // Explicit private visibility
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -220,16 +233,17 @@ describe('MessageService', () => {
           userId: 'user-123',
           content: 'Hello',
         })
-      ).rejects.toThrow('Forbidden: Agent does not belong to user');
+      ).rejects.toThrow('Forbidden: Agent is not accessible');
     });
 
     it('debería procesar GIF con descripción', async () => {
       // Arrange
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -240,6 +254,11 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.findFirst as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       const result = await service.processMessage({
@@ -272,9 +291,10 @@ describe('MessageService', () => {
       // Arrange
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -286,6 +306,12 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.create as any).mockResolvedValue(mockRelation()); // Crear nueva
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue(null);
+      (mockPrismaClient.symbolicBond.create as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       await service.processMessage({
@@ -309,9 +335,10 @@ describe('MessageService', () => {
       // Arrange
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -322,6 +349,11 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.findFirst as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       await service.processMessage({
@@ -346,9 +378,10 @@ describe('MessageService', () => {
       // Arrange
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -361,6 +394,11 @@ describe('MessageService', () => {
       );
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       await service.processMessage({
@@ -385,9 +423,10 @@ describe('MessageService', () => {
       // Arrange: Relación cerca de cambio de stage
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -400,6 +439,11 @@ describe('MessageService', () => {
       );
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       const result = await service.processMessage({
@@ -417,9 +461,10 @@ describe('MessageService', () => {
       // Arrange
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -440,6 +485,11 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.findFirst as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       const result = await service.processMessage({
@@ -457,9 +507,10 @@ describe('MessageService', () => {
       // Arrange
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -470,6 +521,11 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.findFirst as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       const result = await service.processMessage({
@@ -501,6 +557,11 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.findFirst as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       const result = await service.processMessage({
@@ -534,9 +595,10 @@ describe('MessageService', () => {
       // Verificar que no falla con respuesta vacía
       const agentData = mockAgent({
         userId: 'user-123',
-        personalityCore: mockPersonalityCore(),
-        internalState: mockInternalState(),
-        user: mockUser({ location: null }),
+        PersonalityCore: mockPersonalityCore(),
+        InternalState: mockInternalState(),
+        User: mockUser({ location: null }),
+        BehaviorProfile: [],
       });
 
       (mockPrismaClient.agent.findUnique as any).mockResolvedValue(agentData);
@@ -547,6 +609,11 @@ describe('MessageService', () => {
       (mockPrismaClient.relation.findFirst as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.relation.update as any).mockResolvedValue(mockRelation());
       (mockPrismaClient.internalState.update as any).mockResolvedValue(mockInternalState());
+      (mockPrismaClient.symbolicBond.findFirst as any).mockResolvedValue({
+        id: 'bond-123',
+        agentId: 'agent-123',
+        userId: 'user-123',
+      });
 
       // Act
       const result = await service.processMessage({

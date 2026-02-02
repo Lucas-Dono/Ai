@@ -4,7 +4,12 @@
  * Tests básicos de seguridad para verificar que las protecciones están funcionando
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+// IMPORTANT: Unmock the encryption module to test the REAL implementation
+// The global setup.ts mocks this module with base64 encoding for other tests
+vi.unmock('@/lib/encryption/message-encryption');
+
 import { encryptMessage, decryptMessage } from '../encryption/message-encryption';
 
 describe('Security - Message Encryption', () => {

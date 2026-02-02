@@ -304,6 +304,14 @@ export class LLMProvider {
       } catch (error) {
         lastError = error as Error;
 
+        // Si es error de seguridad o validación, lanzar inmediatamente con el error original
+        if (lastError.message.includes('bloqueó la respuesta') ||
+            lastError.message.includes('no retornó texto')) {
+          log.error({ err: error }, 'Error generating LLM response');
+          timer.fail(error);
+          throw lastError;
+        }
+
         // Si no es error de cuota, lanzar inmediatamente
         if (!lastError.message.includes('Quota') && !lastError.message.includes('429')) {
           log.error({ err: error }, 'Error generating LLM response');

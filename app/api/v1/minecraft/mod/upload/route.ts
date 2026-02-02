@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ModVersionService } from '@/lib/minecraft/mod-version-service';
-import { getAuthenticatedUser } from '@/lib/auth/auth-utils';
+import { getAuthenticatedUser } from '@/lib/auth-server';
 
 /**
  * POST /api/v1/minecraft/mod/upload
@@ -48,10 +48,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Parsear FormData
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
-    const version = formData.get('version') as string;
-    const changelog = formData.get('changelog') as string;
+    const formData = await req.formData() as unknown as globalThis.FormData;
+    const file = formData.get('file') as File | null;
+    const version = formData.get('version') as string | null;
+    const changelog = formData.get('changelog') as string | null;
     const required = formData.get('required') === 'true';
     const minimumVersion = formData.get('minimumVersion') as string | null;
 

@@ -99,23 +99,30 @@ export async function POST(req: NextRequest) {
     if (!user) {
       console.log('[Minecraft OAuth Login] Usuario nuevo, creando cuenta...');
 
-      user = await prisma.user.create({
+      const newUser = await prisma.user.create({
         data: {
+          id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           email: email.toLowerCase(),
           name: name || email.split('@')[0],
           image: picture,
-          emailVerified: new Date(), // OAuth emails son verificados
+          emailVerified: true, // OAuth emails son verificados
           plan: 'FREE',
           Account: {
             create: {
+              id: `acc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               providerId: 'google',
-              accountId: googleId,
-              access_token: '', // No almacenamos access_token del OAuth
-              refresh_token: null,
-              expires_at: null,
+              accountId: googleId!,
+              accessToken: '', // No almacenamos access_token del OAuth
+              refreshToken: null,
+              expiresAt: null,
             },
           },
         },
+      });
+
+      // Re-fetch with Agent include
+      user = await prisma.user.findUnique({
+        where: { id: newUser.id },
         include: {
           Agent: {
             select: {
@@ -131,34 +138,34 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      console.log('[Minecraft OAuth Login] Usuario creado:', user.id);
+      console.log('[Minecraft OAuth Login] Usuario creado:', newUser.id);
     } else {
       console.log('[Minecraft OAuth Login] Usuario existente:', user.id);
     }
 
     // 4. Generar JWT de Blaniel (30 días)
     const token = await generateToken({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
-      plan: user.plan,
+      userId: user!.id,
+      email: user!.email,
+      name: user!.name,
+      plan: user!.plan,
     });
 
     // 5. Registrar login exitoso
-    console.log(`[Minecraft OAuth Login] Usuario autenticado: ${user.email}`);
+    console.log(`[Minecraft OAuth Login] Usuario autenticado: ${user!.email}`);
 
     // 6. Retornar JWT + datos del usuario
     return NextResponse.json({
       token,
       expiresIn: 30 * 24 * 60 * 60, // 30 días en segundos
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
-        plan: user.plan,
+        id: user!.id,
+        email: user!.email,
+        name: user!.name,
+        image: user!.image,
+        plan: user!.plan,
       },
-      agents: user.Agent.map((agent) => {
+      agents: user!.Agent.map((agent) => {
         const profile = agent.profile as any;
         const age = profile?.identidad?.edad || profile?.age || null;
 

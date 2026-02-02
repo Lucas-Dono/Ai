@@ -23,10 +23,17 @@ describe('Community Flow Integration', () => {
       slug: 'test-community',
       name: 'Test Community',
       ownerId: 'user-1',
+      User: {
+        id: 'user-1',
+        name: 'User 1',
+        image: null,
+      },
     });
     mockPrismaClient.communityMember.create = vi.fn().mockResolvedValue({
+      id: 'member-1',
       role: 'owner',
     });
+    mockPrismaClient.community.update = vi.fn().mockResolvedValue({});
 
     const community = await CommunityService.createCommunity('user-1', {
       name: 'Test Community',
@@ -76,10 +83,11 @@ describe('Community Flow Integration', () => {
     // Step 4: User-1 comments on the post
     mockPrismaClient.communityPost.findUnique = vi.fn().mockResolvedValue({
       id: 'post-1',
+      title: 'My First Post',
       authorId: 'user-2',
       isLocked: false,
       communityId: 'community-1',
-      community: { id: 'community-1' },
+      Community: { id: 'community-1' },
     });
     mockPrismaClient.communityMember.findUnique = vi.fn().mockResolvedValue({
       canComment: true,
@@ -90,8 +98,13 @@ describe('Community Flow Integration', () => {
       id: 'comment-1',
       content: 'Great post!',
       authorId: 'user-1',
+      User: { name: 'User 1', image: null },
     });
     mockPrismaClient.communityPost.update = vi.fn().mockResolvedValue({});
+    // Mock for post follow service (auto-follow on comment)
+    mockPrismaClient.postFollower.findMany = vi.fn().mockResolvedValue([]);
+    mockPrismaClient.postFollower.findUnique = vi.fn().mockResolvedValue(null);
+    mockPrismaClient.postFollower.create = vi.fn().mockResolvedValue({});
 
     const comment = await CommentService.createComment('user-1', {
       postId: 'post-1',
@@ -112,15 +125,52 @@ describe('Community Flow Integration', () => {
 
     // Step 6: Award reputation points
     mockPrismaClient.userReputation.upsert = vi.fn().mockResolvedValue({
-      points: 5,
+      id: 'reputation-1',
+      userId: 'user-2',
+      totalPoints: 5,
       level: 1,
+      updatedAt: new Date(),
+      currentStreak: 0,
+      longestStreak: 0,
+      lastActiveDate: null,
+      UserBadge: [],
     });
     mockPrismaClient.userReputation.findUnique = vi.fn().mockResolvedValue({
+      id: 'reputation-1',
       userId: 'user-2',
-      points: 5,
+      totalPoints: 5,
       level: 1,
-      badges: [],
+      updatedAt: new Date(),
+      currentStreak: 0,
+      longestStreak: 0,
+      lastActiveDate: null,
+      UserBadge: [],
     });
+
+    // Mock all prisma queries needed by getUserStats
+    mockPrismaClient.user.findUnique = vi.fn().mockResolvedValue({
+      id: 'user-2',
+      createdAt: new Date('2025-01-15'),
+    });
+    mockPrismaClient.agent.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.agent.aggregate = vi.fn().mockResolvedValue({ _sum: { cloneCount: 0 } });
+    mockPrismaClient.directMessage.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.behaviorProfile.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.importantEvent.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.communityPost.count = vi.fn().mockResolvedValue(1);
+    mockPrismaClient.communityPost.aggregate = vi.fn().mockResolvedValue({ _sum: { upvotes: 1 } });
+    mockPrismaClient.communityPost.findFirst = vi.fn().mockResolvedValue({ upvotes: 1 });
+    mockPrismaClient.communityComment.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.community.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.researchProject.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.researchContributor.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.marketplaceTheme.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.marketplaceTheme.findFirst = vi.fn().mockResolvedValue(null);
+    mockPrismaClient.communityMember.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.review.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.message.findMany = vi.fn().mockResolvedValue([]);
+    mockPrismaClient.postAward.count = vi.fn().mockResolvedValue(0);
+    mockPrismaClient.communityEvent.findMany = vi.fn().mockResolvedValue([]);
 
     vi.spyOn(ReputationService, 'getUserStats').mockResolvedValue({
       aisCreated: 0,

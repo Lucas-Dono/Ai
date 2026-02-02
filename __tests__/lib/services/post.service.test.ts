@@ -21,7 +21,8 @@ describe('PostService', () => {
         type: 'discussion',
         authorId: 'user-1',
         slug: 'test-post-abc123',
-        author: { id: 'user-1', name: 'Test User', image: null },
+        User: { id: 'user-1', name: 'Test User', image: null },
+        Community: null,
       };
 
       mockPrismaClient.communityPost.create = vi.fn().mockResolvedValue(mockPost);
@@ -189,7 +190,13 @@ describe('PostService', () => {
           id: 'post-1',
           title: 'Test Post',
           type: 'discussion',
-          author: { id: 'user-1', name: 'User', image: null },
+          User: { id: 'user-1', name: 'User', image: null },
+          Community: null,
+          _count: {
+            CommunityComment: 0,
+            PostVote: 0,
+            PostAward: 0,
+          },
         },
       ];
 
@@ -244,7 +251,13 @@ describe('PostService', () => {
       const mockPost = {
         id: 'post-1',
         title: 'Test Post',
-        author: { id: 'user-1', name: 'User', image: null },
+        User: { id: 'user-1', name: 'User', image: null },
+        Community: null,
+        _count: {
+          CommunityComment: 0,
+          PostVote: 0,
+          PostAward: 0,
+        },
       };
 
       mockPrismaClient.communityPost.findUnique = vi.fn().mockResolvedValue(mockPost);

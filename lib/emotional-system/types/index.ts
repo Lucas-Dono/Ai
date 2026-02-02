@@ -181,6 +181,7 @@ export interface ConversationMessage {
 
 export interface EpisodicMemory {
   id: string;
+  agentId: string;
   event: string;
   userEmotion?: string;
   characterEmotion?: string;

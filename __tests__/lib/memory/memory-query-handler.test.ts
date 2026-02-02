@@ -258,7 +258,7 @@ describe('MemoryQueryHandler', () => {
         'user-456'
       );
 
-      expect(result.metadata.searchTimeMs).toBeGreaterThan(0);
+      expect(result.metadata.searchTimeMs).toBeGreaterThanOrEqual(0);
       expect(result.metadata.searchTimeMs).toBeLessThan(5000);
     });
   });

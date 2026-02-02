@@ -7,7 +7,7 @@
 import { createLogger } from "@/lib/logger";
 import { ConversationScript, ScriptMetadata } from "./conversation-script-types";
 
-const log = createLogger({ module: "ConversationScriptManager" });
+const log = createLogger("ConversationScriptManager");
 
 /**
  * Información de listeners por grupo
@@ -54,12 +54,12 @@ export class ConversationScriptManager {
       lastActivityAt: new Date(),
     });
 
-    log.info("Script registered", {
+    log.info({
       groupHash,
       scriptId: script.scriptId,
       topic: script.topic,
       totalLines: script.lines.length,
-    });
+    }, "Script registered");
   }
 
   /**
@@ -82,7 +82,7 @@ export class ConversationScriptManager {
     this.groupToScript.delete(groupHash);
     this.groupListeners.delete(groupHash);
 
-    log.info("Script unregistered", { groupHash });
+    log.info({ groupHash }, "Script unregistered");
   }
 
   /**
@@ -91,18 +91,18 @@ export class ConversationScriptManager {
   static addListener(groupHash: string, playerId: string): void {
     const group = this.groupListeners.get(groupHash);
     if (!group) {
-      log.warn("Cannot add listener, group not found", { groupHash, playerId });
+      log.warn({ groupHash, playerId }, "Cannot add listener, group not found");
       return;
     }
 
     group.listeners.add(playerId);
     group.lastActivityAt = new Date();
 
-    log.debug("Listener added", {
+    log.debug({
       groupHash,
       playerId,
       totalListeners: group.listeners.size,
-    });
+    }, "Listener added");
   }
 
   /**
@@ -115,11 +115,11 @@ export class ConversationScriptManager {
     group.listeners.delete(playerId);
     group.lastActivityAt = new Date();
 
-    log.debug("Listener removed", {
+    log.debug({
       groupHash,
       playerId,
       totalListeners: group.listeners.size,
-    });
+    }, "Listener removed");
   }
 
   /**
@@ -179,7 +179,7 @@ export class ConversationScriptManager {
     }
 
     if (cleaned > 0) {
-      log.info("Cleaned up inactive groups", { count: cleaned });
+      log.info({ count: cleaned }, "Cleaned up inactive groups");
     }
 
     return cleaned;

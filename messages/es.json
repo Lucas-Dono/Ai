@@ -3177,6 +3177,37 @@
       "warnings": {
         "similarName": "El nombre generado es similar a '{name}'. Por motivos legales, recomendamos usar un nombre más original.",
         "franchiseMention": "La biografía menciona '{franchise}'. Para evitar problemas de copyright, evita referencias directas a franquicias existentes."
+      },
+      "avatar": {
+        "title": "Foto de Perfil (Avatar)",
+        "subtitle": "Elige entre subir tu propia foto o dejar que la IA la genere",
+        "uploadOption": {
+          "title": "Subir Foto",
+          "button": "Subir Foto",
+          "formats": "PNG, JPG, WEBP, GIF",
+          "maxSize": "Máx: 5MB, Min: 256x256px",
+          "selected": "Foto seleccionada"
+        },
+        "generateOption": {
+          "title": "Generar con IA",
+          "button": "Generar con IA",
+          "description": "Basado en descripción",
+          "selected": "✓ Seleccionado (por defecto)",
+          "notSelected": "Generar automáticamente"
+        },
+        "fullBodyInfo": {
+          "title": "Foto de cuerpo completo",
+          "description": "La IA generará automáticamente una foto de cuerpo completo basada en tu descripción"
+        },
+        "uploading": "Subiendo imagen...",
+        "removeButton": "Eliminar foto",
+        "errors": {
+          "invalidFormat": "El archivo debe ser una imagen (PNG, JPG, WEBP, GIF)",
+          "tooLarge": "La imagen es demasiado grande. Tamaño máximo: 5MB",
+          "tooSmall": "Imagen demasiado pequeña. Tamaño mínimo: 256x256px",
+          "uploadFailed": "Error al subir la imagen. Por favor, inténtalo de nuevo.",
+          "processingFailed": "Error al procesar la imagen"
+        }
       }
     },
     "characterType": {

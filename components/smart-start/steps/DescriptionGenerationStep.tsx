@@ -6,8 +6,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import { Sparkles, Wand2, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Sparkles, Wand2, Loader2, AlertCircle, Upload, Image as ImageIcon, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DescriptionGenerationStepProps {
@@ -33,6 +33,60 @@ export function DescriptionGenerationStep({
   const [archetypeHint, setArchetypeHint] = useState<string>('');
   const [era, setEra] = useState<string>('');
 
+  // Avatar management
+  const [avatarMode, setAvatarMode] = useState<'generate' | 'upload' | null>('generate'); // Default to generate
+  const [uploadedAvatar, setUploadedAvatar] = useState<string | null>(null);
+  const [uploadedAvatarFile, setUploadedAvatarFile] = useState<File | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('El archivo debe ser una imagen (PNG, JPG, WEBP, GIF)');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('La imagen es demasiado grande. Tamaño máximo: 5MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    setError(null);
+
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedAvatar(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Store file for later upload
+      setUploadedAvatarFile(file);
+      setAvatarMode('upload');
+    } catch (err) {
+      console.error('Error processing image:', err);
+      setError('Error al procesar la imagen');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setUploadedAvatar(null);
+    setUploadedAvatarFile(null);
+    setAvatarMode('generate');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleGenerate = async () => {
     if (description.trim().length < 10) {
       setError('Por favor, escribe al menos 10 caracteres para describir tu personaje');
@@ -43,12 +97,35 @@ export function DescriptionGenerationStep({
     setError(null);
 
     try {
+      // If user uploaded avatar, upload it first
+      let uploadedAvatarUrl: string | undefined = undefined;
+
+      if (avatarMode === 'upload' && uploadedAvatarFile) {
+        const formData = new FormData();
+        formData.append('avatar', uploadedAvatarFile);
+
+        const uploadResponse = await fetch('/api/smart-start/upload-avatar', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadData = await uploadResponse.json();
+
+        if (!uploadResponse.ok) {
+          throw new Error(uploadData.error || 'Error al subir la imagen');
+        }
+
+        uploadedAvatarUrl = uploadData.avatarUrl;
+        console.log('[DescriptionGen] Avatar uploaded:', uploadedAvatarUrl);
+      }
+
       const response = await fetch('/api/smart-start/generate-from-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId,
           description,
+          uploadedAvatarUrl, // Pass uploaded avatar URL if exists
           options: showAdvanced
             ? {
                 genreHint: genreHint || undefined,
@@ -220,6 +297,112 @@ export function DescriptionGenerationStep({
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Avatar Section */}
+      <div className="space-y-4 p-5 bg-gray-800/30 border border-gray-700/50 rounded-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-purple-400" />
+              Foto de Perfil (Avatar)
+            </h3>
+            <p className="text-sm text-gray-400 mt-1">
+              Elige entre subir tu propia foto o dejar que la IA la genere
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {/* Upload Option */}
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                setAvatarMode('upload');
+                fileInputRef.current?.click();
+              }}
+              disabled={isGenerating || isUploadingAvatar}
+              className={`w-full h-32 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg transition-all ${
+                avatarMode === 'upload' && uploadedAvatar
+                  ? 'border-purple-500 bg-purple-500/10'
+                  : 'border-gray-600 hover:border-gray-500 bg-gray-800/50'
+              } ${isGenerating || isUploadingAvatar ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {uploadedAvatar ? (
+                <div className="relative w-full h-full">
+                  <img
+                    src={uploadedAvatar}
+                    alt="Avatar preview"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveAvatar();
+                    }}
+                    className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-gray-400" />
+                  <span className="text-sm font-medium">Subir Foto</span>
+                  <span className="text-xs text-gray-500">PNG, JPG, WEBP, GIF</span>
+                </>
+              )}
+            </button>
+            <p className="text-xs text-gray-500 text-center">
+              Máx: 5MB, Min: 256x256px
+            </p>
+          </div>
+
+          {/* Generate Option */}
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                setAvatarMode('generate');
+                handleRemoveAvatar();
+              }}
+              disabled={isGenerating || isUploadingAvatar}
+              className={`w-full h-32 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg transition-all ${
+                avatarMode === 'generate'
+                  ? 'border-purple-500 bg-purple-500/10'
+                  : 'border-gray-600 hover:border-gray-500 bg-gray-800/50'
+              } ${isGenerating || isUploadingAvatar ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <Wand2 className="w-8 h-8 text-purple-400" />
+              <span className="text-sm font-medium">Generar con IA</span>
+              <span className="text-xs text-gray-500">Basado en descripción</span>
+            </button>
+            <p className="text-xs text-gray-500 text-center">
+              {avatarMode === 'generate' ? '✓ Seleccionado (por defecto)' : 'Generar automáticamente'}
+            </p>
+          </div>
+        </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        {/* Info about full-body image */}
+        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <div className="flex items-start gap-2">
+            <ImageIcon className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs text-blue-300 font-medium">Foto de cuerpo completo</p>
+              <p className="text-xs text-blue-400/80 mt-1">
+                La IA generará automáticamente una foto de cuerpo completo basada en tu descripción
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Error Display */}

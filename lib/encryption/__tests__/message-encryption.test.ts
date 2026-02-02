@@ -9,6 +9,12 @@
  * - Soporta caracteres especiales y emojis
  */
 
+import { vi, beforeAll, afterAll } from 'vitest';
+
+// IMPORTANT: Unmock the encryption module to test the REAL implementation
+// The global setup.ts mocks this module with base64 encoding for other tests
+vi.unmock('@/lib/encryption/message-encryption');
+
 import {
   encryptMessage,
   decryptMessage,

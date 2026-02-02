@@ -19,7 +19,7 @@ describe('ReputationService', () => {
         userId: 'user-1',
         points: 100,
         level: 1,
-        badges: [],
+        UserBadge: [],
       };
 
       mockPrismaClient.userReputation.findUnique = vi.fn().mockResolvedValue(mockReputation);
@@ -35,7 +35,7 @@ describe('ReputationService', () => {
         userId: 'user-1',
         points: 0,
         level: 0,
-        badges: [],
+        UserBadge: [],
       };
 
       mockPrismaClient.userReputation.findUnique = vi.fn().mockResolvedValue(null);
@@ -81,7 +81,7 @@ describe('ReputationService', () => {
         userId: 'user-1',
         points: 50,
         level: 1,
-        badges: [],
+        UserBadge: [],
       });
 
       // Mock getUserStats and other dependencies for checkAndAwardBadges
@@ -125,14 +125,14 @@ describe('ReputationService', () => {
         totalPoints: 50, // existing points before increment
         level: 1,
         userId: 'user-1',
-        badges: [],
+        UserBadge: [],
       });
       mockPrismaClient.userReputation.update = vi.fn().mockResolvedValue({});
       mockPrismaClient.userReputation.findUnique = vi.fn().mockResolvedValue({
         userId: 'user-1',
         totalPoints: 150,
         level: 1,
-        badges: [],
+        UserBadge: [],
       });
 
       vi.spyOn(ReputationService, 'getUserStats').mockResolvedValue({
@@ -179,7 +179,7 @@ describe('ReputationService', () => {
         userId: 'user-1',
         points: 100,
         level: 2,
-        badges: [],
+        UserBadge: [],
       });
 
       vi.spyOn(ReputationService, 'getUserStats').mockResolvedValue({
@@ -226,7 +226,7 @@ describe('ReputationService', () => {
         userId: 'user-1',
         points: 50,
         level: 1,
-        badges: [],
+        UserBadge: [],
       });
 
       vi.spyOn(ReputationService, 'getUserStats').mockResolvedValue({
@@ -274,7 +274,7 @@ describe('ReputationService', () => {
           points: 1000,
           level: 10,
           user: { id: 'user-1', name: 'Top User', image: null },
-          badges: [],
+          UserBadge: [],
         },
       ];
 
@@ -316,7 +316,7 @@ describe('ReputationService', () => {
         currentStreak: 0,
         longestStreak: 0,
         lastActiveDate: null,
-        badges: [],
+        UserBadge: [],
       });
       mockPrismaClient.userReputation.update = vi.fn().mockResolvedValue({});
 
@@ -342,7 +342,7 @@ describe('ReputationService', () => {
         currentStreak: 5,
         longestStreak: 5,
         lastActiveDate: yesterday,
-        badges: [],
+        UserBadge: [],
       });
       mockPrismaClient.userReputation.update = vi.fn().mockResolvedValue({});
 
@@ -368,7 +368,7 @@ describe('ReputationService', () => {
         currentStreak: 10,
         longestStreak: 10,
         lastActiveDate: threeDaysAgo,
-        badges: [],
+        UserBadge: [],
       });
       mockPrismaClient.userReputation.update = vi.fn().mockResolvedValue({});
 
@@ -392,7 +392,7 @@ describe('ReputationService', () => {
         currentStreak: 5,
         longestStreak: 10,
         lastActiveDate: today,
-        badges: [],
+        UserBadge: [],
       });
 
       const result = await ReputationService.updateDailyStreak('user-1');

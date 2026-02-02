@@ -3,7 +3,7 @@ import { AmbientDialogueService } from "@/lib/minecraft/ambient-dialogue-service
 import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 
-const log = createLogger({ module: "MinecraftAmbientDialogue" });
+const log = createLogger("MinecraftAmbientDialogue");
 
 const RequestSchema = z.object({
   agentIds: z.array(z.string()).min(2).max(8), // 2-8 NPCs
@@ -35,12 +35,12 @@ export async function POST(request: NextRequest) {
 
     const { agentIds, location, contextHint, hasImportantHistory } = validation.data;
 
-    log.info("Generating ambient dialogue", {
+    log.info({
       agentIds,
       location,
       contextHint,
       hasImportantHistory,
-    });
+    }, "Generating ambient dialogue");
 
     // Obtener información de participantes
     const participants = await AmbientDialogueService.getParticipantInfo(agentIds);
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    log.error("Error generating ambient dialogue", { error });
+    log.error({ error }, "Error generating ambient dialogue");
 
     return NextResponse.json(
       {

@@ -5,13 +5,38 @@ import {
   EYE_COLORS,
   HAIR_COLORS,
   CLOTHING_COLORS,
-  CompletePalette
+  CompletePalette,
+  darkenColor,
+  lightenColor
 } from '../lib/minecraft/color-palettes';
-import { SkinConfiguration } from '../types/minecraft-skin-components';
+import { SkinConfiguration, ColorPalette } from '../types/minecraft-skin-components';
 import fs from 'fs/promises';
 import path from 'path';
 
 const OUTPUT_DIR = path.join(process.cwd(), 'public', 'minecraft', 'color-showcase');
+
+/**
+ * Creates a complete ColorPalette from partial data with sensible defaults
+ */
+function createColorPalette(partial: {
+  skinTone: string;
+  hairPrimary: string;
+  eyeColor: string;
+  clothingPrimary: string;
+  clothingSecondary?: string;
+}): ColorPalette {
+  return {
+    skinTone: partial.skinTone,
+    skinShadow: darkenColor(partial.skinTone, 0.8),
+    skinHighlight: lightenColor(partial.skinTone, 1.2),
+    hairPrimary: partial.hairPrimary,
+    eyeColor: partial.eyeColor,
+    eyeWhite: '#FFFFFF',
+    eyePupil: '#000000',
+    clothingPrimary: partial.clothingPrimary,
+    clothingSecondary: partial.clothingSecondary,
+  };
+}
 
 // Configuración base común para todas las skins
 const BASE_CONFIG: Omit<SkinConfiguration, 'colors'> = {
@@ -56,13 +81,13 @@ async function generateSkinFromPalette(
 ): Promise<Buffer> {
   const config: SkinConfiguration = {
     ...BASE_CONFIG,
-    colors: {
+    colors: createColorPalette({
       skinTone: palette.skinTone,
       hairPrimary: palette.hairColor,
       eyeColor: palette.eyeColor,
       clothingPrimary: palette.clothingPrimary,
       clothingSecondary: palette.clothingSecondary,
-    },
+    }),
   };
 
   return assembleSkin(config, componentsDir);
@@ -92,13 +117,13 @@ async function main() {
 
       const buffer = await assembleSkin({
         ...BASE_CONFIG,
-        colors: {
+        colors: createColorPalette({
           skinTone: palette.skinTone,
           hairPrimary: palette.hairColor,
           eyeColor: palette.eyeColor,
           clothingPrimary: palette.clothingPrimary,
           clothingSecondary: palette.clothingSecondary,
-        },
+        }),
       }, componentsDir);
 
       const filename = `${key.toLowerCase()}.png`;
@@ -129,12 +154,12 @@ async function main() {
 
       const buffer = await assembleSkin({
         ...BASE_CONFIG,
-        colors: {
+        colors: createColorPalette({
           skinTone: example.tone,
           hairPrimary: HAIR_COLORS.DARK_BROWN,
           eyeColor: EYE_COLORS.BROWN,
           clothingPrimary: CLOTHING_COLORS.BLUE,
-        },
+        }),
       }, componentsDir);
 
       await fs.writeFile(path.join(OUTPUT_DIR, `${example.name}.png`), buffer);
@@ -163,12 +188,12 @@ async function main() {
 
       const buffer = await assembleSkin({
         ...BASE_CONFIG,
-        colors: {
+        colors: createColorPalette({
           skinTone: SKIN_TONES.BEIGE,
           hairPrimary: HAIR_COLORS.BROWN,
           eyeColor: example.color,
           clothingPrimary: CLOTHING_COLORS.BLUE,
-        },
+        }),
       }, componentsDir);
 
       await fs.writeFile(path.join(OUTPUT_DIR, `${example.name}.png`), buffer);
@@ -200,12 +225,12 @@ async function main() {
 
       const buffer = await assembleSkin({
         ...BASE_CONFIG,
-        colors: {
+        colors: createColorPalette({
           skinTone: SKIN_TONES.BEIGE,
           hairPrimary: example.color,
           eyeColor: EYE_COLORS.BLUE,
           clothingPrimary: CLOTHING_COLORS.BLUE,
-        },
+        }),
       }, componentsDir);
 
       await fs.writeFile(path.join(OUTPUT_DIR, `${example.name}.png`), buffer);
@@ -235,12 +260,12 @@ async function main() {
 
       const buffer = await assembleSkin({
         ...BASE_CONFIG,
-        colors: {
+        colors: createColorPalette({
           skinTone: SKIN_TONES.BEIGE,
           hairPrimary: HAIR_COLORS.BROWN,
           eyeColor: EYE_COLORS.BLUE,
           clothingPrimary: example.color,
-        },
+        }),
       }, componentsDir);
 
       await fs.writeFile(path.join(OUTPUT_DIR, `${example.name}.png`), buffer);

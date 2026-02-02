@@ -35,7 +35,7 @@ const NARRATIVE_PATTERNS: Record<NarrativeState, NarrativePattern[]> = {
   seeking: [
     {
       state: 'seeking',
-      keywords: ['busco', 'quiero', 'necesito', 'estoy buscando', 'me gustaría', 'quisiera', 'ojalá'],
+      keywords: ['busco', 'buscando', 'quiero', 'necesito', 'estoy buscando', 'me gustaría', 'quisiera', 'ojalá'],
       emotionalTone: 'anxious',
     },
     {
@@ -64,12 +64,12 @@ const NARRATIVE_PATTERNS: Record<NarrativeState, NarrativePattern[]> = {
   conclusion: [
     {
       state: 'conclusion',
-      keywords: ['conseguí', 'logré', 'terminé', 'completé', 'aprobé', 'me gradué', 'ganamos'],
+      keywords: ['conseguí', 'logré', 'terminé', 'completé', 'aprobé', 'me gradué', 'ganamos', 'me aceptaron', 'aceptaron', 'fui aceptado', 'fui aceptada'],
       emotionalTone: 'positive',
     },
     {
       state: 'conclusion',
-      keywords: ['somos pareja', 'somos novios', 'estamos saliendo', 'me aceptó', 'dijo que sí'],
+      keywords: ['somos pareja', 'somos novios', 'estamos saliendo', 'me aceptó', 'dijo que sí', 'aceptó salir'],
       emotionalTone: 'positive',
     },
     {
@@ -102,12 +102,16 @@ const CATEGORY_PATTERNS: Record<NarrativeCategory, string[]> = {
   education_learning: [
     'estudiar', 'universidad', 'curso', 'examen', 'aprobar', 'materia', 'carrera',
     'título', 'graduación', 'tesis', 'profesor', 'clase', 'aprender', 'educación',
-    'certificado', 'diplomado', 'maestría', 'doctorado', 'escuela', 'calificación'
+    'certificado', 'diplomado', 'maestría', 'doctorado', 'escuela', 'calificación',
+    'gradué', 'graduado', 'graduada', 'empecé a estudiar', 'estudiando', 'matemáticas',
+    'matemática', 'física', 'química', 'historia', 'inglés', 'idioma', 'alumno', 'estudiante'
   ],
   health_fitness: [
     'gym', 'gimnasio', 'ejercicio', 'dieta', 'adelgazar', 'músculo', 'entrenar',
     'salud', 'médico', 'hospital', 'tratamiento', 'terapia', 'enfermedad', 'recuperación',
-    'peso', 'fitness', 'running', 'maratón', 'nutrición', 'bienestar'
+    'peso', 'fitness', 'running', 'maratón', 'nutrición', 'bienestar', 'kilos', 'kilo',
+    'kg', 'consulta', 'consulta médica', 'doctor', 'doctora', 'médica', 'bajar de peso',
+    'subir de peso', 'engordar', 'grasa', 'cardio', 'yoga', 'pilates', 'deportes'
   ],
   personal_projects: [
     'proyecto', 'app', 'startup', 'emprendimiento', 'desarrollar', 'crear',
@@ -123,6 +127,34 @@ const CATEGORY_PATTERNS: Record<NarrativeCategory, string[]> = {
 };
 
 export class NarrativeArcDetector {
+  /**
+   * Normaliza keywords para incluir formas base de verbos
+   */
+  private static normalizeKeywords(keywords: string[]): string[] {
+    const normalized = new Set(keywords);
+
+    // Map de conjugaciones comunes a forma base
+    const verbMappings: Record<string, string> = {
+      'buscando': 'busco',
+      'queriendo': 'quiero',
+      'necesitando': 'necesito',
+      'trabajando': 'trabajo',
+      'estudiando': 'estudio',
+      'graduando': 'gradúo',
+    };
+
+    keywords.forEach(keyword => {
+      // Check if keyword contains any mapped verb
+      for (const [conjugated, base] of Object.entries(verbMappings)) {
+        if (keyword.includes(conjugated)) {
+          normalized.add(base);
+        }
+      }
+    });
+
+    return Array.from(normalized);
+  }
+
   /**
    * Detecta el estado narrativo de un mensaje
    */
@@ -153,6 +185,9 @@ export class NarrativeArcDetector {
         );
 
         if (matchedKeywords.length > 0) {
+          // Normalizar keywords para incluir formas base
+          const normalizedKeywords = this.normalizeKeywords(matchedKeywords);
+
           // Calcular confianza basada en cantidad de keywords y longitud
           const confidence = Math.min(
             0.5 + (matchedKeywords.length * 0.2) + (matchedKeywords[0].length / 100),
@@ -163,7 +198,7 @@ export class NarrativeArcDetector {
             bestMatch = {
               state: state as NarrativeState,
               confidence,
-              keywords: matchedKeywords,
+              keywords: normalizedKeywords,
               emotionalTone: pattern.emotionalTone,
             };
           }
@@ -200,6 +235,9 @@ export class NarrativeArcDetector {
       );
 
       if (matchedKeywords.length > 0) {
+        // Normalizar keywords para incluir formas base
+        const normalizedKeywords = this.normalizeKeywords(matchedKeywords);
+
         const confidence = Math.min(
           0.4 + (matchedKeywords.length * 0.15),
           1.0
@@ -209,7 +247,7 @@ export class NarrativeArcDetector {
           bestMatch = {
             category: category as NarrativeCategory,
             confidence,
-            keywords: matchedKeywords,
+            keywords: normalizedKeywords,
           };
         }
       }
@@ -249,11 +287,11 @@ export class NarrativeArcDetector {
 
     // Extraer sustantivos principales (simplificado)
     // En producción, usar un parser NLP real
-    const commonWords = ['el', 'la', 'los', 'las', 'un', 'una', 'de', 'en', 'con', 'para', 'por', 'que', 'me', 'te', 'se'];
+    const commonWords = ['el', 'la', 'los', 'las', 'un', 'una', 'de', 'en', 'con', 'para', 'por', 'que', 'me', 'te', 'se', 'mi', 'tu', 'su', 'al', 'del', 'como', 'muy', 'más'];
     const words = messageLower
       .split(/\s+/)
-      .filter(w => w.length > 3 && !commonWords.includes(w))
-      .slice(0, 5);
+      .filter(w => w.length > 2 && !commonWords.includes(w))
+      .slice(0, 8); // Increased from 5 to 8 for better coverage
 
     return words.join(' ');
   }
@@ -293,7 +331,15 @@ export class NarrativeArcDetector {
     const theme2 = this.extractTheme(event2.message);
     const similarity = this.calculateThemeSimilarity(theme1, theme2);
 
-    return similarity > 0.3;
+    // Also check for keyword overlap from detected events
+    const keywordOverlap = event1.keywords.some(k1 =>
+      event2.keywords.some(k2 =>
+        k1.toLowerCase().includes(k2.toLowerCase()) ||
+        k2.toLowerCase().includes(k1.toLowerCase())
+      )
+    );
+
+    return similarity >= 0.2 || keywordOverlap;
   }
 
   /**

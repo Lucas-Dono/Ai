@@ -43,8 +43,10 @@ vi.mock("@/lib/redis/config", () => ({
 describe("Feature Flags Service", () => {
   const mockUserId = "test-user-123";
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    // Clear cache before each test to prevent cross-test pollution
+    await invalidateUserTierCache(mockUserId);
   });
 
   describe("getUserTier", () => {

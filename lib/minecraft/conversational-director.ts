@@ -136,12 +136,7 @@ export class ConversationalDirector {
 
     // Llamar a LLM (una sola vez)
     const venice = getVeniceClient();
-    const completion = await venice.createChatCompletion({
-      model: "llama-3.3-70b",
-      messages: [
-        {
-          role: "system",
-          content: `Eres un director conversacional para un mundo 3D de Minecraft.
+    const systemPrompt = `Eres un director conversacional para un mundo 3D de Minecraft.
 Debes generar respuestas estructuradas que incluyan diálogo, comandos y acciones.
 
 Responde SIEMPRE en formato JSON con esta estructura:
@@ -168,18 +163,19 @@ Responde SIEMPRE en formato JSON con esta estructura:
       "continuesAfterCommand": true
     }
   ]
-}`,
-        },
-        {
-          role: "user",
-          content: directorPrompt,
-        },
-      ],
-      temperature: 0.8,
-      max_tokens: 500,
-    });
+}`;
 
-    const content = completion.choices[0]?.message?.content;
+    const completion = await venice.generateWithSystemPrompt(
+      systemPrompt,
+      directorPrompt,
+      {
+        model: "llama-3.3-70b",
+        temperature: 0.8,
+        maxTokens: 500,
+      }
+    );
+
+    const content = completion.text;
 
     if (!content) {
       throw new Error("Venice returned empty response");

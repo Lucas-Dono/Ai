@@ -36,28 +36,68 @@ export interface MemoryQueryDetection {
 }
 
 /**
+ * Patrones que indican que NO es una memory query (false positives)
+ * Estas son preguntas sobre el futuro o el presente
+ */
+const NEGATIVE_PATTERNS = [
+  // Futuro: "vas a hacer", "voy a hacer", "harás", "haré"
+  /\b(vas?|voy|ir[éá]s?|har[éá]s?|har[éá])\s+(a\s+)?(hacer|ir|venir|decir|ver|comprar|estudiar|trabajar|comer)/i,
+  // Marcadores temporales futuros
+  /\b(mañana|pasado\s+mañana|próximo|siguiente|después|luego|más\s+tarde|en\s+el\s+futuro|pronto)/i,
+  // Preguntas sobre planes futuros
+  /\b(plan(es)?|planeas?|piensas?|quieres?|vas\s+a|voy\s+a)\b/i,
+];
+
+/**
  * Patrones de preguntas sobre memoria
  * Organizados por tipo de query
  */
 const MEMORY_PATTERNS = {
   // RECALL: "¿Recuerdas...?"
   recall: [
+    // Patrones específicos con keywords
     /¿?\s*recuerdas?\s+(cuando|que|cómo|cuál|cuándo|dónde|quién)\s+(.+)/i,
-    /¿?\s*te\s+acuerdas?\s+(de|que|cómo|cuál|cuándo|dónde)?\s*(.+)/i,
-    /¿?\s*sabes?\s+(lo\s+)?que\s+(.+)/i,
+    /¿?\s*te\s+acuerdas?\s+(de|que|cómo|cuál|cuándo|dónde)\s+(.+)/i,
+    // Patrones más flexibles sin keywords requeridos
+    /¿?\s*recuerdas?\s+(.{3,})/i, // "¿Recuerdas mi nombre?"
+    /¿?\s*te\s+acuerdas?\s+(.{3,})/i, // "¿Te acuerdas mi cumpleaños?"
+    /¿?\s*sabes?\s+lo\s+que\s+(.+)/i, // "¿Sabes lo que..." (más específico)
     /recordar[ás]?\s+(.+)/i,
+    // Referencias al pasado que inician con "cuando" - procesadas aquí para tener prioridad sobre verification
+    /cuando\s+te\s+(dije|conté|habl[ée]|mencioné)\s+(.+)/i,
+  ],
+
+  // PERSONAL INFO QUERIES: "¿Cuál/Cómo/Cuándo es mi...?"
+  // Preguntas sobre información personal que implican memoria previa
+  personalInfo: [
+    // "¿Cuándo es mi cumpleaños/aniversario?"
+    /¿?\s*cu[áa]ndo\s+es\s+mi\s+(.+)/i,
+    // "¿Cómo se llama mi hermano/mamá/perro?"
+    /¿?\s*c[óo]mo\s+se\s+llama\s+(mi|el|la)\s+(.+)/i,
+    // "¿Cuál es mi color/comida/película favorito/a?"
+    /¿?\s*cu[áa]l\s+es\s+mi\s+(.+)\s+favorit[oa]/i,
+    // "¿Cuál es mi nombre/edad/trabajo?"
+    /¿?\s*cu[áa]l\s+es\s+mi\s+(.+)/i,
+    // "¿Qué es mi X?"
+    /¿?\s*qu[ée]\s+es\s+mi\s+(.+)/i,
+    // "¿Dónde vivo/trabajo/estudio?"
+    /¿?\s*d[óo]nde\s+(vivo|trabajo|estudio|nac[íi])/i,
   ],
 
   // VERIFICATION: "¿Te dije...?"
   verification: [
     /¿?\s*te\s+(dije|conté|comenté|mencioné)\s+(que|sobre|de)?\s*(.+)/i,
-    /¿?\s*ya\s+te\s+(había\s+)?hablé\s+(de|sobre)\s+(.+)/i,
+    /¿?\s*ya\s+te\s+(había\s+)?habl[ée]\s+(de|sobre)\s+(.+)/i,
   ],
 
   // RETRIEVAL: "¿Qué te dije sobre...?"
   retrieval: [
+    // Patrón directo: "¿Qué te dije sobre...?"
     /¿?\s*(qué|cuál|cómo|cuándo|dónde|quién)\s+te\s+(dije|conté|comenté|mencioné)\s+(sobre|acerca\s+de|de|que)?\s*(.+)/i,
-    /¿?\s*de\s+qué\s+(hablamos|hablé|conversamos)\s+(.+)/i,
+    // Patrón flexible: "¿Cuál era... que te mencioné?"
+    /¿?\s*(qué|cuál|cómo)\s+\w+\s+.*?\s+(te\s+)?(dije|dijiste|conté|contaste|mencioné|mencionaste)/i,
+    // "¿De qué hablamos...?"
+    /¿?\s*de\s+qué\s+(hablamos|habl[ée]|conversamos)\s+(.+)/i,
   ],
 
   // PAST REFERENCE: Referencias directas al pasado
@@ -65,7 +105,7 @@ const MEMORY_PATTERNS = {
     /la\s+(última|primera)\s+vez\s+que\s+(.+)/i,
     /(dijiste|mencionaste|comentaste)\s+que\s+(.+)/i,
     /(hablamos|conversamos|charlamos)\s+(de|sobre)\s+(.+)/i,
-    /cuando\s+te\s+(dije|conté|hablé|mencioné)\s+(.+)/i,
+    /cuando\s+te\s+(dije|conté|habl[ée]|mencioné)\s+(.+)/i,
   ],
 };
 
@@ -107,49 +147,17 @@ export class MemoryQueryDetector {
     // Normalizar mensaje
     const normalizedMessage = this.normalizeMessage(message);
 
-    // 1. CHECK: Patrones de RECALL
-    const recallMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.recall);
-    if (recallMatch) {
-      const keywords = this.extractKeywords(recallMatch.match);
-      const temporal = this.detectTemporalContext(normalizedMessage);
-
-      log.debug(
-        { message: message.substring(0, 100), type: 'recall', confidence: 0.9, timeMs: Date.now() - startTime },
-        'Memory query detected (recall)'
-      );
-
+    // 0. CHECK: Excluir false positives (preguntas sobre futuro/presente)
+    if (this.isFutureOrientedQuery(normalizedMessage)) {
       return {
-        isMemoryQuery: true,
-        confidence: 0.9,
-        queryType: 'recall',
-        keywords,
-        temporalContext: temporal,
-        rawMatch: recallMatch.match,
+        isMemoryQuery: false,
+        confidence: 0,
+        queryType: 'none',
+        keywords: [],
       };
     }
 
-    // 2. CHECK: Patrones de VERIFICATION
-    const verificationMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.verification);
-    if (verificationMatch) {
-      const keywords = this.extractKeywords(verificationMatch.match);
-      const temporal = this.detectTemporalContext(normalizedMessage);
-
-      log.debug(
-        { message: message.substring(0, 100), type: 'verification', confidence: 0.85, timeMs: Date.now() - startTime },
-        'Memory query detected (verification)'
-      );
-
-      return {
-        isMemoryQuery: true,
-        confidence: 0.85,
-        queryType: 'verification',
-        keywords,
-        temporalContext: temporal,
-        rawMatch: verificationMatch.match,
-      };
-    }
-
-    // 3. CHECK: Patrones de RETRIEVAL
+    // 1. CHECK: Patrones de RETRIEVAL (más específicos, se revisan primero)
     const retrievalMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.retrieval);
     if (retrievalMatch) {
       const keywords = this.extractKeywords(retrievalMatch.match);
@@ -170,7 +178,70 @@ export class MemoryQueryDetector {
       };
     }
 
-    // 4. CHECK: Referencias al pasado
+    // 2. CHECK: Patrones de RECALL
+    const recallMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.recall);
+    if (recallMatch) {
+      const keywords = this.extractKeywords(recallMatch.match);
+      const temporal = this.detectTemporalContext(normalizedMessage);
+
+      log.debug(
+        { message: message.substring(0, 100), type: 'recall', confidence: 0.9, timeMs: Date.now() - startTime },
+        'Memory query detected (recall)'
+      );
+
+      return {
+        isMemoryQuery: true,
+        confidence: 0.9,
+        queryType: 'recall',
+        keywords,
+        temporalContext: temporal,
+        rawMatch: recallMatch.match,
+      };
+    }
+
+    // 3. CHECK: Patrones de VERIFICATION (más específico que personal info)
+    const verificationMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.verification);
+    if (verificationMatch) {
+      const keywords = this.extractKeywords(verificationMatch.match);
+      const temporal = this.detectTemporalContext(normalizedMessage);
+
+      log.debug(
+        { message: message.substring(0, 100), type: 'verification', confidence: 0.85, timeMs: Date.now() - startTime },
+        'Memory query detected (verification)'
+      );
+
+      return {
+        isMemoryQuery: true,
+        confidence: 0.85,
+        queryType: 'verification',
+        keywords,
+        temporalContext: temporal,
+        rawMatch: verificationMatch.match,
+      };
+    }
+
+    // 4. CHECK: Patrones de PERSONAL INFO (queries implícitas sobre información personal)
+    // Se revisa después de verification para evitar capturar "te dije dónde vivo?"
+    const personalInfoMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.personalInfo);
+    if (personalInfoMatch) {
+      const keywords = this.extractKeywords(personalInfoMatch.match);
+
+      log.debug(
+        { message: message.substring(0, 100), type: 'personalInfo', confidence: 0.75, timeMs: Date.now() - startTime },
+        'Memory query detected (personal info)'
+      );
+
+      return {
+        isMemoryQuery: true,
+        confidence: 0.75, // Slightly lower confidence as these could be new info requests
+        queryType: 'recall',
+        keywords,
+        temporalContext: undefined,
+        rawMatch: personalInfoMatch.match,
+      };
+    }
+
+    // 5. CHECK: Referencias al pasado
     const pastRefMatch = this.matchPatterns(normalizedMessage, MEMORY_PATTERNS.pastReference);
     if (pastRefMatch) {
       const keywords = this.extractKeywords(pastRefMatch.match);
@@ -196,7 +267,7 @@ export class MemoryQueryDetector {
       }
     }
 
-    // 5. FALLBACK: Keyword-based detection (baja confidence)
+    // 6. FALLBACK: Keyword-based detection (baja confidence)
     const keywordScore = this.calculateKeywordScore(normalizedMessage);
     if (keywordScore >= 0.5) {
       const keywords = this.extractKeywords(normalizedMessage);
@@ -238,6 +309,18 @@ export class MemoryQueryDetector {
       // Normalizar signos de puntuación
       .replace(/[¿¡]/g, '')
       .replace(/\s+/g, ' ');
+  }
+
+  /**
+   * Verifica si el mensaje es sobre el futuro (no es memoria)
+   */
+  private isFutureOrientedQuery(message: string): boolean {
+    for (const pattern of NEGATIVE_PATTERNS) {
+      if (pattern.test(message)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -295,8 +378,13 @@ export class MemoryQueryDetector {
 
     let matchCount = 0;
     for (const token of tokens) {
+      // Filtrar tokens muy cortos para evitar false positives
+      if (token.length < 3) continue;
+
       for (const keyword of MEMORY_KEYWORDS) {
-        if (token.includes(keyword) || keyword.includes(token)) {
+        // Match exacto o el token empieza con el keyword (para conjugaciones)
+        // Evitamos matches de substring (ej: "me" en "mencioné")
+        if (token === keyword || token.startsWith(keyword)) {
           matchCount++;
           break;
         }

@@ -4,7 +4,6 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { NotificationService } from '@/lib/services/notification.service';
 import { mockPrismaClient, resetAllMocks } from '../../setup';
 
 // Mock PushNotificationServerService
@@ -13,6 +12,15 @@ vi.mock('@/lib/services/push-notification-server.service', () => ({
     sendToUser: vi.fn().mockResolvedValue({}),
   },
 }));
+
+// Override the global NotificationService mock with actual implementation for testing
+vi.mock('@/lib/services/notification.service', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('@/lib/services/notification.service')>();
+  return mod;
+});
+
+// Import after mocking
+const { NotificationService } = await import('@/lib/services/notification.service');
 
 describe('NotificationService', () => {
   beforeEach(() => {
@@ -23,7 +31,7 @@ describe('NotificationService', () => {
     it('should create a notification successfully', async () => {
       const mockNotification = {
         id: 'notif-1',
-        userId: 'user-1',
+        recipientId: 'user-1',
         type: 'new_post',
         title: 'New Post',
         message: 'There is a new post',
@@ -33,7 +41,7 @@ describe('NotificationService', () => {
       mockPrismaClient.notification.create = vi.fn().mockResolvedValue(mockNotification);
 
       const result = await NotificationService.createNotification({
-        userId: 'user-1',
+        recipientId: 'user-1',
         type: 'new_post',
         title: 'New Post',
         message: 'There is a new post',
@@ -47,7 +55,7 @@ describe('NotificationService', () => {
     it('should not fail if push notification fails', async () => {
       mockPrismaClient.notification.create = vi.fn().mockResolvedValue({
         id: 'notif-1',
-        userId: 'user-1',
+        recipientId: 'user-1',
       });
 
       const { PushNotificationServerService } = await import(
@@ -58,7 +66,7 @@ describe('NotificationService', () => {
       );
 
       const result = await NotificationService.createNotification({
-        userId: 'user-1',
+        recipientId: 'user-1',
         type: 'test',
         title: 'Test',
         message: 'Test',
@@ -90,7 +98,7 @@ describe('NotificationService', () => {
     it('should mark notification as read', async () => {
       mockPrismaClient.notification.findUnique = vi.fn().mockResolvedValue({
         id: 'notif-1',
-        userId: 'user-1',
+        recipientId: 'user-1',
         isRead: false,
       });
       mockPrismaClient.notification.update = vi.fn().mockResolvedValue({
@@ -114,7 +122,7 @@ describe('NotificationService', () => {
     it('should throw error if wrong user', async () => {
       mockPrismaClient.notification.findUnique = vi.fn().mockResolvedValue({
         id: 'notif-1',
-        userId: 'user-2',
+        recipientId: 'user-2',
       });
 
       await expect(NotificationService.markAsRead('notif-1', 'user-1')).rejects.toThrow(
@@ -133,7 +141,7 @@ describe('NotificationService', () => {
       expect(mockPrismaClient.notification.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            userId: 'user-1',
+            recipientId: 'user-1',
             isRead: false,
           }),
         })
@@ -145,7 +153,7 @@ describe('NotificationService', () => {
     it('should delete notification', async () => {
       mockPrismaClient.notification.findUnique = vi.fn().mockResolvedValue({
         id: 'notif-1',
-        userId: 'user-1',
+        recipientId: 'user-1',
       });
       mockPrismaClient.notification.delete = vi.fn().mockResolvedValue({});
 
@@ -179,7 +187,7 @@ describe('NotificationService', () => {
       expect(mockPrismaClient.notification.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            userId: 'user-1',
+            recipientId: 'user-1',
             type: 'new_comment',
           }),
         })
@@ -246,7 +254,7 @@ describe('NotificationService', () => {
       expect(mockPrismaClient.notification.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            userId: 'user-1',
+            recipientId: 'user-1',
             type: 'direct_message',
             message: 'Hello!',
           }),

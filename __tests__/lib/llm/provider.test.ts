@@ -9,6 +9,18 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LLMProvider } from '@/lib/llm/provider';
 import { mockFetch, mockFetchError, resetAllMocks } from '../../setup';
 
+// Mock character-research to prevent extra API calls during profile generation
+vi.mock('@/lib/profile/character-research', () => ({
+  researchCharacter: vi.fn().mockResolvedValue({
+    detection: {
+      isPublicFigure: false,
+      confidence: 0,
+    },
+    biography: null,
+    enhancedPrompt: null,
+  }),
+}));
+
 // Mock environment variables
 const originalEnv = process.env;
 
@@ -368,7 +380,7 @@ describe('LLMProvider', () => {
       expect(result.systemPrompt).toContain('Test Character');
     });
 
-    it('debería usar Gemini 2.5 Flash (modelo completo) para profiles', async () => {
+    it('debería usar Gemini 2.5 Flash (modelo completo) para ULTRA tier profiles', async () => {
       // Arrange
       mockFetch({
         candidates: [{
@@ -383,10 +395,10 @@ describe('LLMProvider', () => {
         }],
       });
 
-      // Act
-      await provider.generateProfile({ name: 'Test' });
+      // Act - Pass ULTRA tier to use full model
+      await provider.generateProfile({ name: 'Test' }, 'ultra');
 
-      // Assert: Debería usar el modelo completo (no lite)
+      // Assert: ULTRA tier debería usar el modelo completo (no lite)
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('gemini-2.5-flash'),
         expect.any(Object)
@@ -459,6 +471,7 @@ describe('LLMProvider', () => {
   describe('API key rotation', () => {
     it('debería volver al inicio después de probar todas las keys', async () => {
       // Arrange: 2 keys, ambas fallan
+      delete process.env.GOOGLE_AI_API_KEY; // Remove default key
       process.env.GOOGLE_AI_API_KEY_1 = 'key-1';
       process.env.GOOGLE_AI_API_KEY_2 = 'key-2';
       const provider = new LLMProvider();
@@ -475,7 +488,7 @@ describe('LLMProvider', () => {
           systemPrompt: 'Test',
           messages: [{ role: 'user', content: 'Test' }],
         })
-      ).rejects.toThrow('agotaron su cuota');
+      ).rejects.toThrow('han agotado su cuota');
 
       // Debería haber intentado con ambas keys
       expect(global.fetch).toHaveBeenCalledTimes(2);

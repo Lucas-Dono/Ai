@@ -2,7 +2,7 @@ import { getVeniceClient, RECOMMENDED_MODELS } from "@/lib/emotional-system/llm/
 import { prisma } from "@/lib/prisma";
 import { createLogger } from "@/lib/logger";
 
-const log = createLogger({ module: "AmbientDialogueService" });
+const log = createLogger("AmbientDialogueService");
 
 interface DialogueParticipant {
   agentId: string;
@@ -85,9 +85,9 @@ export class AmbientDialogueService {
       const data = JSON.parse(content);
       this.prebuiltDialogues = data.dialogues;
 
-      log.info("Loaded prebuilt dialogues", { count: this.prebuiltDialogues.length });
+      log.info({ count: this.prebuiltDialogues?.length || 0 }, "Loaded prebuilt dialogues");
     } catch (error) {
-      log.warn("Failed to load prebuilt dialogues, using fallback", { error });
+      log.warn({ error }, "Failed to load prebuilt dialogues, using fallback");
       this.prebuiltDialogues = [
         { text: "Qué buen día hace, ¿no?", category: "clima" },
         { text: "Sí, hace un clima agradable.", category: "clima" },
@@ -161,24 +161,24 @@ export class AmbientDialogueService {
 
     if (!useAI) {
       // Usar diálogo pre-armado
-      log.info("Using prebuilt dialogue", {
+      log.info({
         groupHash,
         hasImportantHistory: request.hasImportantHistory || false,
-      });
+      }, "Using prebuilt dialogue");
 
       return this.selectPrebuiltDialogue(request.participants);
     }
 
     // Usar IA (con cache)
-    log.info("Using AI-generated dialogue", {
+    log.info({
       groupHash,
       hasImportantHistory: true,
-    });
+    }, "Using AI-generated dialogue");
 
     // Verificar cache (40% probabilidad de reusar si existe)
     const cachedDialogues = this.dialogueCache.get(groupHash);
     if (cachedDialogues && Math.random() < 0.4) {
-      log.info("Reusing cached AI dialogue", { groupHash, count: cachedDialogues.length });
+      log.info({ groupHash, count: cachedDialogues.length }, "Reusing cached AI dialogue");
 
       // Rotar entre diálogos cacheados
       const lastIndex = this.usageHistory.get(groupHash) || 0;
@@ -259,11 +259,10 @@ Formato JSON:
       }>(systemPrompt, userPrompt, {
         model: RECOMMENDED_MODELS.AMBIENT_DIALOGUE, // Qwen 3 4B - económico
         temperature: 0.9, // Alta creatividad
-        maxTokens: 150, // Respuestas cortas
       });
 
       // Enriquecer con nombres de agentes
-      const dialogues = response.data.dialogues.map((d) => {
+      const dialogues = response.dialogues.map((d: { agentId: string; message: string; emotion?: string }) => {
         const participant = request.participants.find((p) => p.agentId === d.agentId);
         return {
           ...d,
@@ -271,13 +270,13 @@ Formato JSON:
         };
       });
 
-      const totalTokens = response.usage?.total_tokens || 0;
+      const totalTokens = 0; // generateJSON doesn't return usage
 
-      log.info("Ambient dialogue generated", {
+      log.info({
         dialogues: dialogues.length,
         tokens: totalTokens,
         cost: (totalTokens * 0.15) / 1_000_000, // ~$0.15 por millón
-      });
+      }, "Ambient dialogue generated");
 
       return {
         dialogues,
@@ -285,7 +284,7 @@ Formato JSON:
         totalTokens,
       };
     } catch (error) {
-      log.error("Failed to generate ambient dialogue", { error });
+      log.error({ error }, "Failed to generate ambient dialogue");
 
       // Fallback: diálogo genérico
       return {
@@ -339,7 +338,7 @@ Formato JSON:
    */
   static clearOldCache(): void {
     if (this.dialogueCache.size > 100) {
-      log.info("Clearing dialogue cache", { size: this.dialogueCache.size });
+      log.info({ size: this.dialogueCache.size }, "Clearing dialogue cache");
       this.dialogueCache.clear();
       this.usageHistory.clear();
     }

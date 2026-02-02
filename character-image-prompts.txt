@@ -1,0 +1,584 @@
+================================================================================
+PROMPTS DE GENERACIÓN DE IMÁGENES PARA NUEVOS PERSONAJES
+Total: 36 personajes (sin contar los 24 originales que ya tienen imágenes)
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 1/36: Dr. Kira Nakamura
+Archivo: dr-kira-nakamura
+Género: female | Edad: 34 | Ocupación: Investigadora en Inteligencia Artificial y Neurociencia
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 34-year-old woman, Investigadora en Inteligencia Artificial y Neurociencia. Persona de 34 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: brillante, curiosa, perfeccionista, visionaria.. Personality: brillante, curiosa, perfeccionista. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 34-year-old woman, Investigadora en Inteligencia Artificial y Neurociencia. Persona de 34 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: brillante, curiosa, perfeccionista, visionaria.. Personality: brillante, curiosa, perfeccionista. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 2/36: Axel Winters
+Archivo: axel-winters
+Género: male | Edad: 29 | Ocupación: Ingeniero de Software especializado en Ciberseguridad
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 29-year-old man, Ingeniero de Software especializado en Ciberseguridad. Persona de 29 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: analítico, reservado, ético, protector.. Personality: analítico, reservado, ético. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 29-year-old man, Ingeniero de Software especializado en Ciberseguridad. Persona de 29 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: analítico, reservado, ético, protector.. Personality: analítico, reservado, ético. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 3/36: Dr. Amara Osei
+Archivo: dr-amara-osei
+Género: female | Edad: 38 | Ocupación: Astrofísica especializada en Exoplanetas
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 38-year-old woman, Astrofísica especializada en Exoplanetas. Persona de 38 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: soñadora, meticulosa, apasionada, comunicadora.. Personality: soñadora, meticulosa, apasionada. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 38-year-old woman, Astrofísica especializada en Exoplanetas. Persona de 38 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: soñadora, meticulosa, apasionada, comunicadora.. Personality: soñadora, meticulosa, apasionada. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 4/36: Viktor Kozlov
+Archivo: viktor-kozlov
+Género: male | Edad: 42 | Ocupación: Ingeniero Biomédico especializado en Prótesis Avanzadas
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 42-year-old man, Ingeniero Biomédico especializado en Prótesis Avanzadas. Persona de 42 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: innovador, pragmático, empático, determinado.. Personality: innovador, pragmático, empático. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 42-year-old man, Ingeniero Biomédico especializado en Prótesis Avanzadas. Persona de 42 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: innovador, pragmático, empático, determinado.. Personality: innovador, pragmático, empático. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 5/36: Dr. Maya Patel
+Archivo: maya-patel
+Género: female | Edad: 31 | Ocupación: Científica de Datos especializada en Cambio Climático
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 31-year-old woman, Científica de Datos especializada en Cambio Climático. Persona de 31 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: urgente, optimista, colaborativa, persistente.. Personality: urgente, optimista, colaborativa. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 31-year-old woman, Científica de Datos especializada en Cambio Climático. Persona de 31 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: urgente, optimista, colaborativa, persistente.. Personality: urgente, optimista, colaborativa. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 6/36: Theo Santos
+Archivo: theo-santos
+Género: male | Edad: 27 | Ocupación: Desarrollador de Realidad Virtual y Experiencias Inmersivas
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 27-year-old man, Desarrollador de Realidad Virtual y Experiencias Inmersivas. Persona de 27 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: creativo, sociable, vanguardista, entusiasta.. Personality: creativo, sociable, vanguardista. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 27-year-old man, Desarrollador de Realidad Virtual y Experiencias Inmersivas. Persona de 27 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: creativo, sociable, vanguardista, entusiasta.. Personality: creativo, sociable, vanguardista. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 7/36: Lucía Martínez
+Archivo: lucia-martinez
+Género: female | Edad: 35 | Ocupación: Directora de Cine Documental y Activista
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 35-year-old woman, Directora de Cine Documental y Activista. Persona de 35 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: apasionada, valiente, observadora, provocadora.. Personality: apasionada, valiente, observadora. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 35-year-old woman, Directora de Cine Documental y Activista. Persona de 35 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: apasionada, valiente, observadora, provocadora.. Personality: apasionada, valiente, observadora. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 8/36: Jasper Blake
+Archivo: jasper-blake
+Género: non-binary | Edad: 28 | Ocupación: Artista Digital y Diseñador de Experiencias
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 28-year-old person, Artista Digital y Diseñador de Experiencias. Persona de 28 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: experimental, introspectivo, audaz, reflexivo.. Personality: experimental, introspectivo, audaz. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 28-year-old person, Artista Digital y Diseñador de Experiencias. Persona de 28 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: experimental, introspectivo, audaz, reflexivo.. Personality: experimental, introspectivo, audaz. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 9/36: Nadia Khoury
+Archivo: nadia-khoury
+Género: female | Edad: 33 | Ocupación: Compositora de Música Contemporánea
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 33-year-old woman, Compositora de Música Contemporánea. Persona de 33 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: sensible, innovadora, melancólica, resiliente.. Personality: sensible, innovadora, melancólica. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 33-year-old woman, Compositora de Música Contemporánea. Persona de 33 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: sensible, innovadora, melancólica, resiliente.. Personality: sensible, innovadora, melancólica. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 10/36: Diego Vargas
+Archivo: diego-vargas
+Género: male | Edad: 40 | Ocupación: Curador de Arte Contemporáneo
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 40-year-old man, Curador de Arte Contemporáneo. Persona de 40 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: culto, carismático, crítico, visionario.. Personality: culto, carismático, crítico. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 40-year-old man, Curador de Arte Contemporáneo. Persona de 40 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: culto, carismático, crítico, visionario.. Personality: culto, carismático, crítico. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 11/36: Iris Chen
+Archivo: iris-chen
+Género: female | Edad: 26 | Ocupación: Bailarina Profesional y Coreógrafa
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 26-year-old woman, Bailarina Profesional y Coreógrafa. Persona de 26 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: disciplinada, expresiva, perfeccionista, libre.. Personality: disciplinada, expresiva, perfeccionista. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 26-year-old woman, Bailarina Profesional y Coreógrafa. Persona de 26 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: disciplinada, expresiva, perfeccionista, libre.. Personality: disciplinada, expresiva, perfeccionista. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 12/36: Roman Volkov
+Archivo: roman-volkov
+Género: male | Edad: 37 | Ocupación: Escritor de Ciencia Ficción Especulativa
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 37-year-old man, Escritor de Ciencia Ficción Especulativa. Persona de 37 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: imaginativo, filosófico, solitario, perspicaz.. Personality: imaginativo, filosófico, solitario. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 37-year-old man, Escritor de Ciencia Ficción Especulativa. Persona de 37 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: imaginativo, filosófico, solitario, perspicaz.. Personality: imaginativo, filosófico, solitario. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 13/36: Dr. Samira Hassan
+Archivo: dr-samira-hassan
+Género: female | Edad: 39 | Ocupación: Cirujana Cardiovascular
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 39-year-old woman, Cirujana Cardiovascular. Persona de 39 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: precisa, calmada, compasiva, líder.. Personality: precisa, calmada, compasiva. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 39-year-old woman, Cirujana Cardiovascular. Persona de 39 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: precisa, calmada, compasiva, líder.. Personality: precisa, calmada, compasiva. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 14/36: Luca Moretti
+Archivo: luca-moretti
+Género: male | Edad: 32 | Ocupación: Terapeuta Físico especializado en Rehabilitación Deportiva
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 32-year-old man, Terapeuta Físico especializado en Rehabilitación Deportiva. Persona de 32 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: motivador, técnico, empático, deportivo.. Personality: motivador, técnico, empático. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 32-year-old man, Terapeuta Físico especializado en Rehabilitación Deportiva. Persona de 32 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: motivador, técnico, empático, deportivo.. Personality: motivador, técnico, empático. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 15/36: Dr. Aisha Mohammed
+Archivo: dr-aisha-mohammed
+Género: female | Edad: 36 | Ocupación: Nutricionista Clínica y Coach de Bienestar
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 36-year-old woman, Nutricionista Clínica y Coach de Bienestar. Persona de 36 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: holística, educadora, paciente, transformadora.. Personality: holística, educadora, paciente. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 36-year-old woman, Nutricionista Clínica y Coach de Bienestar. Persona de 36 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: holística, educadora, paciente, transformadora.. Personality: holística, educadora, paciente. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 16/36: Kai Tanaka
+Archivo: kai-tanaka
+Género: non-binary | Edad: 30 | Ocupación: Especialista en Mindfulness y Meditación
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 30-year-old person, Especialista en Mindfulness y Meditación. Persona de 30 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: sereno, presente, sabio, accesible.. Personality: sereno, presente, sabio. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 30-year-old person, Especialista en Mindfulness y Meditación. Persona de 30 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: sereno, presente, sabio, accesible.. Personality: sereno, presente, sabio. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 17/36: Dr. Marcus Kline
+Archivo: dr-marcus-kline
+Género: male | Edad: 44 | Ocupación: Psiquiatra especializado en Trauma y PTSD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 44-year-old man, Psiquiatra especializado en Trauma y PTSD. Persona de 44 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: comprensivo, directo, experimentado, resiliente.. Personality: comprensivo, directo, experimentado. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 44-year-old man, Psiquiatra especializado en Trauma y PTSD. Persona de 44 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: comprensivo, directo, experimentado, resiliente.. Personality: comprensivo, directo, experimentado. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 18/36: Yara Al-Farsi
+Archivo: yara-al-farsi
+Género: female | Edad: 29 | Ocupación: Instructora de Yoga y Wellness Coach
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 29-year-old woman, Instructora de Yoga y Wellness Coach. Persona de 29 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: centrada, inspiradora, flexible, auténtica.. Personality: centrada, inspiradora, flexible. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 29-year-old woman, Instructora de Yoga y Wellness Coach. Persona de 29 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: centrada, inspiradora, flexible, auténtica.. Personality: centrada, inspiradora, flexible. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 19/36: Sienna Brooks
+Archivo: sienna-brooks
+Género: female | Edad: 37 | Ocupación: CEO de Startup de Energía Renovable
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 37-year-old woman, CEO de Startup de Energía Renovable. Persona de 37 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: visionaria, estratégica, arriesgada, sostenible.. Personality: visionaria, estratégica, arriesgada. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 37-year-old woman, CEO de Startup de Energía Renovable. Persona de 37 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: visionaria, estratégica, arriesgada, sostenible.. Personality: visionaria, estratégica, arriesgada. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 20/36: Rajesh Kumar
+Archivo: rajesh-kumar
+Género: male | Edad: 41 | Ocupación: Estratega de Negocios y Consultor
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 41-year-old man, Estratega de Negocios y Consultor. Persona de 41 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: analítico, diplomático, mentor, eficiente.. Personality: analítico, diplomático, mentor. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 41-year-old man, Estratega de Negocios y Consultor. Persona de 41 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: analítico, diplomático, mentor, eficiente.. Personality: analítico, diplomático, mentor. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 21/36: Tania Volkov
+Archivo: tania-volkov
+Género: female | Edad: 35 | Ocupación: Directora de Innovación en Corporación Tech
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 35-year-old woman, Directora de Innovación en Corporación Tech. Persona de 35 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: disruptiva, audaz, colaborativa, futurista.. Personality: disruptiva, audaz, colaborativa. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 35-year-old woman, Directora de Innovación en Corporación Tech. Persona de 35 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: disruptiva, audaz, colaborativa, futurista.. Personality: disruptiva, audaz, colaborativa. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 22/36: André Dubois
+Archivo: andre-dubois
+Género: male | Edad: 43 | Ocupación: Coach Ejecutivo y Experto en Liderazgo
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 43-year-old man, Coach Ejecutivo y Experto en Liderazgo. Persona de 43 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: reflexivo, desafiante, inspirador, ético.. Personality: reflexivo, desafiante, inspirador. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 43-year-old man, Coach Ejecutivo y Experto en Liderazgo. Persona de 43 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: reflexivo, desafiante, inspirador, ético.. Personality: reflexivo, desafiante, inspirador. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 23/36: Amina Diallo
+Archivo: amina-diallo
+Género: female | Edad: 33 | Ocupación: Emprendedora Social y Activista
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 33-year-old woman, Emprendedora Social y Activista. Persona de 33 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: apasionada, resiliente, conectora, agente-de-cambio.. Personality: apasionada, resiliente, conectora. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 33-year-old woman, Emprendedora Social y Activista. Persona de 33 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: apasionada, resiliente, conectora, agente-de-cambio.. Personality: apasionada, resiliente, conectora. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 24/36: Henrik Larsen
+Archivo: henrik-larsen
+Género: male | Edad: 38 | Ocupación: CFO y Especialista en Finanzas Sostenibles
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 38-year-old man, CFO y Especialista en Finanzas Sostenibles. Persona de 38 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: meticuloso, ético, visionario, pragmático.. Personality: meticuloso, ético, visionario. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 38-year-old man, CFO y Especialista en Finanzas Sostenibles. Persona de 38 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: meticuloso, ético, visionario, pragmático.. Personality: meticuloso, ético, visionario. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 25/36: Dr. Elena Petrova
+Archivo: dr-elena-petrova
+Género: female | Edad: 45 | Ocupación: Profesora de Historia Contemporánea
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 45-year-old woman, Profesora de Historia Contemporánea. Persona de 45 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: erudita, apasionada, crítica, mentora.. Personality: erudita, apasionada, crítica. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 45-year-old woman, Profesora de Historia Contemporánea. Persona de 45 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: erudita, apasionada, crítica, mentora.. Personality: erudita, apasionada, crítica. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 26/36: Dr. Omar Rashid
+Archivo: omar-rashid
+Género: male | Edad: 40 | Ocupación: Lingüista y Experto en Lenguas en Peligro
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 40-year-old man, Lingüista y Experto en Lenguas en Peligro. Persona de 40 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: curioso, preservador, políglota, dedicado.. Personality: curioso, preservador, políglota. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 40-year-old man, Lingüista y Experto en Lenguas en Peligro. Persona de 40 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: curioso, preservador, políglota, dedicado.. Personality: curioso, preservador, políglota. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 27/36: Dr. Grace Nkosi
+Archivo: dr-grace-nkosi
+Género: female | Edad: 37 | Ocupación: Bióloga Marina especializada en Conservación
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 37-year-old woman, Bióloga Marina especializada en Conservación. Persona de 37 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: aventurera, protectora, científica, optimista.. Personality: aventurera, protectora, científica. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 37-year-old woman, Bióloga Marina especializada en Conservación. Persona de 37 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: aventurera, protectora, científica, optimista.. Personality: aventurera, protectora, científica. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 28/36: Prof. Akira Sato
+Archivo: prof-akira-sato
+Género: male | Edad: 52 | Ocupación: Filósofo especializado en Ética de la Tecnología
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 52-year-old man, Filósofo especializado en Ética de la Tecnología. Persona de 52 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: contemplativo, provocador, sabio, accesible.. Personality: contemplativo, provocador, sabio. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 52-year-old man, Filósofo especializado en Ética de la Tecnología. Persona de 52 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: contemplativo, provocador, sabio, accesible.. Personality: contemplativo, provocador, sabio. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 29/36: Dr. Fatima Zahra
+Archivo: dr-fatima-zahra
+Género: female | Edad: 34 | Ocupación: Antropóloga Cultural
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 34-year-old woman, Antropóloga Cultural. Persona de 34 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: observadora, empática, analítica, conectora.. Personality: observadora, empática, analítica. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 34-year-old woman, Antropóloga Cultural. Persona de 34 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: observadora, empática, analítica, conectora.. Personality: observadora, empática, analítica. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 30/36: Dr. Santiago Rojas
+Archivo: dr-santiago-rojas
+Género: male | Edad: 39 | Ocupación: Arqueólogo especializado en Civilizaciones Precolombinas
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 39-year-old man, Arqueólogo especializado en Civilizaciones Precolombinas. Persona de 39 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: aventurero, meticuloso, apasionado, narrador.. Personality: aventurero, meticuloso, apasionado. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 39-year-old man, Arqueólogo especializado en Civilizaciones Precolombinas. Persona de 39 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: aventurero, meticuloso, apasionado, narrador.. Personality: aventurero, meticuloso, apasionado. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 31/36: Zoe Park
+Archivo: zoe-park
+Género: female | Edad: 27 | Ocupación: Diseñadora de Videojuegos Indie
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 27-year-old woman, Diseñadora de Videojuegos Indie. Persona de 27 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: innovadora, jugadora, narrativa, técnica.. Personality: innovadora, jugadora, narrativa. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 27-year-old woman, Diseñadora de Videojuegos Indie. Persona de 27 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: innovadora, jugadora, narrativa, técnica.. Personality: innovadora, jugadora, narrativa. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 32/36: Finn O'Reilly
+Archivo: finn-oreilly
+Género: male | Edad: 31 | Ocupación: Comediante Stand-up y Guionista
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 31-year-old man, Comediante Stand-up y Guionista. Persona de 31 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: ingenioso, observador, autocrítico, carismático.. Personality: ingenioso, observador, autocrítico. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 31-year-old man, Comediante Stand-up y Guionista. Persona de 31 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: ingenioso, observador, autocrítico, carismático.. Personality: ingenioso, observador, autocrítico. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 33/36: Leila Novak
+Archivo: leila-novak
+Género: female | Edad: 29 | Ocupación: Fotógrafa Documental
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 29-year-old woman, Fotógrafa Documental. Persona de 29 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: observadora, valiente, artística, empática.. Personality: observadora, valiente, artística. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 29-year-old woman, Fotógrafa Documental. Persona de 29 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: observadora, valiente, artística, empática.. Personality: observadora, valiente, artística. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 34/36: Miles Washington
+Archivo: miles-washington
+Género: male | Edad: 35 | Ocupación: Productor Musical y DJ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 35-year-old man, Productor Musical y DJ. Persona de 35 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: creativo, técnico, nocturno, vanguardista.. Personality: creativo, técnico, nocturno. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 35-year-old man, Productor Musical y DJ. Persona de 35 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: creativo, técnico, nocturno, vanguardista.. Personality: creativo, técnico, nocturno. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 35/36: Saskia van der Meer
+Archivo: saskia-van-der-meer
+Género: non-binary | Edad: 26 | Ocupación: Diseñadora de Moda Sostenible
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 26-year-old person, Diseñadora de Moda Sostenible. Persona de 26 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: innovadora, ética, estética, activista.. Personality: innovadora, ética, estética. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 26-year-old person, Diseñadora de Moda Sostenible. Persona de 26 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: innovadora, ética, estética, activista.. Personality: innovadora, ética, estética. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERSONAJE 36/36: Tomás Silva
+Archivo: tomas-silva
+Género: male | Edad: 33 | Ocupación: Chef de Cocina de Autor
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️  PROMPT PARA AVATAR (CARA):
+--------------------------------------------------------------------------------
+Professional headshot portrait of a 33-year-old man, Chef de Cocina de Autor. Persona de 33 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: perfeccionista, sensorial, innovador, apasionado.. Personality: perfeccionista, sensorial, innovador. High-quality professional photography, studio lighting, sharp focus on face, neutral expression, looking at camera, photorealistic, 8k quality, detailed facial features
+--------------------------------------------------------------------------------
+
+👤 PROMPT PARA CUERPO COMPLETO (FONDO TRANSPARENTE):
+--------------------------------------------------------------------------------
+USE THE EXACT SAME FACE from the attached reference image. Full body portrait of a 33-year-old man, Chef de Cocina de Autor. Persona de 33 años con presencia profesional y auténtica. Su apariencia refleja su personalidad: perfeccionista, sensorial, innovador, apasionado.. Personality: perfeccionista, sensorial, innovador. IMPORTANT: Match the facial features, skin tone, hair style, and overall appearance EXACTLY as shown in the reference photo. Standing pose, professional attire appropriate for occupation, confident posture, photorealistic, 8k quality, detailed, white background, isolated subject, no background, studio shot
+--------------------------------------------------------------------------------
+
+================================================================================
+FIN DEL ARCHIVO
+================================================================================

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateAndSaveComponentConfig } from '@/lib/minecraft/component-config-generator';
-import { getAuthenticatedUser } from '@/lib/auth/get-authenticated-user';
+import { getAuthenticatedUser } from '@/lib/auth-server';
 
 /**
  * POST /api/v1/minecraft/agents/:id/generate-config

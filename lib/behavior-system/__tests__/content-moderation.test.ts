@@ -224,7 +224,8 @@ describe("NSFWGatingManager", () => {
     });
 
     it("bloquea fase 7+ de Yandere en SFW mode", () => {
-      const result = gating.verifyContent("YANDERE_OBSESSIVE", 7, false, testAgentId);
+      // Pass isAdult=true but SFW mode, should still block due to SFW
+      const result = gating.verifyContent("YANDERE_OBSESSIVE", 7, false, testAgentId, true);
 
       expect(result.allowed).toBe(false);
       expect(result.reason).toContain("bloqueado");
@@ -232,13 +233,15 @@ describe("NSFWGatingManager", () => {
     });
 
     it("permite fase 7 en NSFW mode", () => {
-      const result = gating.verifyContent("YANDERE_OBSESSIVE", 7, true, testAgentId);
+      // Pass isAdult=true for NSFW mode
+      const result = gating.verifyContent("YANDERE_OBSESSIVE", 7, true, testAgentId, true);
 
       expect(result.allowed).toBe(true);
     });
 
     it("requiere consentimiento para fase 8 en NSFW", () => {
-      const result = gating.verifyContent("YANDERE_OBSESSIVE", 8, true, testAgentId);
+      // Pass isAdult=true for NSFW mode
+      const result = gating.verifyContent("YANDERE_OBSESSIVE", 8, true, testAgentId, true);
 
       expect(result.allowed).toBe(false);
       expect(result.requiresConsent).toBe(true);
@@ -247,7 +250,8 @@ describe("NSFWGatingManager", () => {
     });
 
     it("bloquea HYPERSEXUALITY en SFW mode", () => {
-      const result = gating.verifyContent("HYPERSEXUALITY", 1, false, testAgentId);
+      // Pass isAdult=true but SFW mode, should still block due to SFW
+      const result = gating.verifyContent("HYPERSEXUALITY", 1, false, testAgentId, true);
 
       expect(result.allowed).toBe(false);
       expect(result.reason).toContain("bloqueado");
@@ -257,7 +261,8 @@ describe("NSFWGatingManager", () => {
       // Grant consent primero
       gating.grantConsent(testAgentId, "HYPERSEXUALITY_phase_1");
 
-      const result = gating.verifyContent("HYPERSEXUALITY", 1, true, testAgentId);
+      // Pass isAdult=true for NSFW mode
+      const result = gating.verifyContent("HYPERSEXUALITY", 1, true, testAgentId, true);
 
       expect(result.allowed).toBe(true);
     });
@@ -505,8 +510,8 @@ describe("Integration Tests", () => {
     const gating = new NSFWGatingManager();
     const agentId = "test-agent-nsfw";
 
-    // 1. Intentar acceder a Fase 8 sin consentimiento (NSFW mode)
-    let verification = gating.verifyContent("YANDERE_OBSESSIVE", 8, true, agentId);
+    // 1. Intentar acceder a Fase 8 sin consentimiento (NSFW mode, adult user)
+    let verification = gating.verifyContent("YANDERE_OBSESSIVE", 8, true, agentId, true);
     expect(verification.allowed).toBe(false);
     expect(verification.requiresConsent).toBe(true);
 
@@ -514,7 +519,7 @@ describe("Integration Tests", () => {
     gating.grantConsent(agentId, "YANDERE_OBSESSIVE_phase_8");
 
     // 3. Ahora puede acceder
-    verification = gating.verifyContent("YANDERE_OBSESSIVE", 8, true, agentId);
+    verification = gating.verifyContent("YANDERE_OBSESSIVE", 8, true, agentId, true);
     expect(verification.allowed).toBe(true);
   });
 });

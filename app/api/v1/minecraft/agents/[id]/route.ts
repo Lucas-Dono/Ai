@@ -131,10 +131,10 @@ export async function GET(
           stability: 0.5,
         },
         currentState: {
-          mood: agent.InternalState?.currentMood || "neutral",
+          mood: "neutral",
           arousal: agent.InternalState?.moodArousal || 0.5,
           dominance: agent.InternalState?.moodDominance || 0.5,
-          pleasure: agent.InternalState?.moodPleasure || 0.5,
+          pleasure: agent.InternalState?.moodValence || 0.5,
         },
         isActive: true, // Simplificado
       },

@@ -456,6 +456,18 @@ async function main() {
         const content = fs.readFileSync(filePath, 'utf-8');
         const character = JSON.parse(content);
 
+        // Verificar si existen las imágenes necesarias
+        const slug = file.replace('.json', '');
+        const publicDir = path.join(__dirname, '..', 'public', 'personajes', slug);
+        const avatarPath = path.join(publicDir, 'avatar.webp');
+        const referencePath = path.join(publicDir, 'reference.webp');
+
+        // Solo cargar personajes que tengan al menos el avatar
+        if (!fs.existsSync(avatarPath)) {
+          console.log(`   ⏭️  ${character.name} (sin imagen de avatar, saltando)`);
+          continue;
+        }
+
         // Verificar si ya existe
         const existing = await prisma.agent.findUnique({
           where: { id: character.id }
@@ -480,7 +492,9 @@ async function main() {
               nsfwLevel: character.nsfwLevel,
               personalityVariant: character.personalityVariant || 'balanced',
               avatar: character.avatar,
-              referenceImageUrl: character.avatar,
+              referenceImageUrl: fs.existsSync(referencePath)
+                ? `/personajes/${slug}/reference.webp`
+                : character.avatar, // Usar avatar si no hay reference
               tags: character.tags || [],
               featured: character.isPremium || true,
               profile: character.profile,
@@ -491,7 +505,7 @@ async function main() {
             }
           });
 
-          console.log(`   ✅ ${character.name}`);
+          console.log(`   ✅ ${character.name}${!fs.existsSync(referencePath) ? ' (sin imagen de cuerpo completo)' : ''}`);
           premiumCount++;
         } else {
           console.log(`   ⏭️  ${character.name} (ya existe)`);

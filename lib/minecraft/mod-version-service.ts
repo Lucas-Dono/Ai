@@ -5,7 +5,7 @@
  * desde Cloudflare R2/S3, con verificación SHA-256 y tracking de descargas.
  */
 
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '@/lib/prisma';
 import { storageService } from '@/lib/storage/cloud-storage';
 import crypto from 'crypto';
 
@@ -261,15 +261,15 @@ export class ModVersionService {
       orderBy: { releaseDate: 'desc' },
     });
 
-    const totalDownloads = versions.reduce((sum, v) => sum + v.downloadCount, 0);
-    const latest = versions.find((v) => v.isLatest);
+    const totalDownloads = versions.reduce((sum: number, v: { downloadCount: number }) => sum + v.downloadCount, 0);
+    const latest = versions.find((v: { isLatest: boolean }) => v.isLatest);
 
     return {
       totalVersions: versions.length,
       totalDownloads,
       latestVersion: latest?.version,
       latestDownloads: latest?.downloadCount || 0,
-      versions: versions.map((v) => ({
+      versions: versions.map((v: { version: string; downloadCount: number; releaseDate: Date; isLatest: boolean }) => ({
         version: v.version,
         downloads: v.downloadCount,
         releaseDate: v.releaseDate,

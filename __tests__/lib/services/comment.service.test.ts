@@ -20,7 +20,7 @@ describe('CommentService', () => {
         authorId: 'user-1',
         content: 'Test comment',
         isByOP: false,
-        author: { id: 'user-1', name: 'Test User', image: null },
+        User: { id: 'user-1', name: 'Test User', image: null },
       };
 
       mockPrismaClient.communityPost.findUnique = vi.fn().mockResolvedValue({
@@ -88,7 +88,7 @@ describe('CommentService', () => {
         authorId: 'user-2',
         isLocked: false,
         communityId: 'community-1',
-        community: { id: 'community-1' },
+        Community: { id: 'community-1' },
       });
       mockPrismaClient.communityMember.findUnique = vi.fn().mockResolvedValue({
         canComment: true,
@@ -182,12 +182,16 @@ describe('CommentService', () => {
         {
           id: 'comment-1',
           score: 100,
-          author: { id: 'user-1', name: 'User', image: null },
+          User: { id: 'user-1', name: 'User', image: null },
+          _count: { other_CommunityComment: 0 },
+          CommentVote: [],
         },
         {
           id: 'comment-2',
           score: 50,
-          author: { id: 'user-2', name: 'User2', image: null },
+          User: { id: 'user-2', name: 'User2', image: null },
+          _count: { other_CommunityComment: 0 },
+          CommentVote: [],
         },
       ];
 
@@ -208,7 +212,7 @@ describe('CommentService', () => {
     it('should mark comment as accepted by post author', async () => {
       mockPrismaClient.communityComment.findUnique = vi.fn().mockResolvedValue({
         id: 'comment-1',
-        post: { id: 'post-1', authorId: 'user-1' },
+        CommunityPost: { id: 'post-1', authorId: 'user-1' },
       });
       mockPrismaClient.communityComment.update = vi.fn().mockResolvedValue({});
 
@@ -225,7 +229,7 @@ describe('CommentService', () => {
     it('should throw error if not post author', async () => {
       mockPrismaClient.communityComment.findUnique = vi.fn().mockResolvedValue({
         id: 'comment-1',
-        post: { id: 'post-1', authorId: 'user-2' },
+        CommunityPost: { id: 'post-1', authorId: 'user-2' },
       });
 
       await expect(CommentService.markAsAcceptedAnswer('comment-1', 'user-1')).rejects.toThrow(
@@ -240,7 +244,7 @@ describe('CommentService', () => {
         id: 'comment-1',
         authorId: 'user-1',
         postId: 'post-1',
-        post: { communityId: null },
+        CommunityPost: { communityId: null },
       });
       mockPrismaClient.communityComment.update = vi.fn().mockResolvedValue({});
       mockPrismaClient.communityPost.update = vi.fn().mockResolvedValue({});

@@ -122,18 +122,12 @@ export async function POST(
       agentId,
       content: message,
       metadata: minecraftMetadata,
-      // Configuración específica para Minecraft
-      options: {
-        maxResponseLength: 200, // Minecraft chat tiene límite de caracteres
-        preferShortResponses: true,
-        includeEmotionalContext: true, // Para animaciones
-        includeActionSuggestions: true, // Para movimiento/gestos
-      },
+      userPlan: user.plan,
     });
 
     // Track usage (tokens usados en el procesamiento)
-    if (result.usage?.totalTokens) {
-      await trackUsage(user.id, 'message', result.usage.totalTokens);
+    if (result.usage?.tokensUsed) {
+      await trackUsage(user.id, 'message', result.usage.tokensUsed);
     }
 
     // Obtener el mensaje completo de la BD para desencriptar
@@ -172,12 +166,11 @@ export async function POST(
       action: determineAction(result, { ...context, timeOfDay: normalizedTimeOfDay }),
       relationship: {
         stage: result.relationship?.stage,
-        trust: result.relationship?.trust,
-        affinity: result.relationship?.affinity,
+        trust: result.state?.trust,
+        affinity: result.state?.affinity,
       },
       metadata: {
-        processingTime: result.metadata?.processingTime,
-        tokensUsed: result.usage?.totalTokens,
+        tokensUsed: result.usage?.tokensUsed,
       },
     };
 

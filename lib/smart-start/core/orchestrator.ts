@@ -22,6 +22,7 @@ import { getValidationService } from '../services/validation-service';
 import { PromptBuilder } from '../prompts/generator';
 import { nanoid } from 'nanoid';
 import { getDescriptionBasedGenerator, type GenerationOptions } from '../services/description-based-generator';
+import { getInitialImageGenerationService } from '../services/initial-image-generation.service';
 
 const prisma = new PrismaClient();
 
@@ -418,6 +419,7 @@ export class SmartStartOrchestrator {
       archetypeHint?: ArchetypeId;
       era?: string;
       nsfwLevel?: 'sfw' | 'romantic' | 'suggestive' | 'explicit';
+      uploadedAvatarUrl?: string; // User-uploaded avatar URL
     }
   ): Promise<CharacterDraft> {
     const session = await prisma.smartStartSession.findUnique({
@@ -455,6 +457,53 @@ export class SmartStartOrchestrator {
       console.warn('[Orchestrator] Originality warnings:', result.warnings);
     }
 
+    // Generate character images
+    console.log('[Orchestrator] Generating character images...');
+    const imageGenerator = getInitialImageGenerationService();
+
+    let avatarUrl: string | undefined;
+    let referenceImageUrl: string | undefined;
+
+    try {
+      // Determine if we should use uploaded avatar or generate
+      if (options?.uploadedAvatarUrl) {
+        console.log('[Orchestrator] Using uploaded avatar:', options.uploadedAvatarUrl);
+        avatarUrl = options.uploadedAvatarUrl;
+
+        // Generate only full-body reference image
+        referenceImageUrl = await imageGenerator.generateFullBodyOnly({
+          name: result.draft.name || 'Character',
+          gender: result.draft.gender || 'Other',
+          physicalAppearance: result.draft.physicalAppearance,
+          age: result.draft.age,
+          personality: result.draft.personality,
+          style: 'realistic',
+          userTier,
+        });
+      } else {
+        // Generate both images with AI
+        console.log('[Orchestrator] Generating both images with AI...');
+        const imageResult = await imageGenerator.generateBothImages({
+          name: result.draft.name || 'Character',
+          gender: result.draft.gender || 'Other',
+          physicalAppearance: result.draft.physicalAppearance,
+          age: result.draft.age,
+          personality: result.draft.personality,
+          style: 'realistic',
+          userTier,
+        });
+
+        avatarUrl = imageResult.avatarUrl;
+        referenceImageUrl = imageResult.referenceImageUrl;
+
+        console.log('[Orchestrator] ✅ Images generated in', imageResult.metadata.generationTime, 'seconds');
+      }
+    } catch (imageError) {
+      console.error('[Orchestrator] Error generating images:', imageError);
+      // Continue without images - don't fail the entire generation
+      console.warn('[Orchestrator] Continuing without images');
+    }
+
     // Generate system prompt from the draft
     const genre = options?.genreHint ? this.genreService.getGenre(options.genreHint) : null;
     const archetype = null; // Skip archetype for now as we don't have subgenre
@@ -467,10 +516,12 @@ export class SmartStartOrchestrator {
       appearance: result.draft.physicalAppearance,
     });
 
-    // Enhance draft with system prompt and metadata
+    // Enhance draft with system prompt, metadata, and images
     const enhancedDraft: CharacterDraft = {
       ...result.draft,
       systemPrompt,
+      avatar: avatarUrl, // Add avatar URL
+      referenceImage: referenceImageUrl, // Add reference image URL
       genreId: options?.genreHint,
       archetypeId: options?.archetypeHint,
       aiGeneratedFields: [
@@ -484,6 +535,8 @@ export class SmartStartOrchestrator {
         'communicationStyle',
         'catchphrases',
         'systemPrompt',
+        ...(avatarUrl && !options?.uploadedAvatarUrl ? ['avatar'] : []),
+        ...(referenceImageUrl ? ['referenceImage'] : []),
       ],
       userEditedFields: [],
     };

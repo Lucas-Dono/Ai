@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getAuthenticatedUser } from '@/lib/auth/session';
+import { getAuthenticatedUser } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
-import { formatZodError } from '@/lib/utils/validation';
+import { formatZodError } from '@/lib/validation/schemas';
 
 /**
  * POST /api/v1/minecraft/agents/[id]/sync
@@ -53,27 +53,29 @@ const syncSchema = z.object({
       'item_given',
       'item_taken',
     ]),
-    data: z.record(z.any()).optional(),
+    data: z.record(z.string(), z.any()).optional(),
     timestamp: z.number().optional(),
   })).optional(),
 });
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: agentId } = await params;
+
     const user = await getAuthenticatedUser(req);
     if (!user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    const agentId = params.id;
     const body = await req.json();
     const validation = syncSchema.safeParse(body);
 
     if (!validation.success) {
-      return formatZodError(validation.error);
+      const error = formatZodError(validation.error);
+      return NextResponse.json(error, { status: 400 });
     }
 
     const { position, activity, health, hunger, nearbyPlayers, events } = validation.data;
@@ -82,8 +84,8 @@ export async function POST(
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        internalState: true,
-        relation: {
+        InternalState: true,
+        Relation: {
           where: { targetId: user.id },
         },
       },
@@ -125,8 +127,8 @@ export async function POST(
     });
 
     // Retornar estado actualizado del agente
-    const currentEmotion = agent.internalState?.currentEmotions as any;
-    const relationship = agent.relation[0];
+    const currentEmotion = agent.InternalState?.currentEmotions as any;
+    const relationship = agent.Relation[0];
 
     return NextResponse.json({
       success: true,
@@ -143,7 +145,11 @@ export async function POST(
               stage: relationship.stage,
             }
           : null,
-        mood: agent.internalState?.mood || { pleasure: 0, arousal: 0, dominance: 0 },
+        mood: agent.InternalState ? {
+          pleasure: agent.InternalState.moodValence,
+          arousal: agent.InternalState.moodArousal,
+          dominance: agent.InternalState.moodDominance,
+        } : { pleasure: 0, arousal: 0, dominance: 0 },
         // Sugerencias de comportamiento basadas en estado
         suggestions: generateBehaviorSuggestions(agent, { health, hunger, activity }),
       },
@@ -227,12 +233,15 @@ async function recordEpisodicMemory(agentId: string, data: any) {
   try {
     await prisma.episodicMemory.create({
       data: {
+        id: `mem_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         agentId,
-        content: data.content,
+        event: data.content,
         importance: data.importance || 0.5,
         emotionalValence: data.emotionalValence || 0,
-        tags: data.tags || [],
-        timestamp: new Date(),
+        metadata: {
+          tags: data.tags || [],
+          source: 'minecraft',
+        },
       },
     });
   } catch (error) {
@@ -263,7 +272,7 @@ function generateBehaviorSuggestions(agent: any, state: any) {
   }
 
   // Relación con jugador
-  const relationship = agent.relation[0];
+  const relationship = agent.Relation?.[0];
   if (relationship && relationship.trust > 0.7) {
     suggestions.push('stay_near_player');
   }

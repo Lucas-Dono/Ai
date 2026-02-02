@@ -21,7 +21,7 @@ describe('MarketplaceCharacterService', () => {
         category: 'anime',
         authorId: 'user-1',
         status: 'pending',
-        author: { id: 'user-1', name: 'Author', image: null },
+        User: { id: 'user-1', name: 'Author', image: null },
       };
 
       mockPrismaClient.marketplaceCharacter.create = vi.fn().mockResolvedValue(mockCharacter);
@@ -52,8 +52,8 @@ describe('MarketplaceCharacterService', () => {
       mockPrismaClient.marketplaceCharacter.findUnique = vi
         .fn()
         .mockResolvedValueOnce(mockCharacter)
-        .mockResolvedValueOnce({ ...mockCharacter, author: { id: 'user-2', name: 'Author' } });
-      mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue(null);
+        .mockResolvedValueOnce({ ...mockCharacter, User: { id: 'user-2', name: 'Author', image: null } });
+      mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue(null);
       mockPrismaClient.characterDownload.create = vi.fn().mockResolvedValue({});
       mockPrismaClient.marketplaceCharacter.update = vi.fn().mockResolvedValue({});
 
@@ -72,7 +72,7 @@ describe('MarketplaceCharacterService', () => {
         .fn()
         .mockResolvedValueOnce({ id: 'char-1', status: 'approved' })
         .mockResolvedValueOnce({ id: 'char-1', status: 'approved' });
-      mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue({
+      mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue({
         id: 'download-1',
       });
 
@@ -95,13 +95,12 @@ describe('MarketplaceCharacterService', () => {
 
   describe('rateCharacter', () => {
     it('should rate character after downloading', async () => {
-      mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue({
+      mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue({
         id: 'download-1',
       });
       mockPrismaClient.characterRating.upsert = vi.fn().mockResolvedValue({
         id: 'rating-1',
         rating: 5,
-        user: { id: 'user-1', name: 'User', image: null },
       });
       mockPrismaClient.characterRating.aggregate = vi.fn().mockResolvedValue({
         _avg: { rating: 4.5 },
@@ -120,7 +119,7 @@ describe('MarketplaceCharacterService', () => {
       expect(mockPrismaClient.marketplaceCharacter.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            averageRating: 4.5,
+            rating: 4.5,
             ratingCount: 10,
           }),
         })
@@ -128,7 +127,7 @@ describe('MarketplaceCharacterService', () => {
     });
 
     it('should throw error if not downloaded', async () => {
-      mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue(null);
+      mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue(null);
 
       await expect(
         MarketplaceCharacterService.rateCharacter('char-1', 'user-1', 5)
@@ -136,7 +135,7 @@ describe('MarketplaceCharacterService', () => {
     });
 
     it('should validate rating range', async () => {
-      mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue({});
+      mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue({});
 
       await expect(
         MarketplaceCharacterService.rateCharacter('char-1', 'user-1', 6)
@@ -155,7 +154,7 @@ describe('MarketplaceCharacterService', () => {
           id: 'char-1',
           name: 'Character 1',
           status: 'approved',
-          author: { id: 'user-1', name: 'Author', image: null },
+          User: { id: 'user-1', name: 'Author', image: null },
         },
       ];
 
@@ -252,13 +251,14 @@ describe('MarketplaceCharacterService', () => {
         personality: 'friendly',
         systemPrompt: 'You are helpful',
         status: 'approved',
+        User: { id: 'user-2', name: 'Author', image: null },
       };
 
       mockPrismaClient.marketplaceCharacter.findUnique = vi
         .fn()
         .mockResolvedValueOnce(mockCharacter)
         .mockResolvedValueOnce(mockCharacter);
-      mockPrismaClient.characterDownload.findUnique = vi.fn().mockResolvedValue(null);
+      mockPrismaClient.characterDownload.findFirst = vi.fn().mockResolvedValue(null);
       mockPrismaClient.characterDownload.create = vi.fn().mockResolvedValue({});
       mockPrismaClient.marketplaceCharacter.update = vi.fn().mockResolvedValue({});
       mockPrismaClient.agent.create = vi.fn().mockResolvedValue({

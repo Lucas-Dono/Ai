@@ -140,13 +140,13 @@ export async function createCharacter(
         await prisma.agent.update({
           where: { id: agent.id },
           data: {
-            metadata: {
+            metadata: JSON.parse(JSON.stringify({
               minecraft: {
                 compatible: true,
                 skinTraits: minecraftSkinTraits,
                 generatedAt: new Date().toISOString(),
               },
-            },
+            })),
           },
         });
 

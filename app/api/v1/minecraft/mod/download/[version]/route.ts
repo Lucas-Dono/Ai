@@ -16,10 +16,10 @@ import { ModVersionService } from '@/lib/minecraft/mod-version-service';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { version: string } }
+  { params }: { params: Promise<{ version: string }> }
 ) {
   try {
-    const { version } = params;
+    const { version } = await params;
 
     if (!version) {
       return NextResponse.json(
@@ -51,7 +51,7 @@ export async function GET(
     console.log(`[Mod Download] Serving version ${version} (${fileBuffer.length} bytes)`);
 
     // Retornar archivo con headers apropiados
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/java-archive',

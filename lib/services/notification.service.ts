@@ -7,7 +7,8 @@ import { prisma } from '@/lib/prisma';
 import { PushNotificationServerService } from './push-notification-server.service';
 
 export interface CreateNotificationData {
-  userId: string;
+  recipientId?: string; // For new code
+  userId?: string; // Legacy support - maps to recipientId
   type: string;
   title: string;
   message: string;
@@ -20,10 +21,16 @@ export const NotificationService = {
    * Crear notificación
    */
   async createNotification(data: CreateNotificationData) {
+    // Support both recipientId and userId (legacy)
+    const recipientId = data.recipientId || data.userId;
+    if (!recipientId) {
+      throw new Error('recipientId or userId is required');
+    }
+
     const notification = await prisma.notification.create({
       data: {
         id: nanoid(),
-        recipientId: data.userId,
+        recipientId: recipientId,
         type: data.type,
         title: data.title,
         message: data.message,

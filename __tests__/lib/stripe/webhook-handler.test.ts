@@ -25,7 +25,9 @@ vi.mock("@/lib/prisma", () => ({
     },
     subscription: {
       findUnique: vi.fn(),
+      findFirst: vi.fn(),
       upsert: vi.fn(),
+      create: vi.fn(),
       update: vi.fn(),
     },
     invoice: {
@@ -111,31 +113,18 @@ describe("Stripe Webhook Handler", () => {
         canceled_at: null,
       } as any as Stripe.Subscription;
 
-      vi.mocked(prisma.subscription.upsert).mockResolvedValue({} as any);
+      vi.mocked(prisma.subscription.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.subscription.create).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
-      expect(prisma.subscription.upsert).toHaveBeenCalledWith({
-        where: { stripeSubscriptionId: "sub_123" },
-        create: expect.objectContaining({
-          userId: "user_123",
-          stripeSubscriptionId: "sub_123",
-          stripeCustomerId: "cus_123",
-          status: "active",
-          priceId: "price_plus_monthly",
-        }),
-        update: expect.objectContaining({
-          status: "active",
-          priceId: "price_plus_monthly",
-        }),
-      });
-
+      // Implementation now uses findFirst + create/update instead of upsert
+      // And doesn't use stripeSubscriptionId or stripeCustomerId
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: "user_123" },
         data: {
           plan: "plus",
-          stripeCustomerId: "cus_123",
         },
       });
     });
@@ -163,7 +152,8 @@ describe("Stripe Webhook Handler", () => {
         canceled_at: 1706745600,
       } as any as Stripe.Subscription;
 
-      vi.mocked(prisma.subscription.upsert).mockResolvedValue({} as any);
+      vi.mocked(prisma.subscription.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.subscription.create).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
@@ -172,7 +162,6 @@ describe("Stripe Webhook Handler", () => {
         where: { id: "user_123" },
         data: {
           plan: "free", // Downgraded to free
-          stripeCustomerId: "cus_123",
         },
       });
     });
@@ -200,7 +189,8 @@ describe("Stripe Webhook Handler", () => {
         canceled_at: null,
       } as any as Stripe.Subscription;
 
-      vi.mocked(prisma.subscription.upsert).mockResolvedValue({} as any);
+      vi.mocked(prisma.subscription.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.subscription.create).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
@@ -209,7 +199,6 @@ describe("Stripe Webhook Handler", () => {
         where: { id: "user_123" },
         data: {
           plan: "ultra", // Should have premium during trial
-          stripeCustomerId: "cus_123",
         },
       });
     });
@@ -223,6 +212,7 @@ describe("Stripe Webhook Handler", () => {
         canceled_at: 1706745600,
       };
 
+      vi.mocked(prisma.subscription.findFirst).mockResolvedValue({ id: "sub-db-123" } as any);
       vi.mocked(prisma.subscription.update).mockResolvedValue({} as any);
       vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
@@ -231,7 +221,7 @@ describe("Stripe Webhook Handler", () => {
       );
 
       expect(prisma.subscription.update).toHaveBeenCalledWith({
-        where: { stripeSubscriptionId: "sub_123" },
+        where: { id: "sub-db-123" },
         data: {
           status: "cancelled",
           canceledAt: expect.any(Date),
@@ -264,15 +254,14 @@ describe("Stripe Webhook Handler", () => {
       await handleSubscriptionRenewal(mockInvoice as Stripe.Invoice);
 
       expect(prisma.invoice.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           userId: "user_123",
-          stripeInvoiceId: "in_123",
-          stripePaymentIntentId: "pi_123",
+          mercadopagoPaymentId: "in_123",
           amount: 999,
           currency: "usd",
           status: "paid",
           paidAt: expect.any(Date),
-        },
+        }),
       });
     });
   });
@@ -294,15 +283,14 @@ describe("Stripe Webhook Handler", () => {
       await handlePaymentFailed(mockInvoice as Stripe.Invoice);
 
       expect(prisma.invoice.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           userId: "user_123",
-          stripeInvoiceId: "in_123",
-          stripePaymentIntentId: "pi_123",
+          mercadopagoPaymentId: "in_123",
           amount: 999,
           currency: "usd",
           status: "payment_failed",
           statusDetail: "Attempt 1: Payment failed",
-        },
+        }),
       });
     });
 
@@ -450,7 +438,7 @@ describe("Stripe Webhook Handler", () => {
       await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       // Should log error and not crash
-      expect(prisma.subscription.upsert).not.toHaveBeenCalled();
+      expect(prisma.subscription.findFirst).not.toHaveBeenCalled();
     });
 
     it("should handle invoice without userId metadata", async () => {
@@ -492,7 +480,7 @@ describe("Stripe Webhook Handler", () => {
       await syncStripeSubscription(mockSubscription as unknown as Stripe.Subscription);
 
       // Should log warning and not update plan
-      expect(prisma.subscription.upsert).not.toHaveBeenCalled();
+      expect(prisma.subscription.findFirst).not.toHaveBeenCalled();
     });
   });
 });

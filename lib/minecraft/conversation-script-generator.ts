@@ -16,7 +16,7 @@ import {
   ConversationTemplate,
 } from "./conversation-script-types";
 
-const log = createLogger({ module: "ConversationScriptGenerator" });
+const log = createLogger("ConversationScriptGenerator");
 
 /**
  * Templates de conversaciones pre-definidas
@@ -239,7 +239,7 @@ export class ConversationScriptGenerator {
     const cached = this.scriptCache.get(cacheKey);
 
     if (cached && !options.forceAI) {
-      log.info("Using cached script", { scriptId: cached.scriptId, topic: conversationTopic });
+      log.info({ scriptId: cached.scriptId, topic: conversationTopic }, "Using cached script");
       return {
         script: cached,
         cached: true,
@@ -253,10 +253,10 @@ export class ConversationScriptGenerator {
       const templateScript = this.generateFromTemplate(participants, location, contextHint);
 
       if (templateScript) {
-        log.info("Using template script", {
+        log.info({
           scriptId: templateScript.scriptId,
           topic: templateScript.topic,
-        });
+        }, "Using template script");
 
         // Cachear
         this.scriptCache.set(cacheKey, templateScript);
@@ -271,7 +271,7 @@ export class ConversationScriptGenerator {
     }
 
     // Generar con IA (más costoso pero personalizado)
-    log.info("Generating AI script", { topic: conversationTopic, participants: participants.length });
+    log.info({ topic: conversationTopic, participants: participants.length }, "Generating AI script");
 
     const aiScript = await this.generateWithAI(
       participants,
@@ -411,11 +411,10 @@ Formato JSON:
       }>(systemPrompt, userPrompt, {
         model: RECOMMENDED_MODELS.AMBIENT_DIALOGUE, // Qwen 3 4B
         temperature: 0.85,
-        maxTokens: 600, // Guiones más largos
       });
 
       // Enriquecer con información de participantes
-      const lines: DialogueLine[] = response.data.lines.map((line, index) => {
+      const lines: DialogueLine[] = response.lines.map((line: { agentId: string; message: string; phase: ConversationPhase }, index: number) => {
         const participant = participants.find((p) => p.agentId === line.agentId);
 
         return {
@@ -427,7 +426,7 @@ Formato JSON:
         };
       });
 
-      const totalTokens = response.usage?.total_tokens || 0;
+      const totalTokens = 0; // generateJSON doesn't return usage
       const cost = (totalTokens * 0.15) / 1_000_000; // $0.15 por millón tokens
 
       const now = new Date();
@@ -445,12 +444,12 @@ Formato JSON:
         generatedBy: "ai",
       };
 
-      log.info("AI script generated", {
+      log.info({
         scriptId: script.scriptId,
         lines: lines.length,
         tokens: totalTokens,
         cost,
-      });
+      }, "AI script generated");
 
       return {
         script,
@@ -459,7 +458,7 @@ Formato JSON:
         source: "ai",
       };
     } catch (error) {
-      log.error("Failed to generate AI script", { error });
+      log.error({ error }, "Failed to generate AI script");
 
       // Fallback: usar template
       const fallbackScript = this.generateFromTemplate(participants, location, contextHint);
@@ -504,10 +503,10 @@ Formato JSON:
     existingScript: ConversationScript,
     options?: Partial<ScriptGenerationOptions>
   ): Promise<ScriptGenerationResult> {
-    log.info("Regenerating script", {
+    log.info({
       scriptId: existingScript.scriptId,
       currentVersion: existingScript.version,
-    });
+    }, "Regenerating script");
 
     // Generar nuevo script
     const result = await this.generateScript({
@@ -532,11 +531,11 @@ Formato JSON:
     );
     this.scriptCache.set(cacheKey, result.script);
 
-    log.info("Script regenerated", {
+    log.info({
       scriptId: result.script.scriptId,
       newVersion: result.script.version,
       source: result.source,
-    });
+    }, "Script regenerated");
 
     return result;
   }
@@ -550,12 +549,12 @@ Formato JSON:
       if (script.scriptId === scriptId) {
         script.version++;
         script.updatedAt = new Date();
-        log.info("Script invalidated", { scriptId, newVersion: script.version });
+        log.info({ scriptId, newVersion: script.version }, "Script invalidated");
         return;
       }
     }
 
-    log.warn("Script not found for invalidation", { scriptId });
+    log.warn({ scriptId }, "Script not found for invalidation");
   }
 
   /**

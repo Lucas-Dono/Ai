@@ -18,10 +18,11 @@ describe('MessagingService', () => {
         id: 'conv-1',
         type: 'direct',
         participants: ['user-1', 'user-2'],
-        messages: [],
+        DirectMessage: [],
       };
 
-      mockPrismaClient.directConversation.findFirst = vi.fn().mockResolvedValue(mockConversation);
+      // Service uses findMany + filter, not findFirst
+      mockPrismaClient.directConversation.findMany = vi.fn().mockResolvedValue([mockConversation]);
 
       const result = await MessagingService.getOrCreateConversation('user-1', ['user-2']);
 
@@ -34,10 +35,11 @@ describe('MessagingService', () => {
         id: 'conv-1',
         type: 'direct',
         participants: ['user-1', 'user-2'],
-        messages: [],
+        DirectMessage: [],
       };
 
-      mockPrismaClient.directConversation.findFirst = vi.fn().mockResolvedValue(null);
+      // Service uses findMany + filter, not findFirst
+      mockPrismaClient.directConversation.findMany = vi.fn().mockResolvedValue([]);
       mockPrismaClient.directConversation.create = vi.fn().mockResolvedValue(mockConversation);
 
       const result = await MessagingService.getOrCreateConversation('user-1', ['user-2']);
@@ -51,7 +53,7 @@ describe('MessagingService', () => {
         id: 'conv-1',
         type: 'group',
         participants: ['user-1', 'user-2', 'user-3'],
-        messages: [],
+        DirectMessage: [],
       };
 
       mockPrismaClient.directConversation.create = vi.fn().mockResolvedValue(mockConversation);
@@ -194,7 +196,7 @@ describe('MessagingService', () => {
         {
           id: 'conv-1',
           participants: ['user-1', 'user-2'],
-          messages: [{ id: 'msg-1', content: 'Hello' }],
+          DirectMessage: [{ id: 'msg-1', content: 'Hello' }],
         },
       ];
 
@@ -264,11 +266,11 @@ describe('MessagingService', () => {
   describe('searchMessages', () => {
     it('should search messages in user conversations', async () => {
       mockPrismaClient.directConversation.findMany = vi.fn().mockResolvedValue([
-        { id: 'conv-1' },
-        { id: 'conv-2' },
+        { id: 'conv-1', participants: ['user-1', 'user-2'] },
+        { id: 'conv-2', participants: ['user-1', 'user-3'] },
       ]);
       mockPrismaClient.directMessage.findMany = vi.fn().mockResolvedValue([
-        { id: 'msg-1', content: 'Hello world' },
+        { id: 'msg-1', content: 'Hello world', DirectConversation: { id: 'conv-1' } },
       ]);
 
       const result = await MessagingService.searchMessages('user-1', 'hello', 20);

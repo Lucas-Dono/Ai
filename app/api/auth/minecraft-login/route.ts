@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
     const validation = loginSchema.safeParse(body);
 
     if (!validation.success) {
-      return formatZodError(validation.error);
+      const error = formatZodError(validation.error);
+      return NextResponse.json(error, { status: 400 });
     }
 
     const { email, password } = validation.data;

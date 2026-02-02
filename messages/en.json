@@ -3001,6 +3001,37 @@
       "warnings": {
         "similarName": "The generated name is similar to '{name}'. For legal reasons, we recommend using a more original name.",
         "franchiseMention": "The biography mentions '{franchise}'. To avoid copyright issues, avoid direct references to existing franchises."
+      },
+      "avatar": {
+        "title": "Profile Photo (Avatar)",
+        "subtitle": "Choose between uploading your own photo or letting AI generate it",
+        "uploadOption": {
+          "title": "Upload Photo",
+          "button": "Upload Photo",
+          "formats": "PNG, JPG, WEBP, GIF",
+          "maxSize": "Max: 5MB, Min: 256x256px",
+          "selected": "Photo selected"
+        },
+        "generateOption": {
+          "title": "Generate with AI",
+          "button": "Generate with AI",
+          "description": "Based on description",
+          "selected": "✓ Selected (default)",
+          "notSelected": "Generate automatically"
+        },
+        "fullBodyInfo": {
+          "title": "Full body photo",
+          "description": "AI will automatically generate a full body photo based on your description"
+        },
+        "uploading": "Uploading image...",
+        "removeButton": "Remove photo",
+        "errors": {
+          "invalidFormat": "File must be an image (PNG, JPG, WEBP, GIF)",
+          "tooLarge": "Image is too large. Maximum size: 5MB",
+          "tooSmall": "Image too small. Minimum size: 256x256px",
+          "uploadFailed": "Failed to upload image. Please try again.",
+          "processingFailed": "Failed to process image"
+        }
       }
     },
     "characterType": {

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getAuthenticatedUser } from '@/lib/auth/session';
+import { getAuthenticatedUser } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { formatZodError } from '@/lib/utils/validation';
+import { formatZodError } from '@/lib/validation/schemas';
 
 /**
  * Endpoint para decisiones de movimiento/acción usando LLM
@@ -63,20 +63,22 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: agentId } = await params;
+
     const user = await getAuthenticatedUser(req);
     if (!user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    const agentId = params.id;
     const body = await req.json();
     const validation = actionRequestSchema.safeParse(body);
 
     if (!validation.success) {
-      return formatZodError(validation.error);
+      const error = formatZodError(validation.error);
+      return NextResponse.json(error, { status: 400 });
     }
 
     const { situation, context, availableActions } = validation.data;
@@ -85,9 +87,9 @@ export async function POST(
     const agent = await prisma.agent.findUnique({
       where: { id: agentId },
       include: {
-        personalityCore: true,
-        internalState: true,
-        relation: {
+        PersonalityCore: true,
+        InternalState: true,
+        Relation: {
           where: { targetId: user.id },
         },
       },
@@ -138,12 +140,12 @@ function buildActionPrompt(
   context: any,
   availableActions?: string[]
 ): string {
-  const personality = agent.personalityCore?.openness
-    ? `Personalidad: O${agent.personalityCore.openness} C${agent.personalityCore.conscientiousness} E${agent.personalityCore.extraversion} A${agent.personalityCore.agreeableness} N${agent.personalityCore.neuroticism}`
+  const personality = agent.PersonalityCore?.openness
+    ? `Personalidad: O${agent.PersonalityCore.openness} C${agent.PersonalityCore.conscientiousness} E${agent.PersonalityCore.extraversion} A${agent.PersonalityCore.agreeableness} N${agent.PersonalityCore.neuroticism}`
     : 'Personalidad: Balanceada';
 
-  const emotions = agent.internalState?.currentEmotions || { primary: 'neutral' };
-  const relationship = agent.relation[0];
+  const emotions = agent.InternalState?.currentEmotions || { primary: 'neutral' };
+  const relationship = agent.Relation[0];
   const trust = relationship?.trust || 0.5;
 
   const actionsStr = availableActions?.join(', ') || 'move_forward, turn_left, turn_right, idle, follow_player';
