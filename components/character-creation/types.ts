@@ -23,7 +23,8 @@ export interface CharacterDraft {
   };
   coreValues: string[];
   fears: string[];
-  cognitivePrompt: string; // Descripción del pensamiento y comportamiento
+  cognitivePrompt: string; // Descripción del pensamiento y comportamiento (legacy)
+  deepCognitivePatterns?: DeepCognitivePatterns; // Patrones cognitivos profundos
 
   // Moral Alignment (Optional) - Sistema D&D 9 alineamientos
   moralAlignment: {
@@ -100,6 +101,36 @@ export interface PersonalitySnapshot {
 export interface PersonalityEvolution {
   snapshots: PersonalitySnapshot[]; // Ordenados cronológicamente
   currentTrajectory?: string; // Ej: "Recuperación ascendente", "Estable", "Declive"
+}
+
+// Patrón cognitivo profundo
+export interface CognitiveBias {
+  name: string; // Ej: "Sesgo de confirmación", "Efecto Dunning-Kruger"
+  area: string; // En qué área se manifiesta
+  manifestation: string; // Cómo se manifiesta
+  awareness: 'none' | 'low' | 'medium' | 'high'; // Nivel de consciencia del sesgo
+}
+
+// Patrones cognitivos profundos
+export interface DeepCognitivePatterns {
+  decisionMaking: {
+    style: string; // Ej: "Obsesivamente analítico", "Intuitivo rápido"
+    process: string; // Cómo toma decisiones paso a paso
+    weakness?: string; // Debilidad en toma de decisiones
+  };
+  biases: CognitiveBias[]; // 2-4 sesgos cognitivos
+  thoughtSpeed: 'very-slow' | 'slow' | 'moderate' | 'fast' | 'very-fast';
+  internalDialogue?: {
+    type: string; // Ej: "Narrativa en tercera persona", "Auto-crítico constante"
+    example?: string; // Ejemplo de diálogo interno
+    quirk?: string; // Peculiaridad del diálogo interno
+  };
+  processingPreferences: {
+    verbalVsVisual: 'verbal' | 'visual' | 'balanced'; // Verbal vs Visual thinker
+    needsToVerbalize: boolean; // Necesita hablar para pensar
+    reflectionStyle: 'immediate' | 'delayed' | 'avoidant'; // Cómo procesa emociones
+  };
+  memoryQuirks?: string[]; // Peculiaridades de memoria
 }
 
 export interface ImportantPerson {
