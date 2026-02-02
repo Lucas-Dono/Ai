@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import type { CharacterDraft } from './types';
 import { PersonalityRadarChart } from './PersonalityRadarChart';
+import { MoralAlignmentChart } from './MoralAlignmentChart';
+import { SkillBarsChart } from './SkillBarsChart';
 
 /**
  * Modern Dark Character Creator - PersonaArchitect Style
@@ -840,6 +842,14 @@ export function CVStyleCreator() {
                   </div>
                 )}
 
+                {/* Moral Alignment Chart */}
+                {(character.moralAlignment.lawfulness !== 50 ||
+                  character.moralAlignment.morality !== 50) && (
+                  <div className="mt-8">
+                    <MoralAlignmentChart moralAlignment={character.moralAlignment} />
+                  </div>
+                )}
+
                 {/* Valores y Miedos */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -898,12 +908,19 @@ export function CVStyleCreator() {
                       {t('work.skills.label')}
                     </label>
                     <TagInput
-                      tags={character.skills}
+                      tags={character.skills.map(s => s.name)}
                       placeholder={t('work.skills.placeholder')}
-                      onAdd={(tag: string) => addToArray('skills', tag)}
-                      onRemove={(idx: number) => removeFromArray('skills', idx)}
+                      onAdd={(tag: string) => addSkill(tag)}
+                      onRemove={(idx: number) => removeSkill(idx)}
                     />
                   </div>
+
+                  {/* Visualization de Skills */}
+                  {character.skills.length > 0 && (
+                    <div className="mt-6 pt-6 border-t border-slate-800">
+                      <SkillBarsChart skills={character.skills} />
+                    </div>
+                  )}
                   <MagicButton
                     text={t('work.generate')}
                     onClick={() => simulateAIGeneration('work', 1500)}
