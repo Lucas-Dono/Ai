@@ -727,56 +727,6 @@ export class VeniceClient {
     }
   }
 
-  /**
-   * Construye negative prompt robusto y universal
-   *
-   * NO intenta inferir (frágil, solo funciona en español/inglés).
-   * Usa un negative prompt exhaustivo que funciona en CUALQUIER idioma.
-   *
-   * La solución real es:
-   * 1. Negative prompt base muy completo
-   * 2. Usuarios aprenden a usar énfasis en prompt positivo: (keyword:1.3)
-   * 3. El prompt positivo con énfasis tiene suficiente peso
-   */
-  private buildUniversalNegativePrompt(): string {
-    return [
-      // Estilos no deseados
-      'cartoon', 'anime', 'drawing', 'painting', 'sketch', 'illustration',
-      '3d render', 'cgi', 'digital art', 'comic',
-
-      // Calidad
-      'low quality', 'worst quality', 'low resolution', 'lowres',
-      'blurry', 'blurred', 'out of focus', 'fuzzy', 'pixelated',
-      'compressed', 'jpeg artifacts', 'noise', 'grainy',
-
-      // Anatomía
-      'deformed', 'distorted', 'disfigured', 'malformed',
-      'bad anatomy', 'wrong anatomy', 'extra limbs', 'missing limbs',
-      'extra fingers', 'missing fingers', 'extra arms', 'extra legs',
-      'mutated hands', 'bad hands', 'poorly drawn hands',
-      'fused fingers', 'too many fingers', 'long neck',
-      'bad proportions', 'gross proportions',
-
-      // Cara
-      'bad face', 'ugly face', 'deformed face', 'malformed face',
-      'bad eyes', 'crossed eyes', 'lazy eye', 'asymmetric eyes',
-      'cloned face', 'duplicate face',
-
-      // Composición
-      'multiple people', 'two people', 'crowd', 'group',
-      'duplicate', 'cloned', 'cropped head', 'cut off',
-      'out of frame', 'bad framing',
-
-      // Texto y marcas
-      'text', 'watermark', 'signature', 'username', 'logo',
-      'error', 'words', 'letters', 'numbers on image',
-
-      // Otros
-      'mutation', 'mutated', 'poorly drawn', 'ugly',
-      'disgusting', 'gross', 'bad quality',
-      'morbid', 'horror', 'body horror',
-    ].join(', ');
-  }
 
   /**
    * Genera imagen de avatar optimizada para personajes
@@ -787,15 +737,15 @@ export class VeniceClient {
    *
    * Mismo tamaño (1024x1024) para todos - diferencia en calidad del modelo.
    *
-   * Usa negative prompt universal (funciona en cualquier idioma).
-   * La precisión viene del prompt POSITIVO con énfasis: (keyword:1.3)
+   * NO usa negative prompt por defecto (modelos 2025-2026 son buenos sin él).
+   * Los usuarios pueden especificarlo solo si necesitan casos específicos.
    */
   async generateAvatar(params: {
     description: string;
     age?: number;
     gender?: 'male' | 'female' | 'non-binary';
     userTier?: 'free' | 'plus' | 'ultra';
-    negativePrompt?: string; // Opcional - para usuarios avanzados que quieren override
+    negativePrompt?: string; // Opcional - solo para casos específicos donde el usuario lo necesite
   }): Promise<VeniceImageResult> {
     let prompt = `professional portrait photo, ${params.description}`;
 
@@ -814,15 +764,14 @@ export class VeniceClient {
 
     prompt += ', high quality, realistic, detailed face, professional headshot, studio lighting, 8k';
 
-    // Usar negative prompt del usuario SI lo proporciona, sino usar el universal
-    const negativePrompt = params.negativePrompt || this.buildUniversalNegativePrompt();
-
     console.log('[Venice Avatar] Positive prompt:', prompt);
-    console.log('[Venice Avatar] Negative prompt (universal):', negativePrompt.substring(0, 100) + '...');
+    if (params.negativePrompt) {
+      console.log('[Venice Avatar] Negative prompt (user provided):', params.negativePrompt);
+    }
 
     return this.generateImage({
       prompt,
-      negativePrompt,
+      negativePrompt: params.negativePrompt, // undefined si no se provee (modelos modernos no lo necesitan)
       width: 1024,
       height: 1024,
       style: 'natural',
