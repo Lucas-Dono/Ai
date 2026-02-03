@@ -169,7 +169,7 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
     const response = await llm.generate({
       systemPrompt: 'Eres un psicólogo experto en dinámicas familiares y relacionales. Creas redes sociales realistas con profundidad emocional. Respondes siempre con JSON válido.',
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 1500,
+      maxTokens: 15000, // Límite generoso para evitar cortes
       temperature: 0.8,
     });
 

@@ -87,7 +87,7 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
     const response = await llm.generate({
       systemPrompt: 'Eres un experto en desarrollo profesional que crea perfiles de carrera realistas. Respondes siempre con JSON válido.',
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 400,
+      maxTokens: 15000, // Límite generoso para evitar cortes
       temperature: 0.7,
     });
 

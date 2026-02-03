@@ -97,7 +97,7 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
     const response = await llm.generate({
       systemPrompt: 'Eres un biógrafo experto que crea historias de vida coherentes y realistas. Respondes siempre con JSON válido.',
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 600,
+      maxTokens: 15000, // Límite generoso para evitar cortes
       temperature: 0.8,
     });
 

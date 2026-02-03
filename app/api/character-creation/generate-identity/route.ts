@@ -70,7 +70,7 @@ Responde SOLO con el JSON, sin texto adicional.`;
     const response = await llm.generate({
       systemPrompt: 'Eres un generador de datos de personajes realistas. Respondes siempre con JSON válido y datos coherentes.',
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 200,
+      maxTokens: 15000, // Límite generoso para evitar cortes
       temperature: 0.7,
     });
 
