@@ -17,7 +17,8 @@ import { prisma } from '@/lib/prisma';
 import { nanoid } from 'nanoid';
 import { inferFacetsFromBigFive } from '@/lib/psychological-analysis/facet-inference';
 import { normalizeCoreValuesToStringArray } from '@/lib/psychological-analysis/corevalues-normalizer';
-import type { BigFiveFacets, DarkTriad, AttachmentProfile, PsychologicalNeeds } from '@/lib/psychological-analysis/types';
+import type { BigFiveFacets, DarkTriad, AttachmentProfile } from '@/lib/psychological-analysis/types';
+import type { PsychologicalNeeds } from '@/types/character-creation';
 
 // ============================================================================
 // CONFIGURACIÓN

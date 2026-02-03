@@ -7,7 +7,8 @@
  * 3. Objeto enriquecido (PLUS/ULTRA): {values: [...], bigFiveFacets: {...}, ...}
  */
 
-import type { BigFiveFacets, DarkTriad, AttachmentProfile, PsychologicalNeeds } from './types';
+import type { BigFiveFacets, DarkTriad, AttachmentProfile } from './types';
+import type { PsychologicalNeeds } from '@/types/character-creation';
 
 export interface CoreValueWithWeight {
   value: string;
