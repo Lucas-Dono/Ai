@@ -703,16 +703,22 @@ export class VeniceClient {
 
       const data = await response.json();
 
-      if (!data.data || !data.data[0] || !data.data[0].url) {
-        throw new Error('Invalid response from Venice Image API - no image URL');
+      // Venice API retorna formato: { id, images: ["base64..."], timing: {...} }
+      if (!data.images || !data.images[0]) {
+        console.error('[Venice Image] Invalid response format:', JSON.stringify(data).substring(0, 200));
+        throw new Error('Invalid response from Venice Image API - no images array');
       }
 
       const generationTime = (Date.now() - startTime) / 1000;
       console.log(`[Venice Image] ✅ Imagen generada en ${generationTime.toFixed(2)}s`);
 
+      // Convertir base64 a data URL
+      const base64Image = data.images[0];
+      const imageUrl = `data:image/png;base64,${base64Image}`;
+
       return {
-        imageUrl: data.data[0].url,
-        revisedPrompt: data.data[0].revised_prompt,
+        imageUrl,
+        revisedPrompt: fullPrompt, // Venice no retorna revised prompt
         generationTime,
       };
     } catch (error) {

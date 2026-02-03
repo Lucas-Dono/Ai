@@ -28,15 +28,21 @@ export async function POST(req: NextRequest) {
 
     const { description, age, gender } = validation.data;
 
-    console.log('[Generate Avatar] Generating avatar with Venice (grok-imagine)...');
-    console.log('[Generate Avatar] Cost: $0.04 per image');
+    // Mapear tier del usuario a formato de Venice
+    const userTier = user.plan === 'FREE' ? 'free' : user.plan === 'PLUS' ? 'plus' : 'ultra';
+    const model = userTier === 'free' ? 'z-image-turbo' : 'imagineart-1.5-pro';
+    const cost = userTier === 'free' ? 0.01 : 0.05;
 
-    // Generar avatar usando Venice AI con grok-imagine
+    console.log(`[Generate Avatar] Generating avatar with Venice (${model})...`);
+    console.log(`[Generate Avatar] User tier: ${user.plan}, Cost: $${cost} per image`);
+
+    // Generar avatar usando Venice AI con modelo tier-based
     const veniceClient = getVeniceClient();
     const result = await veniceClient.generateAvatar({
       description,
       age,
       gender,
+      userTier,
     });
 
     console.log(`[Generate Avatar] ✅ Avatar generated in ${result.generationTime.toFixed(2)}s`);
@@ -45,7 +51,9 @@ export async function POST(req: NextRequest) {
       url: result.imageUrl,
       revisedPrompt: result.revisedPrompt,
       generationTime: result.generationTime,
-      cost: 0.04, // USD
+      cost, // USD - tier-based ($0.01 FREE, $0.05 PLUS/ULTRA)
+      model,
+      userTier: user.plan,
     });
   } catch (error: any) {
     console.error('Error generating avatar:', error);
