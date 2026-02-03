@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, RotateCcw, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, RotateCcw, HelpCircle, Palette, ClipboardCheck, Users, Handshake, Zap } from 'lucide-react';
 import type { BigFiveFacets } from '@/lib/psychological-analysis';
 
 interface FacetAccordionProps {
@@ -16,7 +16,7 @@ const DIMENSION_CONFIG = {
   openness: {
     label: 'Apertura a la Experiencia',
     color: 'purple',
-    icon: '🎨',
+    icon: Palette,
     facets: {
       imagination: 'Imaginación',
       artisticInterests: 'Intereses Artísticos',
@@ -37,7 +37,7 @@ const DIMENSION_CONFIG = {
   conscientiousness: {
     label: 'Responsabilidad',
     color: 'blue',
-    icon: '📋',
+    icon: ClipboardCheck,
     facets: {
       selfEfficacy: 'Autoeficacia',
       orderliness: 'Orden',
@@ -58,7 +58,7 @@ const DIMENSION_CONFIG = {
   extraversion: {
     label: 'Extraversión',
     color: 'orange',
-    icon: '🎉',
+    icon: Users,
     facets: {
       friendliness: 'Cordialidad',
       gregariousness: 'Gregarismo',
@@ -79,7 +79,7 @@ const DIMENSION_CONFIG = {
   agreeableness: {
     label: 'Amabilidad',
     color: 'green',
-    icon: '🤝',
+    icon: Handshake,
     facets: {
       trust: 'Confianza',
       morality: 'Moralidad',
@@ -100,7 +100,7 @@ const DIMENSION_CONFIG = {
   neuroticism: {
     label: 'Neuroticismo',
     color: 'red',
-    icon: '⚡',
+    icon: Zap,
     facets: {
       anxiety: 'Ansiedad',
       anger: 'Ira',
@@ -169,7 +169,9 @@ export function FacetAccordion({ dimension, facets, onChange, onReinfer }: Facet
         className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{config.icon}</span>
+          <div className={`${colors.bg} p-2 rounded-lg`}>
+            <config.icon className={`w-5 h-5 ${colors.text}`} />
+          </div>
           <span className={`text-sm font-semibold ${colors.text}`}>{config.label}</span>
         </div>
         <div className="flex items-center gap-2">

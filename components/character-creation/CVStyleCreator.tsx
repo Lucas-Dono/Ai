@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import {
   User, Users, Briefcase, Brain, BookOpen, Sparkles,
   Plus, X, Upload, RefreshCw,
-  PenTool, Download, Rocket, ChevronDown, ChevronUp, Zap
+  PenTool, Download, Rocket, ChevronDown, ChevronUp, Zap, AlertTriangle
 } from 'lucide-react';
 import type { CharacterDraft } from './types';
 import { PersonalityRadarChart } from './PersonalityRadarChart';
@@ -859,8 +859,9 @@ export function CVStyleCreator() {
                   variant="secondary"
                 />
                 {avatarError && (
-                  <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 text-center animate-pulse">
-                    ⚠️ {avatarError}
+                  <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 flex items-center justify-center gap-2 animate-pulse">
+                    <AlertTriangle className="w-4 h-4" />
+                    {avatarError}
                   </div>
                 )}
               </div>
@@ -922,9 +923,19 @@ export function CVStyleCreator() {
                 <SectionHeader icon={Brain} title={t('personality.title')} badge={t('personality.badge')} />
                 <button
                   onClick={() => setShowAdvancedPsychology(!showAdvancedPsychology)}
-                  className="px-4 py-2 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500/50 rounded-lg transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500/50 rounded-lg transition-all cursor-pointer"
                 >
-                  {showAdvancedPsychology ? '🔽 Ocultar' : '✨ Mostrar'} Opciones Avanzadas
+                  {showAdvancedPsychology ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      Ocultar Opciones Avanzadas
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Mostrar Opciones Avanzadas
+                    </>
+                  )}
                 </button>
               </div>
 

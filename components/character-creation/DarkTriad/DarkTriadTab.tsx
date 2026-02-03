@@ -11,10 +11,10 @@ interface DarkTriadTabProps {
 
 // Presets
 const PRESETS = [
-  { name: '😇 Benevolente', values: { machiavellianism: 10, narcissism: 10, psychopathy: 5 } },
-  { name: '🎩 Maquiavélico', values: { machiavellianism: 75, narcissism: 40, psychopathy: 30 } },
-  { name: '👑 Narcisista', values: { machiavellianism: 30, narcissism: 85, psychopathy: 20 } },
-  { name: '🗡️ Psicópata', values: { machiavellianism: 40, narcissism: 30, psychopathy: 80 } },
+  { name: 'Benevolente', values: { machiavellianism: 10, narcissism: 10, psychopathy: 5 } },
+  { name: 'Maquiavélico', values: { machiavellianism: 75, narcissism: 40, psychopathy: 30 } },
+  { name: 'Narcisista', values: { machiavellianism: 30, narcissism: 85, psychopathy: 20 } },
+  { name: 'Psicópata', values: { machiavellianism: 40, narcissism: 30, psychopathy: 80 } },
 ];
 
 /**
@@ -47,7 +47,7 @@ export function DarkTriadTab({ darkTriad, onChange }: DarkTriadTabProps) {
       bg: 'from-yellow-500/10 to-yellow-600/10',
       border: 'border-yellow-500/30',
       text: 'text-yellow-300',
-      title: '⚠️ Rasgos Moderados',
+      title: 'Rasgos Moderados',
       message: 'Algunos rasgos oscuros presentes. Estos pueden influir en las relaciones interpersonales.',
       pulse: false,
     },
@@ -57,7 +57,7 @@ export function DarkTriadTab({ darkTriad, onChange }: DarkTriadTabProps) {
       bg: 'from-orange-500/10 to-orange-600/10',
       border: 'border-orange-500/30',
       text: 'text-orange-300',
-      title: '🔥 Rasgos Altos',
+      title: 'Rasgos Altos',
       message:
         'Rasgos oscuros marcados que probablemente afecten las relaciones. Pueden generar conflictos interpersonales significativos.',
       pulse: false,
@@ -68,7 +68,7 @@ export function DarkTriadTab({ darkTriad, onChange }: DarkTriadTabProps) {
       bg: 'from-red-500/10 to-red-600/10',
       border: 'border-red-500/30',
       text: 'text-red-300',
-      title: '☠️ Rasgos Extremos',
+      title: 'Rasgos Extremos',
       message:
         'Rasgos oscuros extremos. Este perfil puede resultar en dinámicas relacionales muy problemáticas. Revisar análisis psicológico completo.',
       pulse: true,
