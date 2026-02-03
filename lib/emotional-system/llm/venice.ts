@@ -924,7 +924,7 @@ export const VENICE_MODELS = {
   BEST: "llama-3.1-405b",
 
   // Qwen 3 4B - Para diálogos ambientales ($0.15/M output, $0.05/M input)
-  QWEN_3_4B: "qwen-3-4b",
+  QWEN_3_4B: "qwen3-4b",
 };
 
 /**
