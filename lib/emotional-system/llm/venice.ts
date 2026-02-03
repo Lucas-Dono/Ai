@@ -791,7 +791,21 @@ IMPORTANTE: Solo retorna el prompt optimizado, nada más.`;
       maxTokens: 300, // Aumentado para dar margen sin razonamiento interno
     });
 
-    const enhancedPrompt = response.trim();
+    // Post-procesamiento: Limpiar etiquetas <think> y saltos de línea
+    let enhancedPrompt = response.trim();
+
+    // Eliminar bloques <think>...</think> (vacíos o con contenido)
+    enhancedPrompt = enhancedPrompt.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
+    // Eliminar saltos de línea múltiples y reemplazar con espacio
+    enhancedPrompt = enhancedPrompt.replace(/\n+/g, ' ');
+
+    // Eliminar espacios múltiples
+    enhancedPrompt = enhancedPrompt.replace(/\s+/g, ' ');
+
+    // Trim final
+    enhancedPrompt = enhancedPrompt.trim();
+
     console.log('[Venice Prompt Enhancer] Original:', userPrompt);
     console.log('[Venice Prompt Enhancer] Enhanced:', enhancedPrompt);
 
