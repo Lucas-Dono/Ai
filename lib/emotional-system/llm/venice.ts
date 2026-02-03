@@ -285,15 +285,18 @@ const globalCircuitBreaker = new VeniceCircuitBreaker();
 /**
  * Modelos de imagen disponibles en Venice AI
  *
- * Pricing:
- * - z-image-turbo: $0.01/imagen (100 imágenes = $1)
- * - imagineart-1.5-pro: $0.05/imagen (20 imágenes = $1, 4K nativo)
+ * Pricing y características:
+ * - z-image-turbo: $0.01/imagen (100 imágenes = $1) - Buena calidad, rápido
+ * - imagineart-1.5-pro: $0.05/imagen (20 imágenes = $1) - Realismo superior, mejor manejo de luces
+ *
+ * La diferencia está en el MODELO, no en specs técnicas.
+ * imagineart-1.5-pro produce imágenes con mejor calidad inherente incluso con mismos parámetros.
  */
 export const VENICE_IMAGE_MODELS = {
-  // z-image-turbo - Rápido y económico para FREE tier
+  // z-image-turbo - Buena calidad para FREE tier
   TURBO: "z-image-turbo",
 
-  // imagineart-1.5-pro - Alta calidad 4K para PLUS/ULTRA
+  // imagineart-1.5-pro - Realismo superior para PLUS/ULTRA
   PRO: "imagineart-1.5-pro",
 };
 
@@ -628,18 +631,21 @@ export class VeniceClient {
    * Selecciona el modelo de imagen apropiado basado en el tier del usuario
    *
    * - FREE: z-image-turbo ($0.01/imagen) - 100 imágenes = $1 USD
-   * - PLUS: imagineart-1.5-pro ($0.05/imagen) - 20 imágenes = $1 USD (4K, alta calidad)
-   * - ULTRA: imagineart-1.5-pro ($0.05/imagen) - 20 imágenes = $1 USD (4K, ultra alta calidad)
+   * - PLUS: imagineart-1.5-pro ($0.05/imagen) - 20 imágenes = $1 USD
+   * - ULTRA: imagineart-1.5-pro ($0.05/imagen) - 20 imágenes = $1 USD
    *
-   * Con un usuario PLUS/ULTRA que paga $10, obtenemos presupuesto para 200 imágenes avatar.
+   * imagineart-1.5-pro tiene mejor realismo y manejo de luces inherentemente,
+   * incluso con los mismos parámetros técnicos (resolución, quality, etc).
+   *
+   * Con un usuario PLUS/ULTRA que paga $10, obtenemos presupuesto para 200 imágenes.
    */
   private selectImageModel(userTier: 'free' | 'plus' | 'ultra'): string {
     switch (userTier) {
       case 'free':
-        return VENICE_IMAGE_MODELS.TURBO; // $0.01 por imagen
+        return VENICE_IMAGE_MODELS.TURBO; // $0.01 por imagen - Buena calidad
       case 'plus':
       case 'ultra':
-        return VENICE_IMAGE_MODELS.PRO; // $0.05 por imagen (4K nativo)
+        return VENICE_IMAGE_MODELS.PRO; // $0.05 por imagen - Realismo superior
       default:
         return VENICE_IMAGE_MODELS.TURBO;
     }
@@ -649,8 +655,11 @@ export class VeniceClient {
    * Genera una imagen usando Venice AI con modelos tier-based
    *
    * Modelos y costos:
-   * - FREE: z-image-turbo ($0.01/imagen) - Rápido y económico
-   * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen) - Alta calidad 4K
+   * - FREE: z-image-turbo ($0.01/imagen) - Buena calidad, rápido
+   * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen) - Realismo superior, mejor manejo de luces
+   *
+   * La diferencia está en el MODELO, no en la resolución.
+   * imagineart-1.5-pro tiene mejor calidad inherente con los mismos parámetros.
    */
   async generateImage(params: VeniceImageParams): Promise<VeniceImageResult> {
     try {
@@ -672,8 +681,8 @@ export class VeniceClient {
         prompt: fullPrompt,
         n: 1,
         size: `${params.width || 1024}x${params.height || 1024}`,
-        quality: params.quality || 'standard',
-        style: params.style || 'vivid',
+        quality: 'standard', // Mismo para todos, la diferencia está en el modelo
+        style: params.style || 'natural',
       };
 
       const currentKey = this.getCurrentApiKey();
@@ -715,9 +724,11 @@ export class VeniceClient {
   /**
    * Genera imagen de avatar optimizada para personajes
    *
-   * Costos por tier:
-   * - FREE: $0.01/imagen (z-image-turbo)
-   * - PLUS/ULTRA: $0.05/imagen (imagineart-1.5-pro, 4K)
+   * La diferencia entre tiers está en el MODELO usado:
+   * - FREE: z-image-turbo ($0.01/imagen) - Buena calidad
+   * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen) - Realismo superior, mejor manejo de luces
+   *
+   * Mismo tamaño (1024x1024) para todos - diferencia en calidad del modelo.
    */
   async generateAvatar(params: {
     description: string;
@@ -749,7 +760,6 @@ export class VeniceClient {
       negativePrompt,
       width: 1024,
       height: 1024,
-      quality: 'hd',
       style: 'natural',
       userTier: params.userTier || 'free',
     });

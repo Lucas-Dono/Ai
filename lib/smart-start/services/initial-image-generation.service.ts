@@ -5,9 +5,11 @@
  * - Avatar (profile photo - portrait/close-up)
  * - Reference Image (full-body photo)
  *
- * Uses Venice AI with tier-based models:
- * - FREE: z-image-turbo ($0.01/imagen)
- * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen, 4K)
+ * Uses Venice AI with tier-based MODELS (no diferencia en resolución):
+ * - FREE: z-image-turbo ($0.01/imagen) - Buena calidad
+ * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen) - Realismo superior, mejor manejo de luces
+ *
+ * La diferencia está en el modelo, no en parámetros técnicos.
  */
 
 import { getVeniceClient } from '@/lib/emotional-system/llm/venice';
@@ -113,6 +115,9 @@ export class InitialImageGenerationService {
 
   /**
    * Generate avatar (close-up portrait)
+   *
+   * La diferencia de calidad viene del MODELO (z-image-turbo vs imagineart-1.5-pro),
+   * no de parámetros artificiales como resolución o quality flag.
    */
   private async generateAvatar(params: GenerateInitialImagesParams) {
     const prompt = this.buildAvatarPrompt(params);
@@ -128,7 +133,6 @@ export class InitialImageGenerationService {
       negativePrompt,
       width: 1024,
       height: 1024,
-      quality: userTier === 'free' ? 'standard' : 'hd',
       style: 'natural',
       userTier,
     });
@@ -138,6 +142,9 @@ export class InitialImageGenerationService {
 
   /**
    * Generate full-body reference image
+   *
+   * Usa aspect ratio más alto (768x1024) para capturar cuerpo completo.
+   * La diferencia de calidad viene del modelo, no de parámetros técnicos.
    */
   private async generateFullBody(params: GenerateInitialImagesParams) {
     const prompt = this.buildFullBodyPrompt(params);
@@ -153,7 +160,6 @@ export class InitialImageGenerationService {
       negativePrompt,
       width: 768,
       height: 1024, // Taller aspect ratio for full-body
-      quality: userTier === 'free' ? 'standard' : 'hd',
       style: 'natural',
       userTier,
     });

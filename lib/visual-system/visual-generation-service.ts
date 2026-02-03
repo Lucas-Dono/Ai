@@ -251,6 +251,8 @@ export class VisualGenerationService {
 
     if (provider === "venice") {
       // Venice AI - Proveedor principal con modelos tier-based
+      // La diferencia está en el MODELO (z-image-turbo vs imagineart-1.5-pro),
+      // no en parámetros técnicos. imagineart tiene mejor realismo y luces inherentemente.
       const veniceClient = getVeniceClient();
 
       const prompt = this.buildEmotionPrompt({
@@ -266,7 +268,6 @@ export class VisualGenerationService {
         negativePrompt,
         width: 1024,
         height: 1024,
-        quality: userTier === 'free' ? 'standard' : 'hd',
         style: 'natural',
         userTier,
       });
