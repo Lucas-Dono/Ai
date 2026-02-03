@@ -729,6 +729,76 @@ export class VeniceClient {
 
 
   /**
+   * Mejora un prompt de usuario a formato optimizado para modelos de imagen
+   *
+   * Transforma descripciones narrativas en cualquier idioma a keywords
+   * optimizadas en inglés con énfasis apropiado.
+   *
+   * Usa Qwen 3 4B (muy económico: $0.15/M output, $0.05/M input)
+   *
+   * Límites por tier:
+   * - FREE: 2 enhancements/día
+   * - PLUS: 10 enhancements/día
+   * - ULTRA: 30 enhancements/día
+   *
+   * Ejemplo:
+   * Input: "mujer joven con moño, remera beige, ojos verdes"
+   * Output: "professional portrait, young woman, (elegant bun:1.4), (beige top:1.5), (green eyes:1.3), photorealistic, 8k"
+   */
+  async enhanceImagePrompt(userPrompt: string): Promise<string> {
+    const systemPrompt = `Eres un experto en optimización de prompts para modelos de generación de imágenes (Stable Diffusion, DALL-E, Midjourney).
+
+Tu tarea: Transformar descripciones narrativas en keywords optimizadas separadas por comas.
+
+REGLAS OBLIGATORIAS:
+1. Convertir TODO a inglés (incluso si input está en español, francés, chino, etc)
+2. Separar keywords con comas (NO frases completas)
+3. Agregar énfasis con () en características importantes:
+   - Características únicas/críticas: (keyword:1.4) o (keyword:1.5)
+   - Características importantes: (keyword:1.2) o (keyword:1.3)
+   - Características normales: sin paréntesis
+4. Mantener estructura: [tipo imagen], [sujeto], [características con énfasis], [calidad]
+5. Máximo 75-100 palabras
+6. NO usar negative prompts (modelos modernos no los necesitan)
+7. Si el usuario especifica estilo (anime, cartoon, realistic), respetarlo
+
+EJEMPLOS:
+
+Input: "mujer joven de cabello castaño ondulado con moño elegante, viste remera beige y vestido marrón, tiene ojos verdes brillantes y maquillaje natural"
+Output: professional portrait photo, young woman, (elegant bun hairstyle:1.4), brown wavy hair, (beige top:1.5), brown dress, (bright green eyes:1.3), natural makeup, soft lighting, photorealistic, 8k
+
+Input: "homme avec cheveux courts noirs, lunettes rondes, chemise blanche"
+Output: professional portrait photo, man, (short black hair:1.2), (round glasses:1.3), white shirt, natural lighting, photorealistic, 8k
+
+Input: "chica anime de pelo rosa largo, ojos azules grandes, uniforme escolar"
+Output: anime style portrait, teenage girl, (long pink hair:1.3), (large blue eyes:1.3), school uniform, detailed anime art, vibrant colors
+
+Input: "elderly woman, gray hair in braid, warm smile, knitted sweater"
+Output: professional portrait photo, elderly woman, (gray hair in braid:1.2), (warm gentle smile:1.2), knitted sweater, soft natural lighting, photorealistic, 8k
+
+IMPORTANTE: Solo retorna el prompt optimizado, nada más.`;
+
+    const response = await this.generateWithMessages({
+      systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: userPrompt,
+        },
+      ],
+      model: VENICE_MODELS.QWEN_3_4B, // Modelo económico
+      temperature: 0.3, // Baja temperatura para consistencia
+      maxTokens: 200, // Prompts optimizados son cortos
+    });
+
+    const enhancedPrompt = response.trim();
+    console.log('[Venice Prompt Enhancer] Original:', userPrompt);
+    console.log('[Venice Prompt Enhancer] Enhanced:', enhancedPrompt);
+
+    return enhancedPrompt;
+  }
+
+  /**
    * Genera imagen de avatar optimizada para personajes
    *
    * La diferencia entre tiers está en el MODELO usado:
