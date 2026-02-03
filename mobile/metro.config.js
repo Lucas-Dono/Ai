@@ -19,7 +19,4 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve symlinks (important for monorepos)
 config.resolver.unstable_enableSymlinks = true;
 
-// 4. Enable package exports for better-auth
-config.resolver.unstable_enablePackageExports = true;
-
 module.exports = config;
