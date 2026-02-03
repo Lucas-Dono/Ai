@@ -189,7 +189,8 @@ export function CVStyleCreator() {
     relationships: false,
     history: false,
     avatar: false,
-    all: false
+    all: false,
+    promptEnhancer: false
   });
 
   // Estado para dimensiones psicológicas enriquecidas
@@ -255,6 +256,7 @@ export function CVStyleCreator() {
   const [isSaving, setIsSaving] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [enhancerMessage, setEnhancerMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const physicalDescRef = useRef<HTMLTextAreaElement>(null);
 
   // Construir perfil enriquecido completo para análisis
@@ -477,6 +479,62 @@ export function CVStyleCreator() {
           return prev;
       }
     });
+  };
+
+  const handleEnhancePrompt = async () => {
+    // Limpiar mensaje previo
+    setEnhancerMessage(null);
+
+    // Validar que existe descripción
+    if (!character.physicalDescription || character.physicalDescription.trim().length < 5) {
+      setEnhancerMessage({
+        type: 'error',
+        text: 'Escribe primero una descripción (mínimo 5 caracteres)',
+      });
+      setTimeout(() => setEnhancerMessage(null), 3000);
+      return;
+    }
+
+    setLoadingAI(prev => ({ ...prev, promptEnhancer: true }));
+    try {
+      const response = await fetch('/api/character-creation/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: character.physicalDescription,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        if (response.status === 429) {
+          throw new Error(error.upgradeMessage || 'Límite diario alcanzado');
+        }
+        throw new Error(error.error || 'Error al mejorar prompt');
+      }
+
+      const result = await response.json();
+
+      // Actualizar el prompt con la versión mejorada
+      setCharacter(prev => ({ ...prev, physicalDescription: result.enhanced }));
+
+      // Mostrar mensaje de éxito con info de uso
+      setEnhancerMessage({
+        type: 'success',
+        text: `✨ Prompt mejorado (${result.usageInfo.used}/${result.usageInfo.dailyLimit} hoy)`,
+      });
+
+      setTimeout(() => setEnhancerMessage(null), 4000);
+    } catch (error: any) {
+      console.error('Failed to enhance prompt:', error);
+      setEnhancerMessage({
+        type: 'error',
+        text: error.message,
+      });
+      setTimeout(() => setEnhancerMessage(null), 5000);
+    } finally {
+      setLoadingAI(prev => ({ ...prev, promptEnhancer: false }));
+    }
   };
 
   const handleAvatarGeneration = async (silent: boolean = false) => {
@@ -802,7 +860,7 @@ export function CVStyleCreator() {
                   <textarea
                     ref={physicalDescRef}
                     rows={3}
-                    className={`w-full bg-slate-900 border rounded-lg p-3 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none ${
+                    className={`w-full bg-slate-900 border rounded-lg p-3 pr-12 text-slate-200 focus:ring-1 outline-none text-sm leading-relaxed resize-none ${
                       showValidation && !validation.physicalDescription
                         ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                         : 'border-slate-700 focus:ring-indigo-500 focus:border-indigo-500'
@@ -811,14 +869,47 @@ export function CVStyleCreator() {
                     value={character.physicalDescription}
                     onChange={(e) => setCharacter(prev => ({ ...prev, physicalDescription: e.target.value }))}
                   />
+
+                  {/* Botón de mejorar prompt */}
+                  <button
+                    onClick={handleEnhancePrompt}
+                    disabled={loadingAI.promptEnhancer || !character.physicalDescription || character.physicalDescription.trim().length < 5}
+                    className={`absolute top-2 right-2 p-2 rounded-md transition-all ${
+                      loadingAI.promptEnhancer
+                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        : character.physicalDescription && character.physicalDescription.trim().length >= 5
+                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer shadow-lg shadow-indigo-600/30'
+                        : 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                    }`}
+                    title="Mejorar prompt con IA"
+                  >
+                    {loadingAI.promptEnhancer ? (
+                      <RefreshCw size={14} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={14} />
+                    )}
+                  </button>
+
                   {showValidation && !validation.physicalDescription && (
                     <div className="absolute -bottom-5 left-0 text-xs text-red-400">
                       Mínimo 10 caracteres - describe su apariencia física
                     </div>
                   )}
+
+                  {/* Mensaje del enhancer */}
+                  {enhancerMessage && (
+                    <div className={`absolute -bottom-5 left-0 right-0 text-xs flex items-center gap-1.5 ${
+                      enhancerMessage.type === 'success' ? 'text-green-400' :
+                      enhancerMessage.type === 'error' ? 'text-red-400' :
+                      'text-blue-400'
+                    }`}>
+                      {enhancerMessage.text}
+                    </div>
+                  )}
                 </div>
                 <p className="text-xs text-slate-500 mt-2">
                   {t('identity.physicalAppearance.hint')}
+                  <span className="text-indigo-400 ml-1">Click en ✨ para optimizar el prompt</span>
                 </p>
               </div>
             </div>
