@@ -21,9 +21,23 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+
+    // DEBUG: Logging temporal para ver qué datos llegan
+    console.log('═'.repeat(80));
+    console.log('[Generate Work] DATOS RECIBIDOS DEL FRONTEND:');
+    console.log('═'.repeat(80));
+    console.log(JSON.stringify(body, null, 2));
+    console.log('═'.repeat(80));
+
     const validation = RequestSchema.safeParse(body);
 
     if (!validation.success) {
+      console.error('═'.repeat(80));
+      console.error('[Generate Work] ❌ VALIDACIÓN FALLÓ:');
+      console.error('═'.repeat(80));
+      console.error(JSON.stringify(validation.error.format(), null, 2));
+      console.error('═'.repeat(80));
+
       return NextResponse.json(
         { error: 'Datos de entrada inválidos', details: validation.error.format() },
         { status: 400 }

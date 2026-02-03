@@ -161,15 +161,6 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
       temperature: 0.8,
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // DEBUG LOGGING - RESPUESTA COMPLETA DE GEMINI
-    // ═══════════════════════════════════════════════════════════════════════
-    console.log('═'.repeat(80));
-    console.log('[Generate Personality] RESPUESTA RAW DE GEMINI:');
-    console.log('═'.repeat(80));
-    console.log(response);
-    console.log('═'.repeat(80));
-
     // Post-procesamiento: Limpiar artefactos del modelo antes de parsear JSON
     let cleanedResponse = response.trim();
 
@@ -192,41 +183,7 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
     // Limpiar trailing commas antes de } o ]
     jsonText = jsonText.replace(/,(\s*[}\]])/g, '$1');
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // DEBUG LOGGING - JSON DESPUÉS DE LIMPIEZA
-    // ═══════════════════════════════════════════════════════════════════════
-    console.log('═'.repeat(80));
-    console.log('[Generate Personality] JSON DESPUÉS DE LIMPIEZA:');
-    console.log('═'.repeat(80));
-    console.log(jsonText);
-    console.log('═'.repeat(80));
-
-    let personalityData;
-    try {
-      personalityData = JSON.parse(jsonText);
-      console.log('[Generate Personality] ✅ JSON parseado exitosamente');
-    } catch (parseError: any) {
-      console.error('═'.repeat(80));
-      console.error('[Generate Personality] ❌ ERROR PARSEANDO JSON');
-      console.error('═'.repeat(80));
-      console.error('Error:', parseError.message);
-
-      // Mostrar contexto del error
-      if (parseError.message.includes('position')) {
-        const match = parseError.message.match(/position (\d+)/);
-        if (match) {
-          const pos = parseInt(match[1]);
-          const start = Math.max(0, pos - 100);
-          const end = Math.min(jsonText.length, pos + 100);
-          console.error('Contexto del error (100 chars antes y después):');
-          console.error(jsonText.substring(start, end));
-          console.error(' '.repeat(Math.min(100, pos - start)) + '^--- ERROR AQUÍ');
-        }
-      }
-      console.error('═'.repeat(80));
-
-      throw new Error(`Error parseando JSON de personalidad: ${parseError.message}`);
-    }
+    const personalityData = JSON.parse(jsonText);
 
     // Validar rangos de Big Five
     Object.keys(personalityData.bigFive).forEach(trait => {
