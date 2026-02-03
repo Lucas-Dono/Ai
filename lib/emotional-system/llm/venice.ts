@@ -728,6 +728,89 @@ export class VeniceClient {
   }
 
   /**
+   * Construye negative prompt inteligente basado en keywords del prompt positivo
+   *
+   * Infiere automáticamente qué NO queremos basado en lo que SÍ queremos.
+   * Esto mejora la precisión sin que el usuario tenga que saber qué es un negative prompt.
+   */
+  private buildSmartNegativePrompt(positivePrompt: string): string {
+    const prompt = positivePrompt.toLowerCase();
+    const negatives: string[] = [];
+
+    // Base común - siempre aplicar
+    negatives.push(
+      'cartoon', 'anime', 'drawing', 'painting', 'sketch',
+      'low quality', 'blurry', 'distorted', 'deformed',
+      'multiple people', 'text', 'watermark', 'signature',
+      'bad anatomy', 'ugly', 'disfigured'
+    );
+
+    // Inferir opuestos de peinado
+    if (prompt.includes('bun') || prompt.includes('moño') || prompt.includes('recogido') || prompt.includes('updo')) {
+      negatives.push('hair down', 'loose hair', 'flowing hair', 'no bun');
+    }
+    if (prompt.includes('straight hair') || prompt.includes('lacio')) {
+      negatives.push('curly hair', 'wavy hair');
+    }
+    if (prompt.includes('wavy') || prompt.includes('curly') || prompt.includes('ondulado') || prompt.includes('rizado')) {
+      negatives.push('straight hair', 'flat hair');
+    }
+    if (prompt.includes('long hair') || prompt.includes('cabello largo')) {
+      negatives.push('short hair', 'bob cut');
+    }
+    if (prompt.includes('short hair') || prompt.includes('cabello corto')) {
+      negatives.push('long hair');
+    }
+
+    // Inferir opuestos de color de ropa
+    if (prompt.includes('beige') || prompt.includes('cream') || prompt.includes('crema')) {
+      negatives.push('black top', 'dark shirt', 'white top', 'red top', 'blue top');
+    }
+    if (prompt.includes('white') || prompt.includes('blanco')) {
+      negatives.push('black', 'dark colors');
+    }
+    if (prompt.includes('black') || prompt.includes('negro')) {
+      negatives.push('white', 'light colors', 'bright colors');
+    }
+    if (prompt.includes('brown dress') || prompt.includes('vestido marrón')) {
+      negatives.push('black dress', 'white dress', 'red dress', 'blue dress');
+    }
+
+    // Inferir opuestos de accesorios
+    if (prompt.includes('glasses') || prompt.includes('anteojos') || prompt.includes('gafas')) {
+      // No agregar "no glasses" - usuario quiere glasses
+    } else if (prompt.includes('no glasses') || prompt.includes('sin anteojos')) {
+      negatives.push('glasses', 'eyeglasses', 'spectacles');
+    }
+
+    // Inferir opuestos de maquillaje
+    if (prompt.includes('natural makeup') || prompt.includes('minimal makeup') || prompt.includes('maquillaje natural')) {
+      negatives.push('heavy makeup', 'dramatic makeup', 'smokey eyes', 'bold lipstick');
+    }
+    if (prompt.includes('heavy makeup') || prompt.includes('dramatic')) {
+      negatives.push('no makeup', 'bare face');
+    }
+
+    // Inferir opuestos de expresión
+    if (prompt.includes('smiling') || prompt.includes('smile') || prompt.includes('sonriendo')) {
+      negatives.push('frowning', 'sad', 'angry expression');
+    }
+    if (prompt.includes('serious') || prompt.includes('serio')) {
+      negatives.push('smiling', 'laughing', 'grinning');
+    }
+
+    // Inferir opuestos de edad
+    if (prompt.includes('young') || prompt.includes('joven')) {
+      negatives.push('old', 'elderly', 'aged', 'wrinkled');
+    }
+    if (prompt.includes('elderly') || prompt.includes('anciano')) {
+      negatives.push('young', 'teenager', 'child');
+    }
+
+    return negatives.join(', ');
+  }
+
+  /**
    * Genera imagen de avatar optimizada para personajes
    *
    * La diferencia entre tiers está en el MODELO usado:
@@ -735,12 +818,15 @@ export class VeniceClient {
    * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen) - Realismo superior, mejor manejo de luces
    *
    * Mismo tamaño (1024x1024) para todos - diferencia en calidad del modelo.
+   *
+   * Construye automáticamente un negative prompt inteligente basado en el prompt positivo.
    */
   async generateAvatar(params: {
     description: string;
     age?: number;
     gender?: 'male' | 'female' | 'non-binary';
     userTier?: 'free' | 'plus' | 'ultra';
+    negativePrompt?: string; // Opcional - para usuarios avanzados
   }): Promise<VeniceImageResult> {
     let prompt = `professional portrait photo, ${params.description}`;
 
@@ -759,7 +845,11 @@ export class VeniceClient {
 
     prompt += ', high quality, realistic, detailed face, professional headshot, studio lighting, 8k';
 
-    const negativePrompt = 'cartoon, anime, drawing, painting, sketch, low quality, blurry, distorted, deformed, multiple people, text, watermark, signature, bad anatomy, ugly';
+    // Usar negative prompt del usuario SI lo proporciona, sino generar uno inteligente
+    const negativePrompt = params.negativePrompt || this.buildSmartNegativePrompt(prompt);
+
+    console.log('[Venice Avatar] Positive prompt:', prompt);
+    console.log('[Venice Avatar] Negative prompt (smart):', negativePrompt);
 
     return this.generateImage({
       prompt,
