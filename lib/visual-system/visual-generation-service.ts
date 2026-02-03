@@ -8,6 +8,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { getVeniceClient } from "@/lib/emotional-system/llm/venice";
 import { getGeminiImagenClient } from "./gemini-imagen-client";
 import { getHuggingFaceSpacesClient } from "./huggingface-spaces-client";
 import { getFastSDLocalClient } from "./fastsd-local-client";
@@ -17,7 +18,7 @@ import { nanoid } from "nanoid";
 
 export type ContentType = "sfw" | "suggestive" | "nsfw";
 export type UserTier = "free" | "plus" | "ultra";
-export type VisualProvider = "aihorde" | "fastsd" | "gemini" | "huggingface";
+export type VisualProvider = "venice" | "aihorde" | "fastsd" | "gemini" | "huggingface";
 
 export interface VisualGenerationRequest {
   agentId: string;
@@ -155,6 +156,7 @@ export class VisualGenerationService {
           appearance,
           emotionType,
           intensity,
+          userTier,
         });
 
         // Éxito - almacenar en cache y retornar
@@ -187,6 +189,55 @@ export class VisualGenerationService {
   }
 
   /**
+   * Construye prompt para expresión emocional
+   */
+  private buildEmotionPrompt(params: {
+    basePrompt: string;
+    emotionType: string;
+    intensity: "low" | "medium" | "high";
+  }): string {
+    const { basePrompt, emotionType, intensity } = params;
+
+    // Mapeo de emociones a descripciones visuales
+    const emotionDescriptions: Record<string, Record<string, string>> = {
+      joy: {
+        low: 'slight smile, relaxed',
+        medium: 'warm smile, bright eyes',
+        high: 'beaming smile, radiant, joyful expression',
+      },
+      distress: {
+        low: 'slightly worried, furrowed brow',
+        medium: 'concerned expression, tense',
+        high: 'deeply distressed, tearful eyes',
+      },
+      anger: {
+        low: 'slightly annoyed, tense jaw',
+        medium: 'angry expression, furrowed brow',
+        high: 'furious, intense glare, clenched teeth',
+      },
+      fear: {
+        low: 'slightly anxious, uncertain',
+        medium: 'fearful expression, wide eyes',
+        high: 'terrified, panicked expression',
+      },
+      affection: {
+        low: 'gentle smile, soft gaze',
+        medium: 'loving expression, warm eyes',
+        high: 'deeply affectionate, tender loving gaze',
+      },
+      neutral: {
+        low: 'calm neutral expression',
+        medium: 'neutral expression, composed',
+        high: 'serene, peaceful expression',
+      },
+    };
+
+    const emotionDesc = emotionDescriptions[emotionType]?.[intensity] || 'neutral expression';
+
+    return `${basePrompt}, ${emotionDesc}`;
+  }
+
+  /**
    * Genera imagen con un proveedor específico
    */
   private async generateWithProvider(params: {
@@ -194,10 +245,51 @@ export class VisualGenerationService {
     appearance: any;
     emotionType: string;
     intensity: "low" | "medium" | "high";
+    userTier?: UserTier;
   }): Promise<{ imageUrl: string; seed: number }> {
-    const { provider, appearance, emotionType, intensity } = params;
+    const { provider, appearance, emotionType, intensity, userTier = 'free' } = params;
 
-    if (provider === "aihorde") {
+    if (provider === "venice") {
+      // Venice AI - Proveedor principal con modelos tier-based
+      const veniceClient = getVeniceClient();
+
+      const prompt = this.buildEmotionPrompt({
+        basePrompt: appearance.basePrompt,
+        emotionType,
+        intensity,
+      });
+
+      const negativePrompt = 'deformed, distorted, disfigured, bad anatomy, multiple people, text, watermark, low quality';
+
+      const result = await veniceClient.generateImage({
+        prompt,
+        negativePrompt,
+        width: 1024,
+        height: 1024,
+        quality: userTier === 'free' ? 'standard' : 'hd',
+        style: 'natural',
+        userTier,
+      });
+
+      // Track cost
+      const cost = userTier === 'free' ? 0.01 : 0.05;
+      trackImageGeneration({
+        agentId: appearance.agentId,
+        provider: 'venice',
+        model: userTier === 'free' ? 'z-image-turbo' : 'imagineart-1.5-pro',
+        resolution: '1024x1024',
+        cost,
+        metadata: {
+          emotionType,
+          intensity,
+        },
+      }).catch(err => console.warn('[VisualGen] Failed to track image cost:', err));
+
+      return {
+        imageUrl: result.imageUrl,
+        seed: Math.floor(Math.random() * 1000000), // Venice no retorna seed
+      };
+    } else if (provider === "aihorde") {
       // AI Horde - Proveedor principal (gratis, rápido, alta calidad)
       const aihorde = getAIHordeClient({
         apiKey: process.env.AI_HORDE_API_KEY,
@@ -347,10 +439,10 @@ export class VisualGenerationService {
   }): Promise<VisualProvider[]> {
     const { contentType, userTier, preferredProvider } = params;
 
-    // AI Horde es el proveedor principal para todos los tiers
-    // - Gratis (sistema de kudos)
-    // - Rápido (9-12 segundos)
-    // - Alta calidad
+    // Venice AI es el proveedor principal para todos los tiers
+    // - FREE: z-image-turbo ($0.01/imagen)
+    // - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen, 4K)
+    // - Rápido y confiable
     // - Sin requisitos de hardware
 
     // 1. NSFW solo para premium users
@@ -358,17 +450,20 @@ export class VisualGenerationService {
       if (userTier !== "ultra") {
         throw new Error("NSFW content requires ultra tier");
       }
-      // Premium NSFW: AI Horde -> FastSD local -> HF (fallback)
+      // Premium NSFW: Venice -> AI Horde -> FastSD local -> HF (fallback)
       const fastsdAvailable = await this.isFastSDAvailable();
       return fastsdAvailable
-        ? ["aihorde", "fastsd", "huggingface"]
-        : ["aihorde", "huggingface"];
+        ? ["venice", "aihorde", "fastsd", "huggingface"]
+        : ["venice", "aihorde", "huggingface"];
     }
 
-    // 2. Contenido SFW/Suggestive - AI Horde para todos
-    // Chain de fallback: AI Horde -> Gemini -> FastSD Local -> HF
+    // 2. Contenido SFW/Suggestive - Venice para todos
+    // Chain de fallback: Venice -> AI Horde -> Gemini -> FastSD Local -> HF
 
-    const chain: VisualProvider[] = ["aihorde"];
+    const chain: VisualProvider[] = ["venice"];
+
+    // AI Horde como segundo fallback (gratis)
+    chain.push("aihorde");
 
     // Agregar Gemini si hay API key configurada
     if (process.env.GEMINI_API_KEY) {
@@ -562,7 +657,7 @@ export class VisualGenerationService {
         negativePrompt:
           "deformed, distorted, disfigured, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, mutated hands, bad hands, long neck, mutation, ugly, disgusting, blurry, low quality, watermark, text, signature, multiple people",
         seed: Math.floor(Math.random() * 1000000),
-        preferredProvider: "huggingface", // Por ahora forzar HF
+        preferredProvider: "venice", // Venice AI como proveedor principal
         totalGenerations: 0,
         updatedAt: new Date(),
       },
