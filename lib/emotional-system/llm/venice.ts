@@ -783,24 +783,15 @@ IMPORTANTE: Solo retorna el prompt optimizado, nada más.`;
       messages: [
         {
           role: 'user',
-          content: userPrompt,
+          content: `/no_think\n\n${userPrompt}`, // Comando Qwen 3 para desactivar razonamiento interno
         },
       ],
       model: VENICE_MODELS.QWEN_3_4B, // Modelo económico
       temperature: 0.3, // Baja temperatura para consistencia
-      maxTokens: 300, // Aumentado para incluir razonamiento + respuesta
+      maxTokens: 300, // Aumentado para dar margen sin razonamiento interno
     });
 
-    // Filtrar bloques <think> del output (el modelo puede usarlos para razonar mejor)
-    // Mantener el razonamiento mejora la calidad, pero no lo mostramos al usuario
-    let enhancedPrompt = response.trim();
-
-    // Remover cualquier bloque <think>...</think>
-    enhancedPrompt = enhancedPrompt.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-
-    // Remover bloque <think> sin cerrar (si quedó cortado)
-    enhancedPrompt = enhancedPrompt.replace(/<think>[\s\S]*/gi, '').trim();
-
+    const enhancedPrompt = response.trim();
     console.log('[Venice Prompt Enhancer] Original:', userPrompt);
     console.log('[Venice Prompt Enhancer] Enhanced:', enhancedPrompt);
 
