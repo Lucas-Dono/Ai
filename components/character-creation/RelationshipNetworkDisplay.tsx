@@ -1,7 +1,8 @@
 'use client';
 
+import React from 'react';
 import { ImportantPerson } from './types';
-import { Heart, Users, Briefcase, Skull, Zap, Calendar, TrendingUp, AlertCircle, MessageCircle } from 'lucide-react';
+import { Heart, Users, Briefcase, Skull, Zap, Calendar, TrendingUp, AlertCircle, MessageCircle, Handshake, Swords, GraduationCap, User, UsersRound, Gem, AlertTriangle } from 'lucide-react';
 
 interface RelationshipNetworkDisplayProps {
   people: ImportantPerson[];
@@ -14,7 +15,9 @@ export function RelationshipNetworkDisplay({ people, characterName = "Personaje"
     return (
       <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm text-center">
         <div className="text-slate-400 text-sm">
-          <div className="text-3xl mb-2">👥</div>
+          <div className="mb-2 flex justify-center">
+            <Users className="w-12 h-12 inline-block" />
+          </div>
           <p>No hay relaciones definidas</p>
           <p className="text-xs mt-2 text-slate-500">Las personas importantes moldean quiénes somos</p>
         </div>
@@ -23,15 +26,16 @@ export function RelationshipNetworkDisplay({ people, characterName = "Personaje"
   }
 
   // Helpers
-  const getTypeIcon = (type: string) => {
+  const getTypeIcon = (type: string): React.ReactElement => {
+    const iconClass = "w-4 h-4 inline-block";
     switch (type) {
-      case 'family': return '👨‍👩‍👧';
-      case 'friend': return '🤝';
-      case 'romantic': return '💕';
-      case 'rival': return '⚔️';
-      case 'mentor': return '🎓';
-      case 'colleague': return '💼';
-      default: return '👤';
+      case 'family': return <UsersRound className={iconClass} />;
+      case 'friend': return <Handshake className={iconClass} />;
+      case 'romantic': return <Heart className={iconClass} />;
+      case 'rival': return <Swords className={iconClass} />;
+      case 'mentor': return <GraduationCap className={iconClass} />;
+      case 'colleague': return <Briefcase className={iconClass} />;
+      default: return <User className={iconClass} />;
     }
   };
 
@@ -168,9 +172,10 @@ export function RelationshipNetworkDisplay({ people, characterName = "Personaje"
                           {person.influenceOn.values.map((value, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2 py-0.5 bg-green-500/20 text-green-300 rounded text-xs font-medium border border-green-500/30"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/20 text-green-300 rounded text-xs font-medium border border-green-500/30"
                             >
-                              💎 {value}
+                              <Gem className="w-3 h-3 inline-block" />
+                              {value}
                             </span>
                           ))}
                         </div>
@@ -184,9 +189,10 @@ export function RelationshipNetworkDisplay({ people, characterName = "Personaje"
                           {person.influenceOn.fears.map((fear, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2 py-0.5 bg-red-500/20 text-red-300 rounded text-xs font-medium border border-red-500/30"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500/20 text-red-300 rounded text-xs font-medium border border-red-500/30"
                             >
-                              ⚠️ {fear}
+                              <AlertTriangle className="w-3 h-3 inline-block" />
+                              {fear}
                             </span>
                           ))}
                         </div>

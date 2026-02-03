@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CharacterDraft } from './types';
-import { MessageCircle, Zap, Users, Coffee, AlertTriangle, Heart, Play } from 'lucide-react';
+import { MessageCircle, Zap, Users, Coffee, AlertTriangle, Heart, Play, Drama } from 'lucide-react';
 
 interface CharacterSimulatorProps {
   character: CharacterDraft;
@@ -27,7 +27,9 @@ export function CharacterSimulator({ character }: CharacterSimulatorProps) {
     return (
       <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm text-center">
         <div className="text-slate-400 text-sm">
-          <div className="text-3xl mb-2">🎭</div>
+          <div className="mb-2 flex justify-center">
+            <Drama className="w-12 h-12 inline-block" />
+          </div>
           <p>Completa la personalidad para simular comportamiento</p>
           <p className="text-xs mt-2 text-slate-500">Necesitas al menos Big Five y ocupación definidos</p>
         </div>
@@ -191,8 +193,9 @@ export function CharacterSimulator({ character }: CharacterSimulatorProps) {
       {/* Header */}
       <div className="mb-6 text-center">
         <div className="inline-block px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30 backdrop-blur-sm">
-          <span className="text-xs font-semibold text-green-300 uppercase tracking-wider">
-            🎭 Simulador de Personaje
+          <span className="text-xs font-semibold text-green-300 uppercase tracking-wider flex items-center gap-1.5">
+            <Drama className="w-3.5 h-3.5 inline-block" />
+            Simulador de Personaje
           </span>
         </div>
         <p className="text-xs text-slate-400 mt-2">

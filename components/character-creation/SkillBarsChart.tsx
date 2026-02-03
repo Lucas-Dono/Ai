@@ -1,6 +1,8 @@
 'use client';
 
+import React from 'react';
 import { Skill } from './types';
+import { Sprout, BookOpen, Zap, Flame, Crown, BarChart3 } from 'lucide-react';
 
 interface SkillBarsChartProps {
   skills: Skill[];
@@ -24,12 +26,13 @@ export function SkillBarsChart({ skills }: SkillBarsChartProps) {
     return 'from-pink-500 to-rose-500';
   };
 
-  const getLevelIcon = (level: number): string => {
-    if (level <= 20) return '🌱';
-    if (level <= 40) return '📘';
-    if (level <= 60) return '⚡';
-    if (level <= 80) return '🔥';
-    return '👑';
+  const getLevelIcon = (level: number): React.ReactElement => {
+    const iconClass = "w-4 h-4 inline-block";
+    if (level <= 20) return <Sprout className={iconClass} />;
+    if (level <= 40) return <BookOpen className={iconClass} />;
+    if (level <= 60) return <Zap className={iconClass} />;
+    if (level <= 80) return <Flame className={iconClass} />;
+    return <Crown className={iconClass} />;
   };
 
   // Agrupar skills por nivel
@@ -92,7 +95,7 @@ export function SkillBarsChart({ skills }: SkillBarsChartProps) {
                 {/* Skill header */}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{levelIcon}</span>
+                    {levelIcon}
                     <span className="text-sm font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">
                       {skill.name}
                     </span>
@@ -175,7 +178,10 @@ export function SkillBarsChart({ skills }: SkillBarsChartProps) {
 
       {/* Leyenda */}
       <div className="mt-4 bg-slate-800/30 rounded-lg p-4 border border-slate-700/30">
-        <h4 className="text-xs font-semibold text-slate-300 mb-3">📊 Escala de Proficiencia</h4>
+        <h4 className="text-xs font-semibold text-slate-300 mb-3 flex items-center gap-1.5">
+          <BarChart3 className="w-3.5 h-3.5 inline-block" />
+          Escala de Proficiencia
+        </h4>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-[10px]">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-gradient-to-r from-slate-500 to-slate-600" />

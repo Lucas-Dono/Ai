@@ -1,6 +1,7 @@
 'use client';
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { BarChart3, Gem } from 'lucide-react';
 
 interface PersonalityRadarChartProps {
   bigFive: {
@@ -149,7 +150,10 @@ export function PersonalityRadarChart({ bigFive, values }: PersonalityRadarChart
       {/* Leyenda de interpretación */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700/30">
-          <h4 className="text-xs font-semibold text-slate-300 mb-2">📊 Interpretación</h4>
+          <h4 className="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+            <BarChart3 className="w-3.5 h-3.5 inline-block" />
+            Interpretación
+          </h4>
           <ul className="space-y-1 text-xs text-slate-400">
             <li><span className="text-indigo-400">0-30:</span> Bajo</li>
             <li><span className="text-purple-400">30-70:</span> Moderado</li>
@@ -159,7 +163,10 @@ export function PersonalityRadarChart({ bigFive, values }: PersonalityRadarChart
 
         {values && values.length > 0 && (
           <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700/30">
-            <h4 className="text-xs font-semibold text-slate-300 mb-2">💎 Valores Centrales</h4>
+            <h4 className="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+              <Gem className="w-3.5 h-3.5 inline-block" />
+              Valores Centrales
+            </h4>
             <div className="flex flex-wrap gap-1.5">
               {values.slice(0, 5).map((value, idx) => (
                 <span
