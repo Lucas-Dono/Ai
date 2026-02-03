@@ -161,13 +161,48 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
       temperature: 0.8,
     });
 
+    // Post-procesamiento: Limpiar artefactos del modelo antes de parsear JSON
+    let cleanedResponse = response.trim();
+
+    // Eliminar markdown code blocks si existen
+    cleanedResponse = cleanedResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+
+    // Eliminar comentarios de JavaScript (// y /* */)
+    cleanedResponse = cleanedResponse.replace(/\/\/.*$/gm, ''); // Comentarios de una línea
+    cleanedResponse = cleanedResponse.replace(/\/\*[\s\S]*?\*\//g, ''); // Comentarios multilínea
+
     // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[Generate Personality] No se pudo extraer JSON. Respuesta limpiada:', cleanedResponse.substring(0, 500));
       throw new Error('No se pudo extraer JSON de la respuesta');
     }
 
-    const personalityData = JSON.parse(jsonMatch[0]);
+    let jsonText = jsonMatch[0];
+
+    // Limpiar trailing commas antes de } o ]
+    jsonText = jsonText.replace(/,(\s*[}\]])/g, '$1');
+
+    let personalityData;
+    try {
+      personalityData = JSON.parse(jsonText);
+    } catch (parseError: any) {
+      console.error('[Generate Personality] Error parseando JSON:', parseError.message);
+      console.error('[Generate Personality] JSON problemático (primeros 1000 chars):', jsonText.substring(0, 1000));
+
+      // Mostrar contexto del error
+      if (parseError.message.includes('position')) {
+        const match = parseError.message.match(/position (\d+)/);
+        if (match) {
+          const pos = parseInt(match[1]);
+          const start = Math.max(0, pos - 100);
+          const end = Math.min(jsonText.length, pos + 100);
+          console.error('[Generate Personality] Contexto del error:', jsonText.substring(start, end));
+        }
+      }
+
+      throw new Error(`Error parseando JSON de personalidad: ${parseError.message}`);
+    }
 
     // Validar rangos de Big Five
     Object.keys(personalityData.bigFive).forEach(trait => {
