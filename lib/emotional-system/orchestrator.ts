@@ -28,6 +28,7 @@ import { ActionDecisionEngine } from "./modules/cognition/action-decision";
 import { ResponseGenerator } from "./modules/response/generator";
 import { CharacterGrowthSystem } from "./modules/growth/character-growth";
 import { intelligentStorageSystem } from "./modules/memory/intelligent-storage";
+import { normalizeCoreValuesToWeightedArray } from "@/lib/psychological-analysis/corevalues-normalizer";
 
 export class EmotionalSystemOrchestrator {
   private appraisalEngine = new AppraisalEngine();
@@ -338,7 +339,7 @@ export class EmotionalSystemOrchestrator {
           agreeableness: agent.PersonalityCore.agreeableness,
           neuroticism: agent.PersonalityCore.neuroticism,
         },
-        coreValues: agent.PersonalityCore.coreValues as any[],
+        coreValues: normalizeCoreValuesToWeightedArray(agent.PersonalityCore.coreValues),
         moralSchemas: agent.PersonalityCore.moralSchemas as any[],
         backstory: agent.PersonalityCore.backstory || undefined,
         baselineEmotions: agent.PersonalityCore.baselineEmotions as any,

@@ -12,6 +12,7 @@
 
 import { AppraisalScores, CompleteCharacterState, Goal, CoreValue } from "../../types";
 import { getHybridLLMProvider } from "../../llm/hybrid-provider";
+import { normalizeCoreValuesToWeightedArray } from "@/lib/psychological-analysis/corevalues-normalizer";
 
 export class AppraisalEngine {
   private llmClient = getHybridLLMProvider();
@@ -80,7 +81,7 @@ Modelo de evaluación OCC:
       .sort((a, b) => b.priority - a.priority)
       .slice(0, 3); // Top 3 objetivos
 
-    const coreValues = personalityCore.coreValues
+    const coreValues = normalizeCoreValuesToWeightedArray(personalityCore.coreValues)
       .sort((a, b) => b.weight - a.weight)
       .slice(0, 3); // Top 3 valores
 

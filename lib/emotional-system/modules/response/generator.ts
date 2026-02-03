@@ -18,6 +18,7 @@ import {
 } from "../../types";
 import { getHybridLLMProvider } from "../../llm/hybrid-provider";
 import { BehavioralCuesMapper } from "./behavioral-cues";
+import { normalizeCoreValuesToWeightedArray } from "@/lib/psychological-analysis/corevalues-normalizer";
 import { AntiSycophancySystem } from "./anti-sycophancy";
 import { intelligentStorageSystem, type StorageDecision } from "../memory/intelligent-storage";
 
@@ -63,7 +64,7 @@ export class ResponseGenerator {
       const sycophancyCheck = this.antiSycophancy.checkForSycophancy({
         userMessage: input.userMessage,
         appraisal: input.appraisal,
-        coreValues: input.characterState.personalityCore.coreValues,
+        coreValues: normalizeCoreValuesToWeightedArray(input.characterState.personalityCore.coreValues),
         actionDecision: input.actionDecision.action,
         personality: input.characterState.personalityCore.bigFive,
       });

@@ -14,6 +14,7 @@ import {
   MINECRAFT_ERROR_CODES,
   DEFAULT_MINECRAFT_CHAT_CONFIG,
 } from "@/types/minecraft-chat";
+import { normalizeCoreValuesToStringArray } from "@/lib/psychological-analysis/corevalues-normalizer";
 
 /**
  * Minecraft Message Handler
@@ -504,7 +505,7 @@ ${spatialContext}
 Tipo de conversación: ${conversationType}
 
 Personalidad:
-${(agent.PersonalityCore?.coreValues as string[] | undefined)?.join(", ") || "Amigable y servicial"}
+${normalizeCoreValuesToStringArray(agent.PersonalityCore?.coreValues).join(", ") || "Amigable y servicial"}
 
 Instrucciones:
 - Responde de forma natural y breve (1-3 oraciones)

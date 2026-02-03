@@ -132,6 +132,20 @@ export { AuthenticityScorer, calculateAuthenticityScore, isProfileRealistic } fr
 export { BehaviorPredictor, predictBehaviors, predictTopBehaviors } from './behavior-predictor';
 
 // ============================================================================
+// CORE VALUES NORMALIZATION EXPORTS (Backwards Compatibility)
+// ============================================================================
+
+export {
+  normalizeCoreValuesToStringArray,
+  normalizeCoreValuesToWeightedArray,
+  extractEnrichedDimensions,
+  hasEnrichedDimensions as hasCoreValuesEnrichedFormat,
+  migrateToEnrichedFormat,
+  type CoreValueWithWeight,
+  type EnrichedCoreValuesData,
+} from './corevalues-normalizer';
+
+// ============================================================================
 // MAIN ANALYSIS FUNCTION
 // ============================================================================
 
