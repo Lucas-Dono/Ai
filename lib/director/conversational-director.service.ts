@@ -228,15 +228,34 @@ RESPUESTA: Solo el código (ej: COT_001) o NONE`;
    */
   private async callDirectorModel(prompt: string): Promise<string> {
     try {
+      // Agregar /no_think para Qwen 3 modelos
+      const promptWithNoThink = `/no_think\n\n${prompt}`;
+
       const response = await this.veniceClient.generate({
-        prompt,
+        prompt: promptWithNoThink,
         model: this.DIRECTOR_MODEL,
         temperature: 0.3, // Baja temperatura para decisiones consistentes
-        maxTokens: 10, // Solo necesitamos el código
+        maxTokens: 50, // Aumentado para dar margen sin razonamiento interno
       });
 
       const responseText = typeof response === 'string' ? response : (response as any).text || (response as any).content || '';
-      return responseText.trim();
+
+      // Post-procesamiento: Limpiar etiquetas <think> y normalizar espacios
+      let cleanedResponse = responseText.trim();
+
+      // Eliminar bloques <think>...</think> (vacíos o con contenido)
+      cleanedResponse = cleanedResponse.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
+      // Eliminar saltos de línea múltiples y reemplazar con espacio
+      cleanedResponse = cleanedResponse.replace(/\n+/g, ' ');
+
+      // Eliminar espacios múltiples
+      cleanedResponse = cleanedResponse.replace(/\s+/g, ' ');
+
+      // Trim final
+      cleanedResponse = cleanedResponse.trim();
+
+      return cleanedResponse;
     } catch (error) {
       console.error("[Director] Error llamando modelo:", error);
       return "NONE";

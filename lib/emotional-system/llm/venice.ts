@@ -599,9 +599,13 @@ export class VeniceClient {
       temperature?: number;
     }
   ): Promise<T> {
+    // Agregar /no_think para modelos Qwen 3 si el modelo especificado es qwen3-4b
+    const isQwen3 = options?.model?.includes('qwen3') || options?.model?.includes('qwen-3');
+    const finalUserMessage = isQwen3 ? `/no_think\n\n${userMessage}` : userMessage;
+
     const response = await this.generateWithSystemPrompt(
       systemPrompt + "\n\nResponde ÚNICAMENTE con JSON válido, sin texto adicional.",
-      userMessage,
+      finalUserMessage,
       {
         ...options,
         temperature: options?.temperature ?? 0.3, // Más bajo para JSON
@@ -612,10 +616,16 @@ export class VeniceClient {
       // Extraer JSON del texto (a veces viene con ```json o texto extra)
       let jsonText = response.text.trim();
 
+      // Limpiar etiquetas <think> que pueden aparecer con Qwen 3
+      jsonText = jsonText.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
       // Remover markdown code blocks si existen
       if (jsonText.startsWith("```")) {
         jsonText = jsonText.replace(/```json\n?/g, "").replace(/```\n?/g, "");
       }
+
+      // Normalizar espacios y saltos de línea antes de parsear
+      jsonText = jsonText.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim();
 
       // Parsear JSON
       const parsed = JSON.parse(jsonText);
