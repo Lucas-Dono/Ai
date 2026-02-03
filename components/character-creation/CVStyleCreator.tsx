@@ -687,7 +687,7 @@ export function CVStyleCreator() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-200 pb-20 selection:bg-indigo-500/30">
+    <div className="w-full font-sans text-slate-200 selection:bg-indigo-500/30">
 
       {/* HEADER */}
       <header className="bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-800">
