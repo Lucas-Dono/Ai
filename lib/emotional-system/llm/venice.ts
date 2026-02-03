@@ -40,6 +40,7 @@ export interface VeniceImageParams {
   height?: number;
   quality?: 'standard' | 'hd';
   style?: 'vivid' | 'natural';
+  userTier?: 'free' | 'plus' | 'ultra'; // Para seleccionar modelo apropiado
 }
 
 export interface VeniceImageResult {
@@ -280,6 +281,21 @@ class VeniceCircuitBreaker {
  * Instancia global del circuit breaker
  */
 const globalCircuitBreaker = new VeniceCircuitBreaker();
+
+/**
+ * Modelos de imagen disponibles en Venice AI
+ *
+ * Pricing:
+ * - z-image-turbo: $0.01/imagen (100 imágenes = $1)
+ * - imagineart-1.5-pro: $0.05/imagen (20 imágenes = $1, 4K nativo)
+ */
+export const VENICE_IMAGE_MODELS = {
+  // z-image-turbo - Rápido y económico para FREE tier
+  TURBO: "z-image-turbo",
+
+  // imagineart-1.5-pro - Alta calidad 4K para PLUS/ULTRA
+  PRO: "imagineart-1.5-pro",
+};
 
 export class VeniceClient {
   private apiKeys: string[];
@@ -609,12 +625,39 @@ export class VeniceClient {
   }
 
   /**
-   * Genera una imagen usando grok-imagine de Venice
-   * Costo: $0.04 por imagen (mejor que Google Nano Banana a $0.039)
+   * Selecciona el modelo de imagen apropiado basado en el tier del usuario
+   *
+   * - FREE: z-image-turbo ($0.01/imagen) - 100 imágenes = $1 USD
+   * - PLUS: imagineart-1.5-pro ($0.05/imagen) - 20 imágenes = $1 USD (4K, alta calidad)
+   * - ULTRA: imagineart-1.5-pro ($0.05/imagen) - 20 imágenes = $1 USD (4K, ultra alta calidad)
+   *
+   * Con un usuario PLUS/ULTRA que paga $10, obtenemos presupuesto para 200 imágenes avatar.
+   */
+  private selectImageModel(userTier: 'free' | 'plus' | 'ultra'): string {
+    switch (userTier) {
+      case 'free':
+        return VENICE_IMAGE_MODELS.TURBO; // $0.01 por imagen
+      case 'plus':
+      case 'ultra':
+        return VENICE_IMAGE_MODELS.PRO; // $0.05 por imagen (4K nativo)
+      default:
+        return VENICE_IMAGE_MODELS.TURBO;
+    }
+  }
+
+  /**
+   * Genera una imagen usando Venice AI con modelos tier-based
+   *
+   * Modelos y costos:
+   * - FREE: z-image-turbo ($0.01/imagen) - Rápido y económico
+   * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen) - Alta calidad 4K
    */
   async generateImage(params: VeniceImageParams): Promise<VeniceImageResult> {
     try {
-      console.log('[Venice Image] 🎨 Generando imagen con grok-imagine...');
+      // Seleccionar modelo basado en tier
+      const model = this.selectImageModel(params.userTier || 'free');
+
+      console.log(`[Venice Image] 🎨 Generando imagen con ${model}...`);
       const startTime = Date.now();
 
       // Construir prompt completo (combinando prompt + negative prompt)
@@ -625,7 +668,7 @@ export class VeniceClient {
       }
 
       const requestBody = {
-        model: 'grok-imagine',
+        model,
         prompt: fullPrompt,
         n: 1,
         size: `${params.width || 1024}x${params.height || 1024}`,
@@ -671,12 +714,16 @@ export class VeniceClient {
 
   /**
    * Genera imagen de avatar optimizada para personajes
-   * Costo: $0.04 por avatar
+   *
+   * Costos por tier:
+   * - FREE: $0.01/imagen (z-image-turbo)
+   * - PLUS/ULTRA: $0.05/imagen (imagineart-1.5-pro, 4K)
    */
   async generateAvatar(params: {
     description: string;
     age?: number;
     gender?: 'male' | 'female' | 'non-binary';
+    userTier?: 'free' | 'plus' | 'ultra';
   }): Promise<VeniceImageResult> {
     let prompt = `professional portrait photo, ${params.description}`;
 
@@ -704,6 +751,7 @@ export class VeniceClient {
       height: 1024,
       quality: 'hd',
       style: 'natural',
+      userTier: params.userTier || 'free',
     });
   }
 }
@@ -769,7 +817,7 @@ export function getVeniceCircuitBreaker() {
 }
 
 /**
- * Modelos disponibles en Venice AI
+ * Modelos disponibles en Venice AI (Texto)
  */
 export const VENICE_MODELS = {
   // Llama 3.3 70B - Recomendado por defecto (mejor balance)

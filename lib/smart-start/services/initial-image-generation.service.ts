@@ -5,10 +5,12 @@
  * - Avatar (profile photo - portrait/close-up)
  * - Reference Image (full-body photo)
  *
- * Uses AI Horde as primary provider (free, high quality)
+ * Uses Venice AI with tier-based models:
+ * - FREE: z-image-turbo ($0.01/imagen)
+ * - PLUS/ULTRA: imagineart-1.5-pro ($0.05/imagen, 4K)
  */
 
-import { getAIHordeClient } from '@/lib/visual-system/ai-horde-client';
+import { getVeniceClient } from '@/lib/emotional-system/llm/venice';
 import type { GenderType } from '@/types/character-creation';
 
 export interface GenerateInitialImagesParams {
@@ -46,15 +48,14 @@ export interface InitialImagesResult {
 
   /** Generation metadata */
   metadata: {
-    avatarSeed: number;
-    referenceSeed: number;
     generationTime: number;
     cost: number;
+    model: string;
   };
 }
 
 export class InitialImageGenerationService {
-  private aiHorde = getAIHordeClient();
+  private veniceClient = getVeniceClient();
 
   /**
    * Generate both avatar and reference image for a character
@@ -71,16 +72,21 @@ export class InitialImageGenerationService {
 
     const generationTime = (Date.now() - startTime) / 1000;
 
-    console.log(`[InitialImageGen] ✅ Both images generated in ${generationTime}s`);
+    // Calculate cost based on tier
+    const costPerImage = params.userTier === 'FREE' ? 0.01 : 0.05;
+    const totalCost = costPerImage * 2; // 2 imágenes
+
+    const model = params.userTier === 'FREE' ? 'z-image-turbo' : 'imagineart-1.5-pro';
+
+    console.log(`[InitialImageGen] ✅ Both images generated in ${generationTime}s (${model}, $${totalCost})`);
 
     return {
       avatarUrl: avatarResult.imageUrl,
       referenceImageUrl: referenceResult.imageUrl,
       metadata: {
-        avatarSeed: avatarResult.seed,
-        referenceSeed: referenceResult.seed,
         generationTime,
-        cost: 0, // AI Horde is free
+        cost: totalCost,
+        model,
       },
     };
   }
@@ -111,21 +117,20 @@ export class InitialImageGenerationService {
   private async generateAvatar(params: GenerateInitialImagesParams) {
     const prompt = this.buildAvatarPrompt(params);
     const negativePrompt = this.buildNegativePrompt(params.style || 'realistic');
-    const steps = this.getStepsForTier(params.userTier || 'FREE');
 
     console.log('[InitialImageGen] Avatar prompt:', prompt);
 
-    const result = await this.aiHorde.generateImage({
+    // Mapear tier a formato de Venice
+    const userTier = (params.userTier || 'FREE').toLowerCase() as 'free' | 'plus' | 'ultra';
+
+    const result = await this.veniceClient.generateImage({
       prompt,
       negativePrompt,
-      width: 512,
-      height: 512,
-      steps,
-      cfgScale: 7.5,
-      seed: -1, // Random seed
-      sampler: 'k_euler_a',
-      karras: true,
-      nsfw: params.nsfw || false,
+      width: 1024,
+      height: 1024,
+      quality: userTier === 'free' ? 'standard' : 'hd',
+      style: 'natural',
+      userTier,
     });
 
     return result;
@@ -137,21 +142,20 @@ export class InitialImageGenerationService {
   private async generateFullBody(params: GenerateInitialImagesParams) {
     const prompt = this.buildFullBodyPrompt(params);
     const negativePrompt = this.buildNegativePrompt(params.style || 'realistic');
-    const steps = this.getStepsForTier(params.userTier || 'FREE');
 
     console.log('[InitialImageGen] Full-body prompt:', prompt);
 
-    const result = await this.aiHorde.generateImage({
+    // Mapear tier a formato de Venice
+    const userTier = (params.userTier || 'FREE').toLowerCase() as 'free' | 'plus' | 'ultra';
+
+    const result = await this.veniceClient.generateImage({
       prompt,
       negativePrompt,
-      width: 512,
-      height: 768, // Taller aspect ratio for full-body
-      steps,
-      cfgScale: 7.5,
-      seed: -1, // Random seed
-      sampler: 'k_euler_a',
-      karras: true,
-      nsfw: params.nsfw || false,
+      width: 768,
+      height: 1024, // Taller aspect ratio for full-body
+      quality: userTier === 'free' ? 'standard' : 'hd',
+      style: 'natural',
+      userTier,
     });
 
     return result;
@@ -298,13 +302,13 @@ export class InitialImageGenerationService {
     const ageStr = age ? `${age} years old` : 'young adult';
 
     switch (gender) {
-      case 'Male':
+      case 'male':
         return `handsome man, ${ageStr}`;
-      case 'Female':
+      case 'female':
         return `beautiful woman, ${ageStr}`;
-      case 'Non-binary':
+      case 'non-binary':
         return `person, ${ageStr}, androgynous`;
-      case 'Other':
+      case 'other':
       default:
         return `person, ${ageStr}`;
     }
@@ -331,21 +335,6 @@ export class InitialImageGenerationService {
     }
   }
 
-  /**
-   * Get generation steps based on user tier
-   */
-  private getStepsForTier(tier: 'FREE' | 'PLUS' | 'ULTRA'): number {
-    switch (tier) {
-      case 'FREE':
-        return 25; // Faster, still good quality
-      case 'PLUS':
-        return 30; // Balanced
-      case 'ULTRA':
-        return 35; // Best quality
-      default:
-        return 25;
-    }
-  }
 }
 
 // Singleton instance
