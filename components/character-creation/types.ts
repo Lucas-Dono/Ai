@@ -38,6 +38,25 @@ export interface CharacterDraft {
   // Personality Evolution (Optional) - Cómo ha cambiado la personalidad con el tiempo
   personalityEvolution?: PersonalityEvolution;
 
+  // Enriched Psychological System (Optional) - Sistema psicológico enriquecido (PLUS/ULTRA)
+  facets?: any; // BigFiveFacets - 30 dimensiones de facetas
+  darkTriad?: {
+    machiavellianism: number; // 0-100
+    narcissism: number;
+    psychopathy: number;
+  };
+  attachmentProfile?: {
+    primaryStyle: 'secure' | 'anxious' | 'avoidant' | 'fearful-avoidant';
+    intensity: number; // 0-100
+    manifestations: string[];
+  };
+  psychologicalNeeds?: {
+    connection: number; // 0-1
+    autonomy: number;
+    competence: number;
+    novelty: number;
+  };
+
   // Relationships (Optional)
   importantPeople: ImportantPerson[];
   maritalStatus: 'single' | 'married' | 'divorced' | 'widowed' | 'complicated' | undefined;

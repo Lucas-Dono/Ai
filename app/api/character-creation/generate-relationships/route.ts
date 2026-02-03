@@ -8,6 +8,14 @@ const RequestSchema = z.object({
   description: z.string().min(10),
   name: z.string().optional(),
   age: z.number().optional(),
+  // Big Five personality traits
+  bigFive: z.object({
+    openness: z.number().min(0).max(100).optional(),
+    conscientiousness: z.number().min(0).max(100).optional(),
+    extraversion: z.number().min(0).max(100).optional(),
+    agreeableness: z.number().min(0).max(100).optional(),
+    neuroticism: z.number().min(0).max(100).optional(),
+  }).optional(),
   // Contexto existente
   existingPeople: z.array(z.any()).optional(),
   existingValues: z.array(z.string()).optional(),
@@ -31,7 +39,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description, name, age, existingPeople, existingValues, existingFears } = validation.data;
+    const { description, name, age, bigFive, existingPeople, existingValues, existingFears } = validation.data;
+
+    // Determinar cantidad y tipo de relaciones basado en personalidad
+    const extraversion = bigFive?.extraversion ?? 50;
+    const agreeableness = bigFive?.agreeableness ?? 50;
+    const neuroticism = bigFive?.neuroticism ?? 50;
+
+    // Calcular cantidad de personas según extraversión
+    let minPeople = 2;
+    let maxPeople = 6;
+    if (extraversion > 70) {
+      minPeople = 8;
+      maxPeople = 15; // Muy extrovertido: muchas relaciones
+    } else if (extraversion > 50) {
+      minPeople = 5;
+      maxPeople = 9; // Moderadamente extrovertido
+    } else if (extraversion < 30) {
+      minPeople = 2;
+      maxPeople = 4; // Muy introvertido: pocas relaciones pero profundas
+    }
+
+    // Construir perfil de personalidad
+    let personalityContext = '';
+    if (bigFive) {
+      personalityContext = `\n\nPERFIL DE PERSONALIDAD (Big Five):
+- Extraversión: ${extraversion}/100 ${extraversion > 70 ? '(Muy sociable, vida social activa)' : extraversion < 30 ? '(Introvertido, círculo pequeño)' : '(Moderado)'}
+- Amabilidad: ${agreeableness}/100 ${agreeableness > 70 ? '(Muy empático, relaciones armoniosas)' : agreeableness < 30 ? '(Competitivo, relaciones tensas)' : '(Moderado)'}
+- Neuroticismo: ${neuroticism}/100 ${neuroticism > 70 ? '(Emocionalmente volátil, relaciones complicadas)' : neuroticism < 30 ? '(Estable, relaciones tranquilas)' : '(Moderado)'}
+
+ADAPTACIÓN BASADA EN PERSONALIDAD:
+- Cantidad de relaciones: ${minPeople}-${maxPeople} personas (adaptado a extraversión)
+- Tipo de relaciones: ${extraversion > 70 ? 'Muchos conocidos, varios círculos sociales, amistades de distintos contextos' : extraversion < 30 ? 'Pocos amigos cercanos, relaciones profundas y duraderas, evita multitudes' : 'Mix de amigos cercanos y conocidos ocasionales'}
+- Dinámica social: ${agreeableness > 70 ? 'Relaciones generalmente armoniosas, ayuda a otros, evita conflictos' : agreeableness < 30 ? 'Relaciones competitivas, conflictos frecuentes, prioriza sus objetivos' : 'Balance entre cooperación y competencia'}
+- Estabilidad emocional: ${neuroticism > 70 ? 'Relaciones intensas con altibajos, dramas emocionales, inseguridades' : neuroticism < 30 ? 'Relaciones estables y predecibles, resuelve conflictos con calma' : 'Algunos conflictos pero generalmente manejables'}`;
+    }
 
     // Construir sección de contexto existente
     let existingContext = '';
@@ -51,6 +93,7 @@ DESCRIPCIÓN DEL PERSONAJE:
 ${description}
 ${name ? `Nombre: ${name}` : ''}
 ${age ? `Edad: ${age}` : ''}
+${personalityContext}
 ${existingContext}
 
 Genera las siguientes relaciones en formato JSON:
@@ -89,12 +132,15 @@ Genera las siguientes relaciones en formato JSON:
 
 INSTRUCCIONES CRÍTICAS:
 
-1. DIVERSIDAD DE RELACIONES (3-6 personas):
-   - Familia: Padres, hermanos, abuelos (influencias formativas)
-   - Amistades: Mejor amigo, amigos de la infancia
-   - Románticas: Pareja actual, ex significativa
-   - Profesionales: Mentor, colega influyente
-   - Conflictivas: Rival, relación complicada
+1. CANTIDAD Y DIVERSIDAD DE RELACIONES (${minPeople}-${maxPeople} personas):
+   IMPORTANTE: Genera EXACTAMENTE entre ${minPeople} y ${maxPeople} personas, adaptado a la personalidad del personaje.
+
+   DISTRIBUCIÓN SUGERIDA:
+   - Familia: 1-2 miembros clave (padres, hermanos, abuelos - influencias formativas)
+   - Amistades: ${extraversion > 70 ? '4-8 amigos de distintos círculos' : extraversion < 30 ? '1-2 amigos muy cercanos' : '2-4 amigos'}
+   - Románticas: 0-1 pareja actual o ex significativa (según contexto y edad)
+   - Profesionales: 0-2 (mentor, colega influyente - más común en 25+ años)
+   - Conflictivas: ${agreeableness < 30 ? '2-3 relaciones tensas o rivales' : agreeableness > 70 ? '0-1 relación complicada (todos tienen alguna)' : '1-2 relaciones complicadas'}
 
 2. PROFUNDIDAD PSICOLÓGICA:
    - INFLUENCIA: Cada persona debe haber moldeado valores, miedos o personalidad
@@ -115,11 +161,13 @@ INSTRUCCIONES CRÍTICAS:
    - deceased: Persona fallecida (pero su influencia perdura)
    - distant: Relación que se enfrió con el tiempo
 
-5. REALISMO:
+5. REALISMO Y CONTEXTO DE PERSONALIDAD:
    - No todas las relaciones son positivas
-   - Incluir AL MENOS una relación complicada o conflictiva
+   - ${agreeableness < 50 ? 'INCLUIR VARIAS relaciones complicadas o conflictivas (personalidad poco amigable)' : 'Incluir AL MENOS una relación complicada o conflictiva'}
    - Padres/familia pueden ser influencia negativa o fuente de trauma
    - Las personas moldeamos valores EN REACCIÓN a otros (ej: padre controlador → valor de independencia)
+   - ${extraversion > 70 ? 'Personaje extrovertido: incluir amigos de distintos contextos (trabajo, hobbies, bar favorito, gym, etc.)' : extraversion < 30 ? 'Personaje introvertido: pocas personas pero VÍNCULOS MUY PROFUNDOS y significativos' : ''}
+   - ${neuroticism > 70 ? 'Personalidad neurótica: incluir relaciones con ALTIBAJOS EMOCIONALES, inseguridades, celos, dependencia emocional' : ''}
 
 6. COHERENCIA CON EDAD:
    - 18-25 años: Énfasis en amigos, primeras relaciones románticas, padres presentes
@@ -173,13 +221,29 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
       temperature: 0.8,
     });
 
+    // Post-procesamiento: Limpiar artefactos del modelo antes de parsear JSON
+    let cleanedResponse = response.trim();
+
+    // Eliminar markdown code blocks si existen
+    cleanedResponse = cleanedResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+
+    // Eliminar comentarios de JavaScript (// y /* */)
+    cleanedResponse = cleanedResponse.replace(/\/\/.*$/gm, ''); // Comentarios de una línea
+    cleanedResponse = cleanedResponse.replace(/\/\*[\s\S]*?\*\//g, ''); // Comentarios multilínea
+
     // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[Generate Relationships] No se pudo extraer JSON. Respuesta limpiada:', cleanedResponse.substring(0, 500));
       throw new Error('No se pudo extraer JSON de la respuesta');
     }
 
-    const relationshipsData = JSON.parse(jsonMatch[0]);
+    let jsonText = jsonMatch[0];
+
+    // Limpiar trailing commas antes de } o ]
+    jsonText = jsonText.replace(/,([\s]*[}\]])/g, '$1');
+
+    const relationshipsData = JSON.parse(jsonText);
 
     // Añadir IDs a las personas y eventos
     if (relationshipsData.people) {

@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { inferFacetsFromBigFive } from '@/lib/psychological-analysis';
+import { withRetry } from '@/lib/utils/retry';
+import { getVeniceClient, VENICE_MODELS } from '@/lib/emotional-system/llm/venice';
 
 const RequestSchema = z.object({
   description: z.string().min(10),
@@ -154,12 +156,49 @@ ${existingContext ? '- IMPORTANTE: Si hay información previa, REFINA y EXPANDE 
 Responde SOLO con el JSON válido, sin texto adicional.`;
 
     const llm = getLLMProvider();
-    const response = await llm.generate({
-      systemPrompt: 'Eres un psicólogo experto que crea perfiles de personalidad realistas basados en el modelo Big Five. Respondes siempre con JSON válido.',
-      messages: [{ role: 'user', content: prompt }],
-      maxTokens: 15000, // Límite generoso - Gemini rara vez usa tanto pero evita cortes
-      temperature: 0.8,
-    });
+
+    // Try with Gemini first, fallback to Venice if all retries fail
+    let response: string;
+    try {
+      response = await withRetry(
+        async () => {
+          return await llm.generate({
+            systemPrompt: 'Eres un psicólogo experto que crea perfiles de personalidad realistas basados en el modelo Big Five. Respondes siempre con JSON válido.',
+            messages: [{ role: 'user', content: prompt }],
+            maxTokens: 15000,
+            temperature: 0.8,
+          });
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 2000,
+          shouldRetry: (error) => {
+            if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('saturated')) {
+              console.log('[Generate Personality] Gemini saturated, retrying...');
+              return true;
+            }
+            return false;
+          },
+          onRetry: (error, attempt) => {
+            console.log(`[Generate Personality] Retrying with Gemini (${attempt}/3):`, error.message);
+          }
+        }
+      );
+    } catch (geminiError: any) {
+      // Fallback to Venice if Gemini fails
+      console.warn('[Generate Personality] ⚠️ Gemini failed, falling back to Venice...');
+
+      const veniceClient = getVeniceClient();
+      response = await veniceClient.generateWithMessages({
+        systemPrompt: 'Eres un psicólogo experto que crea perfiles de personalidad realistas basados en el modelo Big Five. Respondes siempre con JSON válido.',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8,
+        maxTokens: 15000,
+        model: VENICE_MODELS.DEFAULT,
+      });
+
+      console.log('[Generate Personality] ✅ Fallback to Venice successful');
+    }
 
     // Post-procesamiento: Limpiar artefactos del modelo antes de parsear JSON
     let cleanedResponse = response.trim();

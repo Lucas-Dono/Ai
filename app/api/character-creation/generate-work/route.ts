@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth-helper';
 import { getLLMProvider } from '@/lib/llm/provider';
 import { z } from 'zod';
+import { withRetry } from '@/lib/utils/retry';
+import { getVeniceClient, VENICE_MODELS } from '@/lib/emotional-system/llm/venice';
 
 const RequestSchema = z.object({
   description: z.string().min(10),
@@ -91,20 +93,73 @@ EJEMPLOS DE BUENOS LOGROS:
 Responde SOLO con el JSON válido, sin texto adicional.`;
 
     const llm = getLLMProvider();
-    const response = await llm.generate({
-      systemPrompt: 'Eres un experto en desarrollo profesional que crea perfiles de carrera realistas. Respondes siempre con JSON válido.',
-      messages: [{ role: 'user', content: prompt }],
-      maxTokens: 15000, // Límite generoso para evitar cortes
-      temperature: 0.7,
-    });
+
+    // Try with Gemini first, fallback to Venice if all retries fail
+    let response: string;
+    try {
+      response = await withRetry(
+        async () => {
+          return await llm.generate({
+            systemPrompt: 'Eres un experto en desarrollo profesional que crea perfiles de carrera realistas. Respondes siempre con JSON válido.',
+            messages: [{ role: 'user', content: prompt }],
+            maxTokens: 15000,
+            temperature: 0.7,
+          });
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 2000,
+          shouldRetry: (error) => {
+            if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('saturated')) {
+              console.log('[Generate Work] Gemini saturated, retrying...');
+              return true;
+            }
+            return false;
+          },
+          onRetry: (error, attempt) => {
+            console.log(`[Generate Work] Retrying with Gemini (${attempt}/3):`, error.message);
+          }
+        }
+      );
+    } catch (geminiError: any) {
+      // Fallback to Venice if Gemini fails
+      console.warn('[Generate Work] ⚠️ Gemini failed, falling back to Venice...');
+
+      const veniceClient = getVeniceClient();
+      response = await veniceClient.generateWithMessages({
+        systemPrompt: 'Eres un experto en desarrollo profesional que crea perfiles de carrera realistas. Respondes siempre con JSON válido.',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        maxTokens: 15000,
+        model: VENICE_MODELS.DEFAULT,
+      });
+
+      console.log('[Generate Work] ✅ Fallback to Venice successful');
+    }
+
+    // Post-procesamiento: Limpiar artefactos del modelo antes de parsear JSON
+    let cleanedResponse = response.trim();
+
+    // Eliminar markdown code blocks si existen
+    cleanedResponse = cleanedResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+
+    // Eliminar comentarios de JavaScript (// y /* */)
+    cleanedResponse = cleanedResponse.replace(/\/\/.*$/gm, ''); // Comentarios de una línea
+    cleanedResponse = cleanedResponse.replace(/\/\*[\s\S]*?\*\//g, ''); // Comentarios multilínea
 
     // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[Generate Work] No se pudo extraer JSON. Respuesta limpiada:', cleanedResponse.substring(0, 500));
       throw new Error('No se pudo extraer JSON de la respuesta');
     }
 
-    const workData = JSON.parse(jsonMatch[0]);
+    let jsonText = jsonMatch[0];
+
+    // Limpiar trailing commas antes de } o ]
+    jsonText = jsonText.replace(/,([\s]*[}\]])/g, '$1');
+
+    const workData = JSON.parse(jsonText);
 
     return NextResponse.json(workData);
   } catch (error: any) {

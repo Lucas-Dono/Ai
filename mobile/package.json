@@ -10,6 +10,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@better-auth/expo": "^1.4.18",
     "@circuitpromptai/smart-start-core": "*",
     "@creador-ia/shared": "*",
     "@expo/vector-icons": "^15.0.3",
@@ -17,6 +18,7 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "^8.4.5",
     "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-community/slider": "^4.5.7",
     "@react-navigation/bottom-tabs": "7.4.7",
     "@react-navigation/native": "7.1.18",
     "@react-navigation/native-stack": "7.4.0",
@@ -25,6 +27,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
+    "better-auth": "^1.4.18",
     "expo": "~54.0.18",
     "expo-audio": "~1.0.13",
     "expo-av": "^16.0.7",
@@ -35,7 +38,9 @@
     "expo-image": "~3.0.10",
     "expo-linear-gradient": "~15.0.7",
     "expo-localization": "^17.0.7",
+    "expo-network": "^8.0.8",
     "expo-notifications": "^0.32.12",
+    "expo-secure-store": "^15.0.8",
     "expo-server-sdk": "^4.0.0",
     "expo-status-bar": "~3.0.8",
     "expo-system-ui": "~6.0.8",

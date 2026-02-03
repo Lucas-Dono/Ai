@@ -1,11 +1,10 @@
 /**
  * Contexto de autenticación para la aplicación móvil
- * FIXED: Manejo robusto de sesiones sin race conditions
+ * Using Better Auth for authentication
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { StorageService } from '../services/storage';
-import { AuthService, apiClient, initializeApiClient, authManager } from '../services/api';
+import { authClient } from '../lib/auth-client';
 
 interface User {
   id: string;
@@ -29,130 +28,41 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // Use Better Auth's session hook
+  const { data: session, isPending: sessionLoading, error } = authClient.useSession();
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Registrar callback para manejar unauthorized
-    authManager.setUnauthorizedCallback(() => {
-      console.log('[AuthContext] Session expired, clearing user');
-      setUser(null);
-    });
-
-    loadStoredAuth();
-  }, []);
-
-  async function loadStoredAuth() {
-    try {
-      console.log('[Auth] Loading stored session...');
-
-      // Initialize API client with stored token
-      const hasToken = await initializeApiClient();
-
-      if (!hasToken) {
-        console.log('[Auth] No token found, skipping validation');
-        setLoading(false);
-        return;
-      }
-
-      // Load stored user data
-      const userData = await StorageService.getUserData<User>();
-
-      if (!userData) {
-        console.log('[Auth] No user data found, clearing token');
-        apiClient.clearAuthToken();
-        await StorageService.clearAll();
-        setLoading(false);
-        return;
-      }
-
-      // Set user immediately (optimistic)
-      setUser(userData);
-      console.log('[Auth] Session restored:', userData.email);
-
-      // Validate token in background (don't block UI)
-      validateTokenInBackground(userData);
-      setLoading(false);
-    } catch (error) {
-      console.error('[Auth] Error loading session:', error);
-      await StorageService.clearAll();
-      apiClient.clearAuthToken();
-      setUser(null);
+    // Mark as loaded once session check completes
+    if (!sessionLoading) {
       setLoading(false);
     }
-  }
 
-  /**
-   * Validar token en segundo plano
-   * Si falla, el interceptor de Axios llamará a onUnauthorized
-   */
-  async function validateTokenInBackground(userData: User) {
-    try {
-      const response: any = await AuthService.getMe();
-      const freshUser = response.user || response;
-
-      // Actualizar datos si cambiaron
-      if (JSON.stringify(freshUser) !== JSON.stringify(userData)) {
-        console.log('[Auth] User data updated from server');
-        setUser(freshUser);
-        await StorageService.setUserData(freshUser);
-      } else {
-        console.log('[Auth] Token validated successfully');
-      }
-    } catch (error: any) {
-      // Si es 401, onUnauthorized ya se encargó
-      if (error?.response?.status === 401) {
-        console.log('[Auth] Token invalid, onUnauthorized will handle it');
-        return;
-      }
-
-      // Otros errores (red, etc) - mantener sesión offline
-      console.warn('[Auth] Token validation failed (network?), keeping session:', error.message);
+    if (error) {
+      console.error('[Auth] Session error:', error);
+      setLoading(false);
     }
-  }
+  }, [sessionLoading, error]);
 
   async function login(email: string, password: string) {
     try {
       console.log('[Auth] Logging in:', email);
 
-      // Marcar que estamos autenticando para ignorar 401s transitorios
-      authManager.startAuthenticating();
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-      const response: any = await AuthService.login(email, password);
-
-      if (!response.token || !response.user) {
-        throw new Error('Invalid login response from server');
+      if (error) {
+        console.error('[Auth] Login failed:', error);
+        throw new Error(error.message || 'Error al iniciar sesión');
       }
 
-      console.log('[Auth] Login successful:', response.user.email);
-
-      // CRITICAL: Set token on API client FIRST (in-memory)
-      apiClient.setAuthToken(response.token);
-
-      // Then persist to storage (can fail without breaking session)
-      await Promise.all([
-        StorageService.setToken(response.token),
-        StorageService.setUserData(response.user),
-      ]);
-
-      // Finally update state
-      setUser(response.user);
-
-      // Marcar autenticación como completa
-      authManager.finishAuthenticating();
+      console.log('[Auth] Login successful:', data?.user?.email);
     } catch (error: any) {
-      console.error('[Auth] Login failed:', error);
-
-      // Limpiar en caso de error
-      apiClient.clearAuthToken();
-      await StorageService.clearAll();
-      authManager.reset();
-
-      throw new Error(
-        error?.response?.data?.message ||
-        error?.message ||
-        'Error al iniciar sesión'
-      );
+      console.error('[Auth] Login exception:', error);
+      throw new Error(error?.message || 'Error al iniciar sesión');
     }
   }
 
@@ -160,44 +70,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[Auth] Registering:', email);
 
-      // Marcar que estamos autenticando para ignorar 401s transitorios
-      authManager.startAuthenticating();
+      const { data, error } = await authClient.signUp.email({
+        email,
+        password,
+        name,
+      });
 
-      const response: any = await AuthService.register(email, password, name);
-
-      if (!response.token || !response.user) {
-        throw new Error('Invalid register response from server');
+      if (error) {
+        console.error('[Auth] Registration failed:', error);
+        throw new Error(error.message || 'Error al registrarse');
       }
 
-      console.log('[Auth] Registration successful:', response.user.email);
-
-      // CRITICAL: Set token on API client FIRST (in-memory)
-      apiClient.setAuthToken(response.token);
-
-      // Then persist to storage (can fail without breaking session)
-      await Promise.all([
-        StorageService.setToken(response.token),
-        StorageService.setUserData(response.user),
-      ]);
-
-      // Finally update state
-      setUser(response.user);
-
-      // Marcar autenticación como completa
-      authManager.finishAuthenticating();
+      console.log('[Auth] Registration successful:', data?.user?.email);
     } catch (error: any) {
-      console.error('[Auth] Registration failed:', error);
-
-      // Limpiar en caso de error
-      apiClient.clearAuthToken();
-      await StorageService.clearAll();
-      authManager.reset();
-
-      throw new Error(
-        error?.response?.data?.message ||
-        error?.message ||
-        'Error al registrarse'
-      );
+      console.error('[Auth] Registration exception:', error);
+      throw new Error(error?.message || 'Error al registrarse');
     }
   }
 
@@ -205,32 +92,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[Auth] Logging out...');
 
-      // AuthService.logout ya limpia todo
-      await AuthService.logout();
-
-      // Reset auth manager
-      authManager.reset();
-
-      // Clear state
-      setUser(null);
+      await authClient.signOut();
 
       console.log('[Auth] Logged out successfully');
     } catch (error) {
       console.error('[Auth] Logout error:', error);
-
-      // Asegurar que todo se limpió
-      await StorageService.clearAll();
-      apiClient.clearAuthToken();
-      setUser(null);
     }
   }
 
-  function updateUser(userData: User) {
-    setUser(userData);
-    StorageService.setUserData(userData).catch((error) => {
-      console.error('[Auth] Error saving user data:', error);
-    });
+  function updateUser(_userData: User) {
+    // With better-auth, we don't manually update user
+    // The session hook will automatically update
+    console.log('[Auth] User update requested - will sync via session');
   }
+
+  // Extract user from session
+  const user = session?.user as User | null;
 
   return (
     <AuthContext.Provider

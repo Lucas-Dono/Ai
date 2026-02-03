@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { expo } from "@better-auth/expo";
 import { prisma } from "@/lib/prisma";
 
 export const auth = betterAuth({
@@ -16,11 +17,22 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  plugins: [
+    expo(), // Enable Expo/React Native support
+  ],
   trustedOrigins: [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     process.env.NEXTAUTH_URL,
     process.env.NEXT_PUBLIC_APP_URL,
+    // Expo scheme
+    "blaniel://",
+    // Development mode - Expo's exp:// scheme with local IP ranges
+    ...(process.env.NODE_ENV === "development" ? [
+      "exp://",
+      "exp://**",
+      "exp://192.168.*.*:*/**",
+    ] : [])
   ].filter(Boolean) as string[],
   advanced: {
     cookiePrefix: "better-auth",

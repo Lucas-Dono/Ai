@@ -3,9 +3,15 @@
  *
  * IMPORTANTE: Este es el ÚNICO lugar donde se debe definir la URL base de la API
  * Cualquier otro archivo debe importar desde aquí
+ *
+ * FORCE RELOAD: 2026-02-03 18:25
  */
 
 import { DEV_API_URL as ENV_DEV_API_URL, PROD_API_URL as ENV_PROD_API_URL } from '@env';
+
+// DEBUG: Ver qué valor está llegando desde @env
+console.log('🔍 [DEBUG] ENV_DEV_API_URL from @env:', ENV_DEV_API_URL);
+console.log('🔍 [DEBUG] typeof ENV_DEV_API_URL:', typeof ENV_DEV_API_URL);
 
 // ═══════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN DE URLs DE API
@@ -34,6 +40,9 @@ import { DEV_API_URL as ENV_DEV_API_URL, PROD_API_URL as ENV_PROD_API_URL } from
 
 const DEV_API_URL = ENV_DEV_API_URL || 'http://192.168.0.170:3000';
 const PROD_API_URL = ENV_PROD_API_URL || 'https://api.example.com';
+
+console.log('🔍 [DEBUG] Final DEV_API_URL value:', DEV_API_URL);
+console.log('🔍 [DEBUG] Final API_BASE_URL will be:', __DEV__ ? DEV_API_URL : PROD_API_URL);
 
 // Advertencia en desarrollo si no se configuró la IP
 const DEFAULT_DEV_IP = '192.168.0.170';

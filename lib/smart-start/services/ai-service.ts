@@ -1,9 +1,12 @@
 /**
  * AI Service - Intelligent routing between Gemini (public data) and Venice (private/NSFW)
  * Handles all AI generation tasks for Smart Start
+ *
+ * Fallback system: If Gemini fails after retries, automatically fallback to Venice
  */
 
 import { executeWithRetry } from '@/lib/ai/gemini-client';
+import { getVeniceClient, VENICE_MODELS } from '@/lib/emotional-system/llm/venice';
 
 // Types for AI generation
 export interface GenerationTask {
@@ -70,16 +73,58 @@ export class AIService {
 
   /**
    * Generate content using the appropriate model
+   * With automatic fallback to Venice if Gemini fails
    */
   async generate(task: GenerationTask): Promise<GenerationResult> {
     const model = this.router.selectModel(task);
 
     console.log(`[AIService] Using ${model} for task: ${task.type}`);
 
-    if (model === 'gemini') {
-      return this.generateWithGemini(task);
-    } else {
-      return this.generateWithVenice(task);
+    try {
+      if (model === 'gemini') {
+        return await this.generateWithGemini(task);
+      } else {
+        return await this.generateWithVenice(task);
+      }
+    } catch (primaryError: any) {
+      // If primary model fails, fallback to Venice (if not already using it)
+      // model can be 'gemini' or 'mistral', mistral means we're already using Venice
+      if (model === 'gemini') {
+        console.warn(`[AIService] ⚠️ Gemini failed, falling back to Venice...`);
+        console.warn(`[AIService] Error:`, primaryError.message);
+
+        try {
+          const veniceClient = getVeniceClient();
+
+          // Use Venice with appropriate model
+          const systemPrompt = task.systemPrompt || 'You are a helpful AI assistant.';
+          const veniceResponse = await veniceClient.generateWithMessages({
+            systemPrompt,
+            messages: [{ role: 'user', content: task.prompt }],
+            temperature: task.temperature ?? 0.85,
+            maxTokens: task.maxTokens ?? 2000,
+            model: VENICE_MODELS.DEFAULT,
+          });
+
+          console.log('[AIService] ✅ Fallback to Venice successful');
+
+          return {
+            text: veniceResponse,
+            model: 'mistral', // Maintain interface compatibility
+            tokensUsed: {
+              input: 0,
+              output: 0,
+            },
+            finishReason: 'stop',
+          };
+        } catch (fallbackError: any) {
+          console.error('[AIService] ❌ Venice fallback also failed:', fallbackError.message);
+          throw new Error(`Both Gemini and Venice failed. Gemini: ${primaryError.message}. Venice: ${fallbackError.message}`);
+        }
+      } else {
+        // Already using mistral/Venice, no fallback available
+        throw primaryError;
+      }
     }
   }
 

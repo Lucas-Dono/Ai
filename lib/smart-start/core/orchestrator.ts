@@ -23,6 +23,9 @@ import { PromptBuilder } from '../prompts/generator';
 import { nanoid } from 'nanoid';
 import { getDescriptionBasedGenerator, type GenerationOptions } from '../services/description-based-generator';
 import { getInitialImageGenerationService } from '../services/initial-image-generation.service';
+import { getLLMProvider } from '@/lib/llm/provider';
+import { withRetry } from '@/lib/utils/retry';
+import { getVeniceClient, VENICE_MODELS } from '@/lib/emotional-system/llm/venice';
 
 const prisma = new PrismaClient();
 
@@ -67,6 +70,76 @@ export class SmartStartOrchestrator {
   private aiService = getAIService();
   private promptBuilder = new PromptBuilder();
   private validator = getValidationService();
+
+  /**
+   * Helper to generate with Gemini and fallback to Venice if all retries fail
+   *
+   * Venice Qwen3-235B costs $0.75/M tokens - more cost-effective than service failure
+   */
+  private async generateWithFallback(options: {
+    systemPrompt: string;
+    messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+    maxTokens?: number;
+    temperature?: number;
+  }): Promise<string> {
+    const geminiLLM = getLLMProvider();
+
+    try {
+      // Try with Gemini first (with retry)
+      console.log('[Orchestrator] Attempting generation with Gemini...');
+      const response = await withRetry(
+        async () => {
+          return await geminiLLM.generate({
+            systemPrompt: options.systemPrompt,
+            messages: options.messages,
+            maxTokens: options.maxTokens,
+            temperature: options.temperature,
+          });
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 2000,
+          shouldRetry: (error) => {
+            if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('saturated')) {
+              console.log('[Orchestrator] Gemini saturated, retrying...');
+              return true;
+            }
+            return false;
+          },
+          onRetry: (error, attempt) => {
+            console.log(`[Orchestrator] Retrying with Gemini (${attempt}/3):`, error.message);
+          }
+        }
+      );
+
+      console.log('[Orchestrator] ✅ Generation successful with Gemini');
+      return response;
+    } catch (geminiError: any) {
+      // If Gemini fails after all retries, fallback to Venice
+      console.warn('[Orchestrator] ⚠️ Gemini failed after all retries, falling back to Venice/Qwen3...');
+      console.warn('[Orchestrator] Gemini error:', geminiError.message);
+
+      try {
+        const veniceClient = getVeniceClient();
+
+        // Use Qwen3-235B for cost-effectiveness ($0.75/M tokens)
+        // Note: The actual model name in Venice might be different, using DEFAULT for now
+        const veniceResponse = await veniceClient.generateWithMessages({
+          systemPrompt: options.systemPrompt,
+          messages: options.messages,
+          temperature: options.temperature ?? 0.8,
+          maxTokens: options.maxTokens ?? 15000,
+          model: VENICE_MODELS.DEFAULT, // Using llama-3.3-70b as fallback
+        });
+
+        console.log('[Orchestrator] ✅ Generation successful with Venice fallback');
+        return veniceResponse;
+      } catch (veniceError: any) {
+        console.error('[Orchestrator] ❌ Venice fallback also failed:', veniceError.message);
+        throw new Error(`Both Gemini and Venice failed. Gemini: ${geminiError.message}. Venice: ${veniceError.message}`);
+      }
+    }
+  }
 
   /**
    * Create a new Smart Start session
@@ -450,7 +523,25 @@ export class SmartStartOrchestrator {
       },
     };
 
-    const result = await generator.generate(generationOptions);
+    // Generate character with retry logic
+    const result = await withRetry(
+      async () => await generator.generate(generationOptions),
+      {
+        maxRetries: 3,
+        initialDelay: 2000,
+        shouldRetry: (error) => {
+          // Retry on model saturation errors
+          if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('saturated')) {
+            console.log('[Orchestrator] Model saturated, retrying character generation...');
+            return true;
+          }
+          return false;
+        },
+        onRetry: (error, attempt) => {
+          console.log(`[Orchestrator] Retrying character generation (${attempt}/3):`, error.message);
+        }
+      }
+    );
 
     // Log warnings if any (copyright issues detected)
     if (result.warnings && result.warnings.length > 0) {
@@ -470,28 +561,60 @@ export class SmartStartOrchestrator {
         console.log('[Orchestrator] Using uploaded avatar:', options.uploadedAvatarUrl);
         avatarUrl = options.uploadedAvatarUrl;
 
-        // Generate only full-body reference image
-        referenceImageUrl = await imageGenerator.generateFullBodyOnly({
-          name: result.draft.name || 'Character',
-          gender: result.draft.gender || 'Other',
-          physicalAppearance: result.draft.physicalAppearance,
-          age: result.draft.age,
-          personality: result.draft.personality,
-          style: 'realistic',
-          userTier,
-        });
+        // Generate only full-body reference image with retry
+        referenceImageUrl = await withRetry(
+          async () => await imageGenerator.generateFullBodyOnly({
+            name: result.draft.name || 'Character',
+            gender: result.draft.gender || 'Other',
+            physicalAppearance: result.draft.physicalAppearance,
+            age: result.draft.age,
+            personality: result.draft.personality,
+            style: 'realistic',
+            userTier,
+          }),
+          {
+            maxRetries: 2,
+            initialDelay: 3000,
+            shouldRetry: (error) => {
+              if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('queue')) {
+                console.log('[Orchestrator] Image generation saturated, retrying...');
+                return true;
+              }
+              return false;
+            },
+            onRetry: (error, attempt) => {
+              console.log(`[Orchestrator] Retrying image generation (${attempt}/2):`, error.message);
+            }
+          }
+        );
       } else {
-        // Generate both images with AI
+        // Generate both images with AI and retry logic
         console.log('[Orchestrator] Generating both images with AI...');
-        const imageResult = await imageGenerator.generateBothImages({
-          name: result.draft.name || 'Character',
-          gender: result.draft.gender || 'Other',
-          physicalAppearance: result.draft.physicalAppearance,
-          age: result.draft.age,
-          personality: result.draft.personality,
-          style: 'realistic',
-          userTier,
-        });
+        const imageResult = await withRetry(
+          async () => await imageGenerator.generateBothImages({
+            name: result.draft.name || 'Character',
+            gender: result.draft.gender || 'Other',
+            physicalAppearance: result.draft.physicalAppearance,
+            age: result.draft.age,
+            personality: result.draft.personality,
+            style: 'realistic',
+            userTier,
+          }),
+          {
+            maxRetries: 2,
+            initialDelay: 3000,
+            shouldRetry: (error) => {
+              if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('queue')) {
+                console.log('[Orchestrator] Image generation saturated, retrying...');
+                return true;
+              }
+              return false;
+            },
+            onRetry: (error, attempt) => {
+              console.log(`[Orchestrator] Retrying images generation (${attempt}/2):`, error.message);
+            }
+          }
+        );
 
         avatarUrl = imageResult.avatarUrl;
         referenceImageUrl = imageResult.referenceImageUrl;
@@ -516,12 +639,29 @@ export class SmartStartOrchestrator {
       appearance: result.draft.physicalAppearance,
     });
 
-    // Enhance draft with system prompt, metadata, and images
+    // Generate relationships ecosystem
+    console.log('[Orchestrator] Generating relationship ecosystem...');
+    let importantPeople: any[] = [];
+    try {
+      importantPeople = await this.generateRelationships({
+        description: `${result.draft.name || 'Personaje'}, ${result.draft.age || 25} años. ${result.draft.backstory || description}`,
+        name: result.draft.name,
+        age: result.draft.age,
+        bigFive: (result.draft as any).bigFive,
+      });
+      console.log('[Orchestrator] ✅ Generated', importantPeople.length, 'relationships');
+    } catch (relationshipsError) {
+      console.error('[Orchestrator] Error generating relationships:', relationshipsError);
+      // Continue without relationships - don't fail entire generation
+    }
+
+    // Enhance draft with system prompt, metadata, images, and relationships
     const enhancedDraft: CharacterDraft = {
       ...result.draft,
       systemPrompt,
       avatar: avatarUrl, // Add avatar URL
       referenceImage: referenceImageUrl, // Add reference image URL
+      importantPeople, // Add generated relationships
       genreId: options?.genreHint,
       archetypeId: options?.archetypeHint,
       aiGeneratedFields: [
@@ -535,6 +675,7 @@ export class SmartStartOrchestrator {
         'communicationStyle',
         'catchphrases',
         'systemPrompt',
+        ...(importantPeople.length > 0 ? ['importantPeople'] : []),
         ...(avatarUrl && !options?.uploadedAvatarUrl ? ['avatar'] : []),
         ...(referenceImageUrl ? ['referenceImage'] : []),
       ],
@@ -587,7 +728,26 @@ export class SmartStartOrchestrator {
     console.log('[Orchestrator] Generating random character for tier:', userTier);
 
     const generator = getDescriptionBasedGenerator();
-    const result = await generator.generateRandom(userTier);
+
+    // Generate random character with retry logic
+    const result = await withRetry(
+      async () => await generator.generateRandom(userTier),
+      {
+        maxRetries: 3,
+        initialDelay: 2000,
+        shouldRetry: (error) => {
+          // Retry on model saturation errors
+          if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('saturated')) {
+            console.log('[Orchestrator] Model saturated, retrying random generation...');
+            return true;
+          }
+          return false;
+        },
+        onRetry: (error, attempt) => {
+          console.log(`[Orchestrator] Retrying random generation (${attempt}/3):`, error.message);
+        }
+      }
+    );
 
     // Generate system prompt
     const systemPrompt = await this.promptBuilder.build({
@@ -783,6 +943,119 @@ Return a corrected version in JSON format.`;
     });
 
     return sessions as SmartStartSession[];
+  }
+
+  /**
+   * Generate relationships ecosystem for a character
+   */
+  private async generateRelationships(params: {
+    description: string;
+    name?: string;
+    age?: number;
+    bigFive?: any;
+  }): Promise<any[]> {
+    const { description, name, age, bigFive } = params;
+
+    // Determinar cantidad y tipo de relaciones basado en personalidad
+    const extraversion = bigFive?.extraversion ?? 50;
+    const agreeableness = bigFive?.agreeableness ?? 50;
+    const neuroticism = bigFive?.neuroticism ?? 50;
+
+    // Calcular cantidad de personas según extraversión
+    let minPeople = 2;
+    let maxPeople = 6;
+    if (extraversion > 70) {
+      minPeople = 8;
+      maxPeople = 15;
+    } else if (extraversion > 50) {
+      minPeople = 5;
+      maxPeople = 9;
+    } else if (extraversion < 30) {
+      minPeople = 2;
+      maxPeople = 4;
+    }
+
+    const personalityContext = `
+
+PERFIL DE PERSONALIDAD (Big Five):
+- Extraversión: ${extraversion}/100 ${extraversion > 70 ? '(Muy sociable, vida social activa)' : extraversion < 30 ? '(Introvertido, círculo pequeño)' : '(Moderado)'}
+- Amabilidad: ${agreeableness}/100 ${agreeableness > 70 ? '(Muy empático, relaciones armoniosas)' : agreeableness < 30 ? '(Competitivo, relaciones tensas)' : '(Moderado)'}
+- Neuroticismo: ${neuroticism}/100 ${neuroticism > 70 ? '(Emocionalmente volátil, relaciones complicadas)' : neuroticism < 30 ? '(Estable, relaciones tranquilas)' : '(Moderado)'}
+
+ADAPTACIÓN BASADA EN PERSONALIDAD:
+- Cantidad de relaciones: ${minPeople}-${maxPeople} personas
+- Tipo de relaciones: ${extraversion > 70 ? 'Muchos conocidos, varios círculos sociales' : extraversion < 30 ? 'Pocos amigos cercanos, relaciones profundas' : 'Mix de amigos cercanos y conocidos'}`;
+
+    const prompt = `Genera la red social de este personaje con PROFUNDIDAD PSICOLÓGICA.
+
+PERSONAJE:
+${description}
+${name ? `Nombre: ${name}` : ''}
+${age ? `Edad: ${age}` : ''}
+${personalityContext}
+
+Genera entre ${minPeople} y ${maxPeople} personas en formato JSON:
+
+{
+  "people": [
+    {
+      "name": "Nombre",
+      "relationship": "Madre/Padre/Amigo/etc",
+      "description": "Descripción breve",
+      "type": "family|friend|romantic|rival|mentor|colleague|other",
+      "closeness": 0-100,
+      "status": "active|estranged|deceased|distant",
+      "influenceOn": {
+        "values": ["valor1"],
+        "fears": ["miedo1"],
+        "skills": ["habilidad1"],
+        "personalityImpact": "Cómo moldeó al personaje"
+      },
+      "sharedHistory": [{"year": 2020, "title": "Evento", "description": "Desc"}],
+      "currentDynamic": "Relación actual",
+      "conflict": {"active": false, "description": "", "intensity": 0}
+    }
+  ]
+}
+
+Responde SOLO con JSON válido.`;
+
+    // Generate with retry logic for 500/503 errors and Venice fallback
+    const response = await this.generateWithFallback({
+      systemPrompt: 'Eres un psicólogo experto. Creas redes sociales realistas. Respondes solo con JSON válido.',
+      messages: [{ role: 'user', content: prompt }],
+      maxTokens: 15000,
+      temperature: 0.8,
+    });
+
+    // Parse JSON
+    let cleanedResponse = response.trim()
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No se pudo extraer JSON de la respuesta');
+    }
+
+    let jsonText = jsonMatch[0].replace(/,([\s]*[}\]])/g, '$1');
+    const relationshipsData = JSON.parse(jsonText);
+
+    // Añadir IDs
+    if (relationshipsData.people) {
+      relationshipsData.people = relationshipsData.people.map((person: any) => ({
+        id: nanoid(),
+        ...person,
+        sharedHistory: person.sharedHistory?.map((event: any) => ({
+          id: nanoid(),
+          ...event,
+        })) || [],
+      }));
+    }
+
+    return relationshipsData.people || [];
   }
 
   /**

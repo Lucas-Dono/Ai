@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth-helper';
 import { getLLMProvider } from '@/lib/llm/provider';
 import { z } from 'zod';
+import { withRetry } from '@/lib/utils/retry';
+import { getVeniceClient, VENICE_MODELS } from '@/lib/emotional-system/llm/venice';
 
 const RequestSchema = z.object({
   description: z.string().min(10),
@@ -41,6 +43,23 @@ export async function POST(req: NextRequest) {
       existingContext += `\nDESCRIPCIÓN FÍSICA YA DEFINIDA: "${existingPhysicalDescription}"\n(Refina y expande esta descripción, mantén la esencia)`;
     }
 
+    // Detectar si hay un nombre en la descripción
+    const nameMatch = description.match(/(?:se llama|llamad[oa]|nombre es|es)\s+([A-ZÀÁÈÉÌÍÒÓÙÚÑ][a-zàáèéìíòóùúñ]+(?:\s+[A-ZÀÁÈÉÌÍÒÓÙÚÑ][a-zàáèéìíòóùúñ]+)*)/i);
+    const detectedName = nameMatch ? nameMatch[1].trim() : null;
+
+    let nameInstruction = '';
+    if (detectedName) {
+      // Nombre detectado en la descripción
+      const hasLastName = detectedName.split(' ').length > 1;
+      if (hasLastName) {
+        nameInstruction = `CRÍTICO: La descripción menciona el nombre "${detectedName}". Usa EXACTAMENTE este nombre sin modificarlo. NO agregues segundos nombres ni apellidos adicionales.`;
+      } else {
+        nameInstruction = `CRÍTICO: La descripción menciona el nombre "${detectedName}" sin apellido. Usa este nombre de pila y agrégale SOLO un apellido apropiado (sin segundos nombres). Ejemplo: "${detectedName} García" o "${detectedName} Rodriguez".`;
+      }
+    } else {
+      nameInstruction = 'Genera un nombre completo apropiado basado en el origen y contexto del personaje.';
+    }
+
     const prompt = `Basándote en la siguiente descripción de un personaje, genera los datos de identidad básicos y extrae la descripción física/visual.
 
 DESCRIPCIÓN DEL PERSONAJE:
@@ -49,16 +68,18 @@ ${existingContext}
 
 Genera SOLO los siguientes campos en formato JSON válido:
 {
-  "name": "Nombre completo apropiado",
+  "name": "Nombre del personaje",
   "age": número (edad realista),
   "gender": "male" | "female" | "non-binary",
   "origin": "Ciudad, país de origen realista",
   "physicalDescription": "Descripción SOLO de la apariencia física extraída de la descripción original"
 }
 
-IMPORTANTE:
-- El nombre debe ser coherente con el origen y la descripción
-- La edad debe ser realista según la descripción
+INSTRUCCIONES PARA EL NOMBRE:
+${nameInstruction}
+
+OTRAS INSTRUCCIONES:
+- La edad debe ser realista según la descripción (usa la edad mencionada si existe)
 - El género debe inferirse de la descripción si es posible
 - El origen debe ser específico (ciudad y país)
 - physicalDescription: Extrae SOLO las características visuales/físicas mencionadas (altura, complexión, color de ojos, cabello, rasgos faciales, vestimenta). Si no hay descripción física en el texto original, genera una coherente basada en el nombre, edad y origen. Máximo 150 palabras, enfócate en lo visual.
@@ -67,20 +88,73 @@ ${existingContext ? '- IMPORTANTE: Si hay información previa (origen o descripc
 Responde SOLO con el JSON, sin texto adicional.`;
 
     const llm = getLLMProvider();
-    const response = await llm.generate({
-      systemPrompt: 'Eres un generador de datos de personajes realistas. Respondes siempre con JSON válido y datos coherentes.',
-      messages: [{ role: 'user', content: prompt }],
-      maxTokens: 15000, // Límite generoso para evitar cortes
-      temperature: 0.7,
-    });
+
+    // Try with Gemini first, fallback to Venice if all retries fail
+    let response: string;
+    try {
+      response = await withRetry(
+        async () => {
+          return await llm.generate({
+            systemPrompt: 'Eres un generador de datos de personajes realistas. Respondes siempre con JSON válido y datos coherentes.',
+            messages: [{ role: 'user', content: prompt }],
+            maxTokens: 15000,
+            temperature: 0.7,
+          });
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 2000,
+          shouldRetry: (error) => {
+            if (error.message?.includes('503') || error.message?.includes('500') || error.message?.includes('saturated')) {
+              console.log('[Generate Identity] Gemini saturated, retrying...');
+              return true;
+            }
+            return false;
+          },
+          onRetry: (error, attempt) => {
+            console.log(`[Generate Identity] Retrying with Gemini (${attempt}/3):`, error.message);
+          }
+        }
+      );
+    } catch (geminiError: any) {
+      // Fallback to Venice if Gemini fails
+      console.warn('[Generate Identity] ⚠️ Gemini failed, falling back to Venice...');
+
+      const veniceClient = getVeniceClient();
+      response = await veniceClient.generateWithMessages({
+        systemPrompt: 'Eres un generador de datos de personajes realistas. Respondes siempre con JSON válido y datos coherentes.',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        maxTokens: 15000,
+        model: VENICE_MODELS.DEFAULT,
+      });
+
+      console.log('[Generate Identity] ✅ Fallback to Venice successful');
+    }
+
+    // Post-procesamiento: Limpiar artefactos del modelo antes de parsear JSON
+    let cleanedResponse = response.trim();
+
+    // Eliminar markdown code blocks si existen
+    cleanedResponse = cleanedResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+
+    // Eliminar comentarios de JavaScript (// y /* */)
+    cleanedResponse = cleanedResponse.replace(/\/\/.*$/gm, ''); // Comentarios de una línea
+    cleanedResponse = cleanedResponse.replace(/\/\*[\s\S]*?\*\//g, ''); // Comentarios multilínea
 
     // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[Generate Identity] No se pudo extraer JSON. Respuesta limpiada:', cleanedResponse.substring(0, 500));
       throw new Error('No se pudo extraer JSON de la respuesta');
     }
 
-    const identityData = JSON.parse(jsonMatch[0]);
+    let jsonText = jsonMatch[0];
+
+    // Limpiar trailing commas antes de } o ]
+    jsonText = jsonText.replace(/,([\s]*[}\]])/g, '$1');
+
+    const identityData = JSON.parse(jsonText);
 
     return NextResponse.json(identityData);
   } catch (error: any) {

@@ -279,13 +279,23 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
           <Ionicons name="sparkles" size={19} color="#8b5cf6" />
           <Text style={styles.appTitle}>Blaniel</Text>
         </View>
-        <TouchableOpacity
-          onPress={() => parentNavigation.goBack()}
-          style={styles.closeButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="close" size={24} color="#ffffff" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CVStyleCreator')}
+            style={styles.manualButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="document-text" size={20} color="#8b5cf6" />
+            <Text style={styles.manualButtonText}>Manual</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => parentNavigation.goBack()}
+            style={styles.closeButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="close" size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Progress Indicator */}
@@ -446,11 +456,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   appTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#ffffff',
     letterSpacing: -0.3,
+  },
+  manualButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+  },
+  manualButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#8b5cf6',
   },
   closeButton: {
     width: 44,

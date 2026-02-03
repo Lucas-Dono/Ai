@@ -100,6 +100,22 @@ class IORedisAdapter {
     return this.client.zrange(key, start, stop);
   }
 
+  async zadd(key: string, score: number, member: string): Promise<number> {
+    return this.client.zadd(key, score, member);
+  }
+
+  async zrem(key: string, member: string): Promise<number> {
+    return this.client.zrem(key, member);
+  }
+
+  async zcard(key: string): Promise<number> {
+    return this.client.zcard(key);
+  }
+
+  async zremrangebyscore(key: string, min: string | number, max: string | number): Promise<number> {
+    return this.client.zremrangebyscore(key, min, max);
+  }
+
   multi() {
     const pipeline = this.client.multi();
     return {

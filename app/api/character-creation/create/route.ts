@@ -28,7 +28,13 @@ const CreateCharacterSchema = z.object({
 
   // Trabajo (obligatorio)
   occupation: z.string().min(1),
-  skills: z.array(z.string()),
+  skills: z.array(z.union([
+    z.string(),
+    z.object({
+      name: z.string(),
+      level: z.number().min(0).max(100),
+    })
+  ])),
   achievements: z.array(z.string()),
 
   // Personalidad (opcional)
@@ -111,6 +117,11 @@ export async function POST(req: NextRequest) {
     }
 
     const data = validation.data;
+
+    // Normalizar skills: convertir objetos {name, level} a strings
+    const normalizedSkills = data.skills.map(skill =>
+      typeof skill === 'string' ? skill : `${skill.name} (nivel ${skill.level})`
+    );
 
     // Sanitizar nombre
     const nameValidation = sanitizeAndValidateName(data.name);
@@ -218,7 +229,7 @@ export async function POST(req: NextRequest) {
       personality: {
         bigFive: data.bigFive,
         traits: data.coreValues,
-        strengths: data.skills,
+        strengths: normalizedSkills,
         weaknesses: data.fears,
       },
 
@@ -278,7 +289,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Generar system prompt basado en todos los datos
-    const systemPrompt = generateSystemPrompt(data);
+    const systemPrompt = generateSystemPrompt({...data, skills: normalizedSkills});
 
     // Crear agente con verificación atómica
     const agent = await prisma.$transaction(async (tx) => {
@@ -411,7 +422,7 @@ export async function POST(req: NextRequest) {
 }
 
 // Helper: Generar system prompt completo
-function generateSystemPrompt(data: z.infer<typeof CreateCharacterSchema>): string {
+function generateSystemPrompt(data: z.infer<typeof CreateCharacterSchema> & { skills: string[] }): string {
   const genderPronoun = data.gender === 'male' ? 'él' : data.gender === 'female' ? 'ella' : 'elle';
   const genderAdjective = data.gender === 'male' ? 'o' : data.gender === 'female' ? 'a' : 'e';
 

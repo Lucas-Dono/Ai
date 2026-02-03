@@ -16,6 +16,7 @@ import { ContradictionsDisplay } from './ContradictionsDisplay';
 import { RelationshipNetworkDisplay } from './RelationshipNetworkDisplay';
 import { PersonalityTimelineDisplay } from './PersonalityTimelineDisplay';
 import { CharacterSimulator } from './CharacterSimulator';
+import { fetchWithRetry } from '@/lib/utils/retry';
 
 // UI Components
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -282,6 +283,29 @@ export function CVStyleCreator() {
     };
   }, [character.bigFive, character.coreValues, enrichedPersonality]);
 
+  // Sincronizar enrichedPersonality con character cuando se carga/edita
+  useEffect(() => {
+    if (character.facets || character.darkTriad || character.attachmentProfile || character.psychologicalNeeds) {
+      setEnrichedPersonality({
+        facets: character.facets,
+        darkTriad: character.darkTriad,
+        attachmentProfile: character.attachmentProfile,
+        psychologicalNeeds: character.psychologicalNeeds,
+      });
+    }
+  }, [character.facets, character.darkTriad, character.attachmentProfile, character.psychologicalNeeds]);
+
+  // Debug: Log avatarUrl changes
+  useEffect(() => {
+    console.log('[CVStyleCreator] avatarUrl changed:', character.avatarUrl);
+  }, [character.avatarUrl]);
+
+  // Debug: Log importantPeople changes
+  useEffect(() => {
+    console.log('[CVStyleCreator] importantPeople changed:', character.importantPeople);
+    console.log('[CVStyleCreator] importantPeople count:', character.importantPeople.length);
+  }, [character.importantPeople]);
+
   // Análisis automático con debounce (500ms)
   useEffect(() => {
     if (!enrichedProfile) return;
@@ -391,6 +415,10 @@ export function CVStyleCreator() {
           if (character.importantPeople.length > 0) payload.existingPeople = character.importantPeople;
           if (character.coreValues.length > 0) payload.existingValues = character.coreValues;
           if (character.fears.length > 0) payload.existingFears = character.fears;
+          // Agregar Big Five para generar relaciones adaptadas a la personalidad
+          if (character.bigFive) {
+            payload.bigFive = character.bigFive;
+          }
           break;
 
         case 'identity':
@@ -402,11 +430,21 @@ export function CVStyleCreator() {
 
       console.log(`[Generate ${section}] Enviando contexto:`, payload);
 
-      const response = await fetch(`/api/character-creation/generate-${section}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetchWithRetry(
+        `/api/character-creation/generate-${section}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 2000,
+          onRetry: (error, attempt) => {
+            console.log(`[Generate ${section}] Reintento ${attempt}/3 tras error:`, error.message);
+          }
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -414,6 +452,7 @@ export function CVStyleCreator() {
       }
 
       const result = await response.json();
+      console.log(`[Generate ${section}] Respuesta del API:`, result);
       updateCharacterFromAI(section, result);
     } catch (error: any) {
       console.error(`Failed to generate ${section}:`, error);
@@ -424,6 +463,7 @@ export function CVStyleCreator() {
   };
 
   const updateCharacterFromAI = (section: string, data: any) => {
+    console.log(`[updateCharacterFromAI] Actualizando sección: ${section}`, data);
     setCharacter(prev => {
       switch (section) {
         case 'identity':
@@ -470,10 +510,35 @@ export function CVStyleCreator() {
           if (data.personalityEvolution) {
             updates.personalityEvolution = data.personalityEvolution;
           }
+          // Agregar datos enriquecidos (PLUS/ULTRA tiers)
+          if (data.facets) {
+            updates.facets = data.facets;
+          }
+          if (data.darkTriad) {
+            updates.darkTriad = data.darkTriad;
+          }
+          if (data.attachmentProfile) {
+            updates.attachmentProfile = data.attachmentProfile;
+          }
+          if (data.psychologicalNeeds) {
+            updates.psychologicalNeeds = data.psychologicalNeeds;
+          }
+
+          // IMPORTANTE: Actualizar también enrichedPersonality state para los tabs
+          setEnrichedPersonality({
+            facets: data.facets,
+            darkTriad: data.darkTriad,
+            attachmentProfile: data.attachmentProfile,
+            psychologicalNeeds: data.psychologicalNeeds,
+          });
+
           return { ...prev, ...updates };
         case 'history':
           return { ...prev, importantEvents: data.events, traumas: data.traumas, personalAchievements: data.achievements };
         case 'relationships':
+          console.log('[CVStyleCreator] Procesando relaciones. Data recibida:', data);
+          console.log('[CVStyleCreator] People array:', data.people);
+          console.log('[CVStyleCreator] People length:', data.people?.length);
           return { ...prev, importantPeople: data.people || [] };
         default:
           return prev;
@@ -564,15 +629,28 @@ export function CVStyleCreator() {
 
     setLoadingAI(prev => ({ ...prev, avatar: true }));
     try {
-      const response = await fetch('/api/character-creation/generate-avatar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: character.physicalDescription,
-          age: character.age,
-          gender: character.gender,
-        }),
-      });
+      const response = await fetchWithRetry(
+        '/api/character-creation/generate-avatar',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            description: character.physicalDescription,
+            age: character.age,
+            gender: character.gender,
+          }),
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 2000,
+          onRetry: (error, attempt) => {
+            console.log(`[Generate Avatar] Reintento ${attempt}/3 tras error:`, error.message);
+            if (!silent) {
+              setAvatarError(`Reintentando generación de avatar (${attempt}/3)...`);
+            }
+          }
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -610,14 +688,31 @@ export function CVStyleCreator() {
     formData.append('avatar', file);
 
     try {
-      const response = await fetch('/api/smart-start/upload-avatar', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetchWithRetry(
+        '/api/smart-start/upload-avatar',
+        {
+          method: 'POST',
+          body: formData,
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 1000,
+          onRetry: (error, attempt) => {
+            console.log(`[Upload Avatar] Reintento ${attempt}/3 tras error:`, error.message);
+          }
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
-        setCharacter(prev => ({ ...prev, avatarUrl: result.url }));
+        console.log('[Frontend] Avatar upload response:', result);
+        const avatarUrl = result.url || result.avatarUrl;
+        console.log('[Frontend] Setting avatarUrl to:', avatarUrl);
+        setCharacter(prev => ({ ...prev, avatarUrl }));
+      } else {
+        const error = await response.json();
+        console.error('[Frontend] Upload failed:', error);
+        alert(error.error || t('identity.avatar.errors.uploadFailed'));
       }
     } catch (error) {
       console.error('Failed to upload avatar:', error);
@@ -747,41 +842,26 @@ export function CVStyleCreator() {
   return (
     <div className="w-full font-sans text-slate-200 selection:bg-indigo-500/30">
 
-      {/* HEADER */}
-      <header className="bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-              <PenTool size={20} />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-100 leading-tight">PersonaArchitect</h1>
-              <p className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">
-                {t('header.subtitle')}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors border border-transparent hover:border-slate-700 rounded-lg cursor-pointer">
-              <Download size={14}/> {t('actions.export')}
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving || !isValid}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg uppercase tracking-wide ${
-                isValid && !isSaving
-                  ? 'bg-slate-100 text-slate-900 hover:bg-white shadow-white/5 hover:scale-105 cursor-pointer'
-                  : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50'
-              }`}
-            >
-              <Rocket size={14}/> {isSaving ? t('actions.saving') : t('actions.publish')}
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* DESKTOP: Botones flotantes en esquina superior derecha */}
+      <div className="hidden md:flex fixed top-4 right-4 z-40 gap-3">
+        <button className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors border border-slate-700 hover:border-slate-600 bg-slate-900/90 backdrop-blur-md rounded-lg cursor-pointer shadow-lg">
+          <Download size={14}/> {t('actions.export')}
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={isSaving || !isValid}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-lg uppercase tracking-wide ${
+            isValid && !isSaving
+              ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/20 hover:scale-105 cursor-pointer'
+              : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-50'
+          }`}
+        >
+          <Rocket size={14}/> {isSaving ? t('actions.saving') : t('actions.publish')}
+        </button>
+      </div>
 
       {/* MAIN CONTENT */}
-      <main className="max-w-4xl mx-auto mt-8 px-4 space-y-8">
+      <main className="max-w-4xl mx-auto mt-8 px-4 space-y-8 pb-8">
 
         {/* 1. IDENTIDAD */}
         <section className="bg-slate-900 rounded-xl border border-slate-800 p-6">
@@ -1347,6 +1427,28 @@ export function CVStyleCreator() {
             </section>
           </div>
         )}
+
+        {/* MOBILE: Botones de acción al final del formulario */}
+        <div className="md:hidden space-y-3 mt-12">
+          <button
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-slate-300 border border-slate-700 hover:border-slate-600 active:bg-slate-800 bg-slate-900 rounded-lg transition-colors"
+          >
+            <Download size={18}/>
+            {t('actions.export')}
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isSaving || !isValid}
+            className={`w-full flex items-center justify-center gap-2 px-4 py-4 rounded-lg text-base font-bold transition-all ${
+              isValid && !isSaving
+                ? 'bg-indigo-600 text-white active:bg-indigo-700 shadow-lg shadow-indigo-500/20'
+                : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
+            }`}
+          >
+            <Rocket size={20}/>
+            {isSaving ? t('actions.saving') : t('actions.publish')}
+          </button>
+        </div>
 
       </main>
     </div>

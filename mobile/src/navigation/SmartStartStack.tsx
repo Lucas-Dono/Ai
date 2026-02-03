@@ -13,6 +13,7 @@ import { colors } from '../theme';
 
 // Screens
 import SmartStartWizardScreen from '../screens/smart-start/SmartStartWizardScreen';
+import { CVStyleCreatorScreen } from '../screens/character-creation/CVStyleCreatorScreen';
 
 // Deprecated screens (kept for reference, not used in navigation)
 // import CharacterTypeSelectionScreen from '../screens/smart-start/CharacterTypeSelectionScreen';
@@ -27,6 +28,7 @@ import SmartStartWizardScreen from '../screens/smart-start/SmartStartWizardScree
 
 export type SmartStartStackParamList = {
   SmartStartWizard: undefined;
+  CVStyleCreator: undefined;
 
   // Legacy routes (still used by some screens)
   CharacterTypeSelection: undefined;
@@ -84,6 +86,15 @@ export function SmartStartStack() {
           component={SmartStartWizardScreen}
           options={{
             headerShown: false, // Using custom header in component
+          }}
+        />
+
+        {/* CV Style Creator - Manual character creation */}
+        <Stack.Screen
+          name="CVStyleCreator"
+          component={CVStyleCreatorScreen}
+          options={{
+            headerShown: false,
           }}
         />
 

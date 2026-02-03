@@ -59,9 +59,12 @@ export async function POST(req: NextRequest) {
     });
 
     // 6. Return success with URL
+    console.log('[API] Upload successful, returning URL:', result.url);
+
     return NextResponse.json({
       success: true,
       avatarUrl: result.url,
+      url: result.url, // También incluir como 'url' para compatibilidad
       metadata: result.metadata,
     });
   } catch (error) {

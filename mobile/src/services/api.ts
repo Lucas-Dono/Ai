@@ -127,10 +127,19 @@ export { API_ENDPOINTS };
 // Servicios específicos del API
 export const AuthService = {
   async login(email: string, password: string) {
+    console.log('[AuthService] 📧 Attempting login with email:', email);
+    console.log('[AuthService] 🔑 Password length:', password?.length);
+    console.log('[AuthService] 🔑 Password first 5 chars:', password?.substring(0, 5));
+    console.log('[AuthService] 🔑 Password (FULL):', password);
+    console.log('[AuthService] 📡 Sending to endpoint:', API_ENDPOINTS.AUTH.LOGIN);
+    console.log('[AuthService] 📡 Base URL:', API_BASE_URL);
+
     const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
       email,
       password,
     });
+
+    console.log('[AuthService] ✅ Login response received');
     return response;
   },
 

@@ -973,12 +973,12 @@ export class MessageService {
       return {
         userMessage: {
           id: userMessage.id,
-          content: userMessage.content,
+          content: decryptMessageIfNeeded(userMessage.content, userMessage.iv, userMessage.authTag),
           createdAt: userMessage.createdAt,
         },
         assistantMessage: {
           id: assistantMessage.id,
-          content: assistantMessage.content,
+          content: decryptMessageIfNeeded(assistantMessage.content, assistantMessage.iv, assistantMessage.authTag),
           createdAt: assistantMessage.createdAt,
           metadata: assistantMessage.metadata as Record<string, unknown>,
         },
