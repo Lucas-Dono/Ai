@@ -788,10 +788,19 @@ IMPORTANTE: Solo retorna el prompt optimizado, nada más.`;
       ],
       model: VENICE_MODELS.QWEN_3_4B, // Modelo económico
       temperature: 0.3, // Baja temperatura para consistencia
-      maxTokens: 200, // Prompts optimizados son cortos
+      maxTokens: 300, // Aumentado para incluir razonamiento + respuesta
     });
 
-    const enhancedPrompt = response.trim();
+    // Filtrar bloques <think> del output (el modelo puede usarlos para razonar mejor)
+    // Mantener el razonamiento mejora la calidad, pero no lo mostramos al usuario
+    let enhancedPrompt = response.trim();
+
+    // Remover cualquier bloque <think>...</think>
+    enhancedPrompt = enhancedPrompt.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+    // Remover bloque <think> sin cerrar (si quedó cortado)
+    enhancedPrompt = enhancedPrompt.replace(/<think>[\s\S]*/gi, '').trim();
+
     console.log('[Venice Prompt Enhancer] Original:', userPrompt);
     console.log('[Venice Prompt Enhancer] Enhanced:', enhancedPrompt);
 
