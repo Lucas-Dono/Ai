@@ -157,7 +157,7 @@ Responde SOLO con el JSON válido, sin texto adicional.`;
     const response = await llm.generate({
       systemPrompt: 'Eres un psicólogo experto que crea perfiles de personalidad realistas basados en el modelo Big Five. Respondes siempre con JSON válido.',
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 500,
+      maxTokens: 15000, // Límite generoso - Gemini rara vez usa tanto pero evita cortes
       temperature: 0.8,
     });
 
