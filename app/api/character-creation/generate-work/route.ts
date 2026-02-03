@@ -7,9 +7,15 @@ const RequestSchema = z.object({
   description: z.string().min(10),
   name: z.string().optional(),
   age: z.number().optional(),
+  gender: z.enum(['male', 'female', 'non-binary']).optional(),
   // Contexto existente (para refinar/expandir)
   existingOccupation: z.string().optional(),
-  existingSkills: z.array(z.string()).optional(),
+  existingSkills: z.array(
+    z.object({
+      name: z.string(),
+      level: z.number().min(0).max(100)
+    })
+  ).optional(),
   existingAchievements: z.array(z.string()).optional(),
 });
 
@@ -21,23 +27,9 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-
-    // DEBUG: Logging temporal para ver qué datos llegan
-    console.log('═'.repeat(80));
-    console.log('[Generate Work] DATOS RECIBIDOS DEL FRONTEND:');
-    console.log('═'.repeat(80));
-    console.log(JSON.stringify(body, null, 2));
-    console.log('═'.repeat(80));
-
     const validation = RequestSchema.safeParse(body);
 
     if (!validation.success) {
-      console.error('═'.repeat(80));
-      console.error('[Generate Work] ❌ VALIDACIÓN FALLÓ:');
-      console.error('═'.repeat(80));
-      console.error(JSON.stringify(validation.error.format(), null, 2));
-      console.error('═'.repeat(80));
-
       return NextResponse.json(
         { error: 'Datos de entrada inválidos', details: validation.error.format() },
         { status: 400 }
@@ -52,10 +44,11 @@ export async function POST(req: NextRequest) {
       existingContext += `\nOCUPACIÓN YA DEFINIDA: ${existingOccupation}\n(Usa esta ocupación, genera habilidades y logros coherentes)`;
     }
     if (existingSkills && existingSkills.length > 0) {
-      existingContext += `\nHABILIDADES YA DEFINIDAS: ${existingSkills.join(', ')}\n(Expande estas habilidades, agrega más si es necesario)`;
+      const skillsList = existingSkills.map(s => `${s.name} (nivel ${s.level})`).join(', ');
+      existingContext += `\nHABILIDADES YA DEFINIDAS: ${skillsList}\n(Respeta estas habilidades con sus niveles, puedes agregar más coherentes)`;
     }
     if (existingAchievements && existingAchievements.length > 0) {
-      existingContext += `\nLOGROS YA DEFINIDOS: ${existingAchievements.join(', ')}\n(Expande estos logros, agrega más coherentes)`;
+      existingContext += `\nLOGROS YA DEFINIDOS: ${existingAchievements.join(', ')}\n(Respeta estos logros, agrega más coherentes)`;
     }
 
     const prompt = `Basándote en la siguiente descripción de un personaje, genera su perfil profesional.
