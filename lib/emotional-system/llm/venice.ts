@@ -703,17 +703,17 @@ export class VeniceClient {
 
       const data = await response.json();
 
-      // Venice API retorna formato: { id, images: ["base64..."], timing: {...} }
-      if (!data.images || !data.images[0]) {
-        console.error('[Venice Image] Invalid response format:', JSON.stringify(data).substring(0, 200));
-        throw new Error('Invalid response from Venice Image API - no images array');
+      // Venice API retorna formato OpenAI-like: { created, data: [{ b64_json: "..." }] }
+      if (!data.data || !data.data[0] || !data.data[0].b64_json) {
+        console.error('[Venice Image] Invalid response format:', JSON.stringify(data).substring(0, 500));
+        throw new Error('Invalid response from Venice Image API - no b64_json in data array');
       }
 
       const generationTime = (Date.now() - startTime) / 1000;
       console.log(`[Venice Image] ✅ Imagen generada en ${generationTime.toFixed(2)}s`);
 
       // Convertir base64 a data URL
-      const base64Image = data.images[0];
+      const base64Image = data.data[0].b64_json;
       const imageUrl = `data:image/png;base64,${base64Image}`;
 
       return {
