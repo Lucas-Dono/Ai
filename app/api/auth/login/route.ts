@@ -42,7 +42,13 @@ async function verifyBetterAuthPassword(password: string, storedHash: string): P
     console.log('[LOGIN DEBUG] 🔐 Hash buffer length:', hash.length, 'bytes');
 
     console.log('[LOGIN DEBUG] ⚙️  Deriving key with scrypt...');
-    const derived = (await scryptAsync(password, salt, 64)) as Buffer;
+    // Better-auth usa scrypt con parámetros: N=16384, r=8, p=1
+    // Node.js scrypt signature: scrypt(password, salt, keylen, options)
+    const derived = (await scryptAsync(password, salt, 64, {
+      N: 16384,
+      r: 8,
+      p: 1,
+    })) as Buffer;
 
     console.log('[LOGIN DEBUG] ✅ Derived hash length:', derived.length, 'bytes');
     console.log('[LOGIN DEBUG] 🔐 Derived hash (hex):', derived.toString('hex'));
