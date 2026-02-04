@@ -76,11 +76,17 @@ export class AuthApiClient {
           _retry?: boolean;
         };
 
-        // Si es 401 y no es el endpoint de refresh
+        // Endpoints que NO deben intentar refresh cuando reciben 401
+        const authEndpoints = ['/login', '/register', '/refresh', '/sign-in', '/sign-up'];
+        const isAuthEndpoint = authEndpoints.some(endpoint =>
+          originalRequest.url?.includes(endpoint)
+        );
+
+        // Si es 401 y no es un endpoint de autenticación
         if (
           error.response?.status === 401 &&
           !originalRequest._retry &&
-          !originalRequest.url?.includes(this.config.refreshEndpoint!)
+          !isAuthEndpoint
         ) {
           console.log('[AuthApiClient] 🔄 401 detected, attempting token refresh');
 
