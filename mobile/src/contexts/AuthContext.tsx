@@ -58,6 +58,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (restoredUser) {
         console.log('[Auth] Session restored:', restoredUser.email);
+        console.log('[Auth] User plan from storage:', restoredUser.plan);
+
+        // HOTFIX: Verificar si el plan en storage está desactualizado
+        // Si es 'free', intentar obtener el plan real del servidor
+        if (restoredUser.plan === 'free') {
+          console.log('[Auth] Plan is "free", checking server for updated plan...');
+          try {
+            const freshUser = await authService.getMe();
+            console.log('[Auth] Fresh user data from server:', freshUser.plan);
+            if (freshUser.plan !== 'free') {
+              console.log('[Auth] ✅ Updated plan from free to', freshUser.plan);
+              setUser(freshUser);
+              return;
+            }
+          } catch (error) {
+            console.log('[Auth] Could not fetch fresh user data, using cached');
+          }
+        }
+
         setUser(restoredUser);
       } else {
         console.log('[Auth] No active session');
