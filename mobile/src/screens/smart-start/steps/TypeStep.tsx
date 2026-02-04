@@ -1,8 +1,11 @@
 /**
  * Type Step Component
  *
- * First step: Choose between existing or original character
- * Extracted from CharacterTypeSelectionScreen - maintains same clean design
+ * @deprecated This component is no longer used in the simplified Smart Start flow.
+ * We removed the option to create characters based on famous people (legal compliance).
+ * The new flow starts directly with DescriptionGenerationStep.
+ *
+ * Kept for reference only.
  */
 
 import React, { useEffect } from 'react';

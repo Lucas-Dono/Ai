@@ -1,8 +1,11 @@
 /**
  * Search Step Component
  *
- * Third step: Search for existing characters (only if characterType === 'existing')
- * Redesigned: No gradients, no blur, professional solid design
+ * @deprecated This component is no longer used in the simplified Smart Start flow.
+ * We removed the option to create characters based on famous people (legal compliance).
+ * The new flow starts directly with DescriptionGenerationStep.
+ *
+ * Kept for reference only.
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';

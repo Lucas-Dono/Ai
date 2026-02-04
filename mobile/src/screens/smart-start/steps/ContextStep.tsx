@@ -1,8 +1,11 @@
 /**
  * Context Step Component
  *
- * Shows auto-detected character context (Historical, Cultural Icon, Fictional, etc.)
- * Allows user to confirm or manually select context category and subcategory
+ * @deprecated This component is no longer used in the simplified Smart Start flow.
+ * We removed the option to create characters based on famous people (legal compliance).
+ * The new flow starts directly with DescriptionGenerationStep.
+ *
+ * Kept for reference only.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';

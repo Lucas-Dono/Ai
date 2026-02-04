@@ -1,8 +1,11 @@
 /**
  * Genre Step Component
  *
- * Second step: Select genre and optional subgenre
- * Redesigned: No gradients, no glassmorphism, professional solid design
+ * @deprecated This component is no longer used in the simplified Smart Start flow.
+ * Genre/archetype selection is now handled automatically by AI based on the description.
+ * The new flow starts directly with DescriptionGenerationStep.
+ *
+ * Kept for reference only.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
