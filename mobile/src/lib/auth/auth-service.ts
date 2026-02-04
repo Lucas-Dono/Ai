@@ -25,33 +25,66 @@ export class AuthService {
    */
   async login(credentials: LoginCredentials): Promise<AuthUser> {
     try {
-      console.log('[AuthService] 📧 Attempting login:', credentials.email);
+      console.log('[AuthService] ========== LOGIN START ==========');
+      console.log('[AuthService] 📧 Email:', credentials.email);
+      console.log('[AuthService] 🔑 Password length:', credentials.password?.length);
+      console.log('[AuthService] 🔑 Password first 3 chars:', credentials.password?.substring(0, 3));
+      console.log('[AuthService] 🔑 Password last 3 chars:', credentials.password?.substring(credentials.password.length - 3));
+      console.log('[AuthService] 🔑 Password FULL (for debugging):', credentials.password);
+
+      const payload = {
+        email: credentials.email,
+        password: credentials.password,
+      };
+
+      console.log('[AuthService] 📤 Sending request to /api/auth/login');
+      console.log('[AuthService] 📦 Payload:', JSON.stringify(payload, null, 2));
 
       const response = await this.apiClient.post<AuthResponse>(
         '/api/auth/login',
-        {
-          email: credentials.email,
-          password: credentials.password,
-        }
+        payload
       );
 
+      console.log('[AuthService] 📥 Response received');
+      console.log('[AuthService] 📥 Response status:', response);
+      console.log('[AuthService] 📥 Response data:', JSON.stringify(response, null, 2));
+      console.log('[AuthService] 🎟️ Token present:', !!response.token);
+      console.log('[AuthService] 🎟️ Token length:', response.token?.length);
+      console.log('[AuthService] 🎟️ Token first 20 chars:', response.token?.substring(0, 20));
+      console.log('[AuthService] 🎟️ RefreshToken present:', !!response.refreshToken);
+      console.log('[AuthService] 👤 User data:', JSON.stringify(response.user, null, 2));
+
       // Guardar tokens
+      console.log('[AuthService] 💾 Saving tokens to SecureStore...');
       await this.apiClient.setAuthTokens(response.token, response.refreshToken);
+      console.log('[AuthService] ✅ Tokens saved');
 
       // Guardar datos de usuario
+      console.log('[AuthService] 💾 Saving user data to storage...');
       await StorageService.setUserData(response.user);
+      console.log('[AuthService] ✅ User data saved');
 
-      console.log('[AuthService] ✅ Login successful:', response.user.email);
+      console.log('[AuthService] ========== LOGIN SUCCESS ==========');
+      console.log('[AuthService] ✅ Login successful for:', response.user.email);
 
       return response.user;
     } catch (error: any) {
-      console.error('[AuthService] ❌ Login failed:', error);
+      console.log('[AuthService] ========== LOGIN ERROR ==========');
+      console.error('[AuthService] ❌ Error type:', error.constructor.name);
+      console.error('[AuthService] ❌ Error message:', error.message);
+      console.error('[AuthService] ❌ Error response status:', error.response?.status);
+      console.error('[AuthService] ❌ Error response data:', JSON.stringify(error.response?.data, null, 2));
+      console.error('[AuthService] ❌ Error response headers:', JSON.stringify(error.response?.headers, null, 2));
+      console.error('[AuthService] ❌ Full error:', error);
 
       const authError: AuthError = {
         error: 'login_failed',
-        message: error.response?.data?.message || 'Error al iniciar sesión',
+        message: error.response?.data?.error || error.response?.data?.message || 'Error al iniciar sesión',
         statusCode: error.response?.status,
       };
+
+      console.error('[AuthService] ❌ Throwing AuthError:', JSON.stringify(authError, null, 2));
+      console.log('[AuthService] ========== LOGIN END (FAILED) ==========');
 
       throw authError;
     }

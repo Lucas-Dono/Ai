@@ -51,6 +51,10 @@ export class AuthApiClient {
     // Request interceptor: Auto-attach token
     this.client.interceptors.request.use(
       async (config: InternalAxiosRequestConfig) => {
+        console.log('[AuthApiClient] 🌐 Outgoing request:', config.method?.toUpperCase(), config.url);
+        console.log('[AuthApiClient] 📦 Request data:', JSON.stringify(config.data, null, 2));
+        console.log('[AuthApiClient] 📋 Request headers (before):', JSON.stringify(config.headers, null, 2));
+
         const token = await JWTManager.getAccessToken();
 
         if (token) {
@@ -59,6 +63,8 @@ export class AuthApiClient {
         } else {
           console.log('[AuthApiClient] ⚠️ No valid token found');
         }
+
+        console.log('[AuthApiClient] 📋 Request headers (after):', JSON.stringify(config.headers, null, 2));
 
         return config;
       },
@@ -70,8 +76,14 @@ export class AuthApiClient {
 
     // Response interceptor: Handle 401 and auto-refresh
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log('[AuthApiClient] ✅ Response received:', response.status, response.config.url);
+        console.log('[AuthApiClient] 📥 Response data:', JSON.stringify(response.data, null, 2));
+        return response;
+      },
       async (error: AxiosError) => {
+        console.log('[AuthApiClient] ❌ Response error:', error.response?.status, error.config?.url);
+        console.log('[AuthApiClient] ❌ Error data:', JSON.stringify(error.response?.data, null, 2));
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
         };
@@ -184,7 +196,15 @@ export class AuthApiClient {
    * Set authentication tokens manually (after login/register)
    */
   async setAuthTokens(accessToken: string, refreshToken?: string): Promise<void> {
+    console.log('[AuthApiClient] 💾 setAuthTokens called');
+    console.log('[AuthApiClient] 🎟️ Access token present:', !!accessToken);
+    console.log('[AuthApiClient] 🎟️ Access token length:', accessToken?.length);
+    console.log('[AuthApiClient] 🎟️ Refresh token present:', !!refreshToken);
+    console.log('[AuthApiClient] 🎟️ Refresh token length:', refreshToken?.length);
+
     await JWTManager.saveTokens({ accessToken, refreshToken });
+
+    console.log('[AuthApiClient] ✅ Tokens saved via JWTManager');
     console.log('[AuthApiClient] 🔐 Tokens saved');
   }
 
