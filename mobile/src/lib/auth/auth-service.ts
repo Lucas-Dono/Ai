@@ -5,6 +5,7 @@
 import { AuthApiClient } from './api-client';
 import { JWTManager } from './jwt-manager';
 import { StorageService } from '../../services/storage';
+import { updateApiClientToken } from '../../services/api';
 import type {
   LoginCredentials,
   RegisterCredentials,
@@ -59,6 +60,11 @@ export class AuthService {
       await this.apiClient.setAuthTokens(response.token, response.refreshToken);
       console.log('[AuthService] ✅ Tokens saved');
 
+      // Sincronizar token con ApiClient de shared
+      console.log('[AuthService] 🔄 Syncing token with ApiClient...');
+      await updateApiClientToken();
+      console.log('[AuthService] ✅ Token synced with ApiClient');
+
       // Guardar datos de usuario
       console.log('[AuthService] 💾 Saving user data to storage...');
       await StorageService.setUserData(response.user);
@@ -108,6 +114,9 @@ export class AuthService {
 
       // Guardar tokens
       await this.apiClient.setAuthTokens(response.token, response.refreshToken);
+
+      // Sincronizar token con ApiClient de shared
+      await updateApiClientToken();
 
       // Guardar datos de usuario
       await StorageService.setUserData(response.user);

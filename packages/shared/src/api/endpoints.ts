@@ -23,21 +23,37 @@ export const API_ENDPOINTS = {
     REVIEWS: (id: string) => `/api/agents/${id}/reviews`,
   },
 
-  // Mundos
+  // Grupos (anteriormente Mundos)
   WORLDS: {
-    LIST: '/api/worlds',
-    CREATE: '/api/worlds',
-    GET: (id: string) => `/api/worlds/${id}`,
-    UPDATE: (id: string) => `/api/worlds/${id}`,
-    DELETE: (id: string) => `/api/worlds/${id}`,
-    MESSAGE: (id: string) => `/api/worlds/${id}/message`,
-    START: (id: string) => `/api/worlds/${id}/start`,
-    STOP: (id: string) => `/api/worlds/${id}/stop`,
-    PAUSE: (id: string) => `/api/worlds/${id}/pause`,
-    CLONE: (id: string) => `/api/worlds/${id}/clone`,
-    AGENTS: (id: string) => `/api/worlds/${id}/agents`,
-    TRENDING: '/api/worlds/trending',
-    PREDEFINED: '/api/worlds/predefined',
+    LIST: '/api/groups',
+    CREATE: '/api/groups',
+    GET: (id: string) => `/api/groups/${id}`,
+    UPDATE: (id: string) => `/api/groups/${id}`,
+    DELETE: (id: string) => `/api/groups/${id}`,
+    MESSAGE: (id: string) => `/api/groups/${id}/messages`,
+    START: (id: string) => `/api/groups/${id}/start`,
+    STOP: (id: string) => `/api/groups/${id}/stop`,
+    PAUSE: (id: string) => `/api/groups/${id}/pause`,
+    CLONE: (id: string) => `/api/groups/${id}/clone`,
+    AGENTS: (id: string) => `/api/groups/${id}/agents`,
+    TRENDING: '/api/groups/trending',
+  },
+
+  // Alias para compatibilidad (GROUPS es lo mismo que WORLDS)
+  GROUPS: {
+    LIST: '/api/groups',
+    CREATE: '/api/groups',
+    GET: (id: string) => `/api/groups/${id}`,
+    UPDATE: (id: string) => `/api/groups/${id}`,
+    DELETE: (id: string) => `/api/groups/${id}`,
+    MESSAGE: (id: string) => `/api/groups/${id}/messages`,
+    MESSAGES: (id: string) => `/api/groups/${id}/messages`,
+    START: (id: string) => `/api/groups/${id}/start`,
+    STOP: (id: string) => `/api/groups/${id}/stop`,
+    PAUSE: (id: string) => `/api/groups/${id}/pause`,
+    CLONE: (id: string) => `/api/groups/${id}/clone`,
+    AGENTS: (id: string) => `/api/groups/${id}/agents`,
+    TRENDING: '/api/groups/trending',
   },
 
   // Mensajes

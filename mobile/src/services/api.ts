@@ -98,35 +98,29 @@ export const apiClient = new ApiClient({
   },
 });
 
-// Agregar interceptor para inyectar JWT tokens automáticamente
-if (apiClient['client']) {
-  const axiosInstance = apiClient['client'];
+/**
+ * Inicializar token del ApiClient desde JWTManager
+ * Esto permite que el interceptor interno de ApiClient funcione correctamente
+ */
+async function initializeApiClientToken() {
+  const token = await JWTManager.getAccessToken();
+  if (token) {
+    apiClient.setAuthToken(token);
+    console.log('[ApiClient] ✅ Token initialized from JWTManager');
+  }
+}
 
-  axiosInstance.interceptors.request.use(
-    async (config: any) => {
-      // Agregar Origin header (requerido por el servidor)
-      if (!config.headers.Origin) {
-        config.headers.Origin = API_BASE_URL;
-      }
+// Inicializar token al cargar
+initializeApiClientToken();
 
-      const token = await JWTManager.getAccessToken();
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        console.log('[ApiClient] 🔑 JWT token attached to request');
-      } else {
-        console.log('[ApiClient] ⚠️  No auth token available');
-      }
-
-      return config;
-    },
-    (error: any) => {
-      console.error('[ApiClient] ❌ Request interceptor error:', error);
-      return Promise.reject(error);
-    }
-  );
-
-  console.log('[ApiClient] ✅ JWT interceptor installed');
+/**
+ * Helper para actualizar el token del ApiClient
+ * Llamar después de login o refresh
+ */
+export async function updateApiClientToken() {
+  const token = await JWTManager.getAccessToken();
+  apiClient.setAuthToken(token);
+  console.log('[ApiClient] 🔄 Token updated');
 }
 
 // Re-exportar helper desde configuración centralizada
@@ -192,10 +186,6 @@ export const WorldsService = {
 
   async trending() {
     return await apiClient.get(API_ENDPOINTS.WORLDS.TRENDING);
-  },
-
-  async predefined() {
-    return await apiClient.get(API_ENDPOINTS.WORLDS.PREDEFINED);
   },
 };
 

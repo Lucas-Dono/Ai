@@ -72,22 +72,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         setRecentWorlds(mapped.slice(0, 5));
       }
 
-      // Cargar mundos predefinidos (para recomendaciones)
-      const predefinedResponse: any = await WorldsService.predefined();
-      if (predefinedResponse?.worlds) {
-        const mapped = predefinedResponse.worlds.map((world: any) => ({
-          id: world.id,
-          name: world.name,
-          description: world.description,
-          category: world.category,
-          image: buildAvatarUrl(world.agents?.[0]?.avatar),
-          messagesCount: world.messageCount || 0,
-          isActive: false,
-        }));
-        setRecommended(mapped.slice(0, 6));
-      }
+      // NOTA: Endpoint /api/groups/predefined no existe en el servidor
+      // Usando mundos trending como recomendaciones por ahora
+      // TODO: Implementar endpoint de recomendaciones personalizadas
 
-      // Cargar mundos trending
+      // Cargar mundos trending (también usados como recomendaciones)
       const trendingResponse: any = await WorldsService.trending();
       if (trendingResponse?.trending) {
         const mapped = trendingResponse.trending.map((world: any) => ({
@@ -100,6 +89,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           isActive: false,
         }));
         setTrending(mapped.slice(0, 6));
+        // Usar trending como recomendaciones (ya que predefined no existe)
+        setRecommended(mapped.slice(0, 6));
       }
 
       // Cargar agents
