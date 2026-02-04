@@ -28,7 +28,7 @@ export class AuthService {
       console.log('[AuthService] 📧 Attempting login:', credentials.email);
 
       const response = await this.apiClient.post<AuthResponse>(
-        '/api/auth/sign-in/email',
+        '/api/auth/login',
         {
           email: credentials.email,
           password: credentials.password,

@@ -88,15 +88,25 @@ export const JWTManager = {
         return null;
       }
 
+      // Validar formato JWT básico (antes de intentar decodificar)
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('[JWTManager] Invalid JWT format, clearing invalid token');
+        await this.clearTokens(); // Limpiar token inválido
+        return null;
+      }
+
       // Verificar si está expirado
       if (isTokenExpired(token)) {
         console.log('[JWTManager] ⚠️ Access token expired');
+        await this.clearTokens(); // Limpiar token expirado
         return null;
       }
 
       return token;
     } catch (error) {
       console.error('[JWTManager] Error getting access token:', error);
+      await this.clearTokens(); // Limpiar en caso de error
       return null;
     }
   },
@@ -113,9 +123,18 @@ export const JWTManager = {
         return null;
       }
 
+      // Validar formato JWT básico
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('[JWTManager] Invalid refresh token format, clearing');
+        await this.clearTokens();
+        return null;
+      }
+
       return token;
     } catch (error) {
       console.error('[JWTManager] Error getting refresh token:', error);
+      await this.clearTokens();
       return null;
     }
   },

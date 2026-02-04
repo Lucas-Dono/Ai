@@ -40,6 +40,7 @@ export class AuthApiClient {
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
+        'Origin': config.baseURL, // Requerido por el servidor
       },
     });
 

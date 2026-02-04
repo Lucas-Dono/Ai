@@ -104,6 +104,11 @@ if (apiClient['client']) {
 
   axiosInstance.interceptors.request.use(
     async (config: any) => {
+      // Agregar Origin header (requerido por el servidor)
+      if (!config.headers.Origin) {
+        config.headers.Origin = API_BASE_URL;
+      }
+
       const token = await JWTManager.getAccessToken();
 
       if (token) {
