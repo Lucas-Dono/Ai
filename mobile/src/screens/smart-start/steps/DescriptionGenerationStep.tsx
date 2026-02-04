@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { DEV_API_URL } from '@env';
 import { colors } from '../../../theme';
+import { CharacterPreview } from '../../../components/smart-start/CharacterPreview';
 
 const API_URL = DEV_API_URL || 'http://localhost:3000';
 
@@ -194,13 +195,71 @@ export function DescriptionGenerationStep({
     }
   };
 
-  const examplePrompts = [
-    'un detective noir de los años 40, cínico pero con buen corazón',
-    'una hacker rebelde con mohawk morado, experta en ciberseguridad',
-    'un chef francés obsesionado con la perfección culinaria',
-    'una piloto de drones de carreras con actitud desafiante',
-    'un profesor de filosofía con teorías poco convencionales',
-  ];
+  // Categorized example prompts
+  const exampleCategories = {
+    romance: [
+      'un artista bohemio con alma de poeta, romántico empedernido',
+      'una bailarina profesional, apasionada y misteriosa',
+      'un músico callejero con historias cautivadoras',
+      'una florista con un pasado secreto, amante de las cartas antiguas',
+      'un chef repostero que expresa amor a través de sus creaciones',
+    ],
+    roleplay: [
+      'un detective noir de los años 40, cínico pero con buen corazón',
+      'una guerrera elfa con cicatrices de batalla y trauma de guerra',
+      'un mago rebelde expulsado de la academia por experimentar con magia prohibida',
+      'una capitana espacial con tripulación leal, cazadora de tesoros',
+      'un vampiro de 300 años, culto y melancólico',
+    ],
+    professional: [
+      'un coach de vida especializado en mindfulness y productividad',
+      'una mentora de carrera tech, ex-CEO de startup',
+      'un tutor de idiomas políglota con experiencia en 12 países',
+      'una consultora de negocios directa y estratégica',
+      'un terapeuta cognitivo-conductual especializado en ansiedad',
+    ],
+    gaming: [
+      'un compañero de gaming estratégico, líder de clan en MMORPGs',
+      'una streamer carismática especializada en speedruns',
+      'un analista de esports con conocimiento enciclopédico de meta',
+      'una jugadora profesional de shooters, competitiva pero amigable',
+      'un game designer indie con pasión por mecánicas innovadoras',
+    ],
+    wellness: [
+      'una instructora de yoga y meditación, serena y compasiva',
+      'un nutricionista holístico enfocado en bienestar integral',
+      'una terapeuta de arte para expresión emocional',
+      'un entrenador personal motivador especializado en recuperación',
+      'una consejera de sueño y rutinas de descanso reparador',
+    ],
+    friendship: [
+      'una mejor amiga leal, siempre disponible para charlar',
+      'un compañero de aventuras espontáneo y divertido',
+      'una confidente empática que siempre tiene buenos consejos',
+      'un amigo sarcástico pero con gran corazón',
+      'una persona positiva que siempre ve el lado bueno de las cosas',
+    ],
+    creative: [
+      'una escritora de fantasía oscura con imaginación desbordante',
+      'un fotógrafo urbano que captura momentos efímeros',
+      'una diseñadora de moda vanguardista y atrevida',
+      'un cineasta indie obsesionado con narrativas no lineales',
+      'una ilustradora de concept art para videojuegos',
+    ],
+  };
+
+  const categoryLabels = {
+    romance: '💝 Romance',
+    roleplay: '🎭 Roleplay',
+    professional: '💼 Profesional',
+    gaming: '🎮 Gaming',
+    wellness: '🧘 Bienestar',
+    friendship: '👥 Amistad',
+    creative: '🎨 Creativo',
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState<keyof typeof exampleCategories>('romance');
+  const examplePrompts = exampleCategories[selectedCategory];
 
   return (
     <ScrollView
@@ -242,9 +301,48 @@ export function DescriptionGenerationStep({
         </View>
       </View>
 
+      {/* Character Preview */}
+      {description.length > 10 && (
+        <CharacterPreview
+          description={description}
+          avatarUrl={uploadedAvatar}
+        />
+      )}
+
       {/* Example Prompts */}
       <View style={styles.examplesSection}>
         <Text style={styles.examplesLabel}>Ejemplos rápidos:</Text>
+
+        {/* Category Tabs */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryTabs}
+          contentContainerStyle={styles.categoryTabsContent}
+        >
+          {(Object.keys(exampleCategories) as Array<keyof typeof exampleCategories>).map((category) => (
+            <TouchableOpacity
+              key={category}
+              onPress={() => setSelectedCategory(category)}
+              disabled={isGenerating}
+              style={[
+                styles.categoryTab,
+                selectedCategory === category && styles.categoryTabActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.categoryTabText,
+                  selectedCategory === category && styles.categoryTabTextActive,
+                ]}
+              >
+                {categoryLabels[category]}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Example Chips */}
         <View style={styles.examplesChips}>
           {examplePrompts.map((example, i) => (
             <TouchableOpacity
@@ -253,8 +351,8 @@ export function DescriptionGenerationStep({
               disabled={isGenerating}
               style={styles.exampleChip}
             >
-              <Text style={styles.exampleChipText} numberOfLines={1}>
-                {example.slice(0, 40)}...
+              <Text style={styles.exampleChipText} numberOfLines={2}>
+                {example}
               </Text>
             </TouchableOpacity>
           ))}
@@ -554,24 +652,50 @@ const styles = StyleSheet.create({
   examplesLabel: {
     fontSize: 13,
     color: colors.text.secondary,
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  examplesChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  categoryTabs: {
+    marginBottom: 12,
+  },
+  categoryTabsContent: {
     gap: 8,
+    paddingRight: 16,
   },
-  exampleChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  categoryTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
     borderColor: colors.border.light,
-    borderRadius: 16,
+    borderRadius: 20,
+  },
+  categoryTabActive: {
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderColor: '#8b5cf6',
+  },
+  categoryTabText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text.secondary,
+  },
+  categoryTabTextActive: {
+    color: '#8b5cf6',
+  },
+  examplesChips: {
+    gap: 10,
+  },
+  exampleChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: 12,
   },
   exampleChipText: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.text.secondary,
+    lineHeight: 18,
   },
   advancedSection: {
     marginBottom: 20,

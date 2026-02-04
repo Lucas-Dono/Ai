@@ -2,7 +2,7 @@
  * Smart Start Wizard Screen
  *
  * NEW SIMPLIFIED FLOW (Legal compliance - no famous people):
- * Description → Depth → Review
+ * Description → Customize → Depth → Review
  *
  * User describes character freely, AI generates original character
  */
@@ -24,6 +24,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { ProgressIndicator } from '../../components/smart-start/ProgressIndicator';
 import { DescriptionGenerationStep } from './steps/DescriptionGenerationStep';
+import { CustomizationStep } from './steps/CustomizationStep';
 import { DepthCustomizationStep } from './steps/DepthCustomizationStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { useSmartStartContext } from '../../contexts/SmartStartContext';
@@ -34,7 +35,7 @@ import { colors } from '../../theme';
 // TYPES
 // ============================================================================
 
-type WizardStep = 'description' | 'depth' | 'review';
+type WizardStep = 'description' | 'customize' | 'depth' | 'review';
 
 interface Props {
   navigation: StackNavigationProp<any>;
@@ -67,8 +68,8 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
   // Data state
   const [selectedDepth, setSelectedDepth] = useState<DepthLevelId | null>(null);
 
-  // Simplified step order: description → depth → review
-  const effectiveSteps: WizardStep[] = ['description', 'depth', 'review'];
+  // Simplified step order: description → customize → depth → review
+  const effectiveSteps: WizardStep[] = ['description', 'customize', 'depth', 'review'];
 
   // Initialize session
   useEffect(() => {
@@ -119,15 +120,21 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
 
     markStepComplete('description');
     setCompletedSteps(prev => [...prev, 'description']);
-    setCurrentStepIndex(1); // Move to depth
+    setCurrentStepIndex(1); // Move to customize
   }, [updateDraft, draft, markStepComplete]);
+
+  const handleCustomizeComplete = useCallback(() => {
+    markStepComplete('customize');
+    setCompletedSteps(prev => [...prev, 'customize']);
+    setCurrentStepIndex(2); // Move to depth
+  }, [markStepComplete]);
 
   const handleDepthComplete = useCallback((depthId: DepthLevelId) => {
     setSelectedDepth(depthId);
     updateDraft({ depthLevel: depthId });
     markStepComplete('depth');
     setCompletedSteps(prev => [...prev, 'depth']);
-    setCurrentStepIndex(2); // Move to review
+    setCurrentStepIndex(3); // Move to review
   }, [updateDraft, markStepComplete]);
 
   const handleCreateCharacter = useCallback(async () => {
@@ -247,20 +254,31 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
           onCharacterGenerated={handleDescriptionComplete}
         />
 
-        {/* Step 1: Depth Customization */}
+        {/* Step 1: Customization */}
         {completedSteps.includes('description') && (
-          <DepthCustomizationStep
+          <CustomizationStep
             visible={currentStepIndex >= 1}
+            completed={completedSteps.includes('customize')}
+            draft={draft}
+            onUpdate={updateDraft}
+            onContinue={handleCustomizeComplete}
+          />
+        )}
+
+        {/* Step 2: Depth Customization */}
+        {completedSteps.includes('customize') && (
+          <DepthCustomizationStep
+            visible={currentStepIndex >= 2}
             completed={completedSteps.includes('depth')}
             userTier={userTier}
             onComplete={handleDepthComplete}
           />
         )}
 
-        {/* Step 2: Review */}
+        {/* Step 3: Review */}
         {completedSteps.includes('depth') && (
           <ReviewStep
-            visible={currentStepIndex >= 2}
+            visible={currentStepIndex >= 3}
             completed={completedSteps.includes('review')}
             draft={draft}
             onCreateCharacter={handleCreateCharacter}
