@@ -89,16 +89,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       // Cargar agents
       const agentsResponse = await AgentsService.list({ limit: 50 });
       if (Array.isArray(agentsResponse)) {
-        // Filtrar compañeros (kind === 'companion')
-        const companions = agentsResponse.filter(
-          (agent: any) => agent.kind === 'companion'
-        );
-
         // Separar destacados y del usuario
-        const featured = companions.filter(
+        // NOTA: No filtrar por kind para incluir todos los tipos de agentes (companion, original, etc.)
+        const featured = agentsResponse.filter(
           (agent: any) => agent.featured === true && !agent.userId
         );
-        const userAgents = companions.filter(
+        const userAgents = agentsResponse.filter(
           (agent: any) => agent.userId !== null
         );
 
@@ -111,6 +107,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           ...agent,
           avatar: buildAvatarUrl(agent.avatar),
         }));
+
+        console.log('[HomeScreen] Featured agents:', mappedFeatured.length);
+        console.log('[HomeScreen] User agents:', mappedUserAgents.length);
 
         setFeaturedAgents(mappedFeatured.slice(0, 6));
         setMyAgents(mappedUserAgents.slice(0, 6));

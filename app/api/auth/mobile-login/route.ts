@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { generateToken } from '@/lib/jwt';
+import { prisma } from '@/lib/prisma';
 
 /**
  * Mobile Login Endpoint
@@ -53,13 +54,23 @@ export async function POST(request: NextRequest) {
 
     console.log('[MOBILE-LOGIN] ✅ Login successful for:', result.user.email);
 
+    // CRITICAL: Better-auth no incluye campos custom como 'plan'
+    // Necesitamos consultar Prisma para obtener el plan real del usuario
+    const userWithPlan = await prisma.user.findUnique({
+      where: { id: result.user.id },
+      select: { plan: true }
+    });
+
+    const userPlan = userWithPlan?.plan || 'free';
+    console.log('[MOBILE-LOGIN] 📋 User plan from database:', userPlan);
+
     // Generar JWT propio (no usar el session token de better-auth)
     // El JWT incluye la información del usuario y se puede decodificar en el cliente
     const jwtToken = await generateToken({
       userId: result.user.id,
       email: result.user.email,
       name: result.user.name || undefined,
-      plan: (result.user as any).plan || 'free',
+      plan: userPlan,
     });
 
     console.log('[MOBILE-LOGIN] 🎟️ JWT generated successfully');
@@ -72,7 +83,7 @@ export async function POST(request: NextRequest) {
         id: result.user.id,
         email: result.user.email,
         name: result.user.name,
-        plan: (result.user as any).plan || 'free',
+        plan: userPlan,
         image: result.user.image,
         createdAt: result.user.createdAt,
       },
