@@ -57,41 +57,34 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     try {
       setLoading(true);
 
-      // Cargar mundos del usuario (recientes)
-      const userWorldsResponse: any = await WorldsService.list({ limit: 10 });
-      if (userWorldsResponse?.worlds) {
-        const mapped = userWorldsResponse.worlds.map((world: any) => ({
-          id: world.id,
-          name: world.name,
-          description: world.description,
-          category: world.category,
-          image: buildAvatarUrl(world.agents?.[0]?.avatar),
-          messagesCount: world.messageCount || 0,
-          isActive: world.status === 'active',
-        }));
-        setRecentWorlds(mapped.slice(0, 5));
+      // NOTA: Los endpoints de grupos trending fueron deprecados
+      // El servidor solo expone:
+      // - /api/groups - Lista de grupos del usuario (requiere auth)
+      // - /api/groups/user-groups - Lista simplificada
+
+      // Por ahora, cargar solo grupos del usuario
+      try {
+        const userGroupsResponse: any = await WorldsService.list({ limit: 10 });
+        if (userGroupsResponse?.groups) {
+          const mapped = userGroupsResponse.groups.map((group: any) => ({
+            id: group.id,
+            name: group.name,
+            description: group.description,
+            category: group.category || 'general',
+            image: buildAvatarUrl(group.GroupMember?.[0]?.Agent?.avatar || group.GroupMember?.[0]?.User?.image),
+            messagesCount: group._count?.GroupMessage || 0,
+            isActive: group.status === 'ACTIVE',
+          }));
+          setRecentWorlds(mapped.slice(0, 5));
+        }
+      } catch (error) {
+        console.log('[HomeScreen] No groups available (user may not have any)');
+        setRecentWorlds([]);
       }
 
-      // NOTA: Endpoint /api/groups/predefined no existe en el servidor
-      // Usando mundos trending como recomendaciones por ahora
-      // TODO: Implementar endpoint de recomendaciones personalizadas
-
-      // Cargar mundos trending (también usados como recomendaciones)
-      const trendingResponse: any = await WorldsService.trending();
-      if (trendingResponse?.trending) {
-        const mapped = trendingResponse.trending.map((world: any) => ({
-          id: world.id,
-          name: world.name,
-          description: world.description,
-          category: world.category,
-          image: buildAvatarUrl(world.agents?.[0]?.avatar),
-          messagesCount: world.metrics?.messageCount || world.messageCount || 0,
-          isActive: false,
-        }));
-        setTrending(mapped.slice(0, 6));
-        // Usar trending como recomendaciones (ya que predefined no existe)
-        setRecommended(mapped.slice(0, 6));
-      }
+      // Dejar trending y recommended vacíos (no hay endpoint)
+      setTrending([]);
+      setRecommended([]);
 
       // Cargar agents
       const agentsResponse = await AgentsService.list({ limit: 50 });

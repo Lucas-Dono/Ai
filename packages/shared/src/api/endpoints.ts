@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
   },
 
   // Grupos (anteriormente Mundos)
+  // NOTA: Endpoints de trending/predefined fueron deprecados cuando se removió el feature de worlds
   WORLDS: {
     LIST: '/api/groups',
     CREATE: '/api/groups',
@@ -36,7 +37,7 @@ export const API_ENDPOINTS = {
     PAUSE: (id: string) => `/api/groups/${id}/pause`,
     CLONE: (id: string) => `/api/groups/${id}/clone`,
     AGENTS: (id: string) => `/api/groups/${id}/agents`,
-    TRENDING: '/api/groups/trending',
+    USER_GROUPS: '/api/groups/user-groups', // Lista simplificada
   },
 
   // Alias para compatibilidad (GROUPS es lo mismo que WORLDS)
@@ -53,7 +54,7 @@ export const API_ENDPOINTS = {
     PAUSE: (id: string) => `/api/groups/${id}/pause`,
     CLONE: (id: string) => `/api/groups/${id}/clone`,
     AGENTS: (id: string) => `/api/groups/${id}/agents`,
-    TRENDING: '/api/groups/trending',
+    USER_GROUPS: '/api/groups/user-groups', // Lista simplificada
   },
 
   // Mensajes

@@ -183,10 +183,6 @@ export const WorldsService = {
   async stop(worldId: string) {
     return await apiClient.post(API_ENDPOINTS.WORLDS.STOP(worldId));
   },
-
-  async trending() {
-    return await apiClient.get(API_ENDPOINTS.WORLDS.TRENDING);
-  },
 };
 
 export const RatingsService = {
