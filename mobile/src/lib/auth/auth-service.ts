@@ -41,7 +41,7 @@ export class AuthService {
       console.log('[AuthService] 📦 Payload:', JSON.stringify(payload, null, 2));
 
       const response = await this.apiClient.post<AuthResponse>(
-        '/api/auth/login',
+        '/api/auth/sign-in/email',
         payload
       );
 
