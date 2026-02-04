@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
   textArea: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 12,
     padding: 12,
     fontSize: 14,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 16,
   },
   exampleChipText: {
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   advancedTextInput: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 8,
     padding: 10,
     fontSize: 13,
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 12,
     gap: 6,
   },
@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 12,
   },
   tierInfoTitle: {
