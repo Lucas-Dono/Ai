@@ -12,6 +12,8 @@ interface AuthenticatedUser {
   email: string;
   name: string | null;
   plan: string;
+  image?: string | null;
+  createdAt?: Date;
 }
 
 /**
@@ -42,6 +44,8 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
             email: true,
             name: true,
             plan: true,
+            image: true,
+            createdAt: true,
           },
         });
 
@@ -66,6 +70,8 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
               email: true,
               name: true,
               plan: true,
+              image: true,
+              createdAt: true,
             },
           });
 
@@ -87,11 +93,20 @@ export async function getAuthenticatedUser(req: NextRequest): Promise<Authentica
     const session = await auth.api.getSession({ headers: req.headers });
     if (session?.user?.id) {
       console.log('[AuthHelper] ✅ Authenticated via better-auth:', session.user.email);
+
+      // Obtener plan y otros campos de Prisma (better-auth no tiene campos custom)
+      const userWithPlan = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { plan: true }
+      });
+
       return {
         id: session.user.id,
         email: session.user.email || '',
         name: session.user.name || null,
-        plan: (session.user as any).plan || 'free',
+        plan: userWithPlan?.plan || 'free',
+        image: session.user.image || null,
+        createdAt: session.user.createdAt,
       };
     }
     console.log('[AuthHelper] better-auth session not found');

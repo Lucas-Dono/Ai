@@ -1,36 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getAuthenticatedUser } from "@/lib/auth-helper";
 
 /**
  * GET /api/auth/session
  * Returns the current user session
+ * Supports both web (cookies) and mobile (JWT Bearer token)
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
+    console.log('[Auth Session] Getting session...');
 
-    if (!session) {
+    // Use getAuthenticatedUser which supports both JWT and better-auth
+    const user = await getAuthenticatedUser(req);
+
+    if (!user) {
+      console.log('[Auth Session] No authenticated user found');
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    // CRITICAL: Better-auth no incluye campos custom como 'plan'
-    // Necesitamos consultar Prisma para obtener el plan real del usuario
-    const userWithPlan = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { plan: true }
-    });
-
-    const userPlan = userWithPlan?.plan || 'free';
+    console.log('[Auth Session] ✅ User authenticated:', user.email, 'Plan:', user.plan);
 
     return NextResponse.json({
       user: {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name,
-        image: session.user.image,
-        plan: userPlan,
-        createdAt: session.user.createdAt,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image || null,
+        plan: user.plan,
+        createdAt: user.createdAt || null,
       },
     });
   } catch (error) {

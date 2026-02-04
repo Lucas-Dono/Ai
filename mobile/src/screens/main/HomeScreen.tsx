@@ -82,10 +82,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         setRecentWorlds([]);
       }
 
-      // Dejar trending y recommended vacíos (no hay endpoint)
-      setTrending([]);
-      setRecommended([]);
-
       // Cargar agents
       const agentsResponse = await AgentsService.list({ limit: 50 });
       if (Array.isArray(agentsResponse)) {
@@ -113,6 +109,27 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
         setFeaturedAgents(mappedFeatured.slice(0, 6));
         setMyAgents(mappedUserAgents.slice(0, 6));
+
+        // WORKAROUND: Como no hay endpoint de grupos trending, usar agentes featured
+        // convertidos a formato World para llenar "Para Ti" y "Tendencias"
+        const featuredAsWorlds = mappedFeatured.map((agent: any) => ({
+          id: agent.id,
+          name: agent.name,
+          description: agent.description || `Chatea con ${agent.name}`,
+          category: agent.kind || 'companion',
+          image: agent.avatar,
+          messagesCount: 0,
+          isActive: true,
+        }));
+
+        // "Para Ti" - primeros 6 agentes featured
+        setRecommended(featuredAsWorlds.slice(0, 6));
+
+        // "Tendencias" - agentes featured ordenados por algo (por ahora mismo orden)
+        setTrending(featuredAsWorlds.slice(0, 6));
+
+        console.log('[HomeScreen] Recommended (from featured):', featuredAsWorlds.slice(0, 6).length);
+        console.log('[HomeScreen] Trending (from featured):', featuredAsWorlds.slice(0, 6).length);
       }
     } catch (error) {
       console.error('Error loading home data:', error);
