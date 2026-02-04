@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
+import { Slider } from '../common/SimpleSlider';
 import { colors } from '../../theme';
 
 interface BigFiveData {

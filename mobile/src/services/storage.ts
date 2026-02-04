@@ -6,40 +6,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEYS = {
-  AUTH_TOKEN: '@creador-ia:auth_token',
   USER_DATA: '@creador-ia:user_data',
   SETTINGS: '@creador-ia:settings',
   CHAT_THEMES: '@creador-ia:chat_themes',
 } as const;
 
 export const StorageService = {
-  // Token de autenticación (JWT) - solo para persistencia
-  async getToken(): Promise<string | null> {
-    try {
-      return await AsyncStorage.getItem(KEYS.AUTH_TOKEN);
-    } catch (error) {
-      console.error('[Storage] Error getting token:', error);
-      return null;
-    }
-  },
-
-  async setToken(token: string): Promise<void> {
-    try {
-      await AsyncStorage.setItem(KEYS.AUTH_TOKEN, token);
-    } catch (error) {
-      console.error('[Storage] Error saving token:', error);
-      throw error;
-    }
-  },
-
-  async removeToken(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(KEYS.AUTH_TOKEN);
-    } catch (error) {
-      console.error('[Storage] Error removing token:', error);
-    }
-  },
-
   // Datos de usuario
   async getUserData<T>(): Promise<T | null> {
     try {
@@ -90,7 +62,6 @@ export const StorageService = {
   async clearAll(): Promise<void> {
     try {
       await AsyncStorage.multiRemove([
-        KEYS.AUTH_TOKEN,
         KEYS.USER_DATA,
         KEYS.SETTINGS,
       ]);

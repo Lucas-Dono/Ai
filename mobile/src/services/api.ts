@@ -97,27 +97,6 @@ export const apiClient = new ApiClient({
   },
 });
 
-/**
- * Initialize API client with stored token
- * Call this on app startup
- */
-export async function initializeApiClient(): Promise<boolean> {
-  try {
-    const token = await StorageService.getToken();
-    if (token) {
-      console.log('[API] Initializing with stored token');
-      apiClient.setAuthToken(token);
-      return true;
-    } else {
-      console.log('[API] No stored token found');
-      return false;
-    }
-  } catch (error) {
-    console.error('[API] Error initializing client:', error);
-    return false;
-  }
-}
-
 // Re-exportar helper desde configuración centralizada
 export const buildAvatarUrl = buildAvatarUrlHelper;
 
@@ -125,49 +104,6 @@ export const buildAvatarUrl = buildAvatarUrlHelper;
 export { API_ENDPOINTS };
 
 // Servicios específicos del API
-export const AuthService = {
-  async login(email: string, password: string) {
-    console.log('[AuthService] 📧 Attempting login with email:', email);
-    console.log('[AuthService] 🔑 Password length:', password?.length);
-    console.log('[AuthService] 🔑 Password first 5 chars:', password?.substring(0, 5));
-    console.log('[AuthService] 🔑 Password (FULL):', password);
-    console.log('[AuthService] 📡 Sending to endpoint:', API_ENDPOINTS.AUTH.LOGIN);
-    console.log('[AuthService] 📡 Base URL:', API_BASE_URL);
-
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, {
-      email,
-      password,
-    });
-
-    console.log('[AuthService] ✅ Login response received');
-    return response;
-  },
-
-  async register(email: string, password: string, name: string) {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.REGISTER, {
-      email,
-      password,
-      name,
-    });
-    return response;
-  },
-
-  async logout() {
-    try {
-      await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
-    } catch (error) {
-      console.error('[AuthService] Logout error:', error);
-      // Continuar con el logout local incluso si falla el backend
-    }
-    await StorageService.clearAll();
-    apiClient.clearAuthToken();
-  },
-
-  async getMe() {
-    return await apiClient.get(API_ENDPOINTS.AUTH.ME);
-  },
-};
-
 export const AgentsService = {
   async list(params?: { page?: number; limit?: number }) {
     return await apiClient.get(API_ENDPOINTS.AGENTS.LIST, { params });

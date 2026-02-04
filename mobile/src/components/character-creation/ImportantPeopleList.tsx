@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Slider from '@react-native-community/slider';
+import { Slider } from '../common/SimpleSlider';
 import { colors } from '../../theme';
 import { DarkInput } from './DarkInput';
 import { MagicButton } from './MagicButton';

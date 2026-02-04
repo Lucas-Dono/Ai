@@ -20,16 +20,7 @@ module.exports = function (api) {
           allowUndefined: true,
         },
       ],
-      [
-        'module-resolver',
-        {
-          alias: {
-            'better-auth/react': path.resolve(workspaceRoot, 'node_modules/better-auth/dist/client/react/index.mjs'),
-            'better-auth/client/plugins': path.resolve(workspaceRoot, 'node_modules/better-auth/dist/client/plugins/index.mjs'),
-            '@better-auth/expo/client': path.resolve(workspaceRoot, 'node_modules/@better-auth/expo/dist/client.mjs'),
-          },
-        },
-      ],
+      // module-resolver ya no es necesario (eliminados alias de better-auth)
       'react-native-worklets/plugin', // MUST be last (moved from reanimated/plugin)
     ],
   };

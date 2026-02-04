@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme';
 import { DarkInput } from './DarkInput';
 import { MagicButton } from './MagicButton';
-import Slider from '@react-native-community/slider';
+import { Slider } from '../common/SimpleSlider';
 
 interface Skill {
   name: string;

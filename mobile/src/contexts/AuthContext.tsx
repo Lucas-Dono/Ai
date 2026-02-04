@@ -1,10 +1,11 @@
 /**
  * Contexto de autenticación para la aplicación móvil
- * Using Better Auth for authentication
+ * Using Better Auth API client (no hooks to avoid React Native issues)
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authClient } from '../lib/auth-client';
+import { StorageService } from '../services/storage';
 
 interface User {
   id: string;
@@ -28,22 +29,35 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Use Better Auth's session hook
-  const { data: session, isPending: sessionLoading, error } = authClient.useSession();
-
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mark as loaded once session check completes
-    if (!sessionLoading) {
-      setLoading(false);
-    }
+    loadStoredSession();
+  }, []);
 
-    if (error) {
-      console.error('[Auth] Session error:', error);
+  async function loadStoredSession() {
+    try {
+      console.log('[Auth] Loading stored session...');
+
+      // Try to get session from better-auth
+      const response = await authClient.$fetch('/session');
+
+      if (response?.user) {
+        console.log('[Auth] Session restored:', response.user.email);
+        setUser(response.user as User);
+        await StorageService.setUserData(response.user);
+      } else {
+        console.log('[Auth] No active session');
+        await StorageService.clearAll();
+      }
+    } catch (error) {
+      console.log('[Auth] No stored session:', error);
+      await StorageService.clearAll();
+    } finally {
       setLoading(false);
     }
-  }, [sessionLoading, error]);
+  }
 
   async function login(email: string, password: string) {
     try {
@@ -59,7 +73,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(error.message || 'Error al iniciar sesión');
       }
 
-      console.log('[Auth] Login successful:', data?.user?.email);
+      if (!data?.user) {
+        throw new Error('No user data received');
+      }
+
+      console.log('[Auth] Login successful:', data.user.email);
+      setUser(data.user as User);
+      await StorageService.setUserData(data.user);
     } catch (error: any) {
       console.error('[Auth] Login exception:', error);
       throw new Error(error?.message || 'Error al iniciar sesión');
@@ -81,7 +101,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(error.message || 'Error al registrarse');
       }
 
-      console.log('[Auth] Registration successful:', data?.user?.email);
+      if (!data?.user) {
+        throw new Error('No user data received');
+      }
+
+      console.log('[Auth] Registration successful:', data.user.email);
+      setUser(data.user as User);
+      await StorageService.setUserData(data.user);
     } catch (error: any) {
       console.error('[Auth] Registration exception:', error);
       throw new Error(error?.message || 'Error al registrarse');
@@ -93,21 +119,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('[Auth] Logging out...');
 
       await authClient.signOut();
+      await StorageService.clearAll();
+      setUser(null);
 
       console.log('[Auth] Logged out successfully');
     } catch (error) {
       console.error('[Auth] Logout error:', error);
+      await StorageService.clearAll();
+      setUser(null);
     }
   }
 
-  function updateUser(_userData: User) {
-    // With better-auth, we don't manually update user
-    // The session hook will automatically update
-    console.log('[Auth] User update requested - will sync via session');
+  function updateUser(userData: User) {
+    setUser(userData);
+    StorageService.setUserData(userData).catch((error) => {
+      console.error('[Auth] Error saving user data:', error);
+    });
   }
-
-  // Extract user from session
-  const user = session?.user as User | null;
 
   return (
     <AuthContext.Provider

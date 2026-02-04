@@ -25,6 +25,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
 import { io, Socket } from 'socket.io-client';
+import { JWTManager } from '../../lib/auth';
 import { StorageService } from '../../services/storage';
 import { WorldsService, AgentsService, RatingsService, buildAvatarUrl, apiClient } from '../../services/api';
 import { GifPicker } from '../../components/chat/GifPicker';
@@ -311,7 +312,7 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
 
   const connectSocket = async () => {
     try {
-      const token = await StorageService.getToken();
+      const token = await JWTManager.getAccessToken();
 
       const socket = io(SOCKET_CONFIG.url, {
         auth: { token },
