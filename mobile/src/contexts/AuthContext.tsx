@@ -1,11 +1,25 @@
 /**
  * Contexto de autenticación para la aplicación móvil
- * Using Better Auth API client (no hooks to avoid React Native issues)
+ * Using custom JWT authentication system
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authClient } from '../lib/auth-client';
+import { AuthService } from '../lib/auth';
+import { AuthApiClient } from '../lib/auth/api-client';
 import { StorageService } from '../services/storage';
+import { API_BASE_URL } from '../config/api.config';
+
+// Crear instancia única del API client para auth
+const authApiClient = new AuthApiClient({
+  baseURL: API_BASE_URL,
+  onUnauthorized: () => {
+    console.log('[AuthManager] Handling unauthorized - clearing auth');
+    // El logout se manejará desde el contexto
+  },
+});
+
+// Crear instancia del servicio de autenticación
+const authService = new AuthService(authApiClient);
 
 interface User {
   id: string;
@@ -40,16 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[Auth] Loading stored session...');
 
-      // Try to get session from better-auth
-      const response = await authClient.$fetch('/session');
+      const restoredUser = await authService.restoreSession();
 
-      if (response?.user) {
-        console.log('[Auth] Session restored:', response.user.email);
-        setUser(response.user as User);
-        await StorageService.setUserData(response.user);
+      if (restoredUser) {
+        console.log('[Auth] Session restored:', restoredUser.email);
+        setUser(restoredUser);
       } else {
         console.log('[Auth] No active session');
-        await StorageService.clearAll();
       }
     } catch (error) {
       console.log('[Auth] No stored session:', error);
@@ -63,23 +74,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[Auth] Logging in:', email);
 
-      const { data, error } = await authClient.signIn.email({
+      const userData = await authService.login({
         email,
         password,
       });
 
-      if (error) {
-        console.error('[Auth] Login failed:', error);
-        throw new Error(error.message || 'Error al iniciar sesión');
-      }
-
-      if (!data?.user) {
-        throw new Error('No user data received');
-      }
-
-      console.log('[Auth] Login successful:', data.user.email);
-      setUser(data.user as User);
-      await StorageService.setUserData(data.user);
+      console.log('[Auth] Login successful:', userData.email);
+      setUser(userData);
     } catch (error: any) {
       console.error('[Auth] Login exception:', error);
       throw new Error(error?.message || 'Error al iniciar sesión');
@@ -90,24 +91,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[Auth] Registering:', email);
 
-      const { data, error } = await authClient.signUp.email({
+      const userData = await authService.register({
         email,
         password,
         name,
       });
 
-      if (error) {
-        console.error('[Auth] Registration failed:', error);
-        throw new Error(error.message || 'Error al registrarse');
-      }
-
-      if (!data?.user) {
-        throw new Error('No user data received');
-      }
-
-      console.log('[Auth] Registration successful:', data.user.email);
-      setUser(data.user as User);
-      await StorageService.setUserData(data.user);
+      console.log('[Auth] Registration successful:', userData.email);
+      setUser(userData);
     } catch (error: any) {
       console.error('[Auth] Registration exception:', error);
       throw new Error(error?.message || 'Error al registrarse');
@@ -118,14 +109,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('[Auth] Logging out...');
 
-      await authClient.signOut();
-      await StorageService.clearAll();
+      await authService.logout();
       setUser(null);
 
       console.log('[Auth] Logged out successfully');
     } catch (error) {
       console.error('[Auth] Logout error:', error);
-      await StorageService.clearAll();
       setUser(null);
     }
   }

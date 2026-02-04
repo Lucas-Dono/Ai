@@ -6,6 +6,7 @@
 import { ApiClient, API_ENDPOINTS } from '@creador-ia/shared';
 import { StorageService } from './storage';
 import { API_BASE_URL, buildAvatarUrl as buildAvatarUrlHelper } from '../config/api.config';
+import { JWTManager } from '../lib/auth/jwt-manager';
 
 /**
  * Sistema de autenticación global para evitar race conditions
@@ -96,6 +97,32 @@ export const apiClient = new ApiClient({
     authManager.handleUnauthorized();
   },
 });
+
+// Agregar interceptor para inyectar JWT tokens automáticamente
+if (apiClient['client']) {
+  const axiosInstance = apiClient['client'];
+
+  axiosInstance.interceptors.request.use(
+    async (config: any) => {
+      const token = await JWTManager.getAccessToken();
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('[ApiClient] 🔑 JWT token attached to request');
+      } else {
+        console.log('[ApiClient] ⚠️  No auth token available');
+      }
+
+      return config;
+    },
+    (error: any) => {
+      console.error('[ApiClient] ❌ Request interceptor error:', error);
+      return Promise.reject(error);
+    }
+  );
+
+  console.log('[ApiClient] ✅ JWT interceptor installed');
+}
 
 // Re-exportar helper desde configuración centralizada
 export const buildAvatarUrl = buildAvatarUrlHelper;
