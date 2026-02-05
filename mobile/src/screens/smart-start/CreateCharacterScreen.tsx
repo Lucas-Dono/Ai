@@ -139,6 +139,7 @@ export default function CreateCharacterScreen() {
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [generatingAvatar, setGeneratingAvatar] = useState(false);
   const [enhancingPrompt, setEnhancingPrompt] = useState(false);
+  const [promptEnhanced, setPromptEnhanced] = useState(false);
 
   // Relationship graph
   const [relationshipNodes, setRelationshipNodes] = useState<RelationshipNode[]>([]);
@@ -514,15 +515,18 @@ export default function CreateCharacterScreen() {
 
       const data = await response.json();
       console.log('[EnhancePrompt] Success, enhanced prompt length:', data.enhanced?.length);
+      console.log('[EnhancePrompt] Usage info:', JSON.stringify(data.usageInfo, null, 2));
 
       setPhysicalAppearance(data.enhanced);
 
+      // Mostrar éxito visual en el botón
+      setPromptEnhanced(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(
-        '✨ Prompt Mejorado',
-        `Se ha optimizado la descripción para la generación de imágenes.\n\nUsos restantes hoy: ${data.usageInfo.remaining}`,
-        [{ text: 'OK' }]
-      );
+
+      // Reset el estado de éxito después de 3 segundos
+      setTimeout(() => {
+        setPromptEnhanced(false);
+      }, 3000);
     } catch (error: any) {
       console.error('[EnhancePrompt] Error:', error);
       Alert.alert('Error', error.message || 'No se pudo mejorar el prompt. Intenta nuevamente.');
@@ -876,14 +880,18 @@ export default function CreateCharacterScreen() {
             <TouchableOpacity
               style={[
                 styles.enhanceButton,
+                promptEnhanced && styles.enhanceButtonSuccess,
                 (!physicalAppearance.trim() || physicalAppearance.trim().length < 5 || enhancingPrompt) &&
+                  !promptEnhanced &&
                   styles.enhanceButtonDisabled,
               ]}
               onPress={handleEnhancePrompt}
-              disabled={!physicalAppearance.trim() || physicalAppearance.trim().length < 5 || enhancingPrompt}
+              disabled={!physicalAppearance.trim() || physicalAppearance.trim().length < 5 || enhancingPrompt || promptEnhanced}
             >
               {enhancingPrompt ? (
                 <ActivityIndicator size={16} color="#ffffff" />
+              ) : promptEnhanced ? (
+                <Check size={16} color="#ffffff" />
               ) : (
                 <Sparkles
                   size={16}
@@ -896,10 +904,11 @@ export default function CreateCharacterScreen() {
                 style={[
                   styles.enhanceButtonText,
                   (!physicalAppearance.trim() || physicalAppearance.trim().length < 5) &&
+                    !promptEnhanced &&
                     styles.enhanceButtonTextDisabled,
                 ]}
               >
-                Mejorar
+                {promptEnhanced ? 'Mejorado' : 'Mejorar'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -915,7 +924,13 @@ export default function CreateCharacterScreen() {
             multiline
             numberOfLines={4}
             value={physicalAppearance}
-            onChangeText={setPhysicalAppearance}
+            onChangeText={(text) => {
+              setPhysicalAppearance(text);
+              // Reset estado de éxito si el usuario edita después de mejorar
+              if (promptEnhanced) {
+                setPromptEnhanced(false);
+              }
+            }}
           />
 
           <Text style={styles.hint}>
@@ -1510,6 +1525,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
     borderColor: colors.border.light,
+  },
+  enhanceButtonSuccess: {
+    backgroundColor: '#10b981',
   },
   enhanceButtonText: {
     fontSize: 13,
