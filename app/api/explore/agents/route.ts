@@ -28,12 +28,29 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'popular'; // popular, recent, name
 
     // Construir filtro de búsqueda
+    // DEBE incluir: agentes públicos + agentes privados del usuario
+    const searchConditions: any[] = [
+      // Condición 1: Agentes públicos de cualquier usuario
+      {
+        visibility: { in: ['public', 'world'] },
+      },
+      // Condición 2: Agentes privados del usuario autenticado
+      {
+        userId: session.user.id,
+        visibility: 'private',
+      },
+    ];
+
     const where: any = {
-      visibility: { in: ['public', 'world'] }, // Solo agentes públicos
+      OR: searchConditions,
       ...(query && {
-        OR: [
-          { name: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } },
+        AND: [
+          {
+            OR: [
+              { name: { contains: query, mode: 'insensitive' } },
+              { description: { contains: query, mode: 'insensitive' } },
+            ],
+          },
         ],
       }),
       ...(tag && { tags: { array_contains: tag } }),

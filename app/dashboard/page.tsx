@@ -6,9 +6,10 @@ export const dynamic = 'force-dynamic';
  * Dashboard Principal - Rediseñado para Simulación Social
  * Estructura:
  * 1. Tu Círculo - Conversaciones activas con mensajes sin leer
- * 2. Vibes - Categorías emocionales con ordenamiento dinámico
- * 3. Historias - Nichos de personajes históricos
- * 4. Feed de Descubrimiento - Scroll infinito
+ * 2. Tus Personajes - Todos los agentes creados por el usuario
+ * 3. Vibes - Categorías emocionales con ordenamiento dinámico
+ * 4. Historias - Nichos de personajes históricos
+ * 5. Feed de Descubrimiento - Scroll infinito
  */
 
 import { Plus } from "lucide-react";
@@ -17,6 +18,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { PullToRefresh } from "@/components/mobile/PullToRefresh";
 import { ProactiveMessagesWidget } from "@/components/dashboard/ProactiveMessagesWidget";
 import { YourCircleSection } from "@/components/dashboard/YourCircleSection";
+import { YourAgentsSection } from "@/components/dashboard/YourAgentsSection";
 import { VibesSections } from "@/components/dashboard/VibesSections";
 import { StoriesSection } from "@/components/dashboard/StoriesSection";
 import { DiscoveryFeed } from "@/components/dashboard/DiscoveryFeed";
@@ -45,13 +47,16 @@ export default function DashboardPage() {
             {/* 1. TU CÍRCULO - Conversaciones activas (solo autenticados) */}
             {isAuthenticated && <YourCircleSection />}
 
-            {/* 2. VIBES - Clasificación por emoción/personalidad */}
+            {/* 2. TUS PERSONAJES - Todos los agentes creados por el usuario */}
+            {isAuthenticated && <YourAgentsSection />}
+
+            {/* 3. VIBES - Clasificación por emoción/personalidad */}
             <VibesSections />
 
-            {/* 3. HISTORIAS - Nichos de personajes históricos */}
+            {/* 4. HISTORIAS - Nichos de personajes históricos */}
             <StoriesSection />
 
-            {/* 4. FEED DE DESCUBRIMIENTO - Scroll infinito */}
+            {/* 5. FEED DE DESCUBRIMIENTO - Scroll infinito */}
             <DiscoveryFeed />
           </div>
         </PullToRefresh>
