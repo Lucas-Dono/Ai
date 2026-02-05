@@ -256,7 +256,7 @@ export function CustomizationStep({
           onPress={() => setActiveTab('personality')}
         >
           <Ionicons
-            name="brain"
+            name="bulb"
             size={18}
             color={activeTab === 'personality' ? '#8b5cf6' : colors.text.secondary}
           />

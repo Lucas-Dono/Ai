@@ -9,7 +9,7 @@ import { AppState, AppStateStatus } from 'react-native';
 import { getAsyncStorageCache } from '../storage/AsyncStorageCache';
 
 class CacheCleanupService {
-  private intervalId: number | null = null;
+  private intervalId: NodeJS.Timeout | null = null;
   private isRunning = false;
   private appStateSubscription: any = null;
 

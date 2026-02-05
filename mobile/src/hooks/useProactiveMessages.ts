@@ -19,6 +19,9 @@ import type {
   ProactiveMessageAnalytics,
 } from "../../types/proactive-messages";
 
+// Re-export ProactiveMessage for components
+export type { ProactiveMessage } from "../../types/proactive-messages";
+
 // Configurar handler de notificaciones
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -72,7 +75,7 @@ export function useProactiveMessages(
 
   // Refs para mantener track de estado
   const seenMessageIds = useRef<Set<string>>(new Set());
-  const pollingIntervalRef = useRef<number | null>(null);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const soundObjectRef = useRef<Audio.Sound | null>(null);
   const appState = useRef<AppStateStatus>(AppState.currentState);
 

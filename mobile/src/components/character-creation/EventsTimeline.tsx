@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     top: 24,
     width: 2,
     height: '100%',
-    backgroundColor: colors.border.subtle,
+    backgroundColor: colors.border.light,
   },
   timelineDot: {
     position: 'absolute',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   eventCard: {
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 8,
     padding: 12,
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
   },
   modalHeader: {
     flexDirection: 'row',

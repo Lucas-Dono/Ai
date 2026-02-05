@@ -27,7 +27,7 @@ export interface ReviewStepProps {
   completed: boolean;
   draft: CharacterDraft;
   onCreateCharacter: () => Promise<void>;
-  onEdit: (section: 'type' | 'genre' | 'search' | 'generation') => void;
+  onEdit: (section: 'description' | 'customize' | 'depth' | 'review') => void;
 }
 
 // ============================================================================
@@ -95,7 +95,7 @@ export function ReviewStep({
             <ReviewSection
               title="Información Básica"
               icon="user"
-              onEdit={() => onEdit('generation')}
+              onEdit={() => onEdit('customize')}
               items={[
                 { label: 'Nombre', value: generatedProfile.basicInfo?.name || draft.name || 'No establecido' },
                 { label: 'Edad', value: String(generatedProfile.basicInfo?.age || 'No establecido') },

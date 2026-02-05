@@ -51,7 +51,6 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
     updateDraft,
     resetDraft,
     markStepComplete,
-    setCurrentStep,
     userTier,
   } = useSmartStartContext();
 
@@ -77,7 +76,7 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
       // Generate simple session ID
       const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
       setSessionId(newSessionId);
-      setCurrentStep('description');
+      // Note: currentStep is managed locally via currentStepIndex, not context
     };
 
     initSession();

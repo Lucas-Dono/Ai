@@ -504,7 +504,7 @@ export function CVStyleCreatorScreen() {
         {/* Personality Section */}
         <View style={styles.section}>
           <SectionHeader
-            icon="brain"
+            icon="bulb"
             title="Personalidad"
             badge="Opcional"
           />
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border.subtle,
+    borderBottomColor: colors.border.light,
   },
   backButton: {
     width: 40,
@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border.subtle,
+    backgroundColor: colors.border.light,
     marginVertical: 16,
   },
   helperText: {
@@ -777,7 +777,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 6,
     padding: 10,
     marginBottom: 8,
@@ -796,7 +796,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 6,
     padding: 10,
     marginBottom: 8,

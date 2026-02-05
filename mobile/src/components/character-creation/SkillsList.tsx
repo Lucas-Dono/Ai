@@ -153,9 +153,12 @@ export function SkillsList({ skills, onChange }: SkillsListProps) {
               maximumValue={100}
               step={5}
               value={tempSkillLevel}
-              onValueChange={setTempSkillLevel}
+              onValueChange={(val) => {
+                const numVal = Array.isArray(val) ? val[0] : val;
+                setTempSkillLevel(numVal);
+              }}
               minimumTrackTintColor={colors.primary[400]}
-              maximumTrackTintColor={colors.border.subtle}
+              maximumTrackTintColor={colors.border.light}
               thumbTintColor={colors.primary[400]}
             />
 
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 8,
     padding: 12,
   },
@@ -251,7 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
   },
   modalHeader: {
     flexDirection: 'row',

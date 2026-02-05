@@ -91,7 +91,7 @@ export default function CharacterSearchScreen({ navigation, route }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   // Refs
-  const searchTimeoutRef = useRef<number | undefined>(undefined);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Animation
   const fadeIn = useSharedValue(0);

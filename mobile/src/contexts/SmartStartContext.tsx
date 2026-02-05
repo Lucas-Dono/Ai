@@ -100,7 +100,7 @@ export function SmartStartProvider({ children }: { children: React.ReactNode }) 
 
   // Auto-save draft to AsyncStorage
   useEffect(() => {
-    let timeoutId: number;
+    let timeoutId: NodeJS.Timeout;
 
     const saveDraft = async () => {
       if (Object.keys(state.draft).length === 0) {

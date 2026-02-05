@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 8,
   },
   optionSelected: {

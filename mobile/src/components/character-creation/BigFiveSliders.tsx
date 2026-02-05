@@ -138,9 +138,12 @@ export function BigFiveSliders({ values, onChange }: BigFiveSlidersProps) {
               maximumValue={100}
               step={1}
               value={value}
-              onValueChange={(val) => handleChange(trait.key, val)}
+              onValueChange={(val) => {
+                const numVal = Array.isArray(val) ? val[0] : val;
+                handleChange(trait.key, numVal);
+              }}
               minimumTrackTintColor={color}
-              maximumTrackTintColor={colors.border.subtle}
+              maximumTrackTintColor={colors.border.light}
               thumbTintColor={color}
             />
 
@@ -181,7 +184,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 8,
   },
   traitHeader: {

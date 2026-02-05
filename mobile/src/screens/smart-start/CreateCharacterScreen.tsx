@@ -145,8 +145,12 @@ export default function CreateCharacterScreen() {
     narcissism: 50,
     psychopathy: 50,
   });
-  const [attachment, setAttachment] = useState({
-    style: 'secure' as const,
+  const [attachment, setAttachment] = useState<{
+    style: 'secure' | 'anxious' | 'avoidant' | 'fearful-avoidant';
+    anxiety: number;
+    avoidance: number;
+  }>({
+    style: 'secure',
     anxiety: 50,
     avoidance: 50,
   });

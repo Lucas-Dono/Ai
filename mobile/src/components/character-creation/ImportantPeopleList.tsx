@@ -276,9 +276,12 @@ export function ImportantPeopleList({ people, onChange }: ImportantPeopleListPro
                 maximumValue={100}
                 step={5}
                 value={tempPerson.closeness || 50}
-                onValueChange={(val) => setTempPerson({ ...tempPerson, closeness: val })}
+                onValueChange={(val) => {
+                  const numVal = Array.isArray(val) ? val[0] : val;
+                  setTempPerson({ ...tempPerson, closeness: numVal });
+                }}
                 minimumTrackTintColor={colors.primary[400]}
-                maximumTrackTintColor={colors.border.subtle}
+                maximumTrackTintColor={colors.border.light}
                 thumbTintColor={colors.primary[400]}
               />
 
@@ -337,7 +340,7 @@ const styles = StyleSheet.create({
   personCard: {
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 8,
     padding: 12,
   },
@@ -405,7 +408,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -439,7 +442,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 6,
   },
   typeChipSelected: {
@@ -464,7 +467,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
     borderRadius: 6,
     alignItems: 'center',
   },

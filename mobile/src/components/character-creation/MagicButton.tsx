@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: colors.border.subtle,
+    borderColor: colors.border.light,
   },
   gradient: {
     backgroundColor: colors.primary[600],
