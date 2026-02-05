@@ -244,6 +244,28 @@ export default function CreateCharacterScreen() {
   // HANDLERS
   // ============================================================================
 
+  const handleAddPhoto = () => {
+    Alert.alert(
+      'Agregar Foto',
+      'Elige cómo quieres agregar la foto del avatar',
+      [
+        {
+          text: 'Galería',
+          onPress: handlePickImage,
+        },
+        {
+          text: 'Cámara',
+          onPress: handleTakePhoto,
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -676,12 +698,9 @@ export default function CreateCharacterScreen() {
           </View>
         </View>
 
-        {/* 4. IDENTIDAD (AVATAR) */}
+        {/* 4. AVATAR */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Identidad *</Text>
-          <Text style={styles.sectionSubtitle}>
-            Sube una foto o genera el avatar con IA basándote en la apariencia física
-          </Text>
+          <Text style={styles.sectionTitle}>Avatar *</Text>
 
           <View style={styles.avatarSection}>
             <View style={styles.avatarContainer}>
@@ -691,41 +710,59 @@ export default function CreateCharacterScreen() {
                 <User size={40} color={colors.text.tertiary} />
               )}
             </View>
-            <View style={styles.avatarButtons}>
-              <TouchableOpacity style={styles.avatarButton} onPress={handlePickImage}>
-                <ImageIcon size={16} color="#8b5cf6" />
-                <Text style={styles.avatarButtonText}>Galería</Text>
+            <View style={styles.avatarButtonsContainer}>
+              <TouchableOpacity
+                style={styles.avatarButtonPrimary}
+                onPress={handleAddPhoto}
+              >
+                <ImageIcon size={18} color="#8b5cf6" />
+                <Text style={styles.avatarButtonPrimaryText}>Agregar Foto</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.avatarButton} onPress={handleTakePhoto}>
-                <Camera size={16} color="#8b5cf6" />
-                <Text style={styles.avatarButtonText}>Cámara</Text>
-              </TouchableOpacity>
+
               <TouchableOpacity
                 style={[
-                  styles.avatarButton,
-                  (!physicalAppearance.trim() || generatingAvatar) && styles.avatarButtonDisabled,
+                  styles.avatarButtonPrimary,
+                  (!physicalAppearance.trim() || generatingAvatar) && styles.avatarButtonPrimaryDisabled,
                 ]}
                 onPress={handleGenerateAvatarWithAI}
                 disabled={!physicalAppearance.trim() || generatingAvatar}
               >
                 {generatingAvatar ? (
-                  <ActivityIndicator size={14} color="#8b5cf6" />
+                  <ActivityIndicator size={16} color={!physicalAppearance.trim() ? colors.text.tertiary : "#8b5cf6"} />
                 ) : (
-                  <Sparkles size={16} color="#8b5cf6" />
+                  <Sparkles size={18} color={!physicalAppearance.trim() ? colors.text.tertiary : "#8b5cf6"} />
                 )}
-                <Text style={styles.avatarButtonText}>Generar IA</Text>
+                <Text style={[
+                  styles.avatarButtonPrimaryText,
+                  (!physicalAppearance.trim() || generatingAvatar) && styles.avatarButtonPrimaryTextDisabled,
+                ]}>
+                  Generar con IA
+                </Text>
               </TouchableOpacity>
+
               {avatarUrl && (
                 <TouchableOpacity
-                  style={[styles.avatarButton, styles.avatarEditButton]}
+                  style={styles.avatarButtonEdit}
                   onPress={handleOpenAvatarEditor}
                 >
                   <Sparkles size={16} color="#ffffff" />
-                  <Text style={styles.avatarEditButtonText}>Editar</Text>
+                  <Text style={styles.avatarButtonEditText}>Editar</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
+
+          {/* Indicador visual para generación con IA */}
+          {!physicalAppearance.trim() && (
+            <View style={styles.avatarHint}>
+              <View style={styles.avatarHintIcon}>
+                <Text style={styles.avatarHintIconText}>!</Text>
+              </View>
+              <Text style={styles.avatarHintText}>
+                Completa la "Apariencia Física" más abajo para generar el avatar con IA
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* 5. APARIENCIA FÍSICA */}
@@ -1356,7 +1393,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   avatarContainer: {
     width: 80,
@@ -1373,6 +1410,82 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
   },
+  avatarButtonsContainer: {
+    flex: 1,
+    gap: 8,
+  },
+  avatarButtonPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  avatarButtonPrimaryDisabled: {
+    backgroundColor: colors.background.elevated,
+    borderColor: colors.border.light,
+    opacity: 0.6,
+  },
+  avatarButtonPrimaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8b5cf6',
+  },
+  avatarButtonPrimaryTextDisabled: {
+    color: colors.text.tertiary,
+  },
+  avatarButtonEdit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  avatarButtonEditText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  avatarHint: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 8,
+  },
+  avatarHintIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#f59e0b',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarHintIconText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  avatarHintText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#f59e0b',
+    lineHeight: 18,
+  },
+  // Deprecated styles (kept for compatibility)
   avatarButtons: {
     flex: 1,
     gap: 8,
