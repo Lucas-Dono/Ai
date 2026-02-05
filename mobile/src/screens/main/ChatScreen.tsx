@@ -189,15 +189,39 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
 
       console.log(`[ChatScreen] ✅ Loaded ${loadedMessages.length} messages (${syncResult.source})`);
 
+      // Debug: Log message details
+      if (loadedMessages.length > 0) {
+        console.log('[ChatScreen] 📝 First message details:', {
+          id: loadedMessages[0].id?.substring(0, 8),
+          sender: loadedMessages[0].sender,
+          hasContent: !!loadedMessages[0].content,
+          contentPreview: loadedMessages[0].content?.substring(0, 50),
+          hasAgentName: !!loadedMessages[0].agentName,
+          hasAgentAvatar: !!loadedMessages[0].agentAvatar,
+        });
+        console.log('[ChatScreen] 📝 Last message details:', {
+          id: loadedMessages[loadedMessages.length - 1].id?.substring(0, 8),
+          sender: loadedMessages[loadedMessages.length - 1].sender,
+          contentPreview: loadedMessages[loadedMessages.length - 1].content?.substring(0, 50),
+        });
+      } else {
+        console.warn('[ChatScreen] ⚠️  No messages loaded - chat is empty');
+      }
+
       if (syncResult.hasNewMessages) {
         console.log('[ChatScreen] 📥 New messages synced from backend');
       }
 
       // Update agent info if available
       if (syncResult.agent) {
+        const avatarUrl = buildAvatarUrl(syncResult.agent.avatar);
+        console.log('[ChatScreen] 🖼️  Agent avatar:', {
+          original: syncResult.agent.avatar,
+          built: avatarUrl,
+        });
         setWorldInfo({
           name: syncResult.agent.name,
-          avatar: syncResult.agent.avatar,
+          avatar: avatarUrl,
           isOnline: syncResult.isOnline,
         });
       }

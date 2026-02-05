@@ -87,18 +87,54 @@ export const SyncService = {
       // Extract messages if successful
       if (messagesResponse.status === 'fulfilled' && messagesResponse.value) {
         const data: any = messagesResponse.value;
+        console.log('[Sync] 📦 Backend response structure:', {
+          hasMessages: !!data.messages,
+          messageCount: data.messages?.length || 0,
+          hasPagination: !!data.pagination,
+          dataKeys: Object.keys(data),
+        });
         backendMessages = data.messages || [];
-        console.log(`[Sync] Fetched ${backendMessages.length} messages from backend`);
+        console.log(`[Sync] ✅ Fetched ${backendMessages.length} messages from backend`);
+
+        // Log first message for debugging
+        if (backendMessages.length > 0) {
+          const firstMsg = backendMessages[0];
+          console.log('[Sync] 📝 First message sample:', {
+            id: firstMsg.id?.substring(0, 8),
+            role: firstMsg.role,
+            hasContent: !!firstMsg.content,
+            contentLength: firstMsg.content?.length || 0,
+            hasAgentName: !!firstMsg.agentName,
+            hasAgentAvatar: !!firstMsg.agentAvatar,
+            agentAvatar: firstMsg.agentAvatar,
+          });
+        }
       } else {
-        console.warn('[Sync] Failed to fetch messages from backend, using cache');
+        console.warn('[Sync] ❌ Failed to fetch messages from backend');
+        if (messagesResponse.status === 'rejected') {
+          console.error('[Sync] Rejection reason:', messagesResponse.reason);
+        }
+        console.warn('[Sync] Using cache only');
       }
 
       // Extract agent if successful
       if (agentResponse.status === 'fulfilled' && agentResponse.value) {
         backendAgent = agentResponse.value;
-        console.log(`[Sync] Fetched agent data from backend: ${backendAgent.name}`);
+        console.log(`[Sync] ✅ Fetched agent data from backend:`, {
+          id: backendAgent.id?.substring(0, 8),
+          name: backendAgent.name,
+          hasAvatar: !!backendAgent.avatar,
+          avatar: backendAgent.avatar,
+          avatarType: backendAgent.avatar?.startsWith('data:') ? 'base64' :
+                      backendAgent.avatar?.startsWith('http') ? 'url' :
+                      backendAgent.avatar?.startsWith('/') ? 'path' : 'unknown',
+        });
       } else {
-        console.warn('[Sync] Failed to fetch agent from backend, using cache');
+        console.warn('[Sync] ❌ Failed to fetch agent from backend');
+        if (agentResponse.status === 'rejected') {
+          console.error('[Sync] Rejection reason:', agentResponse.reason);
+        }
+        console.warn('[Sync] Using cached agent data');
       }
 
       // Step 4: Merge messages (deduplicate by ID)
