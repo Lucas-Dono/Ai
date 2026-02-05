@@ -46,6 +46,13 @@ import type { DepthLevelId } from '@circuitpromptai/smart-start-core';
 import { TemplateGallery } from '../../components/character-creation/TemplateGallery';
 import { PersonalityRadarChart } from '../../components/character-creation/PersonalityRadarChart';
 import { AdvancedPersonalityTabs } from '../../components/character-creation/AdvancedPersonalityTabs';
+import { BiographyTimeline, BiographyEvent } from '../../components/character-creation/BiographyTimeline';
+import { VoiceSelector } from '../../components/character-creation/VoiceSelector';
+import { AvatarEditor } from '../../components/character-creation/AvatarEditor';
+import { RelationshipGraph, RelationshipNode } from '../../components/character-creation/RelationshipGraph';
+import { SyncStatusIndicator } from '../../components/character-creation/SyncStatusIndicator';
+import { useOfflineSync } from '../../hooks/useOfflineSync';
+import type { CharacterDraft as OfflineCharacterDraft } from '../../utils/offlineStorage';
 
 // ============================================================================
 // TYPES
@@ -78,6 +85,13 @@ export default function CreateCharacterScreen() {
   // Appearance
   const [physicalAppearance, setPhysicalAppearance] = useState('');
 
+  // Voice
+  const [selectedVoiceId, setSelectedVoiceId] = useState<string | undefined>(undefined);
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string | undefined>(undefined);
+
+  // Biography
+  const [biographyEvents, setBiographyEvents] = useState<BiographyEvent[]>([]);
+
   // Personality (Big Five)
   const [openness, setOpenness] = useState(50);
   const [conscientiousness, setConscientiousness] = useState(50);
@@ -93,12 +107,6 @@ export default function CreateCharacterScreen() {
   // Relationships
   const [maritalStatus, setMaritalStatus] = useState<'single' | 'married' | 'divorced' | 'widowed' | 'complicated' | ''>('');
   const [importantPeople, setImportantPeople] = useState<ImportantPerson[]>([]);
-  const [showAddPerson, setShowAddPerson] = useState(false);
-  const [newPerson, setNewPerson] = useState<ImportantPerson>({
-    name: '',
-    relationship: '',
-    description: '',
-  });
 
   // Depth & Visibility
   const [depthLevel, setDepthLevel] = useState<DepthLevelId>('basic');
@@ -111,6 +119,10 @@ export default function CreateCharacterScreen() {
   // UI states
   const [showTemplates, setShowTemplates] = useState(true);
   const [showAdvancedPersonality, setShowAdvancedPersonality] = useState(false);
+  const [showAvatarEditor, setShowAvatarEditor] = useState(false);
+
+  // Relationship graph
+  const [relationshipNodes, setRelationshipNodes] = useState<RelationshipNode[]>([]);
 
   // Advanced personality
   const [facets, setFacets] = useState({});
@@ -129,6 +141,85 @@ export default function CreateCharacterScreen() {
     autonomy: 0.5,
     competence: 0.5,
     novelty: 0.5,
+  });
+
+  // ============================================================================
+  // OFFLINE SYNC
+  // ============================================================================
+
+  const currentDraft: Partial<OfflineCharacterDraft> = {
+    description,
+    name,
+    age,
+    gender,
+    origin,
+    avatarUrl,
+    physicalAppearance,
+    selectedVoiceId,
+    selectedVoiceName,
+    biographyEvents,
+    openness,
+    conscientiousness,
+    extraversion,
+    agreeableness,
+    neuroticism,
+    facets,
+    darkTriad,
+    attachment,
+    psychologicalNeeds,
+    occupation,
+    skills,
+    maritalStatus,
+    relationshipNodes,
+    depthLevel,
+    isPublic,
+  };
+
+  const {
+    syncStatus,
+    lastSyncTime,
+    isOnline,
+    saveDraftNow,
+    clearDraftNow,
+    hasDraftSaved,
+  } = useOfflineSync(currentDraft, {
+    onDraftLoaded: (draft) => {
+      // Restaurar estado desde el draft guardado
+      if (draft.description) setDescription(draft.description);
+      if (draft.name) setName(draft.name);
+      if (draft.age) setAge(draft.age);
+      if (draft.gender) setGender(draft.gender);
+      if (draft.origin) setOrigin(draft.origin);
+      if (draft.avatarUrl) setAvatarUrl(draft.avatarUrl);
+      if (draft.physicalAppearance) setPhysicalAppearance(draft.physicalAppearance);
+      if (draft.selectedVoiceId) setSelectedVoiceId(draft.selectedVoiceId);
+      if (draft.selectedVoiceName) setSelectedVoiceName(draft.selectedVoiceName);
+      if (draft.biographyEvents) setBiographyEvents(draft.biographyEvents);
+      if (draft.openness !== undefined) setOpenness(draft.openness);
+      if (draft.conscientiousness !== undefined) setConscientiousness(draft.conscientiousness);
+      if (draft.extraversion !== undefined) setExtraversion(draft.extraversion);
+      if (draft.agreeableness !== undefined) setAgreeableness(draft.agreeableness);
+      if (draft.neuroticism !== undefined) setNeuroticism(draft.neuroticism);
+      if (draft.facets) setFacets(draft.facets);
+      if (draft.darkTriad) setDarkTriad(draft.darkTriad);
+      if (draft.attachment) setAttachment(draft.attachment);
+      if (draft.psychologicalNeeds) setPsychologicalNeeds(draft.psychologicalNeeds);
+      if (draft.occupation) setOccupation(draft.occupation);
+      if (draft.skills) setSkills(draft.skills);
+      if (draft.maritalStatus) setMaritalStatus(draft.maritalStatus);
+      if (draft.relationshipNodes) setRelationshipNodes(draft.relationshipNodes);
+      if (draft.depthLevel) setDepthLevel(draft.depthLevel);
+      if (draft.isPublic !== undefined) setIsPublic(draft.isPublic);
+
+      Alert.alert(
+        'Draft restaurado',
+        'Se ha cargado tu personaje en progreso desde el almacenamiento local.',
+        [{ text: 'OK' }]
+      );
+    },
+    onSaveError: (error) => {
+      console.error('Error saving draft:', error);
+    },
   });
 
   // ============================================================================
@@ -231,19 +322,43 @@ export default function CreateCharacterScreen() {
     setSkills(skills.filter((_, i) => i !== index));
   };
 
-  const handleAddPerson = () => {
-    if (!newPerson.name.trim() || !newPerson.relationship.trim()) {
-      Alert.alert('Campos requeridos', 'Nombre y relación son obligatorios.');
-      return;
-    }
-
-    setImportantPeople([...importantPeople, newPerson]);
-    setNewPerson({ name: '', relationship: '', description: '' });
-    setShowAddPerson(false);
+  const handleVoiceSelect = (voiceId: string, voiceName: string) => {
+    setSelectedVoiceId(voiceId);
+    setSelectedVoiceName(voiceName);
   };
 
-  const handleRemovePerson = (index: number) => {
-    setImportantPeople(importantPeople.filter((_, i) => i !== index));
+  const handleBiographyChange = (events: BiographyEvent[]) => {
+    setBiographyEvents(events);
+  };
+
+  const handleAvatarSave = (editedUri: string) => {
+    setAvatarUrl(editedUri);
+    setShowAvatarEditor(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
+  const handleAvatarCancel = () => {
+    setShowAvatarEditor(false);
+  };
+
+  const handleOpenAvatarEditor = () => {
+    if (!avatarUrl) {
+      Alert.alert('Sin imagen', 'Primero selecciona o toma una foto para editarla');
+      return;
+    }
+    setShowAvatarEditor(true);
+  };
+
+  const handleRelationshipNodesChange = (nodes: RelationshipNode[]) => {
+    setRelationshipNodes(nodes);
+
+    // Sincronizar con importantPeople
+    const people: ImportantPerson[] = nodes.map((node) => ({
+      name: node.name,
+      relationship: node.relationship,
+      description: node.description || '',
+    }));
+    setImportantPeople(people);
   };
 
   const handleSelectTemplate = (template: any) => {
@@ -312,7 +427,12 @@ export default function CreateCharacterScreen() {
         depthLevel,
         visibility: isPublic ? 'public' : 'private',
         avatarUrl,
+        voiceId: selectedVoiceId,
+        biographyEvents,
       } as any);
+
+      // Limpiar draft después de crear exitosamente
+      await clearDraftNow();
 
       Alert.alert(
         '¡Personaje creado! ✨',
@@ -347,12 +467,19 @@ export default function CreateCharacterScreen() {
           <Sparkles size={20} color="#8b5cf6" />
           <Text style={styles.headerTitle}>Crear Personaje</Text>
         </View>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.closeButton}
-        >
-          <X size={24} color="#ffffff" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <SyncStatusIndicator
+            status={syncStatus}
+            lastSyncTime={lastSyncTime}
+            compact
+          />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.closeButton}
+          >
+            <X size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Content */}
@@ -449,6 +576,15 @@ export default function CreateCharacterScreen() {
                 <Camera size={16} color="#8b5cf6" />
                 <Text style={styles.avatarButtonText}>Cámara</Text>
               </TouchableOpacity>
+              {avatarUrl && (
+                <TouchableOpacity
+                  style={[styles.avatarButton, styles.avatarEditButton]}
+                  onPress={handleOpenAvatarEditor}
+                >
+                  <Sparkles size={16} color="#ffffff" />
+                  <Text style={styles.avatarEditButtonText}>Editar</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
@@ -506,6 +642,20 @@ export default function CreateCharacterScreen() {
             value={origin}
             onChangeText={setOrigin}
           />
+        </View>
+
+        {/* 2.5 VOZ */}
+        <View style={styles.section}>
+          <VoiceSelector
+            selectedVoiceId={selectedVoiceId}
+            onVoiceSelect={handleVoiceSelect}
+          />
+          {selectedVoiceName && (
+            <View style={styles.selectedVoiceInfo}>
+              <Text style={styles.selectedVoiceLabel}>Voz seleccionada:</Text>
+              <Text style={styles.selectedVoiceName}>{selectedVoiceName}</Text>
+            </View>
+          )}
         </View>
 
         {/* 3. APARIENCIA */}
@@ -771,72 +921,19 @@ export default function CreateCharacterScreen() {
             ))}
           </View>
 
-          <Text style={styles.label}>Personas Importantes</Text>
+          <RelationshipGraph
+            nodes={relationshipNodes}
+            onNodesChange={handleRelationshipNodesChange}
+          />
+        </View>
 
-          {importantPeople.map((person, index) => (
-            <View key={index} style={styles.personCard}>
-              <View style={styles.personInfo}>
-                <Text style={styles.personName}>{person.name}</Text>
-                <Text style={styles.personRelationship}>{person.relationship}</Text>
-              </View>
-              <TouchableOpacity onPress={() => handleRemovePerson(index)}>
-                <Trash2 size={18} color="#ef4444" />
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          {showAddPerson ? (
-            <View style={styles.addPersonForm}>
-              <TextInput
-                style={styles.input}
-                placeholder="Nombre"
-                placeholderTextColor={colors.text.tertiary}
-                value={newPerson.name}
-                onChangeText={(text) => setNewPerson({ ...newPerson, name: text })}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Relación (Ej: Mejor amigo, Hermana, Mentor...)"
-                placeholderTextColor={colors.text.tertiary}
-                value={newPerson.relationship}
-                onChangeText={(text) => setNewPerson({ ...newPerson, relationship: text })}
-              />
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Descripción de la relación (opcional)"
-                placeholderTextColor={colors.text.tertiary}
-                multiline
-                numberOfLines={3}
-                value={newPerson.description}
-                onChangeText={(text) => setNewPerson({ ...newPerson, description: text })}
-              />
-              <View style={styles.row}>
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonSecondary]}
-                  onPress={() => {
-                    setShowAddPerson(false);
-                    setNewPerson({ name: '', relationship: '', description: '' });
-                  }}
-                >
-                  <Text style={styles.buttonSecondaryText}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonPrimary]}
-                  onPress={handleAddPerson}
-                >
-                  <Text style={styles.buttonPrimaryText}>Guardar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.addPersonButton}
-              onPress={() => setShowAddPerson(true)}
-            >
-              <Plus size={16} color="#8b5cf6" />
-              <Text style={styles.addPersonButtonText}>Agregar Persona</Text>
-            </TouchableOpacity>
-          )}
+        {/* 6.5 BIOGRAFÍA */}
+        <View style={styles.section}>
+          <BiographyTimeline
+            events={biographyEvents}
+            onEventsChange={handleBiographyChange}
+            characterAge={age ? parseInt(age) : undefined}
+          />
         </View>
 
         {/* 7. DEPTH LEVEL */}
@@ -926,6 +1023,16 @@ export default function CreateCharacterScreen() {
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Avatar Editor Modal */}
+      {avatarUrl && (
+        <AvatarEditor
+          visible={showAvatarEditor}
+          imageUri={avatarUrl}
+          onSave={handleAvatarSave}
+          onCancel={handleAvatarCancel}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -953,6 +1060,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   headerTitle: {
     fontSize: 18,
@@ -1079,6 +1191,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#8b5cf6',
+  },
+  avatarEditButton: {
+    backgroundColor: '#8b5cf6',
+  },
+  avatarEditButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
   },
   row: {
     flexDirection: 'row',
@@ -1440,5 +1560,26 @@ const styles = StyleSheet.create({
     borderColor: colors.border.light,
     overflow: 'hidden',
     minHeight: 400,
+  },
+  selectedVoiceInfo: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  selectedVoiceLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.secondary,
+  },
+  selectedVoiceName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#8b5cf6',
   },
 });
