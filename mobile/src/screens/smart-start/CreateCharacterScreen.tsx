@@ -19,6 +19,7 @@ import {
   Switch,
   ActivityIndicator,
   Image,
+  Modal,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -39,20 +40,31 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
+  Volume2,
+  Calendar,
+  Network,
+  Check,
 } from 'lucide-react-native';
 import { colors } from '../../theme';
 import { useSmartStartContext } from '../../contexts/SmartStartContext';
 import type { DepthLevelId } from '@circuitpromptai/smart-start-core';
-import { TemplateGallery } from '../../components/character-creation/TemplateGallery';
 import { PersonalityRadarChart } from '../../components/character-creation/PersonalityRadarChart';
 import { AdvancedPersonalityTabs } from '../../components/character-creation/AdvancedPersonalityTabs';
 import { BiographyTimeline, BiographyEvent } from '../../components/character-creation/BiographyTimeline';
 import { VoiceSelector } from '../../components/character-creation/VoiceSelector';
 import { AvatarEditor } from '../../components/character-creation/AvatarEditor';
 import { RelationshipGraph, RelationshipNode } from '../../components/character-creation/RelationshipGraph';
-import { SyncStatusIndicator } from '../../components/character-creation/SyncStatusIndicator';
+import { OfflineIndicator } from '../../components/character-creation/OfflineIndicator';
+import { RandomizeButton } from '../../components/character-creation/RandomizeButton';
 import { useOfflineSync } from '../../hooks/useOfflineSync';
 import type { CharacterDraft as OfflineCharacterDraft } from '../../utils/offlineStorage';
+import {
+  randomizeName,
+  randomizeAge,
+  randomizeOrigin,
+  randomizeOccupation,
+  randomizePersonality,
+} from '../../utils/randomizers';
 
 // ============================================================================
 // TYPES
@@ -116,8 +128,10 @@ export default function CreateCharacterScreen() {
   const [generating, setGenerating] = useState(false);
   const [creating, setCreating] = useState(false);
 
-  // UI states
-  const [showTemplates, setShowTemplates] = useState(true);
+  // UI states - Modals
+  const [showVoiceSelector, setShowVoiceSelector] = useState(false);
+  const [showBiographyTimeline, setShowBiographyTimeline] = useState(false);
+  const [showRelationshipGraph, setShowRelationshipGraph] = useState(false);
   const [showAdvancedPersonality, setShowAdvancedPersonality] = useState(false);
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
 
@@ -184,7 +198,11 @@ export default function CreateCharacterScreen() {
     hasDraftSaved,
   } = useOfflineSync(currentDraft, {
     onDraftLoaded: (draft) => {
-      // Restaurar estado desde el draft guardado
+      // Solo restaurar si NO hay conexión (modo offline)
+      // Esto evita restaurar cuando el usuario tiene internet y está trabajando
+      if (isOnline) return;
+
+      // Restaurar estado desde el draft guardado sin alerta
       if (draft.description) setDescription(draft.description);
       if (draft.name) setName(draft.name);
       if (draft.age) setAge(draft.age);
@@ -210,12 +228,6 @@ export default function CreateCharacterScreen() {
       if (draft.relationshipNodes) setRelationshipNodes(draft.relationshipNodes);
       if (draft.depthLevel) setDepthLevel(draft.depthLevel);
       if (draft.isPublic !== undefined) setIsPublic(draft.isPublic);
-
-      Alert.alert(
-        'Draft restaurado',
-        'Se ha cargado tu personaje en progreso desde el almacenamiento local.',
-        [{ text: 'OK' }]
-      );
     },
     onSaveError: (error) => {
       console.error('Error saving draft:', error);
@@ -361,32 +373,42 @@ export default function CreateCharacterScreen() {
     setImportantPeople(people);
   };
 
-  const handleSelectTemplate = (template: any) => {
+  // ============================================================================
+  // RANDOMIZERS
+  // ============================================================================
+
+  const handleRandomizeName = () => {
+    const newName = randomizeName(gender);
+    setName(newName);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
 
-    // Pre-fill form with template data
-    setName(template.name);
-    setDescription(template.description);
-    setOccupation(template.occupation);
+  const handleRandomizeAge = () => {
+    const newAge = randomizeAge();
+    setAge(newAge);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
-    // Set personality
-    setOpenness(template.personality.openness);
-    setConscientiousness(template.personality.conscientiousness);
-    setExtraversion(template.personality.extraversion);
-    setAgreeableness(template.personality.agreeableness);
-    setNeuroticism(template.personality.neuroticism);
+  const handleRandomizeOrigin = () => {
+    const newOrigin = randomizeOrigin();
+    setOrigin(newOrigin);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
-    // Set skills from traits
-    setSkills(template.traits);
+  const handleRandomizeOccupation = () => {
+    const newOccupation = randomizeOccupation();
+    setOccupation(newOccupation);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
-    // Hide templates
-    setShowTemplates(false);
-
-    Alert.alert(
-      '¡Template aplicado!',
-      `${template.name} ha sido cargado. Puedes personalizar cualquier campo antes de crear.`,
-      [{ text: 'OK' }]
-    );
+  const handleRandomizePersonality = () => {
+    const personality = randomizePersonality();
+    setOpenness(personality.openness);
+    setConscientiousness(personality.conscientiousness);
+    setExtraversion(personality.extraversion);
+    setAgreeableness(personality.agreeableness);
+    setNeuroticism(personality.neuroticism);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const handleCreateCharacter = async () => {
@@ -468,11 +490,7 @@ export default function CreateCharacterScreen() {
           <Text style={styles.headerTitle}>Crear Personaje</Text>
         </View>
         <View style={styles.headerRight}>
-          <SyncStatusIndicator
-            status={syncStatus}
-            lastSyncTime={lastSyncTime}
-            compact
-          />
+          <OfflineIndicator isOnline={isOnline} />
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.closeButton}
@@ -489,37 +507,6 @@ export default function CreateCharacterScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* 0. TEMPLATES (Collapsable) */}
-        {showTemplates && (
-          <TemplateGallery onSelectTemplate={handleSelectTemplate} />
-        )}
-
-        {showTemplates && (
-          <TouchableOpacity
-            style={styles.hideTemplatesButton}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setShowTemplates(false);
-            }}
-          >
-            <ChevronUp size={16} color={colors.text.secondary} />
-            <Text style={styles.hideTemplatesText}>Ocultar plantillas</Text>
-          </TouchableOpacity>
-        )}
-
-        {!showTemplates && (
-          <TouchableOpacity
-            style={styles.showTemplatesButton}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setShowTemplates(true);
-            }}
-          >
-            <Sparkles size={16} color="#8b5cf6" />
-            <Text style={styles.showTemplatesText}>Ver plantillas de inicio rápido</Text>
-          </TouchableOpacity>
-        )}
-
         {/* 1. DESCRIPCIÓN */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Descripción del Personaje</Text>
@@ -589,25 +576,31 @@ export default function CreateCharacterScreen() {
           </View>
 
           <Text style={styles.label}>Nombre Completo *</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nombre del Personaje"
-            placeholderTextColor={colors.text.tertiary}
-            value={name}
-            onChangeText={setName}
-          />
+          <View style={styles.inputWithButton}>
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              placeholder="Nombre del Personaje"
+              placeholderTextColor={colors.text.tertiary}
+              value={name}
+              onChangeText={setName}
+            />
+            <RandomizeButton onPress={handleRandomizeName} />
+          </View>
 
           <View style={styles.row}>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Edad</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="25"
-                placeholderTextColor={colors.text.tertiary}
-                keyboardType="numeric"
-                value={age}
-                onChangeText={setAge}
-              />
+              <View style={styles.inputWithButton}>
+                <TextInput
+                  style={[styles.input, styles.inputFlex]}
+                  placeholder="25"
+                  placeholderTextColor={colors.text.tertiary}
+                  keyboardType="numeric"
+                  value={age}
+                  onChangeText={setAge}
+                />
+                <RandomizeButton onPress={handleRandomizeAge} size={18} />
+              </View>
             </View>
 
             <View style={styles.halfWidth}>
@@ -635,28 +628,34 @@ export default function CreateCharacterScreen() {
           </View>
 
           <Text style={styles.label}>Origen</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ciudad, país o lugar de origen"
-            placeholderTextColor={colors.text.tertiary}
-            value={origin}
-            onChangeText={setOrigin}
-          />
+          <View style={styles.inputWithButton}>
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              placeholder="Ciudad, país o lugar de origen"
+              placeholderTextColor={colors.text.tertiary}
+              value={origin}
+              onChangeText={setOrigin}
+            />
+            <RandomizeButton onPress={handleRandomizeOrigin} />
+          </View>
         </View>
 
         {/* 2.5 VOZ */}
-        <View style={styles.section}>
-          <VoiceSelector
-            selectedVoiceId={selectedVoiceId}
-            onVoiceSelect={handleVoiceSelect}
-          />
-          {selectedVoiceName && (
-            <View style={styles.selectedVoiceInfo}>
-              <Text style={styles.selectedVoiceLabel}>Voz seleccionada:</Text>
-              <Text style={styles.selectedVoiceName}>{selectedVoiceName}</Text>
+        <TouchableOpacity
+          style={styles.modalButton}
+          onPress={() => setShowVoiceSelector(true)}
+        >
+          <View style={styles.modalButtonLeft}>
+            <Volume2 size={20} color="#8b5cf6" />
+            <View>
+              <Text style={styles.modalButtonTitle}>Voz del Personaje</Text>
+              <Text style={styles.modalButtonSubtitle}>
+                {selectedVoiceName || 'Seleccionar voz de ElevenLabs'}
+              </Text>
             </View>
-          )}
-        </View>
+          </View>
+          <ChevronDown size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
 
         {/* 3. APARIENCIA */}
         <View style={styles.section}>
@@ -678,6 +677,7 @@ export default function CreateCharacterScreen() {
           <View style={styles.sectionHeader}>
             <Brain size={20} color="#8b5cf6" />
             <Text style={styles.sectionTitle}>Personalidad (Big Five)</Text>
+            <RandomizeButton onPress={handleRandomizePersonality} size={18} />
           </View>
 
           {/* Openness */}
@@ -849,13 +849,16 @@ export default function CreateCharacterScreen() {
           </View>
 
           <Text style={styles.label}>Ocupación</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ej: Desarrollador de Software, Artista, Estudiante..."
-            placeholderTextColor={colors.text.tertiary}
-            value={occupation}
-            onChangeText={setOccupation}
-          />
+          <View style={styles.inputWithButton}>
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              placeholder="Ej: Desarrollador de Software, Artista, Estudiante..."
+              placeholderTextColor={colors.text.tertiary}
+              value={occupation}
+              onChangeText={setOccupation}
+            />
+            <RandomizeButton onPress={handleRandomizeOccupation} />
+          </View>
 
           <Text style={styles.label}>Habilidades</Text>
           <View style={styles.skillsContainer}>
@@ -887,13 +890,8 @@ export default function CreateCharacterScreen() {
           </View>
         </View>
 
-        {/* 6. RELACIONES */}
+        {/* 6. ESTADO CIVIL */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Users size={20} color="#8b5cf6" />
-            <Text style={styles.sectionTitle}>Relaciones Interpersonales</Text>
-          </View>
-
           <Text style={styles.label}>Estado Civil</Text>
           <View style={styles.maritalStatusButtons}>
             {[
@@ -920,21 +918,45 @@ export default function CreateCharacterScreen() {
               </TouchableOpacity>
             ))}
           </View>
-
-          <RelationshipGraph
-            nodes={relationshipNodes}
-            onNodesChange={handleRelationshipNodesChange}
-          />
         </View>
 
-        {/* 6.5 BIOGRAFÍA */}
-        <View style={styles.section}>
-          <BiographyTimeline
-            events={biographyEvents}
-            onEventsChange={handleBiographyChange}
-            characterAge={age ? parseInt(age) : undefined}
-          />
-        </View>
+        {/* 7. RED DE RELACIONES */}
+        <TouchableOpacity
+          style={styles.modalButton}
+          onPress={() => setShowRelationshipGraph(true)}
+        >
+          <View style={styles.modalButtonLeft}>
+            <Network size={20} color="#8b5cf6" />
+            <View>
+              <Text style={styles.modalButtonTitle}>Red de Relaciones</Text>
+              <Text style={styles.modalButtonSubtitle}>
+                {relationshipNodes.length > 0
+                  ? `${relationshipNodes.length} relaciones configuradas`
+                  : 'Agregar personas importantes'}
+              </Text>
+            </View>
+          </View>
+          <ChevronDown size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        {/* 8. BIOGRAFÍA */}
+        <TouchableOpacity
+          style={styles.modalButton}
+          onPress={() => setShowBiographyTimeline(true)}
+        >
+          <View style={styles.modalButtonLeft}>
+            <Calendar size={20} color="#8b5cf6" />
+            <View>
+              <Text style={styles.modalButtonTitle}>Biografía y Eventos</Text>
+              <Text style={styles.modalButtonSubtitle}>
+                {biographyEvents.length > 0
+                  ? `${biographyEvents.length} eventos en la línea de tiempo`
+                  : 'Agregar eventos significativos'}
+              </Text>
+            </View>
+          </View>
+          <ChevronDown size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
 
         {/* 7. DEPTH LEVEL */}
         <View style={styles.section}>
@@ -1023,6 +1045,77 @@ export default function CreateCharacterScreen() {
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Modals */}
+
+      {/* Voice Selector Modal */}
+      <Modal
+        visible={showVoiceSelector}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowVoiceSelector(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalHeaderTitle}>Seleccionar Voz</Text>
+            <TouchableOpacity onPress={() => setShowVoiceSelector(false)}>
+              <X size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+          </View>
+          <VoiceSelector
+            selectedVoiceId={selectedVoiceId}
+            onVoiceSelect={(voiceId, voiceName) => {
+              handleVoiceSelect(voiceId, voiceName);
+              setShowVoiceSelector(false);
+            }}
+          />
+        </View>
+      </Modal>
+
+      {/* Biography Timeline Modal */}
+      <Modal
+        visible={showBiographyTimeline}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowBiographyTimeline(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalHeaderTitle}>Biografía y Eventos</Text>
+            <TouchableOpacity onPress={() => setShowBiographyTimeline(false)}>
+              <Check size={24} color="#8b5cf6" />
+            </TouchableOpacity>
+          </View>
+          <BiographyTimeline
+            events={biographyEvents}
+            onEventsChange={handleBiographyChange}
+            characterAge={age ? parseInt(age) : undefined}
+          />
+        </View>
+      </Modal>
+
+      {/* Relationship Graph Modal */}
+      <Modal
+        visible={showRelationshipGraph}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowRelationshipGraph(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalHeaderTitle}>Red de Relaciones</Text>
+            <TouchableOpacity onPress={() => setShowRelationshipGraph(false)}>
+              <Check size={24} color="#8b5cf6" />
+            </TouchableOpacity>
+          </View>
+          <ScrollView style={styles.modalContent}>
+            <RelationshipGraph
+              nodes={relationshipNodes}
+              onNodesChange={handleRelationshipNodesChange}
+            />
+          </ScrollView>
+        </View>
+      </Modal>
 
       {/* Avatar Editor Modal */}
       {avatarUrl && (
@@ -1581,5 +1674,63 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#8b5cf6',
+  },
+  inputWithButton: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  inputFlex: {
+    flex: 1,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: colors.background.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  modalButtonLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  modalButtonTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 2,
+  },
+  modalButtonSubtitle: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: 16,
+    paddingHorizontal: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  modalHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 24,
   },
 });

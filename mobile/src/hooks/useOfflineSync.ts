@@ -188,12 +188,38 @@ export function useOfflineSync(
   // ============================================================================
 
   useEffect(() => {
-    // Cargar draft al montar
-    loadDraftNow();
+    let mounted = true;
 
-    // Verificar si hay draft guardado
-    hasDraft().then(setHasDraftSaved);
-  }, [loadDraftNow]);
+    const loadInitialDraft = async () => {
+      if (!mounted) return;
+
+      // Solo cargar una vez al montar
+      const savedDraft = await loadDraft();
+
+      if (savedDraft && onDraftLoaded && mounted) {
+        onDraftLoaded(savedDraft);
+        lastDraftRef.current = JSON.stringify(savedDraft);
+        setHasDraftSaved(true);
+      }
+
+      const syncTime = await getLastSyncTime();
+      if (mounted) {
+        setLastSyncTime(syncTime);
+      }
+
+      // Verificar si hay draft guardado
+      const exists = await hasDraft();
+      if (mounted) {
+        setHasDraftSaved(exists);
+      }
+    };
+
+    loadInitialDraft();
+
+    return () => {
+      mounted = false;
+    };
+  }, []); // Solo ejecutar al montar, sin dependencias
 
   // ============================================================================
   // CLEANUP ON UNMOUNT
