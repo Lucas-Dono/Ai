@@ -140,6 +140,7 @@ export default function CreateCharacterScreen() {
   const [generatingAvatar, setGeneratingAvatar] = useState(false);
   const [enhancingPrompt, setEnhancingPrompt] = useState(false);
   const [promptEnhanced, setPromptEnhanced] = useState(false);
+  const [remainingUses, setRemainingUses] = useState<number | null>(null);
 
   // Relationship graph
   const [relationshipNodes, setRelationshipNodes] = useState<RelationshipNode[]>([]);
@@ -521,11 +522,13 @@ export default function CreateCharacterScreen() {
 
       // Mostrar éxito visual en el botón
       setPromptEnhanced(true);
+      setRemainingUses(data.usageInfo?.remaining ?? null);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
       // Reset el estado de éxito después de 3 segundos
       setTimeout(() => {
         setPromptEnhanced(false);
+        setRemainingUses(null);
       }, 3000);
     } catch (error: any) {
       console.error('[EnhancePrompt] Error:', error);
@@ -929,9 +932,16 @@ export default function CreateCharacterScreen() {
               // Reset estado de éxito si el usuario edita después de mejorar
               if (promptEnhanced) {
                 setPromptEnhanced(false);
+                setRemainingUses(null);
               }
             }}
           />
+
+          {promptEnhanced && remainingUses !== null && (
+            <Text style={styles.usageText}>
+              Usos restantes hasta mañana: {remainingUses}
+            </Text>
+          )}
 
           <Text style={styles.hint}>
             💡 Click en "Mejorar" para optimizar el prompt para generación de imágenes
@@ -1510,6 +1520,12 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     marginTop: 8,
     fontStyle: 'italic',
+  },
+  usageText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#f59e0b',
+    marginTop: 8,
   },
   enhanceButton: {
     flexDirection: 'row',
