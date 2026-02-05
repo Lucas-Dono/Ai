@@ -671,30 +671,65 @@ export default function CreateCharacterScreen() {
 
         {/* 3. PRIVACIDAD */}
         <View style={styles.section}>
-          <View style={styles.visibilityContainer}>
-            <View style={styles.visibilityInfo}>
-              {isPublic ? (
-                <Eye size={20} color="#8b5cf6" />
-              ) : (
-                <EyeOff size={20} color={colors.text.secondary} />
-              )}
-              <View style={styles.visibilityTextContainer}>
-                <Text style={styles.visibilityTitle}>
-                  {isPublic ? 'Público' : 'Privado'}
+          <Text style={styles.sectionTitle}>Privacidad del Personaje *</Text>
+          <Text style={styles.sectionSubtitle}>
+            Elige quién puede ver y usar este personaje
+          </Text>
+
+          <View style={styles.privacyButtons}>
+            <TouchableOpacity
+              style={[
+                styles.privacyButton,
+                !isPublic && styles.privacyButtonActive,
+              ]}
+              onPress={() => {
+                setIsPublic(false);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            >
+              <EyeOff size={20} color={!isPublic ? '#8b5cf6' : colors.text.secondary} />
+              <View style={styles.privacyButtonContent}>
+                <Text style={[
+                  styles.privacyButtonTitle,
+                  !isPublic && styles.privacyButtonTitleActive,
+                ]}>
+                  Privado
                 </Text>
-                <Text style={styles.visibilitySubtitle}>
-                  {isPublic
-                    ? 'Otros usuarios podrán ver y usar este personaje'
-                    : 'Solo tú podrás ver y usar este personaje'}
+                <Text style={[
+                  styles.privacyButtonDesc,
+                  !isPublic && styles.privacyButtonDescActive,
+                ]}>
+                  Solo tú puedes usarlo
                 </Text>
               </View>
-            </View>
-            <Switch
-              value={isPublic}
-              onValueChange={setIsPublic}
-              trackColor={{ false: colors.border.light, true: '#8b5cf6' }}
-              thumbColor="#ffffff"
-            />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.privacyButton,
+                isPublic && styles.privacyButtonActive,
+              ]}
+              onPress={() => {
+                setIsPublic(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            >
+              <Eye size={20} color={isPublic ? '#8b5cf6' : colors.text.secondary} />
+              <View style={styles.privacyButtonContent}>
+                <Text style={[
+                  styles.privacyButtonTitle,
+                  isPublic && styles.privacyButtonTitleActive,
+                ]}>
+                  Público
+                </Text>
+                <Text style={[
+                  styles.privacyButtonDesc,
+                  isPublic && styles.privacyButtonDescActive,
+                ]}>
+                  Otros pueden verlo y usarlo
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -1547,6 +1582,42 @@ const styles = StyleSheet.create({
   },
   genderButtonTextActive: {
     color: '#8b5cf6',
+  },
+  privacyButtons: {
+    gap: 12,
+  },
+  privacyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 16,
+    backgroundColor: colors.background.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: 12,
+  },
+  privacyButtonActive: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderColor: '#8b5cf6',
+  },
+  privacyButtonContent: {
+    flex: 1,
+  },
+  privacyButtonTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 2,
+  },
+  privacyButtonTitleActive: {
+    color: '#8b5cf6',
+  },
+  privacyButtonDesc: {
+    fontSize: 13,
+    color: colors.text.secondary,
+  },
+  privacyButtonDescActive: {
+    color: '#a78bfa',
   },
   sliderContainer: {
     marginBottom: 20,
