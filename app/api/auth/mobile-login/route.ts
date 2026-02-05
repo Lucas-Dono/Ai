@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const jwtToken = await generateToken({
       userId: result.user.id,
       email: result.user.email,
-      name: result.user.name || undefined,
+      name: result.user.name || null,
       plan: userPlan,
     });
 

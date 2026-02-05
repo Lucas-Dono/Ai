@@ -45,7 +45,7 @@ export const NotificationService = {
 
     // Enviar push notification si el usuario tiene tokens
     try {
-      await PushNotificationServerService.sendToUser(data.userId, {
+      await PushNotificationServerService.sendToUser(recipientId, {
         title: data.title,
         body: data.message,
         data: {
@@ -67,10 +67,13 @@ export const NotificationService = {
    * Crear notificación masiva
    */
   async createBulkNotifications(notifications: CreateNotificationData[]) {
+    // Filter out notifications without recipientId/userId
+    const validNotifications = notifications.filter(n => n.recipientId || n.userId);
+
     const created = await prisma.notification.createMany({
-      data: notifications.map(n => ({
+      data: validNotifications.map(n => ({
         id: nanoid(),
-        recipientId: n.userId,
+        recipientId: (n.recipientId || n.userId)!,
         type: n.type,
         title: n.title,
         message: n.message,

@@ -53,7 +53,7 @@ export function useOfflineSync(
   const [isOnline, setIsOnline] = useState(true);
   const [hasDraftSaved, setHasDraftSaved] = useState(false);
 
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastDraftRef = useRef<string>('');
 
   // ============================================================================

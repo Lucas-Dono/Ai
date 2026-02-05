@@ -565,7 +565,7 @@ export class SmartStartOrchestrator {
         referenceImageUrl = await withRetry(
           async () => await imageGenerator.generateFullBodyOnly({
             name: result.draft.name || 'Character',
-            gender: result.draft.gender || 'Other',
+            gender: result.draft.gender || 'other',
             physicalAppearance: result.draft.physicalAppearance,
             age: result.draft.age,
             personality: result.draft.personality,
@@ -593,7 +593,7 @@ export class SmartStartOrchestrator {
         const imageResult = await withRetry(
           async () => await imageGenerator.generateBothImages({
             name: result.draft.name || 'Character',
-            gender: result.draft.gender || 'Other',
+            gender: result.draft.gender || 'other',
             physicalAppearance: result.draft.physicalAppearance,
             age: result.draft.age,
             personality: result.draft.personality,

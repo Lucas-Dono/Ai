@@ -28,11 +28,11 @@ async function main() {
   console.log(`  Agreeableness: ${core.agreeableness}`);
   console.log(`  Neuroticism: ${core.neuroticism}\n`);
 
-  const hasEnriched = hasEnrichedDimensions(core.coreValues);
+  const hasEnriched = core.coreValues ? hasEnrichedDimensions(core.coreValues as any) : false;
   console.log(`¿Tiene dimensiones enriquecidas? ${hasEnriched ? 'SÍ ✅' : 'NO ❌'}\n`);
 
-  if (hasEnriched) {
-    const enriched = extractEnrichedDimensions(core.coreValues);
+  if (hasEnriched && core.coreValues) {
+    const enriched = extractEnrichedDimensions(core.coreValues as any);
 
     if (enriched?.facets) {
       console.log('Facetas de Openness:');

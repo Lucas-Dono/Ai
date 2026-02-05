@@ -119,16 +119,16 @@ async function generateImages() {
       let gender: GenderType;
       switch (characterData.gender) {
         case 'male':
-          gender = 'Male';
+          gender = 'male';
           break;
         case 'female':
-          gender = 'Female';
+          gender = 'female';
           break;
         case 'non-binary':
-          gender = 'Non-binary';
+          gender = 'non-binary';
           break;
         default:
-          gender = 'Other';
+          gender = 'other';
       }
 
       // Generate avatar only

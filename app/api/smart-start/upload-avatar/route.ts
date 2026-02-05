@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Get FormData
     const formData = await req.formData();
-    const file = formData.get('avatar') as File | null;
+    const file = (formData as any).get('avatar') as File | null;
 
     if (!file) {
       return NextResponse.json(

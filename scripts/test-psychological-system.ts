@@ -18,8 +18,8 @@ import {
   AuthenticityScorer,
   BehaviorPredictor,
   type EnrichedPersonalityProfile,
-  type BigFiveTraits,
 } from '@/lib/psychological-analysis';
+import type { BigFiveTraits } from '@/types/character-creation';
 
 // ============================================================================
 // COLORES PARA TERMINAL
@@ -44,27 +44,16 @@ function section(title: string) {
   console.log('='.repeat(80) + '\n');
 }
 
-function test(name: string, fn: () => boolean | Promise<boolean>) {
+async function test(name: string, fn: () => boolean | Promise<boolean>): Promise<boolean> {
   process.stdout.write(`  ${name}... `);
   try {
-    const result = fn();
-    if (result instanceof Promise) {
-      return result.then(passed => {
-        if (passed) {
-          log('✅ PASS', 'green');
-        } else {
-          log('❌ FAIL', 'red');
-        }
-        return passed;
-      });
+    const result = await Promise.resolve(fn());
+    if (result) {
+      log('✅ PASS', 'green');
     } else {
-      if (result) {
-        log('✅ PASS', 'green');
-      } else {
-        log('❌ FAIL', 'red');
-      }
-      return result;
+      log('❌ FAIL', 'red');
     }
+    return result;
   } catch (error: any) {
     log(`❌ ERROR: ${error.message}`, 'red');
     return false;
@@ -87,7 +76,7 @@ async function testFacetInference() {
 
   const passed: boolean[] = [];
 
-  passed.push(test('Infiere 30 facetas correctamente', () => {
+  passed.push(await test('Infiere 30 facetas correctamente', () => {
     const facets = inferFacetsFromBigFive(bigFive);
     const facetCount =
       Object.keys(facets.openness).length +
@@ -98,7 +87,7 @@ async function testFacetInference() {
     return facetCount === 30;
   }));
 
-  passed.push(test('Facetas están en rango 0-100', () => {
+  passed.push(await test('Facetas están en rango 0-100', () => {
     const facets = inferFacetsFromBigFive(bigFive);
     const allFacets = [
       ...Object.values(facets.openness),
@@ -110,14 +99,14 @@ async function testFacetInference() {
     return allFacets.every(v => v >= 0 && v <= 100);
   }));
 
-  passed.push(test('Facetas cercanas a Big Five base', () => {
+  passed.push(await test('Facetas cercanas a Big Five base', () => {
     const facets = inferFacetsFromBigFive(bigFive);
     const opennessAvg = Object.values(facets.openness).reduce((a, b) => a + b, 0) / 6;
     const diff = Math.abs(opennessAvg - bigFive.openness);
     return diff < 15; // Tolerancia de 15 puntos
   }));
 
-  passed.push(test('Valores extremos (0, 100) no crashean', () => {
+  passed.push(await test('Valores extremos (0, 100) no crashean', () => {
     const extremes: BigFiveTraits = {
       openness: 100,
       conscientiousness: 0,
@@ -154,7 +143,7 @@ async function testConflictDetection() {
     baselineEmotions: { joy: 0.5, sadness: 0.3, anger: 0.2, fear: 0.3, disgust: 0.2, surprise: 0.5 },
   };
 
-  passed.push(test('Detecta impulsividad (E>70, C<40)', () => {
+  passed.push(await test('Detecta impulsividad (E>70, C<40)', () => {
     const conflicts = detector.detectConflicts(impulsiveProfile);
     return conflicts.some(c => c.id === 'impulsivity-risk');
   }));
@@ -175,7 +164,7 @@ async function testConflictDetection() {
     },
   };
 
-  passed.push(test('Detecta Dark Triad cluster crítico', () => {
+  passed.push(await test('Detecta Dark Triad cluster crítico', () => {
     const conflicts = detector.detectConflicts(darkProfile);
     return conflicts.some(c => c.id === 'dark-triad-cluster' && c.severity === 'critical');
   }));
@@ -191,12 +180,12 @@ async function testConflictDetection() {
     baselineEmotions: { joy: 0.3, sadness: 0.5, anger: 0.3, fear: 0.7, disgust: 0.3, surprise: 0.4 },
   };
 
-  passed.push(test('Detecta ansiedad perfeccionista (N>70, C>70)', () => {
+  passed.push(await test('Detecta ansiedad perfeccionista (N>70, C>70)', () => {
     const conflicts = detector.detectConflicts(anxiousProfile);
     return conflicts.some(c => c.id === 'perfectionist-anxiety');
   }));
 
-  passed.push(test('Conflictos ordenados por severidad', () => {
+  passed.push(await test('Conflictos ordenados por severidad', () => {
     const conflicts = detector.detectConflicts(darkProfile);
     if (conflicts.length < 2) return true; // No aplicable si hay muy pocos
     const severities = ['critical', 'danger', 'warning', 'info'];
@@ -232,7 +221,7 @@ async function testAuthenticityScoring() {
     attachment: { primaryStyle: 'secure', intensity: 40, manifestations: [] },
   };
 
-  passed.push(test('Perfil coherente tiene autenticidad alta (>70)', () => {
+  passed.push(await test('Perfil coherente tiene autenticidad alta (>70)', () => {
     const score = scorer.calculateScore(coherentProfile);
     console.log(`    (Score: ${score.score})`);
     return score.score > 70;
@@ -251,19 +240,19 @@ async function testAuthenticityScoring() {
     attachment: { primaryStyle: 'secure', intensity: 20, manifestations: [] }, // ❌ Contradice Neuroticism
   };
 
-  passed.push(test('Perfil inconsistente tiene autenticidad baja (<40)', () => {
+  passed.push(await test('Perfil inconsistente tiene autenticidad baja (<40)', () => {
     const score = scorer.calculateScore(inconsistentProfile);
     console.log(`    (Score: ${score.score})`);
     return score.score < 40;
   }));
 
-  passed.push(test('Score está en rango 0-100', () => {
+  passed.push(await test('Score está en rango 0-100', () => {
     const score1 = scorer.calculateScore(coherentProfile);
     const score2 = scorer.calculateScore(inconsistentProfile);
     return score1.score >= 0 && score1.score <= 100 && score2.score >= 0 && score2.score <= 100;
   }));
 
-  passed.push(test('Breakdown tiene 6 componentes', () => {
+  passed.push(await test('Breakdown tiene 6 componentes', () => {
     const score = scorer.calculateScore(coherentProfile);
     const components = Object.keys(score.breakdown);
     return components.length === 6;
@@ -296,7 +285,7 @@ async function testBehaviorPrediction() {
     darkTriad: { machiavellianism: 30, narcissism: 50, psychopathy: 20 },
   };
 
-  passed.push(test('Predice comportamiento yandere con alta likelihood', () => {
+  passed.push(await test('Predice comportamiento yandere con alta likelihood', () => {
     const predictions = predictor.predictBehaviors(yandereProfile);
     const yandere = predictions.find(p => p.behaviorType === 'YANDERE_OBSESSIVE');
     console.log(`    (Likelihood: ${yandere?.likelihood.toFixed(2) || 'N/A'})`);
@@ -314,18 +303,18 @@ async function testBehaviorPrediction() {
     baselineEmotions: { joy: 0.6, sadness: 0.3, anger: 0.5, fear: 0.3, disgust: 0.2, surprise: 0.7 },
   };
 
-  passed.push(test('Predice impulsividad correctamente', () => {
+  passed.push(await test('Predice impulsividad correctamente', () => {
     const predictions = predictor.predictBehaviors(impulsiveProfile);
     const impulsive = predictions.find(p => p.behaviorType === 'IMPULSIVE');
     return impulsive !== undefined && impulsive.likelihood > 0.4;
   }));
 
-  passed.push(test('Todas las likelihoods están en rango 0-1', () => {
+  passed.push(await test('Todas las likelihoods están en rango 0-1', () => {
     const predictions = predictor.predictBehaviors(yandereProfile);
     return predictions.every(p => p.likelihood >= 0 && p.likelihood <= 1);
   }));
 
-  passed.push(test('Predicciones incluyen triggers y warnings', () => {
+  passed.push(await test('Predicciones incluyen triggers y warnings', () => {
     const predictions = predictor.predictBehaviors(yandereProfile);
     const firstPrediction = predictions[0];
     return firstPrediction &&
@@ -378,9 +367,9 @@ async function testPerformance() {
   console.log(`    Mínimo: ${min}ms`);
   console.log(`    Máximo: ${max}ms`);
 
-  passed.push(test('Análisis promedio <500ms', () => avg < 500));
-  passed.push(test('Análisis máximo <1000ms', () => max < 1000));
-  passed.push(test('Análisis mínimo <200ms', () => min < 200));
+  passed.push(await test('Análisis promedio <500ms', () => avg < 500));
+  passed.push(await test('Análisis máximo <1000ms', () => max < 1000));
+  passed.push(await test('Análisis mínimo <200ms', () => min < 200));
 
   const passRate = passed.filter(p => p).length / passed.length * 100;
   log(`\n  Pass Rate: ${passRate.toFixed(0)}% (${passed.filter(p => p).length}/${passed.length})`,
@@ -409,27 +398,27 @@ async function testFullAnalysis() {
 
   const passed: boolean[] = [];
 
-  passed.push(test('Análisis completo se ejecuta sin errores', () => {
+  passed.push(await test('Análisis completo se ejecuta sin errores', () => {
     const analysis = analyzePsychologicalProfile(testProfile);
     return analysis !== null && analysis !== undefined;
   }));
 
   const analysis = analyzePsychologicalProfile(testProfile);
 
-  passed.push(test('Análisis incluye authenticityScore', () => {
+  passed.push(await test('Análisis incluye authenticityScore', () => {
     return analysis.authenticityScore !== undefined &&
            typeof analysis.authenticityScore.score === 'number';
   }));
 
-  passed.push(test('Análisis incluye detectedConflicts', () => {
+  passed.push(await test('Análisis incluye detectedConflicts', () => {
     return Array.isArray(analysis.detectedConflicts);
   }));
 
-  passed.push(test('Análisis incluye predictedBehaviors', () => {
+  passed.push(await test('Análisis incluye predictedBehaviors', () => {
     return Array.isArray(analysis.predictedBehaviors);
   }));
 
-  passed.push(test('Análisis incluye timestamp', () => {
+  passed.push(await test('Análisis incluye timestamp', () => {
     return analysis.analyzedAt instanceof Date;
   }));
 

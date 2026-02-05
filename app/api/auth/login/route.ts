@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/jwt';
 import bcrypt from 'bcryptjs';
-import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
+import { scrypt, randomBytes, timingSafeEqual, ScryptOptions } from 'crypto';
 import { promisify } from 'util';
 
-const scryptAsync = promisify(scrypt);
+const scryptAsync = promisify<string | Buffer, string | Buffer, number, ScryptOptions, Buffer>(scrypt);
 
 /**
  * Verify password using better-auth's scrypt format
