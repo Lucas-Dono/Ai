@@ -136,6 +136,7 @@ export default function CreateCharacterScreen() {
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [generatingAvatar, setGeneratingAvatar] = useState(false);
+  const [enhancingPrompt, setEnhancingPrompt] = useState(false);
 
   // Relationship graph
   const [relationshipNodes, setRelationshipNodes] = useState<RelationshipNode[]>([]);
@@ -459,6 +460,56 @@ export default function CreateCharacterScreen() {
       Alert.alert('Error', 'No se pudo generar el avatar. Intenta nuevamente.');
     } finally {
       setGeneratingAvatar(false);
+    }
+  };
+
+  const handleEnhancePrompt = async () => {
+    if (!physicalAppearance.trim() || physicalAppearance.trim().length < 5) {
+      Alert.alert(
+        'Descripción muy corta',
+        'Escribe al menos 5 caracteres para mejorar el prompt.'
+      );
+      return;
+    }
+
+    setEnhancingPrompt(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    try {
+      const response = await fetch('/api/character-creation/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: physicalAppearance,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        if (response.status === 429) {
+          Alert.alert(
+            'Límite alcanzado',
+            error.upgradeMessage || 'Has alcanzado el límite diario de mejoras de prompt.'
+          );
+          return;
+        }
+        throw new Error(error.error || 'Error al mejorar el prompt');
+      }
+
+      const data = await response.json();
+      setPhysicalAppearance(data.enhanced);
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(
+        '✨ Prompt Mejorado',
+        `Se ha optimizado la descripción para la generación de imágenes.\n\nUsos restantes hoy: ${data.usageInfo.remaining}`,
+        [{ text: 'OK' }]
+      );
+    } catch (error: any) {
+      console.error('Error enhancing prompt:', error);
+      Alert.alert('Error', error.message || 'No se pudo mejorar el prompt. Intenta nuevamente.');
+    } finally {
+      setEnhancingPrompt(false);
     }
   };
 
@@ -802,7 +853,39 @@ export default function CreateCharacterScreen() {
 
         {/* 5. APARIENCIA FÍSICA */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Apariencia Física *</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitleInHeader}>Apariencia Física *</Text>
+            <TouchableOpacity
+              style={[
+                styles.enhanceButton,
+                (!physicalAppearance.trim() || physicalAppearance.trim().length < 5 || enhancingPrompt) &&
+                  styles.enhanceButtonDisabled,
+              ]}
+              onPress={handleEnhancePrompt}
+              disabled={!physicalAppearance.trim() || physicalAppearance.trim().length < 5 || enhancingPrompt}
+            >
+              {enhancingPrompt ? (
+                <ActivityIndicator size={16} color="#ffffff" />
+              ) : (
+                <Sparkles
+                  size={16}
+                  color={
+                    physicalAppearance.trim().length >= 5 ? '#ffffff' : colors.text.tertiary
+                  }
+                />
+              )}
+              <Text
+                style={[
+                  styles.enhanceButtonText,
+                  (!physicalAppearance.trim() || physicalAppearance.trim().length < 5) &&
+                    styles.enhanceButtonTextDisabled,
+                ]}
+              >
+                Mejorar
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.sectionSubtitle}>
             Describe la apariencia del personaje para generar su avatar con IA
           </Text>
@@ -816,6 +899,10 @@ export default function CreateCharacterScreen() {
             value={physicalAppearance}
             onChangeText={setPhysicalAppearance}
           />
+
+          <Text style={styles.hint}>
+            💡 Click en "Mejorar" para optimizar el prompt para generación de imágenes
+          </Text>
         </View>
 
         {/* 6. DESCRIPCIÓN DEL PERSONAJE */}
@@ -1363,6 +1450,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
     marginBottom: 8,
   },
@@ -1372,11 +1460,46 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: 8,
   },
+  sectionTitleInHeader: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text.primary,
+    flex: 1,
+  },
   sectionSubtitle: {
     fontSize: 14,
     color: colors.text.secondary,
     marginBottom: 16,
     lineHeight: 20,
+  },
+  hint: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  enhanceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginLeft: 'auto',
+  },
+  enhanceButtonDisabled: {
+    backgroundColor: colors.background.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  enhanceButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  enhanceButtonTextDisabled: {
+    color: colors.text.tertiary,
   },
   label: {
     fontSize: 14,
