@@ -12,7 +12,7 @@ import { SmartStartProvider } from '../contexts/SmartStartContext';
 import { colors } from '../theme';
 
 // Screens
-import SmartStartWizardScreen from '../screens/smart-start/SmartStartWizardScreen';
+import CreateCharacterScreen from '../screens/smart-start/CreateCharacterScreen';
 import { CVStyleCreatorScreen } from '../screens/character-creation/CVStyleCreatorScreen';
 
 // Deprecated screens (kept for reference, not used in navigation)
@@ -80,10 +80,10 @@ export function SmartStartStack() {
           gestureDirection: 'horizontal',
         }}
       >
-        {/* Smart Start Wizard - Unified vertical flow */}
+        {/* Create Character - Single page form */}
         <Stack.Screen
           name="SmartStartWizard"
-          component={SmartStartWizardScreen}
+          component={CreateCharacterScreen}
           options={{
             headerShown: false, // Using custom header in component
           }}

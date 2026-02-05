@@ -11,7 +11,19 @@ import {
   Image,
   Animated,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { User as UserIcon } from 'lucide-react-native';
+import {
+  Shield,
+  Sword,
+  Laptop,
+  ChefHat,
+  Plane,
+  BookOpen,
+  Smile,
+  Zap,
+  Heart,
+  Frown,
+} from 'lucide-react-native';
 import { colors } from '../../theme';
 
 interface CharacterPreviewProps {
@@ -41,20 +53,20 @@ export function CharacterPreview({
 
   // Extract hints from description
   const getCharacterHints = () => {
-    const hints: string[] = [];
+    const hints: Array<{ icon: any; label: string }> = [];
 
-    if (description.toLowerCase().includes('detective')) hints.push('🕵️ Detective');
-    if (description.toLowerCase().includes('guerrera') || description.toLowerCase().includes('warrior')) hints.push('⚔️ Guerrera');
-    if (description.toLowerCase().includes('hacker')) hints.push('💻 Hacker');
-    if (description.toLowerCase().includes('chef')) hints.push('👨‍🍳 Chef');
-    if (description.toLowerCase().includes('pilot')) hints.push('✈️ Piloto');
-    if (description.toLowerCase().includes('profesor') || description.toLowerCase().includes('teacher')) hints.push('📚 Profesor');
+    if (description.toLowerCase().includes('detective')) hints.push({ icon: Shield, label: 'Detective' });
+    if (description.toLowerCase().includes('guerrera') || description.toLowerCase().includes('warrior')) hints.push({ icon: Sword, label: 'Guerrera' });
+    if (description.toLowerCase().includes('hacker')) hints.push({ icon: Laptop, label: 'Hacker' });
+    if (description.toLowerCase().includes('chef')) hints.push({ icon: ChefHat, label: 'Chef' });
+    if (description.toLowerCase().includes('pilot')) hints.push({ icon: Plane, label: 'Piloto' });
+    if (description.toLowerCase().includes('profesor') || description.toLowerCase().includes('teacher')) hints.push({ icon: BookOpen, label: 'Profesor' });
 
     // Personality traits
-    if (description.toLowerCase().includes('tímid') || description.toLowerCase().includes('shy')) hints.push('😊 Tímido');
-    if (description.toLowerCase().includes('rebelde') || description.toLowerCase().includes('rebel')) hints.push('🤘 Rebelde');
-    if (description.toLowerCase().includes('amable') || description.toLowerCase().includes('kind')) hints.push('💝 Amable');
-    if (description.toLowerCase().includes('cínic') || description.toLowerCase().includes('cynic')) hints.push('🎭 Cínico');
+    if (description.toLowerCase().includes('tímid') || description.toLowerCase().includes('shy')) hints.push({ icon: Smile, label: 'Tímido' });
+    if (description.toLowerCase().includes('rebelde') || description.toLowerCase().includes('rebel')) hints.push({ icon: Zap, label: 'Rebelde' });
+    if (description.toLowerCase().includes('amable') || description.toLowerCase().includes('kind')) hints.push({ icon: Heart, label: 'Amable' });
+    if (description.toLowerCase().includes('cínic') || description.toLowerCase().includes('cynic')) hints.push({ icon: Frown, label: 'Cínico' });
 
     return hints;
   };
@@ -75,7 +87,7 @@ export function CharacterPreview({
             <Image source={{ uri: avatarUrl }} style={styles.avatar} />
           ) : (
             <View style={styles.avatarPlaceholder}>
-              <Ionicons name="person" size={40} color={colors.text.tertiary} />
+              <UserIcon size={40} color={colors.text.tertiary} />
             </View>
           )}
         </View>
@@ -99,11 +111,15 @@ export function CharacterPreview({
           {/* Hints from description */}
           {hints.length > 0 && (
             <View style={styles.hints}>
-              {hints.slice(0, 3).map((hint, index) => (
-                <View key={index} style={styles.hint}>
-                  <Text style={styles.hintText}>{hint}</Text>
-                </View>
-              ))}
+              {hints.slice(0, 3).map((hint, index) => {
+                const Icon = hint.icon;
+                return (
+                  <View key={index} style={styles.hint}>
+                    <Icon size={12} color="#8b5cf6" />
+                    <Text style={styles.hintText}>{hint.label}</Text>
+                  </View>
+                );
+              })}
             </View>
           )}
 
@@ -180,6 +196,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   hint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 8,
     paddingVertical: 4,
     backgroundColor: 'rgba(139, 92, 246, 0.15)',
