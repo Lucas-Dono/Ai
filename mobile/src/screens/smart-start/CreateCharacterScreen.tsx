@@ -22,6 +22,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Haptics from 'expo-haptics';
 import Slider from '@react-native-community/slider';
 import {
   X,
@@ -36,10 +37,15 @@ import {
   EyeOff,
   Plus,
   Trash2,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react-native';
 import { colors } from '../../theme';
 import { useSmartStartContext } from '../../contexts/SmartStartContext';
 import type { DepthLevelId } from '@circuitpromptai/smart-start-core';
+import { TemplateGallery } from '../../components/character-creation/TemplateGallery';
+import { PersonalityRadarChart } from '../../components/character-creation/PersonalityRadarChart';
+import { AdvancedPersonalityTabs } from '../../components/character-creation/AdvancedPersonalityTabs';
 
 // ============================================================================
 // TYPES
@@ -101,6 +107,29 @@ export default function CreateCharacterScreen() {
   // Loading states
   const [generating, setGenerating] = useState(false);
   const [creating, setCreating] = useState(false);
+
+  // UI states
+  const [showTemplates, setShowTemplates] = useState(true);
+  const [showAdvancedPersonality, setShowAdvancedPersonality] = useState(false);
+
+  // Advanced personality
+  const [facets, setFacets] = useState({});
+  const [darkTriad, setDarkTriad] = useState({
+    machiavellianism: 50,
+    narcissism: 50,
+    psychopathy: 50,
+  });
+  const [attachment, setAttachment] = useState({
+    style: 'secure' as const,
+    anxiety: 50,
+    avoidance: 50,
+  });
+  const [psychologicalNeeds, setPsychologicalNeeds] = useState({
+    connection: 0.5,
+    autonomy: 0.5,
+    competence: 0.5,
+    novelty: 0.5,
+  });
 
   // ============================================================================
   // HANDLERS
@@ -217,6 +246,34 @@ export default function CreateCharacterScreen() {
     setImportantPeople(importantPeople.filter((_, i) => i !== index));
   };
 
+  const handleSelectTemplate = (template: any) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    // Pre-fill form with template data
+    setName(template.name);
+    setDescription(template.description);
+    setOccupation(template.occupation);
+
+    // Set personality
+    setOpenness(template.personality.openness);
+    setConscientiousness(template.personality.conscientiousness);
+    setExtraversion(template.personality.extraversion);
+    setAgreeableness(template.personality.agreeableness);
+    setNeuroticism(template.personality.neuroticism);
+
+    // Set skills from traits
+    setSkills(template.traits);
+
+    // Hide templates
+    setShowTemplates(false);
+
+    Alert.alert(
+      '¡Template aplicado!',
+      `${template.name} ha sido cargado. Puedes personalizar cualquier campo antes de crear.`,
+      [{ text: 'OK' }]
+    );
+  };
+
   const handleCreateCharacter = async () => {
     // Validation
     if (!name.trim()) {
@@ -305,6 +362,37 @@ export default function CreateCharacterScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* 0. TEMPLATES (Collapsable) */}
+        {showTemplates && (
+          <TemplateGallery onSelectTemplate={handleSelectTemplate} />
+        )}
+
+        {showTemplates && (
+          <TouchableOpacity
+            style={styles.hideTemplatesButton}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowTemplates(false);
+            }}
+          >
+            <ChevronUp size={16} color={colors.text.secondary} />
+            <Text style={styles.hideTemplatesText}>Ocultar plantillas</Text>
+          </TouchableOpacity>
+        )}
+
+        {!showTemplates && (
+          <TouchableOpacity
+            style={styles.showTemplatesButton}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowTemplates(true);
+            }}
+          >
+            <Sparkles size={16} color="#8b5cf6" />
+            <Text style={styles.showTemplatesText}>Ver plantillas de inicio rápido</Text>
+          </TouchableOpacity>
+        )}
+
         {/* 1. DESCRIPCIÓN */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Descripción del Personaje</Text>
@@ -454,7 +542,10 @@ export default function CreateCharacterScreen() {
               maximumValue={100}
               step={1}
               value={openness}
-              onValueChange={setOpenness}
+              onValueChange={(v) => {
+                setOpenness(v);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               minimumTrackTintColor="#8b5cf6"
               maximumTrackTintColor={colors.border.light}
               thumbTintColor="#8b5cf6"
@@ -473,7 +564,10 @@ export default function CreateCharacterScreen() {
               maximumValue={100}
               step={1}
               value={conscientiousness}
-              onValueChange={setConscientiousness}
+              onValueChange={(v) => {
+                setConscientiousness(v);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               minimumTrackTintColor="#8b5cf6"
               maximumTrackTintColor={colors.border.light}
               thumbTintColor="#8b5cf6"
@@ -492,7 +586,10 @@ export default function CreateCharacterScreen() {
               maximumValue={100}
               step={1}
               value={extraversion}
-              onValueChange={setExtraversion}
+              onValueChange={(v) => {
+                setExtraversion(v);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               minimumTrackTintColor="#8b5cf6"
               maximumTrackTintColor={colors.border.light}
               thumbTintColor="#8b5cf6"
@@ -511,7 +608,10 @@ export default function CreateCharacterScreen() {
               maximumValue={100}
               step={1}
               value={agreeableness}
-              onValueChange={setAgreeableness}
+              onValueChange={(v) => {
+                setAgreeableness(v);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               minimumTrackTintColor="#8b5cf6"
               maximumTrackTintColor={colors.border.light}
               thumbTintColor="#8b5cf6"
@@ -530,12 +630,65 @@ export default function CreateCharacterScreen() {
               maximumValue={100}
               step={1}
               value={neuroticism}
-              onValueChange={setNeuroticism}
+              onValueChange={(v) => {
+                setNeuroticism(v);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               minimumTrackTintColor="#8b5cf6"
               maximumTrackTintColor={colors.border.light}
               thumbTintColor="#8b5cf6"
             />
           </View>
+
+          {/* Radar Chart */}
+          <View style={styles.radarContainer}>
+            <PersonalityRadarChart
+              openness={openness}
+              conscientiousness={conscientiousness}
+              extraversion={extraversion}
+              agreeableness={agreeableness}
+              neuroticism={neuroticism}
+            />
+          </View>
+
+          {/* Advanced Options Toggle */}
+          <TouchableOpacity
+            style={styles.advancedToggle}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setShowAdvancedPersonality(!showAdvancedPersonality);
+            }}
+          >
+            {showAdvancedPersonality ? (
+              <ChevronUp size={20} color="#8b5cf6" />
+            ) : (
+              <ChevronDown size={20} color="#8b5cf6" />
+            )}
+            <Text style={styles.advancedToggleText}>
+              {showAdvancedPersonality
+                ? 'Ocultar Opciones Avanzadas'
+                : 'Mostrar Opciones Avanzadas'}
+            </Text>
+            <View style={styles.advancedBadge}>
+              <Text style={styles.advancedBadgeText}>Pro</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Advanced Personality Tabs */}
+          {showAdvancedPersonality && (
+            <View style={styles.advancedContainer}>
+              <AdvancedPersonalityTabs
+                facets={facets}
+                darkTriad={darkTriad}
+                attachment={attachment}
+                needs={psychologicalNeeds}
+                onFacetsChange={setFacets}
+                onDarkTriadChange={setDarkTriad}
+                onAttachmentChange={setAttachment}
+                onNeedsChange={setPsychologicalNeeds}
+              />
+            </View>
+          )}
         </View>
 
         {/* 5. PROFESIÓN */}
@@ -1202,5 +1355,90 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: '#ffffff',
+  },
+  hideTemplatesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    marginHorizontal: 24,
+    marginBottom: 24,
+    borderRadius: 10,
+    backgroundColor: colors.background.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  hideTemplatesText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.secondary,
+  },
+  showTemplatesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    marginHorizontal: 24,
+    marginBottom: 24,
+    borderRadius: 10,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderStyle: 'dashed',
+  },
+  showTemplatesText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8b5cf6',
+  },
+  radarContainer: {
+    marginTop: 24,
+    marginBottom: 16,
+    backgroundColor: colors.background.elevated,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  advancedToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    marginTop: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+  },
+  advancedToggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8b5cf6',
+  },
+  advancedBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: '#8b5cf6',
+    borderRadius: 6,
+  },
+  advancedBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  advancedContainer: {
+    marginTop: 16,
+    backgroundColor: colors.background.elevated,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    overflow: 'hidden',
+    minHeight: 400,
   },
 });
