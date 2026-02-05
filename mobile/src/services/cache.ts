@@ -318,4 +318,96 @@ export const CacheService = {
       return { totalChats: 0, totalMessages: 0, cacheSize: '0 KB' };
     }
   },
+
+  /**
+   * Clear ALL cache data (nuclear option)
+   * Use this when:
+   * - User logs out
+   * - Database was reset
+   * - Need to force full re-sync
+   */
+  async clearAll(): Promise<void> {
+    try {
+      console.log('[Cache] 🗑️  Clearing ALL cache data...');
+
+      // Get all AsyncStorage keys
+      const allKeys = await AsyncStorage.getAllKeys();
+
+      // Filter keys that belong to our app
+      const ourKeys = allKeys.filter(
+        key =>
+          key.startsWith('@messages:') ||
+          key.startsWith('@agent:') ||
+          key.startsWith('@chats:') ||
+          key.startsWith('@sync:')
+      );
+
+      console.log(`[Cache] Found ${ourKeys.length} cache keys to delete`);
+
+      if (ourKeys.length > 0) {
+        await AsyncStorage.multiRemove(ourKeys);
+        console.log('[Cache] ✅ All cache data cleared successfully');
+      } else {
+        console.log('[Cache] ℹ️  No cache data to clear');
+      }
+    } catch (error) {
+      console.error('[Cache] ❌ Error clearing cache:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Clear cache for a specific user
+   */
+  async clearUserCache(userId: string): Promise<void> {
+    try {
+      console.log(`[Cache] 🗑️  Clearing cache for user ${userId}...`);
+
+      const allKeys = await AsyncStorage.getAllKeys();
+
+      // Filter keys that belong to this user
+      const userKeys = allKeys.filter(
+        key =>
+          key.includes(`:${userId}`) ||
+          key === KEYS.CHAT_LIST(userId)
+      );
+
+      console.log(`[Cache] Found ${userKeys.length} keys for user ${userId}`);
+
+      if (userKeys.length > 0) {
+        await AsyncStorage.multiRemove(userKeys);
+        console.log('[Cache] ✅ User cache cleared successfully');
+      }
+    } catch (error) {
+      console.error('[Cache] ❌ Error clearing user cache:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Clear cache for a specific agent
+   */
+  async clearAgentCache(agentId: string, userId?: string): Promise<void> {
+    try {
+      console.log(`[Cache] 🗑️  Clearing cache for agent ${agentId}...`);
+
+      const keysToDelete: string[] = [
+        KEYS.AGENT_DATA(agentId),
+      ];
+
+      // If userId provided, also clear messages and sync data
+      if (userId) {
+        keysToDelete.push(
+          KEYS.MESSAGES(agentId, userId),
+          KEYS.LAST_SYNC(agentId, userId)
+        );
+      }
+
+      await AsyncStorage.multiRemove(keysToDelete);
+      console.log(`[Cache] ✅ Cleared ${keysToDelete.length} cache keys for agent`);
+    } catch (error) {
+      console.error('[Cache] ❌ Error clearing agent cache:', error);
+      throw error;
+    }
+  },
 };
