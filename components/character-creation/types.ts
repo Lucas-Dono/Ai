@@ -65,6 +65,9 @@ export interface CharacterDraft {
   importantEvents: HistoryEvent[];
   traumas: string[];
   personalAchievements: string[];
+
+  // Visibility (Optional)
+  visibility?: 'public' | 'private';
 }
 
 export interface Skill {

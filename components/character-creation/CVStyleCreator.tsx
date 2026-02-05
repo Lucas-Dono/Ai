@@ -6,7 +6,8 @@ import { useTranslations } from 'next-intl';
 import {
   User, Users, Briefcase, Brain, BookOpen, Sparkles,
   Plus, X, Upload, RefreshCw,
-  PenTool, Download, Rocket, ChevronDown, ChevronUp, Zap, AlertTriangle
+  PenTool, Download, Rocket, ChevronDown, ChevronUp, Zap, AlertTriangle,
+  Eye, EyeOff
 } from 'lucide-react';
 import type { CharacterDraft } from './types';
 import { PersonalityRadarChart } from './PersonalityRadarChart';
@@ -252,6 +253,9 @@ export function CVStyleCreator() {
     importantEvents: [],
     traumas: [],
     personalAchievements: [],
+
+    // Visibilidad
+    visibility: 'private', // 'public' | 'private'
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -1427,6 +1431,44 @@ export function CVStyleCreator() {
             </section>
           </div>
         )}
+
+        {/* VISIBILIDAD */}
+        <section className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {character.visibility === 'public' ? (
+                <Eye className="text-indigo-400" size={24} />
+              ) : (
+                <EyeOff className="text-slate-400" size={24} />
+              )}
+              <div>
+                <h3 className="text-lg font-bold text-slate-100">
+                  {character.visibility === 'public' ? 'Público' : 'Privado'}
+                </h3>
+                <p className="text-sm text-slate-400">
+                  {character.visibility === 'public'
+                    ? 'Otros usuarios podrán ver y usar este personaje'
+                    : 'Solo tú podrás ver y usar este personaje'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setCharacter(prev => ({
+                ...prev,
+                visibility: prev.visibility === 'public' ? 'private' : 'public'
+              }))}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                character.visibility === 'public' ? 'bg-indigo-600' : 'bg-slate-700'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  character.visibility === 'public' ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </section>
 
         {/* MOBILE: Botones de acción al final del formulario */}
         <div className="md:hidden space-y-3 mt-12">
