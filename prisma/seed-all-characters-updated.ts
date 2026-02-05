@@ -1016,6 +1016,18 @@ export async function seedUpdatedCharacters() {
       lunaDemo,             // 25 (FREE)
     ];
 
+    // Helper para generar systemPrompt básico
+    const generateBasicSystemPrompt = (char: any) => {
+      const name = char.name;
+      const age = char.profile?.basicInfo?.age || 'unknown age';
+      const occupation = char.profile?.basicInfo?.occupation || 'companion';
+      return `You are ${name}, a ${age}-year-old ${occupation}.
+
+${char.description}
+
+Stay in character, be authentic, and engage naturally with users.`;
+    };
+
     // Seed cada personaje
     for (let i = 0; i < allCharacters.length; i++) {
       const character = allCharacters[i];
@@ -1023,7 +1035,11 @@ export async function seedUpdatedCharacters() {
       await prisma.agent.upsert({
         where: { id: character.id },
         update: { ...character, updatedAt: new Date() },
-        create: { ...character, updatedAt: new Date() },
+        create: {
+          ...character,
+          systemPrompt: (character as any).systemPrompt || generateBasicSystemPrompt(character),
+          updatedAt: new Date()
+        },
       });
 
       console.log(`✅ ${i + 20}/25 ${character.name} actualizado\n`);

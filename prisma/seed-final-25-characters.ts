@@ -4555,7 +4555,7 @@ export async function seedFinal25Characters() {
         // Agregar systemPrompt genérico si no existe
         const characterData = {
           ...character,
-          systemPrompt: character.systemPrompt || `Eres ${character.name}. ${character.description || 'Interactúa de manera auténtica y coherente con tu personalidad.'}`,
+          systemPrompt: (character as any).systemPrompt || `Eres ${character.name}. ${character.description || 'Interactúa de manera auténtica y coherente con tu personalidad.'}`,
           updatedAt: new Date()
         };
 

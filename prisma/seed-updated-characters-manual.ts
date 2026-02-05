@@ -2340,11 +2340,27 @@ async function seedUpdatedCharacters() {
       },
     });
 
+    // Helper para generar systemPrompt básico
+    const generateBasicSystemPrompt = (char: any) => {
+      const name = char.name;
+      const age = char.profile?.basicInfo?.age || 'unknown age';
+      const occupation = char.profile?.basicInfo?.occupation || 'companion';
+      return `You are ${name}, a ${age}-year-old ${occupation}.
+
+${char.description}
+
+Stay in character, be authentic, and engage naturally with users.`;
+    };
+
     // Seed Amara Okafor
     await prisma.agent.upsert({
       where: { id: amaraOkafor.id },
       update: { ...amaraOkafor, updatedAt: new Date() },
-      create: { ...amaraOkafor, updatedAt: new Date() },
+      create: {
+        ...amaraOkafor,
+        systemPrompt: (amaraOkafor as any).systemPrompt || generateBasicSystemPrompt(amaraOkafor),
+        updatedAt: new Date()
+      },
     });
     console.log('✅ 1/25 Amara Okafor actualizada\n');
 
