@@ -134,6 +134,8 @@ export default function CreateCharacterScreen() {
   const [showRelationshipGraph, setShowRelationshipGraph] = useState(false);
   const [showAdvancedPersonality, setShowAdvancedPersonality] = useState(false);
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [generatingAvatar, setGeneratingAvatar] = useState(false);
 
   // Relationship graph
   const [relationshipNodes, setRelationshipNodes] = useState<RelationshipNode[]>([]);
@@ -415,10 +417,58 @@ export default function CreateCharacterScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
+  const handleGenerateAvatarWithAI = async () => {
+    if (!physicalAppearance.trim()) {
+      Alert.alert(
+        'Apariencia física requerida',
+        'Debes completar la apariencia física antes de generar el avatar con IA.'
+      );
+      return;
+    }
+
+    setGeneratingAvatar(true);
+    try {
+      // TODO: Implementar generación de imagen con IA
+      // Usar el servicio de generación de imágenes
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulación
+      Alert.alert('Función en desarrollo', 'La generación de avatar con IA estará disponible pronto.');
+    } catch (error) {
+      console.error('Error generating avatar:', error);
+      Alert.alert('Error', 'No se pudo generar el avatar. Intenta nuevamente.');
+    } finally {
+      setGeneratingAvatar(false);
+    }
+  };
+
   const handleCreateCharacter = async () => {
-    // Validation
+    // Validación de campos obligatorios
     if (!name.trim()) {
       Alert.alert('Campo requerido', 'El nombre del personaje es obligatorio.');
+      return;
+    }
+
+    if (!age.trim()) {
+      Alert.alert('Campo requerido', 'La edad del personaje es obligatoria.');
+      return;
+    }
+
+    if (!gender) {
+      Alert.alert('Campo requerido', 'El género del personaje es obligatorio.');
+      return;
+    }
+
+    if (!origin.trim()) {
+      Alert.alert('Campo requerido', 'El origen del personaje es obligatorio.');
+      return;
+    }
+
+    if (!selectedVoiceId) {
+      Alert.alert('Campo requerido', 'Debes seleccionar una voz para el personaje.');
+      return;
+    }
+
+    if (!physicalAppearance.trim()) {
+      Alert.alert('Campo requerido', 'La apariencia física del personaje es obligatoria.');
       return;
     }
 
@@ -511,11 +561,196 @@ export default function CreateCharacterScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* 1. DESCRIPCIÓN */}
+        {/* 1. INFORMACIÓN BÁSICA */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Descripción del Personaje</Text>
+          <Text style={styles.sectionTitle}>Información Básica</Text>
+
+          <Text style={styles.label}>Nombre Completo *</Text>
+          <View style={styles.inputWithButton}>
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              placeholder="Nombre del Personaje"
+              placeholderTextColor={colors.text.tertiary}
+              value={name}
+              onChangeText={setName}
+            />
+            <RandomizeButton onPress={handleRandomizeName} />
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Edad *</Text>
+              <View style={styles.inputWithButton}>
+                <TextInput
+                  style={[styles.input, styles.inputFlex]}
+                  placeholder="25"
+                  placeholderTextColor={colors.text.tertiary}
+                  keyboardType="numeric"
+                  value={age}
+                  onChangeText={setAge}
+                />
+                <RandomizeButton onPress={handleRandomizeAge} size={18} />
+              </View>
+            </View>
+
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Género *</Text>
+              <View style={styles.genderButtons}>
+                {['male', 'female', 'non-binary'].map((g) => (
+                  <TouchableOpacity
+                    key={g}
+                    style={[
+                      styles.genderButton,
+                      gender === g && styles.genderButtonActive,
+                    ]}
+                    onPress={() => setGender(g as any)}
+                  >
+                    <Text style={[
+                      styles.genderButtonText,
+                      gender === g && styles.genderButtonTextActive,
+                    ]}>
+                      {g === 'male' ? 'M' : g === 'female' ? 'F' : 'NB'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
+
+          <Text style={styles.label}>Origen *</Text>
+          <View style={styles.inputWithButton}>
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              placeholder="Ciudad, país o lugar de origen"
+              placeholderTextColor={colors.text.tertiary}
+              value={origin}
+              onChangeText={setOrigin}
+            />
+            <RandomizeButton onPress={handleRandomizeOrigin} />
+          </View>
+        </View>
+
+        {/* 2. VOZ */}
+        <TouchableOpacity
+          style={styles.modalButton}
+          onPress={() => setShowVoiceSelector(true)}
+        >
+          <View style={styles.modalButtonLeft}>
+            <Volume2 size={20} color="#8b5cf6" />
+            <View>
+              <Text style={styles.modalButtonTitle}>Voz del Personaje *</Text>
+              <Text style={styles.modalButtonSubtitle}>
+                {selectedVoiceName || 'Seleccionar voz de ElevenLabs'}
+              </Text>
+            </View>
+          </View>
+          <ChevronDown size={20} color={colors.text.tertiary} />
+        </TouchableOpacity>
+
+        {/* 3. PRIVACIDAD */}
+        <View style={styles.section}>
+          <View style={styles.visibilityContainer}>
+            <View style={styles.visibilityInfo}>
+              {isPublic ? (
+                <Eye size={20} color="#8b5cf6" />
+              ) : (
+                <EyeOff size={20} color={colors.text.secondary} />
+              )}
+              <View style={styles.visibilityTextContainer}>
+                <Text style={styles.visibilityTitle}>
+                  {isPublic ? 'Público' : 'Privado'}
+                </Text>
+                <Text style={styles.visibilitySubtitle}>
+                  {isPublic
+                    ? 'Otros usuarios podrán ver y usar este personaje'
+                    : 'Solo tú podrás ver y usar este personaje'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={isPublic}
+              onValueChange={setIsPublic}
+              trackColor={{ false: colors.border.light, true: '#8b5cf6' }}
+              thumbColor="#ffffff"
+            />
+          </View>
+        </View>
+
+        {/* 4. IDENTIDAD (AVATAR) */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Identidad *</Text>
           <Text style={styles.sectionSubtitle}>
-            Describe la persona que quieres crear. Esta descripción servirá como base para generar automáticamente su historia, personalidad y trabajo.
+            Sube una foto o genera el avatar con IA basándote en la apariencia física
+          </Text>
+
+          <View style={styles.avatarSection}>
+            <View style={styles.avatarContainer}>
+              {avatarUrl ? (
+                <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+              ) : (
+                <User size={40} color={colors.text.tertiary} />
+              )}
+            </View>
+            <View style={styles.avatarButtons}>
+              <TouchableOpacity style={styles.avatarButton} onPress={handlePickImage}>
+                <ImageIcon size={16} color="#8b5cf6" />
+                <Text style={styles.avatarButtonText}>Galería</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.avatarButton} onPress={handleTakePhoto}>
+                <Camera size={16} color="#8b5cf6" />
+                <Text style={styles.avatarButtonText}>Cámara</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.avatarButton,
+                  (!physicalAppearance.trim() || generatingAvatar) && styles.avatarButtonDisabled,
+                ]}
+                onPress={handleGenerateAvatarWithAI}
+                disabled={!physicalAppearance.trim() || generatingAvatar}
+              >
+                {generatingAvatar ? (
+                  <ActivityIndicator size={14} color="#8b5cf6" />
+                ) : (
+                  <Sparkles size={16} color="#8b5cf6" />
+                )}
+                <Text style={styles.avatarButtonText}>Generar IA</Text>
+              </TouchableOpacity>
+              {avatarUrl && (
+                <TouchableOpacity
+                  style={[styles.avatarButton, styles.avatarEditButton]}
+                  onPress={handleOpenAvatarEditor}
+                >
+                  <Sparkles size={16} color="#ffffff" />
+                  <Text style={styles.avatarEditButtonText}>Editar</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+
+        {/* 5. APARIENCIA FÍSICA */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Apariencia Física *</Text>
+          <Text style={styles.sectionSubtitle}>
+            Describe la apariencia del personaje para generar su avatar con IA
+          </Text>
+
+          <TextInput
+            style={styles.textArea}
+            placeholder="Ej: Mujer de 25 años, pelo largo castaño, ojos verdes, piel clara, estilo casual moderno con jeans y sudadera..."
+            placeholderTextColor={colors.text.tertiary}
+            multiline
+            numberOfLines={4}
+            value={physicalAppearance}
+            onChangeText={setPhysicalAppearance}
+          />
+        </View>
+
+        {/* 6. DESCRIPCIÓN DEL PERSONAJE */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Descripción del Personaje *</Text>
+          <Text style={styles.sectionSubtitle}>
+            Describe la personalidad, historia y características del personaje. Esto servirá como base para generar automáticamente los ajustes avanzados.
           </Text>
 
           <TextInput
@@ -545,144 +780,41 @@ export default function CreateCharacterScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* 2. IDENTIDAD BÁSICA */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Identidad</Text>
-
-          {/* Avatar */}
-          <View style={styles.avatarSection}>
-            <View style={styles.avatarContainer}>
-              {avatarUrl ? (
-                <Image source={{ uri: avatarUrl }} style={styles.avatar} />
-              ) : (
-                <User size={40} color={colors.text.tertiary} />
-              )}
-            </View>
-            <View style={styles.avatarButtons}>
-              <TouchableOpacity style={styles.avatarButton} onPress={handlePickImage}>
-                <ImageIcon size={16} color="#8b5cf6" />
-                <Text style={styles.avatarButtonText}>Galería</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.avatarButton} onPress={handleTakePhoto}>
-                <Camera size={16} color="#8b5cf6" />
-                <Text style={styles.avatarButtonText}>Cámara</Text>
-              </TouchableOpacity>
-              {avatarUrl && (
-                <TouchableOpacity
-                  style={[styles.avatarButton, styles.avatarEditButton]}
-                  onPress={handleOpenAvatarEditor}
-                >
-                  <Sparkles size={16} color="#ffffff" />
-                  <Text style={styles.avatarEditButtonText}>Editar</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-
-          <Text style={styles.label}>Nombre Completo *</Text>
-          <View style={styles.inputWithButton}>
-            <TextInput
-              style={[styles.input, styles.inputFlex]}
-              placeholder="Nombre del Personaje"
-              placeholderTextColor={colors.text.tertiary}
-              value={name}
-              onChangeText={setName}
-            />
-            <RandomizeButton onPress={handleRandomizeName} />
-          </View>
-
-          <View style={styles.row}>
-            <View style={styles.halfWidth}>
-              <Text style={styles.label}>Edad</Text>
-              <View style={styles.inputWithButton}>
-                <TextInput
-                  style={[styles.input, styles.inputFlex]}
-                  placeholder="25"
-                  placeholderTextColor={colors.text.tertiary}
-                  keyboardType="numeric"
-                  value={age}
-                  onChangeText={setAge}
-                />
-                <RandomizeButton onPress={handleRandomizeAge} size={18} />
-              </View>
-            </View>
-
-            <View style={styles.halfWidth}>
-              <Text style={styles.label}>Género</Text>
-              <View style={styles.genderButtons}>
-                {['male', 'female', 'non-binary'].map((g) => (
-                  <TouchableOpacity
-                    key={g}
-                    style={[
-                      styles.genderButton,
-                      gender === g && styles.genderButtonActive,
-                    ]}
-                    onPress={() => setGender(g as any)}
-                  >
-                    <Text style={[
-                      styles.genderButtonText,
-                      gender === g && styles.genderButtonTextActive,
-                    ]}>
-                      {g === 'male' ? 'M' : g === 'female' ? 'F' : 'NB'}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          </View>
-
-          <Text style={styles.label}>Origen</Text>
-          <View style={styles.inputWithButton}>
-            <TextInput
-              style={[styles.input, styles.inputFlex]}
-              placeholder="Ciudad, país o lugar de origen"
-              placeholderTextColor={colors.text.tertiary}
-              value={origin}
-              onChangeText={setOrigin}
-            />
-            <RandomizeButton onPress={handleRandomizeOrigin} />
-          </View>
-        </View>
-
-        {/* 2.5 VOZ */}
+        {/* 7. AJUSTES AVANZADOS (Colapsable) */}
         <TouchableOpacity
-          style={styles.modalButton}
-          onPress={() => setShowVoiceSelector(true)}
+          style={styles.advancedSettingsToggle}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            setShowAdvancedSettings(!showAdvancedSettings);
+          }}
         >
-          <View style={styles.modalButtonLeft}>
-            <Volume2 size={20} color="#8b5cf6" />
-            <View>
-              <Text style={styles.modalButtonTitle}>Voz del Personaje</Text>
-              <Text style={styles.modalButtonSubtitle}>
-                {selectedVoiceName || 'Seleccionar voz de ElevenLabs'}
-              </Text>
+          <View style={styles.advancedSettingsHeader}>
+            {showAdvancedSettings ? (
+              <ChevronUp size={24} color="#8b5cf6" />
+            ) : (
+              <ChevronDown size={24} color="#8b5cf6" />
+            )}
+            <Text style={styles.advancedSettingsTitle}>Ajustes Avanzados</Text>
+            <View style={styles.advancedBadge}>
+              <Text style={styles.advancedBadgeText}>Opcional</Text>
             </View>
           </View>
-          <ChevronDown size={20} color={colors.text.tertiary} />
+          <Text style={styles.advancedSettingsSubtitle}>
+            {showAdvancedSettings
+              ? 'Ocultar personalidad, profesión y más ajustes'
+              : 'Personalidad, profesión, relaciones y más'}
+          </Text>
         </TouchableOpacity>
 
-        {/* 3. APARIENCIA */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Apariencia Física</Text>
-
-          <TextInput
-            style={styles.textArea}
-            placeholder="Describe solo su apariencia: altura, complexión, color de ojos, cabello, rasgos faciales, estilo de vestir..."
-            placeholderTextColor={colors.text.tertiary}
-            multiline
-            numberOfLines={4}
-            value={physicalAppearance}
-            onChangeText={setPhysicalAppearance}
-          />
-        </View>
-
-        {/* 4. PERSONALIDAD */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Brain size={20} color="#8b5cf6" />
-            <Text style={styles.sectionTitle}>Personalidad (Big Five)</Text>
-            <RandomizeButton onPress={handleRandomizePersonality} size={18} />
-          </View>
+        {showAdvancedSettings && (
+          <>
+            {/* 7.1. PERSONALIDAD */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Brain size={20} color="#8b5cf6" />
+                <Text style={styles.sectionTitle}>Personalidad (Big Five)</Text>
+                <RandomizeButton onPress={handleRandomizePersonality} size={18} />
+              </View>
 
           {/* Openness */}
           <View style={styles.sliderContainer}>
@@ -842,15 +974,15 @@ export default function CreateCharacterScreen() {
                 onNeedsChange={setPsychologicalNeeds}
               />
             </View>
-          )}
-        </View>
+              )}
+            </View>
 
-        {/* 5. PROFESIÓN */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Briefcase size={20} color="#8b5cf6" />
-            <Text style={styles.sectionTitle}>Profesión y Habilidades</Text>
-          </View>
+            {/* 7.2. PROFESIÓN */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Briefcase size={20} color="#8b5cf6" />
+                <Text style={styles.sectionTitle}>Profesión y Habilidades</Text>
+              </View>
 
           <Text style={styles.label}>Ocupación</Text>
           <View style={styles.inputWithButton}>
@@ -891,12 +1023,12 @@ export default function CreateCharacterScreen() {
             >
               <Plus size={18} color="#ffffff" />
             </TouchableOpacity>
-          </View>
-        </View>
+              </View>
+            </View>
 
-        {/* 6. ESTADO CIVIL */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Estado Civil</Text>
+            {/* 7.3. ESTADO CIVIL */}
+            <View style={styles.section}>
+              <Text style={styles.label}>Estado Civil</Text>
           <View style={styles.maritalStatusButtons}>
             {[
               { key: 'single', label: 'Soltero/a' },
@@ -921,119 +1053,92 @@ export default function CreateCharacterScreen() {
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
-        </View>
-
-        {/* 7. RED DE RELACIONES */}
-        <TouchableOpacity
-          style={styles.modalButton}
-          onPress={() => setShowRelationshipGraph(true)}
-        >
-          <View style={styles.modalButtonLeft}>
-            <Network size={20} color="#8b5cf6" />
-            <View>
-              <Text style={styles.modalButtonTitle}>Red de Relaciones</Text>
-              <Text style={styles.modalButtonSubtitle}>
-                {relationshipNodes.length > 0
-                  ? `${relationshipNodes.length} relaciones configuradas`
-                  : 'Agregar personas importantes'}
-              </Text>
-            </View>
-          </View>
-          <ChevronDown size={20} color={colors.text.tertiary} />
-        </TouchableOpacity>
-
-        {/* 8. BIOGRAFÍA */}
-        <TouchableOpacity
-          style={styles.modalButton}
-          onPress={() => setShowBiographyTimeline(true)}
-        >
-          <View style={styles.modalButtonLeft}>
-            <Calendar size={20} color="#8b5cf6" />
-            <View>
-              <Text style={styles.modalButtonTitle}>Biografía y Eventos</Text>
-              <Text style={styles.modalButtonSubtitle}>
-                {biographyEvents.length > 0
-                  ? `${biographyEvents.length} eventos en la línea de tiempo`
-                  : 'Agregar eventos significativos'}
-              </Text>
-            </View>
-          </View>
-          <ChevronDown size={20} color={colors.text.tertiary} />
-        </TouchableOpacity>
-
-        {/* 7. DEPTH LEVEL */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nivel de Profundidad</Text>
-          <Text style={styles.sectionSubtitle}>
-            Elige cuántos detalles tendrá el perfil del personaje
-          </Text>
-
-          <View style={styles.depthButtons}>
-            {[
-              { key: 'basic', label: 'Básico', desc: '60 campos' },
-              { key: 'realistic', label: 'Realista', desc: '160 campos' },
-              { key: 'ultra', label: 'Ultra', desc: '240+ campos' },
-            ].map((depth) => (
-              <TouchableOpacity
-                key={depth.key}
-                style={[
-                  styles.depthButton,
-                  depthLevel === depth.key && styles.depthButtonActive,
-                ]}
-                onPress={() => setDepthLevel(depth.key as DepthLevelId)}
-              >
-                <Text
-                  style={[
-                    styles.depthButtonLabel,
-                    depthLevel === depth.key && styles.depthButtonLabelActive,
-                  ]}
-                >
-                  {depth.label}
-                </Text>
-                <Text
-                  style={[
-                    styles.depthButtonDesc,
-                    depthLevel === depth.key && styles.depthButtonDescActive,
-                  ]}
-                >
-                  {depth.desc}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* 8. VISIBILIDAD */}
-        <View style={styles.section}>
-          <View style={styles.visibilityContainer}>
-            <View style={styles.visibilityInfo}>
-              {isPublic ? (
-                <Eye size={20} color="#8b5cf6" />
-              ) : (
-                <EyeOff size={20} color={colors.text.secondary} />
-              )}
-              <View style={styles.visibilityTextContainer}>
-                <Text style={styles.visibilityTitle}>
-                  {isPublic ? 'Público' : 'Privado'}
-                </Text>
-                <Text style={styles.visibilitySubtitle}>
-                  {isPublic
-                    ? 'Otros usuarios podrán ver y usar este personaje'
-                    : 'Solo tú podrás ver y usar este personaje'}
-                </Text>
               </View>
             </View>
-            <Switch
-              value={isPublic}
-              onValueChange={setIsPublic}
-              trackColor={{ false: colors.border.light, true: '#8b5cf6' }}
-              thumbColor="#ffffff"
-            />
-          </View>
-        </View>
 
-        {/* 9. CREATE BUTTON */}
+            {/* 7.4. RED DE RELACIONES */}
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowRelationshipGraph(true)}
+            >
+              <View style={styles.modalButtonLeft}>
+                <Network size={20} color="#8b5cf6" />
+                <View>
+                  <Text style={styles.modalButtonTitle}>Red de Relaciones</Text>
+                  <Text style={styles.modalButtonSubtitle}>
+                    {relationshipNodes.length > 0
+                      ? `${relationshipNodes.length} relaciones configuradas`
+                      : 'Agregar personas importantes'}
+                  </Text>
+                </View>
+              </View>
+              <ChevronDown size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+
+            {/* 7.5. BIOGRAFÍA */}
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowBiographyTimeline(true)}
+            >
+              <View style={styles.modalButtonLeft}>
+                <Calendar size={20} color="#8b5cf6" />
+                <View>
+                  <Text style={styles.modalButtonTitle}>Biografía y Eventos</Text>
+                  <Text style={styles.modalButtonSubtitle}>
+                    {biographyEvents.length > 0
+                      ? `${biographyEvents.length} eventos en la línea de tiempo`
+                      : 'Agregar eventos significativos'}
+                  </Text>
+                </View>
+              </View>
+              <ChevronDown size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+
+            {/* 7.6. NIVEL DE PROFUNDIDAD */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Nivel de Profundidad</Text>
+              <Text style={styles.sectionSubtitle}>
+                Elige cuántos detalles tendrá el perfil del personaje
+              </Text>
+
+              <View style={styles.depthButtons}>
+                {[
+                  { key: 'basic', label: 'Básico', desc: '60 campos' },
+                  { key: 'realistic', label: 'Realista', desc: '160 campos' },
+                  { key: 'ultra', label: 'Ultra', desc: '240+ campos' },
+                ].map((depth) => (
+                  <TouchableOpacity
+                    key={depth.key}
+                    style={[
+                      styles.depthButton,
+                      depthLevel === depth.key && styles.depthButtonActive,
+                    ]}
+                    onPress={() => setDepthLevel(depth.key as DepthLevelId)}
+                  >
+                    <Text
+                      style={[
+                        styles.depthButtonLabel,
+                        depthLevel === depth.key && styles.depthButtonLabelActive,
+                      ]}
+                    >
+                      {depth.label}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.depthButtonDesc,
+                        depthLevel === depth.key && styles.depthButtonDescActive,
+                      ]}
+                    >
+                      {depth.desc}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </>
+        )}
+
+        {/* 8. CREATE BUTTON */}
         <TouchableOpacity
           style={[styles.createButton, creating && styles.createButtonDisabled]}
           onPress={handleCreateCharacter}
@@ -1736,5 +1841,33 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: 24,
+  },
+  advancedSettingsToggle: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: colors.background.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: 12,
+  },
+  advancedSettingsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
+  },
+  advancedSettingsTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  advancedSettingsSubtitle: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    lineHeight: 18,
+  },
+  avatarButtonDisabled: {
+    opacity: 0.5,
   },
 });
