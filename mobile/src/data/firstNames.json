@@ -1,0 +1,38 @@
+{
+  "male": [
+    "Juan", "Carlos", "Miguel", "Luis", "Roberto", "José", "Antonio", "Pedro", "Francisco", "Manuel",
+    "Andrés", "Diego", "Javier", "Fernando", "Rafael", "Santiago", "Ricardo", "Raúl", "Mariano", "Ignacio",
+    "Guillermo", "Felipe", "Bernardo", "Eduardo", "Alejandro", "Alfredo", "Arturo", "Aurelio", "Benicio", "Benjamín",
+    "Blas", "Bruno", "César", "Claudio", "Cristóbal", "Damián", "Daniel", "Darío", "David", "Desiderio",
+    "Domingo", "Donato", "Douglas", "Edgar", "Edgardo", "Edison", "Edmundo", "Efraín", "Egidio", "Eladio",
+    "Eleuterio", "Elías", "Elicer", "Elídoro", "Eligio", "Elino", "Elio", "Eliseo", "Elmer", "Elmo",
+    "Elpidio", "Elred", "Elson", "Enrique", "Ernesto", "Escolástico", "Esdras", "Estanislao", "Esteban", "Estéfano",
+    "Esteodoro", "Estepano", "Esteras", "Esteban", "Estuardo", "Eufrasio", "Eugenio", "Eulogio", "Eupilio", "Eurasio",
+    "Eusebio", "Eustaquio", "Eutimio", "Eutropio", "Evangelista", "Evandro", "Evaristo", "Evencio", "Everardo", "Everencio",
+    "Evesio", "Evgeny", "Evicto", "Evidente", "Evimio", "Evio", "Evipinio", "Eviquio", "Evitardo", "Evobaldo",
+    "Evocado", "Evonio", "Evópolis", "Evorado", "Evora", "Evorico", "Evoricón", "Evorio", "Evosio", "Evosmarcio",
+    "Evotardo", "Evotendo", "Evoteo", "Evotico", "Evotirio", "Evotis", "Evotismo", "Evotista", "Evotisto", "Evotistitio",
+    "Exandro", "Exantelmo", "Exaquio", "Exarcato", "Exarco", "Exarcón", "Exarconio", "Exardio", "Exarelio", "Exareno",
+    "Exareso", "Exarindo", "Exarino", "Exarinato", "Exarisión", "Exaritio", "Exarito", "Exaritmio", "Exaritmón", "Exaritmonia",
+    "Exaritmonio", "Exaritmoso", "Exaritmotonio", "Exaritmotoso", "Exaritobolomao", "Exaritoboscio", "Exaritmotosio", "Exaritomonio", "Exaritomosio", "Exaritmotosio"
+  ],
+  "female": [
+    "María", "Carmen", "Rosa", "Magdalena", "Juana", "Francisca", "Antonia", "Josefa", "Manuela", "Concepción",
+    "Angela", "Dolores", "Petra", "Rafaela", "Alejandra", "Patricia", "Sandra", "Laura", "Gloria", "Verónica",
+    "Margarita", "Cristina", "Susana", "Mónica", "Adriana", "Silvia", "Pilar", "Teresa", "Jimena", "Micaela",
+    "Gabriela", "Valentina", "Victoria", "Beatriz", "Celestina", "Dayana", "Deyanira", "Diana", "Dionisia", "Dominga",
+    "Domitila", "Dorada", "Doranda", "Dorandina", "Doranela", "Doranía", "Doranilda", "Dorantea", "Dorantela", "Dorantía",
+    "Dorantiana", "Dorantilda", "Dorantilla", "Dorantes", "Dorappa", "Dorara", "Dorarada", "Dorarador", "Doraradora", "Doraradura",
+    "Doraran", "Dorarca", "Dorarcha", "Dorarco", "Dorarcula", "Dorarela", "Dorarena", "Dorareña", "Dorarería", "Dorarero",
+    "Dorarera", "Dorarerita", "Doraresca", "Doraresco", "Dorareta", "Dorarete", "Dorarezia", "Dorareza", "Dorarezuela", "Dorargosa",
+    "Dorargoso", "Dorarguía", "Dorarguida", "Dorarguido", "Dorarguina", "Dorarguinca", "Dorarguinco", "Dorarguineira", "Dorarguinera", "Dorarguinería",
+    "Dorarguinero", "Dorarguinesa", "Dorarguinetada", "Dorarguinetador", "Dorarguinetadora", "Dorarguinetadura", "Dorarguinete", "Dorarguinetería", "Dorarguinía", "Elisa",
+    "Elena", "Elida", "Elidia", "Elma", "Elmira", "Elmiranda", "Elmirana", "Elmirania", "Elmirela", "Elmirena",
+    "Elmireña", "Elmirería", "Elmirerito", "Elmirerita", "Elmiresca", "Elmiresco", "Elmiresa", "Elmireserilla", "Elmiresia", "Elsa"
+  ],
+  "unisex": [
+    "Alex", "Sam", "Jordan", "Casey", "Taylor", "Morgan", "Riley", "Quinn", "Jesse", "Dakota",
+    "Blake", "Cameron", "Drew", "Charlie", "Bailey", "Darcy", "Eden", "Jamie", "Max", "Skyler",
+    "Sage", "River", "Phoenix", "Ariel", "Robin", "Avery", "Bellamy", "Reese", "Devon", "Paris"
+  ]
+}
