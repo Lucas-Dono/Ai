@@ -46,6 +46,8 @@ import {
   Check,
 } from 'lucide-react-native';
 import { colors } from '../../theme';
+import { buildApiUrl } from '../../config/api.config';
+import { JWTManager } from '../../lib/auth/jwt-manager';
 import { useSmartStartContext } from '../../contexts/SmartStartContext';
 import type { DepthLevelId } from '@circuitpromptai/smart-start-core';
 import { PersonalityRadarChart } from '../../components/character-creation/PersonalityRadarChart';
@@ -472,17 +474,31 @@ export default function CreateCharacterScreen() {
       return;
     }
 
+    const token = await JWTManager.getAccessToken();
+    if (!token) {
+      Alert.alert('Error de autenticación', 'No se encontró un token válido. Inicia sesión nuevamente.');
+      return;
+    }
+
     setEnhancingPrompt(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const response = await fetch('/api/character-creation/enhance-prompt', {
+      const url = buildApiUrl('/api/character-creation/enhance-prompt');
+      console.log('[EnhancePrompt] Calling API:', url);
+
+      const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({
           prompt: physicalAppearance,
         }),
       });
+
+      console.log('[EnhancePrompt] Response status:', response.status);
 
       if (!response.ok) {
         const error = await response.json();
@@ -497,6 +513,8 @@ export default function CreateCharacterScreen() {
       }
 
       const data = await response.json();
+      console.log('[EnhancePrompt] Success, enhanced prompt length:', data.enhanced?.length);
+
       setPhysicalAppearance(data.enhanced);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -506,7 +524,7 @@ export default function CreateCharacterScreen() {
         [{ text: 'OK' }]
       );
     } catch (error: any) {
-      console.error('Error enhancing prompt:', error);
+      console.error('[EnhancePrompt] Error:', error);
       Alert.alert('Error', error.message || 'No se pudo mejorar el prompt. Intenta nuevamente.');
     } finally {
       setEnhancingPrompt(false);
