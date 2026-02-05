@@ -975,219 +975,219 @@ export default function CreateCharacterScreen() {
                 <RandomizeButton onPress={handleRandomizePersonality} size={18} />
               </View>
 
-          {/* Openness */}
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={styles.sliderLabel}>Apertura</Text>
-              <Text style={styles.sliderValue}>{openness}%</Text>
-            </View>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={100}
-              step={1}
-              value={openness}
-              onValueChange={(v) => {
-                setOpenness(v);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              minimumTrackTintColor="#8b5cf6"
-              maximumTrackTintColor={colors.border.light}
-              thumbTintColor="#8b5cf6"
-            />
+              {/* Openness */}
+              <View style={styles.sliderContainer}>
+                <View style={styles.sliderHeader}>
+                  <Text style={styles.sliderLabel}>Apertura</Text>
+                  <Text style={styles.sliderValue}>{openness}%</Text>
+                </View>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  value={openness}
+                  onValueChange={(v) => {
+                    setOpenness(v);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  minimumTrackTintColor="#8b5cf6"
+                  maximumTrackTintColor={colors.border.light}
+                  thumbTintColor="#8b5cf6"
+                />
           </View>
 
-          {/* Conscientiousness */}
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={styles.sliderLabel}>Responsabilidad</Text>
-              <Text style={styles.sliderValue}>{conscientiousness}%</Text>
-            </View>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={100}
-              step={1}
-              value={conscientiousness}
-              onValueChange={(v) => {
-                setConscientiousness(v);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              minimumTrackTintColor="#8b5cf6"
-              maximumTrackTintColor={colors.border.light}
-              thumbTintColor="#8b5cf6"
-            />
-          </View>
+              {/* Conscientiousness */}
+              <View style={styles.sliderContainer}>
+                <View style={styles.sliderHeader}>
+                  <Text style={styles.sliderLabel}>Responsabilidad</Text>
+                  <Text style={styles.sliderValue}>{conscientiousness}%</Text>
+                </View>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  value={conscientiousness}
+                  onValueChange={(v) => {
+                    setConscientiousness(v);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  minimumTrackTintColor="#8b5cf6"
+                  maximumTrackTintColor={colors.border.light}
+                  thumbTintColor="#8b5cf6"
+                />
+              </View>
 
-          {/* Extraversion */}
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={styles.sliderLabel}>Extraversión</Text>
-              <Text style={styles.sliderValue}>{extraversion}%</Text>
-            </View>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={100}
-              step={1}
-              value={extraversion}
-              onValueChange={(v) => {
-                setExtraversion(v);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              minimumTrackTintColor="#8b5cf6"
-              maximumTrackTintColor={colors.border.light}
-              thumbTintColor="#8b5cf6"
-            />
-          </View>
+              {/* Extraversion */}
+              <View style={styles.sliderContainer}>
+                <View style={styles.sliderHeader}>
+                  <Text style={styles.sliderLabel}>Extraversión</Text>
+                  <Text style={styles.sliderValue}>{extraversion}%</Text>
+                </View>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  value={extraversion}
+                  onValueChange={(v) => {
+                    setExtraversion(v);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  minimumTrackTintColor="#8b5cf6"
+                  maximumTrackTintColor={colors.border.light}
+                  thumbTintColor="#8b5cf6"
+                />
+              </View>
 
-          {/* Agreeableness */}
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={styles.sliderLabel}>Amabilidad</Text>
-              <Text style={styles.sliderValue}>{agreeableness}%</Text>
-            </View>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={100}
-              step={1}
-              value={agreeableness}
-              onValueChange={(v) => {
-                setAgreeableness(v);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              minimumTrackTintColor="#8b5cf6"
-              maximumTrackTintColor={colors.border.light}
-              thumbTintColor="#8b5cf6"
-            />
-          </View>
+              {/* Agreeableness */}
+              <View style={styles.sliderContainer}>
+                <View style={styles.sliderHeader}>
+                  <Text style={styles.sliderLabel}>Amabilidad</Text>
+                  <Text style={styles.sliderValue}>{agreeableness}%</Text>
+                </View>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  value={agreeableness}
+                  onValueChange={(v) => {
+                    setAgreeableness(v);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  minimumTrackTintColor="#8b5cf6"
+                  maximumTrackTintColor={colors.border.light}
+                  thumbTintColor="#8b5cf6"
+                />
+              </View>
 
-          {/* Neuroticism */}
-          <View style={styles.sliderContainer}>
-            <View style={styles.sliderHeader}>
-              <Text style={styles.sliderLabel}>Neuroticismo</Text>
-              <Text style={styles.sliderValue}>{neuroticism}%</Text>
-            </View>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={100}
-              step={1}
-              value={neuroticism}
-              onValueChange={(v) => {
-                setNeuroticism(v);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              minimumTrackTintColor="#8b5cf6"
-              maximumTrackTintColor={colors.border.light}
-              thumbTintColor="#8b5cf6"
-            />
-          </View>
+              {/* Neuroticism */}
+              <View style={styles.sliderContainer}>
+                <View style={styles.sliderHeader}>
+                  <Text style={styles.sliderLabel}>Neuroticismo</Text>
+                  <Text style={styles.sliderValue}>{neuroticism}%</Text>
+                </View>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  value={neuroticism}
+                  onValueChange={(v) => {
+                    setNeuroticism(v);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  minimumTrackTintColor="#8b5cf6"
+                  maximumTrackTintColor={colors.border.light}
+                  thumbTintColor="#8b5cf6"
+                />
+              </View>
 
-          {/* Radar Chart */}
-          <View style={styles.radarContainer}>
-            <PersonalityRadarChart
-              openness={openness}
-              conscientiousness={conscientiousness}
-              extraversion={extraversion}
-              agreeableness={agreeableness}
-              neuroticism={neuroticism}
-            />
-          </View>
+              {/* Radar Chart */}
+              <View style={styles.radarContainer}>
+                <PersonalityRadarChart
+                  openness={openness}
+                  conscientiousness={conscientiousness}
+                  extraversion={extraversion}
+                  agreeableness={agreeableness}
+                  neuroticism={neuroticism}
+                />
+              </View>
 
-          {/* Advanced Options Toggle */}
-          <TouchableOpacity
-            style={styles.advancedToggle}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setShowAdvancedPersonality(!showAdvancedPersonality);
-            }}
-          >
-            {showAdvancedPersonality ? (
-              <ChevronUp size={20} color="#8b5cf6" />
-            ) : (
-              <ChevronDown size={20} color="#8b5cf6" />
-            )}
-            <Text style={styles.advancedToggleText}>
-              {showAdvancedPersonality
-                ? 'Ocultar Opciones Avanzadas'
-                : 'Mostrar Opciones Avanzadas'}
-            </Text>
-            <View style={styles.advancedBadge}>
-              <Text style={styles.advancedBadgeText}>Pro</Text>
-            </View>
-          </TouchableOpacity>
+              {/* Advanced Options Toggle */}
+                  <TouchableOpacity
+                style={styles.advancedToggle}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setShowAdvancedPersonality(!showAdvancedPersonality);
+                }}
+              >
+                {showAdvancedPersonality ? (
+                  <ChevronUp size={20} color="#8b5cf6" />
+                ) : (
+                  <ChevronDown size={20} color="#8b5cf6" />
+                )}
+                <Text style={styles.advancedToggleText}>
+                  {showAdvancedPersonality
+                    ? 'Ocultar Opciones Avanzadas'
+                    : 'Mostrar Opciones Avanzadas'}
+                </Text>
+                <View style={styles.advancedBadge}>
+                  <Text style={styles.advancedBadgeText}>Pro</Text>
+                </View>
+              </TouchableOpacity>
 
-          {/* Advanced Personality Tabs */}
-          {showAdvancedPersonality && (
-            <View style={styles.advancedContainer}>
-              <AdvancedPersonalityTabs
-                facets={facets}
-                darkTriad={darkTriad}
-                attachment={attachment}
-                needs={psychologicalNeeds}
-                onFacetsChange={setFacets}
-                onDarkTriadChange={setDarkTriad}
-                onAttachmentChange={setAttachment}
-                onNeedsChange={setPsychologicalNeeds}
-              />
-            </View>
-              )}
-            </View>
+              {/* Advanced Personality Tabs */}
+              {showAdvancedPersonality && (
+                <View style={styles.advancedContainer}>
+                  <AdvancedPersonalityTabs
+                    facets={facets}
+                    darkTriad={darkTriad}
+                    attachment={attachment}
+                    needs={psychologicalNeeds}
+                    onFacetsChange={setFacets}
+                    onDarkTriadChange={setDarkTriad}
+                    onAttachmentChange={setAttachment}
+                    onNeedsChange={setPsychologicalNeeds}
+                  />
+                </View>
+                  )}
+                </View>
 
-            {/* 7.2. PROFESIÓN */}
-            <View style={styles.section}>
+                {/* 7.2. PROFESIÓN */}
+                <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Briefcase size={20} color="#8b5cf6" />
                 <Text style={styles.sectionTitle}>Profesión y Habilidades</Text>
               </View>
 
-          <Text style={styles.label}>Ocupación</Text>
-          <View style={styles.inputWithButton}>
-            <TextInput
-              style={[styles.input, styles.inputFlex]}
-              placeholder="Ej: Desarrollador de Software, Artista, Estudiante..."
-              placeholderTextColor={colors.text.tertiary}
-              value={occupation}
-              onChangeText={setOccupation}
-            />
-            <RandomizeButton onPress={handleRandomizeOccupation} />
-          </View>
+              <Text style={styles.label}>Ocupación</Text>
+              <View style={styles.inputWithButton}>
+                <TextInput
+                  style={[styles.input, styles.inputFlex]}
+                  placeholder="Ej: Desarrollador de Software, Artista, Estudiante..."
+                  placeholderTextColor={colors.text.tertiary}
+                  value={occupation}
+                  onChangeText={setOccupation}
+                />
+                <RandomizeButton onPress={handleRandomizeOccupation} />
+              </View>
 
-          <Text style={styles.label}>Habilidades</Text>
-          <View style={styles.skillsContainer}>
-            {skills.map((skill, index) => (
-              <View key={index} style={styles.skillTag}>
-                <Text style={styles.skillTagText}>{skill}</Text>
-                <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
-                  <X size={14} color="#8b5cf6" />
+              <Text style={styles.label}>Habilidades</Text>
+              <View style={styles.skillsContainer}>
+                {skills.map((skill, index) => (
+                  <View key={index} style={styles.skillTag}>
+                    <Text style={styles.skillTagText}>{skill}</Text>
+                    <TouchableOpacity onPress={() => handleRemoveSkill(index)}>
+                      <X size={14} color="#8b5cf6" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+
+              <View style={styles.skillInputContainer}>
+                <TextInput
+                  style={[styles.input, styles.skillInput]}
+                  placeholder="Agregar habilidad..."
+                  placeholderTextColor={colors.text.tertiary}
+                  value={skillInput}
+                  onChangeText={setSkillInput}
+                  onSubmitEditing={handleAddSkill}
+                />
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={handleAddSkill}
+                >
+                  <Plus size={18} color="#ffffff" />
                 </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+                  </View>
+                </View>
 
-          <View style={styles.skillInputContainer}>
-            <TextInput
-              style={[styles.input, styles.skillInput]}
-              placeholder="Agregar habilidad..."
-              placeholderTextColor={colors.text.tertiary}
-              value={skillInput}
-              onChangeText={setSkillInput}
-              onSubmitEditing={handleAddSkill}
-            />
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleAddSkill}
-            >
-              <Plus size={18} color="#ffffff" />
-            </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* 7.3. ESTADO CIVIL */}
-            <View style={styles.section}>
-              <Text style={styles.label}>Estado Civil</Text>
+                {/* 7.3. ESTADO CIVIL */}
+                <View style={styles.section}>
+                  <Text style={styles.label}>Estado Civil</Text>
           <View style={styles.maritalStatusButtons}>
             {[
               { key: 'single', label: 'Soltero/a' },
