@@ -213,6 +213,19 @@ export const RatingsService = {
   },
 };
 
+export const ConversationsService = {
+  async getRecent(limit = 10): Promise<{ conversations: any[]; totalUnread: number }> {
+    const response = await apiClient.get(API_ENDPOINTS.CONVERSATIONS.RECENT, {
+      params: { limit }
+    });
+    return response as { conversations: any[]; totalUnread: number };
+  },
+
+  async markAsRead(agentId: string) {
+    return await apiClient.post(API_ENDPOINTS.CONVERSATIONS.MARK_READ(agentId));
+  },
+};
+
 // Re-export all API clients from the api/ folder
 export * from './api/community.api';
 export * from './api/post.api';

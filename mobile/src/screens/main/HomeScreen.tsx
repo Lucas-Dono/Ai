@@ -14,8 +14,10 @@ import { CreateCompanionCard } from '../../components/ui/CreateCompanionCard';
 import { CircleConversationItem } from '../../components/ui/CircleConversationItem';
 import { VibeChip, VibeType } from '../../components/ui/VibeChip';
 import { VibeCategorySection } from '../../components/ui/VibeCategorySection';
-import { WorldsService, AgentsService, buildAvatarUrl } from '../../services/api';
+import { WorldsService, AgentsService, ConversationsService, buildAvatarUrl } from '../../services/api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
+import type { ConversationWithAgent } from '../../types/conversations';
+import { distributeAgentsByVibe } from '../../utils/agentCategorization';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<MainStackParamList>;
@@ -32,11 +34,27 @@ interface Agent {
 
 interface CircleConversation {
   id: string;
+  agentId: string;
   name: string;
   avatar?: string;
   lastMessage: string;
   time: string;
   unread: number;
+}
+
+// Helper para calcular tiempo relativo
+function getRelativeTime(date: Date | string): string {
+  const now = new Date();
+  const past = new Date(date);
+  const diffMs = now.getTime() - past.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Ahora';
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  return `${diffDays}d`;
 }
 
 // Categorías de vibe con sus configuraciones
@@ -119,34 +137,40 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             avatar: buildAvatarUrl(agent.avatar),
           }));
 
-        // Distribuir agentes en categorías (por ahora aleatoriamente)
-        // TODO: En el futuro, esto debería basarse en tags o categorías del backend
-        const shuffled = [...featured].sort(() => 0.5 - Math.random());
-        const chunkSize = Math.ceil(shuffled.length / 4);
+        // Distribuir agentes en categorías usando el sistema de categorización inteligente
+        const distributedAgents = distributeAgentsByVibe(featured);
 
-        setVibeAgents({
-          love: shuffled.slice(0, chunkSize),
-          chaos: shuffled.slice(chunkSize, chunkSize * 2),
-          conflict: shuffled.slice(chunkSize * 2, chunkSize * 3),
-          stable: shuffled.slice(chunkSize * 3),
+        setVibeAgents(distributedAgents as Record<VibeType, Agent[]>);
+
+        console.log('[HomeScreen] Agent distribution by vibe:', {
+          love: distributedAgents.love.length,
+          chaos: distributedAgents.chaos.length,
+          conflict: distributedAgents.conflict.length,
+          stable: distributedAgents.stable.length,
         });
 
-        // Simular conversaciones recientes (Mock data por ahora)
-        // TODO: Integrar con API de mensajes reales
-        const mockConversations: CircleConversation[] = userAgents.slice(0, 3).map((agent, index) => ({
-          id: agent.id,
-          name: agent.name,
-          avatar: agent.avatar,
-          lastMessage: index === 0
-            ? '¡Hola! ¿Cómo estuvo tu día?'
-            : index === 1
-            ? 'Necesito contarte algo importante...'
-            : 'Gracias por todo el apoyo 💜',
-          time: index === 0 ? '2m' : index === 1 ? '1h' : '3h',
-          unread: index === 0 ? 2 : 0,
-        }));
+        // Cargar conversaciones recientes del API
+        try {
+          const conversationsResponse = await ConversationsService.getRecent(10);
+          if (conversationsResponse?.conversations) {
+            const formattedConversations: CircleConversation[] = conversationsResponse.conversations.map((conv: ConversationWithAgent) => ({
+              id: conv.id,
+              agentId: conv.agentId,
+              name: conv.agentName,
+              avatar: buildAvatarUrl(conv.agentAvatar),
+              lastMessage: conv.staticDescription,
+              time: getRelativeTime(conv.lastMessageAt),
+              unread: conv.unreadCount,
+            }));
 
-        setCircleConversations(mockConversations);
+            setCircleConversations(formattedConversations);
+            console.log('[HomeScreen] Loaded recent conversations:', formattedConversations.length);
+          }
+        } catch (error) {
+          console.error('[HomeScreen] Error loading recent conversations:', error);
+          // Si falla, dejar vacío (no mostrar mock data)
+          setCircleConversations([]);
+        }
       }
     } catch (error) {
       console.error('Error loading home data:', error);
@@ -159,8 +183,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     navigation.navigate('AgentDetail', { agentId });
   };
 
-  const handleCirclePress = (conversationId: string) => {
-    navigation.navigate('Chat', { worldId: conversationId });
+  const handleCirclePress = (agentId: string) => {
+    // Navegar al chat con el agente
+    navigation.navigate('Chat', { worldId: agentId });
   };
 
   const handleCreateAgent = () => {
@@ -279,7 +304,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                   <CircleConversationItem
                     key={conversation.id}
                     {...conversation}
-                    onPress={() => handleCirclePress(conversation.id)}
+                    onPress={() => handleCirclePress(conversation.agentId)}
                   />
                 ))}
               </View>

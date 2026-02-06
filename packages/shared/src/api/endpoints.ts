@@ -83,4 +83,10 @@ export const API_ENDPOINTS = {
   TTS: {
     GENERATE: (worldId: string) => `/api/worlds/${worldId}/tts`,
   },
+
+  // Conversaciones
+  CONVERSATIONS: {
+    RECENT: '/api/conversations/recent',
+    MARK_READ: (agentId: string) => `/api/conversations/${agentId}/mark-read`,
+  },
 } as const;
