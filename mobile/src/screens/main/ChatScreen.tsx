@@ -86,6 +86,7 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
   const [currentRating, setCurrentRating] = useState(0);
   const [currentReview, setCurrentReview] = useState('');
   const [isOffline, setIsOffline] = useState(false); // NEW: Track offline status
+  const [keyboardHeight, setKeyboardHeight] = useState(0); // Track keyboard height
   const [worldInfo, setWorldInfo] = useState<WorldInfo>({
     name: 'Compañero',
     isOnline: false,
@@ -132,14 +133,24 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
     }).start();
   }, [inputText]);
 
-  // Cerrar emoji picker cuando el teclado se abre
+  // Cerrar emoji picker cuando el teclado se abre y trackear altura
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
       setShowGifPicker(false);
+      if (Platform.OS === 'android') {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      if (Platform.OS === 'android') {
+        setKeyboardHeight(0);
+      }
     });
 
     return () => {
       keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
     };
   }, []);
 
@@ -762,7 +773,8 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        enabled={Platform.OS === 'ios'}
       >
         <View style={[styles.header, { paddingTop: insets.top || 60 }]}>
         <TouchableOpacity
@@ -835,7 +847,12 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderMessage}
-        contentContainerStyle={styles.messageList}
+        contentContainerStyle={[
+          styles.messageList,
+          Platform.OS === 'android' && keyboardHeight > 0 && {
+            paddingBottom: keyboardHeight + spacing.md
+          }
+        ]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <LinearGradient
@@ -851,7 +868,14 @@ export default function ChatScreen({ navigation, route }: ChatScreenProps) {
         ListFooterComponent={renderTypingIndicator}
       />
 
-      <View style={[styles.inputContainer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+      <View style={[
+        styles.inputContainer,
+        {
+          paddingBottom: Platform.OS === 'android' && keyboardHeight > 0
+            ? spacing.md
+            : Math.max(insets.bottom, spacing.md)
+        }
+      ]}>
         {showVoiceRecorder ? (
           /* Grabadora de Voz - Reemplaza el input */
           <VoiceRecorder
