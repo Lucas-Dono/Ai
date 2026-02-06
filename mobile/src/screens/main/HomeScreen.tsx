@@ -1,5 +1,6 @@
 /**
  * Pantalla principal (Home) - Feed con discovery inmediato
+ * Diseño moderno con secciones de Compañeros, Círculo y Explorar por Vibe
  */
 
 import React, { useState, useEffect } from 'react';
@@ -8,26 +9,17 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { MainStackParamList } from '../../navigation/types';
 import { useAuth } from '../../contexts/AuthContext';
-import { WorldCard } from '../../components/ui/WorldCard';
-import { AgentCard } from '../../components/ui/AgentCard';
-import { SectionHeader } from '../../components/ui/SectionHeader';
-import { EmptyState } from '../../components/ui/EmptyState';
+import { CompanionCard } from '../../components/ui/CompanionCard';
+import { CreateCompanionCard } from '../../components/ui/CreateCompanionCard';
+import { CircleConversationItem } from '../../components/ui/CircleConversationItem';
+import { VibeChip, VibeType } from '../../components/ui/VibeChip';
+import { VibeCategorySection } from '../../components/ui/VibeCategorySection';
 import { WorldsService, AgentsService, buildAvatarUrl } from '../../services/api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<MainStackParamList>;
 };
-
-interface World {
-  id: string;
-  name: string;
-  description: string;
-  category?: string;
-  image?: string;
-  messagesCount?: number;
-  isActive?: boolean;
-}
 
 interface Agent {
   id: string;
@@ -38,17 +30,66 @@ interface Agent {
   featured?: boolean;
 }
 
+interface CircleConversation {
+  id: string;
+  name: string;
+  avatar?: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+}
+
+// Categorías de vibe con sus configuraciones
+const VIBE_CATEGORIES = [
+  {
+    id: 'love' as VibeType,
+    title: 'Amor y Conexión',
+    subtitle: 'Vínculos profundos y románticos',
+    icon: 'heart' as const,
+    color: '#EC4899',
+    chipLabel: 'Amor',
+  },
+  {
+    id: 'chaos' as VibeType,
+    title: 'Energía Caótica',
+    subtitle: 'Impredecibles y divertidos',
+    icon: 'flash' as const,
+    color: '#FACC15',
+    chipLabel: 'Energía',
+  },
+  {
+    id: 'conflict' as VibeType,
+    title: 'Conflicto & Drama',
+    subtitle: 'Relaciones complicadas y retos',
+    icon: 'flame' as const,
+    color: '#EF4444',
+    chipLabel: 'Conflicto',
+  },
+  {
+    id: 'stable' as VibeType,
+    title: 'Zona de Confort',
+    subtitle: 'Tranquilos y de apoyo',
+    icon: 'shield' as const,
+    color: '#10B981',
+    chipLabel: 'Zona',
+  },
+];
+
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { user } = useAuth();
-  const [recentWorlds, setRecentWorlds] = useState<World[]>([]);
-  const [recommended, setRecommended] = useState<World[]>([]);
-  const [trending, setTrending] = useState<World[]>([]);
-  const [featuredAgents, setFeaturedAgents] = useState<Agent[]>([]);
   const [myAgents, setMyAgents] = useState<Agent[]>([]);
+  const [circleConversations, setCircleConversations] = useState<CircleConversation[]>([]);
+  const [vibeAgents, setVibeAgents] = useState<Record<VibeType, Agent[]>>({
+    love: [],
+    chaos: [],
+    conflict: [],
+    stable: [],
+  });
+  const [selectedVibe, setSelectedVibe] = useState<VibeType | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Cargar datos reales del API
+  // Cargar datos del API
   useEffect(() => {
     loadData();
   }, []);
@@ -57,79 +98,55 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     try {
       setLoading(true);
 
-      // NOTA: Los endpoints de grupos trending fueron deprecados
-      // El servidor solo expone:
-      // - /api/groups - Lista de grupos del usuario (requiere auth)
-      // - /api/groups/user-groups - Lista simplificada
-
-      // Por ahora, cargar solo grupos del usuario
-      try {
-        const userGroupsResponse: any = await WorldsService.list({ limit: 10 });
-        if (userGroupsResponse?.groups) {
-          const mapped = userGroupsResponse.groups.map((group: any) => ({
-            id: group.id,
-            name: group.name,
-            description: group.description,
-            category: group.category || 'general',
-            image: buildAvatarUrl(group.GroupMember?.[0]?.Agent?.avatar || group.GroupMember?.[0]?.User?.image),
-            messagesCount: group._count?.GroupMessage || 0,
-            isActive: group.status === 'ACTIVE',
-          }));
-          setRecentWorlds(mapped.slice(0, 5));
-        }
-      } catch (error) {
-        console.log('[HomeScreen] No groups available (user may not have any)');
-        setRecentWorlds([]);
-      }
-
-      // Cargar agents
+      // Cargar agentes
       const agentsResponse = await AgentsService.list({ limit: 50 });
       if (Array.isArray(agentsResponse)) {
-        // Separar destacados y del usuario
-        // NOTA: No filtrar por kind para incluir todos los tipos de agentes (companion, original, etc.)
-        const featured = agentsResponse.filter(
-          (agent: any) => agent.featured === true && !agent.userId
-        );
-        const userAgents = agentsResponse.filter(
-          (agent: any) => agent.userId !== null
-        );
+        // Agentes del usuario
+        const userAgents = agentsResponse
+          .filter((agent: any) => agent.userId !== null)
+          .map((agent: any) => ({
+            ...agent,
+            avatar: buildAvatarUrl(agent.avatar),
+          }));
 
-        // Mapear y construir URLs completas de avatares
-        const mappedFeatured = featured.map((agent: any) => ({
-          ...agent,
-          avatar: buildAvatarUrl(agent.avatar),
-        }));
-        const mappedUserAgents = userAgents.map((agent: any) => ({
-          ...agent,
-          avatar: buildAvatarUrl(agent.avatar),
-        }));
+        setMyAgents(userAgents.slice(0, 6));
 
-        console.log('[HomeScreen] Featured agents:', mappedFeatured.length);
-        console.log('[HomeScreen] User agents:', mappedUserAgents.length);
+        // Agentes featured para categorías de vibe
+        const featured = agentsResponse
+          .filter((agent: any) => agent.featured === true && !agent.userId)
+          .map((agent: any) => ({
+            ...agent,
+            avatar: buildAvatarUrl(agent.avatar),
+          }));
 
-        setFeaturedAgents(mappedFeatured.slice(0, 6));
-        setMyAgents(mappedUserAgents.slice(0, 6));
+        // Distribuir agentes en categorías (por ahora aleatoriamente)
+        // TODO: En el futuro, esto debería basarse en tags o categorías del backend
+        const shuffled = [...featured].sort(() => 0.5 - Math.random());
+        const chunkSize = Math.ceil(shuffled.length / 4);
 
-        // WORKAROUND: Como no hay endpoint de grupos trending, usar agentes featured
-        // convertidos a formato World para llenar "Para Ti" y "Tendencias"
-        const featuredAsWorlds = mappedFeatured.map((agent: any) => ({
+        setVibeAgents({
+          love: shuffled.slice(0, chunkSize),
+          chaos: shuffled.slice(chunkSize, chunkSize * 2),
+          conflict: shuffled.slice(chunkSize * 2, chunkSize * 3),
+          stable: shuffled.slice(chunkSize * 3),
+        });
+
+        // Simular conversaciones recientes (Mock data por ahora)
+        // TODO: Integrar con API de mensajes reales
+        const mockConversations: CircleConversation[] = userAgents.slice(0, 3).map((agent, index) => ({
           id: agent.id,
           name: agent.name,
-          description: agent.description || `Chatea con ${agent.name}`,
-          category: agent.kind || 'companion',
-          image: agent.avatar,
-          messagesCount: 0,
-          isActive: true,
+          avatar: agent.avatar,
+          lastMessage: index === 0
+            ? '¡Hola! ¿Cómo estuvo tu día?'
+            : index === 1
+            ? 'Necesito contarte algo importante...'
+            : 'Gracias por todo el apoyo 💜',
+          time: index === 0 ? '2m' : index === 1 ? '1h' : '3h',
+          unread: index === 0 ? 2 : 0,
         }));
 
-        // "Para Ti" - primeros 6 agentes featured
-        setRecommended(featuredAsWorlds.slice(0, 6));
-
-        // "Tendencias" - agentes featured ordenados por algo (por ahora mismo orden)
-        setTrending(featuredAsWorlds.slice(0, 6));
-
-        console.log('[HomeScreen] Recommended (from featured):', featuredAsWorlds.slice(0, 6).length);
-        console.log('[HomeScreen] Trending (from featured):', featuredAsWorlds.slice(0, 6).length);
+        setCircleConversations(mockConversations);
       }
     } catch (error) {
       console.error('Error loading home data:', error);
@@ -138,52 +155,54 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }
   };
 
-  const handleWorldPress = (worldId: string) => {
-    navigation.navigate('Chat', { worldId });
-  };
-
   const handleAgentPress = (agentId: string) => {
-    // Ver detalles del agente
     navigation.navigate('AgentDetail', { agentId });
   };
 
-  const handleAgentChatPress = (agentId: string) => {
-    // Ir directo al chat
-    navigation.navigate('Chat', { worldId: agentId });
+  const handleCirclePress = (conversationId: string) => {
+    navigation.navigate('Chat', { worldId: conversationId });
   };
+
+  const handleCreateAgent = () => {
+    navigation.navigate('CreateAgent');
+  };
+
+  const filteredVibeCategories = selectedVibe
+    ? VIBE_CATEGORIES.filter(cat => cat.id === selectedVibe)
+    : VIBE_CATEGORIES;
 
   return (
     <View style={styles.container}>
-      {/* Header minimalista */}
+      {/* Header moderno */}
       <View style={styles.header}>
         {/* Logo y título */}
         <View style={styles.headerTop}>
           <View style={styles.brandContainer}>
-            <Ionicons name="sparkles" size={24} color={colors.primary[500]} />
-            <Text style={styles.brandText}> Blaniel</Text>
+            <Ionicons name="sparkles" size={24} color={colors.primary[600]} />
+            <Text style={styles.brandText}>Blaniel</Text>
           </View>
           <View style={styles.headerActions}>
             <TouchableOpacity
               style={styles.iconButton}
-              onPress={() => navigation.navigate('CreateAgent')}
+              onPress={handleCreateAgent}
             >
               <Ionicons name="add-circle-outline" size={24} color={colors.text.primary} />
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.iconButton, { marginLeft: spacing.md }]}
+              style={styles.iconButton}
               onPress={() => navigation.navigate('Settings')}
             >
-              <Ionicons name="settings-outline" size={24} color={colors.text.primary} />
+              <Ionicons name="settings-outline" size={22} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Barra de búsqueda */}
+        {/* Barra de búsqueda mejorada */}
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color={colors.text.tertiary} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Buscar compañeros, mundos..."
+            placeholder={`Hola ${user?.name?.split(' ')[0] || 'Usuario'}, ¿qué vibra buscas hoy?`}
             placeholderTextColor={colors.text.tertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -196,166 +215,127 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         </View>
       </View>
 
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Saludo personalizado */}
-        <View style={styles.greetingSection}>
-          <Text style={styles.greeting}>Hola, {user?.name?.split(' ')[0] || 'Usuario'} 👋</Text>
-          <Text style={styles.greetingSubtitle}>¿Con quién quieres conversar hoy?</Text>
+      {/* Loading state */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary[500]} />
+          <Text style={styles.loadingText}>Cargando tus compañeros...</Text>
         </View>
-
-        {/* Loading state */}
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary[500]} />
-            <Text style={styles.loadingText}>Cargando tus mundos...</Text>
-          </View>
-        ) : (
-          <>
-            {/* Continuar donde lo dejaste */}
-            {recentWorlds.length > 0 && (
+      ) : (
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* SECCIÓN 1: Mis Compañeros */}
           <View style={styles.section}>
-            <SectionHeader
-              title="Continuar conversación"
-              subtitle="Tus chats recientes"
-              onViewAll={() => navigation.navigate('MainTabs', { screen: 'Worlds' })}
-            />
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Mis Compañeros</Text>
+            </View>
+
             <FlatList
               horizontal
-              data={recentWorlds}
-              renderItem={({ item }) => (
-                <WorldCard
-                  {...item}
-                  onPress={() => handleWorldPress(item.id)}
-                />
-              )}
+              data={[{ id: 'create', type: 'create' }, ...myAgents]}
+              renderItem={({ item }) => {
+                if ('type' in item && item.type === 'create') {
+                  return <CreateCompanionCard onPress={handleCreateAgent} />;
+                }
+
+                const agent = item as Agent;
+                return (
+                  <CompanionCard
+                    id={agent.id}
+                    name={agent.name}
+                    role={agent.description || agent.kind}
+                    avatar={agent.avatar}
+                    status="offline"
+                    onPress={() => handleAgentPress(agent.id)}
+                  />
+                );
+              }}
               keyExtractor={(item) => item.id}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.horizontalList}
             />
           </View>
-        )}
 
-        {/* Mis Compañeros */}
-        <View style={styles.section}>
-          <SectionHeader
-            title="Mis Compañeros"
-            subtitle="Tus IAs personalizadas"
-            onViewAll={myAgents.length > 0 ? () => navigation.navigate('MainTabs', { screen: 'Community' }) : undefined}
-          />
-          {myAgents.length > 0 ? (
-            <FlatList
-              horizontal
-              data={myAgents}
-              renderItem={({ item }) => (
-                <AgentCard
-                  {...item}
-                  onPress={() => handleAgentPress(item.id)}
-                  onChatPress={() => handleAgentChatPress(item.id)}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
-            />
-          ) : (
-            <View style={styles.emptyCompanions}>
-              <EmptyState
-                icon="people-outline"
-                title="Crea tu primer compañero"
-                subtitle="Diseña una IA con personalidad única"
-                buttonText="Crear ahora"
-                buttonIcon="add-circle"
-                onButtonPress={() => navigation.navigate('CreateAgent')}
-                compact
-              />
+          {/* SECCIÓN 2: Mi Círculo */}
+          {circleConversations.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionHeaderLeft}>
+                  <Text style={styles.sectionTitle}>Mi Círculo</Text>
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>Recientes</Text>
+                  </View>
+                </View>
+                <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Worlds' })}>
+                  <Text style={styles.viewAllText}>Ver todo</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.circleList}>
+                {circleConversations.map((conversation) => (
+                  <CircleConversationItem
+                    key={conversation.id}
+                    {...conversation}
+                    onPress={() => handleCirclePress(conversation.id)}
+                  />
+                ))}
+              </View>
             </View>
           )}
-        </View>
 
-        {/* Compañeros Destacados */}
-        {featuredAgents.length > 0 && (
+          {/* SECCIÓN 3: Explorar por Vibe */}
           <View style={styles.section}>
-            <SectionHeader
-              title="Compañeros Destacados"
-              subtitle="IAs con personalidades únicas"
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Explorar por Vibe</Text>
+            </View>
+
+            {/* Chips de filtro */}
+            <View style={styles.vibeChipsContainer}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.vibeChips}
+              >
+                {VIBE_CATEGORIES.map((category) => (
+                  <VibeChip
+                    key={category.id}
+                    type={category.id}
+                    label={category.chipLabel}
+                    icon={category.icon}
+                    selected={selectedVibe === category.id}
+                    onPress={() => setSelectedVibe(selectedVibe === category.id ? null : category.id)}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+
+          {/* Categorías de Vibe */}
+          {filteredVibeCategories.map((category) => (
+            <VibeCategorySection
+              key={category.id}
+              title={category.title}
+              subtitle={category.subtitle}
+              icon={category.icon}
+              color={category.color}
+              items={vibeAgents[category.id].map(agent => ({
+                id: agent.id,
+                name: agent.name,
+                role: agent.description || agent.kind,
+                image: agent.avatar,
+              }))}
+              onItemPress={handleAgentPress}
               onViewAll={() => navigation.navigate('MainTabs', { screen: 'Community' })}
             />
-            <FlatList
-              horizontal
-              data={featuredAgents}
-              renderItem={({ item }) => (
-                <AgentCard
-                  {...item}
-                  onPress={() => handleAgentPress(item.id)}
-                  onChatPress={() => handleAgentChatPress(item.id)}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalList}
-            />
-          </View>
-        )}
+          ))}
 
-        {/* Para Ti */}
-        <View style={styles.section}>
-          <SectionHeader
-            title="Para Ti"
-            subtitle="Basado en tus intereses"
-            onViewAll={() => navigation.navigate('MainTabs', { screen: 'Community' })}
-          />
-          <FlatList
-            horizontal
-            data={recommended}
-            renderItem={({ item }) => (
-              <WorldCard
-                {...item}
-                onPress={() => handleWorldPress(item.id)}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-          />
-        </View>
-
-        {/* Tendencias */}
-        <View style={styles.section}>
-          <SectionHeader
-            title="Tendencias"
-            subtitle="Los más populares ahora"
-            onViewAll={() => navigation.navigate('MainTabs', { screen: 'Community' })}
-          />
-          <FlatList
-            horizontal
-            data={trending}
-            renderItem={({ item }) => (
-              <WorldCard
-                {...item}
-                onPress={() => handleWorldPress(item.id)}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-          />
-        </View>
-
-            {/* Botón de crear destacado */}
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={() => navigation.navigate('CreateAgent')}
-            >
-              <Ionicons name="add-circle-outline" size={24} color={colors.primary[500]} />
-              <Text style={styles.createText}> Crear tu propia IA</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </ScrollView>
+          {/* Espacio adicional al final */}
+          <View style={{ height: spacing['2xl'] }} />
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -366,12 +346,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   header: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: colors.background.primary,
     paddingTop: 60,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
   },
   headerTop: {
     flexDirection: 'row',
@@ -382,98 +360,108 @@ const styles = StyleSheet.create({
   brandContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.xs,
   },
   brandText: {
-    fontSize: typography.fontSize.xl,
+    fontSize: typography.fontSize['2xl'],
     fontWeight: typography.fontWeight.bold,
     color: colors.text.primary,
+    letterSpacing: -0.5,
   },
   headerActions: {
     flexDirection: 'row',
+    gap: spacing.md,
   },
   iconButton: {
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: borderRadius.full,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background.elevated,
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   searchIcon: {
     marginRight: spacing.xs,
   },
   searchInput: {
     flex: 1,
-    fontSize: typography.fontSize.base,
+    fontSize: typography.fontSize.sm,
     color: colors.text.primary,
     paddingVertical: spacing.xs,
-  },
-  greetingSection: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  greeting: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
-  greetingSubtitle: {
-    fontSize: typography.fontSize.sm,
-    color: colors.text.secondary,
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.xl,
   },
   section: {
     marginBottom: spacing.xl,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  sectionHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.text.primary,
+  },
+  badge: {
+    backgroundColor: colors.background.card,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: borderRadius.full,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  badgeText: {
+    fontSize: typography.fontSize.xs,
+    color: colors.text.tertiary,
+    fontWeight: typography.fontWeight.regular,
+  },
+  viewAllText: {
+    fontSize: typography.fontSize.xs,
+    color: colors.primary[400],
+    fontWeight: typography.fontWeight.medium,
+  },
   horizontalList: {
     paddingHorizontal: spacing.lg,
   },
-  createButton: {
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    backgroundColor: colors.background.card,
-    borderWidth: 1,
-    borderColor: colors.primary[500],
-    borderRadius: borderRadius.lg,
-    paddingVertical: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  circleList: {
+    paddingHorizontal: spacing.lg,
   },
-  createText: {
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
-    color: colors.primary[500],
+  vibeChipsContainer: {
+    marginBottom: spacing.md,
+  },
+  vibeChips: {
+    paddingHorizontal: spacing.lg,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: spacing['3xl'],
   },
   loadingText: {
     marginTop: spacing.md,
     fontSize: typography.fontSize.base,
     color: colors.text.secondary,
-  },
-  emptyCompanions: {
-    marginHorizontal: spacing.lg,
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    overflow: 'hidden',
   },
 });
