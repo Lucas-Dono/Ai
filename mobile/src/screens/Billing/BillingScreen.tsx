@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   Linking,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,12 +14,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
 import billingApi, { UsageStats, Subscription, Plan } from '../../services/api/billing.api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
+import { useAlert } from '@/contexts/AlertContext';
 
 type BillingScreenProps = {
   navigation: NativeStackNavigationProp<MainStackParamList, 'Billing'>;
 };
 
 export default function BillingScreen({ navigation }: BillingScreenProps) {
+  const { showAlert } = useAlert();
   const [usage, setUsage] = useState<UsageStats | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -44,7 +45,10 @@ export default function BillingScreen({ navigation }: BillingScreenProps) {
       setPlans(plansData);
     } catch (error) {
       console.error('Error loading billing data:', error);
-      Alert.alert('Error', 'No se pudo cargar la información de facturación');
+      showAlert('No se pudo cargar tu información de facturación', {
+        type: 'error',
+        duration: 4000,
+      });
     } finally {
       setLoading(false);
     }
@@ -56,7 +60,10 @@ export default function BillingScreen({ navigation }: BillingScreenProps) {
       const { url } = await billingApi.createCheckout(tier, 'month');
       await Linking.openURL(url);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo iniciar el proceso de upgrade');
+      showAlert(error.message || 'No se pudo iniciar el proceso de upgrade', {
+        type: 'error',
+        duration: 4000,
+      });
     } finally {
       setUpgrading(false);
     }
@@ -67,7 +74,10 @@ export default function BillingScreen({ navigation }: BillingScreenProps) {
       const { url } = await billingApi.getPortalUrl();
       await Linking.openURL(url);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo abrir el portal de gestión');
+      showAlert(error.message || 'No se pudo abrir el portal de gestión', {
+        type: 'error',
+        duration: 4000,
+      });
     }
   };
 
