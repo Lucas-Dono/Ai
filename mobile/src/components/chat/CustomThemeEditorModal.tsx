@@ -15,6 +15,7 @@ import {
   TouchableWithoutFeedback,
   Switch,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, borderRadius } from '../../theme';
@@ -59,6 +60,7 @@ export function CustomThemeEditorModal({
   initialTheme,
   mode,
 }: CustomThemeEditorModalProps) {
+  const insets = useSafeAreaInsets();
   const [themeName, setThemeName] = useState('');
   const [userBubbleColor, setUserBubbleColor] = useState('#8B5CF6');
   const [agentBubbleColor, setAgentBubbleColor] = useState('#334155');
@@ -141,13 +143,11 @@ export function CustomThemeEditorModal({
   };
 
   const handleSave = () => {
-    if (!themeName.trim()) {
-      alert('Por favor ingresa un nombre para el tema');
-      return;
-    }
+    // Si no hay nombre, generar uno automático
+    const finalName = themeName.trim() || `Mi tema ${new Date().toLocaleDateString()}`;
 
     const themeData: ThemeData = {
-      name: themeName.trim(),
+      name: finalName,
       userBubbleColor,
       agentBubbleColor,
       backgroundColor,
@@ -251,6 +251,7 @@ export function CustomThemeEditorModal({
                 styles.modalContainer,
                 {
                   transform: [{ translateY }],
+                  paddingTop: insets.top || 40,
                 },
               ]}
             >
@@ -276,15 +277,19 @@ export function CustomThemeEditorModal({
               >
                 {/* Nombre del tema */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Nombre del tema</Text>
+                  <Text style={styles.sectionTitle}>Nombre del tema (opcional)</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Ej: Mi tema favorito"
+                    placeholder={`Mi tema ${new Date().toLocaleDateString()}`}
                     placeholderTextColor={colors.text.tertiary}
                     value={themeName}
                     onChangeText={setThemeName}
                     maxLength={30}
+                    autoCorrect={false}
                   />
+                  <Text style={styles.helperText}>
+                    Si no ingresas un nombre, se generará uno automáticamente
+                  </Text>
                 </View>
 
                 {/* Vista previa */}
@@ -418,7 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.card,
     borderTopLeftRadius: borderRadius.xl,
     borderTopRightRadius: borderRadius.xl,
-    maxHeight: '90%',
+    height: '95%',
   },
   handle: {
     width: 40,
@@ -454,7 +459,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing['2xl'],
   },
   section: {
     marginTop: spacing.lg,
@@ -474,6 +479,12 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     borderWidth: 1,
     borderColor: colors.border.light,
+  },
+  helperText: {
+    fontSize: typography.fontSize.xs,
+    color: colors.text.tertiary,
+    marginTop: spacing.xs,
+    lineHeight: 16,
   },
   switchRow: {
     flexDirection: 'row',
@@ -543,19 +554,21 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   colorPicker: {
-    gap: spacing.sm,
+    gap: spacing.md,
+    marginTop: spacing.md,
   },
   colorRow: {
     flexDirection: 'row',
     gap: spacing.sm,
+    justifyContent: 'space-between',
   },
   colorSwatch: {
-    width: 44,
-    height: 44,
-    borderRadius: borderRadius.md,
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: colors.border.light,
   },
   actions: {
