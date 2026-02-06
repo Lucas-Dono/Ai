@@ -1071,7 +1071,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   messageList: {
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingTop: 0,
+    paddingBottom: spacing.md,
   },
   messageContainer: {
     flexDirection: 'row',
