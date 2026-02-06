@@ -11,13 +11,13 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>;
@@ -25,6 +25,7 @@ type LoginScreenProps = {
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
   const { login } = useAuth();
+  const { showAlert } = useAlert();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +35,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
+      showAlert('Completa todos los campos', 'warning', 3000);
       return;
     }
 
@@ -42,7 +43,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     try {
       await login(email, password);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Error al iniciar sesión');
+      showAlert(error.message || 'Error al iniciar sesión', 'error', 4000);
     } finally {
       setLoading(false);
     }
