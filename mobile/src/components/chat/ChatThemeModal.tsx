@@ -225,7 +225,7 @@ export function ChatThemeModal({
     }
   };
 
-  const renderThemePreview = (theme: ChatTheme) => {
+  const renderThemePreview = (theme: ChatTheme, index: number) => {
     const isSelected = selectedTheme.id === theme.id;
 
     return (
@@ -235,7 +235,7 @@ export function ChatThemeModal({
         onPress={() => handleSelectTheme(theme)}
         activeOpacity={0.7}
       >
-        {/* Preview */}
+        {/* Preview compacto estilo WhatsApp */}
         <View
           style={[
             styles.themePreview,
@@ -249,61 +249,43 @@ export function ChatThemeModal({
             />
           ) : null}
 
-          {/* Mensaje del agente (ejemplo) */}
-          <View
-            style={[
-              styles.previewBubble,
-              styles.previewBubbleAgent,
-              { backgroundColor: theme.agentBubbleColor },
-            ]}
-          >
-            <View style={styles.previewBubbleLine} />
-            <View style={[styles.previewBubbleLine, { width: '60%' }]} />
-          </View>
+          {/* Burbujas simplificadas */}
+          <View style={styles.previewBubblesContainer}>
+            {/* Burbuja del agente (pequeña) */}
+            <View
+              style={[
+                styles.compactBubble,
+                styles.compactBubbleAgent,
+                { backgroundColor: theme.agentBubbleColor },
+              ]}
+            />
 
-          {/* Mensaje del usuario (ejemplo) */}
-          <View
-            style={[
-              styles.previewBubble,
-              styles.previewBubbleUser,
-              { backgroundColor: theme.userBubbleColor },
-            ]}
-          >
-            <View style={styles.previewBubbleLine} />
+            {/* Burbuja del usuario (pequeña) */}
+            <View
+              style={[
+                styles.compactBubble,
+                styles.compactBubbleUser,
+                { backgroundColor: theme.userBubbleColor },
+              ]}
+            />
           </View>
         </View>
 
-        {/* Info */}
-        <View style={styles.themeInfo}>
-          <Text style={styles.themeName}>{theme.name}</Text>
-          <View style={styles.themeActions}>
-            {isSelected && (
-              <Ionicons name="checkmark-circle" size={20} color={theme.accentColor} />
-            )}
-            {theme.isCustom && (
-              <View style={styles.customThemeActions}>
-                <TouchableOpacity
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleEditTheme(theme);
-                  }}
-                  style={styles.themeActionButton}
-                >
-                  <Ionicons name="pencil" size={16} color={colors.primary[500]} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleDeleteTheme(theme);
-                  }}
-                  style={styles.themeActionButton}
-                >
-                  <Ionicons name="trash" size={16} color={colors.error.main} />
-                </TouchableOpacity>
-              </View>
-            )}
+        {/* Checkmark si está seleccionado */}
+        {isSelected && (
+          <View style={styles.checkmarkContainer}>
+            <View style={[styles.checkmarkCircle, { backgroundColor: theme.accentColor }]}>
+              <Ionicons name="checkmark" size={14} color="#FFF" />
+            </View>
           </View>
-        </View>
+        )}
+
+        {/* Nombre del tema (solo si es personalizado) */}
+        {theme.isCustom && (
+          <Text style={styles.compactThemeName} numberOfLines={1}>
+            {theme.name}
+          </Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -346,38 +328,70 @@ export function ChatThemeModal({
                 contentContainerStyle={styles.themesContent}
                 showsVerticalScrollIndicator={false}
               >
-                {/* Temas predefinidos */}
-                <Text style={styles.sectionLabel}>Temas predefinidos</Text>
+                {/* Sección de temas - Estilo WhatsApp */}
+                <Text style={styles.sectionLabel}>Temas</Text>
+
+                {/* Grid de temas 4 columnas */}
                 <View style={styles.themesGrid}>
-                  {CHAT_THEMES.map(renderThemePreview)}
+                  {CHAT_THEMES.map((theme, index) => renderThemePreview(theme, index))}
+                  {customThemes.map((theme, index) => renderThemePreview(theme, CHAT_THEMES.length + index))}
                 </View>
 
-                {/* Botón crear tema personalizado */}
+                {/* Texto informativo */}
+                <Text style={styles.infoText}>
+                  El color del chat y el fondo de pantalla cambiarán.
+                </Text>
+
+                {/* Sección de personalización */}
+                <Text style={styles.sectionLabel}>Personalizar</Text>
+
+                {/* Opción: Color del chat */}
                 <TouchableOpacity
-                  style={styles.createThemeButton}
+                  style={styles.customizeOption}
                   onPress={handleCreateTheme}
                   activeOpacity={0.7}
                 >
-                  <LinearGradient
-                    colors={[colors.primary[500], colors.primary[600]] as readonly [string, string, ...string[]]}
-                    style={styles.createThemeGradient}
-                  >
-                    <Ionicons name="add-circle" size={24} color={colors.text.primary} />
-                    <Text style={styles.createThemeText}>Crear tema personalizado</Text>
-                  </LinearGradient>
+                  <View style={styles.customizeIconContainer}>
+                    <Ionicons name="color-palette-outline" size={24} color={colors.text.secondary} />
+                  </View>
+                  <Text style={styles.customizeText}>Color del chat</Text>
+                  <View style={styles.customizePreview}>
+                    <View
+                      style={[
+                        styles.customizeColorCircle,
+                        { backgroundColor: selectedTheme.accentColor }
+                      ]}
+                    />
+                    <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+                  </View>
                 </TouchableOpacity>
 
-                {/* Temas personalizados */}
-                {customThemes.length > 0 && (
-                  <>
-                    <Text style={[styles.sectionLabel, { marginTop: spacing.lg }]}>
-                      Tus temas personalizados
-                    </Text>
-                    <View style={styles.themesGrid}>
-                      {customThemes.map(renderThemePreview)}
-                    </View>
-                  </>
-                )}
+                {/* Opción: Fondo de pantalla */}
+                <TouchableOpacity
+                  style={styles.customizeOption}
+                  onPress={() => {
+                    Alert.alert(
+                      'Fondo de pantalla',
+                      'Esta función estará disponible próximamente.',
+                      [{ text: 'OK' }]
+                    );
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.customizeIconContainer}>
+                    <Ionicons name="image-outline" size={24} color={colors.text.secondary} />
+                  </View>
+                  <Text style={styles.customizeText}>Fondo de pantalla</Text>
+                  <View style={styles.customizePreview}>
+                    <View
+                      style={[
+                        styles.customizeColorCircle,
+                        { backgroundColor: selectedTheme.backgroundColor }
+                      ]}
+                    />
+                    <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+                  </View>
+                </TouchableOpacity>
               </ScrollView>
 
               {/* Actions */}
@@ -471,94 +485,115 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   themesGrid: {
-    flexDirection: 'column',
-    gap: spacing.md,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   themeCard: {
-    borderRadius: borderRadius.lg,
+    width: '23%', // 4 columnas con gap
+    aspectRatio: 0.7, // Proporción vertical
+    borderRadius: borderRadius.md,
     overflow: 'hidden',
     backgroundColor: colors.background.elevated,
     borderWidth: 2,
-    borderColor: 'transparent',
-    marginBottom: spacing.md,
+    borderColor: colors.border.light,
+    position: 'relative',
   },
   themeCardSelected: {
     borderColor: colors.primary[500],
+    borderWidth: 2.5,
   },
   themePreview: {
-    height: 120,
-    padding: spacing.md,
-    justifyContent: 'space-between',
+    flex: 1,
+    padding: spacing.xs,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  previewBubble: {
-    borderRadius: borderRadius.lg,
-    padding: spacing.sm,
-    maxWidth: '70%',
+  previewBubblesContainer: {
+    width: '100%',
+    gap: spacing.xs / 2,
   },
-  previewBubbleAgent: {
+  compactBubble: {
+    height: 16,
+    borderRadius: 8,
+    marginBottom: 2,
+  },
+  compactBubbleAgent: {
+    width: '80%',
     alignSelf: 'flex-start',
   },
-  previewBubbleUser: {
+  compactBubbleUser: {
+    width: '70%',
     alignSelf: 'flex-end',
   },
-  previewBubbleLine: {
-    height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 4,
-    marginBottom: 4,
+  checkmarkContainer: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
   },
-  themeInfo: {
-    flexDirection: 'row',
+  checkmarkCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-    backgroundColor: colors.background.secondary,
   },
-  themeName: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.semibold,
-    color: colors.text.primary,
-    flex: 1,
+  compactThemeName: {
+    fontSize: typography.fontSize.xs,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    paddingHorizontal: spacing.xs,
+    paddingBottom: spacing.xs,
   },
-  themeActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  customThemeActions: {
-    flexDirection: 'row',
-    gap: spacing.xs,
-    marginLeft: spacing.sm,
-  },
-  themeActionButton: {
-    padding: spacing.xs,
+  infoText: {
+    fontSize: typography.fontSize.sm,
+    color: colors.text.tertiary,
+    marginBottom: spacing.lg,
+    lineHeight: 20,
   },
   sectionLabel: {
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
     color: colors.text.secondary,
     marginBottom: spacing.md,
-    marginTop: spacing.sm,
+    marginTop: spacing.lg,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  createThemeButton: {
-    marginTop: spacing.md,
-    marginBottom: spacing.lg,
-    borderRadius: borderRadius.lg,
-    overflow: 'hidden',
-  },
-  createThemeGradient: {
+  customizeOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.background.elevated,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.sm,
+  },
+  customizeIconContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  customizeText: {
+    flex: 1,
+    fontSize: typography.fontSize.base,
+    color: colors.text.primary,
+    fontWeight: typography.fontWeight.medium,
+  },
+  customizePreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
   },
-  createThemeText: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.text.primary,
+  customizeColorCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   actions: {
     flexDirection: 'row',
