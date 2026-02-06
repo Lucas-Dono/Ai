@@ -6,6 +6,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
+import { Logo } from '../../components/ui/Logo';
 
 type WelcomeScreenProps = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
@@ -15,7 +16,7 @@ export default function WelcomeScreen({ navigation }: WelcomeScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Blaniel</Text>
+        <Logo size="xl" showText textColor="#FFFFFF" style={styles.logo} />
         <Text style={styles.subtitle}>
           Crea y personaliza tus propios agentes de IA con personalidades únicas
         </Text>
@@ -52,12 +53,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 16,
+  logo: {
+    marginBottom: 24,
   },
   subtitle: {
     fontSize: 16,

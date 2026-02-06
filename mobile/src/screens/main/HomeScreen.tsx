@@ -14,6 +14,7 @@ import { CreateCompanionCard } from '../../components/ui/CreateCompanionCard';
 import { CircleConversationItem } from '../../components/ui/CircleConversationItem';
 import { VibeChip, VibeType } from '../../components/ui/VibeChip';
 import { VibeCategorySection } from '../../components/ui/VibeCategorySection';
+import { Logo } from '../../components/ui/Logo';
 import { WorldsService, AgentsService, ConversationsService, buildAvatarUrl } from '../../services/api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 import type { ConversationWithAgent } from '../../types/conversations';
@@ -202,10 +203,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       <View style={styles.header}>
         {/* Logo y título */}
         <View style={styles.headerTop}>
-          <View style={styles.brandContainer}>
-            <Ionicons name="sparkles" size={24} color={colors.primary[600]} />
-            <Text style={styles.brandText}>Blaniel</Text>
-          </View>
+          <Logo size="md" showText textColor={colors.text.primary} />
           <View style={styles.headerActions}>
             <TouchableOpacity
               style={styles.iconButton}
@@ -381,17 +379,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.md,
-  },
-  brandContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  brandText: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.text.primary,
-    letterSpacing: -0.5,
   },
   headerActions: {
     flexDirection: 'row',

@@ -28,6 +28,7 @@ import { CustomizationStep } from './steps/CustomizationStep';
 import { DepthCustomizationStep } from './steps/DepthCustomizationStep';
 import { ReviewStep } from './steps/ReviewStep';
 import { useSmartStartContext } from '../../contexts/SmartStartContext';
+import { Logo } from '../../components/ui/Logo';
 import type { DepthLevelId } from '@circuitpromptai/smart-start-core';
 import { colors } from '../../theme';
 
@@ -212,10 +213,7 @@ export default function SmartStartWizardScreen({ navigation }: Props) {
     >
       {/* App Header */}
       <View style={styles.appHeader}>
-        <View style={styles.headerLeft}>
-          <Ionicons name="sparkles" size={19} color="#8b5cf6" />
-          <Text style={styles.appTitle}>Blaniel</Text>
-        </View>
+        <Logo size="sm" showText textColor="#ffffff" />
         <View style={styles.headerRight}>
           <TouchableOpacity
             onPress={() => navigation.navigate('CVStyleCreator')}
@@ -319,21 +317,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     backgroundColor: 'transparent',
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  appTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#ffffff',
-    letterSpacing: -0.3,
   },
   manualButton: {
     flexDirection: 'row',

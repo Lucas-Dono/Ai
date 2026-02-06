@@ -11,14 +11,15 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import { useAlert } from '../../contexts/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { useAuth } from '../../contexts/AuthContext';
+import { Logo } from '../../components/ui/Logo';
 
 type RegisterScreenProps = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'Register'>;
@@ -26,6 +27,7 @@ type RegisterScreenProps = {
 
 export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const { register } = useAuth();
+  const { showAlert } = useAlert();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,17 +42,17 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
   const handleRegister = async () => {
     if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
+      showAlert('Completa todos los campos', { type: 'warning', duration: 3000 });
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden');
+      showAlert('Las contraseñas no coinciden', { type: 'warning', duration: 3000 });
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'La contraseña debe tener al menos 8 caracteres');
+      showAlert('La contraseña debe tener al menos 8 caracteres', { type: 'warning', duration: 3000 });
       return;
     }
 
@@ -58,7 +60,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       await register(email, password, name);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Error al registrarse');
+      showAlert(error.message || 'Error al registrarse', { type: 'error', duration: 4000 });
     } finally {
       setLoading(false);
     }
@@ -75,6 +77,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
       >
         <View style={styles.content}>
           <View style={styles.header}>
+            <Logo size={48} showText textColor="#FFFFFF" style={styles.logo} />
             <Text style={styles.title}>Crear Cuenta</Text>
             <Text style={styles.subtitle}>Únete a nuestra comunidad</Text>
           </View>
@@ -269,6 +272,10 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 40,
+    alignItems: 'center',
+  },
+  logo: {
+    marginBottom: 24,
   },
   title: {
     fontSize: 36,

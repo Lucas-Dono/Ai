@@ -17,7 +17,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { useAuth } from '../../contexts/AuthContext';
-import { useAlert } from '@/contexts/AlertContext';
+import { useAlert } from '../../contexts/AlertContext';
+import { Logo } from '../../components/ui/Logo';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>;
@@ -35,7 +36,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      showAlert('Completa todos los campos', 'warning', 3000);
+      showAlert('Completa todos los campos', { type: 'warning', duration: 3000 });
       return;
     }
 
@@ -43,7 +44,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     try {
       await login(email, password);
     } catch (error: any) {
-      showAlert(error.message || 'Error al iniciar sesión', 'error', 4000);
+      showAlert(error.message || 'Error al iniciar sesión', { type: 'error', duration: 4000 });
     } finally {
       setLoading(false);
     }
@@ -56,6 +57,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     >
       <View style={styles.content}>
         <View style={styles.header}>
+          <Logo size={48} showText textColor="#FFFFFF" style={styles.logo} />
           <Text style={styles.title}>Iniciar Sesión</Text>
           <Text style={styles.subtitle}>Bienvenido de vuelta</Text>
         </View>
@@ -177,6 +179,10 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 40,
+    alignItems: 'center',
+  },
+  logo: {
+    marginBottom: 24,
   },
   title: {
     fontSize: 36,
