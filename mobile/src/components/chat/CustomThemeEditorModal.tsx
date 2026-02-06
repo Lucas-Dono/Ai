@@ -34,6 +34,7 @@ export interface ThemeData {
   agentBubbleColor: string;
   backgroundColor: string;
   backgroundGradient?: string[];
+  backgroundImage?: string;
   accentColor: string;
   useGradient: boolean;
 }

@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 import { ThemeStorageService, CustomChatTheme } from '../../services/theme-storage';
 import { CustomThemeEditorModal, ThemeData } from './CustomThemeEditorModal';
+import { ChatWallpaperModal } from './ChatWallpaperModal';
 
 export interface ChatTheme {
   id: string;
@@ -28,6 +29,7 @@ export interface ChatTheme {
   agentBubbleColor: string;
   backgroundColor: string;
   backgroundGradient?: string[];
+  backgroundImage?: string; // URL de imagen de fondo
   accentColor: string;
   isCustom?: boolean;
 }
@@ -123,6 +125,7 @@ export function ChatThemeModal({
   const [selectedTheme, setSelectedTheme] = useState<ChatTheme>(currentTheme);
   const [customThemes, setCustomThemes] = useState<CustomChatTheme[]>([]);
   const [showCustomEditor, setShowCustomEditor] = useState(false);
+  const [showWallpaperModal, setShowWallpaperModal] = useState(false);
   const [editingTheme, setEditingTheme] = useState<ChatTheme | null>(null);
   const [editorMode, setEditorMode] = useState<'create' | 'edit'>('create');
   const slideAnim = React.useRef(new Animated.Value(0)).current;
@@ -223,6 +226,17 @@ export function ChatThemeModal({
       console.error('Error al guardar tema:', error);
       Alert.alert('Error', 'No se pudo guardar el tema. Intenta nuevamente.');
     }
+  };
+
+  const handleWallpaperSelect = (wallpaper: any) => {
+    // Actualizar tema seleccionado con el nuevo wallpaper
+    const updatedTheme: ChatTheme = {
+      ...selectedTheme,
+      backgroundColor: wallpaper.type === 'solid' ? wallpaper.value : selectedTheme.backgroundColor,
+      backgroundGradient: wallpaper.type === 'gradient' ? wallpaper.value : undefined,
+      backgroundImage: wallpaper.type === 'image' ? wallpaper.value : undefined,
+    };
+    setSelectedTheme(updatedTheme);
   };
 
   const renderThemePreview = (theme: ChatTheme, index: number) => {
@@ -369,13 +383,7 @@ export function ChatThemeModal({
                 {/* Opción: Fondo de pantalla */}
                 <TouchableOpacity
                   style={styles.customizeOption}
-                  onPress={() => {
-                    Alert.alert(
-                      'Fondo de pantalla',
-                      'Esta función estará disponible próximamente.',
-                      [{ text: 'OK' }]
-                    );
-                  }}
+                  onPress={() => setShowWallpaperModal(true)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.customizeIconContainer}>
@@ -437,6 +445,35 @@ export function ChatThemeModal({
           useGradient: !!editingTheme.backgroundGradient,
         } : null}
         mode={editorMode}
+      />
+
+      {/* Wallpaper Modal */}
+      <ChatWallpaperModal
+        visible={showWallpaperModal}
+        onClose={() => setShowWallpaperModal(false)}
+        currentWallpaper={
+          selectedTheme.backgroundImage
+            ? {
+                id: 'current',
+                type: 'image' as const,
+                name: 'Actual',
+                value: selectedTheme.backgroundImage,
+              }
+            : selectedTheme.backgroundGradient
+            ? {
+                id: 'current',
+                type: 'gradient' as const,
+                name: 'Actual',
+                value: selectedTheme.backgroundGradient,
+              }
+            : {
+                id: 'current',
+                type: 'solid' as const,
+                name: 'Actual',
+                value: selectedTheme.backgroundColor,
+              }
+        }
+        onWallpaperSelect={handleWallpaperSelect}
       />
     </Modal>
   );
