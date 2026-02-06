@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, borderRadius } from '../../theme';
@@ -118,6 +119,7 @@ export function ChatThemeModal({
   currentTheme,
   onThemeSelect,
 }: ChatThemeModalProps) {
+  const insets = useSafeAreaInsets();
   const [selectedTheme, setSelectedTheme] = useState<ChatTheme>(currentTheme);
   const [customThemes, setCustomThemes] = useState<CustomChatTheme[]>([]);
   const [showCustomEditor, setShowCustomEditor] = useState(false);
@@ -323,6 +325,7 @@ export function ChatThemeModal({
                 styles.modalContainer,
                 {
                   transform: [{ translateY }],
+                  paddingTop: insets.top || 40,
                 },
               ]}
             >
@@ -435,7 +438,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.card,
     borderTopLeftRadius: borderRadius.xl,
     borderTopRightRadius: borderRadius.xl,
-    maxHeight: '85%',
+    height: '90%',
   },
   handle: {
     width: 40,
@@ -468,6 +471,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   themesGrid: {
+    flexDirection: 'column',
     gap: spacing.md,
   },
   themeCard: {
@@ -476,6 +480,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.elevated,
     borderWidth: 2,
     borderColor: 'transparent',
+    marginBottom: spacing.md,
   },
   themeCardSelected: {
     borderColor: colors.primary[500],
@@ -539,7 +544,7 @@ const styles = StyleSheet.create({
   },
   createThemeButton: {
     marginTop: spacing.md,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.lg,
     borderRadius: borderRadius.lg,
     overflow: 'hidden',
   },
