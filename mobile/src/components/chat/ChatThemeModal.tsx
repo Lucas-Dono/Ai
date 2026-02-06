@@ -30,6 +30,10 @@ export interface ChatTheme {
   backgroundColor: string;
   backgroundGradient?: string[];
   backgroundImage?: string; // URL de imagen de fondo
+  gradientDirection?: 'vertical' | 'horizontal' | 'diagonal-tl-br' | 'diagonal-tr-bl';
+  adaptiveMessageColors?: boolean;
+  messageColorTop?: string;
+  messageColorBottom?: string;
   accentColor: string;
   isCustom?: boolean;
 }
@@ -235,6 +239,10 @@ export function ChatThemeModal({
       backgroundColor: wallpaper.type === 'solid' ? wallpaper.value : selectedTheme.backgroundColor,
       backgroundGradient: wallpaper.type === 'gradient' ? wallpaper.value : undefined,
       backgroundImage: wallpaper.type === 'image' ? wallpaper.value : undefined,
+      gradientDirection: wallpaper.direction,
+      adaptiveMessageColors: wallpaper.adaptiveMessageColors,
+      messageColorTop: wallpaper.messageColorTop,
+      messageColorBottom: wallpaper.messageColorBottom,
     };
     setSelectedTheme(updatedTheme);
   };

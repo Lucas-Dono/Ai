@@ -22,6 +22,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, spacing, typography, borderRadius } from '../../theme';
+import { GradientEditorModal, GradientData } from './GradientEditorModal';
 
 type WallpaperType = 'solid' | 'gradient' | 'image';
 
@@ -31,6 +32,10 @@ interface WallpaperOption {
   name: string;
   value: string | string[]; // Color hex para solid, array de colores para gradient, URL para image
   preview?: string; // URL de preview para imágenes
+  direction?: 'vertical' | 'horizontal' | 'diagonal-tl-br' | 'diagonal-tr-bl';
+  adaptiveMessageColors?: boolean;
+  messageColorTop?: string;
+  messageColorBottom?: string;
 }
 
 interface ChatWallpaperModalProps {
@@ -109,6 +114,7 @@ export function ChatWallpaperModal({
   );
   const [customColor, setCustomColor] = useState('#0F172A');
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showGradientEditor, setShowGradientEditor] = useState(false);
   const slideAnim = React.useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -162,6 +168,21 @@ export function ChatWallpaperModal({
     };
     setSelectedWallpaper(customWallpaper);
     setShowColorPicker(false);
+  };
+
+  const handleSaveGradient = (gradientData: GradientData) => {
+    const customGradient: WallpaperOption = {
+      id: `gradient-${Date.now()}`,
+      type: 'gradient',
+      name: 'Mi gradiente',
+      value: gradientData.colors,
+      direction: gradientData.direction,
+      adaptiveMessageColors: gradientData.adaptiveMessageColors,
+      messageColorTop: gradientData.messageColorTop,
+      messageColorBottom: gradientData.messageColorBottom,
+    };
+    setSelectedWallpaper(customGradient);
+    setShowGradientEditor(false);
   };
 
   const handlePickImage = async () => {
@@ -436,9 +457,28 @@ export function ChatWallpaperModal({
                 )}
 
                 {selectedTab === 'gradient' && (
-                  <View style={styles.optionsGrid}>
-                    {GRADIENT_COLORS.map(renderGradientOption)}
-                  </View>
+                  <>
+                    {/* Botón crear gradiente personalizado */}
+                    <TouchableOpacity
+                      style={styles.uploadButton}
+                      onPress={() => setShowGradientEditor(true)}
+                      activeOpacity={0.7}
+                    >
+                      <LinearGradient
+                        colors={[colors.primary[500], colors.primary[600]] as readonly [string, string, ...string[]]}
+                        style={styles.uploadButtonGradient}
+                      >
+                        <Ionicons name="color-filter" size={24} color={colors.text.primary} />
+                        <Text style={styles.uploadButtonText}>Crear gradiente personalizado</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+
+                    {/* Gradientes predefinidos */}
+                    <Text style={styles.sectionLabel}>Gradientes predefinidos</Text>
+                    <View style={styles.optionsGrid}>
+                      {GRADIENT_COLORS.map(renderGradientOption)}
+                    </View>
+                  </>
                 )}
 
                 {selectedTab === 'image' && (
@@ -494,6 +534,13 @@ export function ChatWallpaperModal({
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
+
+      {/* Gradient Editor Modal */}
+      <GradientEditorModal
+        visible={showGradientEditor}
+        onClose={() => setShowGradientEditor(false)}
+        onSave={handleSaveGradient}
+      />
     </Modal>
   );
 }

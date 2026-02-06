@@ -8,6 +8,8 @@ import { LogBox, View, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { AlertProvider } from './src/contexts/AlertContext';
+import { AlertContainer } from './src/components/alerts/AlertContainer';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { useAppLifecycleTracking } from './src/hooks/useAnalytics';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
@@ -66,6 +68,7 @@ function AppContent() {
     <>
       <StatusBar style="light" />
       <RootNavigator />
+      <AlertContainer />
     </>
   );
 }
@@ -76,7 +79,9 @@ export default function App() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <AuthProvider>
-            <AppContent />
+            <AlertProvider>
+              <AppContent />
+            </AlertProvider>
           </AuthProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>

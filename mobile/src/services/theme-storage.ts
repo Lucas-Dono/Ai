@@ -14,6 +14,10 @@ export interface CustomChatTheme {
   backgroundGradient?: string[];
   accentColor: string;
   backgroundImage?: string; // URL de imagen de fondo
+  gradientDirection?: 'vertical' | 'horizontal' | 'diagonal-tl-br' | 'diagonal-tr-bl';
+  adaptiveMessageColors?: boolean;
+  messageColorTop?: string;
+  messageColorBottom?: string;
   textColor?: string; // Color de texto personalizado
   isCustom: true; // Para diferenciar de temas predefinidos
   createdAt: string;
@@ -155,6 +159,10 @@ export const ThemeStorageService = {
           backgroundGradient: theme.backgroundGradient,
           accentColor: theme.accentColor,
           backgroundImage: theme.backgroundImage,
+          gradientDirection: theme.gradientDirection,
+          adaptiveMessageColors: theme.adaptiveMessageColors,
+          messageColorTop: theme.messageColorTop,
+          messageColorBottom: theme.messageColorBottom,
           textColor: theme.textColor,
           isCustom: true,
           tags: theme.tags,

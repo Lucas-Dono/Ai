@@ -216,7 +216,8 @@
       "Bash(unzip:*)",
       "Bash(javap:*)",
       "Bash(rsync:*)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Bash(npx react-native log-android:*)"
     ],
     "deny": [],
     "ask": []
