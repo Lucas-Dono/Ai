@@ -46,6 +46,7 @@
     "snapshot:watch": "tsx scripts/snapshot/snapshot-service.ts",
     "snapshot:list": "tsx scripts/snapshot/list-snapshots.ts",
     "snapshot:restore": "tsx scripts/snapshot/restore-snapshot.ts",
+    "security:audit": "./scripts/security-audit.sh",
     "postinstall": "prisma generate"
   },
   "prisma": {
