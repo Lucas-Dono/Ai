@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
+import { generateOpenAIEmbedding, cosineSimilarity } from "@/lib/memory/openai-embeddings";
 import { nanoid } from "nanoid";
 
 interface RelevantMemory {
@@ -47,7 +47,7 @@ export class CrossContextMemoryService {
   async retrieveRelevantMemories(params: RetrieveParams): Promise<RelevantMemory[]> {
     try {
       // 1. Generar embedding del query
-      const queryEmbedding = await generateQwenEmbedding(params.query);
+      const queryEmbedding = await generateOpenAIEmbedding(params.query);
 
       // 2. Buscar memorias cross-contexto
       // Buscamos memorias que:
@@ -118,7 +118,7 @@ export class CrossContextMemoryService {
   async saveMemory(params: SaveMemoryParams): Promise<any> {
     try {
       // 1. Generar embedding del summary
-      const embedding = await generateQwenEmbedding(params.summary);
+      const embedding = await generateOpenAIEmbedding(params.summary);
 
       // 2. Crear memoria
       const memory = await prisma.crossContextMemory.create({

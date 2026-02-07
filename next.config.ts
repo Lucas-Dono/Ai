@@ -125,7 +125,6 @@ const nextConfig: NextConfig = {
     "sharp",
     "onnxruntime-node",
     "hnswlib-node",
-    "node-llama-cpp",
   ],
 
   // Configuración de Webpack para ignorar módulos nativos en el cliente
@@ -137,7 +136,6 @@ const nextConfig: NextConfig = {
         sharp: false,
         "onnxruntime-node": false,
         "hnswlib-node": false,
-        "node-llama-cpp": false,
         undici: false,
       };
 
@@ -150,13 +148,9 @@ const nextConfig: NextConfig = {
 
     // Marcar paquetes con binarios nativos como externos en el servidor
     if (isServer) {
-      // Ignorar módulos específicos de node-llama-cpp que causan problemas
+      // Ignorar módulos con binarios nativos
       config.externals = [
         ...config.externals,
-        "node-llama-cpp",
-        "@reflink/reflink",
-        "@reflink/reflink-linux-x64-gnu",
-        "ipull",
         "llamaindex",
       ];
 

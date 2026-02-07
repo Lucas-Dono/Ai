@@ -7,7 +7,7 @@
  * Funciona en cualquier idioma sin necesidad de diccionarios.
  */
 
-import { generateQwenEmbedding, cosineSimilarity } from '@/lib/memory/qwen-embeddings';
+import { generateOpenAIEmbedding, cosineSimilarity } from '@/lib/memory/openai-embeddings';
 import { getProfileEmbeddings, hasProfileEmbeddings, generateProfileEmbeddings } from './profile-embeddings';
 import { createLogger } from '@/lib/logger';
 
@@ -73,7 +73,7 @@ export async function detectRelevantCommands(
     }
 
     // Generar embedding de la query del usuario
-    const queryEmbedding = await generateQwenEmbedding(userQuery);
+    const queryEmbedding = await generateOpenAIEmbedding(userQuery);
 
     // Obtener embeddings del profile
     const profileEmbeddings = await getProfileEmbeddings(agentId);

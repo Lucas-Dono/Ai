@@ -11,7 +11,7 @@
 import { EpisodicMemory, EmotionState } from "../../types";
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
-import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
+import { generateOpenAIEmbedding, cosineSimilarity } from "@/lib/memory/openai-embeddings";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("MemoryRetrieval");
@@ -279,7 +279,7 @@ export class MemoryRetrievalSystem {
       // Intentar generar embedding (no crítico - continuar si falla)
       let embeddingArray: number[] | null = null;
       try {
-        embeddingArray = await generateQwenEmbedding(params.event);
+        embeddingArray = await generateOpenAIEmbedding(params.event);
         log.debug({ embeddingDim: embeddingArray.length }, "Embedding generated successfully");
       } catch (embeddingError) {
         log.warn(
@@ -381,7 +381,7 @@ export class MemoryRetrievalSystem {
    */
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      return await generateQwenEmbedding(text);
+      return await generateOpenAIEmbedding(text);
     } catch (error) {
       log.error({ error }, "Error generating embedding");
       throw error;
@@ -404,7 +404,7 @@ export class MemoryRetrievalSystem {
 
     try {
       // Generar embedding del query
-      const queryEmbedding = await generateQwenEmbedding(query);
+      const queryEmbedding = await generateOpenAIEmbedding(query);
 
       // Obtener todas las memorias del agente
       // Filtraremos las que tienen embedding después de cargarlas

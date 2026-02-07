@@ -6,7 +6,7 @@
  */
 
 import { redis } from '@/lib/redis/config';
-import { generateQwenEmbedding } from '@/lib/memory/qwen-embeddings';
+import { generateOpenAIEmbedding } from '@/lib/memory/openai-embeddings';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('EmbeddingQueueManager');
@@ -166,7 +166,7 @@ export class EmbeddingQueueManager {
 
     // Generar embedding inmediatamente
     log.info({ operation }, 'Procesando embedding inmediato (bypass queue)');
-    const embedding = await generateQwenEmbedding(text);
+    const embedding = await generateOpenAIEmbedding(text);
 
     // Guardar en caché
     await this.cache(text, embedding);
@@ -246,7 +246,7 @@ export class EmbeddingQueueManager {
       } else {
         // Generar embedding
         log.debug({ jobId: job.id, operation: job.operation }, 'Generando embedding');
-        const embedding = await generateQwenEmbedding(job.text);
+        const embedding = await generateOpenAIEmbedding(job.text);
 
         // Guardar en caché
         await this.cache(job.text, embedding);

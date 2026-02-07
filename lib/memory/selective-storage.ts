@@ -6,7 +6,7 @@
  */
 
 import { createLogger } from '@/lib/logger';
-import { generateQwenEmbedding } from './qwen-embeddings';
+import { generateOpenAIEmbedding } from './qwen-embeddings';
 import { prisma } from '@/lib/prisma';
 
 const log = createLogger('SelectiveStorage');
@@ -145,7 +145,7 @@ export async function storeMessageSelectively(
     let embedding: number[];
 
     try {
-      embedding = await generateQwenEmbedding(content);
+      embedding = await generateOpenAIEmbedding(content);
     } catch (embeddingError) {
       log.warn(
         { error: embeddingError, messageId },

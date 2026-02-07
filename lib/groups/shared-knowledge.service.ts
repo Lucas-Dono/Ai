@@ -6,7 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { generateQwenEmbedding, cosineSimilarity } from "@/lib/memory/qwen-embeddings";
+import { generateOpenAIEmbedding, cosineSimilarity } from "@/lib/memory/openai-embeddings";
 import { nanoid } from "nanoid";
 
 export interface SharedKnowledgeInput {
@@ -40,7 +40,7 @@ class SharedKnowledgeService {
   async saveKnowledge(input: SharedKnowledgeInput): Promise<any> {
     try {
       // Generar embedding del contenido
-      const embedding = await generateQwenEmbedding(input.content);
+      const embedding = await generateOpenAIEmbedding(input.content);
 
       // Verificar si ya existe conocimiento similar
       const existing = await prisma.sharedKnowledge.findFirst({
@@ -129,7 +129,7 @@ class SharedKnowledgeService {
 
       // Si hay query, aplicar busqueda semantica
       if (params.query && knowledge.length > 0) {
-        const queryEmbedding = await generateQwenEmbedding(params.query);
+        const queryEmbedding = await generateOpenAIEmbedding(params.query);
 
         const scored = knowledge.map((k) => {
           const embedding = k.embedding as number[] | null;

@@ -11,7 +11,7 @@
  * - Para análisis ML: usa getEmbedding() con context='ml'
  */
 
-import { generateQwenEmbedding, cosineSimilarity } from '@/lib/memory/qwen-embeddings';
+import { generateOpenAIEmbedding, cosineSimilarity } from '@/lib/memory/openai-embeddings';
 import { embeddingQueue, EmbeddingOperation, EmbeddingPriority } from './queue-manager';
 import { createLogger } from '@/lib/logger';
 
@@ -77,7 +77,7 @@ export async function getEmbedding(
   if (!result) {
     // Si timeout, procesar inmediato como fallback
     log.warn({ jobId, context }, 'Timeout esperando embedding, procesando inmediato');
-    return await generateQwenEmbedding(text);
+    return await generateOpenAIEmbedding(text);
   }
 
   return result;

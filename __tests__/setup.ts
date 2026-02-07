@@ -434,13 +434,13 @@ vi.mock('@/lib/encryption/message-encryption', () => ({
 }));
 
 // ============================================
-// MOCK QWEN EMBEDDINGS
+// MOCK OPENAI EMBEDDINGS
 // ============================================
 
-vi.mock('@/lib/memory/qwen-embeddings', () => ({
-  generateQwenEmbedding: vi.fn(async (text: string) => {
-    // Return a mock 384-dimensional embedding vector (Qwen3-Embedding-0.6B dimension)
-    return Array(384).fill(0).map(() => Math.random());
+vi.mock('@/lib/memory/openai-embeddings', () => ({
+  generateOpenAIEmbedding: vi.fn(async (text: string) => {
+    // Return a mock 1536-dimensional embedding vector (text-embedding-3-small)
+    return Array(1536).fill(0).map(() => Math.random());
   }),
   cosineSimilarity: vi.fn((a: number[], b: number[]) => {
     // Simple mock implementation

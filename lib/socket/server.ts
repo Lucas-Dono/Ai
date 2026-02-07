@@ -20,7 +20,6 @@ import { EmotionalEngine } from "@/lib/relations/engine";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { createMemoryManager } from "@/lib/memory/manager";
-import { warmupQwenModel } from "@/lib/memory/qwen-embeddings";
 import { nanoid } from "nanoid";
 
 type SocketServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
@@ -103,7 +102,7 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
   // WARMUP: Pre-calentar modelo de embeddings
   // Esto evita cold start en la primera búsqueda del usuario
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  warmupQwenModel().catch(error => {
+  // warmupQwenModel removed (OpenAI no requiere warmup)().catch(error => {
     console.warn('[SocketServer] Failed to warmup Qwen model:', error.message);
     console.warn('[SocketServer] Embeddings funcionará en modo degradado (solo keywords)');
   });

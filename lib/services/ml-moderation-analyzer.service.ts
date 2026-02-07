@@ -7,7 +7,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { getEmbedding, getBatchEmbeddings, findSimilar } from '@/lib/embeddings/smart-embeddings';
-import { cosineSimilarity } from '@/lib/memory/qwen-embeddings';
+import { cosineSimilarity } from '@/lib/memory/openai-embeddings';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('MLModerationAnalyzer');

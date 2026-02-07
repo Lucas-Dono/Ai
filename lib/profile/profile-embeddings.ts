@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { generateQwenEmbedding } from '@/lib/memory/qwen-embeddings';
+import { generateOpenAIEmbedding } from '@/lib/memory/openai-embeddings';
 import { KNOWLEDGE_COMMANDS } from './knowledge-retrieval';
 import { createLogger } from '@/lib/logger';
 
@@ -49,7 +49,7 @@ export async function generateProfileEmbeddings(agentId: string): Promise<void> 
       }
 
       // Generar embedding
-      const embedding = await generateQwenEmbedding(sectionData);
+      const embedding = await generateOpenAIEmbedding(sectionData);
 
       embeddings.push({
         command,

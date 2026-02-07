@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAdminAuth } from '@/lib/admin/middleware';
 import { embeddingQueue } from '@/lib/embeddings/queue-manager';
 import { redis } from '@/lib/redis/config';
-import { isQwenModelLoaded } from '@/lib/memory/qwen-embeddings';
+import { // isQwenModelLoaded removed (OpenAI siempre disponible) } from '@/lib/memory/openai-embeddings';
 import { optimizedVectorSearch } from '@/lib/memory/optimized-vector-search';
 
 export const GET = withAdminAuth(async (request, { admin }) => {
@@ -23,7 +23,7 @@ export const GET = withAdminAuth(async (request, { admin }) => {
 
     // Estadísticas del modelo
     const modelStats = {
-      loaded: isQwenModelLoaded(),
+      loaded: // isQwenModelLoaded removed (OpenAI siempre disponible)(),
       // TODO: Agregar más stats si es posible (memoria, etc)
     };
 
