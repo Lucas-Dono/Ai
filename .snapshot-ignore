@@ -1,0 +1,106 @@
+# Sistema de Snapshots - Archivos/Directorios a Excluir
+
+# Snapshots mismos
+.snapshots/
+
+# Dependencias
+node_modules/
+mobile/node_modules/
+packages/*/node_modules/
+.pnp
+.pnp.js
+.yarn/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+mobile/.expo/
+mobile/dist/
+mobile/.expo-shared/
+
+# Base de datos local
+*.db
+*.sqlite
+*.sqlite3
+prisma/migrations/*_temp/
+dump.rdb
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Cache
+.cache/
+.temp/
+.turbo/
+.nx/cache
+.eslintcache
+.prettiercache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Vector store y modelos
+.vector-store/
+model/
+models/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+fastsdcpu/
+
+# Git
+.git/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# Test outputs
+coverage/
+__tests__/coverage
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Mobile builds
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/.idea/
+mobile/android/captures/
+mobile/ios/Pods/
+mobile/ios/*.xcworkspace/
+mobile/ios/*.xcodeproj/
+mobile/ios/build/
+mobile/ios/DerivedData/
+*.apk
+*.aab
+
+# Documentación generada
+docs/.vitepress/cache
+docs/.vitepress/dist
+storybook-static/
+
+# Uploads
+uploads/
+
+# Variables de entorno (nunca respaldar)
+.env
+.env*.local

@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useAlert } from '@/contexts/AlertContext';
+import { useAlert } from '../../contexts/AlertContext';
 import { AlertBanner } from './AlertBanner';
 
 /**

@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from 'react-native';
+import { useAlert } from '../../contexts/AlertContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -126,6 +127,7 @@ export function ChatThemeModal({
   onThemeSelect,
 }: ChatThemeModalProps) {
   const insets = useSafeAreaInsets();
+  const { showAlert } = useAlert();
   const [selectedTheme, setSelectedTheme] = useState<ChatTheme>(currentTheme);
   const [customThemes, setCustomThemes] = useState<CustomChatTheme[]>([]);
   const [showCustomEditor, setShowCustomEditor] = useState(false);
@@ -228,7 +230,7 @@ export function ChatThemeModal({
       }
     } catch (error) {
       console.error('Error al guardar tema:', error);
-      Alert.alert('Error', 'No se pudo guardar el tema. Intenta nuevamente.');
+      showAlert('No se pudo guardar el tema', { type: 'error' });
     }
   };
 

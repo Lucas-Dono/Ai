@@ -15,8 +15,8 @@ import {
   Modal,
   Dimensions,
   ScrollView,
-  Alert,
 } from 'react-native';
+import { useAlert } from '../../contexts/AlertContext';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as Haptics from 'expo-haptics';
 import {
@@ -60,6 +60,7 @@ interface CropRegion {
 // ============================================================================
 
 export function AvatarEditor({ imageUri, onSave, onCancel, visible }: AvatarEditorProps) {
+  const { showAlert } = useAlert();
   const [editedUri, setEditedUri] = useState(imageUri);
   const [rotation, setRotation] = useState(0);
   const [flipHorizontal, setFlipHorizontal] = useState(false);
@@ -88,7 +89,7 @@ export function AvatarEditor({ imageUri, onSave, onCancel, visible }: AvatarEdit
       setEditedUri(manipResult.uri);
     } catch (error) {
       console.error('Rotate error:', error);
-      Alert.alert('Error', 'No se pudo rotar la imagen');
+      showAlert('No se pudo rotar la imagen', { type: 'error' });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessing(false);
@@ -112,7 +113,7 @@ export function AvatarEditor({ imageUri, onSave, onCancel, visible }: AvatarEdit
       setEditedUri(manipResult.uri);
     } catch (error) {
       console.error('Flip horizontal error:', error);
-      Alert.alert('Error', 'No se pudo voltear la imagen');
+      showAlert('No se pudo voltear la imagen horizontalmente', { type: 'error' });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessing(false);
@@ -136,7 +137,7 @@ export function AvatarEditor({ imageUri, onSave, onCancel, visible }: AvatarEdit
       setEditedUri(manipResult.uri);
     } catch (error) {
       console.error('Flip vertical error:', error);
-      Alert.alert('Error', 'No se pudo voltear la imagen');
+      showAlert('No se pudo voltear la imagen verticalmente', { type: 'error' });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessing(false);
@@ -165,10 +166,10 @@ export function AvatarEditor({ imageUri, onSave, onCancel, visible }: AvatarEdit
       );
 
       setEditedUri(manipResult.uri);
-      Alert.alert('Recortado', 'La imagen ha sido recortada en formato cuadrado');
+      showAlert('Imagen recortada en formato cuadrado', { type: 'success', duration: 2000 });
     } catch (error) {
       console.error('Crop error:', error);
-      Alert.alert('Error', 'No se pudo recortar la imagen');
+      showAlert('No se pudo recortar la imagen', { type: 'error' });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessing(false);
@@ -218,15 +219,15 @@ export function AvatarEditor({ imageUri, onSave, onCancel, visible }: AvatarEdit
       // Para filtros reales necesitaríamos react-native-image-filter-kit
       // Por ahora dejamos los filtros como placeholders
 
-      Alert.alert(
-        'Filtros Premium',
-        'Los filtros de color requieren funcionalidad Premium. Por ahora puedes usar crop, rotate y flip.'
-      );
+      showAlert('Los filtros de color requieren plan Premium', {
+        type: 'info',
+        duration: 4000
+      });
 
       setCurrentFilter('none');
     } catch (error) {
       console.error('Filter error:', error);
-      Alert.alert('Error', 'No se pudo aplicar el filtro');
+      showAlert('No se pudo aplicar el filtro', { type: 'error' });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setProcessing(false);

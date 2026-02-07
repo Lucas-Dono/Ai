@@ -1,13 +1,19 @@
 /**
  * Cliente API compartido para web y mobile
- * REFACTORED: Token management simplificado
+ * REFACTORED: Token management con soporte automático para JWTManager
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
 export interface ApiClientConfig {
   baseURL: string;
   onUnauthorized?: () => void;
+  /**
+   * Función opcional para obtener el token dinámicamente
+   * En mobile: usar JWTManager.getAccessToken()
+   * En web: usar getSession() o similar
+   */
+  getToken?: () => Promise<string | null>;
 }
 
 export class ApiClient {
@@ -27,11 +33,26 @@ export class ApiClient {
 
     // Interceptor para agregar token de autenticación
     this.client.interceptors.request.use(
-      (config) => {
+      async (config: InternalAxiosRequestConfig) => {
         console.log(`[ApiClient] 🔵 REQUEST: ${config.method?.toUpperCase()} ${config.url}`);
-        if (this.authToken) {
-          config.headers.Authorization = `Bearer ${this.authToken}`;
-          console.log(`[ApiClient] 🔑 Auth token attached:`, this.authToken.substring(0, 30) + '...');
+
+        // Intentar obtener token dinámicamente si está disponible el getter
+        let token = this.authToken;
+        if (this.config.getToken) {
+          try {
+            const dynamicToken = await this.config.getToken();
+            if (dynamicToken) {
+              token = dynamicToken;
+              console.log(`[ApiClient] 🔑 Token obtained from getToken()`);
+            }
+          } catch (error) {
+            console.error(`[ApiClient] ❌ Error getting dynamic token:`, error);
+          }
+        }
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+          console.log(`[ApiClient] 🔑 Auth token attached:`, token.substring(0, 30) + '...');
         } else {
           console.log(`[ApiClient] ⚠️  No auth token available`);
         }
@@ -66,8 +87,9 @@ export class ApiClient {
   }
 
   /**
-   * Set authentication token
+   * Set authentication token manually
    * Call this after login or when restoring session
+   * @deprecated Usar getToken en config para obtención dinámica
    */
   setAuthToken(token: string | null): void {
     if (token) {

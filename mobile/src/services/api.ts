@@ -90,11 +90,17 @@ class AuthManager {
 
 export const authManager = new AuthManager();
 
-// Create API client instance
+// Create API client instance with dynamic token retrieval
 export const apiClient = new ApiClient({
   baseURL: API_BASE_URL,
   onUnauthorized: () => {
     authManager.handleUnauthorized();
+  },
+  // Obtener token dinámicamente del JWTManager
+  // Esto asegura que siempre se use el token más reciente sin necesidad de sincronizar manualmente
+  getToken: async () => {
+    const token = await JWTManager.getAccessToken();
+    return token;
   },
 });
 

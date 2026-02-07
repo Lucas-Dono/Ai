@@ -30,7 +30,7 @@ import {
   AlertTriangle,
   Info,
 } from 'lucide-react-native';
-import type { Alert, AlertType } from '@/contexts/AlertContext';
+import type { Alert, AlertType } from '../../contexts/AlertContext';
 
 /**
  * Props del componente AlertBanner
@@ -66,19 +66,19 @@ function getAlertIcon(type: AlertType) {
 
 /**
  * Obtener colores de gradiente según tipo
- * Negro a violeta con variaciones según tipo
+ * Negro a color secundario específico: violeta (info), amarillo (warning), rojo (error), verde (success)
  */
 function getAlertColors(type: AlertType): [string, string] {
   switch (type) {
     case 'success':
-      return ['#1a1a1a', '#7C3AED']; // Negro a violeta (success)
+      return ['#1a1a1a', '#10B981']; // Negro a verde (success)
     case 'error':
-      return ['#1a1a1a', '#9333EA']; // Negro a violeta intenso (error)
+      return ['#1a1a1a', '#EF4444']; // Negro a rojo (error)
     case 'warning':
-      return ['#1a1a1a', '#A855F7']; // Negro a violeta claro (warning)
+      return ['#1a1a1a', '#F59E0B']; // Negro a amarillo (warning)
     case 'info':
     default:
-      return ['#1a1a1a', '#8B5CF6']; // Negro a violeta medio (info)
+      return ['#1a1a1a', '#8B5CF6']; // Negro a violeta (info)
   }
 }
 

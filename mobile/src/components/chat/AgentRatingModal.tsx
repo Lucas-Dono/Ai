@@ -14,9 +14,9 @@ import {
   Animated,
   TouchableWithoutFeedback,
   ActivityIndicator,
-  Alert,
   Keyboard,
 } from 'react-native';
+import { useAlert } from '../../contexts/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, borderRadius } from '../../theme';
@@ -48,6 +48,7 @@ export function AgentRatingModal({
   currentReview = '',
   onSubmit,
 }: AgentRatingModalProps) {
+  const { showAlert } = useAlert();
   const [rating, setRating] = useState(currentRating);
   const [review, setReview] = useState(currentReview);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,11 +102,10 @@ export function AgentRatingModal({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      Alert.alert(
-        'Valoración requerida',
-        'Por favor, selecciona al menos una estrella para valorar.',
-        [{ text: 'Entendido' }]
-      );
+      showAlert('Selecciona al menos una estrella para valorar', {
+        type: 'warning',
+        duration: 3000
+      });
       return;
     }
 
@@ -117,18 +117,17 @@ export function AgentRatingModal({
       setRating(0);
       setReview('');
 
-      Alert.alert(
-        '¡Gracias por tu valoración!',
-        'Tu opinión nos ayuda a mejorar la experiencia.',
-        [{ text: 'Cerrar', onPress: onClose }]
-      );
+      showAlert('¡Gracias por tu valoración!', {
+        type: 'success',
+        duration: 2500
+      });
+      onClose();
     } catch (error) {
       console.error('Error al enviar valoración:', error);
-      Alert.alert(
-        'Error',
-        'No se pudo enviar tu valoración. Por favor, intenta de nuevo.',
-        [{ text: 'Entendido' }]
-      );
+      showAlert('No se pudo enviar tu valoración', {
+        type: 'error',
+        duration: 4000
+      });
     } finally {
       setIsSubmitting(false);
     }

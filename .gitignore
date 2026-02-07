@@ -125,6 +125,9 @@ ai_variable_de_entrono.js
 *.backup
 *.old
 
+# Sistema de snapshots automáticos
+.snapshots/
+
 # Test outputs
 test-results/
 playwright-report/

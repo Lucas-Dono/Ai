@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MainStackParamList } from '../../navigation/types';
 import billingApi, { UsageStats, Subscription, Plan } from '../../services/api/billing.api';
 import { colors, spacing, typography, borderRadius } from '../../theme';
-import { useAlert } from '@/contexts/AlertContext';
+import { useAlert } from '../../contexts/AlertContext';
 
 type BillingScreenProps = {
   navigation: NativeStackNavigationProp<MainStackParamList, 'Billing'>;

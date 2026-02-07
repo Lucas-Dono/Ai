@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useAlert } from '@/contexts/AlertContext';
+import { useAlert } from '../../contexts/AlertContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export function AlertDemo() {
