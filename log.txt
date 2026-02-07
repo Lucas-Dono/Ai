@@ -1,0 +1,590 @@
+Logs del navegador: [HMR] connected node_modules_next_dist_f3530cac._.js:2298:28
+[HMR] connected node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+🔄 [TOUR] Restore effect triggered: 
+Object { isNavigating: false, isLoaded: false, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+🎯 [TOUR] Navigation detection effect: 
+Object { pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq", isNavigating: false }
+node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 626ms node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] No session or user ID node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: cmkfqtv1j0000ij7v6vgexbvz node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: cmkfqtv1j0000ij7v6vgexbvz node_modules_next_dist_f3530cac._.js:2298:28
+🎨 [OVERLAY] Tour state changed: 
+Object { hasTour: false, tourId: null, currentStep: 0, hasStepData: false, target: undefined, targets: undefined, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+🔍 [OVERLAY] Target element effect triggered node_modules_next_dist_f3530cac._.js:2298:28
+❌ [OVERLAY] No current step data, cleaning up node_modules_next_dist_f3530cac._.js:2298:28
+🔄 [TOUR] Restore effect triggered: 
+Object { isNavigating: false, isLoaded: true, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] No session or user ID node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: cmkfqtv1j0000ij7v6vgexbvz node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: cmkfqtv1j0000ij7v6vgexbvz node_modules_next_dist_f3530cac._.js:2298:28
+🎨 [OVERLAY] Tour state changed: 
+Object { hasTour: false, tourId: null, currentStep: 0, hasStepData: false, target: undefined, targets: undefined, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+🔍 [OVERLAY] Target element effect triggered node_modules_next_dist_f3530cac._.js:2298:28
+❌ [OVERLAY] No current step data, cleaning up node_modules_next_dist_f3530cac._.js:2298:28
+📦 [TOUR] Checking sessionStorage: null node_modules_next_dist_f3530cac._.js:2298:28
+📭 [TOUR] No pending tour in sessionStorage node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 192ms node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 473ms node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 102ms node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] Fetching plan for user: cmkfqtv1j0000ij7v6vgexbvz node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 211ms node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] Response status: 200 node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] Plan data received: 
+Object { plan: "ultra" }
+node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] userPlan state updated to: ultra node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 2079ms node_modules_next_dist_f3530cac._.js:2298:28
+
+Logs de la terminal: lucas@fedora:/mnt/SSD/Proyectos/AI/creador-inteligencias$ npm run dev
+
+> blaniel@0.1.0 dev
+> NODE_OPTIONS='--max-old-space-size=8192' node server.js
+
+[dotenv@17.2.3] injecting env (49) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[Server] Initializing WebSocket support...
+[Server] Cron jobs disabled (set ENABLE_CRON_JOBS=true in production to enable)
+[Server] Socket.IO module loaded successfully
+[Socket.IO] Server initialized successfully
+[Server] WebSocket support enabled and ready
+[Server] Ready on http://0.0.0.0:3000
+{"level":30,"time":"2026-01-16T22:27:03.045Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"f9e0c695-16ac-4099-a6c7-8bc295cb7e80","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:03.054Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:03.054Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:03.265Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"0672d30b-53e4-459f-9a0c-f42c97ee3812","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:03.268Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:03.268Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:03.313Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"cd3fe8e0-1883-4639-a8d1-52f6d237c7e3","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:03.313Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:03.313Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:03.617Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/dashboard/grupos/cmkgvpv1n000mijuahs13velq","origin":null,"requestId":"1f0cdcdc-c440-4fee-a62a-5afbfdbff850","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:03.619Z","pid":105318,"env":"development","module":"middleware","requestId":"unknown","msg":"Starting locale detection"}
+{"level":30,"time":"2026-01-16T22:27:03.619Z","pid":105318,"env":"development","module":"middleware","locale":"es","source":"cookie","requestId":"unknown","msg":"Locale detected from cookie (user preference)"}
+{"level":20,"time":"2026-01-16T22:27:03.619Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:03.619Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+○ Compiling /api/community/notifications/unread-count ...
+{"level":30,"time":"2026-01-16T22:27:06.730Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"eae1200d-9a52-4083-9e61-0d7ac06e7ffc","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:06.732Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:06.733Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/community/notifications/unread-count 200 in 5.8s (compile: 2.6s, proxy.ts: 2.0s, render: 1158ms)
+{"level":30,"time":"2026-01-16T22:27:08.025Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/dashboard/grupos/cmkgvpv1n000mijuahs13velq","origin":null,"requestId":"e0de1dbd-0059-4a7b-8e38-45f706644ac8","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:08.026Z","pid":105318,"env":"development","module":"middleware","requestId":"unknown","msg":"Starting locale detection"}
+{"level":30,"time":"2026-01-16T22:27:08.026Z","pid":105318,"env":"development","module":"middleware","locale":"es","source":"cookie","requestId":"unknown","msg":"Locale detected from cookie (user preference)"}
+{"level":20,"time":"2026-01-16T22:27:08.026Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:08.026Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+⚠ Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+{"level":30,"time":"2026-01-16T22:27:08.563Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/dashboard/grupos/cmkgvpv1n000mijuahs13velq","origin":null,"requestId":"9ac9bdab-00dc-40ef-bc9c-4961ab1df7b2","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:08.565Z","pid":105318,"env":"development","module":"middleware","requestId":"unknown","msg":"Starting locale detection"}
+{"level":30,"time":"2026-01-16T22:27:08.565Z","pid":105318,"env":"development","module":"middleware","locale":"es","source":"cookie","requestId":"unknown","msg":"Locale detected from cookie (user preference)"}
+{"level":20,"time":"2026-01-16T22:27:08.565Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:08.565Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:08.587Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"7d23a8b1-11fb-4bf7-a056-8e0baadef6cf","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:08.587Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:08.587Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/community/notifications?page=1&limit=10 200 in 399ms (compile: 155ms, proxy.ts: 52ms, render: 191ms)
+{"level":30,"time":"2026-01-16T22:27:12.432Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"21606886-4206-4e47-9709-208efb193f3a","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:12.433Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:12.496Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"141a502d-d3d3-44d6-90de-472ec02a6e27","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:12.498Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:12.533Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:12.533Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:12.564Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:12.564Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /dashboard/grupos/cmkgvpv1n000mijuahs13velq 200 in 4.6s (proxy.ts: 54ms)
+{"level":30,"time":"2026-01-16T22:27:12.720Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/dashboard/grupos/cmkgvpv1n000mijuahs13velq","origin":null,"requestId":"730608a1-4813-4c4b-abe1-3a7db607cb49","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:12.721Z","pid":105318,"env":"development","module":"middleware","requestId":"unknown","msg":"Starting locale detection"}
+{"level":30,"time":"2026-01-16T22:27:12.722Z","pid":105318,"env":"development","module":"middleware","locale":"es","source":"cookie","requestId":"unknown","msg":"Locale detected from cookie (user preference)"}
+{"level":20,"time":"2026-01-16T22:27:12.722Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:12.722Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:12.869Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"2a084837-4b98-43dd-a706-8b1457c87da1","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:12.871Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:13.165Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"6a579782-3682-42e5-900e-f3d9f2b33a24","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:13.165Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:13.179Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"28500b80-7777-4bd6-8fea-421a9571477b","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:13.179Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:13.391Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"101af842-0d77-49bc-b5ba-1b4cdfbe51c2","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:13.392Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:13.452Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:13.453Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:13.478Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:13.478Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:13.483Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:13.483Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:13.583Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:13.583Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 1137ms (compile: 161ms, proxy.ts: 727ms, render: 249ms)
+ GET /api/user/onboarding-stats 200 in 757ms (compile: 252ms, proxy.ts: 354ms, render: 151ms)
+ GET /api/friends/requests/count 200 in 1115ms (compile: 233ms, proxy.ts: 698ms, render: 184ms)
+{"level":30,"time":"2026-01-16T22:27:13.918Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"0448db2e-731a-4b58-aaa6-91f19339be2a","msg":"Request received"}
+ GET /api/friends/requests/count 200 in 577ms (compile: 204ms, proxy.ts: 230ms, render: 144ms)
+{"level":20,"time":"2026-01-16T22:27:13.919Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:13.966Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"5b9f1683-13eb-442b-8670-ff4016d447b6","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:13.967Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:13.998Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.000Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:14.013Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.013Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 219ms (compile: 32ms, proxy.ts: 100ms, render: 87ms)
+ GET /api/user/onboarding-stats 200 in 221ms (compile: 62ms, proxy.ts: 78ms, render: 81ms)
+{"level":30,"time":"2026-01-16T22:27:14.168Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"4dd2977a-6758-4d76-8256-5c260696c4ae","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:14.169Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:14.193Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"f4a2d8d1-9d18-491b-aa20-bba2904f4341","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:14.194Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:14.208Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.208Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:14.233Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.234Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 214ms (compile: 41ms, proxy.ts: 71ms, render: 102ms)
+ GET /api/user/onboarding-stats 200 in 206ms (compile: 65ms, proxy.ts: 57ms, render: 84ms)
+{"level":30,"time":"2026-01-16T22:27:14.394Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"83735764-b1c8-4509-8acd-d826b9d66bc0","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:14.395Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:14.427Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"a10e4a26-2278-409f-ad96-a8a1f09e179a","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:14.429Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:14.433Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.433Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:14.496Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.497Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 191ms (compile: 32ms, proxy.ts: 62ms, render: 96ms)
+ GET /api/user/onboarding-stats 200 in 191ms (compile: 32ms, proxy.ts: 91ms, render: 68ms)
+{"level":30,"time":"2026-01-16T22:27:14.633Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"bec9d0a2-90bf-471b-853c-38df6b32918d","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:14.634Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:14.653Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:14.653Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 126ms (compile: 24ms, proxy.ts: 40ms, render: 62ms)
+{"level":30,"time":"2026-01-16T22:27:17.947Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"931ad18f-342b-4362-a4dc-3314b4c12971","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:17.948Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:17.948Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:18.254Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"6ba59481-68e5-45cf-9cbd-7ac2a7d021bb","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:18.255Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:18.255Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/community/notifications?page=1&limit=10 200 in 1191ms (compile: 498ms, proxy.ts: 239ms, render: 454ms)
+ GET /api/community/notifications/unread-count 200 in 928ms (compile: 418ms, proxy.ts: 268ms, render: 242ms)
+ GET /dashboard/grupos/cmkgvpv1n000mijuahs13velq 200 in 11.1s (compile: 7.3s, proxy.ts: 60ms, render: 3.7s)
+ GET /dashboard/grupos/cmkgvpv1n000mijuahs13velq 200 in 6.9s (compile: 3.2s, proxy.ts: 55ms, render: 3.7s)
+{"level":30,"time":"2026-01-16T22:27:19.949Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/onboarding/progress","origin":null,"requestId":"4870bd46-4639-42bc-a698-797f6e821468","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:19.950Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:19.961Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:19.962Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:20.173Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/onboarding/progress","origin":null,"requestId":"8329342d-662f-4a43-a746-3b18595b5329","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:20.173Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:20.185Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:20.186Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/onboarding/progress 200 in 628ms (compile: 542ms, proxy.ts: 32ms, render: 54ms)
+ GET /api/onboarding/progress 200 in 418ms (compile: 349ms, proxy.ts: 42ms, render: 28ms)
+{"level":30,"time":"2026-01-16T22:27:20.786Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"ebac6bcd-9c0d-465e-976a-bf5fe7a9441a","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:20.786Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:20.786Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:20.791Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"9496c476-e21d-49de-b9f5-d32ad6aa675e","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:20.791Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:20.791Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:20.795Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/groups/user-groups","origin":null,"requestId":"9845092e-fd84-4d73-9218-0c0b46ace371","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:20.795Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:20.795Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+[AuthHelper] Attempting authentication...
+[AuthHelper] Authorization header: MISSING
+{"level":30,"time":"2026-01-16T22:27:21.141Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"ac0f646a-3c6e-4430-b339-30e13124dfcb","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.142Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:21.151Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"4975036a-ff83-410d-9af0-1a3f06ea7154","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.151Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:21.151Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:21.158Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"ef93309a-18e2-4836-8e05-b8b713a6a210","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.159Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:21.159Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:21.172Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/groups/user-groups","origin":null,"requestId":"a7b98672-ec5a-4052-9fa6-c8da38d57e82","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.173Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:21.173Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+[AuthHelper] ✅ Authenticated via better-auth: lucasdono332@gmail.com
+ GET /api/community/notifications?page=1&limit=10 200 in 524ms (compile: 76ms, proxy.ts: 18ms, render: 430ms)
+{"level":30,"time":"2026-01-16T22:27:21.315Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+[AuthHelper] Attempting authentication...
+[AuthHelper] Authorization header: MISSING
+ GET /api/community/notifications/unread-count 200 in 565ms (compile: 171ms, proxy.ts: 16ms, render: 378ms)
+ GET /api/groups/user-groups 200 in 567ms (compile: 274ms, proxy.ts: 16ms, render: 277ms)
+{"level":30,"time":"2026-01-16T22:27:21.315Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:21.320Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"9a076f53-479b-4fcb-a382-65283618ffc8","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.321Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:21.365Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/auth/get-session","origin":null,"requestId":"6eb670cd-df4b-44dd-be10-c7c0a12e23d9","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.365Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:21.366Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:21.391Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"db8a4555-375b-4963-b898-70e960bc8330","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.391Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:21.468Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/groups/user-groups","origin":null,"requestId":"10e65fc6-bdeb-435b-8011-839631ef8510","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.468Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:21.469Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+[AuthHelper] ✅ Authenticated via better-auth: lucasdono391@gmail.com
+ GET /api/community/notifications?page=1&limit=10 200 in 377ms (compile: 99ms, proxy.ts: 45ms, render: 234ms)
+ GET /api/community/notifications/unread-count 200 in 374ms (compile: 120ms, proxy.ts: 43ms, render: 211ms)
+{"level":30,"time":"2026-01-16T22:27:21.474Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:21.474Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/groups/user-groups 200 in 396ms (compile: 153ms, proxy.ts: 49ms, render: 195ms)
+{"level":30,"time":"2026-01-16T22:27:21.566Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:21.566Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:21.572Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"3b54c202-1a54-4b9a-a6f6-5e0806f2d253","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.572Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:21.575Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"71435b06-a97b-4d21-8cce-7f3b07740c12","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.576Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+[AuthHelper] Attempting authentication...
+[AuthHelper] Authorization header: MISSING
+{"level":30,"time":"2026-01-16T22:27:21.613Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"05b554a7-69aa-4328-a134-a2d328f108e4","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.614Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:21.621Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/groups/user-groups","origin":null,"requestId":"62e17157-97ef-4b1a-ba95-c92f6081ebd8","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.621Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:21.621Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/friends/requests/count 200 in 712ms (compile: 134ms, proxy.ts: 221ms, render: 358ms)
+{"level":30,"time":"2026-01-16T22:27:21.815Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"edbaa15e-b333-490f-b3ec-a71d4768fc3c","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:21.815Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+[AuthHelper] Attempting authentication...
+[AuthHelper] Authorization header: MISSING
+{"level":30,"time":"2026-01-16T22:27:22.257Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:22.257Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:22.262Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:22.262Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:22.267Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"a7a7b86d-3821-4bb8-8852-27c3ec3aa459","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:22.267Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+[AuthHelper] ✅ Authenticated via better-auth: lucasdono332@gmail.com
+{"level":30,"time":"2026-01-16T22:27:22.333Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:22.334Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:22.354Z","pid":105318,"env":"development","module":"middleware","method":"POST","pathname":"/api/onboarding/progress","origin":"http://localhost:3000","requestId":"431bbda7-0b24-49ad-b30a-2f1b8d66c65b","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:22.355Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/groups/user-groups 200 in 989ms (compile: 174ms, proxy.ts: 64ms, render: 751ms)
+ GET /api/user/onboarding-stats 200 in 1101ms (compile: 243ms, proxy.ts: 173ms, render: 685ms)
+{"level":30,"time":"2026-01-16T22:27:22.417Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:22.418Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+[AuthHelper] ✅ Authenticated via better-auth: lucasdono391@gmail.com
+ GET /api/friends/requests/count 200 in 1279ms (compile: 284ms, proxy.ts: 194ms, render: 801ms)
+{"level":30,"time":"2026-01-16T22:27:22.579Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:22.579Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/groups/user-groups 200 in 1116ms (compile: 657ms, proxy.ts: 34ms, render: 425ms)
+{"level":30,"time":"2026-01-16T22:27:22.680Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:22.680Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":20,"time":"2026-01-16T22:27:22.683Z","pid":105318,"env":"development","module":"middleware","origin":"http://localhost:3000","msg":"CORS headers added for allowed origin"}
+{"level":30,"time":"2026-01-16T22:27:22.692Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"cd75909d-8c4f-4cc6-ab9c-cb9f872ababb","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:22.693Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:22.752Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"5d9dd241-9ad3-4485-b399-163f6fbf7fac","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:22.753Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:22.841Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"f5751edb-1769-4b21-a112-b46547e1668a","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:22.841Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 1414ms (compile: 183ms, proxy.ts: 728ms, render: 503ms)
+ GET /api/friends/requests/count 200 in 1408ms (compile: 240ms, proxy.ts: 719ms, render: 449ms)
+{"level":30,"time":"2026-01-16T22:27:22.969Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+ GET /api/user/onboarding-stats 200 in 1401ms (compile: 280ms, proxy.ts: 755ms, render: 365ms)
+{"level":30,"time":"2026-01-16T22:27:22.970Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:23.016Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.016Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:23.027Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"3b3b8439-280a-4574-9dc4-aba1af2e5a0c","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.027Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:23.033Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/auth/get-session","origin":null,"requestId":"e1e851f7-47d4-4400-9b80-cbc40cd6cd09","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.033Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:23.033Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/friends/requests/count 200 in 1321ms (compile: 369ms, proxy.ts: 651ms, render: 301ms)
+{"level":30,"time":"2026-01-16T22:27:23.076Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.076Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:23.083Z","pid":105318,"env":"development","module":"middleware","method":"POST","pathname":"/api/onboarding/progress","origin":"http://127.0.0.1:3000","requestId":"154e1493-3233-421f-9954-cf5d6c93a203","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.083Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/friends/requests/count 200 in 984ms (compile: 298ms, proxy.ts: 338ms, render: 348ms)
+ POST /api/onboarding/progress 200 in 933ms (compile: 229ms, proxy.ts: 384ms, render: 320ms)
+{"level":30,"time":"2026-01-16T22:27:23.250Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"20842b53-1568-4db8-bdaa-ef556f1c2b95","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.251Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:23.269Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.270Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:23.352Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.352Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":20,"time":"2026-01-16T22:27:23.353Z","pid":105318,"env":"development","module":"middleware","origin":"http://127.0.0.1:3000","msg":"CORS headers added for allowed origin"}
+{"level":30,"time":"2026-01-16T22:27:23.358Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"c3f0067a-0791-4f67-ae63-7b34aed23569","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.359Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 826ms (compile: 172ms, proxy.ts: 313ms, render: 342ms)
+{"level":30,"time":"2026-01-16T22:27:23.501Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+ GET /api/user/onboarding-stats 200 in 825ms (compile: 186ms, proxy.ts: 299ms, render: 340ms)
+{"level":30,"time":"2026-01-16T22:27:23.502Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/friends/requests/count 200 in 758ms (compile: 231ms, proxy.ts: 264ms, render: 262ms)
+{"level":30,"time":"2026-01-16T22:27:23.558Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.558Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:23.618Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"b7b2df74-8970-452e-aadb-823b36c3a099","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.620Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 759ms (compile: 184ms, proxy.ts: 282ms, render: 293ms)
+ POST /api/onboarding/progress 200 in 732ms (compile: 163ms, proxy.ts: 303ms, render: 266ms)
+{"level":30,"time":"2026-01-16T22:27:23.800Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"39eac236-6edc-4166-8dbb-570772b9861d","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.805Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:23.827Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.827Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 679ms (compile: 142ms, proxy.ts: 323ms, render: 214ms)
+ GET /api/friends/requests/count 200 in 543ms (compile: 164ms, proxy.ts: 224ms, render: 154ms)
+{"level":30,"time":"2026-01-16T22:27:23.888Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:23.889Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:23.963Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"3b4b8c7d-b455-4ad5-8f3f-34a1996d8370","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.964Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:23.973Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"f27c9cf1-b9ca-488e-a792-8f91b4012081","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:23.973Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 467ms (compile: 68ms, proxy.ts: 256ms, render: 143ms)
+{"level":30,"time":"2026-01-16T22:27:24.055Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.056Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:24.084Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.084Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:24.104Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"bdb69904-b44e-4249-a5d3-62b8c6b911da","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:24.104Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 333ms (compile: 95ms, proxy.ts: 105ms, render: 133ms)
+{"level":30,"time":"2026-01-16T22:27:24.238Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"4338ad5b-e931-4dfd-97c1-14cf16300765","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:24.239Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:24.254Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.254Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 375ms (compile: 92ms, proxy.ts: 131ms, render: 152ms)
+{"level":30,"time":"2026-01-16T22:27:24.309Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+ GET /api/friends/requests/count 200 in 418ms (compile: 127ms, proxy.ts: 142ms, render: 150ms)
+{"level":30,"time":"2026-01-16T22:27:24.310Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:24.396Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"dff513cc-422b-44b5-9ee7-339f6e8bee46","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:24.398Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 404ms (compile: 72ms, proxy.ts: 190ms, render: 142ms)
+{"level":30,"time":"2026-01-16T22:27:24.498Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.500Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 327ms (compile: 96ms, proxy.ts: 86ms, render: 145ms)
+{"level":30,"time":"2026-01-16T22:27:24.545Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"67cee0db-21fc-4b8c-beea-d58de05263ef","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:24.545Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:24.628Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.629Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:24.646Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"50fdd285-4c66-4f19-9861-50b844eea4f6","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:24.646Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 338ms (compile: 79ms, proxy.ts: 130ms, render: 129ms)
+{"level":30,"time":"2026-01-16T22:27:24.734Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.735Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:24.766Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"5d896ad3-368d-46d7-8655-7051b96a22cf","msg":"Request received"}
+ GET /api/user/onboarding-stats 200 in 252ms (compile: 54ms, proxy.ts: 112ms, render: 85ms)
+{"level":20,"time":"2026-01-16T22:27:24.767Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:24.846Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"24e1c204-5e30-4e44-a159-1b586450ca24","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:24.847Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:24.851Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.851Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 300ms (compile: 64ms, proxy.ts: 120ms, render: 116ms)
+{"level":30,"time":"2026-01-16T22:27:24.929Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:24.929Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:24.981Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"3efb6fce-3657-4890-b30e-4271d8c4f942","msg":"Request received"}
+ GET /api/user/onboarding-stats 200 in 259ms (compile: 36ms, proxy.ts: 100ms, render: 124ms)
+{"level":20,"time":"2026-01-16T22:27:24.983Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:25.036Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.037Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 241ms (compile: 62ms, proxy.ts: 104ms, render: 75ms)
+{"level":30,"time":"2026-01-16T22:27:25.122Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"fcb11b14-f7f7-4dbf-8198-594575ec6212","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:25.123Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/user/onboarding-stats 200 in 187ms (compile: 49ms, proxy.ts: 81ms, render: 57ms)
+{"level":30,"time":"2026-01-16T22:27:25.154Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.155Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 123ms (compile: 23ms, proxy.ts: 50ms, render: 51ms)
+{"level":30,"time":"2026-01-16T22:27:25.247Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"00929e37-a7b6-4c12-a00e-bc293c778191","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:25.248Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:25.264Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.265Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 103ms (compile: 20ms, proxy.ts: 30ms, render: 53ms)
+{"level":30,"time":"2026-01-16T22:27:25.356Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"52571eca-2f06-4db7-8420-5640acf12934","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:25.357Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:25.375Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.376Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 97ms (compile: 19ms, proxy.ts: 32ms, render: 47ms)
+{"level":30,"time":"2026-01-16T22:27:25.468Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"480cf4cc-1dd9-4d0f-ac18-afaf446dc833","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:25.469Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:25.488Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.490Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 134ms (compile: 40ms, proxy.ts: 40ms, render: 54ms)
+{"level":30,"time":"2026-01-16T22:27:25.609Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"129e2715-0d29-4d14-94f5-3963f367251f","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:25.610Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:25.634Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.635Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 123ms (compile: 26ms, proxy.ts: 39ms, render: 58ms)
+{"level":30,"time":"2026-01-16T22:27:25.800Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"98473797-f81a-40f8-8fef-933aaccf5df1","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:25.802Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:25.825Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:25.826Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 131ms (compile: 31ms, proxy.ts: 41ms, render: 59ms)
+ GET /api/auth/get-session 200 in 6.4s (compile: 6.3s, proxy.ts: 17ms, render: 74ms)
+ GET /api/auth/get-session 200 in 4.7s (compile: 4.6s, proxy.ts: 37ms, render: 89ms)
+{"level":30,"time":"2026-01-16T22:27:27.856Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/plan","origin":null,"requestId":"9e5cb5e5-a9d2-46d2-9327-33794d03e32b","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:27.857Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:27.872Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:27.873Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:27.881Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/plan","origin":null,"requestId":"6b7104da-3519-49b1-8edf-8246582f0126","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:27.882Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:27.891Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:27.893Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+[API /api/user/plan] GET request received
+[API /api/user/plan] GET request received
+[API /api/user/plan] User: {
+  userId: 'cmkfqtv1j0000ij7v6vgexbvz',
+  userEmail: 'lucasdono391@gmail.com'
+}
+[API /api/user/plan] User: {
+  userId: 'QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j',
+  userEmail: 'lucasdono332@gmail.com'
+}
+[API /api/user/plan] Usuario encontrado: { email: 'lucasdono391@gmail.com', plan: 'ultra' }
+[API /api/user/plan] Respondiendo con plan: ultra
+ GET /api/user/plan 200 in 270ms (compile: 174ms, proxy.ts: 28ms, render: 67ms)
+[API /api/user/plan] Usuario encontrado: { email: 'lucasdono332@gmail.com', plan: 'free' }
+[API /api/user/plan] Respondiendo con plan: free
+ GET /api/user/plan 200 in 304ms (compile: 220ms, proxy.ts: 30ms, render: 53ms)
+{"level":30,"time":"2026-01-16T22:27:31.074Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"ab95f83d-e911-47f6-8ac7-3fdb86710361","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:31.075Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:31.075Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:31.083Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"9c3eca99-20f4-4e78-9a59-6adadb6767bb","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:31.083Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:31.083Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/community/notifications?page=1&limit=10 200 in 144ms (compile: 54ms, proxy.ts: 20ms, render: 71ms)
+ GET /api/community/notifications/unread-count 200 in 139ms (compile: 91ms, proxy.ts: 18ms, render: 30ms)
+{"level":30,"time":"2026-01-16T22:27:41.371Z","pid":105318,"env":"development","module":"middleware","method":"POST","pathname":"/api/groups/cmkgvpv1n000mijuahs13velq/messages","origin":"http://127.0.0.1:3000","requestId":"a6a2ae4f-3031-429c-860c-f5d5b1da6fc5","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:41.372Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:41.372Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":20,"time":"2026-01-16T22:27:41.372Z","pid":105318,"env":"development","module":"middleware","origin":"http://127.0.0.1:3000","msg":"CORS headers added for allowed origin"}
+🟢 [Redis] Attempting to connect to local Redis: redis://localhost:6379
+🟢 [Redis] Attempting to connect to local Redis: redis://localhost:6379
+[AuthHelper] Attempting authentication...
+[AuthHelper] Authorization header: MISSING
+[AuthHelper] ✅ Authenticated via better-auth: lucasdono391@gmail.com
+[Socket] emitGroupMessage called - groupId: cmkgvpv1n000mijuahs13velq socketIO: initialized globalThis.__socketIO: initialized
+[Socket] Emitting group:message to room: group:cmkgvpv1n000mijuahs13velq
+ POST /api/groups/cmkgvpv1n000mijuahs13velq/messages 201 in 5.9s (compile: 5.8s, proxy.ts: 12ms, render: 109ms)
+[CostTracker] SIGTERM received, flushing buffer...
+[CostTracker] Buffer flushed successfully
+{"level":30,"time":"2026-01-16T22:27:50.836Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"2c58c583-521a-42c2-be9d-1bc7e3186f4c","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:50.837Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:50.837Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:50.857Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"64bc38dd-d753-4026-95bf-9742f9ae33ac","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:50.857Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:50.857Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+{"level":30,"time":"2026-01-16T22:27:50.865Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"a4818ae7-c195-4495-a15f-8e5b762f6ef5","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:50.865Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:50.897Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"df7da896-f5cd-4fda-bd26-e8deaf35642d","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:50.897Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:50.908Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:50.908Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:50.985Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:50.985Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:51.058Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications","origin":null,"requestId":"9dfb7ef4-ea2c-4e4f-94b6-709d860bd123","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.058Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:51.058Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/community/notifications?page=1&limit=10 200 in 320ms (compile: 121ms, proxy.ts: 25ms, render: 174ms)
+{"level":30,"time":"2026-01-16T22:27:51.081Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/community/notifications/unread-count","origin":null,"requestId":"1847ef8f-442f-4405-a0ff-7af48ff5ac5e","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.081Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":true,"msg":"Route type determined"}
+{"level":20,"time":"2026-01-16T22:27:51.081Z","pid":105318,"env":"development","module":"middleware","msg":"Public route - allowing without authentication"}
+ GET /api/community/notifications/unread-count 200 in 359ms (compile: 161ms, proxy.ts: 31ms, render: 167ms)
+{"level":30,"time":"2026-01-16T22:27:51.163Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"de3908cf-2c69-479b-95e2-3a8abb139fd0","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.163Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:51.215Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"49623c7e-5fb0-42a2-805f-d03e15441094","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.216Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/friends/requests/count 200 in 472ms (compile: 213ms, proxy.ts: 64ms, render: 195ms)
+{"level":30,"time":"2026-01-16T22:27:51.270Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.270Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 467ms (compile: 185ms, proxy.ts: 112ms, render: 171ms)
+{"level":30,"time":"2026-01-16T22:27:51.326Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"ed3961bf-69d4-4ec8-94f8-a8cc115824f7","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.326Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:51.330Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.330Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/community/notifications?page=1&limit=10 200 in 335ms (compile: 187ms, proxy.ts: 24ms, render: 124ms)
+{"level":30,"time":"2026-01-16T22:27:51.364Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/friends/requests/count","origin":null,"requestId":"c5b247a3-61e4-4f4c-8853-4d5b4e82bd41","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.364Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/community/notifications/unread-count 200 in 365ms (compile: 220ms, proxy.ts: 19ms, render: 126ms)
+{"level":30,"time":"2026-01-16T22:27:51.377Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.377Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:51.436Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.437Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:51.515Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"16958659-0166-408e-887f-db90b1eff1f2","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.515Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+ GET /api/friends/requests/count 200 in 435ms (compile: 143ms, proxy.ts: 126ms, render: 166ms)
+{"level":30,"time":"2026-01-16T22:27:51.586Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+ GET /api/friends/requests/count 200 in 476ms (compile: 143ms, proxy.ts: 135ms, render: 198ms)
+{"level":30,"time":"2026-01-16T22:27:51.587Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 443ms (compile: 164ms, proxy.ts: 116ms, render: 163ms)
+ GET /api/friends/requests/count 200 in 388ms (compile: 192ms, proxy.ts: 92ms, render: 104ms)
+{"level":30,"time":"2026-01-16T22:27:51.758Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"db43f3e1-d7d6-4160-8d1d-46f42656edd5","msg":"Request received"}
+ GET /api/user/onboarding-stats 200 in 280ms (compile: 130ms, proxy.ts: 103ms, render: 48ms)
+{"level":20,"time":"2026-01-16T22:27:51.760Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:51.773Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.774Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:51.790Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"003a30f4-16d7-47e7-ba6f-4ad96933d5da","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.791Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:51.818Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.818Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 94ms (compile: 24ms, proxy.ts: 32ms, render: 38ms)
+{"level":30,"time":"2026-01-16T22:27:51.884Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"f1bc7b2b-14a1-4d34-9370-1f7b6c83c983","msg":"Request received"}
+ GET /api/user/onboarding-stats 200 in 112ms (compile: 31ms, proxy.ts: 40ms, render: 42ms)
+{"level":20,"time":"2026-01-16T22:27:51.885Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:51.912Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.913Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:51.920Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"1a3ef560-a993-4171-a3d5-b877ac7234e9","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:51.921Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:51.932Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:51.933Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 147ms (compile: 32ms, proxy.ts: 49ms, render: 65ms)
+ GET /api/user/onboarding-stats 200 in 128ms (compile: 48ms, proxy.ts: 31ms, render: 50ms)
+{"level":30,"time":"2026-01-16T22:27:52.054Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"be912993-4827-4e32-ae18-0bfdcaa8927b","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:52.055Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:52.060Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"d64b0bca-bb9a-4334-87ed-b41718b1e7a4","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:52.061Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:52.067Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:52.067Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+{"level":30,"time":"2026-01-16T22:27:52.070Z","pid":105318,"env":"development","module":"middleware","userId":"QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j","userEmail":"lucasdono332@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:52.070Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 107ms (compile: 19ms, proxy.ts: 32ms, render: 56ms)
+ GET /api/user/onboarding-stats 200 in 106ms (compile: 39ms, proxy.ts: 24ms, render: 43ms)
+{"level":30,"time":"2026-01-16T22:27:52.168Z","pid":105318,"env":"development","module":"middleware","method":"GET","pathname":"/api/user/onboarding-stats","origin":null,"requestId":"540cd383-e4e0-4a5e-8025-b76f16e702e1","msg":"Request received"}
+{"level":20,"time":"2026-01-16T22:27:52.168Z","pid":105318,"env":"development","module":"middleware","isPublicRoute":false,"msg":"Route type determined"}
+{"level":30,"time":"2026-01-16T22:27:52.174Z","pid":105318,"env":"development","module":"middleware","userId":"cmkfqtv1j0000ij7v6vgexbvz","userEmail":"lucasdono391@gmail.com","authMethod":"better-auth","msg":"better-auth session found and validated"}
+{"level":30,"time":"2026-01-16T22:27:52.174Z","pid":105318,"env":"development","module":"middleware","authMethod":"better-auth","msg":"Request authorized"}
+ GET /api/user/onboarding-stats 200 in 86ms (compile: 21ms, proxy.ts: 21ms, render: 44ms)
+
+Logs del navegador de usuario invitado: [HMR] connected node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+🔄 [TOUR] Restore effect triggered: 
+Object { isNavigating: false, isLoaded: false, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+🎯 [TOUR] Navigation detection effect: 
+Object { pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq", isNavigating: false }
+node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 799ms node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] No session or user ID node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j node_modules_next_dist_f3530cac._.js:2298:28
+🎨 [OVERLAY] Tour state changed: 
+Object { hasTour: false, tourId: null, currentStep: 0, hasStepData: false, target: undefined, targets: undefined, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+🔍 [OVERLAY] Target element effect triggered node_modules_next_dist_f3530cac._.js:2298:28
+❌ [OVERLAY] No current step data, cleaning up node_modules_next_dist_f3530cac._.js:2298:28
+🔄 [TOUR] Restore effect triggered: 
+Object { isNavigating: false, isLoaded: true, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] No session or user ID node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j node_modules_next_dist_f3530cac._.js:2298:28
+[GroupSocket] Init - token: MISSING groupId: cmkgvpv1n000mijuahs13velq userId: QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j node_modules_next_dist_f3530cac._.js:2298:28
+🎨 [OVERLAY] Tour state changed: 
+Object { hasTour: false, tourId: null, currentStep: 0, hasStepData: false, target: undefined, targets: undefined, pathname: "/dashboard/grupos/cmkgvpv1n000mijuahs13velq" }
+node_modules_next_dist_f3530cac._.js:2298:28
+🔍 [OVERLAY] Target element effect triggered node_modules_next_dist_f3530cac._.js:2298:28
+❌ [OVERLAY] No current step data, cleaning up node_modules_next_dist_f3530cac._.js:2298:28
+📦 [TOUR] Checking sessionStorage: null node_modules_next_dist_f3530cac._.js:2298:28
+📭 [TOUR] No pending tour in sessionStorage node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 135ms node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 189ms node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 474ms node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] Fetching plan for user: QUoHwvKZ2FBwVhg79TDt16SDOOkKX17j node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 212ms node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] Response status: 200 node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] Plan data received: 
+Object { plan: "free" }
+node_modules_next_dist_f3530cac._.js:2298:28
+[DashboardNav] userPlan state updated to: free node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 2079ms node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] rebuilding node_modules_next_dist_f3530cac._.js:2298:28
+[Fast Refresh] done in 108ms node_modules_next_dist_f3530cac._.js:2298:28

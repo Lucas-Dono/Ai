@@ -71,7 +71,7 @@ export function NotificationSettings() {
 
   if (!isSupported) {
     return (
-      <div className="p-4 bg-muted rounded-lg">
+      <div className="p-4 bg-muted rounded-2xl">
         <p className="text-sm text-muted-foreground">
           Push notifications are not supported in your browser.
         </p>
@@ -81,7 +81,7 @@ export function NotificationSettings() {
 
   if (permission === "denied") {
     return (
-      <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+      <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl">
         <p className="text-sm text-destructive">
           Notifications are blocked. Please enable them in your browser settings.
         </p>

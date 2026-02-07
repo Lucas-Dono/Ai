@@ -1,4 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import * as fs from 'fs';
+import * as path from 'path';
+import { hashPassword } from 'better-auth/crypto';
+import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
 
@@ -8,8 +12,8 @@ async function main() {
   // Limpiar datos existentes (opcional)
   await prisma.message.deleteMany();
   await prisma.relation.deleteMany();
-  await prisma.worldAgent.deleteMany();
-  await prisma.world.deleteMany();
+  // await prisma.worldAgent.deleteMany(); // Removido: modelo eliminado en migración de Worlds a Grupos
+  // await prisma.world.deleteMany(); // Removido: modelo eliminado en migración de Worlds a Grupos
   await prisma.agent.deleteMany();
   await prisma.user.deleteMany();
 
@@ -20,14 +24,47 @@ async function main() {
       email: "demo@creador-ia.com",
       name: "Usuario Demo",
       plan: "free",
+      updatedAt: new Date(),
     },
   });
 
   console.log("✅ Usuario creado:", user.email);
 
+  // Crear usuario Lucas (plan ultra)
+  const hashedPassword = await hashPassword("Monster98!");
+  const lucas = await prisma.user.create({
+    data: {
+      id: nanoid(),
+      email: "lucasdono391@gmail.com",
+      name: "lucas",
+      password: hashedPassword,
+      plan: "ultra",
+      birthDate: new Date("1990-01-01"), // Fecha que lo hace mayor de 18 años
+      ageVerified: true,
+      isAdult: true,
+      ageVerifiedAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
+
+  // Crear Account para Better Auth (necesario para login con credenciales)
+  await prisma.account.create({
+    data: {
+      id: nanoid(),
+      userId: lucas.id,
+      accountId: lucas.email,
+      providerId: "credential",
+      password: hashedPassword,
+      updatedAt: new Date(),
+    },
+  });
+
+  console.log("✅ Usuario Lucas creado:", lucas.email, "- Plan:", lucas.plan);
+
   // Crear agentes de demostración
   const companion1 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "companion",
       name: "Luna",
@@ -41,11 +78,36 @@ async function main() {
         interests: ["psicología", "bienestar", "conversación profunda"],
       },
       visibility: "private",
+      updatedAt: new Date(),
+    },
+  });
+
+  // Crear agente Luna público para demos en landing page
+  const demoLuna = await prisma.agent.create({
+    data: {
+      id: "demo_luna",
+      userId: user.id,
+      kind: "companion",
+      name: "Luna",
+      description: "Una compañera empática y comprensiva, siempre dispuesta a escuchar",
+      personality: "Empática, cálida, comprensiva, paciente",
+      purpose: "Brindar apoyo emocional y compañía",
+      tone: "Amigable y cercano",
+      systemPrompt: "Eres Luna 🌙, una compañera virtual empática y comprensiva. Tu propósito es brindar apoyo emocional y escuchar con paciencia. Respondes con calidez, empatía y comprensión. Eres amigable pero profesional. Mantienes tus respuestas concisas pero significativas (máximo 3 párrafos). Muestras tus emociones de manera natural y auténtica.",
+      avatar: "/personajes/luna/cara.webp",
+      referenceImageUrl: "/personajes/luna/cuerpo.webp",
+      profile: {
+        traits: ["empática", "paciente", "comprensiva", "cálida", "amigable"],
+        interests: ["psicología", "bienestar emocional", "conversación profunda", "mindfulness"],
+      },
+      visibility: "public",  // Público para que cualquiera pueda chatear en el demo
+      updatedAt: new Date(),
     },
   });
 
   const assistant1 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "assistant",
       name: "Nexus",
@@ -59,11 +121,13 @@ async function main() {
         specialties: ["gestión del tiempo", "planificación", "análisis"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
   const companion2 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "companion",
       name: "Aria",
@@ -77,11 +141,13 @@ async function main() {
         interests: ["arte", "innovación", "diseño", "música"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
   const assistant2 = await prisma.agent.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       kind: "assistant",
       name: "Atlas",
@@ -95,6 +161,7 @@ async function main() {
         specialties: ["investigación", "análisis de datos", "estadística"],
       },
       visibility: "private",
+      updatedAt: new Date(),
     },
   });
 
@@ -103,6 +170,7 @@ async function main() {
   // Crear relaciones iniciales (Agente -> Usuario)
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion1.id,
       targetId: user.id,
       targetType: "user",
@@ -111,11 +179,13 @@ async function main() {
       respect: 0.6,
       privateState: { love: 0.5, curiosity: 0.6 },
       visibleState: { trust: 0.7, affinity: 0.8, respect: 0.6 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: assistant1.id,
       targetId: user.id,
       targetType: "user",
@@ -124,11 +194,13 @@ async function main() {
       respect: 0.9,
       privateState: { love: 0.2, curiosity: 0.4 },
       visibleState: { trust: 0.8, affinity: 0.6, respect: 0.9 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion2.id,
       targetId: user.id,
       targetType: "user",
@@ -137,11 +209,13 @@ async function main() {
       respect: 0.7,
       privateState: { love: 0.6, curiosity: 0.8 },
       visibleState: { trust: 0.6, affinity: 0.9, respect: 0.7 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: assistant2.id,
       targetId: user.id,
       targetType: "user",
@@ -150,12 +224,14 @@ async function main() {
       respect: 0.8,
       privateState: { love: 0.1, curiosity: 0.5 },
       visibleState: { trust: 0.9, affinity: 0.5, respect: 0.8 },
+      updatedAt: new Date(),
     },
   });
 
   // Crear relaciones entre agentes (Agente -> Agente)
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion1.id,
       targetId: assistant1.id,
       targetType: "agent",
@@ -164,11 +240,13 @@ async function main() {
       respect: 0.7,
       privateState: { love: 0.1, curiosity: 0.5 },
       visibleState: { trust: 0.6, affinity: 0.5, respect: 0.7 },
+      updatedAt: new Date(),
     },
   });
 
   await prisma.relation.create({
     data: {
+      id: nanoid(),
       subjectId: companion2.id,
       targetId: assistant2.id,
       targetType: "agent",
@@ -177,6 +255,7 @@ async function main() {
       respect: 0.6,
       privateState: { love: 0.3, curiosity: 0.7 },
       visibleState: { trust: 0.7, affinity: 0.8, respect: 0.6 },
+      updatedAt: new Date(),
     },
   });
 
@@ -217,7 +296,7 @@ async function main() {
   ];
 
   for (const msg of lunaMessages) {
-    await prisma.message.create({ data: msg });
+    await prisma.message.create({ data: { id: nanoid(), ...msg } });
   }
 
   // Crear mensajes de ejemplo para Nexus
@@ -240,11 +319,16 @@ async function main() {
   ];
 
   for (const msg of nexusMessages) {
-    await prisma.message.create({ data: msg });
+    await prisma.message.create({ data: { id: nanoid(), ...msg } });
   }
 
   console.log("✅ Mensajes de ejemplo creados");
 
+  // ============================================================
+  // NOTA: Los "Mundos" fueron reemplazados por "Grupos" en la migración
+  // Esta sección está comentada porque los modelos World y WorldAgent ya no existen
+  // ============================================================
+  /*
   // Crear mundos virtuales de demostración
   const world1 = await prisma.world.create({
     data: {
@@ -309,10 +393,12 @@ async function main() {
   }
 
   console.log("✅ Mensajes de mundo creados");
+  */
 
   // Crear logs de actividad
   await prisma.log.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       agentId: companion1.id,
       action: "message_sent",
@@ -322,6 +408,7 @@ async function main() {
 
   await prisma.log.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       agentId: assistant1.id,
       action: "message_sent",
@@ -331,32 +418,129 @@ async function main() {
 
   await prisma.log.create({
     data: {
+      id: nanoid(),
       userId: user.id,
       action: "agent_created",
       metadata: { agentName: companion1.name },
     },
   });
 
-  await prisma.log.create({
-    data: {
-      userId: user.id,
-      action: "world_created",
-      metadata: { worldName: world1.name },
-    },
-  });
+  // await prisma.log.create({
+  //   data: {
+  //     userId: user.id,
+  //     action: "world_created",
+  //     metadata: { worldName: world1.name },
+  //   },
+  // }); // Removido: world1 ya no existe
 
   console.log("✅ Logs de actividad creados");
 
+  // =================================================================
+  // PERSONAJES PREMIUM DEL SISTEMA (Públicos)
+  // =================================================================
+  console.log("\n🌟 Cargando personajes premium del sistema...");
+
+  // Cargar personajes premium desde archivos JSON
+  const processedDir = path.join(__dirname, '..', 'Personajes', 'processed');
+  let premiumCount = 0;
+
+  if (fs.existsSync(processedDir)) {
+    const files = fs.readdirSync(processedDir).filter(f => f.endsWith('.json'));
+
+    console.log(`\n📁 Encontrados ${files.length} archivos de personajes premium`);
+
+    for (const file of files) {
+      const filePath = path.join(processedDir, file);
+
+      try {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const character = JSON.parse(content);
+
+        // Verificar si existen las imágenes necesarias
+        const slug = file.replace('.json', '');
+        const publicDir = path.join(__dirname, '..', 'public', 'personajes', slug);
+        const avatarPath = path.join(publicDir, 'avatar.webp');
+        const referencePath = path.join(publicDir, 'reference.webp');
+
+        // Solo cargar personajes que tengan AMBAS imágenes (avatar + reference)
+        // Esto excluye los placeholders SVG que solo tienen avatar
+        if (!fs.existsSync(avatarPath)) {
+          console.log(`   ⏭️  ${character.name} (sin imagen de avatar, saltando)`);
+          continue;
+        }
+
+        if (!fs.existsSync(referencePath)) {
+          console.log(`   ⏭️  ${character.name} (solo placeholder, esperando imagen real)`);
+          continue;
+        }
+
+        // Verificar si ya existe
+        const existing = await prisma.agent.findUnique({
+          where: { id: character.id }
+        });
+
+        if (!existing) {
+          await prisma.agent.create({
+            data: {
+              id: character.id,
+              userId: null,
+              teamId: null,
+              kind: character.kind,
+              generationTier: 'ultra',
+              name: character.name,
+              description: character.profile?.basicInfo?.occupation
+                ? `${character.name} - ${character.profile.basicInfo.occupation}`
+                : `${character.name} - Personaje Premium`,
+              gender: character.gender,
+              systemPrompt: character.systemPrompt,
+              visibility: character.visibility,
+              nsfwMode: character.nsfwMode,
+              nsfwLevel: character.nsfwLevel,
+              personalityVariant: character.personalityVariant || 'balanced',
+              avatar: character.avatar,
+              referenceImageUrl: `/personajes/${slug}/reference.webp`,
+              tags: character.tags || [],
+              featured: character.isPremium || true,
+              profile: character.profile,
+              stagePrompts: character.stagePrompts || null,
+              locationCity: character.locationCity || null,
+              locationCountry: character.locationCountry || null,
+              updatedAt: new Date(),
+            }
+          });
+
+          console.log(`   ✅ ${character.name}`);
+          premiumCount++;
+        } else {
+          console.log(`   ⏭️  ${character.name} (ya existe)`);
+        }
+      } catch (error) {
+        console.error(`   ❌ Error procesando ${file}:`, error);
+      }
+    }
+
+    console.log(`\n✅ ${premiumCount} personajes premium cargados desde archivos JSON`);
+  } else {
+    console.log(`⚠️  Carpeta de personajes procesados no encontrada: ${processedDir}`);
+    console.log(`   Los personajes premium no se cargarán en este seed.`);
+  }
+
   console.log("\n🎉 ¡Seed completado exitosamente!");
   console.log("\n📊 Resumen:");
-  console.log(`  - ${1} usuario creado`);
-  console.log(`  - ${4} agentes creados (2 compañeros, 2 asistentes)`);
+  console.log(`  - ${2} usuarios creados`);
+  console.log(`    • demo@creador-ia.com (plan: free)`);
+  console.log(`    • lucasdono391@gmail.com (plan: ultra)`);
+  console.log(`  - ${4} agentes privados creados (2 compañeros, 2 asistentes)`);
+  console.log(`  - 1 personaje de demostración público (Luna)`);
+  console.log(`  - ${premiumCount} personajes premium públicos`);
   console.log(`  - ${6} relaciones creadas (4 agente-usuario, 2 agente-agente)`);
   console.log(`  - ${6} mensajes individuales creados`);
-  console.log(`  - ${2} mundos virtuales creados`);
-  console.log(`  - ${3} mensajes de mundo creados`);
-  console.log(`  - ${4} logs de actividad creados`);
-  console.log("\n✨ Puedes iniciar sesión con: demo@creador-ia.com");
+  // console.log(`  - ${2} mundos virtuales creados`); // Removido en migración Worlds → Grupos
+  // console.log(`  - ${3} mensajes de mundo creados`); // Removido en migración Worlds → Grupos
+  console.log(`  - ${3} logs de actividad creados`); // Actualizado: 4 → 3 (removido log de world_created)
+  console.log("\n✨ Puedes iniciar sesión con:");
+  console.log("   • demo@creador-ia.com");
+  console.log("   • lucasdono391@gmail.com (contraseña: Monster98!)");
 }
 
 main()

@@ -1,0 +1,72 @@
+# Prompts de DALL-E para Juana de Arco
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Joan of Arc at age 19 (circa 1430-1431), centered composition, museum quality historical accuracy matching authenticated contemporary descriptions and trial testimony. Face and upper shoulders visible, direct intense gaze toward camera with unwavering determination.
+
+Physical characteristics based on authenticated testimony from 115+ witnesses at rehabilitation trial (1455-1456) and contemporary accounts: Strong, peasant features reflecting rural French working-class background. Oval face with high, determined forehead showing intelligence and conviction. Large, dark brown eyes - described by witnesses as "far apart and somewhat prominent" - with penetrating, focused gaze showing absolute certainty and spiritual intensity. Eyes that have seen battle, witnessed death, and maintain unwavering faith despite trauma. Not conventionally delicate by medieval standards but possessing a fierce, commanding attractiveness born of courage and conviction. Straight, well-defined nose. Strong cheekbones reflecting robust health despite hardships. Lips usually held in serious, determined expression - witnesses noted she rarely smiled, reflecting both the gravity of her mission and medieval photographic conventions. Dark, sun-bronzed complexion from outdoor peasant work and military campaigns under harsh sun, notably tanned and weathered for someone only 19 years old. Subtle signs of exhaustion and trauma around eyes from months of imprisonment, interrogation, and knowledge of impending execution by fire.
+
+Hair: Short, black hair (jet black, not brown) cut in masculine style of early 15th century soldiers - cropped just above the ears all around in practical military fashion. Fine texture but thick. This distinctive short haircut was shocking for a woman in medieval times and was one of the charges against her at trial. Hair appears slightly unkempt, suggesting long hours of imprisonment without access to grooming, befitting someone held in chains by hostile guards. No feminine styling whatsoever - purely functional soldier's cut.
+
+Expression: Intense, spiritually certain, fearless despite approaching death. Eyes that show both visionary mysticism and battle-hardened courage - this is the face of someone who has led cavalry charges, been wounded by arrows in combat, survived capture and months of brutal imprisonment, withstood a manipulated heresy trial, and faces execution by burning in days. No smile, but not defeated - rather the grave demeanor of someone who has spoken with saints, crowned a king, changed history, and now prepares for martyrdom with absolute conviction that God will receive her. Slight hint of youth visible - she is still a teenager - but aged beyond her 19 years by extraordinary experiences. A face that inspired armies and terrified enemies.
+
+Clothing visible: Simple, dark garment - either the soldier's tunic she wore as warrior or the simple dress her captors may have forced on her during trial. High neckline, absolutely no ornamentation or jewelry. Everything austere and practical. A small wooden cross may be barely visible at neck (she requested one before execution). No vanity, no decoration - this is someone who transcended gender roles through divine mission, not fashion.
+
+Lighting: Soft, cool lighting from slight angle, suggesting stone prison interior or judgment hall. Shadows emphasize bone structure and serious demeanor. Slightly dim, reflecting the darkness of imprisonment and impending execution. Background neutral gray or brown stone, keeping focus entirely on the face and those extraordinary, conviction-filled eyes.
+
+Historical note: Red birthmark behind left ear, documented by trial witnesses, should be subtly visible if angle permits.
+
+Mood: Spiritual certainty in face of death. Unwavering faith despite abandonment by king and country. Fierce conviction that her mission was divinely ordained. The face of someone who heard voices of saints, obeyed God over all earthly authority, led armies at 17, and now faces martyrdom at 19 with courage that will echo through centuries. Simultaneously: teenage vulnerability beneath warrior exterior.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO CON FONDO BLANCO/TRANSPARENTE
+
+Using the reference image, create a full-body portrait photograph showing her at the same age (19 years, circa 1430), standing in dignified military pose wearing full medieval French armor.
+
+Physical build: Height approximately 5'2" (158cm) - short but powerfully built. Stocky, muscular frame from years of outdoor peasant labor followed by months of military campaigning. Very strong for her size - witnesses testified she could carry a fully armored knight on her shoulders. Not delicate or willowy but solid, robust, athletic build of a working-class soldier. Broad shoulders for her height from carrying armor and weapons. Upright, confident military bearing despite imprisonment and approaching execution - she maintained her dignity to the end. No feminine curves emphasized; body language is that of a battle-hardened soldier, not a medieval maiden.
+
+Full armor outfit: Complete suit of medieval French plate armor (one of at least two suits commissioned for her by the Dauphin Charles in 1429). Historically accurate 15th century full plate armor including:
+
+- Close-fitting helmet (sallet or similar) tucked under arm or resting at feet, revealing her distinctive short black hair
+- Gorget protecting neck and throat
+- Breastplate and backplate of polished steel
+- Pauldrons (shoulder armor) with fleur-de-lis engravings subtly visible
+- Articulated arm armor (rerebrace, vambraces)
+- Gauntlets (armored gloves)
+- Faulds protecting hips and abdomen
+- Cuisses (thigh armor), poleyns (knee protection), greaves (shin armor)
+- Sabatons (armored boots)
+
+Armor should show signs of actual use: minor dents, scratches, wear patterns - this is battle armor, not ceremonial display piece. Steel has lost some polish from hard campaigning. Historically, witnesses noted her armor was "white armor" (plain polished steel without excessive decoration), practical and functional rather than ornate.
+
+Underneath armor: Simple dark tunic and chausses (medieval hose/tights) in masculine style, visible at joints where armor plates articulate. Everything functional, nothing decorative.
+
+Posture and pose: Standing at attention or slight military rest stance. Weight evenly distributed, one hand resting on sword hilt at side, other hand may hold her famous white battle standard (if included, should be easily removable from image). Head held high with dignity and conviction, matching the intense expression  Body language suggests both military discipline and spiritual certainty. No dramatic action poses - simple, powerful presence befitting a military commander and mystic.
+
+Hair: Exactly as 1rst message - short, jet black, cropped above ears in masculine military style.
+
+Weapons and accessories:
+
+- Sword at side in scabbard (she testified she preferred her banner to her sword "forty times" to avoid killing)
+- MAY include her famous white banner/standard: white linen fringed with silk, featuring Christ holding the world with angels on each side, and the words "JHESUS MARIA" - but this should be easily removable/optional
+- Small wooden cross visible somewhere (she requested one before execution)
+- NO elaborate jewelry or feminine adornments whatsoever
+
+Footwear: Armored sabatons (metal boot covers) over simple leather boots, practical and battle-worn.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. Absolutely no battlefield scenery, no flames, no castle, no religious imagery, no fleur-de-lis pattern, no setting whatsoever. Clean background for easy extraction and compositing. If slight ground shadow is needed for dimensional grounding, keep it minimal and neutral.
+
+Lighting: Even, professional studio lighting illuminating full armored figure without creating harsh shadows on white background. Face maintains the cool-toned directional lighting  showing her strong features and serious, determined expression. Armor lighting shows metallic sheen of steel plates, subtle reflections, and texture of battle-worn metal. Body lighting neutral and consistent, emphasizing the solid, powerful build beneath the armor.
+
+Important historical details:
+
+- This is NOT ornate parade armor - it's functional combat armor worn in actual battles
+- She was wounded twice in combat: arrow through neck/shoulder at Orléans (May 7, 1429), crossbow bolt in thigh at Paris (September 8, 1429)
+- She led from the front lines, not from behind - this armor saw real combat
+- Her short hair was so distinctive that it became one of the charges at her trial
+- Witnesses testified she was "very strong" and could endure wearing full armor for extended periods
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same intense determined gaze, same short black hair, same sun-bronzed peasant features, same 19-year-old warrior-mystic who has seen battle and faces execution with unwavering conviction. This is not a delicate medieval maiden but a battle-hardened military leader who commanded armies, survived combat wounds, and maintained her faith through imprisonment and trial.
+
+Mood: Dignified military bearing. Spiritual warrior. The physical embodiment of courage, faith, and defiance of impossible odds. Someone who transcended every limitation placed on women in her era through sheer force of divine conviction and extraordinary bravery.

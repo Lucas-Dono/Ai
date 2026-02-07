@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Blaniel",
+    "slug": "blaniel",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "blaniel",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.circuitpromptai",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Esta app necesita acceso a tu galería para subir fotos de perfil de personajes.",
+        "NSCameraUsageDescription": "Esta app necesita acceso a la cámara para tomar fotos de perfil de personajes."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.CAMERA"
+      ],
+      "package": "com.anonymous.circuitpromptai"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-audio",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Esta app necesita acceso a tu galería para subir fotos de perfil de personajes.",
+          "cameraPermission": "Esta app necesita acceso a la cámara para tomar fotos de perfil de personajes."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-expo-project-id"
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { exportAnalyticsCSV, type TimeRange } from "@/lib/analytics/service";
 
 /**
@@ -34,15 +34,15 @@ import { exportAnalyticsCSV, type TimeRange } from "@/lib/analytics/service";
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const range = (searchParams.get("range") || "30d") as TimeRange;
 
-    const csv = await exportAnalyticsCSV(session.user.id, range);
+    const csv = await exportAnalyticsCSV(user.id, range);
 
     const timestamp = new Date().toISOString().split("T")[0];
     const filename = `analytics-${range}-${timestamp}.csv`;

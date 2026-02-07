@@ -1,0 +1,24 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- BODY TOP (8x4) at (20,16) -->
+      <rect x="20" y="16" width="8" height="4" fill="#707070" class="colorizable-skin"/>
+
+      <!-- BODY BOTTOM (8x4) at (28,16) -->
+      <rect x="28" y="16" width="8" height="4" fill="#606060" class="colorizable-skin"/>
+
+      <!-- BODY RIGHT (4x12) at (16,20) -->
+      <rect x="16" y="20" width="4" height="12" fill="#707070" class="colorizable-skin"/>
+
+      <!-- BODY FRONT (8x12) at (20,20) -->
+      <rect x="20" y="20" width="8" height="12" fill="#808080" class="colorizable-skin"/>
+      <!-- Definición muscular -->
+      <rect x="22" y="22" width="2" height="8" fill="#707070" class="colorizable-skin" opacity="0.3"/>
+      <rect x="24" y="22" width="2" height="8" fill="#707070" class="colorizable-skin" opacity="0.3"/>
+
+      <!-- BODY LEFT (4x12) at (28,20) -->
+      <rect x="28" y="20" width="4" height="12" fill="#707070" class="colorizable-skin"/>
+
+      <!-- BODY BACK (8x12) at (32,20) -->
+      <rect x="32" y="20" width="8" height="12" fill="#606060" class="colorizable-skin"/>
+    </svg>
+  

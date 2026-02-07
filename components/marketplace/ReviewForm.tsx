@@ -73,7 +73,7 @@ export function ReviewForm({ onSubmit }: ReviewFormProps) {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Share your experience with this agent..."
-          className="flex min-h-[120px] w-full rounded-xl border border-input bg-background px-4 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+          className="flex min-h-[120px] w-full rounded-2xl border border-input bg-background px-4 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
           maxLength={500}
         />
         <p className="text-xs text-muted-foreground text-right">

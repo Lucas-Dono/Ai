@@ -1,0 +1,88 @@
+{
+  "countries": [
+    {
+      "name": "Argentina",
+      "cities": ["Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata", "San Miguel de Tucumán", "Mar del Plata", "Salta", "Santa Fe", "Quilmes"]
+    },
+    {
+      "name": "Bolivia",
+      "cities": ["La Paz", "Santa Cruz de la Sierra", "Cochabamba", "Oruro", "Sucre", "Potosí", "Tarija", "Riberalta", "Montero", "Sacaba"]
+    },
+    {
+      "name": "Brasil",
+      "cities": ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza", "Belo Horizonte", "Manaus", "Curitiba", "Recife", "Porto Alegre"]
+    },
+    {
+      "name": "Chile",
+      "cities": ["Santiago", "Valparaíso", "Concepción", "La Serena", "Temuco", "Valdivia", "Puerto Montt", "Antofagasta", "Iquique", "Punta Arenas"]
+    },
+    {
+      "name": "Colombia",
+      "cities": ["Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Cúcuta", "Bucaramanga", "Santa Marta", "Pereira", "Manizales"]
+    },
+    {
+      "name": "Costa Rica",
+      "cities": ["San José", "Alajuela", "Cartago", "Heredia", "Limón", "Puntarenas", "San Isidro", "Liberia", "Puerto Viejo", "Uvita"]
+    },
+    {
+      "name": "Cuba",
+      "cities": ["La Habana", "Santiago de Cuba", "Camagüey", "Holguín", "Guantánamo", "Santa Clara", "Cienfuegos", "Matanzas", "Pinar del Río", "Bayamo"]
+    },
+    {
+      "name": "Ecuador",
+      "cities": ["Quito", "Guayaquil", "Cuenca", "Santo Domingo", "Ambato", "Machala", "Portoviejo", "Manta", "Ibarra", "Latacunga"]
+    },
+    {
+      "name": "El Salvador",
+      "cities": ["San Salvador", "Santa Ana", "San Miguel", "Mejicanos", "Soyapango", "Apopa", "Nueva San Salvador", "Chalatenango", "Cojutepeque", "Sonsonete"]
+    },
+    {
+      "name": "España",
+      "cities": ["Madrid", "Barcelona", "Valencia", "Sevilla", "Zaragoza", "Málaga", "Murcia", "Bilbao", "Alicante", "Córdoba"]
+    },
+    {
+      "name": "Guatemala",
+      "cities": ["Ciudad de Guatemala", "Mixco", "Villa Nueva", "Petapa", "San Juan Sacatepéquez", "Chinautla", "Amatitlán", "Escuintla", "Quetzaltenango", "Huehuetenango"]
+    },
+    {
+      "name": "Honduras",
+      "cities": ["Tegucigalpa", "San Pedro Sula", "La Ceiba", "Choloma", "Siguatepeque", "Comayagua", "Danlí", "Juticalpa", "Olanchito", "Gracias"]
+    },
+    {
+      "name": "México",
+      "cities": ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Toluca", "Querétaro", "Cancún", "Morelia", "Saltillo", "León"]
+    },
+    {
+      "name": "Nicaragua",
+      "cities": ["Managua", "León", "Granada", "Masaya", "Chinandega", "Estelí", "Bluefields", "Juigalpa", "Ocotal", "Rivas"]
+    },
+    {
+      "name": "Panamá",
+      "cities": ["Panamá", "San Miguelito", "Tocumen", "Juan Díaz", "Colón", "La Chorrera", "Arraiján", "Chitré", "David", "Santiago"]
+    },
+    {
+      "name": "Paraguay",
+      "cities": ["Asunción", "Ciudad del Este", "Encarnación", "Caaguazú", "Concepción", "Villarrica", "Coronel Oviedo", "Salto del Guairá", "Pedro Juan Caballero", "Caazapá"]
+    },
+    {
+      "name": "Perú",
+      "cities": ["Lima", "Arequipa", "Trujillo", "Chiclayo", "Cusco", "Piura", "Iquitos", "Huancayo", "Cajamarca", "Tacna"]
+    },
+    {
+      "name": "Puerto Rico",
+      "cities": ["San Juan", "Bayamón", "Carolina", "Ponce", "Caguas", "Mayagüez", "Arecibo", "Toa Baja", "Guaynabo", "Juana Díaz"]
+    },
+    {
+      "name": "República Dominicana",
+      "cities": ["Santo Domingo", "Santiago", "La Romana", "San Cristóbal", "San Felipe", "Baní", "Higüey", "Puerto Plata", "La Vega", "Moca"]
+    },
+    {
+      "name": "Uruguay",
+      "cities": ["Montevideo", "Salto", "Paysandú", "Las Piedras", "Rivera", "Melo", "Tacuarembó", "Durazno", "Mercedes", "Florida"]
+    },
+    {
+      "name": "Venezuela",
+      "cities": ["Caracas", "Maracaibo", "Valencia", "Maracay", "Barquisimeto", "Ciudad Guayana", "Mérida", "Barcelona", "Puerto La Cruz", "Cumaná"]
+    }
+  ]
+}

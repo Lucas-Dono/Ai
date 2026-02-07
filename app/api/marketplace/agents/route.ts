@@ -31,9 +31,9 @@ export async function GET(req: NextRequest) {
     orderBy,
     take: limit,
     include: {
-      user: { select: { name: true, email: true } },
-      reviews: { select: { rating: true } },
-      _count: { select: { reviews: true, clones: true } },
+      User: { select: { name: true, email: true } },
+      Review: { select: { rating: true } },
+      _count: { select: { Review: true, AgentClone: true } },
     },
   });
 

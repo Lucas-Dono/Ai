@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { withTeamPermission } from "@/lib/permissions/middleware";
 
@@ -8,8 +8,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthenticatedUser(req);
+  if (!user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,19 +19,19 @@ export async function GET(
     where: {
       id,
       OR: [
-        { ownerId: session.user.id },
-        { members: { some: { userId: session.user.id } } },
+        { ownerId: user.id },
+        { TeamMember: { some: { userId: user.id } } },
       ],
     },
     include: {
-      owner: { select: { id: true, name: true, email: true, image: true } },
-      members: {
+      User: { select: { id: true, name: true, email: true, image: true } },
+      TeamMember: {
         include: {
-          user: { select: { id: true, name: true, email: true, image: true } },
+          User: { select: { id: true, name: true, email: true, image: true } },
         },
         orderBy: { joinedAt: "asc" },
       },
-      agents: {
+      Agent: {
         select: {
           id: true,
           name: true,
@@ -42,7 +42,7 @@ export async function GET(
         },
       },
       _count: {
-        select: { members: true, agents: true, invitations: true },
+        select: { TeamMember: true, Agent: true, TeamInvitation: true },
       },
     },
   });
@@ -77,9 +77,9 @@ export async function PATCH(
       ...(metadata && { metadata }),
     },
     include: {
-      owner: { select: { name: true, email: true, image: true } },
+      User: { select: { name: true, email: true, image: true } },
       _count: {
-        select: { members: true, agents: true },
+        select: { TeamMember: true, Agent: true },
       },
     },
   });

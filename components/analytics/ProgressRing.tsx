@@ -1,0 +1,63 @@
+/**
+ * ProgressRing Component
+ * Circular progress indicator for visual progress tracking
+ */
+
+import { cn } from "@/lib/utils";
+
+interface ProgressRingProps {
+  progress: number; // 0-100
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+  color?: string;
+  children?: React.ReactNode;
+}
+
+export function ProgressRing({
+  progress,
+  size = 120,
+  strokeWidth = 8,
+  className,
+  color = "#8b5cf6",
+  children,
+}: ProgressRingProps) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className={cn("relative inline-flex items-center justify-center", className)}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-muted opacity-20"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-500 ease-out"
+        />
+      </svg>
+      {children && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}

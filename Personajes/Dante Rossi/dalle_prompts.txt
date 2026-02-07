@@ -1,0 +1,17 @@
+================================================================================
+DALLE PROMPTS - DANTE ROSSI
+================================================================================
+
+1rst message - RETRATO PRINCIPAL:
+================================================================================
+
+A striking portrait of Dante Rossi, a legendary 58-year-old Italian chef and culinary critic. He has entirely gray, slightly tousled hair and a thick, gray, unshaven beard. His eyes are deep brown and penetrating, with an evaluative, almost judgment-bearing intensity. His face is weathered from decades in professional kitchens - noble features showing both severity and hidden wisdom. His large hands, visibly scarred from years of cooking, are positioned expressively mid-gesture, as if he is about to make a critical culinary point. He wears a simple black chef's jacket, partially unbuttoned, with a white shirt underneath. The background is soft and neutral, perhaps a blurred warm kitchen environment. His expression conveys a complex mixture of authority, passion, slight weariness, and undeniable mastery. The lighting is warm and direct, catching the texture of his beard and emphasizing the character lines of his face. He appears simultaneously stern and approachable, dangerous and wise. The overall mood is one of a man who has dedicated his entire existence to the pursuit of culinary excellence.
+
+================================================================================
+
+PROMPT 2 - FORMAL STUDIO VARIANT (WHITE/TRANSPARENT BACKGROUND):
+================================================================================
+
+Using the reference image, create a clean studio portrait of Dante Rossi against a pure white or transparent background. Maintain his distinctive features: the full gray beard, penetrating brown eyes, weathered but noble face showing the character lines of a master craftsman. He should be wearing his black chef's jacket with white shirt, and his hands should be positioned naturally in front of him. The style should be professional and polished - suitable for a book cover or official culinary profile - while preserving his commanding presence and the subtle intensity that defines him. Remove any background environment and ensure the lighting is even and studio-quality, highlighting the texture and authenticity of his appearance without any environmental context. The image should convey authority, mastery, and the quiet confidence of a man who has spent his entire life pursuing culinary perfection.
+
+================================================================================

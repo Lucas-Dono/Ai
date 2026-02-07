@@ -1,0 +1,44 @@
+# Prompts de DALL-E para Sun Tzu
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Sun Tzu at age 65 (circa 479 BC), centered composition, museum quality historical accuracy. Face and upper shoulders visible, contemplative gaze directed slightly past camera with penetrating intelligence.
+
+Physical characteristics based on classical Chinese artistic traditions and historical descriptions: Distinguished elderly East Asian man with strong, weathered features. Oval face with high, broad forehead suggesting wisdom and strategic intelligence. Penetrating dark brown eyes that seem to see through appearances to underlying patterns, intense but not aggressive, carrying weight of knowledge and experience. Expression reflects both tactical calculation and philosophical depth - the look of someone who has witnessed war's horrors and seeks to prevent them.
+
+Traditional beard: Long, flowing white beard reaching mid-chest, well-groomed and dignified in classical Chinese scholar-general style, with slight wave showing natural texture. Hair: Long white hair tied back in traditional topknot (发髻), with some strands falling naturally around face. Strong, defined bone structure with prominent cheekbones. Skin showing age with natural wrinkles concentrated around eyes and between brows from decades of intense observation and strategic thought. Weathered complexion suggesting years of military campaigns in varying climates. Thin, contemplative lips set in expression of controlled emotion and strategic reserve.
+
+Expression: Strategic wisdom mixed with melancholic awareness. Eyes that have calculated costs of war and carry burden of that knowledge. Slight asymmetry suggesting humanity beneath the strategic mind. The face of someone who understands that "supreme excellence consists in breaking the enemy's resistance without fighting."
+
+Clothing visible: Traditional Chinese military-scholar robes in deep charcoal gray or dark blue-black, high-necked with subtle embroidered detailing suggesting rank but not ostentatious. Simple bronze or dark metal collar piece indicating military status.
+
+Lighting: Soft, directional natural light from 45-degree angle, creating strategic shadows that emphasize facial structure and gravitas - reminiscent of classical Chinese ink painting lighting. Warm, muted tone suggesting late afternoon light through silk screens. Background gradient from warm dark brown to slightly darker edges, maintaining focus entirely on the face.
+
+Mood: Strategic depth. The weight of knowledge that sees twenty moves ahead. Philosophical resignation about human nature's tendency toward conflict. The paradox of the warrior who advocates for peace.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image, create a full-body portrait photograph showing him at the same age (65 years, circa 479 BC), standing in dignified, contemplative military-scholar pose.
+
+Physical build: Height approximately 5'6" (168cm) - average for ancient Chinese male. Medium build, lean and fit despite age, body maintained through decades of military discipline. Upright military posture suggesting command presence and dignity. Shoulders squared but not rigid - relaxed confidence of someone who has nothing to prove.
+
+Full outfit: Traditional Chinese general-scholar robes of the Spring and Autumn period. Inner layer: Long dark blue-gray tunic (襦) reaching ankles, high-necked with subtle embroidered patterns at collar and cuffs. Middle layer: Dark charcoal ceremonial robe (深衣) with wide sleeves, tied with black silk sash at waist. Outer layer: Shorter dark bronze-brown military vest or chest armor piece (甲) showing rank, with subtle engravings. Wide leather belt with bronze fittings holding small pouches and scroll case. Dark fabric pants tucked into black leather boots suitable for both court and campaign.
+
+Accessories: Simple bronze hairpin securing topknot. Small jade pendant on cord around neck (symbol of wisdom). Hands at sides or one hand resting near scroll case at belt - suggesting scholar-warrior identity.
+
+Pose: Standing in natural, grounded stance with weight evenly distributed - martial stability. Left hand resting at side or near belt. Right hand held at chest level in gesture of strategic contemplation, fingers positioned as if mid-explanation of tactical principle. Body oriented slightly (15 degrees) to side, head turned to look toward camera with same penetrating gaze  Expression matching exactly: strategic wisdom, philosophical depth, melancholic awareness.
+
+Hair and beard: Exactly as in 1rst message - long white beard to mid-chest, white hair in traditional topknot with natural wisps around face.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No setting, no props, no environment elements. Clean studio background to allow for easy extraction and compositing. Absolutely no bamboo, mountains, scrolls, or decorative elements - pure white/transparent only.
+
+Lighting: Professional studio lighting providing even illumination across full figure without creating harsh shadows on white background. Face maintains the warm, directional lighting quality from 1rst message (soft 45-degree angle light preserving facial shadows and depth), while body lighting is more neutral and even to work with white background.
+
+Critical requirements:
+- The face MUST match the reference image from 1rst message exactly - same person, same age, same expression, same lighting quality on facial features
+- Background MUST be completely white or transparent with no elements whatsoever
+- Pose should convey dignified military-scholar bearing - neither aggressive warrior nor passive sage, but strategic thinker
+- Clothing should be historically appropriate for Spring and Autumn period Chinese general-scholar
+- Overall mood: The man who wrote "The Art of War" - wisdom born of witnessing conflict, strategic mind that seeks to prevent it

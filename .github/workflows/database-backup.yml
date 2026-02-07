@@ -1,0 +1,305 @@
+# Database Backup GitHub Action
+#
+# Ejecuta backups automáticos de la base de datos usando GitHub Actions.
+# Esta es una alternativa a Vercel Cron cuando pg_dump no está disponible.
+#
+# VENTAJAS:
+# - PostgreSQL client pre-instalado
+# - Sin límite de tiempo (vs 5 min en Vercel)
+# - Gratis en repos públicos y privados (2000 min/mes)
+#
+# SETUP:
+# 1. Configurar secrets en GitHub:
+#    Settings > Secrets and variables > Actions > New repository secret
+#
+#    Secrets requeridos:
+#    - DATABASE_URL
+#    - R2_ENDPOINT
+#    - R2_ACCESS_KEY_ID
+#    - R2_SECRET_ACCESS_KEY
+#    - CRON_SECRET (opcional, para notificar a API)
+#
+#    Secrets opcionales (notificaciones):
+#    - SLACK_WEBHOOK_URL
+#    - ADMIN_EMAIL
+#    - RESEND_API_KEY
+#    - RESEND_FROM_EMAIL
+#
+# 2. Habilitar GitHub Actions:
+#    Settings > Actions > General > Allow all actions
+#
+# 3. Push este archivo a main/master
+#
+# SCHEDULE:
+# - Ejecuta diariamente a las 3:00 AM UTC
+# - Modificar cron en "schedule" si necesitas otro horario
+
+name: Database Backup
+
+on:
+  # Ejecutar automáticamente
+  schedule:
+    # 3:00 AM UTC diariamente (Syntax: min hour day month day-of-week)
+    - cron: '0 3 * * *'
+
+  # Permitir ejecución manual desde GitHub UI
+  workflow_dispatch:
+
+  # Ejecutar en push a main (solo para testing, comentar después)
+  # push:
+  #   branches: [main, master]
+  #   paths:
+  #     - '.github/workflows/database-backup.yml'
+
+jobs:
+  backup:
+    name: Create Database Backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # Timeout de 30 minutos (ajustar según tamaño DB)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      - name: Verify tools
+        run: |
+          pg_dump --version
+          aws --version
+          node --version
+
+      - name: Create database backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME || 'database-backups' }}
+        run: |
+          echo "Starting backup process..."
+
+          # Generar nombre del archivo
+          TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
+          FILENAME="backup_${TIMESTAMP}.sql"
+          GZIP_FILENAME="${FILENAME}.gz"
+
+          echo "Backup filename: $GZIP_FILENAME"
+
+          # Crear dump
+          echo "Creating database dump..."
+          pg_dump "$DATABASE_URL" > "$FILENAME"
+
+          # Verificar que el dump se creó
+          if [ ! -f "$FILENAME" ]; then
+            echo "Error: Dump file was not created"
+            exit 1
+          fi
+
+          DUMP_SIZE=$(stat -f%z "$FILENAME" 2>/dev/null || stat -c%s "$FILENAME")
+          echo "Dump size: $DUMP_SIZE bytes"
+
+          # Comprimir
+          echo "Compressing backup..."
+          gzip -c "$FILENAME" > "$GZIP_FILENAME"
+
+          GZIP_SIZE=$(stat -f%z "$GZIP_FILENAME" 2>/dev/null || stat -c%s "$GZIP_FILENAME")
+          echo "Compressed size: $GZIP_SIZE bytes"
+
+          # Configurar AWS CLI para R2
+          aws configure set aws_access_key_id "$R2_ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$R2_SECRET_ACCESS_KEY"
+          aws configure set region auto
+
+          # Upload a R2
+          echo "Uploading to Cloudflare R2..."
+          aws s3 cp \
+            "$GZIP_FILENAME" \
+            "s3://${R2_BUCKET_NAME}/postgres-backups/$GZIP_FILENAME" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --metadata backup-timestamp="$TIMESTAMP",database-name="creador-inteligencias",backup-type="full",source="github-actions"
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Backup uploaded successfully"
+            echo "BACKUP_SUCCESS=true" >> $GITHUB_ENV
+            echo "BACKUP_FILENAME=$GZIP_FILENAME" >> $GITHUB_ENV
+            echo "BACKUP_SIZE=$GZIP_SIZE" >> $GITHUB_ENV
+          else
+            echo "❌ Failed to upload backup"
+            echo "BACKUP_SUCCESS=false" >> $GITHUB_ENV
+            exit 1
+          fi
+
+          # Limpiar archivos locales
+          rm -f "$FILENAME" "$GZIP_FILENAME"
+
+      - name: Cleanup old backups (>30 days)
+        if: success()
+        env:
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME || 'database-backups' }}
+        run: |
+          echo "Cleaning up old backups..."
+
+          # Configurar AWS CLI (ya configurado en step anterior)
+
+          # Listar backups
+          aws s3 ls "s3://${R2_BUCKET_NAME}/postgres-backups/" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --recursive > backups_list.txt
+
+          # Eliminar backups más antiguos de 30 días
+          RETENTION_DAYS=30
+          CUTOFF_DATE=$(date -d "$RETENTION_DAYS days ago" +%Y-%m-%d || date -v-${RETENTION_DAYS}d +%Y-%m-%d)
+
+          echo "Deleting backups older than: $CUTOFF_DATE"
+
+          DELETED_COUNT=0
+          while read -r line; do
+            BACKUP_DATE=$(echo "$line" | awk '{print $1}')
+            BACKUP_FILE=$(echo "$line" | awk '{print $4}')
+
+            if [[ "$BACKUP_DATE" < "$CUTOFF_DATE" ]]; then
+              echo "Deleting old backup: $BACKUP_FILE (date: $BACKUP_DATE)"
+              aws s3 rm "s3://${R2_BUCKET_NAME}/$BACKUP_FILE" --endpoint-url "$R2_ENDPOINT"
+              DELETED_COUNT=$((DELETED_COUNT + 1))
+            fi
+          done < backups_list.txt
+
+          echo "Deleted $DELETED_COUNT old backup(s)"
+
+          rm backups_list.txt
+
+      - name: Send Slack notification
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "Skipping Slack notification (webhook not configured)"
+            exit 0
+          fi
+
+          if [ "$BACKUP_SUCCESS" = "true" ]; then
+            MESSAGE="✅ Database backup completed successfully\nFilename: $BACKUP_FILENAME\nSize: $BACKUP_SIZE bytes\nSource: GitHub Actions"
+            COLOR="good"
+          else
+            MESSAGE="❌ Database backup failed\nCheck GitHub Actions logs for details"
+            COLOR="danger"
+          fi
+
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "{\"text\":\"$MESSAGE\",\"color\":\"$COLOR\"}"
+
+      - name: Send email notification (optional)
+        if: always()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL || 'backups@creador-inteligencias.com' }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ] || [ -z "$ADMIN_EMAIL" ]; then
+            echo "Skipping email notification (not configured)"
+            exit 0
+          fi
+
+          # Instalar dependencias si es necesario
+          npm install --no-save resend
+
+          # Enviar email usando Node.js
+          node -e "
+          const { Resend } = require('resend');
+          const resend = new Resend('$RESEND_API_KEY');
+
+          const success = process.env.BACKUP_SUCCESS === 'true';
+          const subject = success ? '✅ Database Backup Success' : '❌ Database Backup Failed';
+          const message = success
+            ? 'Database backup completed successfully\n\n' +
+              'Filename: ' + process.env.BACKUP_FILENAME + '\n' +
+              'Size: ' + process.env.BACKUP_SIZE + ' bytes\n' +
+              'Source: GitHub Actions\n' +
+              'Timestamp: ' + new Date().toISOString()
+            : 'Database backup failed. Check GitHub Actions logs for details.';
+
+          resend.emails.send({
+            from: '$RESEND_FROM_EMAIL',
+            to: '$ADMIN_EMAIL',
+            subject: subject,
+            text: message
+          }).then(() => {
+            console.log('Email notification sent');
+          }).catch(error => {
+            console.error('Failed to send email:', error);
+          });
+          "
+
+      - name: Notify Vercel API (optional)
+        if: always()
+        env:
+          VERCEL_API_URL: ${{ secrets.VERCEL_API_URL }}  # https://tu-dominio.com
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$VERCEL_API_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Skipping Vercel API notification (not configured)"
+            exit 0
+          fi
+
+          # Notificar a la API de Vercel que el backup se completó
+          curl -X POST "${VERCEL_API_URL}/api/webhooks/backup-completed" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"success\": $BACKUP_SUCCESS,
+              \"filename\": \"$BACKUP_FILENAME\",
+              \"size\": $BACKUP_SIZE,
+              \"source\": \"github-actions\",
+              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+            }" || echo "Failed to notify Vercel API"
+
+      - name: Upload backup logs as artifact (for debugging)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-logs
+          path: |
+            *.log
+            backups_list.txt
+          retention-days: 7
+
+# NOTAS:
+#
+# 1. GitHub Actions free tier:
+#    - Public repos: ilimitado
+#    - Private repos: 2000 minutos/mes
+#    - Este workflow usa ~5 min/día = ~150 min/mes
+#
+# 2. Para verificar estado:
+#    - GitHub > Actions tab
+#    - Ver runs del workflow "Database Backup"
+#
+# 3. Para ejecutar manualmente:
+#    - GitHub > Actions > Database Backup > Run workflow
+#
+# 4. Para desactivar:
+#    - Comentar el bloque "schedule:" arriba
+#    - O deshabilitar en Settings > Actions
+#
+# 5. Logs:
+#    - Cada run guarda logs por 90 días
+#    - Ver en Actions > Workflow run > Job logs

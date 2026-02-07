@@ -1,0 +1,138 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Ejecutar escaneo diario a las 2 AM
+    - cron: '0 2 * * *'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Vulnerability Scan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 1. NPM AUDIT - Vulnerabilidades en dependencias
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate || true
+          npm audit --json > npm-audit-results.json || true
+        continue-on-error: true
+
+      - name: Upload npm audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-results
+          path: npm-audit-results.json
+
+      # 2. TRIVY - Escaneo de vulnerabilidades en dependencias y código
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'  # No fallar el build, solo reportar
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      # 3. SEMGREP - Análisis estático de código (SAST)
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/typescript
+            p/react
+            p/nextjs
+          generateSarif: true
+
+      # 4. DEPENDENCY REVIEW - Revisar nuevas dependencias en PRs
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        if: github.event_name == 'pull_request'
+
+      # 5. SECRET SCANNING - Buscar secrets expuestos (GitHub Advanced Security)
+      - name: Secret Scanning
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
+
+      # 6. TESTS DE SEGURIDAD PERSONALIZADOS
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security tests
+        run: npm run test lib/__tests__/security.test.ts
+        env:
+          MESSAGE_ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+
+  # Job para escanear el schema de Prisma
+  prisma-security:
+    runs-on: ubuntu-latest
+    name: Prisma Schema Security Check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for exposed secrets in schema
+        run: |
+          # Buscar posibles secrets en el schema
+          if grep -r "password\|secret\|key" prisma/schema.prisma | grep -v "//"; then
+            echo "⚠️ Warning: Potential secrets found in Prisma schema"
+            grep -r "password\|secret\|key" prisma/schema.prisma | grep -v "//"
+          fi
+
+      - name: Check for proper encryption fields
+        run: |
+          # Verificar que el modelo Message tiene campos de encriptación
+          if grep -q "iv.*String" prisma/schema.prisma && grep -q "authTag.*String" prisma/schema.prisma; then
+            echo "✅ Message encryption fields found"
+          else
+            echo "❌ ERROR: Message model missing encryption fields (iv, authTag)"
+            exit 1
+          fi
+
+  # Resumen de seguridad
+  security-summary:
+    runs-on: ubuntu-latest
+    needs: [security-scan, prisma-security]
+    if: always()
+    name: Security Scan Summary
+
+    steps:
+      - name: Create summary
+        run: |
+          echo "## 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Escaneo de seguridad completado" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Escaneos ejecutados:" >> $GITHUB_STEP_SUMMARY
+          echo "- npm audit (dependencias)" >> $GITHUB_STEP_SUMMARY
+          echo "- Trivy (vulnerabilidades)" >> $GITHUB_STEP_SUMMARY
+          echo "- Semgrep (código estático)" >> $GITHUB_STEP_SUMMARY
+          echo "- TruffleHog (secrets)" >> $GITHUB_STEP_SUMMARY
+          echo "- Tests de seguridad personalizados" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Revisa los resultados en la pestaña Security de GitHub." >> $GITHUB_STEP_SUMMARY

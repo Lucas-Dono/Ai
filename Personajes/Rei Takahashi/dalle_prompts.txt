@@ -1,0 +1,69 @@
+DALLE PROMPTS - REI TAKAHASHI
+Ingeniera Robótica Japonesa
+================================================================================
+
+1rst message: FULL ILLUSTRATION
+================================================================================
+
+Create a professional portrait of Rei Takahashi, a 38-year-old Japanese robotics engineer. She has an angular, intelligent face with sharp dark eyes that convey both brilliance and quiet intensity. Her black hair is styled in a modern shoulder-length cut with subtle layers, sometimes tied back with a minimalist clip. Her expression is contemplative and composed, with an almost imperceptible hint of a knowing smile.
+
+She is wearing a fitted charcoal grey technical blazer over a white minimalist shirt made of advanced fabric. Around her neck is a delicate silver locket containing a tiny photograph of her late father. Her hands are visible, strong and precise, with short practical nails. She wears a singular minimalist titanium ring on her left hand—a gift from herself after successfully launching NEXUS Robotics.
+
+In the background, suggest her work environment: soft focus of robotics laboratory equipment, green and blue LED lights reflecting off metal surfaces, blurred circuit patterns. Her environment speaks to precision and innovation. The overall aesthetic is clean, modern, Japanese-influenced minimalism—think Apple design meets traditional Japanese aesthetics.
+
+Lighting should be professional and warm but cool-toned. She is photographed from a three-quarter angle, seated but appearing alert and engaged. The composition conveys authority without arrogance, competence without coldness. The overall mood is: visionary-pragmatist. A woman who understands the future and is actively building it.
+
+Style: High-resolution photorealistic digital portrait, professional headshot quality, contemporary aesthetic, technically refined, emotionally reserved but not distant, cinematic lighting, Japanese color palette influences.
+
+
+PROMPT 2: REFERENCE-BASED ILLUSTRATION WITH TRANSPARENT BACKGROUND
+================================================================================
+
+Using the reference image, create a full-body illustration of Rei Takahashi in a dynamic pose suggesting both intellectual engagement and technological innovation. She should be positioned as if interacting with or contemplating advanced robotics systems around her.
+
+Rei should be wearing her signature look: the charcoal technical blazer with white shirt, tailored but functional. Add elements that suggest her work: perhaps her hand resting on or near an elegant robotic component, or her gesturing as if explaining a complex system. Include subtle references to her interests—perhaps a small ceramic vessel visible on a nearby desk, or traditional Japanese architectural elements in her environment that suggest the bridge between traditional and modern.
+
+The background should be COMPLETELY WHITE or TRANSPARENT, with no environment visible. All visual weight should be on Rei's figure and her interaction with technology elements. Any technological elements around her should be rendered in a minimalist style—clean lines, subtle metallic tones (silver, grey, gunmetal), with soft glowing accents in blue or green suggesting active systems.
+
+Lighting should come from above and slightly to one side, creating subtle shadows that define her form. Her expression should convey concentration mixed with quiet confidence. Perhaps she is examining something small in her hands (a component, a circuit board), or her hands are positioned as if conducting energy or guiding something invisible.
+
+The overall composition should balance human and technological elements in harmony—suggesting that she sees technology not as separate from humanity but as an extension of human intention and compassion.
+
+Style: High-resolution illustration, minimalist composition, white/transparent background (NO BACKGROUND ELEMENTS), technical and artistic fusion, contemporary design sensibility, warm and cool tones balanced, emotional intelligence visible in expression and posture, professional and approachable, cinematic quality.
+
+================================================================================
+NOTES FOR IMAGE GENERATION
+================================================================================
+
+Key Visual Elements to Emphasize:
+- Intelligent, focused eyes suggesting depth and vision
+- Hands that convey both technical precision and artistic sensitivity
+- Posture suggesting confidence mixed with humble engagement
+- Color palette: Charcoal, white, silver, navy, with accent blues and greens
+- Lighting: Professional, slightly cool-toned, suggesting laboratory or creative workspace
+- Details: Minimalist jewelry, functional clothing, subtle Japanese design influences
+- Mood: Visionary, pragmatic, compassionate, intelligent, contemporary
+
+Physical Characteristics:
+- Age: Mid-to-late 30s (appears slightly younger due to healthy lifestyle)
+- Height: 5'6" (168 cm)
+- Build: Lean, athletic, suggesting discipline and active lifestyle
+- Skin tone: Warm East Asian complexion
+- Eyes: Dark brown, almond-shaped, highly expressive
+- Hair: Black, shoulder-length, naturally straight with modern styling
+- Distinguishing features: A small scar on her left temple from childhood robotics accident, delicate hands with long pianist-like fingers
+
+Personality Expression in Image:
+- Not smiling broadly, but with composed, intelligent expression
+- Eyes engaging viewer with sense of presence and depth
+- Posture open but not casual—professional presence
+- Hands positioned purposefully (not random or limp)
+- Overall impression: Someone who is brilliant, kind, and taking her work very seriously
+
+Cultural Context:
+- Blend Japanese minimalism with Western contemporary design
+- Suggest innovation and tradition coexisting
+- Imply she is someone who bridges cultures and perspectives
+- Convey respect for precision and beauty
+
+================================================================================

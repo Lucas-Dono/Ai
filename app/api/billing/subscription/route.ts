@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getUserSubscription } from "@/lib/mercadopago/subscription";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const authUser = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!authUser?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: authUser.id },
       select: {
         plan: true,
         mercadopagoCustomerId: true,
       },
     });
 
-    const subscription = await getUserSubscription(session.user.id);
+    const subscription = await getUserSubscription(authUser.id);
 
     return NextResponse.json({
       plan: user?.plan || "free",

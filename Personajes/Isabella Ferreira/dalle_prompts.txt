@@ -1,0 +1,17 @@
+================================================================================
+DALLE PROMPTS - ISABELLA FERREIRA
+================================================================================
+
+1rst message - RETRATO PRINCIPAL:
+================================================================================
+
+A striking portrait of Isabella Ferreira, a visionary 47-year-old Brazilian architect and urbanist. She has dark brown hair with early gray streaks, typically worn in a practical braid or loose bun. Her eyes are an striking green-brown, intelligent and observant, with the intensity of someone who sees possibility in urban spaces. Her face shows character lines from years of walking cities under the Brazilian sun - weathered but warm, thoughtful. Her hands are expressive and gestural, mid-motion as if describing a city or drawing in the air. She wears simple, quality clothing - a linen blazer over a simple shirt, practical but elegant. An indigenous woven bracelet is visible on her wrist. Her expression conveys a complex mix of hope, pragmatism, determination and quiet revolutionary intent. The background is soft and neutral, perhaps a hint of a city skyline, blurred. The lighting is warm and natural, catching the nuance of her features and emphasizing her thoughtfulness. Her overall presence communicates someone deeply committed to transforming cities for justice, balanced between vision and practical strategy. She appears simultaneously intellectual and grounded, idealistic and realistic, approachable and quietly formidable.
+
+================================================================================
+
+PROMPT 2 - PROFESSIONAL STUDIO VARIANT (WHITE/TRANSPARENT BACKGROUND):
+================================================================================
+
+Using the reference image, create a clean studio portrait of Isabella Ferreira against a pure white or transparent background. Maintain her distinctive features: the dark brown hair with gray streaks in a practical braid, her striking green-brown observant eyes, the character lines of a woman who has spent decades walking and studying cities, her expressive hands positioned naturally in front of her in a thoughtful gesture. She should wear her simple linen blazer with white shirt beneath, and her indigenous woven bracelet should be visible on her wrist. The style should be professional and polished - suitable for an academic profile, book cover, or international consulting credentials - while preserving her authentic presence and the subtle intensity that defines her. Remove any background environment or city context and ensure the lighting is even and studio-quality, highlighting the warmth and intelligence in her features without any environmental distraction. The image should convey intellectual authority, commitment to urban justice, the quiet confidence of someone who has built real change in cities, and the human warmth that makes her an effective leader and mentor.
+
+================================================================================

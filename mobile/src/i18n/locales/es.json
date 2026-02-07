@@ -1,0 +1,118 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo",
+    "search": "Buscar..."
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "dontHaveAccount": "¿No tienes cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
+    "welcome": "Bienvenido a Blaniel",
+    "welcomeSubtitle": "Crea y chatea con compañeros IA emocionales"
+  },
+  "home": {
+    "title": "Inicio",
+    "greeting": "¡Hola, {{name}}!",
+    "continueChat": "Continuar Chat",
+    "myCompanions": "Mis Compañeros",
+    "featured": "Destacados",
+    "forYou": "Para Ti",
+    "trending": "Tendencias",
+    "createFirst": "Crea tu primer compañero IA"
+  },
+  "worlds": {
+    "title": "Mundos",
+    "create": "Crear Mundo",
+    "noWorlds": "No tienes conversaciones",
+    "exploreCompanions": "Explora compañeros increíbles en la página de inicio",
+    "goHome": "Ir al Inicio"
+  },
+  "community": {
+    "title": "Comunidad",
+    "createPost": "Crear Post",
+    "noPosts": "No hay posts aún",
+    "hot": "Destacados",
+    "new": "Nuevos",
+    "top": "Top"
+  },
+  "profile": {
+    "title": "Perfil",
+    "level": "Nivel",
+    "points": "Puntos",
+    "badges": "Insignias",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión"
+  },
+  "chat": {
+    "typeMessage": "Escribe un mensaje...",
+    "sending": "Enviando...",
+    "voiceInput": "Entrada de Voz",
+    "imageInput": "Imagen",
+    "emojiPicker": "Emoji",
+    "gifPicker": "GIF"
+  },
+  "billing": {
+    "title": "Suscripción",
+    "currentPlan": "Tu Plan",
+    "upgrade": "Mejorar",
+    "selectPlan": "Seleccionar",
+    "free": "Gratis",
+    "plus": "Plus",
+    "ultra": "Ultra",
+    "perMonth": "/ mes",
+    "features": "Características",
+    "usage": "Uso",
+    "messages": "Mensajes",
+    "voice": "Voz",
+    "images": "Imágenes",
+    "agents": "Agentes",
+    "unlimited": "Ilimitados",
+    "notAvailable": "No disponible",
+    "resetDate": "Se reinicia: {{date}}"
+  },
+  "achievements": {
+    "title": "Logros",
+    "yourProgress": "Tu Progreso",
+    "all": "Todos",
+    "earned": "Ganados",
+    "locked": "Bloqueados",
+    "noEarned": "Aún no has ganado insignias",
+    "noLocked": "No hay insignias bloqueadas"
+  },
+  "createWorld": {
+    "title": "Crear Mundo",
+    "basicInfo": "Información Básica",
+    "basicInfoSub": "Dale un nombre y descripción a tu mundo",
+    "worldName": "Nombre del Mundo",
+    "worldNamePlaceholder": "Ej: Academia Sakura",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Describe tu mundo, su ambiente y qué sucederá...",
+    "genre": "Género",
+    "genreSub": "¿Qué tipo de experiencia quieres crear?",
+    "format": "Formato",
+    "formatSub": "¿Cómo quieres experimentar tu mundo?",
+    "characters": "Personajes (Opcional)",
+    "charactersSub": "Selecciona los agentes que participarán en este mundo",
+    "noAgents": "No tienes agentes aún. Crea uno primero.",
+    "createAgent": "Crear Agente",
+    "createWorld": "Crear Mundo",
+    "worldCreated": "¡Mundo Creado!",
+    "worldCreatedMsg": "Tu mundo \"{{name}}\" ha sido creado exitosamente",
+    "goToWorld": "Ir al Mundo"
+  }
+}

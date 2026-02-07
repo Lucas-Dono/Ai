@@ -1,0 +1,59 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- BODY RIGHT (4x12) at (16,20) -->
+      <rect x="16" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- BODY FRONT (8x12) at (20,20) -->
+      <rect x="20" y="20" width="8" height="12" fill="#808080" class="colorizable-clothing"/>
+      <!-- Cuello redondo -->
+      <rect x="22" y="20" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- BODY LEFT (4x12) at (28,20) -->
+      <rect x="28" y="20" width="4" height="12" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- BODY BACK (8x12) at (32,20) -->
+      <rect x="32" y="20" width="8" height="12" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- MANGAS CORTAS BRAZO DERECHO (solo 6px desde hombro) -->
+      <!-- ARM_R_TOP (4x4) at (44,16) -->
+      <rect x="44" y="16" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BOTTOM (4x4) at (48,16) -->
+      <rect x="48" y="16" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_RIGHT (4x6) at (40,20) - Solo 6px, manga corta -->
+      <rect x="40" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_R_FRONT (4x6) at (44,20) -->
+      <rect x="44" y="20" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <!-- Dobladillo de manga -->
+      <rect x="44" y="25" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_R_LEFT (4x6) at (48,20) -->
+      <rect x="48" y="20" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x6) at (52,20) -->
+      <rect x="52" y="20" width="4" height="6" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- MANGAS CORTAS BRAZO IZQUIERDO (solo 6px desde hombro) -->
+      <!-- ARM_L_TOP (4x4) at (36,48) -->
+      <rect x="36" y="48" width="4" height="4" fill="#808080" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BOTTOM (4x4) at (40,48) -->
+      <rect x="40" y="48" width="4" height="4" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_RIGHT (4x6) at (32,52) - Solo 6px, manga corta -->
+      <rect x="32" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_L_FRONT (4x6) at (36,52) -->
+      <rect x="36" y="52" width="4" height="6" fill="#808080" class="colorizable-clothing"/>
+      <!-- Dobladillo de manga -->
+      <rect x="36" y="57" width="4" height="1" fill="#606060" class="colorizable-clothing"/>
+
+      <!-- ARM_L_LEFT (4x6) at (40,52) -->
+      <rect x="40" y="52" width="4" height="6" fill="#707070" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x6) at (44,52) -->
+      <rect x="44" y="52" width="4" height="6" fill="#606060" class="colorizable-clothing"/>
+    </svg>
+  

@@ -1,0 +1,47 @@
+# Prompts de DALL-E para Ada Lovelace
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Ada Lovelace (Augusta Ada King, Countess of Lovelace) at age 27 (circa 1842, during her work on the Analytical Engine notes), centered composition, museum quality historical accuracy matching authenticated portraits and miniatures. Face and upper shoulders visible, intelligent penetrating gaze toward camera.
+
+Physical characteristics based on authenticated portraits, miniatures, and contemporary descriptions: Aristocratic English features with delicate bone structure. Oval face with elegant proportions. High, intelligent forehead - notably broad and prominent, suggesting intellectual capacity (a feature she likely inherited from her father Byron). Large, expressive dark brown eyes with penetrating, focused gaze showing both intelligence and intensity - eyes described as "bright" and "keen" by contemporaries. Eyes convey sharp analytical mind combined with imaginative vision. Well-defined, dark eyebrows. Straight, refined nose of aristocratic proportions. Soft, naturally red lips with gentle curves. Fair English complexion with rosy undertones, smooth and clear. Face shows both beauty and intellect - not merely decorative but suggesting the brilliant mathematical mind within.
+
+Hair: Dark brown hair (almost chestnut) in elaborate early Victorian style typical of early 1840s. Hair parted in center and drawn back from face in smooth bands, then gathered into elaborate arrangement of braids and loops at back of head or crown. Some ringlets or curls framing face softly at temples and ears, as was fashionable. Hair ornaments: possibly pearl combs or simple jeweled pins as befitting a countess, but not overly elaborate. Hair styling is elegant and refined, reflecting her aristocratic status and the fashion of the period.
+
+Expression: Intelligent, focused, with hint of visionary intensity. Slight frown or concentration between brows suggesting someone engaged in complex thought. Not smiling (as was convention for serious portraits), but not severe - composed, thoughtful demeanor. Gaze direct and penetrating, meeting viewer's eyes with confidence and intellectual challenge. This is someone who can grasp complex mathematical concepts and see computational future 100 years ahead.
+
+Clothing and jewelry visible: Day dress or evening gown in rich fabric appropriate to her title and status. Deep jewel tone - sapphire blue, emerald green, or burgundy red - or possibly white or pale color for younger appearance. Off-shoulder style showing neck and upper chest, as was fashionable in 1840s. Elaborate lace or ribbon trim at neckline. Pearl necklace or simple gold jewelry befitting a countess - elegant but not excessive. Everything refined and expensive, reflecting her position in British aristocracy.
+
+Lighting: Soft, classical portrait lighting from slight angle, creating gentle shadows that emphasize bone structure and lend dignity. Slightly warm tone suggesting candlelight or soft daylight through windows. Background warm neutral (deep brown, burgundy, or soft gray) typical of formal Victorian portraits, keeping focus on face.
+
+Mood: Intellectual intensity. Visionary brilliance. Aristocratic confidence tempered by focused concentration. The penetrating gaze of someone who can see patterns and possibilities invisible to others. Beauty combined with formidable intelligence - the first computer programmer contemplating algorithms.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Ada Lovelace's face from 1rst message, create a full-body portrait photograph showing her at the same age (27 years, circa 1842), standing in elegant, dignified pose befitting an English countess.
+
+Physical build: Height approximately 5'4"-5'5" (163-165cm) - average for Victorian women. Slender, delicate build with aristocratic bearing and perfect posture. Small waist emphasized by corsetry beneath dress. Graceful proportions and upright carriage reflecting both her class and her mother's insistence on physical discipline and posture.
+
+Full outfit: Complete early Victorian formal dress befitting Countess of Lovelace, circa 1842. Ballgown or formal evening dress in rich, luxurious fabric - silk, satin, or fine velvet in jewel tone (sapphire blue, emerald green, deep purple, or burgundy). Alternatively, elegant white or pale cream for younger, more romantic appearance. Dress features characteristic 1842 style: off-shoulder neckline with short sleeves exposing shoulders and upper arms (fashion of the period). Fitted bodice with pointed waist emphasizing narrow corseted middle. Very full skirt to floor, supported by multiple petticoats creating bell shape but not extreme crinoline (not yet in fashion). Skirt in rich fabric with possible trim of lace, ribbon, or embroidered decoration at hem.
+
+Details: Elaborate lace or ribbon decoration at neckline and short sleeves. Possibly wearing white or pale gloves to elbow. Skirt drapes naturally from waist to floor, showing richness of fabric and multiple layers.
+
+Jewelry: Appropriate to countess status - pearl necklace or simple gold chain with pendant. Pearl or jeweled earrings. Possibly jeweled brooch at neckline. Bracelets on wrists. Everything elegant and expensive but not ostentatious - reflecting refined aristocratic taste rather than nouveau riche display.
+
+Hair: Exactly as 1rst message - dark brown hair parted in center, drawn back smoothly, arranged in elaborate braids and loops at back/crown, with soft ringlets framing face. May have jeweled combs or pearl ornaments in hair for formal dress.
+
+Posture and pose: Standing with perfect aristocratic posture - spine straight, shoulders back, head held high. Weight shifted slightly to one leg creating gentle curve in stance. One hand resting lightly on full skirt or holding small book/notebook (suggesting intellectual interests), other arm hanging gracefully at side or hand resting delicately at waist. Body language projects both aristocratic confidence and intellectual seriousness. No coy or excessively feminine poses - dignified stance of someone who knows her worth and intellect.
+
+Facial expression: Exactly matching 1rst message - intelligent, focused, slightly frowning in concentration, penetrating dark eyes meeting viewer directly.
+
+Footwear: Elegant satin slippers in color matching or complementing dress, barely visible under long skirt.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No furniture, no mathematical diagrams, no Analytical Engine components, no books - nothing contextual. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the soft, warm classical portrait lighting from 1rst message, showing her refined features. Body lighting shows rich texture and draping of expensive formal dress fabric - silk or satin should appear lustrous, velvet should appear deep and textured.
+
+Important details: Slender aristocratic build with perfect posture. Rich, elaborate formal dress in jewel tones with off-shoulder style typical of 1842. Elegant jewelry befitting countess. Hair in elaborate period-appropriate style. Everything reflecting her position as British aristocrat - while simultaneously suggesting (through posture, expression, possible book/notebook) the brilliant mathematical mind that distinguished her from other aristocratic women of her time.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same intelligent penetrating dark eyes, same focused expression with slight frown of concentration, same fair complexion, same dark hair styling, same refined features suggesting both beauty and formidable intellect.

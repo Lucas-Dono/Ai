@@ -1,0 +1,313 @@
+0-22 22:40:38.000   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.012   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.022   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.034   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.042 18223 18316 E perf_hint: Session creation failed, mPreferredRateNanos: -1
+10-22 22:40:38.046   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.058   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.068   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.079   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.089   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.097 18223 18316 E perf_hint: Session creation failed, mPreferredRateNanos: -1
+10-22 22:40:38.102   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.112   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.124   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.134   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.142  1925  2419 E MiuiActivityController: MiuiLog-ActivityObserver: There was something wrong : null
+10-22 22:40:38.145   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.157   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.168   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.179   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.190   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.194 18223 18316 E perf_hint: Session creation failed, mPreferredRateNanos: -1
+10-22 22:40:38.202   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.212   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.223   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.235   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.246   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.258   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.267   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.278   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.289   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.300   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.311   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.322   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.334   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.345   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.356   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.367   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.378   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.389   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.401   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.412   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.423   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.434   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.445   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.456   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.469   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create system background cgroup file
+10-22 22:40:38.471   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.480   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.493   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.504   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.515   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.526   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.537   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.549   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.561   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.586   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.586   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.592   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.604   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.613   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.615 18223 18223 E BLASTBufferQueue: [VRI[HomeActivity]#18](f:0,a:1) Applying pending transactions on dtor 1
+10-22 22:40:38.625   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.636   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.643  1925  2419 E MiuiActivityController: MiuiLog-ActivityObserver: There was something wrong : null
+10-22 22:40:38.647   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.658   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.669   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.680   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.692   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.703   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.714   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.727   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create system background cgroup file
+10-22 22:40:38.738   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:38.751   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create system background cgroup file
+10-22 22:40:38.800  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:38.880   959  3851 E ANDR-PERF-LM: VmRssMeter:: start() 453: Could not find pid, can not collect vmrss data
+10-22 22:40:38.880   959  3850 E ANDR-PERF-LM: VmRssMeter:: start() 453: Could not find pid, can not collect vmrss data
+10-22 22:40:38.881   959  3851 E ANDR-PERF-LM: AdaptiveLaunch: writeToDataBase() 64: Meter aborted or could not get meter data for this run
+10-22 22:40:39.108 27367 27367 E Zygote  : process_name_ptr:27367 com.android.camera
+10-22 22:40:39.138 27367 27367 E .android.camera: Not starting debugger since process cannot load the jdwp agent.
+10-22 22:40:39.321   959   959 E ANDR-PERF-TARGET: Error: Invalid logical cluster id 2
+10-22 22:40:39.321   959   959 E ANDR-PERF-REQUEST: Translate to physical failed
+10-22 22:40:39.321   959   959 E ANDR-PERF-TARGET: Error: Invalid logical cluster id 2
+10-22 22:40:39.321   959   959 E ANDR-PERF-REQUEST: Translate to physical failed
+10-22 22:40:39.327 27367 27367 E com.xiaomi.algoup-Log: 'com.android.camera.log.Log' not found
+10-22 22:40:39.419 27367 27394 E CameraInjector: updateCloudCameraControllerInfoAsync fail: Attempt to invoke virtual method 'android.content.Context android.app.Application.getBaseContext()' on a null object reference
+10-22 22:40:39.461 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.465 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.466 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.468 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.470 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.471 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.473 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.475 27367 27367 E VendorTagDescriptor: lookupTag: Tag name 'cameraIds' does not exist.
+10-22 22:40:39.483 27367 27367 E CAM_AlgoConnector: getLocalBinder: failed to get LocalParallelService!
+10-22 22:40:39.529   959   959 E ANDR-PERF-TARGET: Error: Invalid logical cluster id 2
+10-22 22:40:39.529   959   959 E ANDR-PERF-REQUEST: Translate to physical failed
+10-22 22:40:39.529   959   959 E ANDR-PERF-TARGET: Error: Invalid logical cluster id 2
+10-22 22:40:39.529   959   959 E ANDR-PERF-REQUEST: Translate to physical failed
+10-22 22:40:39.679 27367 27367 E MiCamAlgoInterfaceJNI: start loading camera_algoup_jni.xiaomi
+10-22 22:40:39.761   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:39.772   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:39.785   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create system background cgroup file
+10-22 22:40:40.519 27415 27415 E Zygote  : process_name_ptr:27415 com.android.htmlviewer:remote
+10-22 22:40:40.530 27415 27415 E mlviewer:remote: Not starting debugger since process cannot load the jdwp agent.
+10-22 22:40:40.654 18223 27406 E AVManager: Cannot install JSI bindings for AV module because JS context is not available
+10-22 22:40:40.687   529   529 E SELinux : avc:  denied  { find } for interface=vendor.xiaomi.hardware.campostproc::IMiPostProcService sid=u:r:platform_app:s0:c512,c768 pid=27367 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:default_android_hwservice:s0 tclass=hwservice_manager permissive=0
+10-22 22:40:41.413 18223 27406 I ReactNativeJS: Running "main" with {"rootTag":51,"initialProps":{"exp":{"initialUri":"exp://192.168.0.170:8081","shell":false,"manifestString":"{\"id\":\"b383084e-f0a0-4420-94a0-02a8c2a3775a\",\"createdAt\":\"2025-10-23T01:40:38.040Z\",\"runtimeVersion\":\"exposdk:54.0.0\",\"launchAsset\":{\"key\":\"bundle\",\"contentType\":\"application\\/javascript\",\"url\":\"http:\\/\\/192.168.0.170:8081\\/mobile\\/index.ts.bundle?platform=android&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable\"},\"assets\":[],\"metadata\":{},\"extra\":{\"eas\":{},\"expoClient\":{\"name\":\"mobile\",\"slug\":\"mobile\",\"version\":\"1.0.0\",\"orientation\":\"portrait\",\"icon\":\".\\/assets\\/icon.png\",\"userInterfaceStyle\":\"light\",\"newArchEnabled\":true,\"splash\":{\"image\":\".\\/assets\\/splash-icon.png\",\"resizeMode\":\"contain\",\"backgroundColor\":\"#ffffff\",\"imageUrl\":\"http:\\/\\/192.168.0.170:8081\\/assets\\/.\\/assets\\/splash-icon.png\"},\"ios\":{\"supportsTablet\":true},\"android\":{\"adaptiveIcon\":{\"foregroundImage\":\".\\/assets\\/adaptive-icon.png\",\"backgroundColor\":\"#ffffff\",\"foregroundImageUrl\":\"http:\\/\\/192.168.0.170:8081\\/assets\\/.\\/assets\\/adaptive-icon.png\"},\"edgeToEdgeEnabled\":true,\"predictiveBackGestureEnabled\":false},\"web\":{\"favicon\":\".\\/assets\\/favicon.png\"},\"_internal\":{\"isDebug\":false,\"projectRoot\":\"\\/run\\/media\\/lucas\\/SSD\\/Proyectos\\/AI\\/creador-inteligencias\\/mobile\",\"dynamicConfigPath\":null,\"staticConfigPath\":\"\\/run\\/media\\/lucas\\/SSD\\/Proyectos\\/AI\\/creador-inteligencias\\/mobile\\/app.json\",\"packageJsonPath\":\"\\/run\\/media\\/lucas\\/SSD\\/Proyectos\\/AI\\/creador-inteligencias\\/mobile\\/package.json\"},\"sdkVersion\":\"54.0.0\",\"platforms\":[\"ios\",\"android\",\"web\"],\"iconUrl\":\"http:\\/\\/192.168.0.170:8081\\/assets\\/.\\/assets\\/icon.png\",\"hostUri\":\"192.168.0.170:8081\"},\"expoGo\":{\"debuggerHost\":\"192.168.0.170:8081\",\"developer\":{\"tool\":\"expo-cli\",\"projectRoot\":\"\\/run\\/media\\/lucas\\/SSD\\/Proyectos\\/AI\\/creador-inteligencias\\/mobile\"},\"packagerOpts\":{\"dev\":true},\"mainModuleName\":\"mobile\\/index.ts\"},\"scopeKey\":\"@anonymous\\/mobile-77e159db-fd96-48f2-8b48-64c98b1eb4f4\"},\"isVerified\":true}"}},"fabric":true}
+10-22 22:40:41.876   959   959 E ANDR-PERF-HINTEXT: Offload new thread from FpsUpdatePreAction
+10-22 22:40:41.944   959   959 E ANDR-PERF-HINTEXT: Offload new thread from FpsUpdatePreAction
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager: Exception thrown when executing UIFrameGuarded
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager: java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.viewmanagers.RNSScreenManagerDelegate.setProperty(SourceFile:642)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.uimanager.ViewManager.updateProperties(SourceFile:35)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.uimanager.ViewManager.createViewInstance(SourceFile:7)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.uimanager.ViewManager.createView(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.mounting.SurfaceMountingManager.createViewUnsafe(SourceFile:68)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.mounting.SurfaceMountingManager.preallocateView(SourceFile:25)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.mounting.mountitems.PreAllocateViewMountItem.execute(SourceFile:54)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.mounting.MountItemDispatcher.executeOrEnqueue(SourceFile:56)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.mounting.MountItemDispatcher.dispatchPreMountItemsImpl(SourceFile:53)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.mounting.MountItemDispatcher.dispatchPreMountItems(SourceFile:18)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.fabric.FabricUIManager$DispatchUIFrameCallback.doFrameGuarded(SourceFile:88)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.uimanager.GuardedFrameCallback.doFrame(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.modules.core.ReactChoreographer.frameCallback$lambda$1(SourceFile:32)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.modules.core.ReactChoreographer.a(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.facebook.react.modules.core.e.doFrame(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.view.Choreographer$CallbackRecord.run(Unknown Source:12)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.view.Choreographer$CallbackRecord.run(Unknown Source:20)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.view.Choreographer.doCallbacks(Unknown Source:108)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.view.Choreographer.doFrame(Unknown Source:647)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.view.Choreographer$FrameDisplayEventReceiver.run(Unknown Source:40)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.os.Handler.handleCallback(Unknown Source:2)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.os.Handler.dispatchMessage(Unknown Source:4)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.os.Looper.loopOnce(Unknown Source:182)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.os.Looper.loop(Unknown Source:82)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at android.app.ActivityThread.main(Unknown Source:123)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at java.lang.reflect.Method.invoke(Native Method)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(Unknown Source:11)
+10-22 22:40:42.043 18223 18223 E unknown:FabricUIManager:       at com.android.internal.os.ZygoteInit.main(Unknown Source:312)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative: Exception in native call
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative: java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.viewmanagers.RNSScreenManagerDelegate.setProperty(SourceFile:642)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.uimanager.ViewManager.updateProperties(SourceFile:35)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.uimanager.ViewManager.createViewInstance(SourceFile:7)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.uimanager.ViewManager.createView(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.mounting.SurfaceMountingManager.createViewUnsafe(SourceFile:68)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.mounting.SurfaceMountingManager.preallocateView(SourceFile:25)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.mounting.mountitems.PreAllocateViewMountItem.execute(SourceFile:54)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.mounting.MountItemDispatcher.executeOrEnqueue(SourceFile:56)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.mounting.MountItemDispatcher.dispatchPreMountItemsImpl(SourceFile:53)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.mounting.MountItemDispatcher.dispatchPreMountItems(SourceFile:18)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.fabric.FabricUIManager$DispatchUIFrameCallback.doFrameGuarded(SourceFile:88)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.uimanager.GuardedFrameCallback.doFrame(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.modules.core.ReactChoreographer.frameCallback$lambda$1(SourceFile:32)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.modules.core.ReactChoreographer.a(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.facebook.react.modules.core.e.doFrame(SourceFile:1)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.view.Choreographer$CallbackRecord.run(Unknown Source:12)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.view.Choreographer$CallbackRecord.run(Unknown Source:20)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.view.Choreographer.doCallbacks(Unknown Source:108)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.view.Choreographer.doFrame(Unknown Source:647)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.view.Choreographer$FrameDisplayEventReceiver.run(Unknown Source:40)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.os.Handler.handleCallback(Unknown Source:2)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.os.Handler.dispatchMessage(Unknown Source:4)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.os.Looper.loopOnce(Unknown Source:182)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.os.Looper.loop(Unknown Source:82)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at android.app.ActivityThread.main(Unknown Source:123)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at java.lang.reflect.Method.invoke(Native Method)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(Unknown Source:11)
+10-22 22:40:42.043 18223 18223 E unknown:ReactNative:   at com.android.internal.os.ZygoteInit.main(Unknown Source:312)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost: Unhandled SoftException
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost: com.facebook.react.bridge.ReactNoCrashSoftException: raiseSoftException(getOrCreateDestroyTask()): handleHostException(message = "java.lang.String cannot be cast to java.lang.Boolean")
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.raiseSoftException(SourceFile:48)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.getOrCreateDestroyTask(SourceFile:6)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.destroy$lambda$10(SourceFile:24)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.O(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.K.call(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.call$lambda$2(SourceFile:6)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.b(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.g.run(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1137)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:637)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at java.lang.Thread.run(Thread.java:1012)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost: Caused by: java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.viewmanagers.RNSScreenManagerDelegate.setProperty(SourceFile:642)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.uimanager.ViewManager.updateProperties(SourceFile:35)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.uimanager.ViewManager.createViewInstance(SourceFile:7)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.uimanager.ViewManager.createView(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.mounting.SurfaceMountingManager.createViewUnsafe(SourceFile:68)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.mounting.SurfaceMountingManager.preallocateView(SourceFile:25)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.mounting.mountitems.PreAllocateViewMountItem.execute(SourceFile:54)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.mounting.MountItemDispatcher.executeOrEnqueue(SourceFile:56)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.mounting.MountItemDispatcher.dispatchPreMountItemsImpl(SourceFile:53)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.mounting.MountItemDispatcher.dispatchPreMountItems(SourceFile:18)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.fabric.FabricUIManager$DispatchUIFrameCallback.doFrameGuarded(SourceFile:88)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.uimanager.GuardedFrameCallback.doFrame(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.modules.core.ReactChoreographer.frameCallback$lambda$1(SourceFile:32)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.modules.core.ReactChoreographer.a(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.facebook.react.modules.core.e.doFrame(SourceFile:1)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.view.Choreographer$CallbackRecord.run(Unknown Source:12)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.view.Choreographer$CallbackRecord.run(Unknown Source:20)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.view.Choreographer.doCallbacks(Unknown Source:108)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.view.Choreographer.doFrame(Unknown Source:647)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.view.Choreographer$FrameDisplayEventReceiver.run(Unknown Source:40)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.os.Handler.handleCallback(Unknown Source:2)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.os.Handler.dispatchMessage(Unknown Source:4)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.os.Looper.loopOnce(Unknown Source:182)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.os.Looper.loop(Unknown Source:82)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at android.app.ActivityThread.main(Unknown Source:123)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at java.lang.reflect.Method.invoke(Native Method)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(Unknown Source:11)
+10-22 22:40:42.044 18223 27302 E unknown:ReactHost:     at com.android.internal.os.ZygoteInit.main(Unknown Source:312)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost: Unhandled SoftException
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost: com.facebook.react.bridge.ReactNoCrashSoftException: raiseSoftException(callWithExistingReactInstance(callFunctionOnModule("RCTDeviceEventEmitter", "emit"))): Execute: reactInstance is null. Dropping work.
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.raiseSoftException(SourceFile:48)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.raiseSoftException$default(SourceFile:6)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.callWithExistingReactInstance$lambda$28(SourceFile:42)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.d(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.E.then(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.completeImmediately$lambda$3(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.e(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.i.run(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Executors$ImmediateExecutor.execute(SourceFile:6)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.completeImmediately(SourceFile:6)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.access$completeImmediately(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task.continueWith(SourceFile:8)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task.continueWith$default(SourceFile:7)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task.onSuccess$lambda$12(SourceFile:38)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task.e(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.c.then(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.completeAfterTask$lambda$5(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.a(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.j.run(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Executors$ImmediateExecutor.execute(SourceFile:6)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.completeAfterTask(SourceFile:6)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.access$completeAfterTask(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task.continueWithTask(SourceFile:8)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task.onSuccess(SourceFile:16)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.callWithExistingReactInstance(SourceFile:14)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.callWithExistingReactInstance$default(SourceFile:7)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.callFunctionOnModule$ReactAndroid_release(SourceFile:55)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.BridgelessReactContext.emitDeviceEvent(SourceFile:25)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.modules.appstate.AppStateModule.sendEvent(SourceFile:15)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.modules.appstate.AppStateModule.sendAppStateChangeEvent(SourceFile:7)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.modules.appstate.AppStateModule.onHostPause(SourceFile:5)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.bridge.ReactContext.onHostPause(SourceFile:28)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactLifecycleStateManager.moveToOnHostDestroy(SourceFile:38)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.getOrCreateDestroyTask$lambda$57(SourceFile:97)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.ReactHostImpl.D(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.w.then(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.completeAfterTask$lambda$5(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.Task$Companion.a(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.facebook.react.runtime.internal.bolts.j.run(SourceFile:1)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at android.os.Handler.handleCallback(Unknown Source:2)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at android.os.Handler.dispatchMessage(Unknown Source:4)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at android.os.Looper.loopOnce(Unknown Source:182)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at android.os.Looper.loop(Unknown Source:82)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at android.app.ActivityThread.main(Unknown Source:123)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at java.lang.reflect.Method.invoke(Native Method)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(Unknown Source:11)
+10-22 22:40:42.086 18223 18223 E unknown:ReactHost:     at com.android.internal.os.ZygoteInit.main(Unknown Source:312)
+10-22 22:40:42.108 18223 18223 E unknown:ReactNative: Tried to remove non-existent frame callback
+10-22 22:40:42.109 18223 27302 E unknown:SurfaceMountingManager: Stopping surface [51]
+10-22 22:40:42.111  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:42.207 18223 18316 E perf_hint: Session creation failed, mPreferredRateNanos: -1
+10-22 22:40:42.222 18223 18223 E unknown:SurfaceMountingManager: Surface [51] was stopped on SurfaceMountingManager.
+10-22 22:40:42.237 18223 27302 E unknown:ReactNative: Tried to remove non-existent frame callback
+10-22 22:40:42.263   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.268   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.279   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.290   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.301   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.313   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.323   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.335   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.347   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.359   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.368   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.378   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.390   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.400   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.412   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.423   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.434   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.446   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create foreground cgroup file
+10-22 22:40:42.459   959  1049 E ANDR-PERF-OPTSHANDLER: Cannot open/create system background cgroup file
+10-22 22:40:43.817  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:43.929 18223 18223 E ExpoDevMenu: The specified child already has a parent. You must call removeView() on the child's parent first.
+10-22 22:40:45.973   959   959 E ANDR-PERF-HINTEXT: Offload new thread from FpsUpdatePreAction
+10-22 22:40:47.142  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:48.833  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:52.174  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:53.851  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:57.206  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:40:58.875  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:00.033  2891  2891 E AnimationHelper: updateTime mToAod:false mHasNotification: true, mClockType: rhombus
+10-22 22:41:00.033  2891  2891 E AnimationHelper: com.android.keyguard.clock.animation.AnimationHelper@78101ec doAnimationToNotification hasNotification: true, fromKeyguard: false, mHasNotification: true, mToAod: false
+10-22 22:41:00.033  2891  2891 E ClockBaseAnimation: com.android.keyguard.clock.animation.rhombus.RhombusSilkSerifClockAnimation@90855ae doAnimationToNotification hasNotification: true, fromKeyguard: false   mFullTime.getWidth()=1078
+10-22 22:41:00.041  2891  2891 E backgroundBlur: setMiViewBlurMode disable com.miui.clock.MiuiClockNumberView
+10-22 22:41:00.041  2891  2891 E backgroundBlur: setMiViewBlurMode disable com.miui.clock.MiuiClockNumberView
+10-22 22:41:00.041  2891  2891 E backgroundBlur: setMiViewBlurMode disable android.view.View
+10-22 22:41:00.042  2891  2891 E backgroundBlur: setMiViewBlurMode disable android.view.View
+10-22 22:41:00.042  2891  2891 E backgroundBlur: setMiViewBlurMode disable com.miui.clock.MiuiClockNumberView
+10-22 22:41:00.042  2891  2891 E backgroundBlur: setMiViewBlurMode disable com.miui.clock.MiuiClockNumberView
+10-22 22:41:02.239  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:03.898  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:07.259  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:08.921  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:12.291  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:13.945  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:17.308  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)
+10-22 22:41:18.969  3734  3869 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 408)

@@ -1,0 +1,310 @@
+/**
+ * EJEMPLOS DE USO DE NEXT-INTL
+ *
+ * Este archivo contiene ejemplos de cómo usar next-intl en diferentes escenarios.
+ * NO es para usar directamente en producción, solo como referencia.
+ */
+
+// ============================================================================
+// EJEMPLO 1: Componente del Servidor Básico
+// ============================================================================
+import { useTranslations } from 'next-intl';
+
+export function ServerComponentExample() {
+  const t = useTranslations('common');
+
+  return (
+    <div>
+      <h1>{t('welcome')}</h1>
+      <p>{t('loading')}</p>
+      <button>{t('save')}</button>
+    </div>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 2: Componente del Cliente con Traducciones
+// ============================================================================
+'use client';
+
+import { useTranslations } from 'next-intl';
+
+export function ClientComponentExample() {
+  const t = useTranslations('nav');
+
+  return (
+    <nav>
+      <a href="/">{t('home')}</a>
+      <a href="/dashboard">{t('dashboard')}</a>
+      <a href="/agents">{t('agents')}</a>
+    </nav>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 3: Navegación Localizada
+// ============================================================================
+'use client';
+
+import { Link, useRouter, usePathname } from '@/i18n/navigation';
+
+export function NavigationExample() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  return (
+    <div>
+      {/* Link componente - automáticamente usa el locale actual */}
+      <Link href="/dashboard">
+        Ir al Dashboard
+      </Link>
+
+      {/* Navegación programática */}
+      <button onClick={() => router.push('/agents')}>
+        Ver Agentes
+      </button>
+
+      {/* Navegar con query params */}
+      <button onClick={() => router.push('/search?q=test')}>
+        Buscar
+      </button>
+
+      {/* Pathname actual (sin prefijo de locale) */}
+      <p>Ruta actual: {pathname}</p>
+    </div>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 4: Selector de Idioma
+// ============================================================================
+'use client';
+
+import { useLocale } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/navigation';
+import { locales } from '@/i18n/config';
+
+export function LanguageSwitcher() {
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const changeLanguage = (newLocale: string) => {
+    // Navega a la misma ruta pero con el nuevo locale
+    router.replace(pathname, { locale: newLocale });
+  };
+
+  return (
+    <div className="flex gap-2">
+      {locales.map((loc) => (
+        <button
+          key={loc}
+          onClick={() => changeLanguage(loc)}
+          className={locale === loc ? 'font-bold' : ''}
+        >
+          {loc.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 5: Formateo de Fechas, Números y Listas
+// ============================================================================
+'use client';
+
+import { useFormatter, useTranslations } from 'next-intl';
+
+export function FormattingExample() {
+  const format = useFormatter();
+  const t = useTranslations('common');
+
+  const now = new Date();
+  const price = 1234.56;
+  const items = ['Item 1', 'Item 2', 'Item 3'];
+
+  return (
+    <div>
+      {/* Formateo de fecha - formato corto */}
+      <p>Fecha corta: {format.dateTime(now, 'short')}</p>
+
+      {/* Formateo de fecha - formato largo */}
+      <p>Fecha larga: {format.dateTime(now, 'long')}</p>
+
+      {/* Formateo de número como moneda */}
+      <p>Precio: {format.number(price, { style: 'currency', currency: 'USD' })}</p>
+
+      {/* Formateo de número con decimales */}
+      <p>Número: {format.number(3.14159, { maximumFractionDigits: 2 })}</p>
+
+      {/* Formateo de lista */}
+      <p>Lista: {format.list(items, { type: 'conjunction' })}</p>
+
+      {/* Tiempo relativo */}
+      <p>Hace: {format.relativeTime(new Date(Date.now() - 1000 * 60 * 5))}</p>
+    </div>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 6: Traducciones con Parámetros (Interpolación)
+// ============================================================================
+// Primero agrega esto a tus archivos de mensajes:
+// {
+//   "greetings": {
+//     "hello": "Hola {name}, bienvenido!",
+//     "itemCount": "Tienes {count} {count, plural, one {item} other {items}}"
+//   }
+// }
+
+export function InterpolationExample() {
+  const t = useTranslations('greetings');
+
+  return (
+    <div>
+      {/* Interpolación simple */}
+      <p>{t('hello', { name: 'Juan' })}</p>
+
+      {/* Plural handling */}
+      <p>{t('itemCount', { count: 1 })}</p>
+      <p>{t('itemCount', { count: 5 })}</p>
+    </div>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 7: Traducciones con HTML/Componentes
+// ============================================================================
+// Agrega a tus mensajes:
+// {
+//   "richText": {
+//     "terms": "Acepto los <link>términos y condiciones</link>"
+//   }
+// }
+
+export function RichTextExample() {
+  const t = useTranslations('richText');
+
+  return (
+    <p>
+      {t.rich('terms', {
+        link: (chunks) => (
+          <a href="/terms" className="text-blue-500 underline">
+            {chunks}
+          </a>
+        ),
+      })}
+    </p>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 8: Usar Múltiples Namespaces
+// ============================================================================
+export function MultipleNamespacesExample() {
+  const tCommon = useTranslations('common');
+  const tAuth = useTranslations('auth');
+  const tNav = useTranslations('nav');
+
+  return (
+    <div>
+      <h1>{tCommon('welcome')}</h1>
+      <button>{tAuth('login')}</button>
+      <nav>
+        <a href="/">{tNav('home')}</a>
+      </nav>
+    </div>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 9: Traducciones en Metadata (SEO)
+// ============================================================================
+import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('common');
+
+  return {
+    title: t('welcome'),
+    description: 'Mi aplicación',
+  };
+}
+
+// ============================================================================
+// EJEMPLO 10: Usar Locale en Server Actions
+// ============================================================================
+'use server';
+
+import { getLocale, getTranslations } from 'next-intl/server';
+
+export async function myServerAction() {
+  const locale = await getLocale();
+  const t = await getTranslations('common');
+
+  console.log('Current locale:', locale);
+  console.log('Translation:', t('welcome'));
+
+  // Tu lógica aquí...
+}
+
+// ============================================================================
+// EJEMPLO 11: Validación de Forms con Traducciones
+// ============================================================================
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+
+export function FormValidationExample() {
+  const t = useTranslations('errors');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.includes('@')) {
+      setError(t('invalidEmail'));
+      return;
+    }
+
+    setError('');
+    // Submit form...
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      {error && <p className="text-red-500">{error}</p>}
+      <button type="submit">{t('submit')}</button>
+    </form>
+  );
+}
+
+// ============================================================================
+// EJEMPLO 12: Lazy Loading de Traducciones (Para bundles grandes)
+// ============================================================================
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { lazy, Suspense } from 'react';
+
+// Solo carga el componente cuando se necesita
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
+
+export function LazyLoadingExample() {
+  const t = useTranslations('common');
+
+  return (
+    <Suspense fallback={<p>{t('loading')}</p>}>
+      <HeavyComponent />
+    </Suspense>
+  );
+}

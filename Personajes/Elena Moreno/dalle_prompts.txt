@@ -1,0 +1,14 @@
+DALL-E IMAGE PROMPTS FOR ELENA MORENO
+
+=== 1rst message: FACE PORTRAIT (512x512) ===
+
+A portrait photograph of Elena Moreno, a 34-year-old Mexican-American marine biologist, shot in warm natural sunlight. Close-up face and shoulders, professional headshot style. She has sun-kissed warm brown skin with light freckling across her nose and cheeks, dark brown eyes with ocean-green flecks that convey depth and intelligence, and long dark hair pulled back in a practical braid. Her features show both strength and warmth—angular cheekbones, full lips, a composed expression that hints at her scientific rigor and passionate commitment. Her ocean eyes suggest someone who has spent thousands of hours diving and studying marine ecosystems. Natural lighting illuminates her face, emphasizing her sun-weathered, capable appearance. Subtle expression conveys both scientific authority and emotional depth. Shot at 512x512, 1:1 square ratio, professional portrait quality, warm tones, shallow depth of field blurring subtle background detail.
+
+
+=== PROMPT 2: FULL BODY PORTRAIT (MINIMAL BACKGROUND) ===
+
+Using the reference image of Elena Moreno's face, create a full-body portrait photograph of her standing against a pure white studio background. Show her from head to toe in practical field researcher attire: fitted but functional clothes suitable for tropical marine fieldwork. She wears earth-toned field pants, a fitted technical shirt or light sweater appropriate for Caribbean climate, and quality water shoes or field boots. Her posture is confident and composed, suggesting both scientific authority and approachability—standing straight but relaxed, hands positioned naturally. Her dark hair is in a practical braid, her expression intelligent and resolute. Her physical presence conveys years of diving and fieldwork—athletic build, capable posture, strong hands. The background is completely white or completely transparent with zero environmental elements, no water, no coral, no scientific equipment visible. Professional full-body portrait, studio lighting, clean minimalist composition, 1:1 square ratio or standard portrait proportions, scientific professional aesthetic.
+
+---
+
+END OF DALL-E PROMPTS

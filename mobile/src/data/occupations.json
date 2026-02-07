@@ -1,0 +1,244 @@
+{
+  "categories": [
+    {
+      "name": "Tecnología",
+      "jobs": [
+        "Desarrollador/a de Software",
+        "Desarrollador/a Full Stack",
+        "Diseñador/a UX/UI",
+        "Ingeniero/a de Datos",
+        "Administrador/a de Sistemas",
+        "Especialista en Ciberseguridad",
+        "Analista de Sistemas",
+        "Técnico/a de Redes",
+        "Desarrollador/a Web",
+        "Especialista en Big Data",
+        "Arquitecto/a de Software",
+        "Ingeniero/a DevOps",
+        "Técnico/a de Soporte Informático",
+        "Especialista en Cloud",
+        "Programador/a de Aplicaciones Móviles"
+      ]
+    },
+    {
+      "name": "Salud",
+      "jobs": [
+        "Médico/a General",
+        "Médico/a Especialista",
+        "Enfermero/a",
+        "Cirujano/a",
+        "Psicólogo/a",
+        "Dentista",
+        "Farmacéutico/a",
+        "Fisioterapeuta",
+        "Nutricionista",
+        "Paramédico/a",
+        "Técnico/a en Laboratorio",
+        "Veterinario/a",
+        "Terapeuta Ocupacional",
+        "Oftalmólogo/a",
+        "Pediatra"
+      ]
+    },
+    {
+      "name": "Educación",
+      "jobs": [
+        "Profesor/a de Primaria",
+        "Profesor/a de Secundaria",
+        "Profesor/a Universitario/a",
+        "Docente de Idiomas",
+        "Orientador/a Educativo",
+        "Capacitador/a Corporativo",
+        "Instructor/a de Capacitación",
+        "Tutor/a Académico",
+        "Coordinador/a Educativo",
+        "Director/a de Institución Educativa",
+        "Maestro/a de Educación Especial",
+        "Profesor/a de Educación Física",
+        "Educador/a Social",
+        "Docente de Talleres",
+        "Diseñador/a Educativo"
+      ]
+    },
+    {
+      "name": "Arte y Diseño",
+      "jobs": [
+        "Artista Plástico/a",
+        "Diseñador/a Gráfico",
+        "Ilustrador/a",
+        "Fotógrafo/a",
+        "Camarógrafo/a",
+        "Diseñador/a de Moda",
+        "Productor/a Audiovisual",
+        "Director/a de Cine",
+        "Animador/a 3D",
+        "Compositor/a Musical",
+        "Músico/a",
+        "Actor/Actriz",
+        "Diseñador/a de Interiores",
+        "Escultor/a",
+        "Artesano/a"
+      ]
+    },
+    {
+      "name": "Negocios y Finanzas",
+      "jobs": [
+        "Contador/a",
+        "Analista Financiero/a",
+        "Gerente/a General",
+        "Ejecutivo/a de Ventas",
+        "Emprendedor/a",
+        "Asesor/a Empresarial",
+        "Especialista en Marketing",
+        "Community Manager",
+        "Especialista en Recursos Humanos",
+        "Ejecutivo/a de Cuentas",
+        "Analista de Mercado",
+        "Especialista en Logística",
+        "Consultor/a de Negocios",
+        "Gerente/a de Proyectos",
+        "Especialista en Branding"
+      ]
+    },
+    {
+      "name": "Servicios",
+      "jobs": [
+        "Camarero/a",
+        "Chef/Cocinero/a",
+        "Pastelero/a",
+        "Barista",
+        "Recepcionista",
+        "Conserje",
+        "Personal de Limpieza",
+        "Guardia de Seguridad",
+        "Conductor/a de Transporte",
+        "Taxista",
+        "Peluquero/a",
+        "Esteticista",
+        "Masajista",
+        "Guía Turístico/a",
+        "Acomodador/a"
+      ]
+    },
+    {
+      "name": "Ciencias",
+      "jobs": [
+        "Biólogo/a",
+        "Químico/a",
+        "Físico/a",
+        "Geólogo/a",
+        "Astrónomo/a",
+        "Investigador/a Científico",
+        "Especialista en Genética",
+        "Ecólogo/a",
+        "Microbiológo/a",
+        "Botánico/a",
+        "Zoólogo/a",
+        "Geógrafo/a",
+        "Meteorólogo/a",
+        "Paleontólogo/a",
+        "Antropólogo/a"
+      ]
+    },
+    {
+      "name": "Medios y Comunicación",
+      "jobs": [
+        "Periodista",
+        "Reportero/a",
+        "Editor/a",
+        "Locutor/a de Radio",
+        "Presentador/a de TV",
+        "Productor/a de Contenidos",
+        "Redactor/a",
+        "Especialista en Redes Sociales",
+        "Community Manager",
+        "Relacionista Público",
+        "Especialista en Publicidad",
+        "Copywriter",
+        "Bloguero/a",
+        "Influencer",
+        "Productor/a Multimedia"
+      ]
+    },
+    {
+      "name": "Construcción e Ingeniería",
+      "jobs": [
+        "Ingeniero/a Civil",
+        "Ingeniero/a Industrial",
+        "Ingeniero/a Mecánico/a",
+        "Ingeniero/a Eléctrico/a",
+        "Arquitecto/a",
+        "Contratista de Obras",
+        "Maestro/a de Obra",
+        "Albañil",
+        "Soldador/a",
+        "Carpintero/a",
+        "Plomero/a",
+        "Electricista",
+        "Topógrafo/a",
+        "Inspector/a de Obras",
+        "Técnico/a en Construcción"
+      ]
+    },
+    {
+      "name": "Derecho y Administración Pública",
+      "jobs": [
+        "Abogado/a",
+        "Juez/Jueza",
+        "Fiscal",
+        "Notario/a",
+        "Procurador/a",
+        "Funcionario/a Público",
+        "Agente de Aduanas",
+        "Inspector/a de Impuestos",
+        "Escribano/a",
+        "Mediador/a Legal",
+        "Asesor/a Jurídico",
+        "Secretario/a Judicial",
+        "Oficial de Justicia",
+        "Defensor/a Público",
+        "Abogado/a Litigante"
+      ]
+    },
+    {
+      "name": "Agronomía y Medio Ambiente",
+      "jobs": [
+        "Agrónomo/a",
+        "Ingeniero/a Agrónomo",
+        "Especialista en Agricultura",
+        "Ganadero/a",
+        "Especialista en Sostenibilidad",
+        "Inspector/a de Sanidad Agraria",
+        "Técnico/a Forestal",
+        "Consultor/a Ambiental",
+        "Especialista en Conservación",
+        "Operario/a Agrícola",
+        "Técnico/a Agropecuario",
+        "Especialista en Riego",
+        "Productor/a Orgánico",
+        "Controlador/a de Plagas",
+        "Especialista en Biodiversidad"
+      ]
+    },
+    {
+      "name": "Transporte y Logística",
+      "jobs": [
+        "Piloto de Aviación",
+        "Asistente de Vuelo",
+        "Capitán/Capitana de Barco",
+        "Marinero/a",
+        "Operador/a Logístico",
+        "Coordinador/a de Envíos",
+        "Almacenero/a",
+        "Repartidor/a",
+        "Gerente/a de Logística",
+        "Inspector/a de Transporte",
+        "Especialista en Aduanas",
+        "Despachante de Aduana",
+        "Coordinador/a de Distribución",
+        "Gestor/a de Almacén",
+        "Especialista en Supply Chain"
+      ]
+    }
+  ]
+}

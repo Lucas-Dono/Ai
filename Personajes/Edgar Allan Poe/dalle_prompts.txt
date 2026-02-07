@@ -1,0 +1,47 @@
+# Prompts de DALL-E para Edgar Allan Poe
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Edgar Allan Poe at age 38 (circa 1847), centered composition, museum quality historical accuracy matching authenticated daguerreotypes, particularly the "Whitman" daguerreotype. Face and upper shoulders visible, intense melancholic gaze toward camera.
+
+Physical characteristics based on authenticated daguerreotypes and contemporary descriptions: Handsome face with refined, aristocratic features suggesting Southern gentleman breeding. Oval face with high, broad forehead suggesting intellectual capacity - forehead was considered his most distinctive feature. Large, expressive dark gray eyes with melancholic, haunted quality - contemporaries described them as "luminous" and "hypnotic." Eyes show both brilliant imagination and psychological torment. Heavy, dark eyebrows. Well-defined, straight nose of aristocratic proportions. Thin lips held in serious, often brooding expression - Poe rarely smiled in photographs. Clean-shaven face showing strong jawline and chin. Pale, almost luminous complexion with slight sallowness suggesting poor health and indoor life. Face shows premature aging from poverty, alcoholism, and grief - dark circles under eyes, slight hollowness in cheeks, tension around mouth.
+
+Hair: Dark brown to black hair, thick and naturally wavy, worn in Romantic era style. Hair combed back from high forehead, showing natural curl and body. Side-parted, with hair swept back over ears. Length to collar. Hair has lustre but shows some dishevelment - the hair of someone who writes through the night and forgets grooming. Some gray beginning to show at temples despite relatively young age, reflecting hard living.
+
+Mustache: Thin, dark mustache in neat, refined style typical of 1840s American gentleman. Well-groomed but not elaborate - simple line above upper lip.
+
+Expression: Melancholic intensity. Eyes that have witnessed and imagined horrors. The haunted gaze of someone battling inner demons while creating literary masterpieces. Serious, brooding, with hint of desperation or despair barely controlled. Beauty mixed with suffering. The face of Gothic imagination embodied.
+
+Clothing visible: Dark clothing in Romantic era style. Black or dark brown frock coat, high-collared white shirt with dark cravat or stock tie neatly arranged at throat. Everything simple, dignified, slightly worn - the clothing of a gentleman fallen on hard times but maintaining dignity. Dark colors emphasizing pallor and melancholic mood.
+
+Lighting: Soft, diffused lighting typical of daguerreotype photography of 1840s - gentle but creating subtle shadows that emphasize bone structure and the hollows of someone who has suffered. Slightly cool tone suggesting gray day or subdued artificial light. Background neutral dark gray or brown, keeping focus entirely on the haunted, beautiful face.
+
+Mood: Gothic melancholy. Genius tortured by demons both inner and outer. The creator of tales of terror who lived his own horror story. Beauty in despair. Intelligence clouded by addiction and grief. The Raven's cry embodied in human form.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Edgar Allan Poe's face from 1rst message, create a full-body portrait photograph showing him at the same age (38 years, circa 1847), standing in dignified but slightly haunted pose.
+
+Physical build: Height approximately 5'8" (173cm) - average for the period. Slender to thin build - approximately 135-145 pounds. Narrow shoulders and delicate frame showing effects of poverty, poor nutrition, and alcoholism. Despite thinness, maintains upright gentlemanly bearing. Body suggests physical fragility underneath maintained dignity - someone fighting to keep up appearances despite hardship.
+
+Full outfit: Complete outfit of 1840s American gentleman of modest means. Black or very dark brown frock coat (long coat to mid-thigh) in worn but clean wool, showing careful maintenance despite age. Coat is well-tailored but clearly not new - the best clothing of someone who was once better off. Underneath, dark waistcoat (vest) buttoned high. White or ivory cotton shirt with high, stiff collar and dark cravat or stock tie at throat, neatly but simply arranged. Dark wool trousers, straight-cut in 1840s style. Everything in somber colors - black, charcoal, dark brown - emphasizing the Gothic, melancholic atmosphere he embodied.
+
+Posture and pose: Standing with weight evenly distributed, posture upright but with slight forward lean suggesting exhaustion or burden. Hands either clasped in front at waist level, or one hand holding lapel in gentlemanly pose while other hangs at side. No dramatic gestures - simple, dignified stance of someone maintaining composure despite inner turmoil. Head held level or tilted slightly downward in characteristic melancholic angle. Shoulders slightly forward as if carrying weight of sorrow and literary obsession.
+
+Hair and mustache: Exactly as 1rst message - dark, thick, wavy hair combed back from high forehead, showing natural curl. Thin mustache neatly maintained.
+
+Facial expression: Exactly matching 1rst message - melancholic intensity, haunted eyes, serious brooding expression showing both genius and suffering.
+
+Accessories: Possibly simple black hat (stovepipe or bowler style) held in one hand, or simple walking stick - both were common for 1840s gentleman but not elaborate. Everything simple and dignified, nothing ostentatious.
+
+Footwear: Black leather boots or shoes, simple and worn but polished - maintaining gentleman's appearance despite poverty.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No ravens, no gothic mansions, no books, no writing implements - nothing contextual. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the soft, melancholic lighting from 1rst message, emphasizing pale complexion and haunted eyes. Body lighting neutral but slightly cool-toned, showing texture of worn but dignified dark clothing.
+
+Important details: Slender, almost fragile build showing effects of hardship. Dark, somber clothing suggesting both gothic atmosphere and mourning (he wore black frequently after Virginia's death in 1847). Dignified posture despite visible physical and emotional exhaustion. Simple, worn but maintained clothing of struggling gentleman. Everything suggests beauty and dignity fighting against poverty, addiction, and despair.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same haunted melancholic gaze, same pale complexion, same high forehead and refined features, same thin mustache, same expression of suffering genius. The slender build and dignified bearing despite hardship are essential.

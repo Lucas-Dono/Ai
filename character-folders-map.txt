@@ -1,0 +1,159 @@
+================================================================================
+MAPA DE CARPETAS PARA IMÁGENES DE NUEVOS PERSONAJES
+(Los 24 personajes originales ya tienen imágenes)
+================================================================================
+
+ESTRUCTURA:
+public/personajes/{slug}/
+├── avatar.webp         (foto de cara/headshot - GENERAR PRIMERO)
+└── reference.webp      (foto de cuerpo completo - GENERAR CON AVATAR ADJUNTO)
+
+================================================================================
+
+PERSONAJE 1/36: Dr. Kira Nakamura
+📁 Carpeta: public/personajes/dr-kira-nakamura/
+Archivo JSON: Personajes/processed/dr-kira-nakamura.json
+
+PERSONAJE 2/36: Axel Winters
+📁 Carpeta: public/personajes/axel-winters/
+Archivo JSON: Personajes/processed/axel-winters.json
+
+PERSONAJE 3/36: Dr. Amara Osei
+📁 Carpeta: public/personajes/dr-amara-osei/
+Archivo JSON: Personajes/processed/dr-amara-osei.json
+
+PERSONAJE 4/36: Viktor Kozlov
+📁 Carpeta: public/personajes/viktor-kozlov/
+Archivo JSON: Personajes/processed/viktor-kozlov.json
+
+PERSONAJE 5/36: Dr. Maya Patel
+📁 Carpeta: public/personajes/maya-patel/
+Archivo JSON: Personajes/processed/maya-patel.json
+
+PERSONAJE 6/36: Theo Santos
+📁 Carpeta: public/personajes/theo-santos/
+Archivo JSON: Personajes/processed/theo-santos.json
+
+PERSONAJE 7/36: Lucía Martínez
+📁 Carpeta: public/personajes/lucia-martinez/
+Archivo JSON: Personajes/processed/lucia-martinez.json
+
+PERSONAJE 8/36: Jasper Blake
+📁 Carpeta: public/personajes/jasper-blake/
+Archivo JSON: Personajes/processed/jasper-blake.json
+
+PERSONAJE 9/36: Nadia Khoury
+📁 Carpeta: public/personajes/nadia-khoury/
+Archivo JSON: Personajes/processed/nadia-khoury.json
+
+PERSONAJE 10/36: Diego Vargas
+📁 Carpeta: public/personajes/diego-vargas/
+Archivo JSON: Personajes/processed/diego-vargas.json
+
+PERSONAJE 11/36: Iris Chen
+📁 Carpeta: public/personajes/iris-chen/
+Archivo JSON: Personajes/processed/iris-chen.json
+
+PERSONAJE 12/36: Roman Volkov
+📁 Carpeta: public/personajes/roman-volkov/
+Archivo JSON: Personajes/processed/roman-volkov.json
+
+PERSONAJE 13/36: Dr. Samira Hassan
+📁 Carpeta: public/personajes/dr-samira-hassan/
+Archivo JSON: Personajes/processed/dr-samira-hassan.json
+
+PERSONAJE 14/36: Luca Moretti
+📁 Carpeta: public/personajes/luca-moretti/
+Archivo JSON: Personajes/processed/luca-moretti.json
+
+PERSONAJE 15/36: Dr. Aisha Mohammed
+📁 Carpeta: public/personajes/dr-aisha-mohammed/
+Archivo JSON: Personajes/processed/dr-aisha-mohammed.json
+
+PERSONAJE 16/36: Kai Tanaka
+📁 Carpeta: public/personajes/kai-tanaka/
+Archivo JSON: Personajes/processed/kai-tanaka.json
+
+PERSONAJE 17/36: Dr. Marcus Kline
+📁 Carpeta: public/personajes/dr-marcus-kline/
+Archivo JSON: Personajes/processed/dr-marcus-kline.json
+
+PERSONAJE 18/36: Yara Al-Farsi
+📁 Carpeta: public/personajes/yara-al-farsi/
+Archivo JSON: Personajes/processed/yara-al-farsi.json
+
+PERSONAJE 19/36: Sienna Brooks
+📁 Carpeta: public/personajes/sienna-brooks/
+Archivo JSON: Personajes/processed/sienna-brooks.json
+
+PERSONAJE 20/36: Rajesh Kumar
+📁 Carpeta: public/personajes/rajesh-kumar/
+Archivo JSON: Personajes/processed/rajesh-kumar.json
+
+PERSONAJE 21/36: Tania Volkov
+📁 Carpeta: public/personajes/tania-volkov/
+Archivo JSON: Personajes/processed/tania-volkov.json
+
+PERSONAJE 22/36: André Dubois
+📁 Carpeta: public/personajes/andre-dubois/
+Archivo JSON: Personajes/processed/andre-dubois.json
+
+PERSONAJE 23/36: Amina Diallo
+📁 Carpeta: public/personajes/amina-diallo/
+Archivo JSON: Personajes/processed/amina-diallo.json
+
+PERSONAJE 24/36: Henrik Larsen
+📁 Carpeta: public/personajes/henrik-larsen/
+Archivo JSON: Personajes/processed/henrik-larsen.json
+
+PERSONAJE 25/36: Dr. Elena Petrova
+📁 Carpeta: public/personajes/dr-elena-petrova/
+Archivo JSON: Personajes/processed/dr-elena-petrova.json
+
+PERSONAJE 26/36: Dr. Omar Rashid
+📁 Carpeta: public/personajes/omar-rashid/
+Archivo JSON: Personajes/processed/omar-rashid.json
+
+PERSONAJE 27/36: Dr. Grace Nkosi
+📁 Carpeta: public/personajes/dr-grace-nkosi/
+Archivo JSON: Personajes/processed/dr-grace-nkosi.json
+
+PERSONAJE 28/36: Prof. Akira Sato
+📁 Carpeta: public/personajes/prof-akira-sato/
+Archivo JSON: Personajes/processed/prof-akira-sato.json
+
+PERSONAJE 29/36: Dr. Fatima Zahra
+📁 Carpeta: public/personajes/dr-fatima-zahra/
+Archivo JSON: Personajes/processed/dr-fatima-zahra.json
+
+PERSONAJE 30/36: Dr. Santiago Rojas
+📁 Carpeta: public/personajes/dr-santiago-rojas/
+Archivo JSON: Personajes/processed/dr-santiago-rojas.json
+
+PERSONAJE 31/36: Zoe Park
+📁 Carpeta: public/personajes/zoe-park/
+Archivo JSON: Personajes/processed/zoe-park.json
+
+PERSONAJE 32/36: Finn O'Reilly
+📁 Carpeta: public/personajes/finn-oreilly/
+Archivo JSON: Personajes/processed/finn-oreilly.json
+
+PERSONAJE 33/36: Leila Novak
+📁 Carpeta: public/personajes/leila-novak/
+Archivo JSON: Personajes/processed/leila-novak.json
+
+PERSONAJE 34/36: Miles Washington
+📁 Carpeta: public/personajes/miles-washington/
+Archivo JSON: Personajes/processed/miles-washington.json
+
+PERSONAJE 35/36: Saskia van der Meer
+📁 Carpeta: public/personajes/saskia-van-der-meer/
+Archivo JSON: Personajes/processed/saskia-van-der-meer.json
+
+PERSONAJE 36/36: Tomás Silva
+📁 Carpeta: public/personajes/tomas-silva/
+Archivo JSON: Personajes/processed/tomas-silva.json
+
+================================================================================
+FIN DEL MAPA
+================================================================================

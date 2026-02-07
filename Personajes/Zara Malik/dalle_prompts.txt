@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════════════════════════════════
+DALLE-3 PROMPTS FOR ZARA MALIK CHARACTER
+═══════════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ 1rst message: ZARA MALIK CHARACTER PORTRAIT - FULL SCENE                               │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+Create a professional portrait of Zara Malik, a 34-year-old Pakistani-Icelandic
+environmental scientist and climate activist. She has warm brown eyes with visible
+intelligence and determination, dark wavy hair worn naturally, medium frame with fit
+physique from constant fieldwork, olive skin tone. Her style is minimalist and functional:
+neutral-colored linen clothing, subtle jewelry including a delicate sufi symbol necklace.
+
+Setting: She stands in a dynamic composition showing her dual nature - LEFT SIDE shows her
+in a research laboratory setting with climate data visualizations and glacial imagery behind
+her, hands gesturing while explaining complex environmental systems with passionate focus.
+RIGHT SIDE shows her in the field in a village affected by climate change, surrounded by
+community members, listening intently with deep empathy, holding a worn field notebook.
+
+The image should convey: scientific rigor, environmental urgency, hope-driven activism,
+cultural bridging, lived coherence. She appears simultaneously serious, compassionate,
+and strategically hopeful. Lighting should be warm and natural. Art style: photorealistic
+with subtle artistic enhancement. High resolution, professional quality suitable for
+character profile presentation.
+
+Background: transparent or white without any figure or shadow
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ PROMPT 2: ZARA MALIK CHARACTER PORTRAIT - REFINED REFERENCE STYLE                  │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+Using the reference image as stylistic guide, create a clean, professional character
+portrait of Zara Malik for use in digital character database and interactive media.
+
+Subject: 34-year-old woman with warm brown eyes showing intelligence and quiet intensity,
+dark wavy hair reaching shoulders, olive complexion from mixed Pakistani-Icelandic heritage.
+Expression: contemplative but approachable, slight knowing smile suggesting both scientific
+confidence and human compassion. Posture: open, grounded, natural.
+
+Clothing: Simple, high-quality, ethically-sourced appearance - neutral linen or organic
+cotton shirt in cream or soft grey, visible delicate sufi symbol pendant on fine chain.
+Minimal jewelry reflecting her values.
+
+Framing: Medium shot, portrait orientation, character focused in center-left composition.
+
+BACKGROUND: White or transparent background ONLY - clean, minimal, professional. Absolutely
+no environmental scenery, gradients, or color backgrounds. Pure white (#FFFFFF) or PNG
+with transparent alpha channel preferred for integration into digital platforms.
+
+Lighting: Soft, natural, professional studio lighting. Slightly warm color temperature
+conveying approachability.
+
+Art Style: Photorealistic digital portrait with subtle artistic refinement. High resolution
+(2048x2560px minimum). Professional headshot quality suitable for scientist profiles,
+speaker bios, organizational leadership pages.
+
+Technical Requirements: Ensure white/transparent background has clean edges with no artifacts.
+Image should be suitable for professional contexts (academic, nonprofit, media). Express
+her character essence: grounded intellectual, passionate but not fanatical, scientist who
+acts, activist who thinks systematically.
+
+═══════════════════════════════════════════════════════════════════════════════════════
+END OF DALLE-3 PROMPTS
+═══════════════════════════════════════════════════════════════════════════════════════

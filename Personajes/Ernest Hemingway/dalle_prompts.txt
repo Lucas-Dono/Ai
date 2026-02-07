@@ -1,0 +1,64 @@
+# DALLE PROMPTS - ERNEST HEMINGWAY
+
+## 1rst message: RETRATO FACIAL (512x512)
+
+Portrait of Ernest Hemingway at age 50-55, close-up headshot, strong masculine features, thick white beard, weathered and tanned skin showing years of outdoor life, intense penetrating gaze with dark eyes, slightly furrowed brow suggesting depth of thought and experience, lines and wrinkles that tell stories of war, adventure and hard living, strong jawline visible beneath the beard, salt-and-pepper hair slightly tousled, expression that combines confidence with underlying melancholy, the face of a man who has lived intensely - hunter, fisherman, war correspondent, literary genius, photorealistic style, dramatic natural lighting highlighting facial features and texture, warm earth tones, studio portrait quality, focused and sharp, no background distractions, capturing both his legendary masculinity and hidden vulnerability, the eyes reflecting intelligence, pain, and the weight of lived experience.
+
+---
+
+## PROMPT 2: CUERPO COMPLETO (CONSISTENCIA FACIAL)
+
+Full body portrait of Ernest Hemingway at age 50-55, **MATCHING THE FACIAL FEATURES FROM PREVIOUS IMAGE: thick white beard, weathered tanned face, intense dark eyes, strong masculine features**, standing in a confident pose, wearing a cream-colored heavy cable-knit fisherman's sweater or khaki safari shirt with rolled sleeves, brown canvas pants or khaki trousers, the clothing suggesting both the fisherman and the adventurer, broad-shouldered athletic build showing physical strength despite his age, hands weathered from outdoor life visible at his sides or one hand casually in pocket, full body visible from head to feet, sturdy leather boots or deck shoes, the stance of a man comfortable in his body and his legend, expression matching the first portrait - confident yet carrying deep complexity, photorealistic style, natural lighting, **PURE WHITE BACKGROUND or TRANSPARENT BACKGROUND (no textures, no gradients, absolute white)**, centered composition with full figure visible, capturing the physical presence of "Papa Hemingway" - the writer as man of action, the literary giant who was also hunter, fisherman, and war correspondent, body language suggesting both strength and the toll of hard living.
+
+---
+
+## NOTAS TÉCNICAS:
+
+**Consistencia Visual entre Prompts:**
+- El Prompt 2 debe mantener EXACTAMENTE las características faciales del 1rst message
+- Barba blanca espesa y distintiva
+- Piel curtida y bronceada
+- Ojos oscuros intensos y penetrantes
+- Rasgos masculinos fuertes
+- Expresión que combina confianza con complejidad emocional
+
+**Elementos Clave de la Imagen de Hemingway:**
+- Edad: 50-55 años (su época más icónica: Cuba, Nobel, "The Old Man and the Sea")
+- Barba: Blanca, espesa, bien cuidada pero no demasiado arreglada
+- Piel: Bronceada, curtida por el sol, arrugas que cuentan historias
+- Ojos: Intensos, inteligentes, con profundidad emocional
+- Expresión: Confiada pero con matices de melancolía y peso existencial
+
+**Vestimenta Representativa:**
+- Opción 1: Suéter de pescador de punto grueso color crema/beige (representa su amor por la pesca)
+- Opción 2: Camisa safari color caqui (representa su lado aventurero, cazador, corresponsal)
+- Ambas opciones capturan su identidad como hombre de acción, no solo escritor de escritorio
+
+**Background para Prompt 2:**
+- CRUCIAL: Fondo blanco puro o transparente
+- Sin texturas, sin gradientes, sin elementos decorativos
+- Esto permite usar la imagen en cualquier contexto sin distracción
+- El foco debe estar 100% en la figura de Hemingway
+
+**Estilo Fotográfico:**
+- Fotorrealismo, no ilustración ni estilo artístico
+- Calidad de retrato fotográfico profesional
+- Iluminación natural que resalta textura de piel, barba, ropa
+- Alta definición y nitidez
+- Tonos cálidos terrosos que reflejan su vida al aire libre
+
+**Evitar:**
+- Apariencia demasiado joven o suave
+- Barba oscura (era blanca en su época icónica)
+- Ropa formal o traje (Hemingway era informal, práctico)
+- Fondos decorativos o con elementos que distraigan
+- Expresión excesivamente sonriente o artificial
+- Aspecto débil o frágil (pese a su sufrimiento interno, proyectaba fuerza física)
+
+**Capturar la Esencia:**
+- "Papa Hemingway": patriarca literario, figura legendaria
+- El escritor como hombre de acción: no solo palabras, sino aventura vivida
+- La contradicción visual: fuerza física que esconde tormento interno
+- El rostro curtido que ha visto guerra, muerte, belleza, tragedia
+- Los ojos que observan profundamente, que han mirado el abismo
+- La presencia física imponente que construyó como armadura contra la vulnerabilidad

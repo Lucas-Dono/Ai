@@ -16,7 +16,7 @@ export async function withTeamPermission(
   resource: string,
   action: string
 ): Promise<{ authorized: true; context: TeamContext } | { authorized: false; error: NextResponse }> {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: req.headers });
 
   if (!session?.user?.id) {
     return {
@@ -34,7 +34,7 @@ export async function withTeamPermission(
       },
     },
     include: {
-      team: true,
+      Team: true,
     },
   });
 
@@ -62,7 +62,7 @@ export async function withTeamPermission(
       userId: session.user.id,
       teamId,
       role: membership.role as TeamRole,
-      team: membership.team,
+      team: membership.Team,
     },
   };
 }

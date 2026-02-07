@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { nanoid } from "nanoid";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { withTeamPermission } from "@/lib/permissions/middleware";
 import { canManageRole, TeamRole } from "@/lib/permissions/roles";
@@ -19,7 +20,7 @@ export async function GET(
   const members = await prisma.teamMember.findMany({
     where: { teamId: id },
     include: {
-      user: {
+      User: {
         select: {
           id: true,
           name: true,
@@ -39,8 +40,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthenticatedUser(req);
+  if (!user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -58,7 +59,7 @@ export async function POST(
   // Find invitation
   const invitation = await prisma.teamInvitation.findUnique({
     where: { token: invitationToken },
-    include: { team: true },
+    include: { Team: true },
   });
 
   if (!invitation || invitation.teamId !== id) {
@@ -81,7 +82,7 @@ export async function POST(
     where: {
       teamId_userId: {
         teamId: id,
-        userId: session.user.id,
+        userId: user.id,
       },
     },
   });
@@ -97,12 +98,13 @@ export async function POST(
   const [member] = await prisma.$transaction([
     prisma.teamMember.create({
       data: {
+        id: nanoid(),
         teamId: id,
-        userId: session.user.id,
+        userId: user.id,
         role: invitation.role,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,

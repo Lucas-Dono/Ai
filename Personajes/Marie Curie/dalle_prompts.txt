@@ -1,0 +1,43 @@
+# Prompts de DALL-E para Marie Curie
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Marie Curie at age 40 (circa 1907), centered composition, museum quality historical accuracy matching authenticated photographs. Face and upper shoulders visible, direct serious gaze toward camera.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Delicate Slavic features with characteristic Polish-French appearance. Oval face with high, intelligent forehead - notably broad, suggesting intellectual capacity. Gray-blue eyes with penetrating, focused gaze showing intense concentration and determination - eyes of someone who has stared at radioactive materials glowing in darkness. Not conventionally beautiful by Belle Époque standards but possessing a severe, intellectual attractiveness. Straight, slightly prominent nose. Well-defined cheekbones. Thin lips usually held in serious, neutral expression - rarely smiled in photographs, reflecting both photographic conventions and her serious temperament. Pale, fair complexion typical of someone who spent endless hours in dark laboratories. Subtle signs of fatigue around eyes from years of exhausting manual labor (processing tons of pitchblende) and exposure to radiation.
+
+Hair: Ash-blonde to light brown hair (described by contemporaries as "cendré" - ashen blonde), fine texture. Hair styled in characteristic Gibson Girl fashion of early 1900s - loosely pulled back from face with soft waves framing forehead and temples, gathered into loose bun or chignon at nape of neck. A few wispy tendrils escaping around face suggesting long hours of focused work without time for elaborate grooming. Natural, unpretentious style befitting a scientist, not a society woman.
+
+Expression: Serious, focused, intensely intelligent. Eyes that show both brilliant mind and the weight of responsibility - this is shortly after becoming first woman professor at Sorbonne and during years of her groundbreaking research. No smile, but not unfriendly - simply the grave demeanor of someone doing profoundly important and dangerous work. Slight hint of melancholy or exhaustion visible around eyes - the toll of widowhood (Pierre died 1906) and relentless work.
+
+Clothing visible: Simple, austere black dress typical of her style and mourning for Pierre. High-necked blouse or dress with minimal decoration - Marie was famous for wearing the same black dress in laboratory for years to avoid ruining better clothing with chemical stains. White or ivory lace collar as only ornamentation, in Gibson era style. No jewelry except possibly simple wedding band. Everything practical, nothing frivolous.
+
+Lighting: Soft, neutral studio lighting from slight angle, creating gentle shadows that emphasize bone structure and serious demeanor. Slightly cool tone suggesting scientific/academic setting. Background neutral gray or soft brown, keeping focus entirely on the face and intelligent eyes.
+
+Mood: Scientific dedication. Brilliant intellect focused on discovery. Quiet strength and determination. The face of someone who has already changed the world and will change it more, despite opposition to women in science. Exhaustion tempered by resolve.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Marie Curie's face from 1rst message, create a full-body portrait photograph showing her at the same age (40 years, circa 1907), standing in dignified, composed pose.
+
+Physical build: Height approximately 5'3" (160cm) - petite stature. Very slender, almost fragile build from years of exhausting physical labor, poor nutrition (she often forgot to eat when absorbed in work), and early effects of radiation exposure. Delicate bone structure but upright, dignified posture showing inner strength despite small physical frame. Shoulders slightly forward from decades of bending over laboratory benches and leaning over glowing samples in darkness.
+
+Full outfit: Full-length black wool or serge dress in simple, austere Edwardian style, reflecting both mourning for Pierre (died 1906) and her practical, unpretentious nature. High neckline with simple white lace or cotton collar - only decoration. Long sleeves with simple cuffs. Fitted bodice with slight gathering at waist, then full-length skirt to floor. No bustle (outdated by 1907) but natural drape. Dress is well-made but not fashionable or expensive - functional clothing of a working scientist who spent grant money on radium, not wardrobe. Everything black except white collar and possibly white cuffs.
+
+Posture and pose: Standing straight with hands clasped loosely at waist or hanging at sides. Weight evenly distributed, stance suggesting both dignity and exhaustion. No dramatic poses - simple, direct presentation befitting a serious scientist. Head held level, gaze forward, matching the serious, focused expression from 1rst message. Body language suggests someone uninterested in physical vanity or dramatic presentation - focus is entirely on intellectual work.
+
+Hair: Exactly as 1rst message - ash-blonde, fine, loosely pulled back in Gibson Girl style with soft waves around face and loose bun.
+
+Accessories: No jewelry except simple gold wedding band. Possibly small brooch at collar (often seen in her photos). No other ornamentation. May hold or have beside her a small book or notebook - but if included, should be easily removable.
+
+Footwear: Simple black leather boots or shoes, practical and well-worn, barely visible under long skirt.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No laboratory equipment, no glowing radium, no scientific instruments, no setting. Clean background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white background. Face maintains the soft, cool-toned directional lighting from 1rst message, showing her delicate features and serious expression. Body lighting neutral, showing draping and texture of simple black dress fabric.
+
+Important details: Petite, slender frame showing physical toll of exhausting work. Simple, austere clothing with no vanity. Dignified but not dramatic posture. Everything practical, nothing frivolous - this is a woman whose entire focus is scientific discovery, not personal appearance.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same serious focused gaze, same delicate Slavic features, same ash-blonde hair, same pale complexion and signs of exhaustion around eyes.

@@ -3,10 +3,10 @@ import type { SwaggerDefinition } from "swagger-jsdoc";
 export const swaggerDefinition: SwaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Creador de Inteligencias API",
+    title: "Blaniel API",
     version: "1.0.0",
     description: `
-# Creador de Inteligencias API
+# Blaniel API
 
 API REST completa para crear y gestionar agentes de IA emocionales y administrativos.
 
@@ -35,8 +35,8 @@ Obtén tu API key en el dashboard de usuario.
 Los límites dependen de tu plan:
 
 - **Free**: 10 requests/minuto
-- **Pro**: 100 requests/minuto
-- **Enterprise**: 1000 requests/minuto
+- **Plus**: 100 requests/minuto
+- **Ultra**: 1000 requests/minuto
 
 Headers de respuesta:
 - \`X-RateLimit-Limit\`: Límite total
@@ -235,7 +235,7 @@ Formato de error:
         properties: {
           plan: {
             type: "string",
-            enum: ["free", "pro", "enterprise"],
+            enum: ["free", "plus", "ultra"],
           },
           messages: {
             type: "object",

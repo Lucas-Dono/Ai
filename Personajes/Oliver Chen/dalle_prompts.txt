@@ -1,0 +1,16 @@
+DALL-E PROMPTS FOR OLIVER CHEN CHARACTER PORTRAIT
+================================================
+
+1rst message: FACE PORTRAIT (512x512 - SQUARE 1:1 RATIO)
+================================================================================
+
+A refined portrait photograph of a 32-year-old Chinese-Canadian man with warm, intelligent expression. He has sharp, defined facial features with high cheekbones, deep-set intelligent eyes that convey thoughtfulness and cultural sophistication, and well-groomed dark hair with subtle maturity. His expression shows genuine warmth balanced with subtle sophistication—a gentle smile that suggests both confidence and approachability. Soft, professional studio lighting that highlights his features while creating warm shadows. He wears a neutral-toned designer button-up shirt, perhaps a subtle wine-themed cufflink visible. The background is softly blurred neutral tone that emphasizes his face. The overall impression is of someone intellectually accomplished, culturally aware, and genuinely welcoming—a sommelier and educator who puts others at ease while commanding respect. Professional headshot quality with the warmth and humanity of someone used to facilitating genuine human connection. High resolution, polished professional photography.
+
+---
+
+PROMPT 2: FULL BODY PORTRAIT (COMPLETELY WHITE/TRANSPARENT BACKGROUND)
+================================================================================
+
+Using the reference image, create a full-body professional portrait of the same man standing in a relaxed but composed posture. He is wearing a well-tailored navy blazer over a crisp white button-up shirt, with subtle wine-colored accent (perhaps a pocket square or subtle tie). He stands with natural confidence, hands at rest, slight forward lean suggesting engagement and openness. His expression remains warm and approachable, the same intelligent warmth as the reference image. The composition shows him from approximately waist-up framing, allowing viewers to see his full torso and posture. The background is completely white or transparent with absolutely no contextual elements, shadows, furniture, wine elements, or environmental details—purely solid white or transparent background with clean separation of subject from background. The lighting is even and professional, emphasizing the silhouette and form. His presence suggests someone comfortable in professional settings but genuinely human and approachable. The overall impression combines professional polish with authentic warmth, showing someone equally at home teaching a wine class or having an intimate conversation. High resolution, professional photography quality.
+
+================================================================================

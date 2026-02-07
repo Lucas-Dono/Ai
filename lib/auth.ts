@@ -1,81 +1,60 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { expo } from "@better-auth/expo";
 import { prisma } from "@/lib/prisma";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    Google({
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+  },
+  socialProviders: {
+    google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    Credentials({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email) return null;
-
-        // Buscar usuario por email
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
-
-        if (!user) {
-          // En modo demo, crear usuario automáticamente
-          const newUser = await prisma.user.create({
-            data: {
-              email: credentials.email as string,
-              name: credentials.email?.toString().split("@")[0] || "Usuario",
-              plan: "free",
-            },
-          });
-          return {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-          };
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
-      },
-    }),
+    },
+  },
+  plugins: [
+    expo(), // Enable Expo/React Native support
   ],
-  callbacks: {
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.sub!;
-        session.user.plan = token.plan as string | undefined;
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        // Fetch plan from database
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { plan: true },
-        });
-        token.plan = dbUser?.plan || "free";
-      }
-      return token;
-    },
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    process.env.NEXTAUTH_URL,
+    process.env.NEXT_PUBLIC_APP_URL,
+    // Expo scheme
+    "blaniel://",
+    // Development mode - Expo's exp:// scheme with local IP ranges
+    ...(process.env.NODE_ENV === "development" ? [
+      "exp://",
+      "exp://**",
+      "exp://192.168.*.*:*/**",
+    ] : [])
+  ].filter(Boolean) as string[],
+  advanced: {
+    cookiePrefix: "better-auth",
   },
-  pages: {
-    signIn: "/login",
-    signOut: "/",
-    error: "/login",
-  },
+  // SECURITY: Configuración de cookies con flags de seguridad
   session: {
-    strategy: "jwt",
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 minutos en memoria
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: "better-auth.session_token",
+      options: {
+        httpOnly: true, // No accesible desde JavaScript (previene XSS)
+        sameSite: "lax" as const, // Protección CSRF (usar "strict" si es posible)
+        path: "/",
+        secure: process.env.NODE_ENV === "production", // Solo HTTPS en producción
+      },
+    },
   },
 });
+
+export type Session = typeof auth.$Infer.Session;

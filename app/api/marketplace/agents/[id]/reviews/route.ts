@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 export async function GET(
   req: NextRequest,
@@ -24,8 +25,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthenticatedUser(req);
+  if (!user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -39,11 +40,13 @@ export async function POST(
 
   const review = await prisma.review.upsert({
     where: {
-      agentId_userId: { agentId: id, userId: session.user.id },
+      agentId_userId: { agentId: id, userId: user.id },
     },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       agentId: id,
-      userId: session.user.id,
+      userId: user.id,
       rating,
       comment,
     },

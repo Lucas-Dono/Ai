@@ -1,0 +1,492 @@
+/**
+ * WORLD EPISODIC MEMORY - EJEMPLOS PRÁCTICOS
+ *
+ * Este archivo contiene ejemplos de uso del sistema de memoria episódica
+ * para mundos virtuales.
+ */
+
+import { WorldAgentMemoryService } from '@/lib/worlds/world-agent-memory.service';
+
+// ============================================
+// EJEMPLO 1: Guardar evento importante
+// ============================================
+
+async function example1_SaveImportantEvent() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  // Guardar una confesión emocional (alta importancia)
+  const memory = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'María me confesó que tiene miedo de no ser suficiente para sus padres',
+    involvedAgentIds: ['agent-maria'],
+    turnNumber: 142,
+
+    // Importancia alta (momento clave del arco emocional)
+    importance: 0.92,
+    emotionalArousal: 0.85, // Muy intenso emocionalmente
+    emotionalValence: -0.35, // Negativo (tristeza, preocupación)
+    dominantEmotion: 'concern',
+
+    // Contexto adicional
+    location: 'Azotea de la escuela, atardecer',
+    agentEmotions: {
+      'agent-protagonist': {
+        concern: 0.8,
+        empathy: 0.7,
+        affection: 0.6,
+      },
+      'agent-maria': {
+        anxiety: 0.85,
+        trust: 0.75,
+        vulnerability: 0.9,
+      },
+    },
+
+    metadata: {
+      conversationTone: 'intimate',
+      privacyLevel: 'high',
+      storyArc: 'maria-emotional-development',
+      narrativeImpact: 'major',
+    },
+  });
+
+  console.log('✅ Memoria guardada:', memory.id);
+  return memory;
+}
+
+// ============================================
+// EJEMPLO 2: Recuperar memorias relevantes
+// ============================================
+
+async function example2_RetrieveRelevantMemories() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  // Contexto: El protagonista está pensando en María
+  const memories = await memoryService.retrieveRelevantEpisodes({
+    agentId: 'agent-protagonist',
+    query: 'María confesión miedo padres',
+    limit: 5,
+    minImportance: 0.5,
+
+    // Contexto emocional actual del agente
+    emotionalContext: {
+      currentEmotion: 'concern',
+      currentValence: -0.2, // Preocupado
+    },
+  });
+
+  console.log(`\n🧠 Recuperadas ${memories.length} memorias relevantes:\n`);
+
+  memories.forEach(({ memory, score, relevanceReason }, index) => {
+    console.log(`${index + 1}. [Score: ${score.toFixed(3)}]`);
+    console.log(`   "${memory.event}"`);
+    console.log(`   Turno: ${memory.turnNumber} | Emoción: ${memory.dominantEmotion}`);
+    console.log(`   Razón: ${relevanceReason}\n`);
+  });
+
+  return memories;
+}
+
+// ============================================
+// EJEMPLO 3: Serie de eventos que forman un arco
+// ============================================
+
+async function example3_NarrativeArc() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  console.log('📖 Creando arco narrativo: "La amistad de María"\n');
+
+  // Acto 1: Conocerse
+  const act1 = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'Conocí a María hoy en clase. Parece tímida pero inteligente.',
+    involvedAgentIds: ['agent-maria'],
+    turnNumber: 10,
+    importance: 0.55,
+    emotionalArousal: 0.45,
+    emotionalValence: 0.15,
+    dominantEmotion: 'curiosity',
+    metadata: { arcStage: 'introduction' },
+  });
+  console.log('✓ Acto 1 - Introducción (Turno 10)');
+
+  // Acto 2: Primera conversación profunda
+  const act2 = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'María y yo hablamos por horas sobre nuestros sueños y aspiraciones.',
+    involvedAgentIds: ['agent-maria'],
+    turnNumber: 45,
+    importance: 0.70,
+    emotionalArousal: 0.65,
+    emotionalValence: 0.60,
+    dominantEmotion: 'connection',
+    metadata: { arcStage: 'rising_action' },
+  });
+  console.log('✓ Acto 2 - Desarrollo (Turno 45)');
+
+  // Acto 3: Conflicto
+  const act3 = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'María y yo tuvimos un desacuerdo fuerte sobre cómo ayudar a Carlos.',
+    involvedAgentIds: ['agent-maria', 'agent-carlos'],
+    turnNumber: 89,
+    importance: 0.75,
+    emotionalArousal: 0.80,
+    emotionalValence: -0.50,
+    dominantEmotion: 'frustration',
+    metadata: { arcStage: 'conflict' },
+  });
+  console.log('✓ Acto 3 - Conflicto (Turno 89)');
+
+  // Acto 4: Climax emocional
+  const act4 = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'María me confesó que tiene miedo de no ser suficiente para sus padres.',
+    involvedAgentIds: ['agent-maria'],
+    turnNumber: 142,
+    importance: 0.92,
+    emotionalArousal: 0.85,
+    emotionalValence: -0.35,
+    dominantEmotion: 'concern',
+    metadata: { arcStage: 'climax' },
+  });
+  console.log('✓ Acto 4 - Climax (Turno 142)');
+
+  // Acto 5: Resolución
+  const act5 = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'María me dijo que soy su mejor amiga y que me agradece por estar ahí.',
+    involvedAgentIds: ['agent-maria'],
+    turnNumber: 180,
+    importance: 0.88,
+    emotionalArousal: 0.75,
+    emotionalValence: 0.85,
+    dominantEmotion: 'gratitude',
+    metadata: { arcStage: 'resolution' },
+  });
+  console.log('✓ Acto 5 - Resolución (Turno 180)\n');
+
+  console.log('✅ Arco narrativo completo guardado\n');
+
+  return { act1, act2, act3, act4, act5 };
+}
+
+// ============================================
+// EJEMPLO 4: Evento multi-agente (3+ personajes)
+// ============================================
+
+async function example4_MultiAgentEvent() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  // Evento que involucra a 4 agentes
+  const groupEvent = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'Organizamos una fiesta sorpresa para el cumpleaños de Carlos. María preparó el pastel, Daniela las decoraciones y yo me encargué de distraerlo.',
+    involvedAgentIds: ['agent-maria', 'agent-daniela', 'agent-carlos'],
+    turnNumber: 220,
+
+    importance: 0.82, // Alta importancia (momento social importante)
+    emotionalArousal: 0.78,
+    emotionalValence: 0.85, // Muy positivo
+    dominantEmotion: 'joy',
+
+    location: 'Casa de María, sala de estar',
+
+    // Emociones de cada participante
+    agentEmotions: {
+      'agent-protagonist': {
+        joy: 0.85,
+        excitement: 0.80,
+        satisfaction: 0.75,
+      },
+      'agent-maria': {
+        joy: 0.90,
+        pride: 0.70,
+        affection: 0.80,
+      },
+      'agent-daniela': {
+        joy: 0.88,
+        excitement: 0.85,
+      },
+      'agent-carlos': {
+        surprise: 0.95,
+        joy: 0.90,
+        gratitude: 0.85,
+      },
+    },
+
+    metadata: {
+      eventType: 'social_gathering',
+      participantCount: 4,
+      socialBondingMoment: true,
+    },
+  });
+
+  console.log('🎉 Evento grupal guardado');
+  console.log(`   Involucra a ${groupEvent.involvedAgentIds.length + 1} agentes`);
+  console.log(`   Importancia: ${groupEvent.importance}`);
+  console.log(`   Valence: ${groupEvent.emotionalValence} (muy positivo)\n`);
+
+  // Ahora, guardar la misma memoria desde la perspectiva de cada participante
+  console.log('💾 Guardando perspectivas individuales...\n');
+
+  // Perspectiva de María
+  await memoryService.saveEpisode({
+    agentId: 'agent-maria',
+    event: 'Preparé el pastel de cumpleaños para Carlos con la ayuda de todos. Fue hermoso verlo tan feliz.',
+    involvedAgentIds: ['agent-protagonist', 'agent-daniela', 'agent-carlos'],
+    turnNumber: 220,
+    importance: 0.80,
+    emotionalArousal: 0.75,
+    emotionalValence: 0.80,
+    dominantEmotion: 'pride',
+    metadata: { perspective: 'maria', originalEventId: groupEvent.id },
+  });
+
+  // Perspectiva de Carlos
+  await memoryService.saveEpisode({
+    agentId: 'agent-carlos',
+    event: 'Me hicieron una fiesta sorpresa de cumpleaños. No puedo creer que lo hayan planeado todo en secreto. Son los mejores amigos que alguien podría pedir.',
+    involvedAgentIds: ['agent-protagonist', 'agent-maria', 'agent-daniela'],
+    turnNumber: 220,
+    importance: 0.95, // ¡Altísima para el cumpleañero!
+    emotionalArousal: 0.90,
+    emotionalValence: 0.95,
+    dominantEmotion: 'gratitude',
+    metadata: { perspective: 'carlos', originalEventId: groupEvent.id },
+  });
+
+  console.log('✅ Memorias multi-perspectiva guardadas\n');
+
+  return groupEvent;
+}
+
+// ============================================
+// EJEMPLO 5: Consolidación de memorias
+// ============================================
+
+async function example5_MemoryConsolidation() {
+  const worldId = 'long-running-world';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  console.log('🔄 Consolidando memorias...\n');
+
+  const result = await memoryService.consolidateMemories('agent-protagonist');
+
+  console.log('Resultados de consolidación:');
+  console.log(`  • Memorias consolidadas: ${result.memoriesConsolidated}`);
+  console.log(`  • Nuevas memorias resumen: ${result.newMemoriesCreated}`);
+  console.log(`  • Memorias eliminadas: ${result.oldMemoriesDeleted}\n`);
+
+  if (result.memoriesConsolidated > 0) {
+    console.log('✅ Consolidación completada exitosamente');
+  } else {
+    console.log('ℹ️  No había suficientes memorias para consolidar');
+  }
+
+  return result;
+}
+
+// ============================================
+// EJEMPLO 6: Estadísticas de memoria
+// ============================================
+
+async function example6_MemoryStats() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  const stats = await memoryService.getMemoryStats('agent-protagonist');
+
+  console.log('📊 Estadísticas de Memoria - Protagonista\n');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log(`Total de memorias:      ${stats.totalMemories}`);
+  console.log(`Memorias consolidadas:  ${stats.consolidatedMemories}`);
+  console.log(`Importancia promedio:   ${stats.averageImportance.toFixed(2)}`);
+  console.log(`Memorias recientes (7d): ${stats.recentMemories}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+  // Calcular métricas adicionales
+  const consolidationRate = stats.totalMemories > 0
+    ? (stats.consolidatedMemories / stats.totalMemories * 100).toFixed(1)
+    : '0.0';
+
+  const recentActivityRate = stats.totalMemories > 0
+    ? (stats.recentMemories / stats.totalMemories * 100).toFixed(1)
+    : '0.0';
+
+  console.log('Métricas derivadas:');
+  console.log(`  Tasa de consolidación: ${consolidationRate}%`);
+  console.log(`  Actividad reciente: ${recentActivityRate}%\n`);
+
+  // Interpretación
+  if (stats.averageImportance > 0.7) {
+    console.log('💡 Alto nivel de eventos importantes guardados');
+  } else if (stats.averageImportance < 0.4) {
+    console.log('⚠️  Muchas memorias de baja importancia - considerar consolidación');
+  }
+
+  return stats;
+}
+
+// ============================================
+// EJEMPLO 7: Búsqueda con contexto emocional
+// ============================================
+
+async function example7_EmotionalContextRetrieval() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  console.log('🎭 Búsqueda basada en estado emocional\n');
+
+  // Caso 1: Agente está triste, busca memorias positivas (contraste)
+  console.log('Caso 1: Buscar memorias positivas cuando está triste\n');
+  const positiveMemories = await memoryService.retrieveRelevantEpisodes({
+    agentId: 'agent-protagonist',
+    query: 'María amistad felicidad',
+    limit: 3,
+    emotionalContext: {
+      currentEmotion: 'sadness',
+      currentValence: -0.6, // Muy triste
+    },
+  });
+
+  positiveMemories.forEach(({ memory, score }) => {
+    console.log(`  [${score.toFixed(2)}] "${memory.event}"`);
+    console.log(`       Valence: ${memory.emotionalValence.toFixed(2)}\n`);
+  });
+
+  // Caso 2: Agente está preocupado, busca memorias similares
+  console.log('\nCaso 2: Buscar memorias de preocupación (similares)\n');
+  const concernMemories = await memoryService.retrieveRelevantEpisodes({
+    agentId: 'agent-protagonist',
+    query: 'preocupación miedo ansiedad',
+    limit: 3,
+    emotionalContext: {
+      currentEmotion: 'concern',
+      currentValence: -0.3,
+    },
+  });
+
+  concernMemories.forEach(({ memory, score }) => {
+    console.log(`  [${score.toFixed(2)}] "${memory.event}"`);
+    console.log(`       Emoción: ${memory.dominantEmotion}\n`);
+  });
+
+  return { positiveMemories, concernMemories };
+}
+
+// ============================================
+// EJEMPLO 8: Memoria de evento emergente
+// ============================================
+
+async function example8_EmergentEventMemory() {
+  const worldId = 'school-world-1';
+  const memoryService = new WorldAgentMemoryService(worldId);
+
+  // Evento emergente (bump-into scene)
+  const emergentMemory = await memoryService.saveEpisode({
+    agentId: 'agent-protagonist',
+    event: 'Me encontré con María en la azotea de manera inesperada. Estaba llorando sola.',
+    involvedAgentIds: ['agent-maria'],
+    turnNumber: 156,
+
+    // Los eventos emergentes son automáticamente importantes
+    importance: 0.85,
+    emotionalArousal: 0.88,
+    emotionalValence: -0.45,
+    dominantEmotion: 'concern',
+
+    location: 'Azotea de la escuela',
+
+    metadata: {
+      isEmergentEvent: true,
+      emergentEventType: 'bump_into',
+      narrativeFunction: 'emotional_revelation',
+      storyImpact: 'high',
+    },
+  });
+
+  console.log('🎪 Evento emergente guardado');
+  console.log(`   Tipo: Encuentro inesperado`);
+  console.log(`   Impacto narrativo: Alto`);
+  console.log(`   Importancia: ${emergentMemory.importance}\n`);
+
+  return emergentMemory;
+}
+
+// ============================================
+// EJECUTAR TODOS LOS EJEMPLOS
+// ============================================
+
+export async function runAllExamples() {
+  console.log('═══════════════════════════════════════════════════');
+  console.log('  WORLD EPISODIC MEMORY - EJEMPLOS PRÁCTICOS');
+  console.log('═══════════════════════════════════════════════════\n');
+
+  try {
+    console.log('1️⃣  Guardar evento importante');
+    console.log('───────────────────────────────────────────────────');
+    await example1_SaveImportantEvent();
+    console.log('\n');
+
+    console.log('2️⃣  Recuperar memorias relevantes');
+    console.log('───────────────────────────────────────────────────');
+    await example2_RetrieveRelevantMemories();
+    console.log('\n');
+
+    console.log('3️⃣  Crear arco narrativo completo');
+    console.log('───────────────────────────────────────────────────');
+    await example3_NarrativeArc();
+    console.log('\n');
+
+    console.log('4️⃣  Evento multi-agente (4 personajes)');
+    console.log('───────────────────────────────────────────────────');
+    await example4_MultiAgentEvent();
+    console.log('\n');
+
+    console.log('5️⃣  Consolidación de memorias');
+    console.log('───────────────────────────────────────────────────');
+    await example5_MemoryConsolidation();
+    console.log('\n');
+
+    console.log('6️⃣  Estadísticas de memoria');
+    console.log('───────────────────────────────────────────────────');
+    await example6_MemoryStats();
+    console.log('\n');
+
+    console.log('7️⃣  Búsqueda con contexto emocional');
+    console.log('───────────────────────────────────────────────────');
+    await example7_EmotionalContextRetrieval();
+    console.log('\n');
+
+    console.log('8️⃣  Evento emergente');
+    console.log('───────────────────────────────────────────────────');
+    await example8_EmergentEventMemory();
+    console.log('\n');
+
+    console.log('═══════════════════════════════════════════════════');
+    console.log('✅ Todos los ejemplos ejecutados exitosamente');
+    console.log('═══════════════════════════════════════════════════\n');
+
+  } catch (error) {
+    console.error('❌ Error ejecutando ejemplos:', error);
+    throw error;
+  }
+}
+
+// Ejecutar si se llama directamente
+if (require.main === module) {
+  runAllExamples()
+    .then(() => {
+      console.log('Done!');
+      process.exit(0);
+    })
+    .catch(error => {
+      console.error('Fatal error:', error);
+      process.exit(1);
+    });
+}

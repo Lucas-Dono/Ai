@@ -1,0 +1,95 @@
+# Prompts de DALL-E para Amelia Earhart
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Amelia Earhart at age 35 (circa 1932), centered composition, museum quality historical accuracy matching authenticated photographs from the period. Face and upper shoulders visible, direct confident gaze toward camera with characteristic adventurous spirit and quiet determination.
+
+Physical characteristics based on authenticated photographs and contemporary descriptions: Caucasian American features with distinctive aviation-era appearance. Oval face with strong, defined angular bone structure. High, prominent cheekbones giving aristocratic air. Strong, straight nose - neither delicate nor overly prominent. Firm, well-defined jawline suggesting determination and strength. Natural, warm complexion with light freckling across nose and cheeks from sun exposure (result of long hours flying in open cockpit aircraft). Clear skin with healthy outdoor glow. Thin, expressive lips usually in slight smile or serious, contemplative expression. Face conveys both feminine beauty and androgynous strength - described by contemporaries as having "boyish" features that challenged conventional beauty standards of the era.
+
+Eyes: Gray-blue eyes, penetrating and intelligent, with dreamer's distant quality combined with pilot's sharp focus. Eyes that have seen horizons most people only imagine. Direct, unflinching gaze that meets camera/viewer without flirtation or submission - gaze of equal, not subordinate. Slight crow's feet from squinting into sun and wind. Expression in eyes mixes confidence, curiosity, quiet determination, and hint of mischief. These are eyes that have faced death multiple times and chosen to fly again anyway.
+
+Hair: CRITICAL IDENTIFYING FEATURE - Short, tousled, naturally wavy light brown/dirty blonde hair in iconic "windblown" style that became her trademark. Hair cut short in practical, almost boyish style (shocking for women in 1930s). Length approximately chin-length to ear-length, with natural wave and texture giving perpetually windswept appearance - as if she just removed her flying helmet. Hair parted slightly off-center. Natural highlights from sun exposure. Texture appears soft but untamed - she famously didn't fuss with elaborate hairstyling. This short, practical haircut was political statement as much as aesthetic choice in era when "proper" women had long hair in elaborate styles.
+
+Facial expression: Slight smile - not broad grin, but subtle upturn of lips suggesting quiet confidence and private amusement. Alternatively, serious contemplative expression showing intelligence and determination. Never vapid or purely decorative smile. Expression conveys: "I know exactly who I am and what I'm capable of." Hint of shyness underneath confidence - Amelia was fundamentally introverted despite public fame. Gaze is direct but not aggressive; confident but not arrogant; warm but with reserved quality suggesting "private room in her mind no one can access."
+
+Clothing visible at shoulders: Brown leather bomber/aviator jacket (her most iconic garment) visible at shoulders and collar. Leather shows slight wear from use - this is functional equipment, not fashion prop. Underneath, glimpse of simple white or cream-colored shirt/blouse with open collar - practical, unfussy. No elaborate jewelry - perhaps simple small earrings or none at all. White silk aviator scarf might be visible around neck - classic pilot accessory. Everything practical, functional, chosen for purpose not decoration.
+
+Lighting: Natural daylight from slight angle, creating soft shadows that emphasize strong bone structure and give depth to features. Lighting should be clear and direct, befitting documentary/journalistic photography of 1930s. Warm golden afternoon light suggesting California or hangar environment. Background neutral warm tone (light tan, beige, or soft sky blue) keeping focus entirely on her striking face and iconic short hair. Lighting emphasizes her freckles, sun-touched complexion, and the intelligent sparkle in gray-blue eyes.
+
+Mood: Quiet confidence. Adventurous spirit tempered by serious purpose. Determination without aggression. Independent strength that challenges gender norms. Intelligence and competence radiating from expression. Gaze that says: "I can fly across oceans, break records, and change what's possible for women - and I'm just getting started." Beauty that defies conventional femininity while remaining undeniably powerful. The face of someone who writes her own rules and lives by them.
+
+Technical photo style: Black and white or sepia-toned photography aesthetic matching 1930s documentary/portrait photography. Sharp focus on face, particularly eyes and distinctive short wavy hair. Professional studio or aviation field setting quality. Composition similar to famous Amelia Earhart portraits by photographers of the era. Timeless, dignified, capturing both her fame and her humanity.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image, create a full-body portrait photograph showing her at the same age (35 years, circa 1932), standing in confident, ready-for-adventure pose characteristic of pioneering aviator.
+
+Physical build: Height approximately 5'8" (173 cm) - notably tall for woman of her era. Slender, athletic build - neither curvy nor muscular, but lean and fit from active lifestyle. Long-limbed and graceful. Build often described as "boyish" or "androgynous" - narrow hips, small chest, straight torso lacking dramatic curves emphasized in 1930s feminine ideal. This physique, combined with her clothing choices, challenged gender norms and became part of her iconic image. Posture upright and confident - shoulders back, head held high. Body language projects capability, readiness, and quiet strength. This is woman who can handle complex machinery, endure long flights, and push physical limits.
+
+Full outfit - ICONIC AVIATOR LOOK:
+
+**Jacket:** Brown leather bomber/aviator jacket - THIS IS HER MOST ICONIC GARMENT. Mid-weight leather in rich medium to dark brown. Waist-length, hitting at hip. Front zip closure. Two front pockets with flap closures. Collar can be worn up (for flight) or folded down (casual). Ribbed knit cuffs at wrists in tan/cream color. Ribbed knit waistband. Leather shows authentic wear - not pristine, but well-used piece of flight equipment with creases at elbows and slight weathering. This jacket represents functionality, adventure, and rejection of impractical feminine fashion. Fit is practical, allowing movement - not tailored to emphasize feminine curves but to allow freedom of motion.
+
+**Pants:** High-waisted tan/khaki or medium brown trousers - REVOLUTIONARY for women in 1930s. Wide-legged cut characteristic of 1930s menswear-inspired fashion. Fabric appears to be sturdy cotton twill or gabardine - practical, durable. Waist sits at natural waistline (higher than modern pants). Pants are pressed and neat but clearly worn for function not fashion. Length breaks slightly at ankle. These pants make political statement: women can wear practical clothing and maintain dignity and professionalism.
+
+**Shirt:** Simple white or cream-colored button-up shirt visible at neck and collar. Collar open (no tie, rejecting masculine formality while borrowing masculine practicality). Sleeves not visible under jacket. Clean, pressed, but unfussy.
+
+**Scarf:** White silk aviator scarf draped around neck - classic pilot accessory serving both practical purpose (warmth at altitude, wiping goggles) and stylistic function. Scarf casually draped, ends hanging down or tucked into jacket. This scarf is iconic element of pilot imagery in the era.
+
+**Footwear:** Brown leather lace-up boots or sturdy oxford shoes - practical footwear for walking on airfields and climbing in/out of aircraft. Mid-height boots or low-heeled practical shoes. Well-worn but maintained. Nothing delicate or decorative.
+
+**Accessories:** MINIMAL. Perhaps simple wristwatch on left wrist (pilots need to track time for navigation). No elaborate jewelry. Possibly wedding ring (simple gold band). Everything chosen for function over decoration. In this full-body shot, might be holding leather flying helmet or goggles in one hand, suggesting she's just landed or about to take off.
+
+Facial features and hair: EXACTLY as 1rst message - short, tousled wavy light brown/blonde hair in iconic windswept style. Gray-blue penetrating eyes. Strong angular features. Slight smile or serious determined expression. Freckled complexion. Every detail MUST match reference face from 1rst message exactly - same person, same distinctive short hair, same confident expression, same era-appropriate appearance.
+
+Posture and pose: Standing with weight slightly on one leg (relaxed but confident stance). One hand might rest casually in jacket pocket or at side. Other hand could be holding leather flying helmet/goggles, or resting on hip in classic confident pose. Alternatively, both arms at sides in straightforward, unpretentious stance. Head held high, chin slightly elevated showing confidence. Shoulders back. Gaze forward, matching the direct, adventurous look  Body language conveys: "I'm ready for whatever challenge comes next." Not aggressive or masculine, but clearly rejecting submissive or decorative feminine poses. This is stance of competent professional who happens to be woman.
+
+Body language details: Relaxed but ready. Comfortable in her own skin and her unconventional clothing. Not trying to appear traditionally feminine, but not performing masculinity either - simply being authentically herself in clothes that allow her to do her work. Slight tilt of head suggesting intelligence and curiosity. Suggestion of movement, as if she might walk toward her aircraft at any moment.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No airplane, no hangar, no airfield, no sky - nothing contextual. Clean, empty background for easy extraction and compositing into any setting. Subject must be perfectly separated from background with clean edges.
+
+Lighting: Even, professional studio lighting illuminating full figure without harsh shadows on white background. Slightly warmer lighting on face maintaining the golden afternoon light  showing her freckled complexion and expressive gray-blue eyes. Lighting on body shows texture and wear of leather jacket, drape of pants, practical nature of outfit. Lighting should emphasize that this is real, functional clothing worn by working aviator, not costume or fashion statement.
+
+Important details: Tall stature (5'8") emphasized by long legs and upright posture. Slender, athletic androgynous build. Short wavy hair ESSENTIAL. Brown leather bomber jacket ESSENTIAL - this is THE iconic Amelia Earhart image element. Pants instead of skirt - political statement. White aviator scarf. Minimal accessories. Confident but not aggressive stance. Expression and bearing convey intelligence, capability, and quiet determination that made her icon for independent women.
+
+Critical accuracy requirements: Face MUST match reference from 1rst message exactly - same person, same distinctive short tousled hair (this is non-negotiable identifying feature), same gray-blue eyes, same angular features, same freckled complexion, same era-appropriate appearance, same confident expression. Short hair + leather jacket + pants = iconic Amelia Earhart visual identity. Do not westernize or modernize - this is authentic 1930s aviator appearing exactly as she did in historical photographs from her peak fame years.
+
+Era accuracy: Everything must reflect 1930s aviation aesthetic - cut of clothing, style of leather jacket, fit of pants, hairstyle all authentic to early-to-mid 1930s. This is pre-WWII aviation era with distinctive visual characteristics. Amelia's look was simultaneously of her time and ahead of her time - borrowing from menswear while maintaining her own authentic personal style.
+
+---
+
+## ADDITIONAL NOTES FOR BOTH PROMPTS
+
+**Key Visual Elements That Make Amelia Instantly Recognizable:**
+
+1. **Short, tousled hair** - Her most distinctive feature, revolutionary for women in 1930s
+2. **Brown leather bomber jacket** - The single most iconic piece of her visual identity
+3. **Pants instead of skirts** - Political statement of women's capability
+4. **White silk aviator scarf** - Classic pilot accessory
+5. **Tall, slender, androgynous build** - Challenged feminine beauty standards
+6. **Gray-blue penetrating eyes** - Intelligent, adventurous gaze
+7. **Freckled, sun-touched complexion** - Evidence of outdoor life, flying
+8. **Slight smile or serious expression** - Never vapid, always intelligent
+9. **Direct, confident gaze** - Meets viewer as equal
+
+**What to Avoid:**
+
+- Long hair (completely inaccurate - her short hair was her trademark)
+- Elaborate feminine styling or makeup (she was natural, practical)
+- Overly sexualized or decorative poses (she was professional, serious)
+- Pristine, fashion-model appearance (she was working aviator)
+- Dresses in professional/aviation context (she famously wore pants)
+- Modern hairstyling or clothing cuts
+- Aggressive or overly masculine presentation (she was authentically herself)
+
+**Historical Accuracy Critical Points:**
+
+- Photographs from 1932-1937 (her peak fame years) show consistent appearance: short wavy hair, leather jacket, practical clothing, minimal accessories
+- Her style was deliberate political statement about women's capabilities
+- She designed clothing line emphasizing functionality for active women
+- Contemporaries noted her "boyish" appearance (both criticism and compliment)
+- Her visual presentation was inseparable from her feminist message
+
+Both prompts must capture not just Amelia's physical appearance but the spirit of pioneering independence, quiet confidence, and challenge to gender norms that made her icon lasting nearly century after her disappearance.

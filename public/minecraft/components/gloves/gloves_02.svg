@@ -1,0 +1,34 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- GUANTE BRAZO DERECHO -->
+      <!-- ARM_R_RIGHT (4x3) at (40,29) -->
+      <rect x="40" y="29" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+      <!-- Costuras -->
+      <rect x="41" y="29" width="1" height="3" fill="#4A3022" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_R_FRONT (4x3) at (44,29) -->
+      <rect x="44" y="29" width="4" height="3" fill="#6B4E3D" class="colorizable-clothing"/>
+      <rect x="45" y="29" width="1" height="3" fill="#5C4033" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_R_LEFT (4x3) at (48,29) -->
+      <rect x="48" y="29" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x3) at (52,29) -->
+      <rect x="52" y="29" width="4" height="3" fill="#4A3022" class="colorizable-clothing"/>
+
+      <!-- GUANTE BRAZO IZQUIERDO -->
+      <!-- ARM_L_RIGHT (4x3) at (32,61) -->
+      <rect x="32" y="61" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+      <rect x="33" y="61" width="1" height="3" fill="#4A3022" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_L_FRONT (4x3) at (36,61) -->
+      <rect x="36" y="61" width="4" height="3" fill="#6B4E3D" class="colorizable-clothing"/>
+      <rect x="37" y="61" width="1" height="3" fill="#5C4033" class="colorizable-clothing" opacity="0.5"/>
+
+      <!-- ARM_L_LEFT (4x3) at (40,61) -->
+      <rect x="40" y="61" width="4" height="3" fill="#5C4033" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x3) at (44,61) -->
+      <rect x="44" y="61" width="4" height="3" fill="#4A3022" class="colorizable-clothing"/>
+    </svg>
+  

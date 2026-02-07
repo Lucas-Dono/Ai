@@ -1,0 +1,22 @@
+
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg">
+      <!-- Fondo transparente -->
+      <rect width="8" height="8" fill="none"/>
+
+      <!-- Ojo izquierdo (desde perspectiva del personaje) -->
+      <!-- Blanco del ojo -->
+      <rect x="1" y="3" width="2" height="2" fill="#FFFFFF"/>
+      <!-- Pupila (se recolorea) -->
+      <rect x="2" y="3" width="1" height="2" fill="#808080" class="colorizable-eye"/>
+
+      <!-- Ojo derecho (desde perspectiva del personaje) -->
+      <!-- Blanco del ojo -->
+      <rect x="5" y="3" width="2" height="2" fill="#FFFFFF"/>
+      <!-- Pupila (se recolorea) -->
+      <rect x="5" y="3" width="1" height="2" fill="#808080" class="colorizable-eye"/>
+
+      <!-- Sombra superior (párpados) -->
+      <rect x="1" y="2" width="2" height="1" fill="#404040"/>
+      <rect x="5" y="2" width="2" height="1" fill="#404040"/>
+    </svg>
+  

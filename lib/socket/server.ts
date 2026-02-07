@@ -10,19 +10,35 @@ import {
   ServerToClientEvents,
   getRoomName,
   TYPING_TIMEOUT,
+  GroupMessageEvent,
+  GroupMemberEvent,
 } from "./events";
+import { registerChatEvents, registerReactionEvents } from "./chat-events";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { EmotionalEngine } from "@/lib/relations/engine";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
 import { checkRateLimit } from "@/lib/redis/ratelimit";
 import { createMemoryManager } from "@/lib/memory/manager";
+import { nanoid } from "nanoid";
 
 type SocketServer = SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
 type AuthenticatedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
   userId?: string;
 };
 
+// Extend globalThis type for Socket.IO singleton
+declare global {
+  // eslint-disable-next-line no-var
+  var __socketIO: SocketServer | undefined;
+}
+
+// Get Socket.IO instance from globalThis (set by server.mjs)
+function getIO(): SocketServer | null {
+  return globalThis.__socketIO || null;
+}
+
+// Local reference (set by initSocketServer if called from this module)
 let io: SocketServer | null = null;
 
 // Store typing timeouts
@@ -31,6 +47,43 @@ const typingTimeouts = new Map<string, NodeJS.Timeout>();
 /**
  * Initialize Socket.IO server
  */
+/**
+ * Lista de orígenes permitidos para CORS en WebSockets
+ * Debe coincidir con la configuración del middleware
+ */
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'https://creador-inteligencias.vercel.app',
+  process.env.NEXTAUTH_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
+].filter(Boolean) as string[];
+
+/**
+ * Validar origen para CORS de Socket.IO
+ * Implementa validación estricta, no usa wildcards
+ */
+function validateSocketOrigin(origin: string, callback: (err: Error | null, allow?: boolean) => void) {
+  // Desarrollo: permitir localhost y 127.0.0.1 con cualquier puerto
+  if (process.env.NODE_ENV === 'development') {
+    const localhostPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+    if (localhostPattern.test(origin)) {
+      return callback(null, true);
+    }
+  }
+
+  // Producción: validación exacta contra whitelist
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    return callback(null, true);
+  }
+
+  // Origen no permitido
+  console.warn('[SocketServer] CORS: Origin not allowed:', origin);
+  callback(new Error('Not allowed by CORS'));
+}
+
 export function initSocketServer(httpServer: HTTPServer): SocketServer {
   if (io) {
     return io;
@@ -38,12 +91,17 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
 
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      origin: validateSocketOrigin as any,
       credentials: true,
     },
     path: "/api/socketio",
     addTrailingSlash: false,
   });
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // WARMUP: Pre-calentar modelo de embeddings
+  // OpenAI no requiere warmup (warmupQwenModel removed)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   // Authentication middleware
   io.use(async (socket: AuthenticatedSocket, next) => {
@@ -95,6 +153,15 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
       connected: true,
       timestamp: Date.now(),
     });
+
+    // Socket server is guaranteed to be initialized at this point
+    const socketServer = io!;
+
+    // Register multimodal chat events
+    registerChatEvents(socketServer, socket);
+
+    // Register reaction events
+    registerReactionEvents(socketServer, socket);
 
     // Handle presence online
     handlePresenceOnline(socket, userId);
@@ -185,6 +252,48 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
       handlePresenceOffline(io!, data.userId);
     });
 
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // GROUP EVENTS
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    // Group: Join room
+    socket.on("group:join", async (data) => {
+      try {
+        // Verify user is member of the group
+        const member = await prisma.groupMember.findFirst({
+          where: {
+            groupId: data.groupId,
+            userId: data.userId,
+            memberType: "user",
+            isActive: true,
+          },
+        });
+
+        if (!member) {
+          console.warn(`[Socket] User ${data.userId} not member of group ${data.groupId}`);
+          return;
+        }
+
+        const roomName = getRoomName.group(data.groupId);
+        socket.join(roomName);
+        console.log(`[Socket] User ${data.userId} joined group room ${roomName}`);
+      } catch (error) {
+        console.error("[Socket] Error joining group:", error);
+      }
+    });
+
+    // Group: Leave room
+    socket.on("group:leave", (data) => {
+      const roomName = getRoomName.group(data.groupId);
+      socket.leave(roomName);
+      console.log(`[Socket] User ${data.userId} left group room ${roomName}`);
+    });
+
+    // Group: Typing indicator
+    socket.on("group:typing", (data) => {
+      handleGroupTypingIndicator(io!, data);
+    });
+
     // Disconnect handler
     socket.on("disconnect", () => {
       console.log(`[Socket] User disconnected: ${userId}`);
@@ -235,6 +344,7 @@ async function handleChatMessage(
   // Save user message
   const userMessage = await prisma.message.create({
     data: {
+      id: nanoid(),
       agentId,
       userId,
       role: "user",
@@ -265,6 +375,7 @@ async function handleChatMessage(
   if (!relation) {
     relation = await prisma.relation.create({
       data: {
+        id: nanoid(),
         subjectId: agentId,
         targetId: userId,
         targetType: "user",
@@ -273,6 +384,7 @@ async function handleChatMessage(
         respect: 0.5,
         privateState: { love: 0, curiosity: 0 },
         visibleState: { trust: 0.5, affinity: 0.5, respect: 0.5 },
+        updatedAt: new Date(),
       },
     });
   }
@@ -401,6 +513,7 @@ async function handleChatMessage(
     // Save assistant message
     const assistantMessage = await prisma.message.create({
       data: {
+        id: nanoid(),
         agentId,
         role: "assistant",
         content: fullResponse,
@@ -504,7 +617,7 @@ function handleTypingIndicator(
         timestamp: Date.now(),
       });
       typingTimeouts.delete(timeoutKey);
-    }, TYPING_TIMEOUT);
+    }, TYPING_TIMEOUT) as unknown as NodeJS.Timeout;
 
     typingTimeouts.set(timeoutKey, timeout);
   }
@@ -534,16 +647,17 @@ function handlePresenceOffline(io: SocketServer, userId: string) {
  * Get Socket.IO instance
  */
 export function getSocketServer(): SocketServer | null {
-  return io;
+  return getIO();
 }
 
 /**
  * Emit agent update to all subscribers
  */
 export async function emitAgentUpdate(agentId: string, updates: Record<string, unknown>) {
-  if (!io) return;
+  const socketIO = getIO();
+  if (!socketIO) return;
 
-  io.to(getRoomName.agent(agentId)).emit("agent:updated", {
+  socketIO.to(getRoomName.agent(agentId)).emit("agent:updated", {
     agentId,
     updates,
     timestamp: Date.now(),
@@ -554,9 +668,10 @@ export async function emitAgentUpdate(agentId: string, updates: Record<string, u
  * Emit agent deletion to all subscribers
  */
 export async function emitAgentDeleted(agentId: string) {
-  if (!io) return;
+  const socketIO = getIO();
+  if (!socketIO) return;
 
-  io.to(getRoomName.agent(agentId)).emit("agent:deleted", {
+  socketIO.to(getRoomName.agent(agentId)).emit("agent:deleted", {
     agentId,
   });
 }
@@ -573,10 +688,141 @@ export async function sendSystemNotification(
     action?: { label: string; url: string };
   }
 ) {
-  if (!io) return;
+  const socketIO = getIO();
+  if (!socketIO) return;
 
-  io.to(getRoomName.user(userId)).emit("system:notification", {
+  socketIO.to(getRoomName.user(userId)).emit("system:notification", {
     ...notification,
     timestamp: Date.now(),
+  });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// GROUP SOCKET FUNCTIONS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Store group typing timeouts
+const groupTypingTimeouts = new Map<string, NodeJS.Timeout>();
+
+/**
+ * Handle group typing indicator with timeout
+ */
+function handleGroupTypingIndicator(
+  io: SocketServer,
+  data: { groupId: string; userId: string; userName: string; isTyping: boolean }
+) {
+  const { groupId, userId, userName, isTyping } = data;
+  const roomName = getRoomName.group(groupId);
+  const timeoutKey = `group:${groupId}:${userId}`;
+
+  // Clear existing timeout
+  const existingTimeout = groupTypingTimeouts.get(timeoutKey);
+  if (existingTimeout) {
+    clearTimeout(existingTimeout);
+  }
+
+  // Emit typing event to all in room except sender
+  io.to(roomName).emit("group:typing", {
+    groupId,
+    userId,
+    userName,
+    isTyping,
+    timestamp: Date.now(),
+  });
+
+  // Set timeout to auto-stop typing
+  if (isTyping) {
+    const timeout = setTimeout(() => {
+      io.to(roomName).emit("group:typing", {
+        groupId,
+        userId,
+        userName,
+        isTyping: false,
+        timestamp: Date.now(),
+      });
+      groupTypingTimeouts.delete(timeoutKey);
+    }, TYPING_TIMEOUT) as unknown as NodeJS.Timeout;
+
+    groupTypingTimeouts.set(timeoutKey, timeout);
+  }
+}
+
+/**
+ * Emit new message to group members
+ */
+export function emitGroupMessage(groupId: string, message: GroupMessageEvent) {
+  const socketIO = getIO();
+  console.log('[Socket] emitGroupMessage called - groupId:', groupId, 'socketIO:', socketIO ? 'initialized' : 'NULL', 'globalThis.__socketIO:', globalThis.__socketIO ? 'initialized' : 'NULL');
+
+  if (!socketIO) {
+    console.warn('[Socket] Cannot emit group:message - server not initialized');
+    return;
+  }
+
+  const roomName = getRoomName.group(groupId);
+  console.log('[Socket] Emitting group:message to room:', roomName);
+  socketIO.to(roomName).emit("group:message", message);
+}
+
+/**
+ * Emit member joined event to group
+ */
+export function emitGroupMemberJoined(groupId: string, member: GroupMemberEvent) {
+  const socketIO = getIO();
+  if (!socketIO) {
+    console.warn('[Socket] Cannot emit group:member:joined - server not initialized');
+    return;
+  }
+
+  socketIO.to(getRoomName.group(groupId)).emit("group:member:joined", member);
+}
+
+/**
+ * Emit member left event to group
+ */
+export function emitGroupMemberLeft(groupId: string, memberId: string, memberType: 'user' | 'agent') {
+  const socketIO = getIO();
+  if (!socketIO) {
+    console.warn('[Socket] Cannot emit group:member:left - server not initialized');
+    return;
+  }
+
+  socketIO.to(getRoomName.group(groupId)).emit("group:member:left", {
+    groupId,
+    memberId,
+    memberType,
+  });
+}
+
+/**
+ * Emit AI responding indicator
+ */
+export function emitGroupAIResponding(groupId: string, agentId: string, agentName: string) {
+  const socketIO = getIO();
+  if (!socketIO) {
+    console.warn('[Socket] Cannot emit group:ai:responding - server not initialized');
+    return;
+  }
+
+  socketIO.to(getRoomName.group(groupId)).emit("group:ai:responding", {
+    groupId,
+    agentId,
+    agentName,
+  });
+}
+
+/**
+ * Emit AI stopped responding
+ */
+export function emitGroupAIStopped(groupId: string, agentId: string) {
+  const socketIO = getIO();
+  if (!socketIO) {
+    console.warn('[Socket] Cannot emit group:ai:stopped - server not initialized');
+    return;
+  }
+
+  socketIO.to(getRoomName.group(groupId)).emit("group:ai:stopped", {
+    groupId,
+    agentId,
   });
 }

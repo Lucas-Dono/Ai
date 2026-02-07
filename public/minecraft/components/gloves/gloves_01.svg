@@ -1,0 +1,33 @@
+
+    <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+      <!-- GUANTE BRAZO DERECHO (solo manos, últimos 3px) -->
+      <!-- ARM_R_RIGHT (4x3) at (40,29) -->
+      <rect x="40" y="29" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_R_FRONT (4x3) at (44,29) -->
+      <rect x="44" y="29" width="4" height="3" fill="#606060" class="colorizable-clothing"/>
+      <!-- Detalle de muñeca -->
+      <rect x="44" y="29" width="4" height="1" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- ARM_R_LEFT (4x3) at (48,29) -->
+      <rect x="48" y="29" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_R_BACK (4x3) at (52,29) -->
+      <rect x="52" y="29" width="4" height="3" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- GUANTE BRAZO IZQUIERDO (solo manos, últimos 3px) -->
+      <!-- ARM_L_RIGHT (4x3) at (32,61) -->
+      <rect x="32" y="61" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_L_FRONT (4x3) at (36,61) -->
+      <rect x="36" y="61" width="4" height="3" fill="#606060" class="colorizable-clothing"/>
+      <!-- Detalle de muñeca -->
+      <rect x="36" y="61" width="4" height="1" fill="#404040" class="colorizable-clothing"/>
+
+      <!-- ARM_L_LEFT (4x3) at (40,61) -->
+      <rect x="40" y="61" width="4" height="3" fill="#505050" class="colorizable-clothing"/>
+
+      <!-- ARM_L_BACK (4x3) at (44,61) -->
+      <rect x="44" y="61" width="4" height="3" fill="#404040" class="colorizable-clothing"/>
+    </svg>
+  

@@ -65,7 +65,7 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
   );
 
   const socketRef = useRef<SocketClient | null>(null);
-  const eventHandlersRef = useRef<Map<string, Function>>(new Map());
+  const eventHandlersRef = useRef<Map<string, (...args: any[]) => void>>(new Map());
 
   // Initialize socket connection
   const connect = useCallback(() => {
@@ -153,7 +153,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
       ...args: Parameters<ClientToServerEvents[K]>
     ) => {
       if (socketRef.current?.connected) {
-        // @ts-ignore - Type complexity with variadic parameters
         socketRef.current.emit(event, ...args);
       } else {
         console.warn("[Socket] Cannot emit - not connected:", event);

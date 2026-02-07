@@ -8,17 +8,24 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
 // VAPID keys for web push (should be in environment variables)
-const VAPID_PUBLIC_KEY =
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-  "BP_mPzCRBHcG3Z9Vj7nYKqZwX0T5yPnZPnrQPnYKqZwX0T5yPnZPnrQPnYKqZwX0T5yPnZPnrQPnYKqZwX0";
-const VAPID_PRIVATE_KEY =
-  process.env.VAPID_PRIVATE_KEY ||
-  "generate-real-vapid-keys-with-web-push-generate-vapid-keys";
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || "";
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || "mailto:admin@example.com";
 
-// Configure web push
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+// Configure web push only if valid keys are provided
+const isValidVapidKey = (key: string) => {
+  return key && key.length > 40 && !key.includes("generate-real");
+};
+
+if (
+  isValidVapidKey(VAPID_PUBLIC_KEY) &&
+  isValidVapidKey(VAPID_PRIVATE_KEY)
+) {
+  try {
+    webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+  } catch (error) {
+    console.warn("Failed to configure VAPID details:", error);
+  }
 }
 
 export interface PushSubscription {
@@ -277,4 +284,92 @@ export async function notifyUsageLimitApproaching(
  */
 export function generateVAPIDKeys() {
   return webpush.generateVAPIDKeys();
+}
+
+/**
+ * Send notification when a bond is at risk
+ */
+export async function notifyBondAtRisk(
+  userId: string,
+  agentName: string,
+  bondStatus: "warned" | "dormant" | "fragile",
+  daysInactive: number
+): Promise<void> {
+  const statusMessages = {
+    warned: {
+      title: "⚠️ Tu vínculo necesita atención",
+      body: `Tu relación con ${agentName} ha estado inactiva por ${daysInactive} días. ¡Envíale un mensaje!`,
+      urgency: "low" as const,
+    },
+    dormant: {
+      title: "💔 Tu vínculo está inactivo",
+      body: `${agentName} te extraña. Han pasado ${daysInactive} días sin interactuar.`,
+      urgency: "normal" as const,
+    },
+    fragile: {
+      title: "🔥 ¡Tu vínculo está en peligro!",
+      body: `Tu relación con ${agentName} está a punto de perderse. ${daysInactive} días sin actividad.`,
+      urgency: "high" as const,
+    },
+  };
+
+  const message = statusMessages[bondStatus];
+
+  await sendPushNotification(userId, {
+    title: message.title,
+    body: message.body,
+    icon: "/icons/bond-warning.png",
+    badge: "/icons/badge.png",
+    tag: `bond-at-risk-${bondStatus}`,
+    data: {
+      type: "bond-at-risk",
+      agentName,
+      bondStatus,
+      daysInactive,
+      urgency: message.urgency,
+    },
+    actions: [
+      {
+        action: "message",
+        title: "Enviar Mensaje",
+      },
+      {
+        action: "dismiss",
+        title: "Más Tarde",
+      },
+    ],
+  });
+}
+
+/**
+ * Send notification when a bond milestone is reached
+ */
+export async function notifyBondMilestone(
+  userId: string,
+  agentName: string,
+  milestoneType: string,
+  milestoneDescription: string
+): Promise<void> {
+  await sendPushNotification(userId, {
+    title: `🎉 Hito alcanzado con ${agentName}`,
+    body: milestoneDescription,
+    icon: "/icons/milestone.png",
+    badge: "/icons/badge.png",
+    tag: "bond-milestone",
+    data: {
+      type: "bond-milestone",
+      agentName,
+      milestoneType,
+    },
+    actions: [
+      {
+        action: "view",
+        title: "Ver Progreso",
+      },
+      {
+        action: "dismiss",
+        title: "Cerrar",
+      },
+    ],
+  });
 }

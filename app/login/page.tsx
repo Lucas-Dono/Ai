@@ -1,34 +1,105 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { signIn } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Mail, Chrome } from "lucide-react";
+import { Sparkles, Mail, Chrome, Lock, AlertCircle, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useShakeOnError } from "@/hooks/useShake";
+import { getSecureCallbackUrl } from "@/lib/security/url-validation";
+
+export const dynamic = 'force-dynamic';
 
 export default function LoginPage() {
+  const t = useTranslations("login");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { shakeClass } = useShakeOnError(!!error);
+
+  // Obtener y validar callbackUrl de manera segura
+  const [callbackUrl, setCallbackUrl] = useState("/dashboard");
+
+  // Demo migration params
+  const [fromDemo, setFromDemo] = useState(false);
+  const [demoSessionId, setDemoSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Validar callbackUrl al montar el componente
+    const secureUrl = getSecureCallbackUrl(searchParams, "/dashboard");
+    setCallbackUrl(secureUrl);
+
+    // Detectar si viene de demo
+    const isFromDemo = searchParams.get('fromDemo') === 'true';
+    const sessionId = searchParams.get('demoSessionId');
+
+    setFromDemo(isFromDemo);
+    setDemoSessionId(sessionId);
+  }, [searchParams]);
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn.email({
         email,
-        redirect: false,
+        password,
       });
 
-      if (result?.ok) {
-        router.push("/dashboard");
+      if (result.error) {
+        setError("Email o contraseña incorrectos");
+      } else {
+        // Si viene de demo, migrar mensajes y redirigir al chat de Luna
+        if (fromDemo && demoSessionId) {
+          try {
+            const migrateResponse = await fetch("/api/demo/migrate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                demoSessionId,
+              }),
+            });
+
+            if (migrateResponse.ok) {
+              const migrateData = await migrateResponse.json();
+
+              // Limpiar localStorage del demo
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('luna_demo_session');
+              }
+
+              // Redirigir al chat de Luna con indicador de continuación
+              router.push(`/agentes/${migrateData.agentId}?fromDemo=true`);
+              router.refresh();
+              return;
+            } else {
+              console.error("Error migrating demo:", await migrateResponse.text());
+              // Si falla la migración, seguir al callback normal
+            }
+          } catch (migrateError) {
+            console.error("Error migrating demo:", migrateError);
+            // Si falla la migración, seguir al callback normal
+          }
+        }
+
+        router.push(callbackUrl);
+        router.refresh();
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
+      setError("Error al iniciar sesión. Por favor, intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -36,7 +107,10 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn.social({
+      provider: "google",
+      callbackURL: callbackUrl,
+    });
   };
 
   return (
@@ -54,30 +128,27 @@ export default function LoginPage() {
           </div>
           <div>
             <CardTitle className="text-3xl font-bold mb-2">
-              Bienvenido de vuelta
+              {t("title")}
             </CardTitle>
             <CardDescription className="text-base">
-              Accede a tu mundo de inteligencias artificiales
+              {t("subtitle")}
             </CardDescription>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Demo Quick Access */}
-          <div className="p-4 rounded-lg bg-muted/50 border border-border">
-            <p className="text-sm text-muted-foreground mb-2">
-              🎯 <strong>Acceso rápido Demo:</strong>
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Email: <code className="bg-background px-2 py-1 rounded">demo@creador-ia.com</code>
-            </p>
-          </div>
+          {error && (
+            <div className={`p-3 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-start gap-2 ${shakeClass}`}>
+              <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-destructive">{error}</p>
+            </div>
+          )}
 
           {/* Email Login Form */}
           <form onSubmit={handleCredentialsLogin} className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Email
+                {t("form.emailLabel")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -85,10 +156,39 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder={t("form.emailPlaceholder")}
                   className="pl-10"
                   required
                 />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">
+                  {t("form.passwordLabel")}
+                </label>
+                <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                  {t("form.forgotPassword")}
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={t("form.passwordPlaceholder")}
+                  className="pl-10 pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
@@ -96,12 +196,12 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  Iniciando...
+                  {t("form.loggingIn")}
                 </>
               ) : (
                 <>
                   <Mail className="h-4 w-4 mr-2" />
-                  Continuar con Email
+                  {t("form.continueWithEmail")}
                 </>
               )}
             </Button>
@@ -112,7 +212,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-card text-muted-foreground">O continúa con</span>
+              <span className="px-2 bg-card text-muted-foreground">{t("divider")}</span>
             </div>
           </div>
 
@@ -125,14 +225,14 @@ export default function LoginPage() {
             disabled={loading}
           >
             <Chrome className="h-4 w-4 mr-2" />
-            Google
+            {t("form.google")}
           </Button>
 
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              ¿Primera vez aquí?{" "}
-              <Link href="/" className="text-primary hover:underline font-medium">
-                Conoce más sobre Creador IA
+              {t("footer.noAccount")}{" "}
+              <Link href="/registro" className="text-primary hover:underline font-medium">
+                {t("footer.register")}
               </Link>
             </p>
           </div>

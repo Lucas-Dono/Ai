@@ -1,0 +1,59 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+build
+dist
+
+# Production
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Misc
+.DS_Store
+*.pem
+*.log
+
+# Debug
+.vscode/
+.idea/
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Testing
+coverage/
+.nyc_output/
+
+# Documentation
+README.md
+docs/
+*.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Prisma
+prisma/migrations/*.sql
+!prisma/schema.prisma
+
+# Development only
+scripts/test-*.ts
+scripts/migrate-*.ts
+tmp/
+temp/

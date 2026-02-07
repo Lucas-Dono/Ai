@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { generateAPIKey } from "@/lib/api/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -28,16 +28,16 @@ import { prisma } from "@/lib/prisma";
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const newAPIKey = generateAPIKey();
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: { apiKey: newAPIKey },
     });
 
@@ -78,18 +78,18 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
       select: { apiKey: true },
     });
 
-    if (!user?.apiKey) {
+    if (!dbUser?.apiKey) {
       return NextResponse.json({
         hasKey: false,
         message: "No API key generated yet",
@@ -98,9 +98,9 @@ export async function GET(req: NextRequest) {
 
     // Mask API key for security
     const masked =
-      user.apiKey.substring(0, 8) +
+      dbUser.apiKey.substring(0, 8) +
       "****" +
-      user.apiKey.substring(user.apiKey.length - 8);
+      dbUser.apiKey.substring(dbUser.apiKey.length - 8);
 
     return NextResponse.json({
       hasKey: true,

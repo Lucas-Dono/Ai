@@ -23,68 +23,149 @@ export const PLANS = {
     currency: "ARS",
     interval: "month" as const,
     features: [
-      "2 agentes de IA",
-      "100 mensajes por mes",
-      "Inteligencia emocional básica",
-      "1 mundo virtual",
-      "Soporte por email",
+      "3 compañeros IA",
+      "20 mensajes por día",
+      "Sistema emocional básico",
+      "1 mundo predefinido (Academia Sakura)",
+      "5 análisis de imágenes por mes",
+      "❌ Sin voz (usa tu API key de ElevenLabs)",
+      "❌ Sin contenido NSFW",
+      "❌ Sin comportamientos avanzados",
+      "✨ Gana más mensajes e imágenes viendo anuncios",
+      "Soporte comunitario",
     ],
     limits: {
-      agents: 2,
-      messages: 100,
+      agents: 3,
+      messages: -1, // Ilimitado mensualmente pero con límite diario
+      messagesPerDay: 20, // 20 mensajes por día
+      rewardedMessagesPerVideo: 10, // +10 mensajes por video ad
       worlds: 1,
+      worldsAllowed: ["academia-sakura"], // Solo Academia Sakura
       tokensPerMessage: 1000,
+
+      // Voz
+      voiceEnabled: false, // Sin voz incluida
+      canUseBYOK: true, // Puede usar su propia API key de ElevenLabs
+      voiceMessagesPerMonth: 0,
+
+      // Imágenes
+      imageAnalysisPerMonth: 5, // 5 análisis gratis por mes
+      imageAnalysisRewardedMax: 60, // Máximo 60 extra viendo ads
+      imageAnalysisPerMinuteVideo: 4, // 4 análisis por cada minuto de video
+      imageGeneration: 0, // Sin generación de imágenes
+
+      // NSFW y Comportamientos
+      nsfwMode: false, // Sin contenido NSFW
+      advancedBehaviors: false, // Sin Yandere, BPD, NPD, etc.
+
+      // Otros
+      proactiveMessages: 1, // Solo 1 mensaje proactivo por semana
+      exportConversations: false,
     },
   },
-  pro: {
-    id: "pro",
-    name: "Pro",
-    description: "Para usuarios avanzados y profesionales",
-    price: 9900,
+  plus: {
+    id: "plus",
+    name: "Plus",
+    description: "Ideal para usuarios regulares que quieren más",
+    price: 4900, // ~$5 USD
     currency: "ARS",
     interval: "month" as const,
-    mercadopagoPreapprovalPlanId: process.env.MERCADOPAGO_PRO_PLAN_ID,
+    mercadopagoPreapprovalPlanId: process.env.MERCADOPAGO_PLUS_PLAN_ID,
     features: [
-      "20 agentes de IA",
-      "5,000 mensajes por mes",
-      "Inteligencia emocional avanzada",
-      "Mundos virtuales ilimitados",
-      "Personalización de voz y personalidad",
-      "Exportar conversaciones",
-      "Soporte prioritario",
-      "Acceso a API",
+      "10 compañeros IA",
+      "Mensajes de texto ilimitados",
+      "100 mensajes con voz por mes",
+      "Sistema emocional avanzado",
+      "5 mundos virtuales (chat + novelas visuales)",
+      "50 análisis de imágenes por mes",
+      "20 generaciones de imágenes por mes",
+      "✅ Acceso a Novelas Visuales",
+      "✅ Contenido NSFW habilitado",
+      "✅ Comportamientos psicológicos avanzados",
+      "✅ Sin publicidad",
+      "Soporte prioritario por email",
     ],
     limits: {
-      agents: 20,
-      messages: 5000,
-      worlds: -1,
-      tokensPerMessage: 4000,
+      agents: 10,
+      messages: -1, // Ilimitado
+      messagesPerDay: -1, // Sin límite diario
+      worlds: 5,
+      worldsAllowed: [], // Todos los mundos disponibles
+      tokensPerMessage: 2000,
+
+      // Voz
+      voiceEnabled: true,
+      voiceMessagesPerMonth: 100,
+
+      // Imágenes
+      imageAnalysisPerMonth: 50,
+      imageGeneration: 20,
+
+      // NSFW y Comportamientos
+      nsfwMode: true, // NSFW habilitado
+      advancedBehaviors: true, // Yandere, BPD, NPD, etc.
+
+      // Otros
+      proactiveMessages: 20,
+      exportConversations: true,
+      prioritySupport: true,
+      adsEnabled: false, // Sin publicidad
     },
   },
-  enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    description: "Para equipos y organizaciones",
-    price: 29900,
+  ultra: {
+    id: "ultra",
+    name: "Ultra",
+    description: "Experiencia completa sin límites",
+    price: 14900, // ~$15 USD
     currency: "ARS",
     interval: "month" as const,
-    mercadopagoPreapprovalPlanId: process.env.MERCADOPAGO_ENTERPRISE_PLAN_ID,
+    mercadopagoPreapprovalPlanId: process.env.MERCADOPAGO_ULTRA_PLAN_ID,
     features: [
-      "Agentes de IA ilimitados",
-      "Mensajes ilimitados",
-      "Seguridad de nivel empresarial",
-      "Autenticación SSO y SAML",
-      "Colaboración en equipo",
-      "Opciones white-label",
-      "Integraciones personalizadas",
-      "Gerente de cuenta dedicado",
-      "Garantía de SLA",
+      "Compañeros IA ilimitados",
+      "Mensajes de texto ilimitados",
+      "500 mensajes con voz por mes",
+      "Sistema emocional avanzado",
+      "Mundos virtuales ilimitados",
+      "200 análisis de imágenes por mes",
+      "100 generaciones de imágenes por mes",
+      "✅ Generación prioritaria de imágenes (rápida)",
+      "✅ Contenido NSFW sin restricciones",
+      "✅ Clonación de voz personalizada",
+      "✅ Acceso API para integraciones",
+      "✅ Exportar conversaciones en PDF",
+      "✅ Sin publicidad",
+      "✅ Mensajes proactivos ilimitados",
+      "Soporte prioritario 24/7",
+      "Acceso anticipado a nuevas funciones",
     ],
     limits: {
       agents: -1,
       messages: -1,
+      messagesPerDay: -1,
       worlds: -1,
-      tokensPerMessage: 8000,
+      worldsAllowed: [],
+      tokensPerMessage: 4000,
+
+      // Voz
+      voiceEnabled: true,
+      voiceMessagesPerMonth: 500,
+      customVoiceCloning: true, // Clonación de voz
+
+      // Imágenes
+      imageAnalysisPerMonth: 200,
+      imageGeneration: 100,
+      priorityGeneration: true, // Generación rápida
+
+      // NSFW y Comportamientos
+      nsfwMode: true,
+      advancedBehaviors: true,
+
+      // Otros
+      proactiveMessages: -1, // Ilimitado
+      exportConversations: true,
+      apiAccess: true, // Acceso API
+      prioritySupport: true,
+      adsEnabled: false,
     },
   },
 } as const;
@@ -110,7 +191,7 @@ export function getPlanLimit(
   planId: PlanId,
   resource: keyof (typeof PLANS)[PlanId]["limits"]
 ): number {
-  return PLANS[planId].limits[resource];
+  return PLANS[planId].limits[resource] as number;
 }
 
 export function canCreateResource(
@@ -135,8 +216,8 @@ export function formatPrice(
 }
 
 export const MERCADOPAGO_URLS = {
-  success: `${process.env.NEXTAUTH_URL}/dashboard/billing/success`,
-  failure: `${process.env.NEXTAUTH_URL}/dashboard/billing/failure`,
-  pending: `${process.env.NEXTAUTH_URL}/dashboard/billing/pending`,
-  notification: `${process.env.NEXTAUTH_URL}/api/webhooks/mercadopago`,
+  success: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/dashboard/billing/success`,
+  failure: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/dashboard/billing/failure`,
+  pending: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/dashboard/billing/pending`,
+  notification: `${process.env.NEXTAUTH_URL || process.env.APP_URL || "http://localhost:3000"}/api/webhooks/mercadopago`,
 };

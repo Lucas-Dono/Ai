@@ -1,13 +1,18 @@
 /**
  * Vector Store using HNSW (Hierarchical Navigable Small World)
  * Fast approximate nearest neighbor search for semantic similarity
+ *
+ * IMPORTANT: Uses dynamic import for hnswlib-node to avoid bundling
+ * native binaries in webpack. Only works server-side.
  */
 
-import { HierarchicalNSW } from "hnswlib-node";
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { getEmbeddingDimensions } from "./embeddings";
+
+// Type for HierarchicalNSW (imported dynamically)
+type HierarchicalNSW = any;
 
 export interface VectorMetadata {
   id: string;
@@ -30,6 +35,23 @@ export interface SearchResult {
 
 const VECTOR_STORE_DIR = "./.vector-store";
 const EMBEDDING_DIMENSIONS = getEmbeddingDimensions();
+
+/**
+ * Dynamic import of hnswlib-node to avoid webpack bundling issues
+ */
+let HierarchicalNSWClass: any = null;
+async function getHierarchicalNSW() {
+  if (typeof window !== "undefined") {
+    throw new Error("Vector store can only be used on the server side");
+  }
+
+  if (!HierarchicalNSWClass) {
+    const hnswModule = await import("hnswlib-node");
+    HierarchicalNSWClass = hnswModule.HierarchicalNSW;
+  }
+
+  return HierarchicalNSWClass;
+}
 
 /**
  * Vector Store class for managing embeddings and similarity search
@@ -68,8 +90,9 @@ export class VectorStore {
       if (indexExists && metadataExists) {
         await this.load();
       } else {
-        // Create new index
-        this.index = new HierarchicalNSW("cosine", EMBEDDING_DIMENSIONS);
+        // Create new index with dynamic import
+        const HNSWClass = await getHierarchicalNSW();
+        this.index = new HNSWClass("cosine", EMBEDDING_DIMENSIONS);
         this.index.initIndex(maxElements);
         console.log(
           `[VectorStore] Created new index for ${this.storeId} with ${maxElements} max elements`
@@ -232,7 +255,8 @@ export class VectorStore {
     this.nextLabel = 0;
 
     if (this.index) {
-      this.index = new HierarchicalNSW("cosine", EMBEDDING_DIMENSIONS);
+      const HNSWClass = await getHierarchicalNSW();
+      this.index = new HNSWClass("cosine", EMBEDDING_DIMENSIONS);
       this.index.initIndex(10000);
     }
   }
@@ -277,8 +301,9 @@ export class VectorStore {
    */
   async load(): Promise<void> {
     try {
-      // Load HNSW index
-      this.index = new HierarchicalNSW("cosine", EMBEDDING_DIMENSIONS);
+      // Load HNSW index with dynamic import
+      const HNSWClass = await getHierarchicalNSW();
+      this.index = new HNSWClass("cosine", EMBEDDING_DIMENSIONS);
       this.index.readIndexSync(this.indexPath);
 
       // Load metadata

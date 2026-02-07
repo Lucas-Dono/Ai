@@ -1,0 +1,32 @@
+═══════════════════════════════════════════════════════════════════════════════
+DALLE-3 PROMPTS - ETHAN CROSS
+═══════════════════════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════════════════════
+1rst message: DETAILED CHARACTER DESCRIPTION
+═══════════════════════════════════════════════════════════════════════════════
+
+Create a realistic portrait of Ethan Cross, a 44-year-old private investigator and detective. He has a lean, athletic build that suggests rigorous physical discipline. His face shows the weathering of years spent in pursuit of difficult truths—sharp cheekbones, a strong jaw, and intense gray-blue eyes that seem to analyze everything they observe. His dark hair is beginning to gray at the temples, evidence of chronic stress and insomnia. He has a five-day stubble that looks perpetually unwashed.
+
+He wears a dark charcoal button-up shirt, partially unbuttoned at the collar, suggesting someone who dresses for function rather than appearance. Over it, a well-worn black leather jacket that's developed a patina of age and use. The lighting should be cool and noir-influenced, casting subtle shadows across his face that emphasize the lines of exhaustion and the intensity of his gaze.
+
+His expression should be neutral but watchful—a man in the middle of analyzing a situation or a person. One hand should be partially visible, showing calluses and the small silver ring on his index finger. The background should be dark and indistinct, suggesting an urban environment—perhaps slightly out of focus brick or concrete. There should be a sense of isolation and intensity in the composition.
+
+The overall tone should be cinematic and serious—the visual representation of someone who has spent decades chasing truth through darkness, and that pursuit has left visible marks on his soul.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+PROMPT 2: REFERENCE-BASED PROFESSIONAL PORTRAIT
+═══════════════════════════════════════════════════════════════════════════════
+
+Using the reference image, create a professional yet gritty portrait of Ethan Cross, a private investigator. Maintain the facial structure, the intensity of his gaze, and the distinctive gray-blue eyes from the reference. Keep the dark hair with gray at the temples and the slight stubble that characterizes his appearance.
+
+Update the composition to show him wearing a dark, tailored charcoal suit jacket over a plain white shirt—slightly more formal than his usual wear, as though he's preparing for a meeting with a client or attending something he doesn't want to be at. His expression should remain analytical and slightly guarded.
+
+Place him against a WHITE or fully TRANSPARENT background to isolate the figure. The lighting should remain cool and slightly dramatic, with subtle shadows that define his facial features and create depth without the background details. Ensure the portrait is clean, professional, and suitable for formal use, while maintaining the character's inherent sense of danger and intellectual precision.
+
+The overall aesthetic should be: serious investigator, analytical, trustworthy yet dangerous, someone you would hire if you needed uncomfortable truths revealed.
+
+═══════════════════════════════════════════════════════════════════════════════
+END OF DALLE PROMPTS
+═══════════════════════════════════════════════════════════════════════════════

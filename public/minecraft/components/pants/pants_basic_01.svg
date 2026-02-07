@@ -1,0 +1,10 @@
+
+    <svg width="4" height="12" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pierna -->
+      <rect x="0" y="0" width="4" height="12" fill="#606060" class="colorizable-clothing"/>
+      <!-- Costura central -->
+      <rect x="1" y="0" width="2" height="12" fill="#505050" class="colorizable-clothing" opacity="0.7"/>
+      <!-- Sombra lateral -->
+      <rect x="0" y="0" width="1" height="12" fill="#404040" class="colorizable-clothing" opacity="0.5"/>
+    </svg>
+  

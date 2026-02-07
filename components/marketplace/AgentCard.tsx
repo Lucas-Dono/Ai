@@ -4,8 +4,9 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, Copy, Heart } from "lucide-react";
+import { Star, Copy, Heart, Share2, Lock, Globe, Crown, Flame } from "lucide-react";
 import { useState } from "react";
+import { ShareAgentDialog } from "@/components/share/ShareAgentDialog";
 
 interface AgentCardProps {
   agent: {
@@ -14,25 +15,36 @@ interface AgentCardProps {
     description: string | null;
     avatar: string | null;
     kind: string;
+    gender?: string | null;
     rating: number | null;
     cloneCount: number;
     featured: boolean;
     tags: any;
+    visibility?: string | null;
+    nsfwMode?: boolean | null;
+    nsfwLevel?: string | null;
+    generationTier?: string | null;
+    userId?: string | null;
     user: {
       name: string | null;
       email: string;
-    };
+    } | null;
     _count: {
       reviews: number;
     };
   };
   onViewDetails: (agentId: string) => void;
   onClone: (agentId: string) => void;
+  showVisibilityBadge?: boolean;
 }
 
-export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
+export function AgentCard({ agent, onViewDetails, onClone, showVisibilityBadge = false }: AgentCardProps) {
   const [isCloning, setIsCloning] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const tags = Array.isArray(agent.tags) ? agent.tags : [];
+
+  // Check if this is user's own character
+  const isOwnCharacter = agent.userId !== null;
 
   const handleClone = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,22 +80,62 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
 
   return (
     <Card
-      className="cursor-pointer hover:border-primary transition-all group"
+      className="cursor-pointer hover:border-primary transition-all group hover-lift-glow relative"
       onClick={() => onViewDetails(agent.id)}
     >
-      {agent.featured && (
-        <div className="absolute top-2 right-2 z-10">
+      {/* Badges Container */}
+      <div className="absolute top-2 right-2 z-10 flex flex-col gap-1 items-end">
+        {/* Featured Badge */}
+        {agent.featured && (
           <Badge variant="default" className="bg-gradient-to-r from-purple-600 to-pink-600">
             <Heart className="w-3 h-3 mr-1" />
             Featured
           </Badge>
-        </div>
-      )}
+        )}
+
+        {/* Visibility Badge (only for user's own characters) */}
+        {isOwnCharacter && showVisibilityBadge && agent.visibility === 'private' && (
+          <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700">
+            <Lock className="w-3 h-3 mr-1" />
+            Private
+          </Badge>
+        )}
+
+        {isOwnCharacter && showVisibilityBadge && agent.visibility === 'public' && (
+          <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700">
+            <Globe className="w-3 h-3 mr-1" />
+            Public
+          </Badge>
+        )}
+
+        {/* Tier Badge */}
+        {agent.generationTier === 'ultra' && (
+          <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+            <Crown className="w-3 h-3 mr-1" />
+            Ultra
+          </Badge>
+        )}
+
+        {agent.generationTier === 'plus' && (
+          <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0">
+            <Star className="w-3 h-3 mr-1" />
+            Plus
+          </Badge>
+        )}
+
+        {/* NSFW Badge */}
+        {(agent.nsfwMode || (agent.nsfwLevel && agent.nsfwLevel !== 'sfw')) && (
+          <Badge variant="destructive" className="font-semibold">
+            <Flame className="w-3 h-3 mr-1" />
+            18+
+          </Badge>
+        )}
+      </div>
 
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <Avatar className="w-12 h-12 border-2 border-border">
-            <AvatarImage src={agent.avatar || ""} alt={agent.name} />
+            <AvatarImage src={agent.avatar || (agent as any).referenceImageUrl || ""} alt={agent.name} />
             <AvatarFallback>{agent.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
 
@@ -92,7 +144,7 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
               {agent.name}
             </h3>
             <p className="text-xs text-muted-foreground truncate">
-              by {agent.user.name || agent.user.email.split("@")[0]}
+              by {agent.user?.name || agent.user?.email?.split("@")[0] || "Unknown"}
             </p>
           </div>
         </div>
@@ -104,9 +156,14 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
         </p>
 
         <div className="flex items-center gap-2 mt-3">
-          <Badge variant={agent.kind === "companion" ? "secondary" : "outline"}>
-            {agent.kind}
-          </Badge>
+          {agent.gender && (
+            <Badge variant="secondary" className="capitalize">
+              {agent.gender === "male" ? "Masculino" :
+               agent.gender === "female" ? "Femenino" :
+               agent.gender === "non-binary" ? "No binario" :
+               agent.gender}
+            </Badge>
+          )}
           {tags.slice(0, 2).map((tag: string, idx: number) => (
             <Badge key={idx} variant="outline" className="text-xs">
               {tag}
@@ -127,17 +184,42 @@ export function AgentCard({ agent, onViewDetails, onClone }: AgentCardProps) {
           </div>
         </div>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleClone}
-          disabled={isCloning}
-          className="group-hover:bg-primary group-hover:text-primary-foreground"
-        >
-          <Copy className="w-3 h-3 mr-1" />
-          {isCloning ? "Cloning..." : "Clone"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowShareDialog(true);
+            }}
+            className="px-2"
+          >
+            <Share2 className="w-3 h-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClone}
+            disabled={isCloning}
+            className="group-hover:bg-primary group-hover:text-primary-foreground"
+          >
+            <Copy className="w-3 h-3 mr-1" />
+            {isCloning ? "Cloning..." : "Clone"}
+          </Button>
+        </div>
       </CardFooter>
+
+      {/* Share Dialog */}
+      <ShareAgentDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        agent={{
+          id: agent.id,
+          name: agent.name,
+          avatar: agent.avatar,
+          description: agent.description ?? undefined,
+        }}
+      />
     </Card>
   );
 }

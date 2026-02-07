@@ -1,0 +1,36 @@
+YUKI TANAKA - DALL-E GENERATION PROMPTS
+================================================================================
+
+1rst message: FACE PORTRAIT (512x512 - 1:1 Ratio)
+================================================================================
+
+A detailed portrait of Yuki Tanaka, a 28-year-old Japanese woman with sharp, intelligent eyes that hold both creative energy and underlying anxiety. She has straight black hair with a subtle, deliberate asymmetry—longer on one side—that suggests someone who thinks carefully about aesthetics. Her complexion is pale, her features finely drawn with high cheekbones and a thoughtful expression. Her eyes are dark brown, intense, observant, with just a hint of sadness or pensiveness beneath their clarity. She has a calm, composed expression but her eyes suggest someone constantly processing, analyzing, thinking several layers deep.
+
+She's wearing a minimalist dark turtleneck or simple blouse in muted tones—grays, blacks, deep blues. The styling is deliberately understated, focusing attention on her face and expression rather than clothing. Her hair falls naturally, partially framing her face in a way that creates psychological depth.
+
+The lighting should be soft, slightly moody, emphasizing her thoughtful expression and the intelligence in her eyes. The background should be neutral, blurred, almost abstract—perhaps soft shadows of darker tones that suggest depth without distraction. The overall mood is introspective and serious, capturing someone engaged in creative and psychological work. There should be a sense of quiet intensity, of someone managing significant internal complexity while maintaining external composure.
+
+The image should feel like a portrait of someone you'd have a meaningful conversation with—someone both emotionally articulate and somewhat reserved, creative and thoughtful, carrying both strength and vulnerability. High quality, photorealistic or semi-realistic art style.
+
+Image dimensions: 512x512 pixels (1:1 square ratio)
+
+================================================================================
+
+PROMPT 2: FULL BODY PORTRAIT
+================================================================================
+
+Using the reference image, create a full-body portrait of Yuki Tanaka standing in three-quarter pose against a completely white or completely transparent background with no contextual elements, furniture, or environmental details whatsoever.
+
+She's dressed in her typical work aesthetic: a simple, well-fitted dark turtleneck or minimalist top in black or deep gray, paired with high-waisted, tailored dark trousers in muted tones. She might be wearing a simple cardigan or structured jacket in neutral colors, suggesting someone who dresses thoughtfully but without ostentation. Her shoes are minimal and functional—simple black sneakers, understated loafers, or flats that suggest practicality rather than fashion statement.
+
+Her posture conveys quiet confidence mixed with introversion—she stands with composed, controlled body language, shoulders slightly drawn, not expansive but not collapsed either. Her hands are visible, perhaps one relaxed at her side and one near her torso, in a natural, thoughtful pose. Her expression remains calm and introspective, maintaining the intellectual intensity and quiet intensity of her face from the reference.
+
+She has the bearing of someone intellectually focused and creatively engaged—someone who spends hours designing games and thinking about narrative—but also someone aware of the social space around her and her place in it. There's no tension in her posture but there's also no relaxation; she's present and engaged but somewhat careful.
+
+The styling emphasizes her Japanese cultural context subtly—her proportions, features, and aesthetic sensibility are distinctly Japanese but not stereotyped. She looks like someone who could be at an indie game conference in Tokyo, working at a design studio, or in a casual creative professional setting.
+
+The entire background must be completely white or completely transparent (no gradients, no shadows, no environmental elements). The image is cleanly cut with no context, emphasizing the figure against pure emptiness. Professional quality, semi-realistic art style that matches the reference portrait in terms of detail and rendering.
+
+Image dimensions: 512x512 pixels (1:1 square ratio) - can be adjusted to 512x768 or similar if full body requires more vertical space while maintaining white/transparent background
+
+================================================================================

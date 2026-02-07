@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { PLANS, getPlanLimit } from "@/lib/mercadopago/config";
 import { Prisma } from "@prisma/client";
+import { nanoid } from "nanoid";
 
-export type ResourceType = "message" | "agent" | "world" | "api_call" | "tokens";
+export type ResourceType = "message" | "agent" | "world" | "api_call" | "tokens" | "prompt_enhancement";
 
 // Trackear uso de un recurso
 export async function trackUsage(
@@ -14,6 +15,7 @@ export async function trackUsage(
 ): Promise<void> {
   await prisma.usage.create({
     data: {
+      id: nanoid(),
       userId,
       resourceType,
       resourceId,
@@ -51,6 +53,33 @@ export async function getCurrentMonthUsage(
   return usage._sum.quantity || 0;
 }
 
+// Obtener uso del día actual (para límites diarios)
+export async function getCurrentDayUsage(
+  userId: string,
+  resourceType?: ResourceType
+): Promise<number> {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const whereClause: { userId: string; resourceType?: string; createdAt: { gte: Date } } = {
+    userId,
+    createdAt: { gte: startOfDay },
+  };
+
+  if (resourceType) {
+    whereClause.resourceType = resourceType;
+  }
+
+  const usage = await prisma.usage.aggregate({
+    where: whereClause,
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  return usage._sum.quantity || 0;
+}
+
 // Obtener conteo actual de recursos
 export async function getCurrentResourceCount(
   userId: string,
@@ -59,7 +88,7 @@ export async function getCurrentResourceCount(
   if (resourceType === "agent") {
     return await prisma.agent.count({ where: { userId } });
   } else if (resourceType === "world") {
-    return await prisma.world.count({ where: { userId } });
+    return await prisma.group.count({ where: { creatorId: userId } });
   }
   return 0;
 }
@@ -147,6 +176,28 @@ export async function canUseResource(
       };
     }
     return { allowed: true };
+  }
+
+  if (resourceType === "prompt_enhancement") {
+    // Límites diarios por tier
+    const dailyLimits: Record<string, number> = {
+      FREE: 2,
+      PLUS: 10,
+      ULTRA: 30,
+    };
+
+    const limit = dailyLimits[planId] || 2;
+    const current = await getCurrentDayUsage(userId, "prompt_enhancement");
+
+    if (current + quantity > limit) {
+      return {
+        allowed: false,
+        reason: `Daily prompt enhancement limit reached (${limit})`,
+        current,
+        limit,
+      };
+    }
+    return { allowed: true, current, limit };
   }
 
   // Default: allow

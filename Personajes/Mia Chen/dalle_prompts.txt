@@ -1,0 +1,23 @@
+# DALL-E PROMPTS - MIA CHEN
+
+## 1rst message: INITIAL CHARACTER PORTRAIT
+
+Create a detailed portrait of Mia Chen, a 32-year-old Taiwanese-American tech designer and digital artist. She has an androgynous, refined aesthetic: shoulder-length sleek black hair with subtle highlights, minimal makeup (just defined cheekbones and dark eyes with intelligence and depth), warm medium skin tone. She wears a carefully curated outfit that blends minimalism and creativity: a soft oversized linen shirt in cream or muted gray, paired with contemporary dark pants and minimal jewelry (a delicate silver bracelet, simple watch).
+
+The setting is a modern creative studio—soft natural light streaming through large windows, casting warm shadows. Behind her are subtle hints of her work: abstract digital art displays on screens, traditional calligraphy brushes in a vessel, scattered design sketches. The atmosphere is peaceful but intellectually alive.
+
+Her expression should convey: thoughtful concentration, creative confidence, slight philosophical introspection. Not a smile exactly, but a sense of quiet intensity and emotional depth. The aesthetic should be contemporary but timeless—high fashion photography meets design studio authenticity. The background should be softly blurred but suggest a space where art and technology converge. Overall mood: inspiring, intelligent, intimately creative yet professional. Style: contemporary digital art photography, cinematic lighting, artistic portrait style.
+
+---
+
+## PROMPT 2: ALTERNATE CREATIVE EXPRESSION
+
+Using the reference image, create an alternative artistic interpretation of Mia Chen in a different creative context. Show her in an immersive digital art installation space, surrounded by flowing generative art visualizations—abstract patterns of light and geometric forms that suggest algorithmic creativity. The space should feel like the intersection of traditional Eastern aesthetics and cutting-edge digital technology.
+
+She's wearing slightly more experimental clothing: a fitted tech-forward black turtleneck with subtle iridescent elements, paired with sleek pants. Her posture is dynamic—one hand reaching toward or interacting with a holographic-like display of generative art that seems to respond to her touch. The visualization should show actual swirling fractals, light patterns, and digital brushstrokes that evoke both traditional calligraphy and contemporary generative art.
+
+The background features the immersive installation with holographic elements, glowing digital art projections, and crystalline geometric structures. The lighting is futuristic but warm—a blend of cool blue and warm amber tones that create a contemplative yet energizing atmosphere. The overall mood should convey: creative genius in action, the marriage of human intuition with technological possibility, profound focus combined with artistic liberation.
+
+Background: white/transparent with soft glowing edges to the digital elements
+Style: High-tech artistic portrait, sci-art visualization, contemporary digital illustration, cinematic quality, emphasis on the fusion of human creativity and digital expression
+

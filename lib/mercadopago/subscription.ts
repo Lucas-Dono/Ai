@@ -1,5 +1,6 @@
 import { preApprovalClient, customerClient, PLANS, MERCADOPAGO_URLS } from "./config";
 import { prisma } from "@/lib/prisma";
+import { nanoid } from "nanoid";
 
 // Crear o recuperar cliente de Mercado Pago
 export async function getOrCreateMercadoPagoCustomer(
@@ -40,30 +41,40 @@ export async function getOrCreateMercadoPagoCustomer(
 export async function createSubscriptionPreference(
   userId: string,
   email: string,
-  planId: "pro" | "enterprise",
+  planId: "plus" | "ultra",
   name?: string
 ): Promise<string> {
-  const customerId = await getOrCreateMercadoPagoCustomer(userId, email, name);
   const plan = PLANS[planId];
 
-  const preapproval = await preApprovalClient.create({
-    body: {
-      payer_email: email,
-      back_url: MERCADOPAGO_URLS.success,
-      reason: `Suscripción ${plan.name} - Creador de Inteligencias`,
-      auto_recurring: {
-        frequency: 1,
-        frequency_type: "months",
-        transaction_amount: plan.price,
-        currency_id: plan.currency,
-        start_date: new Date().toISOString(),
-        end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 año
-      },
-      external_reference: userId,
-      notification_url: MERCADOPAGO_URLS.notification,
-      status: "pending",
+  console.log("📝 Creando PreApproval con:");
+  console.log(`   payer_email: ${email}`);
+  console.log(`   transaction_amount: ${plan.price}`);
+
+  // Solo incluir back_url si no es localhost (MercadoPago lo rechaza)
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || "";
+  const isLocalhost = baseUrl.includes("localhost") || baseUrl.includes("127.0.0.1");
+
+  const body: any = {
+    payer_email: email,
+    reason: `Suscripción ${plan.name} - Blaniel`,
+    auto_recurring: {
+      frequency: 1,
+      frequency_type: "months",
+      transaction_amount: plan.price,
+      currency_id: plan.currency,
     },
-  });
+    external_reference: userId,
+  };
+
+  // Solo agregar back_url si no es localhost
+  if (!isLocalhost && baseUrl) {
+    body.back_url = `${baseUrl}/dashboard/billing/success`;
+    console.log(`   back_url: ${body.back_url}`);
+  } else {
+    console.log(`   back_url: (omitido - localhost no es válido)`);
+  }
+
+  const preapproval = await preApprovalClient.create({ body });
 
   return preapproval.init_point!;
 }
@@ -139,9 +150,9 @@ export async function syncSubscription(
   }
 
   // Determinar el plan basado en el monto
-  let planId = "pro";
-  if (preapprovalData.auto_recurring?.transaction_amount >= PLANS.enterprise.price) {
-    planId = "enterprise";
+  let planId = "plus";
+  if (preapprovalData.auto_recurring?.transaction_amount >= PLANS.ultra.price) {
+    planId = "ultra";
   }
 
   // Actualizar plan del usuario
@@ -154,6 +165,8 @@ export async function syncSubscription(
   await prisma.subscription.upsert({
     where: { mercadopagoPreapprovalId: preapprovalData.id },
     create: {
+      id: nanoid(),
+      updatedAt: new Date(),
       userId,
       mercadopagoPreapprovalId: preapprovalData.id,
       status: preapprovalData.status,

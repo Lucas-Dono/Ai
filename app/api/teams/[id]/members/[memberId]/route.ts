@@ -51,7 +51,7 @@ export async function PATCH(
     where: { id: memberId },
     data: { role },
     include: {
-      user: {
+      User: {
         select: {
           id: true,
           name: true,

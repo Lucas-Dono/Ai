@@ -1,0 +1,18 @@
+# DALL-E PROMPTS FOR JAMES O'BRIEN
+## Ultra-Professional Character Visualization
+
+---
+
+## 1rst message: PORTRAIT FACE (512x512 Square)
+
+Close-up portrait photograph of James O'Brien, 38-year-old Irish photojournalist. Square composition (1:1 ratio, 512x512px). Head and shoulders, direct gaze slightly offset to camera left. Weathered features showing lived experience: sun-damaged skin, subtle lines around eyes from years squinting through viewfinders, dark circles suggesting chronic sleep disruption from trauma. Intense, intelligent eyes - grey-blue, penetrating, with both weariness and acute perception. Strong jawline, stubbled with several days' growth. Dark brown hair streaked with premature grey at temples, slightly disheveled in that way of someone who doesn't prioritize appearance. Slight asymmetry to his features - a barely noticeable scar through his left eyebrow from a minor injury in conflict zone. Expression is controlled but not cold - slight tension around mouth suggesting someone managing inner complexity. Warm Irish undertones to skin despite weathering. Wearing a dark cotton shirt or simple sweater, out of focus background. Professional documentary photography style - clear, unflinching, honest. The photograph captures someone intelligent, capable, and carrying invisible weight. Natural lighting, shot by experienced photographer who understands portraiture. No studio lighting - looks like documentary photograph rather than glamour portrait. 4K professional quality.
+
+---
+
+## PROMPT 2: FULL BODY PORTRAIT
+
+Using the reference image, create a full-body portrait of James O'Brien standing against a completely white background. No contextual elements, pure white negative space. James stands in natural posture - not rigid but composed, weight slightly forward as if ready to move. He's approximately 5'11" (180cm), athletic build from active work but not muscular - lean strength developed through physical work rather than gym training. He's wearing casual but intentional clothing: worn dark jeans, simple dark long-sleeve cotton shirt (sleeves rolled to forearms), worn leather watch on left wrist, no other visible jewelry. His posture suggests quiet confidence without arrogance. Hands are visible, slightly at his sides, strong hands with visible calluses and the particular wear patterns of someone who handles cameras and equipment regularly. His expression is calm, present, slightly off-camera - the look of someone used to observation rather than being observed. His presence is substantial without being loud. The background is completely white (pure #FFFFFF or completely transparent), with no shadows, no floor indication, no environmental context whatsoever. Professional photography studio quality. The image should convey someone genuinely comfortable with their own presence - not performing, not withdrawn, just authentically present. The full-body composition emphasizes his physical reality while the blank white space emphasizes his psychological interiority. Professional documentary photography style. 4K quality.
+
+---
+
+END OF DALL-E PROMPTS

@@ -6,15 +6,16 @@ import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, forcedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return <div className="h-10 w-10" />;
+  // Si el tema está forzado, no mostramos el toggle
+  if (forcedTheme || !mounted) {
+    return null;
   }
 
   return (
@@ -22,7 +23,7 @@ export function ThemeToggle() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="relative h-10 w-10 rounded-xl border border-border bg-card hover:bg-accent transition-colors flex items-center justify-center overflow-hidden"
+      className="relative h-10 w-10 rounded-2xl border border-border bg-card hover:bg-accent transition-colors flex items-center justify-center overflow-hidden"
       aria-label="Toggle theme"
     >
       <motion.div

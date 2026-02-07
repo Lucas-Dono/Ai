@@ -1,0 +1,60 @@
+# Prompts de DALL-E para Confucio (孔子 Kong Fuzi)
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Confucius (Kong Fuzi, 孔子) at age 60-65 (circa 490 a.C., during his mature teaching years after returning from exile), centered composition, museum quality historical accuracy matching traditional Chinese portraits and classical descriptions. Face and upper shoulders visible, wise penetrating gaze toward camera with hint of gentle warmth.
+
+Physical characteristics based on authenticated historical descriptions, classical portraits, and traditional depictions: Distinguished elderly Chinese man with dignified, scholarly appearance. Face showing wisdom earned through decades of teaching and hardship. Oval face with prominent, high forehead suggesting deep intellect - described by contemporaries as having "unusual cranial protuberance" (a distinctive high forehead that became iconic in his portraits). Warm, intelligent dark brown eyes with gentle expression showing both profound wisdom and compassionate understanding - eyes that have seen political failure, personal loss, but maintain quiet optimism about human perfectibility. Eyes convey depth of scholar who spent lifetime studying ancient texts. Well-defined eyebrows, slightly arched. Long, straight nose of dignified proportions typical of Northern Chinese features. Thin lips forming gentle, thoughtful expression - not quite smiling (maintains scholarly dignity) but suggesting benevolence and readiness to teach. Face shows age gracefully - some wrinkles around eyes and forehead from decades of concentration and thought, but overall serene countenance of someone at peace with their mission.
+
+Facial hair: Full, long beard characteristic of Chinese scholars and sages - gray-white in color, flowing down from chin in traditional Confucian scholar style, well-groomed and dignified, reaching mid-chest length. Beard symbolizes wisdom and venerable status. Also thin, long mustache drooping down past mouth corners, traditional style of Zhou dynasty scholars. No sideburns or cheek beard - clean-shaven on cheeks, all facial hair concentrated in mustache and beard areas.
+
+Hair: Mostly gray-white hair (at age 60+) worn in traditional Zhou dynasty scholarly style - hair pulled back from face and bound in topknot at crown of head, then secured with traditional ji (笄, hairpin). Hair styling reflects his role as custodian of Zhou ritual traditions. Some hair visible at temples showing gray-white color. Hair is neat and properly arranged according to li (ritual propriety).
+
+Expression: Serene wisdom combined with gentle approachability. Slight hint of sadness in eyes (reflecting years of political rejection and loss of beloved disciples like Yan Hui), but tempered by quiet confidence in the eternal value of the Dao. Faint smile beginning at corners of mouth suggesting readiness to teach and genuine pleasure in learning. Gaze direct but not harsh - inviting questions, encouraging thought. This is the face of a master teacher who has refined his pedagogy over 40+ years. Expression conveys: "I transmit but do not innovate; I trust and love the antiquity."
+
+Headwear and clothing visible: Traditional Zhou dynasty scholar's formal attire. Wearing ceremonial guan (冠, ritual cap/crown) - a black or dark colored formal hat appropriate to shi (scholar-official) class, with upright structure showing proper observance of ritual dress codes. The guan is simple but dignified - Confucius valued proper ritual dress but not ostentation.
+
+Clothing: Upper portion of traditional Chinese robes (shenyi, 深衣) visible - formal scholarly robes in deep, dignified colors appropriate to Zhou ritual code. Likely dark blue, deep brown, or black - colors associated with scholars and officials. Robes show quality fabric but not excessive luxury (Confucius lived modestly). Collar and upper chest area visible, showing traditional cross-collar (交领) style of hanfu, right side folding over left (proper Zhou ritual style). Fabric appears substantial and well-made but not adorned with excessive decoration - reflecting his teaching that junzi values virtue over external display.
+
+Lighting: Soft, classical portrait lighting from slight angle, creating gentle shadows that emphasize the noble bone structure and age-earned dignity. Slightly warm tone suggesting natural daylight through windows or doors of a traditional Chinese study. Background warm neutral typical of Chinese classical portraits (deep brown, burgundy red, or soft beige) with possible subtle suggestion of wooden interior or scholarly environment, keeping focus on face.
+
+Mood: Profound wisdom tempered by humility. Patient teacher who has taught thousands but still considers himself a learner. Dignified sage carrying weight of Zhou cultural tradition. Compassionate humanist who believes deeply in human perfectibility. The penetrating yet kind gaze of someone who sees moral potential in everyone. Quiet confidence of someone who knows their teachings, though rejected politically in their lifetime, contain eternal truth. Face that invites questions: "Is it not pleasant to learn with constant perseverance and application?"
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image, create a full-body portrait photograph showing him at the same age (60-65 years, circa 490 a.C.), standing in dignified scholarly pose appropriate to a Zhou dynasty master teacher.
+
+Physical build: Height approximately 5'9"-5'10" (175-178cm) - Confucius was described as tall for his era (traditional sources claim he was exceptionally tall at over 9 chi, roughly 6 feet, though this may be exaggerated; use moderately tall build). Slender to medium build appropriate to scholar who walks extensively (he traveled for 14 years across Chinese states) but is not engaged in physical labor. Upright, dignified posture reflecting decades of practicing and teaching ritual propriety (li). Perfect bearing of someone who embodies the rituals he teaches. Age-appropriate build for man in his 60s - not frail, but showing some signs of age and decades of travel hardship.
+
+Full outfit: Complete traditional Zhou dynasty formal scholarly robes (shenyi, 深衣) appropriate to shi (士) class scholar-official. This is ceremonial dress Confucius would wear when teaching or attending formal occasions.
+
+Robes: Deep, dignified color - dark blue, deep brown, or black (colors appropriate to scholars and officials in Zhou period). Alternatively, could be deep burgundy or muted earth tone. Full-length robe extending to ankles. Traditional cross-collar style (交领) with right side folding over left (this is ritually correct; left over right would be incorrect and Confucius was meticulous about ritual propriety). Wide sleeves typical of scholarly robes - sleeves extend past hands and hang gracefully, allowing for ritualized hand gestures. Robe is secured at waist with fabric belt or sash (带) in coordinating color. Multiple layers visible at collar and sleeves showing proper layering of inner and outer garments as dictated by ritual dress codes. Fabric appears as high-quality silk or fine hemp, with subtle sheen but not ostentatious - reflecting his teaching that junzi values substance over excessive display. No elaborate embroidery or decoration - dignified simplicity.
+
+Headwear: Traditional ceremonial guan (冠, ritual cap) - formal black or very dark colored hat with structured, upright form appropriate to scholar-official class. The guan has distinctive vertical elements or upright panels showing this is formal ritual attire. Secured on head above the topknot.
+
+Footwear: Traditional Chinese履 (lü, formal shoes) in dark color (black or deep brown), made of fabric or simple leather, barely visible beneath the long robe. Shoes appropriate to scholar class - well-made but not luxurious.
+
+Beard and hair: Exactly as 1rst message - full long gray-white beard flowing down to mid-chest, thin drooping mustache, gray-white hair pulled back in topknot secured under the guan. All maintained with scholarly propriety.
+
+Posture and pose: Standing upright with perfect dignified bearing - spine straight, shoulders naturally back (but not stiffly military), head held high with quiet confidence. This is posture of someone who has practiced ritual propriety his entire life and embodies li in every gesture. Weight distributed evenly or slightly shifted to one leg in classical scholarly pose.
+
+Hand position (critical for conveying meaning): One of these traditional scholarly/teaching gestures:
+OPTION A: Right hand raised to mid-chest level, fingers loosely curled as if making a point in teaching, left hand holding a simple wooden scroll or ancient text (representing the classics he studied and edited) at waist level.
+OPTION B: Both hands clasped together in front at waist/chest level in traditional gesture of respect and contemplation (抱拳, baoquan), fingers loosely interlaced, suggesting readiness to bow or greet students with proper ritual courtesy.
+OPTION C: Right hand holding a ceremonial tablet (笏, hu) - the ritual object officials and scholars held during formal ceremonies - at waist level, left hand hanging naturally at side or resting on robe.
+
+Hands should appear aged appropriately (60+ years) with some visible veins and age spots, but still strong and capable - these are hands that have written countless commentaries, corrected thousands of students' texts.
+
+Facial expression: Exactly matching 1rst message - serene wisdom, gentle approachability, faint sadness in eyes tempered by quiet confidence, hint of smile. The face of a patient master teacher ready to transmit the wisdom of the ancients.
+
+Optional prop: Could be holding or standing near a simple wooden scroll case or ancient text bundle (representing the Five Classics he edited), but this should be subtle and not dominate the image.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No furniture, no bookshelves, no ancient Chinese architectural elements, no writing, no calligraphy, no decorative elements - nothing contextual whatsoever. Clean, empty background for easy extraction and compositing.
+
+Lighting: Even, professional studio lighting illuminating full figure without creating harsh shadows on white/transparent background. Face maintains the soft, warm classical portrait lighting  showing refined scholarly features. Lighting on body shows the texture and draping of the formal robes - silk should appear subtly lustrous, fabric folds should be visible, multiple layers at collar should be clear. Overall lighting is dignified and reveals the quality and proper wearing of ritual garments.
+
+Important details: Slender to medium build, moderately tall height (tall for the era), upright scholarly posture reflecting decades of ritual practice. Complete formal Zhou dynasty scholarly robes in dignified dark colors with cross-collar style and wide sleeves. Traditional guan (ritual cap). Long gray-white beard and mustache. Everything reflecting his status as custodian and teacher of Zhou ritual traditions and ancient wisdom. Hands in scholarly/teaching gesture appropriate to his role as master teacher.
+
+Critical: Face MUST match reference from 1rst message exactly - same person, same wise penetrating eyes with gentle warmth, same serene expression with hint of sadness and quiet smile, same high distinctive forehead, same full gray-white beard and mustache, same age (60-65 years), same dignified scholarly features suggesting profound wisdom earned through decades of teaching, study, political disappointment, and moral perseverance. This is Kong Fuzi - the Master of Ten Thousand Generations - in his mature teaching years, embodying the virtues of ren (benevolence) and li (ritual propriety) that he dedicated his life to transmitting.

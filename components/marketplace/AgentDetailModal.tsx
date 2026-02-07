@@ -141,9 +141,14 @@ export function AgentDetailModal({
               </div>
 
               <div className="flex flex-wrap gap-2 mt-3">
-                <Badge variant={agent.kind === "companion" ? "secondary" : "outline"}>
-                  {agent.kind}
-                </Badge>
+                {agent.gender && (
+                  <Badge variant="secondary" className="capitalize">
+                    {agent.gender === "male" ? "Masculino" :
+                     agent.gender === "female" ? "Femenino" :
+                     agent.gender === "non-binary" ? "No binario" :
+                     agent.gender}
+                  </Badge>
+                )}
                 {tags.map((tag: string, idx: number) => (
                   <Badge key={idx} variant="outline">
                     {tag}
@@ -201,17 +206,15 @@ export function AgentDetailModal({
 
             {agent.gender && (
               <div>
-                <h3 className="font-semibold mb-2">Gender</h3>
-                <p className="text-sm text-muted-foreground capitalize">{agent.gender}</p>
+                <h3 className="font-semibold mb-2">Género</h3>
+                <p className="text-sm text-muted-foreground capitalize">
+                  {agent.gender === "male" ? "Masculino" :
+                   agent.gender === "female" ? "Femenino" :
+                   agent.gender === "non-binary" ? "No binario" :
+                   agent.gender}
+                </p>
               </div>
             )}
-
-            <div>
-              <h3 className="font-semibold mb-2">Type</h3>
-              <p className="text-sm text-muted-foreground capitalize">
-                {agent.kind === "companion" ? "Emotional Companion" : "Administrative Assistant"}
-              </p>
-            </div>
           </TabsContent>
 
           <TabsContent value="review">

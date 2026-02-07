@@ -1,74 +1,202 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
+# Dependencies
+node_modules/
 /.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+.pnp.js
+.yarn/install-state.gz
 
-# testing
+# Testing
 /coverage
+__tests__/coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
+next-env.d.ts
 
-# production
+# Production
 /build
+/dist
 
-# misc
-.DS_Store
-*.pem
+# Environment variables
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# debug
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-!.env.example
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# database
-*.db
-*.db-journal
-/prisma/migrations/*_*/
-dev.db*
-
-# IDE
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.idea
+# IDEs and editors
+.idea/
+.vscode/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
 
-# logs
-logs
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma
+prisma/migrations/*_temp/
+
+# Redis
+dump.rdb
+
+# Logs
+logs/
 *.log
 
-# temp
-tmp/
-temp/
+# Vector store
+.vector-store/
+/model/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
 .temp/
 
-/lib/generated/prisma
+# OS files
+Thumbs.db
+.DS_Store
+
+# Python (for AI scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.venv/
+venv/
+ENV/
+
+# AI/ML models
+*.pt
+*.pth
+*.onnx
+*.safetensors
+/models/
+/checkpoints/
+
+# Mobile
+mobile/.expo/
+mobile/dist/
+mobile/.expo-shared/
+
+# Package managers
+package-lock.json.bak
+yarn.lock.bak
+pnpm-lock.yaml.bak
+
+# Documentation artifacts
+docs/.vitepress/cache
+docs/.vitepress/dist
+
+# Personal notes and temp docs
+*.personal.md
+TODO-*.md
+TEMP-*.md
+investigaciones.txt
+investigación.txt
+
+# Scripts de configuración temporal
+reset-db.js
+create-superuser.js
+create-superuser-with-password.js
+fix_duplicate_user.js
+check_*.js
+apply_schema.bat
+add_case_insensitive_email.js
+ai.js
+ai_variable_de_entrono.js
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Sistema de snapshots automáticos
+.snapshots/
+
+# Test outputs
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Firebase (si se usa)
+.firebase/
+firebase-debug.log
+
+# Vercel
+.vercel
+
+# Sentry
+.sentryclirc
+
+# Locales temporales
+*.locale.tmp
+
+# Package manager directories
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# TypeScript incremental builds
+*.tsbuildinfo
+
+# Storybook
+storybook-static/
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Turborepo
+.turbo
+
+# Nx
+.nx/cache
+
+# WebStorm
+.idea/
+
+# Android
+*.apk
+*.aab
+local.properties
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/.idea/
+mobile/android/captures/
+mobile/android/gradle/
+mobile/android/gradlew
+mobile/android/gradlew.bat
+
+# iOS
+mobile/ios/Pods/
+mobile/ios/*.xcworkspace/
+mobile/ios/*.xcodeproj/
+mobile/ios/build/
+mobile/ios/DerivedData/
+
+# FastSD CPU
+fastsdcpu/
+uploads/
+
+
+ssh key.txt

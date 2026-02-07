@@ -1,0 +1,78 @@
+# =============================================================================
+# CRON JOBS SCHEDULE FOR BLANIEL
+# =============================================================================
+#
+# Instrucciones de instalación:
+# 1. Editar cron-jobs.sh y configurar BASE_URL y CRON_SECRET
+# 2. chmod +x /path/to/cron-jobs.sh
+# 3. crontab -e
+# 4. Copiar las líneas de abajo
+# 5. Cambiar /path/to/ por la ruta real
+#
+# =============================================================================
+
+# Crear directorio de logs
+# mkdir -p /var/log/blaniel
+# chown your-user:your-user /var/log/blaniel
+
+# Aggregate Daily KPIs - Diario a las 00:05
+5 0 * * * /path/to/deployment/cron-jobs.sh aggregate-daily-kpis
+
+# Update User Summaries - Cada hora
+0 * * * * /path/to/deployment/cron-jobs.sh update-user-summaries
+
+# Auto Pause Worlds - Cada 15 minutos
+*/15 * * * * /path/to/deployment/cron-jobs.sh auto-pause-worlds
+
+# Delete Scheduled Worlds - Cada hora
+0 * * * * /path/to/deployment/cron-jobs.sh delete-scheduled-worlds
+
+# Bonds Decay - Diario a las 02:00
+0 2 * * * /path/to/deployment/cron-jobs.sh bonds-decay
+
+# Check Security Alerts - Cada 30 minutos
+*/30 * * * * /path/to/deployment/cron-jobs.sh check-alerts
+
+# Expire Temp Grants - Diario a medianoche
+0 0 * * * /path/to/deployment/cron-jobs.sh expire-temp-grants
+
+# Check Bonds At Risk - Diario a las 03:00
+0 3 * * * /path/to/deployment/cron-jobs.sh check-bonds-at-risk
+
+# Proactive Messaging - 3 veces al día (04:00, 12:00, 20:00)
+0 4,12,20 * * * /path/to/deployment/cron-jobs.sh proactive-messaging
+
+# Update Retention Leaderboard - Diario a las 01:00
+0 1 * * * /path/to/deployment/cron-jobs.sh update-retention-leaderboard
+
+# Email Sequences - Diario a las 09:00
+0 9 * * * /path/to/deployment/cron-jobs.sh email-sequences
+
+# ML Moderation Analysis - Diario a las 05:00
+0 5 * * * /path/to/deployment/cron-jobs.sh ml-moderation-analysis
+
+# Daily Digest - Diario a las 10:00
+0 10 * * * /path/to/deployment/cron-jobs.sh daily-digest
+
+# Weekly Digest - Lunes a las 10:00
+0 10 * * 1 /path/to/deployment/cron-jobs.sh weekly-digest
+
+# Database Backup - Cada 6 horas
+0 */6 * * * /path/to/deployment/cron-jobs.sh backup-database
+
+# Cache Cleanup - Cada 12 horas
+0 */12 * * * /path/to/deployment/cron-jobs.sh cache-cleanup
+
+# =============================================================================
+# MONITORING (opcional)
+# =============================================================================
+
+# Health check cada 5 minutos (alertar si falla)
+# */5 * * * * curl -f https://tu-dominio.com/api/health || echo "Health check failed" | mail -s "Blaniel Health Check Failed" tu@email.com
+
+# =============================================================================
+# LIMPIEZA DE LOGS (opcional)
+# =============================================================================
+
+# Rotar logs mensualmente
+# 0 0 1 * * find /var/log/blaniel -name "*.log" -mtime +30 -delete

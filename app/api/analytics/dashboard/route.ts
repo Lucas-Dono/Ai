@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getDashboardStats, type TimeRange } from "@/lib/analytics/service";
 
 /**
@@ -58,15 +58,15 @@ import { getDashboardStats, type TimeRange } from "@/lib/analytics/service";
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const user = await getAuthenticatedUser(req);
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const range = (searchParams.get("range") || "30d") as TimeRange;
 
-    const stats = await getDashboardStats(session.user.id, range);
+    const stats = await getDashboardStats(user.id, range);
 
     return NextResponse.json(stats);
   } catch (error) {

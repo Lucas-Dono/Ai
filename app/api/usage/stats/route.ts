@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { getUsageStats } from "@/lib/usage/tracker";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const stats = await getUsageStats(session.user.id);
+    const stats = await getUsageStats(user.id);
 
     if (!stats) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

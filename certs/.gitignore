@@ -1,0 +1,43 @@
+# ============================================================================
+# CERTIFICADOS - NO SUBIR A GIT
+# ============================================================================
+#
+# IMPORTANTE: Estos archivos contienen información sensible y nunca deben
+# subirse a Git o compartirse públicamente.
+#
+# ============================================================================
+
+# Certificado de CA (Certificate Authority)
+ca/ca.key
+ca/ca.crt
+ca/*.key
+ca/*.crt
+ca/*.pem
+ca/*.txt
+ca/*.cnf
+
+# Certificados cliente
+client/
+client/*.key
+client/*.crt
+client/*.csr
+client/*.p12
+client/*.pem
+
+# Certificados temporales
+temp/
+temp/*.key
+temp/*.crt
+temp/*.csr
+temp/*.p12
+temp/*.pem
+
+# Solo permitir estructura de directorios
+!ca/.gitkeep
+!client/.gitkeep
+!temp/.gitkeep
+
+# Backup de certificados
+*.tar.gz
+*.zip
+backup-*

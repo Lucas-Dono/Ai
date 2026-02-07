@@ -1,0 +1,9 @@
+
+    <svg width="8" height="8" xmlns="http://www.w3.org/2000/svg">
+      <!-- Flequillo que cubre frente -->
+      <rect x="0" y="0" width="8" height="2" fill="#808080" class="colorizable-hair"/>
+      <!-- Mechones -->
+      <rect x="1" y="2" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+      <rect x="5" y="2" width="2" height="1" fill="#707070" class="colorizable-hair"/>
+    </svg>
+  

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { withTeamPermission } from "@/lib/permissions/middleware";
 import { randomBytes } from "crypto";
@@ -97,6 +98,7 @@ export async function POST(
   // Create invitation (expires in 7 days)
   const invitation = await prisma.teamInvitation.create({
     data: {
+      id: nanoid(),
       teamId: id,
       email,
       role,

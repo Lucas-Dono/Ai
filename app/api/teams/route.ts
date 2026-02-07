@@ -1,25 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { nanoid } from "nanoid";
+import { getAuthenticatedUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/teams - List user's teams
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthenticatedUser(req);
+  if (!user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const teams = await prisma.team.findMany({
     where: {
       OR: [
-        { ownerId: session.user.id },
-        { members: { some: { userId: session.user.id } } },
+        { ownerId: user.id },
+        { TeamMember: { some: { userId: user.id } } },
       ],
     },
     include: {
-      owner: { select: { name: true, email: true, image: true } },
+      User: { select: { name: true, email: true, image: true } },
       _count: {
-        select: { members: true, agents: true },
+        select: { TeamMember: true, Agent: true },
       },
     },
     orderBy: { createdAt: "desc" },
@@ -30,8 +31,8 @@ export async function GET(req: NextRequest) {
 
 // POST /api/teams - Create new team
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthenticatedUser(req);
+  if (!user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -45,20 +46,23 @@ export async function POST(req: NextRequest) {
   // Create team and add owner as member
   const team = await prisma.team.create({
     data: {
+      id: nanoid(),
+      updatedAt: new Date(),
       name,
       description,
-      ownerId: session.user.id,
-      members: {
+      ownerId: user.id,
+      TeamMember: {
         create: {
-          userId: session.user.id,
+          id: nanoid(),
+          userId: user.id,
           role: "owner",
         },
       },
     },
     include: {
-      owner: { select: { name: true, email: true, image: true } },
+      User: { select: { name: true, email: true, image: true } },
       _count: {
-        select: { members: true, agents: true },
+        select: { TeamMember: true, Agent: true },
       },
     },
   });

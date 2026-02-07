@@ -1,0 +1,43 @@
+# Prompts de DALL-E para Liam O'Connor
+
+## 1rst message: FOTO DE CARA (512x512, cuadrada 1:1)
+
+Professional portrait photograph of Liam O'Connor at age 42 (year 2025), centered composition, museum quality contemporary realism. Face and upper shoulders visible, contemplative gaze slightly to the side, melancholic intelligence evident.
+
+Physical characteristics: Angular, distinctly Irish face with sharp cheekbones and defined jawline. Hair thick, shoulder-length, dark brown with premature silver-gray streaking throughout, parted naturally and somewhat tousled, suggesting someone who frequently runs fingers through it in concentration. Eyes deep blue-green (Irish eyes) with slight crow's feet suggesting decades of intense focus and subtle sadness. Eyes appear perceptive, observant, carrying weight of being perpetually analyzed the world through musical perspective. Thick, well-maintained beard with same salt-and-pepper pattern, carefully groomed but natural. Forehead prominent with small horizontal lines from frequent furrowing when concentrating or troubled. Nose straight, proportionate. Lips slightly compressed, as if mid-thought or holding back words. Skin fair with subtle olive undertones, showing fatigue - slight darkness under eyes suggesting chronic sleep disruption, pale suggesting indoor lifestyle, minimal sun exposure.
+
+Expression: Melancholic introspection. Not sad exactly, but bearing weight of creative struggle, unresolved trauma, and perpetual self-doubt. Eyes simultaneously brilliant and haunted. Slight asymmetry in expression - subtle tension between intellectual composure and emotional vulnerability. Faint line between eyebrows from frequent concentration or worry. Expression says: "I understand too much and it exhausts me."
+
+Clothing visible: Black turtleneck sweater, expensive but deliberately understated (Irish designer, quality natural fibers). Small pendant visible - appears to be Celtic symbol or musical notation in silver. Clothing suggests artist who has achieved commercial success but disdains ostentation.
+
+Lighting: Soft, directional studio lighting from 45-degree angle left, creating subtle shadows emphasizing face structure. Warm but muted color temperature - neither harsh nor artificially warm, suggesting late afternoon Irish light (overcast but luminous). Background gradient from soft gray-brown to slightly darker edges, completely non-distracting.
+
+Mood: Genius burdened by perfectionism. The weight of being perpetually dissatisfied with his own considerable talent. Melancholic wisdom of someone who has succeeded critically but cannot accept his own success. Perpetual internal struggle between intellectual ambition and emotional exhaustion.
+
+Photography style: Contemporary fine art portrait photography, similar to Patrick Kavanagh late-life portraits or more recent photographs of contemporary Irish intellectuals. Museum quality. Not glamorous, but captures profound interiority.
+
+---
+
+## PROMPT 2: FOTO DE CUERPO COMPLETO SIN BACKGROUND
+
+Using the reference image of Liam O'Connor's face from 1rst message, create a full-body portrait photograph showing him at the same age (42 years, contemporary 2025), standing in a naturally contemplative pose within an intimate studio setting, later refined to pure white or transparent background.
+
+Physical build: Height approximately 5'10" (178cm), lean build suggesting someone who forgets to eat during creative hyperfocus periods. Upright posture with slight forward lean suggesting decades of work hunched over composition manuscripts and piano keyboards. Shoulders tense, slightly raised - habitual tension from stress and perfectionism.
+
+Full outfit: Dark charcoal or black slim-fit modern dress trousers, tailored but not ostentatious. Black leather Chelsea boots, expensive but well-worn. Upper body: Black turtleneck sweater (merino wool, high quality) visible, layered with dark gray-black unbuttoned cardigan or overshirt in natural linen or wool blend, adding texture and depth. Silver pendant on neck, same as in face portrait. Hands: Elegantly long fingers with pianist's calluses visible on fingertips. Left hand hanging at side. Right hand raised to approximately chest height, fingers in characteristic gesture - either about to touch collarbone or positioned as if conducting, frozen mid-gesture suggesting perpetual creative impulse. Hands suggest musician, intellectual, someone accustomed to precision and expression through physical gesture.
+
+Pose: Standing with weight slightly shifted to right leg (contrapposto stance), creating natural asymmetry and sense of movement frozen mid-contemplation. Posture combines dignity with exhaustion - straight back but shoulders slightly inward, suggesting protective collapse. Head turned slightly, gaze directed thoughtfully beyond frame, not at camera. Expression exactly matching 1rst message: melancholic intelligence, the look of someone simultaneously brilliant and wounded.
+
+Hair and beard: Exactly as in 1rst message - shoulder-length dark brown with silver-gray streaking, somewhat tousled. Salt-and-pepper beard, full but well-groomed, indicating care despite depression and chaos.
+
+Full-body proportions: Lean, refined build suggesting classical musician or intellectual - strong upper body but not muscular (musician's strength, not athlete's). Posture suggesting someone who spends 12+ hours daily at instruments or desk. Movement frozen in gesture suggesting constant creative impulse even in stillness.
+
+Background: COMPLETELY WHITE or COMPLETELY TRANSPARENT. No studio setting, no props, no environment visible. Pure negative space. This allows for easy extraction and use in other compositions - the figure completely isolated against void, emphasizing the emotional isolation that characterizes his inner experience.
+
+Lighting: Professional studio lighting that illuminates the entire figure evenly without casting heavy shadows on white background. Face maintains warm, subtle directional lighting quality from 1rst message, creating dimensionality and emotional weight. Body lighting is more even and neutral, but maintains warmth. Lighting design emphasizes the figure's form without harsh shadows.
+
+Clothing texture: Important to capture texture - the slight sheen of quality wool, the matte of linen, the subtle variations in black suggesting depth and quality materials. Not the clothing of someone seeking attention but the uniform of the working artist - carefully curated understatement.
+
+Critical requirements: The face MUST match the reference image from 1rst message exactly - same person, same age, same melancholic expression, same intensity in eyes, same fatigue and brilliance. The body should reflect the interior state visible in the face: tension, perfectionism, creative drive, emotional guardedness, exhaustion.
+
+Mood and intention: Final image should evoke the feeling of viewing someone at the moment they're momentarily caught off-guard by emotion - contemplative, vulnerable, brilliant, exhausted, deeply alone even if surrounded. The isolation emphasized by white/transparent background should feel appropriate, not mournful.

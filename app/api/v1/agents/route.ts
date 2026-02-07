@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { withAPIAuth } from "@/lib/api/auth";
 import { canUseResource, trackUsage } from "@/lib/usage/tracker";
+import { atomicCheckAgentLimit } from "@/lib/usage/atomic-resource-check";
 
 /**
  * @swagger
@@ -138,20 +140,11 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   return withAPIAuth(req, async (userId) => {
-    // Check agent quota
-    const quotaCheck = await canUseResource(userId, "agent");
-    if (!quotaCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: quotaCheck.reason,
-          current: quotaCheck.current,
-          limit: quotaCheck.limit,
-        },
-        { status: 403 }
-      );
-    }
+    try {
+      // NOTE: Agent quota check moved to atomic transaction below
+      // to prevent race conditions
 
-    const body = await req.json();
+      const body = await req.json();
     const { name, kind, personality, purpose, tone } = body;
 
     if (!name || !kind) {
@@ -168,7 +161,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate profile with LLM
+    // Get user's plan/tier
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true }
+    });
+
+    // Map user plan to generation tier
+    const tier = (user?.plan || 'free') as 'free' | 'plus' | 'ultra';
+
+    // Generate profile with LLM using user's tier
     const llm = getLLMProvider();
     const { profile, systemPrompt } = await llm.generateProfile({
       name,
@@ -176,27 +178,177 @@ export async function POST(req: NextRequest) {
       personality,
       purpose,
       tone,
+    }, tier);
+
+    // Type assertion for profile to include extended fields
+    type ExtendedProfile = Record<string, any> & {
+      deepRelationalPatterns?: any;
+      philosophicalFramework?: any;
+      psychologicalProfile?: any;
+      currentLocation?: any;
+      background?: any;
+    };
+    const extendedProfile = profile as ExtendedProfile;
+
+    // Extract location from profile (for real-time weather system)
+    let locationCity = null;
+    let locationCountry = null;
+
+    if (extendedProfile.currentLocation) {
+      // LLM generates currentLocation in the profile
+      locationCity = extendedProfile.currentLocation.city;
+      locationCountry = extendedProfile.currentLocation.country;
+    } else if (extendedProfile.background?.birthplace) {
+      // Fallback to birthplace if no current location
+      locationCity = extendedProfile.background.birthplace.city;
+      locationCountry = extendedProfile.background.birthplace.country;
+    }
+
+    // CRITICAL: Create agent with atomic limit check to prevent race condition
+    const agent = await prisma.$transaction(
+      async (tx) => {
+        // Verificar límite DENTRO de la transacción
+        await atomicCheckAgentLimit(tx, userId, tier);
+
+        // Crear agente dentro de la transacción
+        const newAgent = await tx.agent.create({
+          data: {
+            id: nanoid(),
+            updatedAt: new Date(),
+            userId,
+            kind,
+            generationTier: tier, // Store which tier was used to generate this agent
+            name,
+            description: personality || purpose,
+            personality,
+            purpose,
+            tone,
+            profile: profile as Record<string, string | number | boolean | null>,
+            systemPrompt,
+            visibility: "private",
+            locationCity, // For real-time weather system
+            locationCountry, // For real-time weather system
+          },
+        });
+
+        return newAgent;
+      },
+      {
+        isolationLevel: "Serializable",
+        maxWait: 5000,
+        timeout: 10000,
+      }
+    ).catch((error) => {
+      if (error.message.startsWith("{")) {
+        const errorData = JSON.parse(error.message);
+        throw errorData;
+      }
+      throw error;
     });
 
-    // Create agent
-    const agent = await prisma.agent.create({
-      data: {
-        userId,
-        kind,
-        name,
-        description: personality || purpose,
-        personality,
-        purpose,
-        tone,
-        profile: profile as Record<string, string | number | boolean | null>,
-        systemPrompt,
-        visibility: "private",
-      },
-    });
+    // For ULTRA tier: Create the exclusive psychological profiles
+    if (tier === 'ultra' && extendedProfile.psychologicalProfile) {
+      await prisma.psychologicalProfile.create({
+        data: {
+          id: nanoid(),
+          updatedAt: new Date(),
+          agentId: agent.id,
+          attachmentStyle: extendedProfile.psychologicalProfile.attachmentStyle || 'secure',
+          attachmentDescription: extendedProfile.psychologicalProfile.attachmentDescription,
+          primaryCopingMechanisms: extendedProfile.psychologicalProfile.primaryCopingMechanisms || [],
+          unhealthyCopingMechanisms: extendedProfile.psychologicalProfile.unhealthyCopingMechanisms || [],
+          copingTriggers: extendedProfile.psychologicalProfile.copingTriggers || [],
+          emotionalRegulationBaseline: extendedProfile.psychologicalProfile.emotionalRegulationBaseline || 'estable',
+          emotionalExplosiveness: extendedProfile.psychologicalProfile.emotionalExplosiveness || 30,
+          emotionalRecoverySpeed: extendedProfile.psychologicalProfile.emotionalRecoverySpeed || 'moderado',
+          mentalHealthConditions: extendedProfile.psychologicalProfile.mentalHealthConditions || [],
+          therapyStatus: extendedProfile.psychologicalProfile.therapyStatus,
+          medicationUse: extendedProfile.psychologicalProfile.medicationUse || false,
+          mentalHealthStigma: extendedProfile.psychologicalProfile.mentalHealthStigma,
+          defenseMethanisms: extendedProfile.psychologicalProfile.defenseMethanisms || {},
+          traumaHistory: extendedProfile.psychologicalProfile.traumaHistory,
+          resilienceFactors: extendedProfile.psychologicalProfile.resilienceFactors || [],
+          selfAwarenessLevel: extendedProfile.psychologicalProfile.selfAwarenessLevel || 50,
+          blindSpots: extendedProfile.psychologicalProfile.blindSpots || [],
+          insightAreas: extendedProfile.psychologicalProfile.insightAreas || [],
+        },
+      });
+    }
+
+    if (tier === 'ultra' && extendedProfile.deepRelationalPatterns) {
+      await prisma.deepRelationalPatterns.create({
+        data: {
+          id: nanoid(),
+          updatedAt: new Date(),
+          agentId: agent.id,
+          givingLoveLanguages: extendedProfile.deepRelationalPatterns.givingLoveLanguages || [],
+          receivingLoveLanguages: extendedProfile.deepRelationalPatterns.receivingLoveLanguages || [],
+          loveLanguageIntensities: extendedProfile.deepRelationalPatterns.loveLanguageIntensities || {},
+          repeatingPatterns: extendedProfile.deepRelationalPatterns.repeatingPatterns || [],
+          whyRepeats: extendedProfile.deepRelationalPatterns.whyRepeats,
+          awarenessOfPatterns: extendedProfile.deepRelationalPatterns.awarenessOfPatterns || 'inconsciente',
+          personalBoundaryStyle: extendedProfile.deepRelationalPatterns.personalBoundaryStyle || 'saludable',
+          professionalBoundaryStyle: extendedProfile.deepRelationalPatterns.professionalBoundaryStyle || 'saludable',
+          boundaryEnforcement: extendedProfile.deepRelationalPatterns.boundaryEnforcement || 50,
+          boundaryGuilty: extendedProfile.deepRelationalPatterns.boundaryGuilty || false,
+          conflictStyle: extendedProfile.deepRelationalPatterns.conflictStyle || 'colaborativo',
+          conflictTriggers: extendedProfile.deepRelationalPatterns.conflictTriggers || [],
+          healthyConflictSkills: extendedProfile.deepRelationalPatterns.healthyConflictSkills || [],
+          unhealthyConflictPatterns: extendedProfile.deepRelationalPatterns.unhealthyConflictPatterns || [],
+          trustBaseline: extendedProfile.deepRelationalPatterns.trustBaseline || 50,
+          vulnerabilityComfort: extendedProfile.deepRelationalPatterns.vulnerabilityComfort || 50,
+          trustRepairAbility: extendedProfile.deepRelationalPatterns.trustRepairAbility || 50,
+          intimacyComfort: extendedProfile.deepRelationalPatterns.intimacyComfort || {},
+          intimacyFears: extendedProfile.deepRelationalPatterns.intimacyFears || [],
+          intimacyNeeds: extendedProfile.deepRelationalPatterns.intimacyNeeds || [],
+          socialMaskLevel: extendedProfile.deepRelationalPatterns.socialMaskLevel || 30,
+          authenticityByContext: extendedProfile.deepRelationalPatterns.authenticityByContext || {},
+          socialEnergy: extendedProfile.deepRelationalPatterns.socialEnergy || 'neutral',
+        },
+      });
+    }
+
+    if (tier === 'ultra' && extendedProfile.philosophicalFramework) {
+      await prisma.philosophicalFramework.create({
+        data: {
+          id: nanoid(),
+          updatedAt: new Date(),
+          agentId: agent.id,
+          optimismLevel: extendedProfile.philosophicalFramework.optimismLevel || 50,
+          worldviewType: extendedProfile.philosophicalFramework.worldviewType,
+          meaningSource: extendedProfile.philosophicalFramework.meaningSource,
+          existentialStance: extendedProfile.philosophicalFramework.existentialStance,
+          politicalLeanings: extendedProfile.philosophicalFramework.politicalLeanings,
+          politicalEngagement: extendedProfile.philosophicalFramework.politicalEngagement || 30,
+          activismLevel: extendedProfile.philosophicalFramework.activismLevel || 20,
+          socialJusticeStance: extendedProfile.philosophicalFramework.socialJusticeStance,
+          ethicalFramework: extendedProfile.philosophicalFramework.ethicalFramework,
+          moralComplexity: extendedProfile.philosophicalFramework.moralComplexity || 50,
+          moralRigidity: extendedProfile.philosophicalFramework.moralRigidity || 50,
+          moralDilemmas: extendedProfile.philosophicalFramework.moralDilemmas,
+          religiousBackground: extendedProfile.philosophicalFramework.religiousBackground,
+          currentBeliefs: extendedProfile.philosophicalFramework.currentBeliefs,
+          spiritualPractices: extendedProfile.philosophicalFramework.spiritualPractices || [],
+          faithImportance: extendedProfile.philosophicalFramework.faithImportance || 30,
+          lifePhilosophy: extendedProfile.philosophicalFramework.lifePhilosophy,
+          coreBeliefs: extendedProfile.philosophicalFramework.coreBeliefs || [],
+          dealbreakers: extendedProfile.philosophicalFramework.dealbreakers || [],
+          personalMotto: extendedProfile.philosophicalFramework.personalMotto,
+          epistomologyStance: extendedProfile.philosophicalFramework.epistomologyStance,
+          scienceTrustLevel: extendedProfile.philosophicalFramework.scienceTrustLevel || 70,
+          intuitionVsLogic: extendedProfile.philosophicalFramework.intuitionVsLogic || 50,
+          growthMindset: extendedProfile.philosophicalFramework.growthMindset || 60,
+          opennessToChange: extendedProfile.philosophicalFramework.opennessToChange || 50,
+          philosophicalEvolution: extendedProfile.philosophicalFramework.philosophicalEvolution,
+        },
+      });
+    }
 
     // Create initial relation
     await prisma.relation.create({
       data: {
+        id: nanoid(),
+        updatedAt: new Date(),
         subjectId: agent.id,
         targetId: userId,
         targetType: "user",
@@ -208,12 +360,35 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Track usage
-    await trackUsage(userId, "agent", 1, agent.id, {
-      name: agent.name,
-      kind: agent.kind,
-    });
+      // Track usage
+      await trackUsage(userId, "agent", 1, agent.id, {
+        name: agent.name,
+        kind: agent.kind,
+      });
 
-    return NextResponse.json(agent, { status: 201 });
+      return NextResponse.json(agent, { status: 201 });
+    } catch (error: any) {
+      console.error("Error creating agent (v1 API):", error);
+
+      // Si es un error de límite (lanzado desde la transacción)
+      if (error.error && error.limit) {
+        return NextResponse.json(error, { status: 403 });
+      }
+
+      // Errores de transacción de Prisma
+      if (error.code === "P2034") {
+        // Serialization failure - race condition detectada
+        return NextResponse.json(
+          {
+            error: "Agent limit reached. Please try again.",
+            hint: "Multiple concurrent requests detected"
+          },
+          { status: 409 }
+        );
+      }
+
+      // Re-throw para que withAPIAuth lo maneje
+      throw error;
+    }
   });
 }

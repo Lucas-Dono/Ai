@@ -1,0 +1,76 @@
+# PROMPTS DALL-E PARA BUDA (SIDDHARTHA GAUTAMA)
+
+## 1rst message: Retrato Principal de Buda
+
+A serene, photorealistic portrait of Buddha (Siddhartha Gautama) at age 80, showing deep spiritual wisdom and compassionate presence. South Asian male with gentle, peaceful facial features, warm bronze skin tone. Head completely shaved, showing natural aging with subtle wrinkles around eyes and forehead that convey wisdom rather than age. Eyes half-closed in meditative state, expression of profound inner peace and boundless compassion. Slight, gentle smile suggesting deep contentment and understanding.
+
+Wearing traditional saffron-orange Buddhist monk robes (kasaya) draped elegantly over left shoulder, exposing right shoulder in traditional monastic style. Simple, unadorned robes showing texture of hand-woven fabric. Sitting in partial view, hands visible in teaching mudra (dharmachakra mudra - right hand raised, thumb and index finger forming circle).
+
+Background: Soft, muted tones of ochre, beige and pale gold suggesting the sacred atmosphere of Bodh Gaya or Sarnath. Subtle golden aura or soft radiant glow emanating from behind the head, symbolizing enlightenment but rendered naturalistically, not cartoonish. Ethereal quality suggesting transcendent wisdom while maintaining photorealistic human features.
+
+Lighting: Warm, diffused natural light from the left side, creating gentle shadows that emphasize the peaceful, contemplative mood. Soft backlighting creating subtle halo effect. Overall atmosphere of tranquility, wisdom, and universal compassion.
+
+Style: Photorealistic digital portrait with slight painterly quality in the background, reminiscent of classical religious art but with contemporary realism. Ultra-detailed facial features showing both humanity and spiritual transcendence. Expression must convey equanimity, compassion, and the profound peace of enlightenment.
+
+Resolution: High detail, suitable for profile image, capturing the essence of Buddha as the awakened teacher - neither deity nor ordinary human, but one who has realized the true nature of reality.
+
+---
+
+## PROMPT 2: Buda en Postura de Meditación/Caminando (Fondo Blanco)
+
+Full-body illustration of Buddha (Siddhartha Gautama) in one of two classic poses (artist's choice):
+
+OPTION A - SEATED MEDITATION: Buddha sitting in full lotus position (padmasana) on a simple meditation cushion. Hands resting in lap in dhyana mudra (meditation gesture - right hand over left, thumbs touching). Spine straight, posture perfect, embodying stillness and inner peace. Eyes gently closed in deep meditation.
+
+OPTION B - WALKING MEDITATION: Buddha walking slowly in mindful walking meditation, right foot slightly raised mid-step. Left hand holding alms bowl, right hand in abhaya mudra (gesture of fearlessness - palm forward at chest level). Expression serene and present, demonstrating mindfulness in motion.
+
+CHARACTER DESIGN (consistent with 1rst message): Same individual from 1rst message - South Asian male, age 80, completely shaved head, warm bronze skin, gentle facial features with subtle aging wrinkles. Deep wisdom and compassion in expression. Traditional saffron-orange Buddhist monk robes (kasaya) draped over left shoulder, right shoulder exposed. Simple, hand-woven fabric texture.
+
+BACKGROUND: Pure white background (#FFFFFF) OR fully transparent background (alpha channel). Absolutely NO other elements, shadows, or environmental details. Clean, isolated character illustration suitable for overlay on any background.
+
+LIGHTING: Soft, even lighting from front and slightly above, creating minimal shadows. No harsh shadows on the white background. Character should appear naturally lit as if in gentle daylight, but without casting floor shadows or environmental shadows.
+
+STYLE: Clean, high-quality digital illustration with photorealistic detail in the character rendering. Clear edges for easy background removal if needed. Full figure composition showing Buddha from head to toe (or to bottom of robes if seated). Character should occupy approximately 70-80% of the frame height.
+
+TECHNICAL REQUIREMENTS:
+- Pure white (#FFFFFF) or transparent background
+- No additional elements, decorations, or environmental details
+- High contrast between character and background for clean silhouette
+- Suitable for use as standalone character image or for composition
+- Must match visual consistency with 1rst message (same individual, same facial features, same artistic style)
+
+MOOD: Embodies the essence of Buddha's teaching through posture - whether the stillness of deep meditation or the mindful presence of walking meditation. Visual representation of inner peace, enlightenment, and compassionate awareness.
+
+Resolution: High detail, full-body composition, professional character illustration quality.
+
+---
+
+## NOTAS TÉCNICAS
+
+**Consistencia Visual Entre Prompts:**
+- Mismo individuo: Buda a los 80 años
+- Mismos rasgos faciales: forma de cara, estructura ósea, expresión serena
+- Mismo tono de piel: bronze cálido
+- Misma vestimenta: túnicas safron tradicionales, hombro derecho expuesto
+- Misma expresión: paz profunda, compasión ilimitada, sabiduría
+- Mismo estilo artístico: fotorealista con calidad profesional
+
+**Elementos Esenciales del Personaje:**
+- Cabeza completamente rapada (sin cabello)
+- Edad evidente pero digna (80 años)
+- Expresión de serenidad absoluta
+- Compasión visible en ojos y rostro
+- Túnicas monásticas saffron/naranja simples
+- Sin joyas, adornos o elementos materiales
+- Postura perfecta que refleja décadas de práctica meditativa
+
+**Referencias Culturales:**
+- Estilo tradicional theravada/budismo temprano
+- Iconografía históricamente auténtica
+- Evitar estereotipos orientalistas
+- Representación respetuosa y dignificada
+- Balance entre humanidad y realización espiritual
+
+**Uso de las Imágenes:**
+- 1rst message: Imagen de perfil principal, avatar, cabecera
+- Prompt 2: Imagen de cuerpo completo para ilustraciones, composiciones, diseños donde se requiera figura completa sobre fondo personalizable

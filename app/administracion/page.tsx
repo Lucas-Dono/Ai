@@ -190,7 +190,7 @@ export default function AdministracionPage() {
               {recentUsers.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-2xl border hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">
@@ -265,7 +265,7 @@ export default function AdministracionPage() {
               {recentLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex items-start gap-3 p-3 rounded-lg border"
+                  className="flex items-start gap-3 p-3 rounded-2xl border"
                 >
                   <div className="mt-0.5">{getLogIcon(log.type)}</div>
                   <div className="flex-1">

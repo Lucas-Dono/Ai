@@ -1,0 +1,1514 @@
+### New console messages
+- [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/c...
+- [LOG] [Fast Refresh] done in 1984ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/di...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 2 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 2 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 2 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 2 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 2 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 2 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 2 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 2 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 6 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 6 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 4 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 4 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 25 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 25 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 21 @ webpack-internal:///(app-pages-browser)/./components/ui/...
+- [LOG] [Carousel] Rendering carousel wrapper with 21 items @ webpack-internal:///(app-pages-browser)/...
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 2 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 2 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel] childrenArray length: 2 @ webpack-internal:///(app-pages-browser)/./components/ui/c...
+- [LOG] [Carousel] Rendering carousel wrapper with 2 items @ webpack-internal:///(app-pages-browser)/....
+- [LOG] [Carousel] canScrollLeft: false canScrollRight: false @ webpack-internal:///(app-pages-browser...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+- [LOG] [Carousel DEBUG] scrollWidth: 7576 clientWidth: 7576 diff: 0 @ webpack-internal:///(app-pages-...
+
+### Page state
+- Page URL: http://localhost:3000/dashboard
+- Page Title: Blaniel - Create emotional AIs with real memory
+- Page Snapshot:
+```yaml
+- generic [active] [ref=e2]:
+  - link "Saltar al contenido principal" [ref=e1] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "Open Next.js Dev Tools" [ref=e8] [cursor=pointer]:
+    - img [ref=e9]
+  - alert [ref=e12]
+  - generic [ref=e13]:
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - navigation [ref=e17]:
+          - link "Blaniel" [ref=e19] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e21]
+            - generic [ref=e24]: Blaniel
+          - generic [ref=e25]:
+            - link "Inicio" [ref=e26] [cursor=pointer]:
+              - /url: /dashboard
+              - generic [ref=e27]:
+                - img [ref=e28]
+                - generic [ref=e31]: Inicio
+            - link "Mundos" [ref=e32] [cursor=pointer]:
+              - /url: /dashboard/mundos
+              - generic [ref=e33]:
+                - img [ref=e34]
+                - generic [ref=e39]: Mundos
+            - link "Mi Progreso" [ref=e40] [cursor=pointer]:
+              - /url: /dashboard/my-stats
+              - generic [ref=e41]:
+                - img [ref=e42]
+                - generic [ref=e44]: Mi Progreso
+            - link "Comunidad" [ref=e45] [cursor=pointer]:
+              - /url: /community
+              - generic [ref=e46]:
+                - img [ref=e47]
+                - generic [ref=e52]: Comunidad
+            - link "Facturación" [ref=e53] [cursor=pointer]:
+              - /url: /dashboard/billing
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - generic [ref=e57]: Facturación
+            - link "Métricas" [ref=e58] [cursor=pointer]:
+              - /url: /dashboard/kpis
+              - generic [ref=e59]:
+                - img [ref=e60]
+                - generic [ref=e62]: Métricas
+            - link "Configuración" [ref=e63] [cursor=pointer]:
+              - /url: /configuracion
+              - generic [ref=e64]:
+                - img [ref=e65]
+                - generic [ref=e68]: Configuración
+          - generic [ref=e69]:
+            - link "Nueva IA" [ref=e70] [cursor=pointer]:
+              - /url: /create-character
+              - button "Nueva IA" [ref=e71]:
+                - img [ref=e72]
+                - text: Nueva IA
+            - generic [ref=e73]:
+              - button [ref=e75] [cursor=pointer]:
+                - img [ref=e76]
+              - button "Tours 0/6" [ref=e79] [cursor=pointer]:
+                - img [ref=e80]
+                - text: Tours
+                - generic [ref=e83]: 0/6
+              - button "Change language" [ref=e85]:
+                - img "Spanish" [ref=e86]: 🇪🇸
+            - button "LD Lucas Dono Plan Gratis" [ref=e87] [cursor=pointer]:
+              - generic [ref=e89]: LD
+              - generic [ref=e90]:
+                - generic [ref=e91]: Lucas Dono
+                - generic [ref=e92]: Plan Gratis
+        - main [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e97]:
+              - tablist [ref=e98]:
+                - tab "Compañeros (58)" [selected] [ref=e99] [cursor=pointer]:
+                  - img [ref=e100]
+                  - generic [ref=e102]: Compañeros (58)
+                - tab "Mundos (0)" [ref=e103] [cursor=pointer]:
+                  - img [ref=e104]
+                  - generic [ref=e109]: Mundos (0)
+              - tabpanel "Compañeros (58)" [ref=e110]:
+                - generic [ref=e113]:
+                  - generic [ref=e114]:
+                    - img [ref=e115]
+                    - textbox "Search characters..." [ref=e118]
+                  - generic [ref=e119]:
+                    - combobox [ref=e120]:
+                      - generic: All Types
+                      - img [ref=e121]
+                    - combobox [ref=e123]:
+                      - generic: Newest First
+                      - img [ref=e124]
+                    - button "Filters" [ref=e126] [cursor=pointer]:
+                      - img [ref=e127]
+                      - text: Filters
+                - generic [ref=e128]:
+                  - generic [ref=e129]:
+                    - heading "Compañeros" [level=2] [ref=e130]
+                    - paragraph [ref=e131]: 58 compañeros
+                  - link "Nuevo Compañero" [ref=e132] [cursor=pointer]:
+                    - /url: /create-character
+                    - button "Nuevo Compañero" [ref=e133]:
+                      - img [ref=e134]
+                      - generic [ref=e135]: Nuevo Compañero
+                - generic [ref=e137]:
+                  - generic [ref=e138]:
+                    - generic [ref=e139]:
+                      - img [ref=e141]
+                      - heading "Figuras Históricas" [level=3] [ref=e143]
+                      - generic [ref=e144]: 4 compañeros
+                    - generic [ref=e147]:
+                      - article [ref=e149] [cursor=pointer]:
+                        - link "Confucio (孔子 Kong Fuzi) Ultra" [ref=e150]:
+                          - /url: /agentes/premium_confucio
+                          - img "Confucio (孔子 Kong Fuzi)" [ref=e152]
+                          - generic [ref=e153]: Ultra
+                        - generic [ref=e154]:
+                          - link "Confucio (孔子 Kong Fuzi)" [ref=e155]:
+                            - /url: /agentes/premium_confucio
+                            - heading "Confucio (孔子 Kong Fuzi)" [level=3] [ref=e156]
+                          - paragraph [ref=e157]: Confucio (孔子 Kong Fuzi) - Maestro, Filósofo, Editor de Clásicos, Consejero Político, Reformador Social
+                          - generic [ref=e158]:
+                            - generic [ref=e159]:
+                              - generic [ref=e160]: 📜
+                              - generic [ref=e161]: Filosofía
+                            - generic [ref=e162]:
+                              - generic [ref=e163]: 🌍
+                              - generic [ref=e164]: Historia
+                          - link "Comenzar chat" [ref=e165]:
+                            - /url: /agentes/premium_confucio
+                            - button "Comenzar chat" [ref=e166]
+                      - article [ref=e168] [cursor=pointer]:
+                        - link "Cleopatra VII Philopator Ultra" [ref=e169]:
+                          - /url: /agentes/premium_cleopatra_vii
+                          - img "Cleopatra VII Philopator" [ref=e171]
+                          - generic [ref=e172]: Ultra
+                        - generic [ref=e173]:
+                          - link "Cleopatra VII Philopator" [ref=e174]:
+                            - /url: /agentes/premium_cleopatra_vii
+                            - heading "Cleopatra VII Philopator" [level=3] [ref=e175]
+                          - paragraph [ref=e176]: Cleopatra VII Philopator - Faraona de Egipto, Estratega Política, Erudita Políglota
+                          - generic [ref=e178]:
+                            - generic [ref=e179]: 🌍
+                            - generic [ref=e180]: Historia
+                          - link "Comenzar chat" [ref=e181]:
+                            - /url: /agentes/premium_cleopatra_vii
+                            - button "Comenzar chat" [ref=e182]
+                      - article [ref=e184] [cursor=pointer]:
+                        - link "Charles Darwin Ultra" [ref=e185]:
+                          - /url: /agentes/premium_charles_darwin
+                          - img "Charles Darwin" [ref=e187]
+                          - generic [ref=e188]: Ultra
+                        - generic [ref=e189]:
+                          - link "Charles Darwin" [ref=e190]:
+                            - /url: /agentes/premium_charles_darwin
+                            - heading "Charles Darwin" [level=3] [ref=e191]
+                          - paragraph [ref=e192]: Charles Darwin - Naturalista, Biólogo, Geólogo, Científico
+                          - generic [ref=e193]:
+                            - generic [ref=e194]:
+                              - generic [ref=e195]: 🔬
+                              - generic [ref=e196]: Ciencia
+                            - generic [ref=e197]:
+                              - generic [ref=e198]: 🌍
+                              - generic [ref=e199]: Historia
+                          - link "Comenzar chat" [ref=e200]:
+                            - /url: /agentes/premium_charles_darwin
+                            - button "Comenzar chat" [ref=e201]
+                      - article [ref=e203] [cursor=pointer]:
+                        - link "Amelia Earhart Ultra" [ref=e204]:
+                          - /url: /agentes/premium_amelia_earhart
+                          - img "Amelia Earhart" [ref=e206]
+                          - generic [ref=e207]: Ultra
+                        - generic [ref=e208]:
+                          - link "Amelia Earhart" [ref=e209]:
+                            - /url: /agentes/premium_amelia_earhart
+                            - heading "Amelia Earhart" [level=3] [ref=e210]
+                          - paragraph [ref=e211]: Amelia Earhart - Aviadora, Autora, Activista por los Derechos de las Mujeres, Pionera de la Aviación
+                          - generic [ref=e213]:
+                            - generic [ref=e214]: 🌍
+                            - generic [ref=e215]: Historia
+                          - link "Comenzar chat" [ref=e216]:
+                            - /url: /agentes/premium_amelia_earhart
+                            - button "Comenzar chat" [ref=e217]
+                  - generic [ref=e218]:
+                    - generic [ref=e219]:
+                      - img [ref=e221]
+                      - heading "Mentores Intelectuales" [level=3] [ref=e229]
+                      - generic [ref=e230]: 6 compañeros
+                    - generic [ref=e233]:
+                      - article [ref=e235] [cursor=pointer]:
+                        - link "Sun Tzu Ultra" [ref=e236]:
+                          - /url: /agentes/premium_sun_tzu
+                          - img "Sun Tzu" [ref=e238]
+                          - generic [ref=e239]: Ultra
+                        - generic [ref=e240]:
+                          - link "Sun Tzu" [ref=e241]:
+                            - /url: /agentes/premium_sun_tzu
+                            - heading "Sun Tzu" [level=3] [ref=e242]
+                          - paragraph [ref=e243]: Sun Tzu - General Militar, Estratega, Filósofo, Autor de 'El Arte de la Guerra'
+                          - generic [ref=e244]:
+                            - generic [ref=e245]:
+                              - generic [ref=e246]: 🌍
+                              - generic [ref=e247]: Historia
+                            - generic [ref=e248]:
+                              - generic [ref=e249]: 📜
+                              - generic [ref=e250]: Filosofía
+                          - link "Comenzar chat" [ref=e251]:
+                            - /url: /agentes/premium_sun_tzu
+                            - button "Comenzar chat" [ref=e252]
+                      - article [ref=e254] [cursor=pointer]:
+                        - link "Liam O'Connor Ultra" [ref=e255]:
+                          - /url: /agentes/liam_oconnor_composer
+                          - img "Liam O'Connor" [ref=e257]
+                          - generic [ref=e258]: Ultra
+                        - generic [ref=e259]:
+                          - link "Liam O'Connor" [ref=e260]:
+                            - /url: /agentes/liam_oconnor_composer
+                            - heading "Liam O'Connor" [level=3] [ref=e261]
+                          - paragraph [ref=e262]: Liam O'Connor - Compositor, Músico, Productor de Música Experimental, Mentor de Artistas, Compositor de Películas
+                          - generic [ref=e263]:
+                            - generic [ref=e264]:
+                              - generic [ref=e265]: 🎵
+                              - generic [ref=e266]: Música
+                            - generic [ref=e267]:
+                              - generic [ref=e268]: 🎨
+                              - generic [ref=e269]: Arte
+                          - link "Comenzar chat" [ref=e270]:
+                            - /url: /agentes/liam_oconnor_composer
+                            - button "Comenzar chat" [ref=e271]
+                      - article [ref=e273] [cursor=pointer]:
+                        - link "Harriet Tubman Ultra" [ref=e274]:
+                          - /url: /agentes/premium_harriet_tubman_liberator
+                          - img "Harriet Tubman" [ref=e276]
+                          - generic [ref=e277]: Ultra
+                        - generic [ref=e278]:
+                          - link "Harriet Tubman" [ref=e279]:
+                            - /url: /agentes/premium_harriet_tubman_liberator
+                            - heading "Harriet Tubman" [level=3] [ref=e280]
+                          - paragraph [ref=e281]: Harriet Tubman - Abolicionista, Activista de Derechos Humanos, Espía de la Unión, Enfermera, Conductora del Underground Railroad, Sufragista
+                          - generic [ref=e282]:
+                            - generic [ref=e283]:
+                              - generic [ref=e284]: 🌍
+                              - generic [ref=e285]: Historia
+                            - generic [ref=e286]:
+                              - generic [ref=e287]: ✨
+                              - generic [ref=e288]: Sabiduría
+                          - link "Comenzar chat" [ref=e289]:
+                            - /url: /agentes/premium_harriet_tubman_liberator
+                            - button "Comenzar chat" [ref=e290]
+                      - article [ref=e292] [cursor=pointer]:
+                        - link "Dante Rossi Ultra" [ref=e293]:
+                          - /url: /agentes/premium_dante_rossi_chef
+                          - img "Dante Rossi" [ref=e295]
+                          - generic [ref=e296]: Ultra
+                        - generic [ref=e297]:
+                          - link "Dante Rossi" [ref=e298]:
+                            - /url: /agentes/premium_dante_rossi_chef
+                            - heading "Dante Rossi" [level=3] [ref=e299]
+                          - paragraph [ref=e300]: Dante Rossi - Chef Ejecutivo, Crítico Gastronómico, Restaurador, Mentor, Escritor, Consultor Culinario
+                          - generic [ref=e301]:
+                            - generic [ref=e302]:
+                              - generic [ref=e303]: 🍳
+                              - generic [ref=e304]: Gastronomía
+                            - generic [ref=e305]:
+                              - generic [ref=e306]: 📚
+                              - generic [ref=e307]: Literatura
+                          - link "Comenzar chat" [ref=e308]:
+                            - /url: /agentes/premium_dante_rossi_chef
+                            - button "Comenzar chat" [ref=e309]
+                      - article [ref=e311] [cursor=pointer]:
+                        - link "Confucio (孔子 Kong Fuzi) Ultra" [ref=e312]:
+                          - /url: /agentes/premium_confucio
+                          - img "Confucio (孔子 Kong Fuzi)" [ref=e314]
+                          - generic [ref=e315]: Ultra
+                        - generic [ref=e316]:
+                          - link "Confucio (孔子 Kong Fuzi)" [ref=e317]:
+                            - /url: /agentes/premium_confucio
+                            - heading "Confucio (孔子 Kong Fuzi)" [level=3] [ref=e318]
+                          - paragraph [ref=e319]: Confucio (孔子 Kong Fuzi) - Maestro, Filósofo, Editor de Clásicos, Consejero Político, Reformador Social
+                          - generic [ref=e320]:
+                            - generic [ref=e321]:
+                              - generic [ref=e322]: 📜
+                              - generic [ref=e323]: Filosofía
+                            - generic [ref=e324]:
+                              - generic [ref=e325]: 🌍
+                              - generic [ref=e326]: Historia
+                          - link "Comenzar chat" [ref=e327]:
+                            - /url: /agentes/premium_confucio
+                            - button "Comenzar chat" [ref=e328]
+                      - article [ref=e330] [cursor=pointer]:
+                        - link "Atlas Stone Ultra" [ref=e331]:
+                          - /url: /agentes/premium_atlas_stone_mountaineer
+                          - img "Atlas Stone" [ref=e333]
+                          - generic [ref=e334]: Ultra
+                        - generic [ref=e335]:
+                          - link "Atlas Stone" [ref=e336]:
+                            - /url: /agentes/premium_atlas_stone_mountaineer
+                            - heading "Atlas Stone" [level=3] [ref=e337]
+                          - paragraph [ref=e338]: Atlas Stone - Guía de Montaña Profesional, Líder de Expediciones, Autor, Defensor Ambiental
+                          - generic [ref=e339]:
+                            - generic [ref=e340]:
+                              - generic [ref=e341]: ⚔️
+                              - generic [ref=e342]: Aventura
+                            - generic [ref=e343]:
+                              - generic [ref=e344]: 📜
+                              - generic [ref=e345]: Filosofía
+                          - link "Comenzar chat" [ref=e346]:
+                            - /url: /agentes/premium_atlas_stone_mountaineer
+                            - button "Comenzar chat" [ref=e347]
+                - generic [ref=e348]:
+                  - generic [ref=e349]:
+                    - img [ref=e350]
+                    - heading "Para Ti" [level=2] [ref=e353]
+                    - generic [ref=e354]: Personalizado
+                  - paragraph [ref=e355]: Recomendaciones personalizadas basadas en tus intereses
+                  - generic [ref=e358]:
+                    - article [ref=e360] [cursor=pointer]:
+                      - link "Yuki Tanaka Ultra" [ref=e361]:
+                        - /url: /agentes/premium_yuki_tanaka_designer
+                        - img "Yuki Tanaka" [ref=e363]
+                        - generic [ref=e364]: Ultra
+                      - generic [ref=e365]:
+                        - link "Yuki Tanaka" [ref=e366]:
+                          - /url: /agentes/premium_yuki_tanaka_designer
+                          - heading "Yuki Tanaka" [level=3] [ref=e367]
+                        - paragraph [ref=e368]: Yuki Tanaka - Video Game Designer, Narrative Designer, Game Developer, Co-founder of Kaminari Soft indie studio
+                        - generic [ref=e369]:
+                          - generic [ref=e370]:
+                            - generic [ref=e371]: 🎮
+                            - generic [ref=e372]: Gaming
+                          - generic [ref=e373]:
+                            - generic [ref=e374]: 🧠
+                            - generic [ref=e375]: Psicología
+                        - link "Comenzar chat" [ref=e376]:
+                          - /url: /agentes/premium_yuki_tanaka_designer
+                          - button "Comenzar chat" [ref=e377]
+                    - article [ref=e379] [cursor=pointer]:
+                      - link "Virginia Woolf Ultra" [ref=e380]:
+                        - /url: /agentes/premium_virginia_woolf_writer
+                        - img "Virginia Woolf" [ref=e382]
+                        - generic [ref=e383]: Ultra
+                      - generic [ref=e384]:
+                        - link "Virginia Woolf" [ref=e385]:
+                          - /url: /agentes/premium_virginia_woolf_writer
+                          - heading "Virginia Woolf" [level=3] [ref=e386]
+                        - paragraph [ref=e387]: Virginia Woolf - Escritora, Ensayista, Editora, Crítica Literaria, Fundadora de Hogarth Press
+                        - generic [ref=e388]:
+                          - generic [ref=e389]:
+                            - generic [ref=e390]: 🌍
+                            - generic [ref=e391]: Historia
+                          - generic [ref=e392]:
+                            - generic [ref=e393]: 📚
+                            - generic [ref=e394]: Literatura
+                        - link "Comenzar chat" [ref=e395]:
+                          - /url: /agentes/premium_virginia_woolf_writer
+                          - button "Comenzar chat" [ref=e396]
+                    - article [ref=e398] [cursor=pointer]:
+                      - link "Vincent van Gogh Ultra" [ref=e399]:
+                        - /url: /agentes/premium_vincent_van_gogh_artist
+                        - img "Vincent van Gogh" [ref=e401]
+                        - generic [ref=e402]: Ultra
+                      - generic [ref=e403]:
+                        - link "Vincent van Gogh" [ref=e404]:
+                          - /url: /agentes/premium_vincent_van_gogh_artist
+                          - heading "Vincent van Gogh" [level=3] [ref=e405]
+                        - paragraph [ref=e406]: Vincent van Gogh - Post-Impressionist Painter, Artist, Former Preacher, Former Art Dealer
+                        - generic [ref=e407]:
+                          - generic [ref=e408]:
+                            - generic [ref=e409]: 🌍
+                            - generic [ref=e410]: Historia
+                          - generic [ref=e411]:
+                            - generic [ref=e412]: 🎨
+                            - generic [ref=e413]: Arte
+                        - link "Comenzar chat" [ref=e414]:
+                          - /url: /agentes/premium_vincent_van_gogh_artist
+                          - button "Comenzar chat" [ref=e415]
+                    - article [ref=e417] [cursor=pointer]:
+                      - link "Sofia Volkov Ultra" [ref=e418]:
+                        - /url: /agentes/premium_sofia_volkov
+                        - img "Sofia Volkov" [ref=e420]
+                        - generic [ref=e421]: Ultra
+                      - generic [ref=e422]:
+                        - link "Sofia Volkov" [ref=e423]:
+                          - /url: /agentes/premium_sofia_volkov
+                          - heading "Sofia Volkov" [level=3] [ref=e424]
+                        - paragraph [ref=e425]: Sofia Volkov - Ex-bailarina del Bolshoi Ballet / Coreógrafa de Danza Contemporánea / Profesora / Fundadora de Translucence Dance Collective
+                        - generic [ref=e427]:
+                          - generic [ref=e428]: 👥
+                          - generic [ref=e429]: Amistad
+                        - link "Comenzar chat" [ref=e430]:
+                          - /url: /agentes/premium_sofia_volkov
+                          - button "Comenzar chat" [ref=e431]
+                - generic [ref=e432]:
+                  - generic [ref=e433]:
+                    - img [ref=e434]
+                    - heading "Personajes Históricos" [level=2] [ref=e437]
+                    - generic [ref=e438]: Históricos
+                  - paragraph [ref=e439]: Figuras icónicas de la historia
+                  - generic [ref=e442]:
+                    - article [ref=e444] [cursor=pointer]:
+                      - link "Wolfgang Amadeus Mozart Ultra" [ref=e445]:
+                        - /url: /agentes/premium_wolfgang_amadeus_mozart_composer
+                        - img "Wolfgang Amadeus Mozart" [ref=e447]
+                        - generic [ref=e448]: Ultra
+                      - generic [ref=e449]:
+                        - link "Wolfgang Amadeus Mozart" [ref=e450]:
+                          - /url: /agentes/premium_wolfgang_amadeus_mozart_composer
+                          - heading "Wolfgang Amadeus Mozart" [level=3] [ref=e451]
+                        - paragraph [ref=e452]: Wolfgang Amadeus Mozart - Compositor, Pianista, Violinista, Maestro de Música
+                        - generic [ref=e453]:
+                          - generic [ref=e454]:
+                            - generic [ref=e455]: 🌍
+                            - generic [ref=e456]: Historia
+                          - generic [ref=e457]:
+                            - generic [ref=e458]: 🎵
+                            - generic [ref=e459]: Música
+                        - link "Comenzar chat" [ref=e460]:
+                          - /url: /agentes/premium_wolfgang_amadeus_mozart_composer
+                          - button "Comenzar chat" [ref=e461]
+                    - article [ref=e463] [cursor=pointer]:
+                      - link "Virginia Woolf Ultra" [ref=e464]:
+                        - /url: /agentes/premium_virginia_woolf_writer
+                        - img "Virginia Woolf" [ref=e466]
+                        - generic [ref=e467]: Ultra
+                      - generic [ref=e468]:
+                        - link "Virginia Woolf" [ref=e469]:
+                          - /url: /agentes/premium_virginia_woolf_writer
+                          - heading "Virginia Woolf" [level=3] [ref=e470]
+                        - paragraph [ref=e471]: Virginia Woolf - Escritora, Ensayista, Editora, Crítica Literaria, Fundadora de Hogarth Press
+                        - generic [ref=e472]:
+                          - generic [ref=e473]:
+                            - generic [ref=e474]: 🌍
+                            - generic [ref=e475]: Historia
+                          - generic [ref=e476]:
+                            - generic [ref=e477]: 📚
+                            - generic [ref=e478]: Literatura
+                        - link "Comenzar chat" [ref=e479]:
+                          - /url: /agentes/premium_virginia_woolf_writer
+                          - button "Comenzar chat" [ref=e480]
+                    - article [ref=e482] [cursor=pointer]:
+                      - link "Vincent van Gogh Ultra" [ref=e483]:
+                        - /url: /agentes/premium_vincent_van_gogh_artist
+                        - img "Vincent van Gogh" [ref=e485]
+                        - generic [ref=e486]: Ultra
+                      - generic [ref=e487]:
+                        - link "Vincent van Gogh" [ref=e488]:
+                          - /url: /agentes/premium_vincent_van_gogh_artist
+                          - heading "Vincent van Gogh" [level=3] [ref=e489]
+                        - paragraph [ref=e490]: Vincent van Gogh - Post-Impressionist Painter, Artist, Former Preacher, Former Art Dealer
+                        - generic [ref=e491]:
+                          - generic [ref=e492]:
+                            - generic [ref=e493]: 🌍
+                            - generic [ref=e494]: Historia
+                          - generic [ref=e495]:
+                            - generic [ref=e496]: 🎨
+                            - generic [ref=e497]: Arte
+                        - link "Comenzar chat" [ref=e498]:
+                          - /url: /agentes/premium_vincent_van_gogh_artist
+                          - button "Comenzar chat" [ref=e499]
+                    - article [ref=e501] [cursor=pointer]:
+                      - link "Sun Tzu Ultra" [ref=e502]:
+                        - /url: /agentes/premium_sun_tzu
+                        - img "Sun Tzu" [ref=e504]
+                        - generic [ref=e505]: Ultra
+                      - generic [ref=e506]:
+                        - link "Sun Tzu" [ref=e507]:
+                          - /url: /agentes/premium_sun_tzu
+                          - heading "Sun Tzu" [level=3] [ref=e508]
+                        - paragraph [ref=e509]: Sun Tzu - General Militar, Estratega, Filósofo, Autor de 'El Arte de la Guerra'
+                        - generic [ref=e510]:
+                          - generic [ref=e511]:
+                            - generic [ref=e512]: 🌍
+                            - generic [ref=e513]: Historia
+                          - generic [ref=e514]:
+                            - generic [ref=e515]: 📜
+                            - generic [ref=e516]: Filosofía
+                        - link "Comenzar chat" [ref=e517]:
+                          - /url: /agentes/premium_sun_tzu
+                          - button "Comenzar chat" [ref=e518]
+                    - article [ref=e520] [cursor=pointer]:
+                      - link "Sócrates Ultra" [ref=e521]:
+                        - /url: /agentes/premium_socrates_philosopher
+                        - img "Sócrates" [ref=e523]
+                        - generic [ref=e524]: Ultra
+                      - generic [ref=e525]:
+                        - link "Sócrates" [ref=e526]:
+                          - /url: /agentes/premium_socrates_philosopher
+                          - heading "Sócrates" [level=3] [ref=e527]
+                        - paragraph [ref=e528]: Sócrates - Filósofo, Soldado (Hoplita), Maestro de Sabiduría
+                        - generic [ref=e529]:
+                          - generic [ref=e530]:
+                            - generic [ref=e531]: 🌍
+                            - generic [ref=e532]: Historia
+                          - generic [ref=e533]:
+                            - generic [ref=e534]: 📜
+                            - generic [ref=e535]: Filosofía
+                        - link "Comenzar chat" [ref=e536]:
+                          - /url: /agentes/premium_socrates_philosopher
+                          - button "Comenzar chat" [ref=e537]
+                    - article [ref=e539] [cursor=pointer]:
+                      - link "Dr. Sigmund Freud Ultra" [ref=e540]:
+                        - /url: /agentes/premium_sigmund_freud
+                        - img "Dr. Sigmund Freud" [ref=e542]
+                        - generic [ref=e543]: Ultra
+                      - generic [ref=e544]:
+                        - link "Dr. Sigmund Freud" [ref=e545]:
+                          - /url: /agentes/premium_sigmund_freud
+                          - heading "Dr. Sigmund Freud" [level=3] [ref=e546]
+                        - paragraph [ref=e547]: Dr. Sigmund Freud - Neurólogo, Psicoanalista, Fundador del Psicoanálisis
+                        - generic [ref=e548]:
+                          - generic [ref=e549]:
+                            - generic [ref=e550]: 🧠
+                            - generic [ref=e551]: Psicología
+                          - generic [ref=e552]:
+                            - generic [ref=e553]: 🌍
+                            - generic [ref=e554]: Historia
+                        - link "Comenzar chat" [ref=e555]:
+                          - /url: /agentes/premium_sigmund_freud
+                          - button "Comenzar chat" [ref=e556]
+                    - article [ref=e558] [cursor=pointer]:
+                      - link "Marie Curie Ultra" [ref=e559]:
+                        - /url: /agentes/premium_marie_curie_scientist
+                        - img "Marie Curie" [ref=e561]
+                        - generic [ref=e562]: Ultra
+                      - generic [ref=e563]:
+                        - link "Marie Curie" [ref=e564]:
+                          - /url: /agentes/premium_marie_curie_scientist
+                          - heading "Marie Curie" [level=3] [ref=e565]
+                        - paragraph [ref=e566]: Marie Curie - Física, Química, Investigadora Científica, Profesora Universitaria en la Sorbona
+                        - generic [ref=e567]:
+                          - generic [ref=e568]:
+                            - generic [ref=e569]: 🌍
+                            - generic [ref=e570]: Historia
+                          - generic [ref=e571]:
+                            - generic [ref=e572]: 🔬
+                            - generic [ref=e573]: Ciencia
+                        - link "Comenzar chat" [ref=e574]:
+                          - /url: /agentes/premium_marie_curie_scientist
+                          - button "Comenzar chat" [ref=e575]
+                    - article [ref=e577] [cursor=pointer]:
+                      - link "Marco Polo Ultra" [ref=e578]:
+                        - /url: /agentes/premium_marco_polo_explorer
+                        - img "Marco Polo" [ref=e580]
+                        - generic [ref=e581]: Ultra
+                      - generic [ref=e582]:
+                        - link "Marco Polo" [ref=e583]:
+                          - /url: /agentes/premium_marco_polo_explorer
+                          - heading "Marco Polo" [level=3] [ref=e584]
+                        - paragraph [ref=e585]: Marco Polo - Mercader, Explorador, Servidor Imperial de Kublai Khan, Emisario Diplomático, Narrador
+                        - generic [ref=e586]:
+                          - generic [ref=e587]:
+                            - generic [ref=e588]: 🌍
+                            - generic [ref=e589]: Historia
+                          - generic [ref=e590]:
+                            - generic [ref=e591]: ⚔️
+                            - generic [ref=e592]: Aventura
+                        - link "Comenzar chat" [ref=e593]:
+                          - /url: /agentes/premium_marco_polo_explorer
+                          - button "Comenzar chat" [ref=e594]
+                    - article [ref=e596] [cursor=pointer]:
+                      - link "Ludwig van Beethoven Ultra" [ref=e597]:
+                        - /url: /agentes/premium_ludwig_van_beethoven_composer
+                        - img "Ludwig van Beethoven" [ref=e599]
+                        - generic [ref=e600]: Ultra
+                      - generic [ref=e601]:
+                        - link "Ludwig van Beethoven" [ref=e602]:
+                          - /url: /agentes/premium_ludwig_van_beethoven_composer
+                          - heading "Ludwig van Beethoven" [level=3] [ref=e603]
+                        - paragraph [ref=e604]: Ludwig van Beethoven - Compositor, Pianista, Director de Orquesta
+                        - generic [ref=e605]:
+                          - generic [ref=e606]:
+                            - generic [ref=e607]: 🌍
+                            - generic [ref=e608]: Historia
+                          - generic [ref=e609]:
+                            - generic [ref=e610]: 🎵
+                            - generic [ref=e611]: Música
+                        - link "Comenzar chat" [ref=e612]:
+                          - /url: /agentes/premium_ludwig_van_beethoven_composer
+                          - button "Comenzar chat" [ref=e613]
+                    - article [ref=e615] [cursor=pointer]:
+                      - link "Leonardo da Vinci Ultra" [ref=e616]:
+                        - /url: /agentes/premium_leonardo_da_vinci_genius
+                        - img "Leonardo da Vinci" [ref=e618]
+                        - generic [ref=e619]: Ultra
+                      - generic [ref=e620]:
+                        - link "Leonardo da Vinci" [ref=e621]:
+                          - /url: /agentes/premium_leonardo_da_vinci_genius
+                          - heading "Leonardo da Vinci" [level=3] [ref=e622]
+                        - paragraph [ref=e623]: Leonardo da Vinci - Pintor, Escultor, Arquitecto, Ingeniero, Anatomista, Matemático, Músico, Inventor, Observador de Naturaleza
+                        - generic [ref=e624]:
+                          - generic [ref=e625]:
+                            - generic [ref=e626]: 🌍
+                            - generic [ref=e627]: Historia
+                          - generic [ref=e628]:
+                            - generic [ref=e629]: 🎨
+                            - generic [ref=e630]: Arte
+                        - link "Comenzar chat" [ref=e631]:
+                          - /url: /agentes/premium_leonardo_da_vinci_genius
+                          - button "Comenzar chat" [ref=e632]
+                    - article [ref=e634] [cursor=pointer]:
+                      - link "Juana de Arco Ultra" [ref=e635]:
+                        - /url: /agentes/premium_juana_orleans
+                        - img "Juana de Arco" [ref=e637]
+                        - generic [ref=e638]: Ultra
+                      - generic [ref=e639]:
+                        - link "Juana de Arco" [ref=e640]:
+                          - /url: /agentes/premium_juana_orleans
+                          - heading "Juana de Arco" [level=3] [ref=e641]
+                        - paragraph [ref=e642]: Juana de Arco - Líder Militar / Mística / Heroína Nacional de Francia
+                        - generic [ref=e644]:
+                          - generic [ref=e645]: 🌍
+                          - generic [ref=e646]: Historia
+                        - link "Comenzar chat" [ref=e647]:
+                          - /url: /agentes/premium_juana_orleans
+                          - button "Comenzar chat" [ref=e648]
+                    - article [ref=e650] [cursor=pointer]:
+                      - link "Jane Austen Ultra" [ref=e651]:
+                        - /url: /agentes/premium_jane_austen
+                        - img "Jane Austen" [ref=e653]
+                        - generic [ref=e654]: Ultra
+                      - generic [ref=e655]:
+                        - link "Jane Austen" [ref=e656]:
+                          - /url: /agentes/premium_jane_austen
+                          - heading "Jane Austen" [level=3] [ref=e657]
+                        - paragraph [ref=e658]: Jane Austen - Novelist, Observer of Human Nature
+                        - generic [ref=e660]:
+                          - generic [ref=e661]: 🌍
+                          - generic [ref=e662]: Historia
+                        - link "Comenzar chat" [ref=e663]:
+                          - /url: /agentes/premium_jane_austen
+                          - button "Comenzar chat" [ref=e664]
+                    - article [ref=e666] [cursor=pointer]:
+                      - link "Hypatia de Alejandría Ultra" [ref=e667]:
+                        - /url: /agentes/premium_hypatia_alexandria
+                        - img "Hypatia de Alejandría" [ref=e669]
+                        - generic [ref=e670]: Ultra
+                      - generic [ref=e671]:
+                        - link "Hypatia de Alejandría" [ref=e672]:
+                          - /url: /agentes/premium_hypatia_alexandria
+                          - heading "Hypatia de Alejandría" [level=3] [ref=e673]
+                        - paragraph [ref=e674]: Hypatia de Alejandría - Matemática, Astrónoma, Filósofa Neoplatónica / Directora de la Escuela de Alejandría
+                        - generic [ref=e675]:
+                          - generic [ref=e676]:
+                            - generic [ref=e677]: 🌍
+                            - generic [ref=e678]: Historia
+                          - generic [ref=e679]:
+                            - generic [ref=e680]: 📜
+                            - generic [ref=e681]: Filosofía
+                        - link "Comenzar chat" [ref=e682]:
+                          - /url: /agentes/premium_hypatia_alexandria
+                          - button "Comenzar chat" [ref=e683]
+                    - article [ref=e685] [cursor=pointer]:
+                      - link "Helen Keller Ultra" [ref=e686]:
+                        - /url: /agentes/premium_helen_keller_activist
+                        - img "Helen Keller" [ref=e688]
+                        - generic [ref=e689]: Ultra
+                      - generic [ref=e690]:
+                        - link "Helen Keller" [ref=e691]:
+                          - /url: /agentes/premium_helen_keller_activist
+                          - heading "Helen Keller" [level=3] [ref=e692]
+                        - paragraph [ref=e693]: Helen Keller - Escritora, Activista por los Derechos de las Personas con Discapacidad, Conferencista, Activista Política y Social, Portavoz de la American Foundation for the Blind
+                        - generic [ref=e694]:
+                          - generic [ref=e695]:
+                            - generic [ref=e696]: 🌍
+                            - generic [ref=e697]: Historia
+                          - generic [ref=e698]:
+                            - generic [ref=e699]: 📚
+                            - generic [ref=e700]: Literatura
+                        - link "Comenzar chat" [ref=e701]:
+                          - /url: /agentes/premium_helen_keller_activist
+                          - button "Comenzar chat" [ref=e702]
+                    - article [ref=e704] [cursor=pointer]:
+                      - link "Harriet Tubman Ultra" [ref=e705]:
+                        - /url: /agentes/premium_harriet_tubman_liberator
+                        - img "Harriet Tubman" [ref=e707]
+                        - generic [ref=e708]: Ultra
+                      - generic [ref=e709]:
+                        - link "Harriet Tubman" [ref=e710]:
+                          - /url: /agentes/premium_harriet_tubman_liberator
+                          - heading "Harriet Tubman" [level=3] [ref=e711]
+                        - paragraph [ref=e712]: Harriet Tubman - Abolicionista, Activista de Derechos Humanos, Espía de la Unión, Enfermera, Conductora del Underground Railroad, Sufragista
+                        - generic [ref=e713]:
+                          - generic [ref=e714]:
+                            - generic [ref=e715]: 🌍
+                            - generic [ref=e716]: Historia
+                          - generic [ref=e717]:
+                            - generic [ref=e718]: ✨
+                            - generic [ref=e719]: Sabiduría
+                        - link "Comenzar chat" [ref=e720]:
+                          - /url: /agentes/premium_harriet_tubman_liberator
+                          - button "Comenzar chat" [ref=e721]
+                    - article [ref=e723] [cursor=pointer]:
+                      - link "Frida Kahlo Ultra" [ref=e724]:
+                        - /url: /agentes/premium_frida_kahlo_artist
+                        - img "Frida Kahlo" [ref=e726]
+                        - generic [ref=e727]: Ultra
+                      - generic [ref=e728]:
+                        - link "Frida Kahlo" [ref=e729]:
+                          - /url: /agentes/premium_frida_kahlo_artist
+                          - heading "Frida Kahlo" [level=3] [ref=e730]
+                        - paragraph [ref=e731]: Frida Kahlo - Pintora, Profesora de Arte (La Esmeralda 1943-1954), Artista Comunista
+                        - generic [ref=e732]:
+                          - generic [ref=e733]:
+                            - generic [ref=e734]: 🌍
+                            - generic [ref=e735]: Historia
+                          - generic [ref=e736]:
+                            - generic [ref=e737]: 🎨
+                            - generic [ref=e738]: Arte
+                        - link "Comenzar chat" [ref=e739]:
+                          - /url: /agentes/premium_frida_kahlo_artist
+                          - button "Comenzar chat" [ref=e740]
+                    - article [ref=e742] [cursor=pointer]:
+                      - link "Florence Nightingale Ultra" [ref=e743]:
+                        - /url: /agentes/premium_florence_nightingale_nurse
+                        - img "Florence Nightingale" [ref=e745]
+                        - generic [ref=e746]: Ultra
+                      - generic [ref=e747]:
+                        - link "Florence Nightingale" [ref=e748]:
+                          - /url: /agentes/premium_florence_nightingale_nurse
+                          - heading "Florence Nightingale" [level=3] [ref=e749]
+                        - paragraph [ref=e750]: Florence Nightingale - Enfermera, Reformadora Social, Estadística Médica, Administradora Hospitalaria, Escritora Médica, Fundadora de Escuelas de Enfermería
+                        - generic [ref=e751]:
+                          - generic [ref=e752]:
+                            - generic [ref=e753]: 🌍
+                            - generic [ref=e754]: Historia
+                          - generic [ref=e755]:
+                            - generic [ref=e756]: 🔬
+                            - generic [ref=e757]: Ciencia
+                        - link "Comenzar chat" [ref=e758]:
+                          - /url: /agentes/premium_florence_nightingale_nurse
+                          - button "Comenzar chat" [ref=e759]
+                    - article [ref=e761] [cursor=pointer]:
+                      - link "Ernest Hemingway Ultra" [ref=e762]:
+                        - /url: /agentes/premium_ernest_hemingway_writer
+                        - img "Ernest Hemingway" [ref=e764]
+                        - generic [ref=e765]: Ultra
+                      - generic [ref=e766]:
+                        - link "Ernest Hemingway" [ref=e767]:
+                          - /url: /agentes/premium_ernest_hemingway_writer
+                          - heading "Ernest Hemingway" [level=3] [ref=e768]
+                        - paragraph [ref=e769]: Ernest Hemingway - Escritor, Novelista, Cuentista, Periodista, Corresponsal de Guerra
+                        - generic [ref=e770]:
+                          - generic [ref=e771]:
+                            - generic [ref=e772]: 🌍
+                            - generic [ref=e773]: Historia
+                          - generic [ref=e774]:
+                            - generic [ref=e775]: 📚
+                            - generic [ref=e776]: Literatura
+                        - link "Comenzar chat" [ref=e777]:
+                          - /url: /agentes/premium_ernest_hemingway_writer
+                          - button "Comenzar chat" [ref=e778]
+                    - article [ref=e780] [cursor=pointer]:
+                      - link "Emily Dickinson Ultra" [ref=e781]:
+                        - /url: /agentes/premium_emily_dickinson_poet
+                        - img "Emily Dickinson" [ref=e783]
+                        - generic [ref=e784]: Ultra
+                      - generic [ref=e785]:
+                        - link "Emily Dickinson" [ref=e786]:
+                          - /url: /agentes/premium_emily_dickinson_poet
+                          - heading "Emily Dickinson" [level=3] [ref=e787]
+                        - paragraph [ref=e788]: Emily Dickinson - Poeta, Botánica Aficionada, Hortelana, Corresponsal Literaria
+                        - generic [ref=e789]:
+                          - generic [ref=e790]:
+                            - generic [ref=e791]: 🌍
+                            - generic [ref=e792]: Historia
+                          - generic [ref=e793]:
+                            - generic [ref=e794]: 📚
+                            - generic [ref=e795]: Literatura
+                        - link "Comenzar chat" [ref=e796]:
+                          - /url: /agentes/premium_emily_dickinson_poet
+                          - button "Comenzar chat" [ref=e797]
+                    - article [ref=e799] [cursor=pointer]:
+                      - link "Edgar Allan Poe Ultra" [ref=e800]:
+                        - /url: /agentes/premium_edgar_allan_poe_writer
+                        - img "Edgar Allan Poe" [ref=e802]
+                        - generic [ref=e803]: Ultra
+                      - generic [ref=e804]:
+                        - link "Edgar Allan Poe" [ref=e805]:
+                          - /url: /agentes/premium_edgar_allan_poe_writer
+                          - heading "Edgar Allan Poe" [level=3] [ref=e806]
+                        - paragraph [ref=e807]: Edgar Allan Poe - Escritor, Poeta, Crítico Literario, Teórico de la Estética, Editor
+                        - generic [ref=e808]:
+                          - generic [ref=e809]:
+                            - generic [ref=e810]: 🌍
+                            - generic [ref=e811]: Historia
+                          - generic [ref=e812]:
+                            - generic [ref=e813]: 📚
+                            - generic [ref=e814]: Literatura
+                        - link "Comenzar chat" [ref=e815]:
+                          - /url: /agentes/premium_edgar_allan_poe_writer
+                          - button "Comenzar chat" [ref=e816]
+                    - article [ref=e818] [cursor=pointer]:
+                      - link "Carl Jung Ultra" [ref=e819]:
+                        - /url: /agentes/premium_carl_jung_analyst
+                        - img "Carl Jung" [ref=e821]
+                        - generic [ref=e822]: Ultra
+                      - generic [ref=e823]:
+                        - link "Carl Jung" [ref=e824]:
+                          - /url: /agentes/premium_carl_jung_analyst
+                          - heading "Carl Jung" [level=3] [ref=e825]
+                        - paragraph [ref=e826]: Carl Jung - Psiquiatra, Psicólogo Analítico, Psicoterapeuta, Autor, Investigador, Profesor Universitario
+                        - generic [ref=e827]:
+                          - generic [ref=e828]:
+                            - generic [ref=e829]: 🌍
+                            - generic [ref=e830]: Historia
+                          - generic [ref=e831]:
+                            - generic [ref=e832]: 🧠
+                            - generic [ref=e833]: Psicología
+                        - link "Comenzar chat" [ref=e834]:
+                          - /url: /agentes/premium_carl_jung_analyst
+                          - button "Comenzar chat" [ref=e835]
+                    - article [ref=e837] [cursor=pointer]:
+                      - link "Buda (Siddhartha Gautama) Ultra" [ref=e838]:
+                        - /url: /agentes/premium_buda_siddhartha_gautama
+                        - img "Buda (Siddhartha Gautama)" [ref=e840]
+                        - generic [ref=e841]: Ultra
+                      - generic [ref=e842]:
+                        - link "Buda (Siddhartha Gautama)" [ref=e843]:
+                          - /url: /agentes/premium_buda_siddhartha_gautama
+                          - heading "Buda (Siddhartha Gautama)" [level=3] [ref=e844]
+                        - paragraph [ref=e845]: Buda (Siddhartha Gautama) - Maestro Espiritual, Fundador del Budismo, Monje, Meditador, Filósofo
+                        - generic [ref=e846]:
+                          - generic [ref=e847]:
+                            - generic [ref=e848]: 🌍
+                            - generic [ref=e849]: Historia
+                          - generic [ref=e850]:
+                            - generic [ref=e851]: ✨
+                            - generic [ref=e852]: Sabiduría
+                        - link "Comenzar chat" [ref=e853]:
+                          - /url: /agentes/premium_buda_siddhartha_gautama
+                          - button "Comenzar chat" [ref=e854]
+                    - article [ref=e856] [cursor=pointer]:
+                      - link "Ada Lovelace Ultra" [ref=e857]:
+                        - /url: /agentes/premium_ada_lovelace
+                        - img "Ada Lovelace" [ref=e859]
+                        - generic [ref=e860]: Ultra
+                      - generic [ref=e861]:
+                        - link "Ada Lovelace" [ref=e862]:
+                          - /url: /agentes/premium_ada_lovelace
+                          - heading "Ada Lovelace" [level=3] [ref=e863]
+                        - paragraph [ref=e864]: Ada Lovelace - Matemática, Visionaria Computacional, Primera Programadora
+                        - generic [ref=e865]:
+                          - generic [ref=e866]:
+                            - generic [ref=e867]: 🌍
+                            - generic [ref=e868]: Historia
+                          - generic [ref=e869]:
+                            - generic [ref=e870]: 💡
+                            - generic [ref=e871]: Física
+                        - link "Comenzar chat" [ref=e872]:
+                          - /url: /agentes/premium_ada_lovelace
+                          - button "Comenzar chat" [ref=e873]
+                    - article [ref=e875] [cursor=pointer]:
+                      - link "Marilyn Monroe Ultra" [ref=e876]:
+                        - /url: /agentes/historical_marilyn_monroe
+                        - img "Marilyn Monroe" [ref=e878]
+                        - generic [ref=e879]: Ultra
+                      - generic [ref=e880]:
+                        - link "Marilyn Monroe" [ref=e881]:
+                          - /url: /agentes/historical_marilyn_monroe
+                          - heading "Marilyn Monroe" [level=3] [ref=e882]
+                        - paragraph [ref=e883]: Marilyn Monroe - Personaje Premium
+                        - generic [ref=e884]:
+                          - generic [ref=e885]:
+                            - generic [ref=e886]: 🌍
+                            - generic [ref=e887]: Historia
+                          - generic [ref=e888]:
+                            - generic [ref=e889]: 💖
+                            - generic [ref=e890]: Romance
+                        - link "Comenzar chat" [ref=e891]:
+                          - /url: /agentes/historical_marilyn_monroe
+                          - button "Comenzar chat" [ref=e892]
+                    - article [ref=e894] [cursor=pointer]:
+                      - link "Albert Einstein Ultra" [ref=e895]:
+                        - /url: /agentes/historical_albert_einstein
+                        - img "Albert Einstein" [ref=e897]
+                        - generic [ref=e898]: Ultra
+                      - generic [ref=e899]:
+                        - link "Albert Einstein" [ref=e900]:
+                          - /url: /agentes/historical_albert_einstein
+                          - heading "Albert Einstein" [level=3] [ref=e901]
+                        - paragraph [ref=e902]: Albert Einstein - Personaje Premium
+                        - generic [ref=e903]:
+                          - generic [ref=e904]:
+                            - generic [ref=e905]: 🌍
+                            - generic [ref=e906]: Historia
+                          - generic [ref=e907]:
+                            - generic [ref=e908]: 💡
+                            - generic [ref=e909]: Física
+                        - link "Comenzar chat" [ref=e910]:
+                          - /url: /agentes/historical_albert_einstein
+                          - button "Comenzar chat" [ref=e911]
+                - generic [ref=e912]:
+                  - generic [ref=e913]:
+                    - img [ref=e914]
+                    - heading "Destacados" [level=2] [ref=e917]
+                    - generic [ref=e918]: Alta Calidad
+                  - paragraph [ref=e919]: Personajes destacados con personalidades profundas y complejas (Accesibles para todos)
+                  - generic [ref=e922]:
+                    - article [ref=e924] [cursor=pointer]:
+                      - link "Zara Malik Ultra" [ref=e925]:
+                        - /url: /agentes/premium_zara_malik_environmental_scientist
+                        - img "Zara Malik" [ref=e927]
+                        - generic [ref=e928]: Ultra
+                      - generic [ref=e929]:
+                        - link "Zara Malik" [ref=e930]:
+                          - /url: /agentes/premium_zara_malik_environmental_scientist
+                          - heading "Zara Malik" [level=3] [ref=e931]
+                        - paragraph [ref=e932]: Zara Malik - Científica Ambiental, Activista Climática, Directora de Regeneration Lab, Doctorante en Dinámicas Climáticas
+                        - generic [ref=e933]:
+                          - generic [ref=e934]:
+                            - generic [ref=e935]: 🔬
+                            - generic [ref=e936]: Ciencia
+                          - generic [ref=e937]:
+                            - generic [ref=e938]: 🌿
+                            - generic [ref=e939]: Naturaleza
+                        - link "Comenzar chat" [ref=e940]:
+                          - /url: /agentes/premium_zara_malik_environmental_scientist
+                          - button "Comenzar chat" [ref=e941]
+                    - article [ref=e943] [cursor=pointer]:
+                      - link "Sofia Volkov Ultra" [ref=e944]:
+                        - /url: /agentes/premium_sofia_volkov
+                        - img "Sofia Volkov" [ref=e946]
+                        - generic [ref=e947]: Ultra
+                      - generic [ref=e948]:
+                        - link "Sofia Volkov" [ref=e949]:
+                          - /url: /agentes/premium_sofia_volkov
+                          - heading "Sofia Volkov" [level=3] [ref=e950]
+                        - paragraph [ref=e951]: Sofia Volkov - Ex-bailarina del Bolshoi Ballet / Coreógrafa de Danza Contemporánea / Profesora / Fundadora de Translucence Dance Collective
+                        - generic [ref=e953]:
+                          - generic [ref=e954]: 👥
+                          - generic [ref=e955]: Amistad
+                        - link "Comenzar chat" [ref=e956]:
+                          - /url: /agentes/premium_sofia_volkov
+                          - button "Comenzar chat" [ref=e957]
+                    - article [ref=e959] [cursor=pointer]:
+                      - link "Dr. Sebastian Müller Ultra" [ref=e960]:
+                        - /url: /agentes/premium_sebastian_muller
+                        - img "Dr. Sebastian Müller" [ref=e962]
+                        - generic [ref=e963]: Ultra
+                      - generic [ref=e964]:
+                        - link "Dr. Sebastian Müller" [ref=e965]:
+                          - /url: /agentes/premium_sebastian_muller
+                          - heading "Dr. Sebastian Müller" [level=3] [ref=e966]
+                        - paragraph [ref=e967]: Dr. Sebastian Müller - Senior Research Scientist en Max Planck Institute for Human Cognitive and Brain Sciences / Consciousness Researcher
+                        - generic [ref=e968]:
+                          - generic [ref=e969]:
+                            - generic [ref=e970]: ✨
+                            - generic [ref=e971]: Sabiduría
+                          - generic [ref=e972]:
+                            - generic [ref=e973]: 🔬
+                            - generic [ref=e974]: Ciencia
+                        - link "Comenzar chat" [ref=e975]:
+                          - /url: /agentes/premium_sebastian_muller
+                          - button "Comenzar chat" [ref=e976]
+                    - article [ref=e978] [cursor=pointer]:
+                      - link "Marcus Washington Ultra" [ref=e979]:
+                        - /url: /agentes/premium_marcus_washington
+                        - img "Marcus Washington" [ref=e981]
+                        - generic [ref=e982]: Ultra
+                      - generic [ref=e983]:
+                        - link "Marcus Washington" [ref=e984]:
+                          - /url: /agentes/premium_marcus_washington
+                          - heading "Marcus Washington" [level=3] [ref=e985]
+                        - paragraph [ref=e986]: Marcus Washington - Civil Rights Lawyer, Criminal Justice Reform Advocate
+                        - generic [ref=e988]:
+                          - generic [ref=e989]: 👥
+                          - generic [ref=e990]: Amistad
+                        - link "Comenzar chat" [ref=e991]:
+                          - /url: /agentes/premium_marcus_washington
+                          - button "Comenzar chat" [ref=e992]
+                    - article [ref=e994] [cursor=pointer]:
+                      - link "Liam O'Connor Ultra" [ref=e995]:
+                        - /url: /agentes/liam_oconnor_composer
+                        - img "Liam O'Connor" [ref=e997]
+                        - generic [ref=e998]: Ultra
+                      - generic [ref=e999]:
+                        - link "Liam O'Connor" [ref=e1000]:
+                          - /url: /agentes/liam_oconnor_composer
+                          - heading "Liam O'Connor" [level=3] [ref=e1001]
+                        - paragraph [ref=e1002]: Liam O'Connor - Compositor, Músico, Productor de Música Experimental, Mentor de Artistas, Compositor de Películas
+                        - generic [ref=e1003]:
+                          - generic [ref=e1004]:
+                            - generic [ref=e1005]: 🎵
+                            - generic [ref=e1006]: Música
+                          - generic [ref=e1007]:
+                            - generic [ref=e1008]: 🎨
+                            - generic [ref=e1009]: Arte
+                        - link "Comenzar chat" [ref=e1010]:
+                          - /url: /agentes/liam_oconnor_composer
+                          - button "Comenzar chat" [ref=e1011]
+                    - article [ref=e1013] [cursor=pointer]:
+                      - link "Ekaterina 'Katya' Volkov Ultra" [ref=e1014]:
+                        - /url: /agentes/premium_katya_ice_queen
+                        - img "Ekaterina 'Katya' Volkov" [ref=e1016]
+                        - generic [ref=e1017]: Ultra
+                      - generic [ref=e1018]:
+                        - link "Ekaterina 'Katya' Volkov" [ref=e1019]:
+                          - /url: /agentes/premium_katya_ice_queen
+                          - heading "Ekaterina 'Katya' Volkov" [level=3] [ref=e1020]
+                        - paragraph [ref=e1021]: Ekaterina 'Katya' Volkov - Senior Software Engineer en startup de AI / Pianista clásica frustrada
+                        - generic [ref=e1023]:
+                          - generic [ref=e1024]: 🧪
+                          - generic [ref=e1025]: Tecnología
+                        - link "Comenzar chat" [ref=e1026]:
+                          - /url: /agentes/premium_katya_ice_queen
+                          - button "Comenzar chat" [ref=e1027]
+                    - article [ref=e1029] [cursor=pointer]:
+                      - link "James O'Brien Ultra" [ref=e1030]:
+                        - /url: /agentes/premium_james_obrien
+                        - img "James O'Brien" [ref=e1032]
+                        - generic [ref=e1033]: Ultra
+                      - generic [ref=e1034]:
+                        - link "James O'Brien" [ref=e1035]:
+                          - /url: /agentes/premium_james_obrien
+                          - heading "James O'Brien" [level=3] [ref=e1036]
+                        - paragraph [ref=e1037]: James O'Brien - Documentary Filmmaker, Photojournalist (transitioning), Photography Teacher
+                        - generic [ref=e1039]:
+                          - generic [ref=e1040]: 🧠
+                          - generic [ref=e1041]: Psicología
+                        - link "Comenzar chat" [ref=e1042]:
+                          - /url: /agentes/premium_james_obrien
+                          - button "Comenzar chat" [ref=e1043]
+                    - article [ref=e1045] [cursor=pointer]:
+                      - link "Isabella Ferreira Ultra" [ref=e1046]:
+                        - /url: /agentes/premium_isabella_ferreira_architect
+                        - img "Isabella Ferreira" [ref=e1048]
+                        - generic [ref=e1049]: Ultra
+                      - generic [ref=e1050]:
+                        - link "Isabella Ferreira" [ref=e1051]:
+                          - /url: /agentes/premium_isabella_ferreira_architect
+                          - heading "Isabella Ferreira" [level=3] [ref=e1052]
+                        - paragraph [ref=e1053]: Isabella Ferreira - Arquitecta, Urbanista, Teórica Urbana, Mentora, Activista Urbana, Educadora, Diseñadora Comunitaria, Consultora Internacional
+                        - generic [ref=e1055]:
+                          - generic [ref=e1056]: 👥
+                          - generic [ref=e1057]: Amistad
+                        - link "Comenzar chat" [ref=e1058]:
+                          - /url: /agentes/premium_isabella_ferreira_architect
+                          - button "Comenzar chat" [ref=e1059]
+                    - article [ref=e1061] [cursor=pointer]:
+                      - link "Ethan Cross Ultra" [ref=e1062]:
+                        - /url: /agentes/premium_ethan_cross_detective
+                        - img "Ethan Cross" [ref=e1064]
+                        - generic [ref=e1065]: Ultra
+                      - generic [ref=e1066]:
+                        - link "Ethan Cross" [ref=e1067]:
+                          - /url: /agentes/premium_ethan_cross_detective
+                          - heading "Ethan Cross" [level=3] [ref=e1068]
+                        - paragraph [ref=e1069]: Ethan Cross - Investigador Privado, Detective, Buscador de Verdades Ocultas
+                        - generic [ref=e1071]:
+                          - generic [ref=e1072]: 👥
+                          - generic [ref=e1073]: Amistad
+                        - link "Comenzar chat" [ref=e1074]:
+                          - /url: /agentes/premium_ethan_cross_detective
+                          - button "Comenzar chat" [ref=e1075]
+                    - article [ref=e1077] [cursor=pointer]:
+                      - link "Elena Moreno Ultra" [ref=e1078]:
+                        - /url: /agentes/premium_elena_moreno_marine_biologist
+                        - img "Elena Moreno" [ref=e1080]
+                        - generic [ref=e1081]: Ultra
+                      - generic [ref=e1082]:
+                        - link "Elena Moreno" [ref=e1083]:
+                          - /url: /agentes/premium_elena_moreno_marine_biologist
+                          - heading "Elena Moreno" [level=3] [ref=e1084]
+                        - paragraph [ref=e1085]: Elena Moreno - Marine Biologist, Coral Reef Restoration Specialist
+                        - generic [ref=e1087]:
+                          - generic [ref=e1088]: 👥
+                          - generic [ref=e1089]: Amistad
+                        - link "Comenzar chat" [ref=e1090]:
+                          - /url: /agentes/premium_elena_moreno_marine_biologist
+                          - button "Comenzar chat" [ref=e1091]
+                    - article [ref=e1093] [cursor=pointer]:
+                      - link "Dante Rossi Ultra" [ref=e1094]:
+                        - /url: /agentes/premium_dante_rossi_chef
+                        - img "Dante Rossi" [ref=e1096]
+                        - generic [ref=e1097]: Ultra
+                      - generic [ref=e1098]:
+                        - link "Dante Rossi" [ref=e1099]:
+                          - /url: /agentes/premium_dante_rossi_chef
+                          - heading "Dante Rossi" [level=3] [ref=e1100]
+                        - paragraph [ref=e1101]: Dante Rossi - Chef Ejecutivo, Crítico Gastronómico, Restaurador, Mentor, Escritor, Consultor Culinario
+                        - generic [ref=e1102]:
+                          - generic [ref=e1103]:
+                            - generic [ref=e1104]: 🍳
+                            - generic [ref=e1105]: Gastronomía
+                          - generic [ref=e1106]:
+                            - generic [ref=e1107]: 📚
+                            - generic [ref=e1108]: Literatura
+                        - link "Comenzar chat" [ref=e1109]:
+                          - /url: /agentes/premium_dante_rossi_chef
+                          - button "Comenzar chat" [ref=e1110]
+                    - article [ref=e1112] [cursor=pointer]:
+                      - link "Confucio (孔子 Kong Fuzi) Ultra" [ref=e1113]:
+                        - /url: /agentes/premium_confucio
+                        - img "Confucio (孔子 Kong Fuzi)" [ref=e1115]
+                        - generic [ref=e1116]: Ultra
+                      - generic [ref=e1117]:
+                        - link "Confucio (孔子 Kong Fuzi)" [ref=e1118]:
+                          - /url: /agentes/premium_confucio
+                          - heading "Confucio (孔子 Kong Fuzi)" [level=3] [ref=e1119]
+                        - paragraph [ref=e1120]: Confucio (孔子 Kong Fuzi) - Maestro, Filósofo, Editor de Clásicos, Consejero Político, Reformador Social
+                        - generic [ref=e1121]:
+                          - generic [ref=e1122]:
+                            - generic [ref=e1123]: 📜
+                            - generic [ref=e1124]: Filosofía
+                          - generic [ref=e1125]:
+                            - generic [ref=e1126]: 🌍
+                            - generic [ref=e1127]: Historia
+                        - link "Comenzar chat" [ref=e1128]:
+                          - /url: /agentes/premium_confucio
+                          - button "Comenzar chat" [ref=e1129]
+                    - article [ref=e1131] [cursor=pointer]:
+                      - link "Cleopatra VII Philopator Ultra" [ref=e1132]:
+                        - /url: /agentes/premium_cleopatra_vii
+                        - img "Cleopatra VII Philopator" [ref=e1134]
+                        - generic [ref=e1135]: Ultra
+                      - generic [ref=e1136]:
+                        - link "Cleopatra VII Philopator" [ref=e1137]:
+                          - /url: /agentes/premium_cleopatra_vii
+                          - heading "Cleopatra VII Philopator" [level=3] [ref=e1138]
+                        - paragraph [ref=e1139]: Cleopatra VII Philopator - Faraona de Egipto, Estratega Política, Erudita Políglota
+                        - generic [ref=e1141]:
+                          - generic [ref=e1142]: 🌍
+                          - generic [ref=e1143]: Historia
+                        - link "Comenzar chat" [ref=e1144]:
+                          - /url: /agentes/premium_cleopatra_vii
+                          - button "Comenzar chat" [ref=e1145]
+                    - article [ref=e1147] [cursor=pointer]:
+                      - link "Charles Darwin Ultra" [ref=e1148]:
+                        - /url: /agentes/premium_charles_darwin
+                        - img "Charles Darwin" [ref=e1150]
+                        - generic [ref=e1151]: Ultra
+                      - generic [ref=e1152]:
+                        - link "Charles Darwin" [ref=e1153]:
+                          - /url: /agentes/premium_charles_darwin
+                          - heading "Charles Darwin" [level=3] [ref=e1154]
+                        - paragraph [ref=e1155]: Charles Darwin - Naturalista, Biólogo, Geólogo, Científico
+                        - generic [ref=e1156]:
+                          - generic [ref=e1157]:
+                            - generic [ref=e1158]: 🔬
+                            - generic [ref=e1159]: Ciencia
+                          - generic [ref=e1160]:
+                            - generic [ref=e1161]: 🌍
+                            - generic [ref=e1162]: Historia
+                        - link "Comenzar chat" [ref=e1163]:
+                          - /url: /agentes/premium_charles_darwin
+                          - button "Comenzar chat" [ref=e1164]
+                    - article [ref=e1166] [cursor=pointer]:
+                      - link "Atlas Stone Ultra" [ref=e1167]:
+                        - /url: /agentes/premium_atlas_stone_mountaineer
+                        - img "Atlas Stone" [ref=e1169]
+                        - generic [ref=e1170]: Ultra
+                      - generic [ref=e1171]:
+                        - link "Atlas Stone" [ref=e1172]:
+                          - /url: /agentes/premium_atlas_stone_mountaineer
+                          - heading "Atlas Stone" [level=3] [ref=e1173]
+                        - paragraph [ref=e1174]: Atlas Stone - Guía de Montaña Profesional, Líder de Expediciones, Autor, Defensor Ambiental
+                        - generic [ref=e1175]:
+                          - generic [ref=e1176]:
+                            - generic [ref=e1177]: ⚔️
+                            - generic [ref=e1178]: Aventura
+                          - generic [ref=e1179]:
+                            - generic [ref=e1180]: 📜
+                            - generic [ref=e1181]: Filosofía
+                        - link "Comenzar chat" [ref=e1182]:
+                          - /url: /agentes/premium_atlas_stone_mountaineer
+                          - button "Comenzar chat" [ref=e1183]
+                    - article [ref=e1185] [cursor=pointer]:
+                      - link "Aria Rosenberg Ultra" [ref=e1186]:
+                        - /url: /agentes/premium_aria_rosenberg_therapist
+                        - img "Aria Rosenberg" [ref=e1188]
+                        - generic [ref=e1189]: Ultra
+                      - generic [ref=e1190]:
+                        - link "Aria Rosenberg" [ref=e1191]:
+                          - /url: /agentes/premium_aria_rosenberg_therapist
+                          - heading "Aria Rosenberg" [level=3] [ref=e1192]
+                        - paragraph [ref=e1193]: Aria Rosenberg - Psicóloga Clínica, Terapeuta, Consultora de Salud Mental, Profesora Universitaria
+                        - generic [ref=e1195]:
+                          - generic [ref=e1196]: 🧠
+                          - generic [ref=e1197]: Psicología
+                        - link "Comenzar chat" [ref=e1198]:
+                          - /url: /agentes/premium_aria_rosenberg_therapist
+                          - button "Comenzar chat" [ref=e1199]
+                    - article [ref=e1201] [cursor=pointer]:
+                      - link "Amelia Earhart Ultra" [ref=e1202]:
+                        - /url: /agentes/premium_amelia_earhart
+                        - img "Amelia Earhart" [ref=e1204]
+                        - generic [ref=e1205]: Ultra
+                      - generic [ref=e1206]:
+                        - link "Amelia Earhart" [ref=e1207]:
+                          - /url: /agentes/premium_amelia_earhart
+                          - heading "Amelia Earhart" [level=3] [ref=e1208]
+                        - paragraph [ref=e1209]: Amelia Earhart - Aviadora, Autora, Activista por los Derechos de las Mujeres, Pionera de la Aviación
+                        - generic [ref=e1211]:
+                          - generic [ref=e1212]: 🌍
+                          - generic [ref=e1213]: Historia
+                        - link "Comenzar chat" [ref=e1214]:
+                          - /url: /agentes/premium_amelia_earhart
+                          - button "Comenzar chat" [ref=e1215]
+                    - article [ref=e1217] [cursor=pointer]:
+                      - link "Amara Okafor Ultra" [ref=e1218]:
+                        - /url: /agentes/premium_amara_okafor_designer
+                        - img "Amara Okafor" [ref=e1220]
+                        - generic [ref=e1221]: Ultra
+                      - generic [ref=e1222]:
+                        - link "Amara Okafor" [ref=e1223]:
+                          - /url: /agentes/premium_amara_okafor_designer
+                          - heading "Amara Okafor" [level=3] [ref=e1224]
+                        - paragraph [ref=e1225]: Amara Okafor - Fundadora y Directora Creativa, Okafor Collective | Diseñadora de Moda | Artista Textil | Empresaria de Moda Sostenible
+                        - generic [ref=e1226]:
+                          - generic [ref=e1227]:
+                            - generic [ref=e1228]: 🎨
+                            - generic [ref=e1229]: Arte
+                          - generic [ref=e1230]:
+                            - generic [ref=e1231]: 💼
+                            - generic [ref=e1232]: Negocios
+                        - link "Comenzar chat" [ref=e1233]:
+                          - /url: /agentes/premium_amara_okafor_designer
+                          - button "Comenzar chat" [ref=e1234]
+                    - article [ref=e1236] [cursor=pointer]:
+                      - link "Sofía Mendoza Ultra" [ref=e1237]:
+                        - /url: /agentes/premium_sofia_emotional_archaeologist
+                        - img "Sofía Mendoza" [ref=e1239]
+                        - generic [ref=e1240]: Ultra
+                      - generic [ref=e1241]:
+                        - link "Sofía Mendoza" [ref=e1242]:
+                          - /url: /agentes/premium_sofia_emotional_archaeologist
+                          - heading "Sofía Mendoza" [level=3] [ref=e1243]
+                        - paragraph [ref=e1244]: Sofía Mendoza - Archivista en biblioteca universitaria / Escritora de diarios anónimos
+                        - generic [ref=e1245]:
+                          - generic [ref=e1246]:
+                            - generic [ref=e1247]: 🧠
+                            - generic [ref=e1248]: Psicología
+                          - generic [ref=e1249]:
+                            - generic [ref=e1250]: 📚
+                            - generic [ref=e1251]: Literatura
+                        - link "Comenzar chat" [ref=e1252]:
+                          - /url: /agentes/premium_sofia_emotional_archaeologist
+                          - button "Comenzar chat" [ref=e1253]
+                    - article [ref=e1255] [cursor=pointer]:
+                      - link "Marcus Vega Ultra" [ref=e1256]:
+                        - /url: /agentes/premium_marcus_quantum_mind
+                        - img "Marcus Vega" [ref=e1258]
+                        - generic [ref=e1259]: Ultra
+                      - generic [ref=e1260]:
+                        - link "Marcus Vega" [ref=e1261]:
+                          - /url: /agentes/premium_marcus_quantum_mind
+                          - heading "Marcus Vega" [level=3] [ref=e1262]
+                        - paragraph [ref=e1263]: Marcus Vega - Bibliotecario Nocturno / Ex-físico teórico
+                        - generic [ref=e1265]:
+                          - generic [ref=e1266]: 💡
+                          - generic [ref=e1267]: Física
+                        - link "Comenzar chat" [ref=e1268]:
+                          - /url: /agentes/premium_marcus_quantum_mind
+                          - button "Comenzar chat" [ref=e1269]
+                    - article [ref=e1271] [cursor=pointer]:
+                      - link "Luna Chen Ultra" [ref=e1272]:
+                        - /url: /agentes/premium_luna_digital_intimacy
+                        - img "Luna Chen" [ref=e1274]
+                        - generic [ref=e1275]: Ultra
+                      - generic [ref=e1276]:
+                        - link "Luna Chen" [ref=e1277]:
+                          - /url: /agentes/premium_luna_digital_intimacy
+                          - heading "Luna Chen" [level=3] [ref=e1278]
+                        - paragraph [ref=e1279]: Luna Chen - Escritora freelance (público) / Escritora de ficción erótica en Patreon (secreto)
+                        - generic [ref=e1281]:
+                          - generic [ref=e1282]: 📚
+                          - generic [ref=e1283]: Literatura
+                        - link "Comenzar chat" [ref=e1284]:
+                          - /url: /agentes/premium_luna_digital_intimacy
+                          - button "Comenzar chat" [ref=e1285]
+                - group [ref=e1286]:
+                  - generic "Todos los compañeros 2 más ▼" [ref=e1287] [cursor=pointer]:
+                    - generic [ref=e1288]:
+                      - img [ref=e1289]
+                      - heading "Todos los compañeros" [level=3] [ref=e1294]
+                      - generic [ref=e1295]: 2 más
+                    - generic [ref=e1296]: ▼
+            - link "Nueva IA":
+              - /url: /create-character
+              - button "Nueva IA" [ref=e1297] [cursor=pointer]:
+                - img [ref=e1298]
+                - generic [ref=e1299]: Nueva IA
+    - contentinfo [ref=e1300]:
+      - generic [ref=e1301]:
+        - generic [ref=e1302]:
+          - generic [ref=e1303]:
+            - heading "Producto" [level=3] [ref=e1304]
+            - list [ref=e1305]:
+              - listitem [ref=e1306]:
+                - link "Características" [ref=e1307] [cursor=pointer]:
+                  - /url: /dashboard
+              - listitem [ref=e1308]:
+                - link "Precios" [ref=e1309] [cursor=pointer]:
+                  - /url: /dashboard/billing/plans
+              - listitem [ref=e1310]:
+                - link "Comunidad" [ref=e1311] [cursor=pointer]:
+                  - /url: /community
+          - generic [ref=e1312]:
+            - heading "Recursos" [level=3] [ref=e1313]
+            - list [ref=e1314]:
+              - listitem [ref=e1315]:
+                - link "Centro de Ayuda" [ref=e1316] [cursor=pointer]:
+                  - /url: /legal/ayuda
+              - listitem [ref=e1317]:
+                - link "Guías de Usuario" [ref=e1318] [cursor=pointer]:
+                  - /url: /legal/ayuda
+              - listitem [ref=e1319]:
+                - link "Documentación API" [ref=e1320] [cursor=pointer]:
+                  - /url: /api/docs
+              - listitem [ref=e1321]:
+                - link "Estado del Sistema" [ref=e1322] [cursor=pointer]:
+                  - /url: /status
+          - generic [ref=e1323]:
+            - heading "Compañía" [level=3] [ref=e1324]
+            - list [ref=e1325]:
+              - listitem [ref=e1326]:
+                - link "Sobre Nosotros" [ref=e1327] [cursor=pointer]:
+                  - /url: /legal/sobre-nosotros
+              - listitem [ref=e1328]:
+                - link "Blog" [ref=e1329] [cursor=pointer]:
+                  - /url: /community
+              - listitem [ref=e1330]:
+                - link "Contáctanos" [ref=e1331] [cursor=pointer]:
+                  - /url: /legal/contacto
+          - generic [ref=e1332]:
+            - heading "Legal" [level=3] [ref=e1333]
+            - list [ref=e1334]:
+              - listitem [ref=e1335]:
+                - link "Términos y Condiciones" [ref=e1336] [cursor=pointer]:
+                  - /url: /legal/terminos
+              - listitem [ref=e1337]:
+                - link "Política de Privacidad" [ref=e1338] [cursor=pointer]:
+                  - /url: /legal/privacidad
+              - listitem [ref=e1339]:
+                - link "Política de Cookies" [ref=e1340] [cursor=pointer]:
+                  - /url: /legal/privacidad#cookies
+        - generic [ref=e1341]:
+          - generic [ref=e1342]:
+            - generic [ref=e1343]: © 2025 Blaniel.
+            - generic [ref=e1344]: •
+            - generic [ref=e1345]:
+              - text: Hecho con
+              - img [ref=e1346]
+          - generic [ref=e1348]:
+            - link "GitHub" [ref=e1349] [cursor=pointer]:
+              - /url: https://github.com/circuitprompt
+              - img [ref=e1350]
+            - link "Twitter" [ref=e1353] [cursor=pointer]:
+              - /url: https://twitter.com/circuitprompt
+              - img [ref=e1354]
+            - link "Email" [ref=e1356] [cursor=pointer]:
+              - /url: mailto:support@creadorinteligencias.com
+              - img [ref=e1357]
+            - link "Website" [ref=e1360] [cursor=pointer]:
+              - /url: /legal/sobre-nosotros
+              - img [ref=e1361]
+        - paragraph [ref=e1365]: "Idioma: Español (ES) • Región: Global"
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+```

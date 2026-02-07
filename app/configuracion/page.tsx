@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+export const dynamic = 'force-dynamic';
+
+import { useState, useEffect } from "react";
+import { useSession } from "@/lib/auth-client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { DangerConfirmDialog } from "@/components/DangerConfirmDialog";
+import { signOut } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
 import {
   User,
   Key,
@@ -18,17 +28,57 @@ import {
   EyeOff,
   Sparkles,
   Mail,
-  Shield
+  Shield,
+  AlertTriangle,
+  Check,
+  Loader2,
+  Crown,
+  MessageSquare,
+  Users,
+  Trash2,
+  Accessibility,
+  ChevronRight,
+  LogOut,
 } from "lucide-react";
+import { AccessibilitySettings } from "@/components/accessibility/AccessibilitySettings";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { SFWProtectionToggle } from "@/components/settings/SFWProtectionToggle";
+import { mobileTheme } from "@/lib/mobile-theme";
+
+interface UserProfile {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+  plan: string;
+  createdAt: string;
+}
+
+interface UserStats {
+  agentsCount: number;
+  worldsCount: number;
+  messagesThisMonth: number;
+}
 
 export default function ConfiguracionPage() {
-  const [showApiKey, setShowApiKey] = useState(false);
+  const t = useTranslations("settings");
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
 
-  // User settings
-  const [userName, setUserName] = useState("Usuario");
-  const [userEmail, setUserEmail] = useState("usuario@ejemplo.com");
-  const [userBio, setUserBio] = useState("");
+  // User data
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stats, setStats] = useState<UserStats>({ agentsCount: 0, worldsCount: 0, messagesThisMonth: 0 });
+
+  // Form states
+  const [userName, setUserName] = useState("");
+
+  // Danger zone dialogs
+  const [deleteMessagesDialog, setDeleteMessagesDialog] = useState(false);
+  const [deleteAgentsDialog, setDeleteAgentsDialog] = useState(false);
+  const [deleteAccountDialog, setDeleteAccountDialog] = useState(false);
 
   // API settings
   const [geminiApiKey, setGeminiApiKey] = useState("");
@@ -37,293 +87,917 @@ export default function ConfiguracionPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [agentUpdates, setAgentUpdates] = useState(true);
 
-  const handleSave = async () => {
+  // Mobile active section state
+  const [mobileActiveSection, setMobileActiveSection] = useState<string | null>(null);
+
+  // Fetch user profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("/api/user/profile");
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Profile loaded:", data.user);
+          console.log("Plan from DB:", data.user.plan);
+          setProfile(data.user);
+          setStats(data.stats);
+          setUserName(data.user.name || "");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast.error(t("profile.toasts.loadError"));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (session?.user) {
+      fetchProfile();
+    }
+  }, [session]);
+
+  const handleSaveProfile = async () => {
     setSaving(true);
-    // Simular guardado
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSaving(false);
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: userName,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(data.user);
+        // Session will be updated automatically on next page load
+        toast.success(t("profile.toasts.saveSuccess"));
+      } else {
+        toast.error(t("profile.toasts.saveError"));
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast.error(t("profile.toasts.saveError"));
+    } finally {
+      setSaving(false);
+    }
   };
 
+  const planLabels: Record<string, { name: string; color: string; icon: any }> = {
+    free: { name: "Free", color: "bg-gray-500", icon: Sparkles },
+    plus: { name: "Plus", color: "bg-blue-500", icon: Sparkles },
+    ultra: { name: "Ultra", color: "bg-gradient-to-r from-purple-600 to-pink-600", icon: Crown },
+  };
+
+  const currentPlan = profile ? (planLabels[profile.plan] || { name: profile.plan, color: "bg-gray-500", icon: Sparkles }) : planLabels.free;
+
+  // Danger zone actions
+  const handleDeleteMessages = async () => {
+    try {
+      const res = await fetch("/api/messages/delete-all", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(data.message || t("danger.toasts.deleteMessagesSuccess"));
+        // Refresh stats
+        const profileRes = await fetch("/api/user/profile");
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          setStats(profileData.stats);
+        }
+      } else {
+        toast.error(t("danger.toasts.deleteMessagesError"));
+      }
+    } catch (error) {
+      console.error("Error deleting messages:", error);
+      toast.error(t("danger.toasts.deleteMessagesError"));
+    }
+  };
+
+  const handleDeleteAgents = async () => {
+    try {
+      const res = await fetch("/api/agents/delete-all", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(data.message || t("danger.toasts.deleteAgentsSuccess"));
+        // Refresh stats
+        const profileRes = await fetch("/api/user/profile");
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          setStats(profileData.stats);
+        }
+      } else {
+        toast.error(t("danger.toasts.deleteAgentsError"));
+      }
+    } catch (error) {
+      console.error("Error deleting agents:", error);
+      toast.error(t("danger.toasts.deleteAgentsError"));
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const res = await fetch("/api/user/account", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        toast.success(t("danger.deleteAccount.toast"));
+        // Sign out and redirect to home
+        setTimeout(async () => {
+          await signOut();
+          window.location.href = "/";
+        }, 1500);
+      } else {
+        toast.error(t("danger.deleteAccount.toastError"));
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error(t("danger.deleteAccount.toastError"));
+    }
+  };
+
+  if (loading) {
+    return (
+      <LoadingIndicator
+        variant="page"
+        message={t("loading")}
+        submessage={t("loadingSettings")}
+      />
+    );
+  }
+
+  // Mobile menu items
+  const mobileMenuItems = [
+    { id: 'profile', icon: User, label: t("tabs.profile"), color: mobileTheme.colors.primary[500] },
+    { id: 'plan', icon: Crown, label: t("tabs.plan"), color: '#F59E0B' },
+    { id: 'preferences', icon: Palette, label: t("tabs.preferences"), color: '#8B5CF6' },
+    { id: 'accessibility', icon: Accessibility, label: t("tabs.accessibility"), color: '#22C55E' },
+    { id: 'danger', icon: AlertTriangle, label: t("tabs.danger"), color: '#EF4444' },
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold mb-2">Configuración</h1>
-        <p className="text-xl text-muted-foreground">
-          Administra tu cuenta y preferencias
-        </p>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Perfil de Usuario */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Perfil de Usuario
-            </CardTitle>
-            <CardDescription>
-              Actualiza tu información personal
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-6">
-              <Avatar className="h-24 w-24 border-2 border-primary">
-                <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold">
-                  {userName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 space-y-2">
-                <Button variant="outline" size="sm">
-                  Cambiar avatar
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  JPG, PNG o GIF. Máximo 2MB.
-                </p>
-              </div>
+    <ErrorBoundary variant="page">
+      {/* Mobile View */}
+      <div
+        className="lg:hidden min-h-screen"
+        style={{ backgroundColor: mobileTheme.colors.background.primary }}
+      >
+        {/* Profile Header - Mobile */}
+        <div className="p-6 pb-4">
+          <div className="flex items-center gap-4 mb-6">
+            <Avatar className="h-20 w-20 border-2" style={{ borderColor: mobileTheme.colors.primary[500] }}>
+              <AvatarImage src={profile?.image || undefined} alt={userName} />
+              <AvatarFallback
+                className="text-xl font-bold"
+                style={{
+                  background: `linear-gradient(135deg, ${mobileTheme.colors.primary[500]}, ${mobileTheme.colors.secondary[500]})`,
+                  color: '#fff'
+                }}
+              >
+                {userName ? userName.charAt(0).toUpperCase() : session?.user?.email?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2
+                className="font-bold text-xl"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {userName || t("profile.avatar.noName")}
+              </h2>
+              <p
+                className="text-sm"
+                style={{ color: mobileTheme.colors.text.secondary }}
+              >
+                {profile?.email}
+              </p>
+              <Badge
+                className="mt-2"
+                style={{
+                  backgroundColor: profile?.plan === 'ultra'
+                    ? `linear-gradient(135deg, ${mobileTheme.colors.primary[600]}, ${mobileTheme.colors.secondary[600]})`
+                    : mobileTheme.colors.primary[500],
+                  background: profile?.plan === 'ultra'
+                    ? `linear-gradient(135deg, ${mobileTheme.colors.primary[600]}, ${mobileTheme.colors.secondary[600]})`
+                    : undefined,
+                  color: '#fff'
+                }}
+              >
+                {currentPlan.name}
+              </Badge>
             </div>
+          </div>
 
-            <div className="space-y-4">
+          {/* Stats Row - Mobile */}
+          <div
+            className="grid grid-cols-3 gap-3 p-4 rounded-xl"
+            style={{ backgroundColor: mobileTheme.colors.background.card }}
+          >
+            <div className="text-center">
+              <p
+                className="text-2xl font-bold"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {stats.agentsCount}
+              </p>
+              <p
+                className="text-xs"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              >
+                Agentes
+              </p>
+            </div>
+            <div className="text-center">
+              <p
+                className="text-2xl font-bold"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {stats.worldsCount}
+              </p>
+              <p
+                className="text-xs"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              >
+                Mundos
+              </p>
+            </div>
+            <div className="text-center">
+              <p
+                className="text-2xl font-bold"
+                style={{ color: mobileTheme.colors.text.primary }}
+              >
+                {stats.messagesThisMonth.toLocaleString()}
+              </p>
+              <p
+                className="text-xs"
+                style={{ color: mobileTheme.colors.text.tertiary }}
+              >
+                Mensajes
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Menu Items - Mobile */}
+        <div className="px-4 space-y-2">
+          {mobileMenuItems.map((item) => (
+            <motion.button
+              key={item.id}
+              onClick={() => setMobileActiveSection(mobileActiveSection === item.id ? null : item.id)}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-between p-4 rounded-xl transition-all"
+              style={{
+                backgroundColor: mobileActiveSection === item.id
+                  ? mobileTheme.colors.background.elevated
+                  : mobileTheme.colors.background.card,
+                border: `1px solid ${mobileActiveSection === item.id ? item.color : mobileTheme.colors.border.light}`
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: `${item.color}20` }}
+                >
+                  <item.icon size={20} style={{ color: item.color }} />
+                </div>
+                <span
+                  className="font-medium"
+                  style={{ color: mobileTheme.colors.text.primary }}
+                >
+                  {item.label}
+                </span>
+              </div>
+              <ChevronRight
+                size={20}
+                className="transition-transform"
+                style={{
+                  color: mobileTheme.colors.text.tertiary,
+                  transform: mobileActiveSection === item.id ? 'rotate(90deg)' : 'none'
+                }}
+              />
+            </motion.button>
+          ))}
+
+          {/* Expanded Sections */}
+          {mobileActiveSection === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl space-y-4"
+              style={{ backgroundColor: mobileTheme.colors.background.card }}
+            >
               <div>
-                <label className="text-sm font-medium mb-2 block">Nombre</label>
+                <Label
+                  className="text-sm mb-2 block"
+                  style={{ color: mobileTheme.colors.text.secondary }}
+                >
+                  {t("profile.form.nameLabel")}
+                </Label>
                 <Input
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Tu nombre"
+                  placeholder={t("profile.form.namePlaceholder")}
+                  className="bg-transparent border"
+                  style={{
+                    borderColor: mobileTheme.colors.border.light,
+                    color: mobileTheme.colors.text.primary
+                  }}
                 />
               </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Email</label>
-                <Input
-                  type="email"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  placeholder="tu@email.com"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Biografía</label>
-                <Textarea
-                  value={userBio}
-                  onChange={(e) => setUserBio(e.target.value)}
-                  placeholder="Cuéntanos sobre ti..."
-                  rows={3}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Plan y Cuenta */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Plan Actual
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center py-4">
-              <Badge variant="secondary" className="text-lg px-4 py-2 mb-3">
-                Free
-              </Badge>
-              <p className="text-sm text-muted-foreground mb-4">
-                Acceso básico a todas las funciones
-              </p>
-              <Button className="w-full">
-                <Sparkles className="h-4 w-4 mr-2" />
-                Mejorar a Pro
+              <Button
+                onClick={handleSaveProfile}
+                disabled={saving}
+                className="w-full"
+                style={{ backgroundColor: mobileTheme.colors.primary[500] }}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t("profile.actions.saving")}
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {t("profile.actions.save")}
+                  </>
+                )}
               </Button>
-            </div>
+            </motion.div>
+          )}
 
-            <div className="space-y-2 pt-4 border-t">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">IAs creadas</span>
-                <span className="font-medium">0 / 5</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Mundos activos</span>
-                <span className="font-medium">0 / 2</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Mensajes/mes</span>
-                <span className="font-medium">0 / 1000</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* API Keys */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              API Keys
-            </CardTitle>
-            <CardDescription>
-              Configura tus claves de API para integrar servicios externos
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Google Gemini API Key
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    type={showApiKey ? "text" : "password"}
-                    value={geminiApiKey}
-                    onChange={(e) => setGeminiApiKey(e.target.value)}
-                    placeholder="AIza..."
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                  >
-                    {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+          {mobileActiveSection === 'preferences' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl space-y-4"
+              style={{ backgroundColor: mobileTheme.colors.background.card }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p style={{ color: mobileTheme.colors.text.primary, fontWeight: 500 }}>
+                    {t("preferences.appearance.theme.title")}
+                  </p>
+                  <p style={{ color: mobileTheme.colors.text.tertiary, fontSize: 12 }}>
+                    {t("preferences.appearance.theme.description")}
+                  </p>
                 </div>
-                <Button variant="outline">
-                  Verificar
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Obtén tu API key en{" "}
-                <a
-                  href="https://makersuite.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  Google AI Studio
-                </a>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Apariencia */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              Apariencia
-            </CardTitle>
-            <CardDescription>
-              Personaliza la interfaz
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-3 block">Tema</label>
-              <div className="flex items-center justify-between p-3 rounded-lg border">
-                <span className="text-sm">Modo oscuro/claro</span>
                 <ThemeToggle />
               </div>
-            </div>
+              <Separator style={{ backgroundColor: mobileTheme.colors.border.light }} />
+              <SFWProtectionToggle />
+            </motion.div>
+          )}
 
-            <div>
-              <label className="text-sm font-medium mb-3 block">Idioma</label>
-              <Input value="Español" disabled />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Notificaciones */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              Notificaciones
-            </CardTitle>
-            <CardDescription>
-              Gestiona cómo y cuándo recibes notificaciones
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <div className="font-medium text-sm">Notificaciones por email</div>
-                  <div className="text-xs text-muted-foreground">
-                    Recibe actualizaciones importantes por correo
-                  </div>
-                </div>
-              </div>
+          {mobileActiveSection === 'danger' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="p-4 rounded-xl space-y-3"
+              style={{
+                backgroundColor: mobileTheme.colors.background.card,
+                border: '1px solid #EF444440'
+              }}
+            >
               <Button
-                variant={emailNotifications ? "default" : "outline"}
-                size="sm"
-                onClick={() => setEmailNotifications(!emailNotifications)}
+                variant="outline"
+                className="w-full justify-start text-red-500 border-red-500/30"
+                onClick={() => setDeleteMessagesDialog(true)}
               >
-                {emailNotifications ? "Activado" : "Desactivado"}
+                <Trash2 className="h-4 w-4 mr-2" />
+                {t("danger.deleteMessages.button")}
               </Button>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <div className="font-medium text-sm">Actualizaciones de agentes</div>
-                  <div className="text-xs text-muted-foreground">
-                    Notificaciones sobre la actividad de tus IAs
-                  </div>
-                </div>
-              </div>
               <Button
-                variant={agentUpdates ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAgentUpdates(!agentUpdates)}
+                variant="outline"
+                className="w-full justify-start text-red-500 border-red-500/30"
+                onClick={() => setDeleteAgentsDialog(true)}
               >
-                {agentUpdates ? "Activado" : "Desactivado"}
+                <Users className="h-4 w-4 mr-2" />
+                {t("danger.deleteAgents.button")}
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <Button
+                variant="destructive"
+                className="w-full justify-start"
+                onClick={() => setDeleteAccountDialog(true)}
+              >
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                {t("danger.deleteAccount.button")}
+              </Button>
+            </motion.div>
+          )}
+        </div>
 
-        {/* Zona de peligro */}
-        <Card className="lg:col-span-3 border-destructive/50">
-          <CardHeader>
-            <CardTitle className="text-destructive">Zona de Peligro</CardTitle>
-            <CardDescription>
-              Acciones irreversibles relacionadas con tu cuenta
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
-              Eliminar todas las conversaciones
-            </Button>
-            <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
-              Eliminar todos los agentes
-            </Button>
-            <Button variant="destructive">
-              Eliminar cuenta permanentemente
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Sign Out Button - Mobile */}
+        <div className="p-4 mt-6">
+          <Button
+            variant="outline"
+            className="w-full"
+            style={{
+              borderColor: mobileTheme.colors.border.light,
+              color: mobileTheme.colors.text.secondary
+            }}
+            onClick={async () => {
+              await signOut();
+              window.location.href = "/";
+            }}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Cerrar sesión
+          </Button>
+        </div>
       </div>
 
-      {/* Botón de guardar flotante */}
-      <div className="fixed bottom-8 right-8">
-        <Button size="lg" onClick={handleSave} disabled={saving} className="shadow-2xl">
-          {saving ? (
-            <>
-              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Guardando...
-            </>
-          ) : (
-            <>
-              <Save className="h-5 w-5 mr-2" />
-              Guardar cambios
-            </>
-          )}
-        </Button>
+      {/* Desktop View */}
+      <div className="hidden lg:block min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto p-6 lg:p-8 space-y-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            {t("title")}
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            {t("subtitle")}
+          </p>
+        </div>
+
+        {/* Main Content */}
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="profile" className="gap-2">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("tabs.profile")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="plan" className="gap-2">
+              <Shield className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("tabs.plan")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="gap-2">
+              <Palette className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("tabs.preferences")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="accessibility" className="gap-2">
+              <Accessibility className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("tabs.accessibility")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="danger" className="gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("tabs.danger")}</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("profile.title")}</CardTitle>
+                <CardDescription>
+                  {t("profile.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Avatar Section */}
+                <div className="flex items-center gap-6 pb-6 border-b">
+                  <Avatar className="h-24 w-24 border-4 border-primary/20">
+                    <AvatarImage src={profile?.image || undefined} alt={userName} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold">
+                      {userName ? userName.charAt(0).toUpperCase() : session?.user?.email?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <h3 className="font-semibold text-lg">{userName || t("profile.avatar.noName")}</h3>
+                    <p className="text-sm text-muted-foreground">{profile?.email}</p>
+                    <Button variant="outline" size="sm" disabled>
+                      {t("profile.avatar.changeAvatar")}
+                      <span className="ml-2 text-xs text-muted-foreground">{t("profile.avatar.comingSoon")}</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Form Fields */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">{t("profile.form.nameLabel")}</Label>
+                    <Input
+                      id="name"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder={t("profile.form.namePlaceholder")}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">{t("profile.form.emailLabel")}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profile?.email || ""}
+                      disabled
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {t("profile.form.emailReadonly")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button onClick={handleSaveProfile} disabled={saving}>
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t("profile.actions.saving")}
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        {t("profile.actions.save")}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Plan Tab */}
+          <TabsContent value="plan" className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Current Plan */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <currentPlan.icon className="h-5 w-5" />
+                    {t("plan.current.title")}
+                  </CardTitle>
+                  <CardDescription>{t("plan.current.description")}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center py-6">
+                    <Badge className={`${currentPlan.color} text-white text-lg px-6 py-2 mb-4`}>
+                      {currentPlan.name}
+                    </Badge>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      {profile?.plan === "ultra"
+                        ? t("plan.current.ultraMessage")
+                        : t("plan.current.upgradeMessage")}
+                    </p>
+                    {profile?.plan !== "ultra" && (
+                      <Button className="w-full">
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {t("plan.current.upgradeButton")}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Usage Stats */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t("plan.usage.title")}</CardTitle>
+                  <CardDescription>{t("plan.usage.description")}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/50">
+                      <span className="text-sm font-medium">{t("plan.usage.agentsCreated")}</span>
+                      <span className="text-sm font-bold">
+                        {stats.agentsCount} {profile?.plan === "ultra" ? `/ ${t("plan.usage.unlimited")}` : profile?.plan === "plus" ? "/ 10" : "/ 3"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/50">
+                      <span className="text-sm font-medium">{t("plan.usage.worldsActive")}</span>
+                      <span className="text-sm font-bold">
+                        {stats.worldsCount} {profile?.plan === "ultra" ? `/ ${t("plan.usage.unlimited")}` : profile?.plan === "plus" ? "/ 5" : "/ 1"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/50">
+                      <span className="text-sm font-medium">{t("plan.usage.messagesThisMonth")}</span>
+                      <span className="text-sm font-bold">
+                        {stats.messagesThisMonth.toLocaleString()} {profile?.plan !== "free" ? `/ ${t("plan.usage.unlimited")}` : "/ 600"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {profile?.plan === "ultra" && (
+                    <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+                      <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-2">
+                        <Crown className="h-5 w-5" />
+                        <span className="font-semibold">{t("plan.usage.ultraBadge.title")}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {t("plan.usage.ultraBadge.message")}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* API Keys */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="h-5 w-5" />
+                  {t("plan.apiKeys.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("plan.apiKeys.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="gemini-key">{t("plan.apiKeys.geminiLabel")}</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        id="gemini-key"
+                        type={showApiKey ? "text" : "password"}
+                        value={geminiApiKey}
+                        onChange={(e) => setGeminiApiKey(e.target.value)}
+                        placeholder={t("plan.apiKeys.geminiPlaceholder")}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                      >
+                        {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                    <Button variant="outline" disabled>
+                      {t("plan.apiKeys.verifyButton")}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("plan.apiKeys.getKeyMessage")}{" "}
+                    <a
+                      href="https://makersuite.google.com/app/apikey"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {t("plan.apiKeys.getKeyLink")}
+                    </a>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Preferences Tab */}
+          <TabsContent value="preferences" className="space-y-6">
+            {/* Appearance */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  {t("preferences.appearance.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("preferences.appearance.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>{t("preferences.appearance.theme.label")}</Label>
+                  <div className="flex items-center justify-between p-4 rounded-2xl border bg-muted/50">
+                    <div>
+                      <p className="font-medium">{t("preferences.appearance.theme.title")}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("preferences.appearance.theme.description")}
+                      </p>
+                    </div>
+                    <ThemeToggle />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="language">{t("preferences.appearance.language.label")}</Label>
+                  <Input id="language" value={t("preferences.appearance.language.current")} disabled className="bg-muted" />
+                  <p className="text-xs text-muted-foreground">
+                    {t("preferences.appearance.language.comingSoon")}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Notifications */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  {t("preferences.notifications.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("preferences.notifications.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl border">
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium text-sm">{t("preferences.notifications.email.title")}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("preferences.notifications.email.description")}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant={emailNotifications ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setEmailNotifications(!emailNotifications)}
+                  >
+                    {emailNotifications ? (
+                      <>
+                        <Check className="h-4 w-4 mr-1" />
+                        {t("preferences.notifications.email.enabled")}
+                      </>
+                    ) : (
+                      t("preferences.notifications.email.disabled")
+                    )}
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-2xl border">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium text-sm">{t("preferences.notifications.agentUpdates.title")}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("preferences.notifications.agentUpdates.description")}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant={agentUpdates ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAgentUpdates(!agentUpdates)}
+                  >
+                    {agentUpdates ? (
+                      <>
+                        <Check className="h-4 w-4 mr-1" />
+                        {t("preferences.notifications.email.enabled")}
+                      </>
+                    ) : (
+                      t("preferences.notifications.email.disabled")
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* SFW Protection */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  {t("preferences.sfwProtection.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("preferences.sfwProtection.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SFWProtectionToggle />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Accessibility Tab */}
+          <TabsContent value="accessibility" className="space-y-6">
+            <AccessibilitySettings />
+          </TabsContent>
+
+          {/* Danger Zone Tab */}
+          <TabsContent value="danger" className="space-y-6">
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="text-destructive flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  {t("danger.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("danger.description")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="p-4 rounded-2xl border border-destructive/30 bg-destructive/5">
+                    <div className="flex items-start gap-3 mb-3">
+                      <MessageSquare className="h-5 w-5 text-destructive mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-1">{t("danger.deleteMessages.title")}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {t("danger.deleteMessages.description")} {stats.messagesThisMonth > 0 ? t("danger.deleteMessages.messagesCount", { count: stats.messagesThisMonth.toLocaleString() }) : ""}{t("danger.deleteMessages.descriptionSuffix")}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      onClick={() => setDeleteMessagesDialog(true)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {t("danger.deleteMessages.button")}
+                    </Button>
+                  </div>
+
+                  <div className="p-4 rounded-2xl border border-destructive/30 bg-destructive/5">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Users className="h-5 w-5 text-destructive mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-1">{t("danger.deleteAgents.title")}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {t("danger.deleteAgents.description")} {stats.agentsCount > 0 ? t("danger.deleteAgents.agentsCount", {
+                            count: stats.agentsCount,
+                            plural: stats.agentsCount === 1 ? t("danger.deleteAgents.agentSingular") : t("danger.deleteAgents.agentPlural")
+                          }) + " " : ""}{t("danger.deleteAgents.descriptionSuffix")}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      onClick={() => setDeleteAgentsDialog(true)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {t("danger.deleteAgents.button")}
+                    </Button>
+                  </div>
+
+                  <div className="p-4 rounded-2xl border border-destructive bg-destructive/10">
+                    <div className="flex items-start gap-3 mb-3">
+                      <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 animate-pulse" />
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-1 text-destructive">{t("danger.deleteAccount.title")}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {t("danger.deleteAccount.description")}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setDeleteAccountDialog(true)}
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      {t("danger.deleteAccount.button")}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Danger Zone Confirmation Dialogs */}
+        <DangerConfirmDialog
+          open={deleteMessagesDialog}
+          onOpenChange={setDeleteMessagesDialog}
+          title={t("danger.deleteMessages.dialogTitle")}
+          description={`${t("danger.deleteMessages.dialogDescription")} ${
+            stats.messagesThisMonth > 0
+              ? t("danger.deleteMessages.dialogInclude", { count: stats.messagesThisMonth.toLocaleString() })
+              : ""
+          } ${t("danger.deleteMessages.dialogWarning")}`}
+          onConfirm={handleDeleteMessages}
+        />
+
+        <DangerConfirmDialog
+          open={deleteAgentsDialog}
+          onOpenChange={setDeleteAgentsDialog}
+          title={t("danger.deleteAgents.dialogTitle")}
+          description={`${t("danger.deleteAgents.dialogDescription")} ${
+            stats.agentsCount > 0
+              ? t("danger.deleteAgents.dialogInclude", {
+                  count: stats.agentsCount,
+                  plural: stats.agentsCount === 1 ? t("danger.deleteAgents.agentSingular") : t("danger.deleteAgents.agentPlural")
+                })
+              : ""
+          } ${t("danger.deleteAgents.dialogWarning")}`}
+          onConfirm={handleDeleteAgents}
+        />
+
+        <DangerConfirmDialog
+          open={deleteAccountDialog}
+          onOpenChange={setDeleteAccountDialog}
+          title={t("danger.deleteAccount.dialogTitle")}
+          description={t("danger.deleteAccount.dialogDescription")}
+          onConfirm={handleDeleteAccount}
+        />
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

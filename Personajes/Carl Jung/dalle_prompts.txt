@@ -1,0 +1,54 @@
+=================================================================
+DALL-E PROMPTS - CARL GUSTAV JUNG
+=================================================================
+
+───────────────────────────────────────────────────────────────
+1rst message: PORTRAIT (CARA) - 512x512
+───────────────────────────────────────────────────────────────
+
+A highly detailed portrait photograph of Carl Gustav Jung at age 70, capturing his wise and penetrating gaze. He has white hair neatly combed back, deep-set eyes with an intense, knowing expression that seems to look into the soul, prominent facial features with distinguished lines of wisdom, round wire-rimmed glasses. His expression is contemplative and profound, emanating both scientific rigor and mystical depth. The lighting is soft and dignified, creating subtle shadows that emphasize the depth of his character. Professional photographic quality, neutral gray background, head and shoulders only, facing slightly to the side but eyes looking directly at viewer. The overall feeling should convey wisdom, depth, psychological insight, and a connection to something beyond the material world. Photorealistic style, black and white photography aesthetic from the 1950s.
+
+───────────────────────────────────────────────────────────────
+PROMPT 2: FULL BODY (CUERPO COMPLETO) - 768x1024
+───────────────────────────────────────────────────────────────
+
+Full body portrait of Carl Gustav Jung at age 70, exactly matching the facial features from 1rst message: same wise, penetrating eyes, white hair combed back, round wire-rimmed glasses, distinguished facial lines, contemplative expression. He is wearing an elegant formal Swiss three-piece suit from the 1950s - dark wool suit with vest, white dress shirt, conservative tie, well-tailored and dignified. He stands in a relaxed but dignified pose, perhaps with one hand in his pocket or holding a book, embodying both professorial authority and spiritual wisdom. The background is completely WHITE or TRANSPARENT - no environmental details, just clean white backdrop. Professional full-length studio portrait style. The composition should show him from head to toe, standing naturally, capturing both his scholarly gravitas and his depth as an explorer of the human soul. Photorealistic style, maintaining consistency with the facial features from the first portrait. Black and white photography aesthetic from the 1950s, high quality studio portrait.
+
+───────────────────────────────────────────────────────────────
+NOTAS TÉCNICAS
+───────────────────────────────────────────────────────────────
+
+CONSISTENCIA ENTRE PROMPTS:
+- Mismo rostro: Carl Jung a los 70 años
+- Mismo cabello: blanco, peinado hacia atrás
+- Mismos ojos: profundos, penetrantes, sabios
+- Mismas gafas: redondas de montura metálica
+- Misma expresión: contemplativa, profunda, sabia
+
+ELEMENTOS CLAVE A MANTENER:
+- Calidad fotorrealista
+- Estética fotografía blanco y negro años 1950
+- Mirada penetrante que transmite profundidad psicológica
+- Expresión que combina rigor científico y apertura mística
+- Dignidad y autoridad intelectual
+
+1rst message (Cara):
+- Enfoque: Cabeza y hombros solamente
+- Fondo: Gris neutral
+- Tamaño: 512x512 (cuadrado)
+- Uso: Avatar, perfil cercano
+
+PROMPT 2 (Cuerpo completo):
+- Enfoque: Figura completa de pie
+- Fondo: BLANCO o TRANSPARENTE (importante para composición)
+- Tamaño: 768x1024 (vertical)
+- Ropa: Traje suizo formal años 1950
+- Pose: Natural, digna, profesoral
+- Uso: Imagen de cuerpo completo para presentaciones
+
+REFERENCIA HISTÓRICA:
+Carl Jung en sus últimos años (1950s-1961) tenía cabello completamente blanco, usaba gafas redondas, y tenía una presencia que combinaba la autoridad académica europea con una cualidad casi chamánica de alguien que había explorado profundidades psíquicas. Su mirada era famosamente penetrante.
+
+=================================================================
+FIN DEL DOCUMENTO
+=================================================================
