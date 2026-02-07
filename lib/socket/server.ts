@@ -100,12 +100,8 @@ export function initSocketServer(httpServer: HTTPServer): SocketServer {
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // WARMUP: Pre-calentar modelo de embeddings
-  // Esto evita cold start en la primera búsqueda del usuario
+  // OpenAI no requiere warmup (warmupQwenModel removed)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // warmupQwenModel removed (OpenAI no requiere warmup)().catch(error => {
-    console.warn('[SocketServer] Failed to warmup Qwen model:', error.message);
-    console.warn('[SocketServer] Embeddings funcionará en modo degradado (solo keywords)');
-  });
 
   // Authentication middleware
   io.use(async (socket: AuthenticatedSocket, next) => {

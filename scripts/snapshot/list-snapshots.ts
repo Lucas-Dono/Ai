@@ -6,8 +6,8 @@
  *   npm run snapshot:list
  */
 
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import { DEFAULT_CONFIG } from './config';
 
 interface SnapshotInfo {

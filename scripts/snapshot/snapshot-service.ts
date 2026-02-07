@@ -9,10 +9,10 @@
  *   npm run snapshot:watch
  */
 
-import chokidar from 'chokidar';
+import * as chokidar from 'chokidar';
 import archiver from 'archiver';
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   DEFAULT_CONFIG,
   loadIgnorePatterns,

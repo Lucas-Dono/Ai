@@ -5,8 +5,8 @@
  * cada 30 minutos si detecta cambios, independiente de git.
  */
 
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 
 export interface SnapshotConfig {
   /** Directorio donde se almacenan los snapshots */

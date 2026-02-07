@@ -11,10 +11,10 @@
  *   npm run snapshot:restore snapshot-2025-01-30T14-30-45-123Z.tar.gz
  */
 
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import { execSync } from 'child_process';
-import readline from 'readline';
+import * as readline from 'readline';
 import { DEFAULT_CONFIG } from './config';
 
 interface SnapshotInfo {
