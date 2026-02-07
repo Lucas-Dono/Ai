@@ -276,22 +276,6 @@ export const CacheService = {
   // ==================== UTILITIES ====================
 
   /**
-   * Clear all cache for an agent
-   */
-  async clearAgentCache(agentId: string, userId: string): Promise<void> {
-    try {
-      await Promise.all([
-        AsyncStorage.removeItem(KEYS.MESSAGES(agentId, userId)),
-        AsyncStorage.removeItem(KEYS.AGENT_DATA(agentId)),
-        AsyncStorage.removeItem(KEYS.LAST_SYNC(agentId, userId)),
-      ]);
-      console.log(`[Cache] Cleared cache for agent ${agentId}`);
-    } catch (error) {
-      console.error('[Cache] Error clearing cache:', error);
-    }
-  },
-
-  /**
    * Get cache statistics
    */
   async getCacheStats(userId: string): Promise<{

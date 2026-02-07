@@ -21,6 +21,7 @@ interface UserAgent {
   kind: string;
   visibility: string;
   createdAt: string;
+  generationTier?: string | null;
   _count?: {
     Message?: number;
   };
@@ -166,14 +167,13 @@ export function YourAgentsSection() {
           {agents.slice(0, 6).map((agent) => (
             <MobileAgentCard
               key={agent.id}
-              agent={{
-                id: agent.id,
-                name: agent.name,
-                avatar: agent.avatar,
-                description: agent.description || '',
-                kind: agent.kind,
-              }}
-              onClick={() => router.push(`/agentes/${agent.id}`)}
+              id={agent.id}
+              name={agent.name}
+              avatar={agent.avatar || undefined}
+              description={agent.description || undefined}
+              generationTier={agent.generationTier}
+              variant="grid"
+              onPress={() => router.push(`/agentes/${agent.id}`)}
             />
           ))}
         </div>

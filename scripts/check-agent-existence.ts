@@ -41,13 +41,12 @@ async function checkAgentExistence(agentId: string) {
       description: agent.description?.substring(0, 100) + '...',
       kind: agent.kind,
       visibility: agent.visibility,
-      isPublic: agent.isPublic,
       featured: agent.featured,
       createdAt: agent.createdAt,
       updatedAt: agent.updatedAt,
-      userId: agent.userId,
-      userName: agent.User?.name,
-      userEmail: agent.User?.email,
+      userId: agent.userId ?? null,
+      userName: agent.User?.name ?? null,
+      userEmail: agent.User?.email ?? null,
       hasAvatar: !!agent.avatar,
       avatarPreview: agent.avatar?.substring(0, 50),
     }, null, 2));
@@ -69,6 +68,8 @@ async function checkAgentExistence(agentId: string) {
       });
 
       for (const group of messagesByUser) {
+        if (!group.userId) continue;
+
         const user = await prisma.user.findUnique({
           where: { id: group.userId },
           select: { name: true, email: true },
@@ -82,17 +83,20 @@ async function checkAgentExistence(agentId: string) {
         where: { agentId },
         orderBy: { createdAt: 'desc' },
         take: 5,
-        include: {
-          User: {
-            select: { name: true },
-          },
-        },
       });
 
-      recentMessages.forEach((msg, idx) => {
-        console.log(`   ${idx + 1}. [${msg.role}] ${msg.User?.name}: ${msg.content?.substring(0, 80)}...`);
+      for (const [idx, msg] of recentMessages.entries()) {
+        let userName = 'Unknown';
+        if (msg.userId) {
+          const user = await prisma.user.findUnique({
+            where: { id: msg.userId },
+            select: { name: true },
+          });
+          userName = user?.name || 'Unknown';
+        }
+        console.log(`   ${idx + 1}. [${msg.role}] ${userName}: ${msg.content?.substring(0, 80)}...`);
         console.log(`      Fecha: ${msg.createdAt.toLocaleString()}`);
-      });
+      }
     } else {
       console.log('\n⚠️  No hay mensajes para este agente');
     }

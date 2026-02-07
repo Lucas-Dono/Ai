@@ -41,6 +41,7 @@
   "exclude": [
     "node_modules",
     "local-ai-server",
-    "test-output"
+    "test-output",
+    "deprecated"
   ]
 }

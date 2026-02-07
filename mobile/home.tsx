@@ -350,7 +350,12 @@ export default function App() {
   );
 }
 
-function NavItem({ icon: Icon, label, active, onClick }) {
+function NavItem({ icon: Icon, label, active, onClick }: {
+  icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
     <button 
       onClick={onClick}

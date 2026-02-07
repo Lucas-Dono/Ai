@@ -6,7 +6,7 @@
  */
 
 import { createLogger } from '@/lib/logger';
-import { generateOpenAIEmbedding } from './qwen-embeddings';
+import { generateOpenAIEmbedding } from './openai-embeddings';
 import { prisma } from '@/lib/prisma';
 
 const log = createLogger('SelectiveStorage');

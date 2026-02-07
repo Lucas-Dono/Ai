@@ -121,7 +121,7 @@ class SnapshotService {
 
     this.debounceTimer = setTimeout(() => {
       console.log('✅ Cambios detectados y estabilizados\n');
-    }, this.config.debounceTime);
+    }, this.config.debounceTime) as unknown as NodeJS.Timeout;
   }
 
   /**
@@ -135,7 +135,7 @@ class SnapshotService {
       } else if (!this.hasChanges) {
         console.log('⏭️  No hay cambios, omitiendo snapshot...\n');
       }
-    }, this.config.interval);
+    }, this.config.interval) as unknown as NodeJS.Timeout;
 
     console.log('⏰ Snapshots programados\n');
   }
