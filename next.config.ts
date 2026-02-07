@@ -7,6 +7,9 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // CRÍTICO: Standalone output para Docker deployment
+  output: 'standalone',
+
   // Security headers para proteger contra vulnerabilidades comunes
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
