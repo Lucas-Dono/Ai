@@ -384,7 +384,7 @@ export function TourOverlay() {
     if (!currentTour) return;
 
     let allowScroll = false;
-    let scrollTimeout: number;
+    let scrollTimeout: NodeJS.Timeout;
 
     const handleWheel = (e: WheelEvent) => {
       // Bloquear scroll manual del usuario
