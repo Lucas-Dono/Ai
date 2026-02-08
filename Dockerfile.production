@@ -40,12 +40,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Build workspace packages first
 RUN npm run -w packages/smart-start-core build || true
 
-# Copy .env.production to a location where it can be sourced during build
-COPY .env.production .env || true
-
 # Build Next.js with standalone output
 # Parse .env.production and build with environment variables
-RUN sh -c 'if [ -f .env.production ]; then export $(grep -v "^#" .env.production | xargs); fi && npm run build'
+RUN sh -c '[ -f .env.production ] && export $(grep -v "^#" .env.production | xargs) || true; npm run build'
 
 # ============================================
 # Stage 3: Runner (Production)
