@@ -41,7 +41,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run -w packages/smart-start-core build || true
 
 # Build Next.js with standalone output
-RUN npm run build
+# Source .env.production to make environment variables available
+RUN sh -c 'set -a; [ -f .env.production ] && . .env.production; set +a; npm run build'
 
 # ============================================
 # Stage 3: Runner (Production)
