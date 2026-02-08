@@ -288,7 +288,7 @@ export function validateOrThrow<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const message = errorMessage || 'Validation failed';
-      const details = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const details = error.errors.map((e: z.ZodIssue) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new Error(`${message}: ${details}`);
     }
     throw error;
