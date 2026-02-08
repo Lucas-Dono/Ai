@@ -19,7 +19,7 @@ export function TourOverlay() {
   const [cardPosition, setCardPosition] = useState<any>({});
   const [targetRects, setTargetRects] = useState<DOMRect[]>([]);
   const [isInteractive, setIsInteractive] = useState(false);
-  const scrollCheckIntervalRef = useRef<number | null>(null);
+  const scrollCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get translated tours
   const onboardingTours = useOnboardingTours();
