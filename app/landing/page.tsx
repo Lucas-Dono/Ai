@@ -8,6 +8,7 @@ import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSect
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { SocialProof } from "@/components/landing/SocialProof";
+import { DownloadsSection } from "@/components/landing/DownloadsSection";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { trackPageView, createScrollDepthTracker } from "@/lib/analytics/track-client";
 
@@ -73,6 +74,7 @@ export default function LandingPage() {
         <HowItWorks />
         <ComparisonTable />
         <SocialProof />
+        <DownloadsSection />
         <FinalCTA />
       </LandingWrapper>
     </>

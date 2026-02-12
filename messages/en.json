@@ -238,6 +238,26 @@
       },
       "footer": "Join thousands of creators who are already revolutionizing emotional AI"
     },
+    "downloads": {
+      "title": "Download Blaniel Everywhere",
+      "subtitle": "Take your AI companions wherever you go",
+      "android": {
+        "title": "Android App",
+        "description": "Download the native app for your Android device",
+        "benefit1": "Direct installation (APK)",
+        "benefit2": "Real-time notifications",
+        "benefit3": "Works offline",
+        "badge": "Beta"
+      },
+      "minecraft": {
+        "title": "Minecraft Mod",
+        "description": "Bring your AI agents into Minecraft",
+        "benefit1": "NPCs with conversational AI",
+        "benefit2": "Compatible with Java Edition",
+        "benefit3": "Works in multiplayer",
+        "badge": "New"
+      }
+    },
     "finalCta": {
       "badge": "Last chance",
       "title": "Create your first AI in",

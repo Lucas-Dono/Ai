@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLLMProvider } from "@/lib/llm/provider";
 import { getAuthenticatedUser } from "@/lib/auth-server";
-import { canUseResource, trackUsage } from "@/lib/usage/tracker";
+import { trackUsage } from '@/lib/usage/tracker';
 import { createAgentBodySchema, formatValidationError } from "@/lib/validation/api-schemas";
 import { saveDataUrlAsFile, isDataUrl } from "@/lib/utils/image-helpers";
 import { trackEvent, EventType } from "@/lib/analytics/kpi-tracker";

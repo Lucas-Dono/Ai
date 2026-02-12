@@ -301,6 +301,26 @@
         }
       }
     },
+    "downloads": {
+      "title": "Descarga Blaniel en Todas Partes",
+      "subtitle": "Lleva tus compañeros IA donde quieras ir",
+      "android": {
+        "title": "App Android",
+        "description": "Descarga la aplicación nativa para tu dispositivo Android",
+        "benefit1": "Instalación directa (APK)",
+        "benefit2": "Notificaciones en tiempo real",
+        "benefit3": "Funciona sin conexión",
+        "badge": "Beta"
+      },
+      "minecraft": {
+        "title": "Mod de Minecraft",
+        "description": "Trae tus agentes IA dentro de Minecraft",
+        "benefit1": "NPCs con IA conversacional",
+        "benefit2": "Compatible con Java Edition",
+        "benefit3": "Funciona en multiplayer",
+        "badge": "Nuevo"
+      }
+    },
     "finalCta": {
       "title": "Crea tu compañero hoy",
       "subtitle": "Gratis para siempre. Sin tarjeta de crédito. Cancela cuando quieras.",

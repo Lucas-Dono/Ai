@@ -33,6 +33,10 @@ export enum LandingEventType {
   // Pricing & Plans
   PLAN_VIEW = "landing.plan_view",
   PLAN_SELECT = "landing.plan_select",
+
+  // Downloads Section
+  DOWNLOADS_SECTION_VIEWED = "landing.downloads_section_viewed",
+  DOWNLOAD_CLICKED = "landing.download_clicked",
 }
 
 /**
