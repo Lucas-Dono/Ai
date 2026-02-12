@@ -67,6 +67,7 @@ export default function LandingPage() {
 
       <LandingWrapper>
         <HeroSection />
+        <DownloadsSection />
         <div id="features">
           <FeaturesGrid />
         </div>
@@ -74,7 +75,6 @@ export default function LandingPage() {
         <HowItWorks />
         <ComparisonTable />
         <SocialProof />
-        <DownloadsSection />
         <FinalCTA />
       </LandingWrapper>
     </>

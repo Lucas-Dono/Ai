@@ -54,7 +54,7 @@ export function PlatformCard({
           }}
         />
 
-        <div className="p-8 flex flex-col flex-1 relative z-10">
+        <div className="p-6 flex flex-col flex-1 relative z-10">
           {/* Badge superior derecho */}
           {badge && (
             <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-orange-500 text-white text-xs font-bold">

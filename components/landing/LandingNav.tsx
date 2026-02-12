@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Smartphone } from "lucide-react";
+import { Menu, X, Smartphone, Gamepad2, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -12,8 +12,10 @@ export function LandingNav() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Google Play URL from environment variable
+  // Platform URLs from environment variables
   const googlePlayUrl = process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL;
+  const androidApkUrl = process.env.NEXT_PUBLIC_ANDROID_APK_URL;
+  const minecraftModUrl = "/api/v1/minecraft/mod/download/latest";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,22 +66,48 @@ export function LandingNav() {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-2">
-            {/* Google Play Button - Only show if URL is configured */}
-            {googlePlayUrl && (
-              <a
-                href={googlePlayUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black hover:bg-black/90 text-white text-xs font-medium transition-all duration-200 hover:scale-105"
-                title="Descargar en Google Play"
-              >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
-                </svg>
-                <span className="hidden lg:inline">Google Play</span>
-                <Smartphone className="lg:hidden w-3.5 h-3.5" />
-              </a>
-            )}
+            {/* Downloads Dropdown */}
+            <div className="relative group">
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-muted-foreground hover:text-foreground text-xs font-medium transition-colors hover:bg-muted">
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Descargar</span>
+              </button>
+
+              {/* Dropdown Menu */}
+              <div className="absolute right-0 mt-1 w-48 rounded-lg border border-border bg-background shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                {androidApkUrl && (
+                  <a
+                    href={androidApkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted rounded-t-lg transition-colors border-b border-border last:border-b-0"
+                  >
+                    <Smartphone className="w-4 h-4" />
+                    App Android (APK)
+                  </a>
+                )}
+                <a
+                  href={minecraftModUrl}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted rounded-b-lg transition-colors border-b border-border last:border-b-0"
+                >
+                  <Gamepad2 className="w-4 h-4" />
+                  Mod Minecraft
+                </a>
+                {googlePlayUrl && (
+                  <a
+                    href={googlePlayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted rounded-b-lg transition-colors"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                    </svg>
+                    Google Play
+                  </a>
+                )}
+              </div>
+            </div>
 
             <Link href="/login">
               <Button variant="ghost" size="sm" className="text-sm font-medium">
@@ -150,23 +178,46 @@ export function LandingNav() {
                 ))}
               </div>
 
-              {/* CTA Buttons */}
+              {/* Downloads & CTA Buttons */}
               <div className="pt-4 mt-4 border-t border-border space-y-2.5">
-                {/* Google Play Button Mobile - Only show if URL is configured */}
-                {googlePlayUrl && (
+                {/* Downloads Section */}
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground px-1">Descargar</p>
+                  {androidApkUrl && (
+                    <a
+                      href={androidApkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm font-medium transition-colors w-full"
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      App Android (APK)
+                    </a>
+                  )}
                   <a
-                    href={googlePlayUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={minecraftModUrl}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors w-full"
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-muted hover:bg-muted/80 text-sm font-medium transition-colors w-full"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
-                    </svg>
-                    Descargar en Google Play
+                    <Gamepad2 className="w-4 h-4" />
+                    Mod Minecraft
                   </a>
-                )}
+                  {googlePlayUrl && (
+                    <a
+                      href={googlePlayUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors w-full"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                      </svg>
+                      Google Play
+                    </a>
+                  )}
+                </div>
 
                 <Link href="/login" className="block">
                   <Button variant="outline" size="sm" className="w-full text-sm font-medium border-border">

@@ -45,31 +45,31 @@ export function DownloadsSection() {
   ];
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      {/* Background grid pattern */}
+    <section className="py-16 sm:py-20 relative overflow-hidden">
+      {/* Background grid pattern - subtle */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6">
-        {/* Header */}
+        {/* Header - More compact */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
-          <h2 className="text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-2 tracking-tight">
             {t("title")}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {t("subtitle")}
           </p>
         </motion.div>
 
         {/* Cards Grid */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <PlatformCard
             platform="android"
             title={t("android.title")}
