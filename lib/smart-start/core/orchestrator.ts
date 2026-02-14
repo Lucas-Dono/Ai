@@ -5,8 +5,8 @@
 
 import { PrismaClient } from '@prisma/client';
 import {
-  SmartStartSessionData,
-  SmartStartStep,
+  _SmartStartSessionData,
+  _SmartStartStep,
   CharacterDraft,
   SearchResult,
   GenreId,
@@ -438,14 +438,14 @@ export class SmartStartOrchestrator {
       config.additionalContext
     );
 
-    // Create draft - convert personality to string if needed
-    const personalityStr = typeof generated.personality === 'string'
+    // Create draft - convert personality to array
+    const personalityArray = Array.isArray(generated.personality)
       ? generated.personality
-      : (Array.isArray(generated.personality) ? generated.personality.join(', ') : '');
+      : (typeof generated.personality === 'string' ? [generated.personality] : []);
 
     const draft: CharacterDraft = {
       name: config.name || generated.name || 'New Character',
-      personality: personalityStr,
+      personality: personalityArray as any,
       backstory: generated.background || '',
       physicalAppearance: generated.appearance,
       age: typeof generated.age === 'string' ? parseInt(generated.age, 10) : generated.age,
@@ -628,8 +628,8 @@ export class SmartStartOrchestrator {
     }
 
     // Generate system prompt from the draft
-    const genre = options?.genreHint ? this.genreService.getGenre(options.genreHint) : null;
-    const archetype = null; // Skip archetype for now as we don't have subgenre
+    const _genre = options?.genreHint ? this.genreService.getGenre(options.genreHint) : null;
+    const _archetype = null; // Skip archetype for now as we don't have subgenre
 
     const systemPrompt = await this.promptBuilder.build({
       genreId: options?.genreHint || ('general' as GenreId),
@@ -826,7 +826,7 @@ Return a corrected version in JSON format.`;
     try {
       const parsedFix = JSON.parse(fixed.text);
       return { ...draft, ...parsedFix };
-    } catch (error) {
+    } catch {
       console.error('[Orchestrator] Failed to parse fix response');
       return draft; // Return original if fix fails
     }
