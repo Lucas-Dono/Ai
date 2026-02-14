@@ -4,8 +4,7 @@
  */
 
 import { GenreId, SubGenreId, ArchetypeId } from '../core/types';
-import { CharacterDraft } from '../validation/schemas';
-import { CharacterDraft as CharacterDraftType } from '@/types/character-creation';
+import { CharacterDraft } from '@/types/character-creation';
 import { getGenreService } from './genre-service';
 
 export interface ValidationIssue {
