@@ -16,7 +16,7 @@ export function DownloadsSection() {
     trackEvent({
       eventType: LandingEventType.DOWNLOADS_SECTION_VIEWED,
       metadata: {
-        timestamp: Date.now(),
+        timestamp: Date.now().toString(),
       },
     }).catch(() => {});
   }, []);
@@ -27,7 +27,7 @@ export function DownloadsSection() {
       metadata: {
         platform,
         source: "landing",
-        timestamp: Date.now(),
+        timestamp: Date.now().toString(),
       },
     }).catch(() => {});
   };
