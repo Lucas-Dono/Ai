@@ -60,3 +60,8 @@ temp/
 # Mobile examples (should not be in web build)
 mobile/ACCESSIBILITY_EXAMPLE.tsx
 mobile/*.example.tsx
+
+# Large project folders not needed in production
+Juego/
+.cache/
+**/.gradle/
