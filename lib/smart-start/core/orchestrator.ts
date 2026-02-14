@@ -438,14 +438,9 @@ export class SmartStartOrchestrator {
       config.additionalContext
     );
 
-    // Create draft - convert personality to array
-    const personalityArray = Array.isArray(generated.personality)
-      ? generated.personality
-      : (typeof generated.personality === 'string' ? [generated.personality] : []);
-
     const draft: CharacterDraft = {
       name: config.name || generated.name || 'New Character',
-      personality: personalityArray as any,
+      personality: generated.personality,
       backstory: generated.background || '',
       physicalAppearance: generated.appearance,
       age: typeof generated.age === 'string' ? parseInt(generated.age, 10) : generated.age,
