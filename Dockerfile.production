@@ -70,6 +70,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/Personajes ./Personajes
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/tsx ./node_modules/tsx
+
+# Create init script for seed execution
+RUN mkdir -p /app/scripts
+RUN echo '#!/bin/sh\nset -e\necho "🌱 Ejecutando seed de la base de datos..."\nnode -r tsx /app/prisma/seed.ts || echo "⚠️  Seed execution skipped or failed (non-fatal)"\nexec node server.js' > /app/scripts/init.sh && \
+    chmod +x /app/scripts/init.sh && \
+    chown -R nextjs:nodejs /app/scripts
 
 # Switch to non-root user
 USER nextjs
@@ -81,4 +89,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start application
-CMD ["node", "server.js"]
+CMD ["/app/scripts/init.sh"]
