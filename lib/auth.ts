@@ -4,6 +4,7 @@ import { expo } from "@better-auth/expo";
 import { prisma } from "@/lib/prisma";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_BASE_URL,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
