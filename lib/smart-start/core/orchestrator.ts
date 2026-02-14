@@ -5,8 +5,8 @@
 
 import { PrismaClient } from '@prisma/client';
 import {
-  _SmartStartSessionData,
-  _SmartStartStep,
+  SmartStartSessionData,
+  SmartStartStep,
   CharacterDraft,
   SearchResult,
   GenreId,
