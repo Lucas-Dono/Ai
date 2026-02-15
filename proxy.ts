@@ -169,6 +169,7 @@ export default async function proxy(req: NextRequest) {
     "/api/security", // Security API (TODO: proteger en producción)
     "/api/demo", // Demo chat system - Sin autenticación para visitantes de landing
     "/api/cron", // CRON: Endpoints de cron jobs (autenticación propia via CRON_SECRET)
+    "/api/health", // Health check endpoint for Docker and load balancers
   ];
 
   // SECURITY FIX #5: Verificar coincidencia exacta o que sea subruta válida
