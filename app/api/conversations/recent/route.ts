@@ -4,15 +4,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getAuthSession } from '@/lib/middleware/auth-helper';
 import { ConversationTrackingService } from '@/lib/services/conversation-tracking.service';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    // Verificar autenticación
-    const session = await auth.api.getSession({ headers: req.headers });
+    // Verificar autenticación (soporta Better Auth y JWT)
+    const session = await getAuthSession(req);
 
     if (!session?.user?.id) {
       return NextResponse.json(
