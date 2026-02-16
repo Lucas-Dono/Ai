@@ -311,46 +311,85 @@ export default function CreateCharacterScreen() {
   };
 
   const handleGenerateWithAI = async () => {
-    if (!description.trim()) {
-      Alert.alert('Descripción requerida', 'Escribe una descripción del personaje para generar automáticamente sus detalles.');
+    if (!description.trim() || description.trim().length < 10) {
+      Alert.alert(
+        'Descripción requerida',
+        'Escribe una descripción del personaje de al menos 10 caracteres para generar automáticamente sus detalles.'
+      );
+      return;
+    }
+
+    const token = await JWTManager.getAccessToken();
+    if (!token) {
+      Alert.alert('Error de autenticación', 'No se encontró un token válido. Inicia sesión nuevamente.');
       return;
     }
 
     setGenerating(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // TODO: Call API to generate character details from description
-      const response = await fetch('/api/smart-start/generate-from-description', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description, tier: userTier }),
-      });
+      // Generar sessionId temporal para la petición
+      const sessionId = `mobile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-      if (!response.ok) throw new Error('Error generating character');
+      const url = buildApiUrl('/api/smart-start/generate-from-description');
+      console.log('[GenerateCharacter] Calling API:', url);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          sessionId,
+          description: description.trim(),
+          options: {
+            nsfwLevel: 'sfw', // Por defecto SFW en creación móvil
+          },
+        }),
+      });
 
       const data = await response.json();
 
-      // Populate fields with generated data
-      setName(data.name || '');
-      setAge(data.age?.toString() || '');
-      setGender(data.gender || '');
-      setOrigin(data.origin || '');
-      setPhysicalAppearance(data.physicalAppearance || '');
-      setOccupation(data.occupation || '');
-
-      if (data.personality) {
-        setOpenness(data.personality.openness || 50);
-        setConscientiousness(data.personality.conscientiousness || 50);
-        setExtraversion(data.personality.extraversion || 50);
-        setAgreeableness(data.personality.agreeableness || 50);
-        setNeuroticism(data.personality.neuroticism || 50);
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al generar personaje');
       }
 
-      Alert.alert('¡Generado!', 'Los detalles del personaje han sido generados. Puedes editarlos antes de crear.');
+      console.log('[GenerateCharacter] ✅ Character generated:', data);
 
-    } catch (error) {
+      // Mapear los datos del draft generado a los campos del formulario
+      const draft = data.draft;
+
+      if (draft.name) setName(draft.name);
+      if (draft.age) setAge(draft.age.toString());
+      if (draft.gender) setGender(draft.gender);
+      if (draft.origin) setOrigin(draft.origin);
+      if (draft.physicalAppearance) setPhysicalAppearance(draft.physicalAppearance);
+      if (draft.occupation) setOccupation(draft.occupation);
+      if (draft.avatarUrl) setAvatarUrl(draft.avatarUrl);
+
+      // Mapear personalidad (Big Five)
+      if (draft.personality) {
+        if (draft.personality.openness !== undefined) setOpenness(draft.personality.openness);
+        if (draft.personality.conscientiousness !== undefined) setConscientiousness(draft.personality.conscientiousness);
+        if (draft.personality.extraversion !== undefined) setExtraversion(draft.personality.extraversion);
+        if (draft.personality.agreeableness !== undefined) setAgreeableness(draft.personality.agreeableness);
+        if (draft.personality.neuroticism !== undefined) setNeuroticism(draft.personality.neuroticism);
+      }
+
+      // Feedback háptico de éxito
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      Alert.alert(
+        '¡Personaje generado!',
+        'Los detalles del personaje han sido generados con IA. Puedes editarlos antes de crear.',
+        [{ text: 'OK' }]
+      );
+    } catch (error: any) {
       console.error('Generate error:', error);
-      Alert.alert('Error', 'No se pudo generar el personaje. Intenta nuevamente.');
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Error', error.message || 'No se pudo generar el personaje. Intenta nuevamente.');
     } finally {
       setGenerating(false);
     }
