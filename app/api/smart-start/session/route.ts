@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-server';
+import { getAuthenticatedUser } from '@/lib/auth-server';
 import { getSmartStartOrchestrator } from '@/lib/smart-start/core/orchestrator';
 import { getGenreService } from '@/lib/smart-start/services/genre-service';
 
@@ -18,14 +18,14 @@ const genreService = getGenreService();
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession(req);
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Create Smart Start session
-    const smartStartSession = await orchestrator.createSession(session.user.id);
+    const smartStartSession = await orchestrator.createSession(user.id);
 
     // Get available genres for selection
     const genres = genreService.getAllGenres();
@@ -70,9 +70,9 @@ export async function POST(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await getSession(req);
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -88,7 +88,7 @@ export async function PATCH(req: NextRequest) {
 
     // Verify session belongs to user
     const existingSession = await orchestrator.getSession(sessionId);
-    if (!existingSession || existingSession.userId !== session.user.id) {
+    if (!existingSession || existingSession.userId !== user.id) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
@@ -120,9 +120,9 @@ export async function PATCH(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
-    const session = await getSession(req);
+    const user = await getAuthenticatedUser(req);
 
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -138,7 +138,7 @@ export async function GET(req: NextRequest) {
 
     const smartStartSession = await orchestrator.getSession(sessionId);
 
-    if (!smartStartSession || smartStartSession.userId !== session.user.id) {
+    if (!smartStartSession || smartStartSession.userId !== user.id) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 

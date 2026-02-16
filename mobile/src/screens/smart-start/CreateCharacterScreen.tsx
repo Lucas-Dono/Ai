@@ -329,13 +329,32 @@ export default function CreateCharacterScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // Generar sessionId temporal para la petición
-      const sessionId = `mobile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Paso 1: Crear una sesión en el backend
+      console.log('[GenerateCharacter] Step 1: Creating session...');
+      const sessionUrl = buildApiUrl('/api/smart-start/session');
 
-      const url = buildApiUrl('/api/smart-start/generate-from-description');
-      console.log('[GenerateCharacter] Calling API:', url);
+      const sessionResponse = await fetch(sessionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-      const response = await fetch(url, {
+      const sessionData = await sessionResponse.json();
+
+      if (!sessionResponse.ok) {
+        throw new Error(sessionData.error || 'Error al crear sesión');
+      }
+
+      const sessionId = sessionData.session.id;
+      console.log('[GenerateCharacter] ✅ Session created:', sessionId);
+
+      // Paso 2: Generar personaje usando el sessionId
+      console.log('[GenerateCharacter] Step 2: Generating character...');
+      const generateUrl = buildApiUrl('/api/smart-start/generate-from-description');
+
+      const response = await fetch(generateUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
