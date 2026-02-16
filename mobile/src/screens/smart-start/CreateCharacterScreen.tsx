@@ -445,23 +445,63 @@ export default function CreateCharacterScreen() {
   };
 
   const handleGenerateAvatarWithAI = async () => {
-    if (!physicalAppearance.trim()) {
+    if (!physicalAppearance.trim() || physicalAppearance.trim().length < 10) {
       Alert.alert(
         'Apariencia física requerida',
-        'Debes completar la apariencia física antes de generar el avatar con IA.'
+        'Debes completar la apariencia física antes de generar el avatar con IA (mínimo 10 caracteres).'
       );
       return;
     }
 
+    const token = await JWTManager.getAccessToken();
+    if (!token) {
+      Alert.alert('Error de autenticación', 'No se encontró un token válido. Inicia sesión nuevamente.');
+      return;
+    }
+
     setGeneratingAvatar(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     try {
-      // TODO: Implementar generación de imagen con IA
-      // Usar el servicio de generación de imágenes
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulación
-      Alert.alert('Función en desarrollo', 'La generación de avatar con IA estará disponible pronto.');
-    } catch (error) {
+      const url = buildApiUrl('/api/character-creation/generate-avatar');
+      console.log('[GenerateAvatar] Calling API:', url);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          description: physicalAppearance,
+          age: age ? parseInt(age, 10) : undefined,
+          gender: gender || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al generar avatar');
+      }
+
+      console.log('[GenerateAvatar] ✅ Avatar generated:', data);
+
+      // Guardar la URL del avatar generado
+      setAvatarUrl(data.url);
+
+      // Feedback háptico de éxito
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      Alert.alert(
+        '¡Avatar generado!',
+        `Se generó exitosamente en ${data.generationTime.toFixed(1)}s usando ${data.model}.`,
+        [{ text: 'OK' }]
+      );
+    } catch (error: any) {
       console.error('Error generating avatar:', error);
-      Alert.alert('Error', 'No se pudo generar el avatar. Intenta nuevamente.');
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Error', error.message || 'No se pudo generar el avatar. Intenta nuevamente.');
     } finally {
       setGeneratingAvatar(false);
     }
